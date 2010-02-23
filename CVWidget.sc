@@ -83,7 +83,8 @@ CVWidget {
 								this.midiSetUp[0].switch(
 									0, { 
 										if(val/127 < (cv.input+(softWithin/2)) and: { 
-											val/127 > (cv.input-(softWithin/2));										}, {
+											val/127 > (cv.input-(softWithin/2));
+										}, { 
 											cv.input_(val/127);
 										})
 									},
