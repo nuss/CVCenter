@@ -1,0 +1,6 @@
+CVCenter resp. CVWidget are is a convenience class for using GUI-elements, MIDI-sliders in combination with with Patterns. CVCenter itself is more or less a container of CVs. Each of them can be connected to an unlimited number GUI-elements or/and control parameters in running Synths or set values in Patterns. As CV inherits from Stream any instance can be used as any other Pattern (Pseq, Prand, Pwhite etcetc.).
+
+For more info check out CVCenter.html resp. CVWidget.html.
+
+Installation: Put all content of CVCenter in
+~/Library/Application Support/SuperCollider/Extensions/ (Mac)
