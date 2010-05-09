@@ -1,19 +1,17 @@
 
 CVCenter {
 
-	classvar <cvsList, <nextCVKey, <cvWidgets, <window, <setup, nextPos; 
+	classvar <cvsList, <nextCVKey, <cvWidgets, <window, /*<setup, */nextPos;
+	classvar <>midimode = 0, <>midimean = 64, <>midistring;  
 	classvar 	widgetwidth = 52, widgetheight = 136, colwidth, rowheight, widgetStates;
 	
-	*new { |cvs, setUpArgs|
+	*new { |cvs...setUpArgs|
 		
 		if(cvsList.isNil, {
 			cvsList = Dictionary.new;
 			cvWidgets = Dictionary.new;
 			widgetStates = Dictionary.new;
-			setup = Dictionary.new;
-			setUpArgs ?? { setUpArgs = 0 };
-			setUpArgs = [setUpArgs].flat;
-			this.setup_(*setUpArgs);
+			this.prSetup(*setUpArgs);
 			
 			if(cvs.isNil, {
 				nextCVKey = 1;
@@ -37,44 +35,24 @@ CVCenter {
 			})
 		})
 	}
-	
-	*setup_ { |mode=0, mean|
-		setup ?? { this.new(setUpArgs:[mode, mean]) };
-		setup !? {
-			if(mode == 1 and: { mean.isNil }, { mean = 64 });
-			mode.switch(
-				0, { setup.put(\midi, [0, "0-127"]) },
-				1, { setup.put(\midi, [1, "+/-1", mean]) }
-			)
-		};
-		if(Window.allWindows.select({ |w| "^CVCenter\ \-\ MIDI\-Setup".matchRegexp(w.name) == true }).size > 0, {
-			mode.switch(
-				0, { window.name = "CVCenter\ \-\ MIDI\-Setup:"+setup[\midi][1].asString },
-				1, { window.name = "CVCenter\ \-\ MIDI\-Setup:"+setup[\midi][2].asString+setup[\midi][1] }
-			);
-			cvWidgets.keysValuesDo({ |k, cv| cv.midiSetUp_(mode, mean) })
-		})
-	}
-			
-	
+		
 	*gui { |...args|
 		var rowwidth, colcount;
 		var midiString, mode, mean;
-		var updateRoutine, lastUpdate, lastUpdateWidth, removedKeys, skipJacks;
+		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, removedKeys, skipJacks;
 			
 		args !? { this.put(*args) };
-
-		if(setup[\midi][0] == 1, {
-			midiString = setup[\midi][2].asString+setup[\midi][1];
-		}, {
-			midiString = setup[\midi][1].asString;
-		});
-		mode = setup[\midi][0];
-		mean = setup[\midi][2];
 		
-		if(Window.allWindows.select({ |w| "^CVCenter\ \-\ MIDI\-Setup".matchRegexp(w.name) == true }).size < 1, {
+		this.setup.postln;
+//		if(this.midimode == 1, {
+//			midiString = this.midimean.asString+this.midistring.asString;
+//		}, {
+//			midiString = this.midistring;
+//		});
+//		
+		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 
-			window = Window("CVCenter - MIDI-Setup:"+midiString, Rect(0, 0, 335, 200), scroll: true);
+			window = Window("CVCenter"+midiString, Rect(0, 0, 335, 200), scroll: true);
 			
 			window.onClose_({
 				cvWidgets.keysValuesDo({ |k, w|
@@ -99,7 +77,7 @@ CVCenter {
 			rowwidth = colcount * colwidth;
 			
 			cvsList.keysValuesDo({ |k, v|
-				cvWidgets[k] = CVWidget(window, v, k, nextPos, widgetwidth, widgetheight, setup:[mode, mean]);
+				cvWidgets[k] = CVWidget(window, v, k, nextPos, widgetwidth, widgetheight, this.setup);
 				widgetStates[k] !? {
 					cvWidgets[k].nameField.string_(widgetStates[k].nameField);
 					cvWidgets[k].midiHead.enabled_(widgetStates[k].midiEdit);
@@ -127,8 +105,14 @@ CVCenter {
 		if(skipJacks.includes(true).not, {
 			updateRoutine = SkipJack({
 				lastUpdate ?? { lastUpdate = cvsList.size };
+				lastSetUp !? {
+					if(this.setup != lastSetUp, {
+						this.prSetup;
+					})
+				};	
 				if(cvsList.size != lastUpdate, {
 					if(cvsList.size > lastUpdate, {
+						"should add to gui now".postln;
 						this.prAddToGui;
 					});
 					if(cvsList.size < lastUpdate, {
@@ -148,6 +132,7 @@ CVCenter {
 					})
 				};
 				lastUpdateWidth = window.bounds.width;
+				lastSetUp = this.setup;
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});
 	}	
@@ -197,7 +182,7 @@ CVCenter {
 		^cvsList.at(key.asSymbol);
 	}
 		
-	*use { |key, spec, value|
+	*use { |key, spec, value, tab|
 		var thiskey, thisspec, thisval;
 		[key, spec, value].postln;		
 		key ?? { 
@@ -243,14 +228,35 @@ CVCenter {
 			});
 			^softWithins;
 		}
-	}	
+	}
+	
+	*setup {
+		^[this.midimode, this.midimean, this.midistring];
+	}
 	
 	// private Methods - not to be used directly
 	
+	*prSetup { |argMode, argMean, argString|
+		argMode !? { this.midimode_(argMode) };
+		argMean !? { this.midimean_(argMean) };
+		argString !? { this.midistring_(argString.asString) };
+		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
+//			this.midimode.switch(
+//				0, { window.name = "CVCenter\ \-\ MIDI\-Setup:"+this.midistring.asString },
+//				1, { window.name = "CVCenter\ \-\ MIDI\-Setup:"+this.midimean.asString+this.midistring.asString }
+//			);
+			window.name = "CVCenter"+midistring.asString;
+			cvWidgets.keysValuesDo({ |k, cv| 
+				cv.midimode_(this.midimode); 
+				cv.midimean_(this.midimean);
+				cv.midistring_(this.midistring.asString);
+			})
+		})
+	}
+			
 	*prAddToGui {
 		var allCVKeys, widgetKeys, thisKeys;
 		var rowwidth, colcount;
-		var mode, mean;
 		
 		colwidth = widgetwidth+1; // add a small gap between widgets
 		rowheight = widgetheight+1;
@@ -258,14 +264,11 @@ CVCenter {
 		colcount = rowwidth.div(colwidth);
 		rowwidth = colcount * colwidth;
 		
-		mode = setup[\midi][0];
-		mean = setup[\midi][2];		
-		
 		allCVKeys = cvsList.keys;
 		widgetKeys = cvWidgets.keys;
 		thisKeys = allCVKeys.difference(widgetKeys);
 		thisKeys.do({ |k| 
-			cvWidgets[k] = CVWidget(window, cvsList[k], k, nextPos, widgetwidth, widgetheight, setup:[mode, mean]);
+			cvWidgets[k] = CVWidget(window, cvsList[k], k, nextPos, widgetwidth, widgetheight, this.setup);
 			if(nextPos.x+colwidth > rowwidth, {
 				// jump to next row
 				nextPos = 5@(nextPos.y+rowheight);

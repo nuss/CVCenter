@@ -3,24 +3,28 @@ CVWidget {
 
 	classvar <editorWindow, <window;
 
-	var <>midiSetUp, thisCV;
+//	var <>midiSetUp, thisCV;
+	var thisCV;
+	var <>midimode = 0, <>midimean = 64, <>midistring = ""; 
 	var <>widgetBg, <>label, <>nameField, <>knob, <>numVal, <>specBut, <>midiHead, <>midiLearn, <>midiSrc, <>midiChan, <>midiCtrl, <>editor;
 	var <>cc, <>softWithin = 0.1, spec;
 	var <visible;
 	var widgetXY, widgetProps;
 
-	*new { |parent, cv, name, xy, widgetwidth=52, widgetheight=137, setup|
-		^super.new.init(parent, cv, name, xy, widgetwidth, widgetheight, setup)
+	*new { |parent, cv, name, xy, widgetwidth=52, widgetheight=137, setupArgs|
+		^super.new.init(parent, cv, name, xy, widgetwidth, widgetheight, setupArgs)
 	}
 	
-	init { |parentView, cv, name, xy, widgetwidth, widgetheight, setup|
+	init { |parentView, cv, name, xy, widgetwidth, widgetheight, setupArgs|
 		var knobsize, meanVal, widgetSpecsActions, editor, cvString;
-		
+		var tmpSetup;
+
 		thisCV = cv;
 		
-		setup ?? { this.midiSetUp = [0] };
-		setup !? { this.midiSetUp = [setup].flat };
-		
+		setupArgs[0] !? this.midimode_(setupArgs[0]);
+		setupArgs[1] !? this.midimean_(setupArgs[1]);
+		setupArgs[2] !? this.midistring_(setupArgs[2].asString);
+				
 		knobsize = widgetwidth-10;
 		
 		this.widgetBg = UserView(parentView, Rect(xy.x, xy.y, widgetwidth, widgetheight))
@@ -79,21 +83,22 @@ CVWidget {
 						0.01.wait;
 						if(ml.value == 1, {
 							this.cc = CCResponder({ |src, chan, ctrl, val|
-								this.midiSetUp.isArray.not.if{this.midiSetUp_(this.midiSetUp.asArray.flat)};
-								this.midiSetUp[0].switch(
+//								if(CCResponder.ccnumr[ctrl].size > 1, {
+//									CCResponder.ccnumr[ctrl][0].remove;
+//								});
+//								this.midiSetUp.isArray.not.if { 
+//									this.midiSetUp_(this.midiSetUp.asArray.flat);
+//								};
+								this.midimode.switch(
 									0, { 
-										if(val/127 < (cv.input+(softWithin/2)) and: { 
+										if(val/127 < (cv.input+(softWithin/2)) and: {
 											val/127 > (cv.input-(softWithin/2));
 										}, { 
 											cv.input_(val/127);
 										})
 									},
 									1, { 
-										if(this.midiSetUp[1].isNil, { 
-											meanVal = 64;
-										}, { 
-											meanVal = this.midiSetUp[1];
-										});
+										meanVal = this.midimean;
 										cv.input_(cv.input+((val-meanVal)/127)) 
 									}
 								);
@@ -115,9 +120,11 @@ CVWidget {
 									}
 								}.defer;
 							});
+//							[this, this.cc].postln;
 							this.cc.learn;
 							nil.yield;
 						}, {
+							[this, this.cc].postln;
 							this.cc.remove;
 							this.cc = nil;
 							this.midiSrc.string_("source")
@@ -165,6 +172,10 @@ CVWidget {
 		;
 		
 		[this.knob, this.numVal].do({ |view| cv.connect(view) });
+	}
+	
+	setup {
+		^[this.midimode, this.midimean, this.midistring];
 	}
 	
 	visible_ { |visible|

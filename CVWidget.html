@@ -15,16 +15,16 @@ p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
 p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco}
 p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #606060}
 p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; min-height: 14.0px}
-p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #89625f}
-span.s1 {color: #205a8b}
-span.s2 {color: #195995}
-span.s3 {color: #265a82}
-span.s4 {font: 10.0px Monaco}
-span.s5 {color: #1e4561}
-span.s6 {color: #495248}
+p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #866562}
+span.s1 {color: #265a82}
+span.s2 {color: #205a8b}
+span.s3 {color: #2c5a7a}
+span.s4 {font: 12.0px Helvetica}
+span.s5 {color: #22455b}
+span.s6 {color: #4a5149}
 span.s7 {color: #000000}
 span.s8 {color: #606060}
-span.s9 {color: #1157a1}
+span.s9 {color: #195995}
 span.Apple-tab-span {white-space:pre}
 </style>
 </head>
@@ -47,9 +47,9 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><span class="Apple-tab-span">	</span><b>xy</b> - an instance of <a href="SC://Point"><span class="s3"><b>Point</b></span></a>. The position of the CVWidget in its parent view</p>
 <p class="p3"><span class="Apple-tab-span">	</span><b>widgetwidth</b> - by default this will be set to 52 pixels</p>
 <p class="p3"><span class="Apple-tab-span">	</span><b>widgetheight</b> - by default this will be set to 137 pixels</p>
-<p class="p3"><span class="Apple-tab-span">	</span><b>setup</b> - an array reflecting the setup of the connected external MIDI-device. If the setup consits of a single value (e.g.: 0) it will internally be converted into an array.<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-tab-span">	</span>The array mat contain the following slots: <span class="s4">[ mode, mean ]</span></p>
-<p class="p3"><span class="Apple-tab-span">	</span>Currently two different modes are supported (the values represent <i>mode</i> :</p>
+<p class="p3"><span class="Apple-tab-span">	</span><b>setupArgs</b> - an array reflecting the setup of the connected external MIDI-device. If the setup consits of a single value (e.g.: 0) it will internally be converted into an array.<span class="Apple-converted-space"> </span></p>
+<p class="p3"><span class="Apple-tab-span">	</span>If not given explicitely the setup will reflect the an array consisting of [midimode, midimean, midistring, midibounds].</p>
+<p class="p3"><span class="Apple-tab-span">	</span>Currently two different (midi)modes are supported (the values represent <i>midimode</i> :</p>
 <p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>0: MIDI-output is 0-127</p>
 <p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>1: MIDI-output is a mean-value +/- in-/decrement. If no value for <i>mean</i> is given in the setup-array 64 is assumed to be the default value for <i>mean</i>.</p>
 <p class="p3"><span class="Apple-tab-span">	</span>Default mode is 0.</p>
@@ -62,9 +62,21 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><span class="Apple-tab-span">	</span>a convenience method for the use in mode 0 (output: 0-127, non-endless). A new value (input) of a CV is set by a MIDI-slider only if the slider's value is within +/- softWithin/2 to the current value (input) of the CV, avoiding abrupt changes.</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p3"><b>softWithin</b></p>
-<p class="p2"><br></p>
 <p class="p3"><span class="Apple-tab-span">	</span>returns the softWithin-value (defaults to 0.1 if not set explicitely)</p>
-<p class="p2"><br></p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p3"><b>midimode_</b></p>
+<p class="p3"><span class="Apple-tab-span">	</span>0 - the default mode. The output reflects the absolute position of the adjecant slider.<span class="Apple-converted-space"> </span></p>
+<p class="p3"><span class="Apple-tab-span">	</span>1 - in- resp. decremental output. The Output will be a mean-value (default: 64, see method <b>midimean_</b>) +/- in- or decrement (determined be the the slider's accelaration)</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p3"><b>midimean_</b><span class="Apple-converted-space"> </span></p>
+<p class="p3"><span class="Apple-tab-span">	</span>default: 64. Only relevant for midimode == 1. It reflects the default output of a midislider in neutral position.</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p3"><b>midistring_</b></p>
+<p class="p3"><span class="Apple-tab-span">	</span>A string, that may display details of your current midi-settings (certain details like the midi-silder's source-id, the channel, the controller-number will automatically displayed when a widget gets instantiated)</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p3"><b>setup</b></p>
+<p class="p3"><span class="Apple-tab-span">	</span>A convenience-method, returning<span class="Apple-converted-space"> </span></p>
+<p class="p6"><span class="s4"><span class="Apple-tab-span">	</span></span>[midimode, midimean, midistring]</p>
 <p class="p2"><br></p>
 <p class="p5"><b>Example</b></p>
 <p class="p4"><br></p>
