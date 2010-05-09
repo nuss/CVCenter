@@ -44,12 +44,7 @@ CVCenter {
 		args !? { this.put(*args) };
 		
 		this.setup.postln;
-//		if(this.midimode == 1, {
-//			midiString = this.midimean.asString+this.midistring.asString;
-//		}, {
-//			midiString = this.midistring;
-//		});
-//		
+
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 
 			window = Window("CVCenter"+midiString, Rect(0, 0, 335, 200), scroll: true);
@@ -203,7 +198,7 @@ CVCenter {
 			})
 		});
 				
-		if(Window.allWindows.select({ |w| "^CVCenter\ \-\ MIDI\-Setup".matchRegexp(w.name) == true }).size < 1, {
+		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 			this.gui;
 		}, {
 			this.prAddToGui;
@@ -241,10 +236,6 @@ CVCenter {
 		argMean !? { this.midimean_(argMean) };
 		argString !? { this.midistring_(argString.asString) };
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
-//			this.midimode.switch(
-//				0, { window.name = "CVCenter\ \-\ MIDI\-Setup:"+this.midistring.asString },
-//				1, { window.name = "CVCenter\ \-\ MIDI\-Setup:"+this.midimean.asString+this.midistring.asString }
-//			);
 			window.name = "CVCenter"+midistring.asString;
 			cvWidgets.keysValuesDo({ |k, cv| 
 				cv.midimode_(this.midimode); 
