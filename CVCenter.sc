@@ -1,8 +1,8 @@
 
 CVCenter {
 
-	classvar <cvsList, <nextCVKey, <cvWidgets, <window, /*<setup, */nextPos;
-	classvar <>midimode = 0, <>midimean = 64, <>midistring;  
+	classvar <cvsList, <nextCVKey, <cvWidgets, <window, nextPos;
+	classvar <>midimode = 0, <>midimean = 64, <>midistring = "";  
 	classvar 	widgetwidth = 52, widgetheight = 136, colwidth, rowheight, widgetStates;
 	
 	*new { |cvs...setUpArgs|
@@ -38,7 +38,7 @@ CVCenter {
 		
 	*gui { |...args|
 		var rowwidth, colcount;
-		var midiString, mode, mean;
+//		var midiString, mode, mean;
 		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, removedKeys, skipJacks;
 			
 		args !? { this.put(*args) };
@@ -47,7 +47,7 @@ CVCenter {
 
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 
-			window = Window("CVCenter"+midiString, Rect(0, 0, 335, 200), scroll: true);
+			window = Window("CVCenter"+this.midistring, Rect(0, 0, 335, 200), scroll: true);
 			
 			window.onClose_({
 				cvWidgets.keysValuesDo({ |k, w|
@@ -107,7 +107,6 @@ CVCenter {
 				};	
 				if(cvsList.size != lastUpdate, {
 					if(cvsList.size > lastUpdate, {
-						"should add to gui now".postln;
 						this.prAddToGui;
 					});
 					if(cvsList.size < lastUpdate, {
@@ -267,7 +266,8 @@ CVCenter {
 				// add next widget to the right
 				nextPos = nextPos.x+colwidth@(nextPos.y);
 			});
-		})
+		});
+		window.front;
 	}
 	
 	*prRegroupWidgets {
