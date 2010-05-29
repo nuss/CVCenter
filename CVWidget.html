@@ -13,18 +13,19 @@ p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
 p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; min-height: 17.0px}
 p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
 p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco}
-p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #606060}
-p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; min-height: 14.0px}
-p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #866562}
-span.s1 {color: #265a82}
-span.s2 {color: #205a8b}
-span.s3 {color: #2c5a7a}
+p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #000000}
+p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #606060}
+p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #000000; min-height: 14.0px}
+p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #bf0000}
+span.s1 {color: #2c5a7a}
+span.s2 {color: #265a82}
+span.s3 {color: #315a73}
 span.s4 {font: 12.0px Helvetica}
-span.s5 {color: #22455b}
-span.s6 {color: #4a5149}
+span.s5 {color: #0000bf}
+span.s6 {color: #007300}
 span.s7 {color: #000000}
 span.s8 {color: #606060}
-span.s9 {color: #195995}
+span.s9 {color: #205a8b}
 span.Apple-tab-span {white-space:pre}
 </style>
 </head>
@@ -40,15 +41,13 @@ span.Apple-tab-span {white-space:pre}
 <p class="p4"><br></p>
 <p class="p5"><b>Creation</b></p>
 <p class="p4"><br></p>
-<p class="p3"><b>*new(parent, cv, name, xy, widgetwidth, widgetheight, setup)</b></p>
+<p class="p3"><b>*new(parent, cv, name, bounds, setup)</b></p>
 <p class="p3"><b><span class="Apple-tab-span">	</span>parent</b> - the parent view: e.g. a Window or a TabbedView</p>
 <p class="p3"><span class="Apple-tab-span">	</span><b>cv</b> - a CV (have a look at the CV helpfile for mor information on that)</p>
 <p class="p3"><span class="Apple-tab-span">	</span><b>name</b> - each CVWidget will have a label displaying this name</p>
-<p class="p3"><span class="Apple-tab-span">	</span><b>xy</b> - an instance of <a href="SC://Point"><span class="s3"><b>Point</b></span></a>. The position of the CVWidget in its parent view</p>
-<p class="p3"><span class="Apple-tab-span">	</span><b>widgetwidth</b> - by default this will be set to 52 pixels</p>
-<p class="p3"><span class="Apple-tab-span">	</span><b>widgetheight</b> - by default this will be set to 137 pixels</p>
+<p class="p3"><span class="Apple-tab-span">	</span><b>bounds</b> - an instance of <b>Rect</b>. The default widget-width will be 52 pixel, the widget-height will be 137 pixel.<span class="Apple-converted-space"> </span></p>
 <p class="p3"><span class="Apple-tab-span">	</span><b>setupArgs</b> - an array reflecting the setup of the connected external MIDI-device. If the setup consits of a single value (e.g.: 0) it will internally be converted into an array.<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-tab-span">	</span>If not given explicitely the setup will reflect the an array consisting of [midimode, midimean, midistring, midibounds].</p>
+<p class="p3"><span class="Apple-tab-span">	</span>If not given explicitely the setup will reflect the an array consisting of [midimode, midimean, midistring].</p>
 <p class="p3"><span class="Apple-tab-span">	</span>Currently two different (midi)modes are supported (the values represent <i>midimode</i> :</p>
 <p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>0: MIDI-output is 0-127</p>
 <p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>1: MIDI-output is a mean-value +/- in-/decrement. If no value for <i>mean</i> is given in the setup-array 64 is assumed to be the default value for <i>mean</i>.</p>
@@ -80,22 +79,22 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2"><br></p>
 <p class="p5"><b>Example</b></p>
 <p class="p4"><br></p>
-<p class="p6">(</p>
-<p class="p6"><span class="s5">var</span> cv, win;</p>
-<p class="p6">cv = <span class="s5">CV</span>.new(<span class="s6">\boostcut</span>.asSpec);<span class="Apple-converted-space"> </span></p>
-<p class="p7"><span class="s7">win = </span><span class="s5">Window</span><span class="s7">(</span>"CVWidget"<span class="s7">);</span></p>
-<p class="p6">~wdgt = <span class="s5">CVWidget</span>(win, cv, <span class="s8">"CV test"</span>, 10@10);</p>
-<p class="p6">win.front;</p>
-<p class="p6">)</p>
-<p class="p8"><br></p>
-<p class="p9">// change the Spec of the CV</p>
-<p class="p9">// change is reflected in the widget immediately</p>
-<p class="p9">// can also be done through the "edit Spec" button in the widget</p>
-<p class="p6">~wdgt.spec_(<span class="s6">\freq</span>.asSpec)</p>
-<p class="p8"><br></p>
-<p class="p9">// change the MIDI-setup</p>
-<p class="p9">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
-<p class="p6">~wdgt.midiSetUp_(1, 64)</p>
+<p class="p7">(</p>
+<p class="p7"><span class="s5">var</span> cv, win;</p>
+<p class="p7">cv = <span class="s5">CV</span>.new(<span class="s6">\boostcut</span>.asSpec);<span class="Apple-converted-space"> </span></p>
+<p class="p8"><span class="s7">win = </span><span class="s5">Window</span><span class="s7">(</span>"CVWidget"<span class="s7">);</span></p>
+<p class="p7">~wdgt = <span class="s5">CVWidget</span>(win, cv, <span class="s8">"CV test"</span>, 10@10);</p>
+<p class="p7">win.front;</p>
+<p class="p7">)</p>
+<p class="p9"><br></p>
+<p class="p10">// change the Spec of the CV</p>
+<p class="p10">// change is reflected in the widget immediately</p>
+<p class="p10">// can also be done through the "edit Spec" button in the widget</p>
+<p class="p7">~wdgt.spec_(<span class="s6">\freq</span>.asSpec)</p>
+<p class="p9"><br></p>
+<p class="p10">// change the MIDI-setup</p>
+<p class="p10">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
+<p class="p7">~wdgt.midiSetUp_(1, 64)</p>
 <p class="p2"><br></p>
 <p class="p5"><b>about the GUI</b></p>
 <p class="p4"><br></p>

@@ -11,15 +11,17 @@ CVWidget {
 	var <visible;
 	var widgetXY, widgetProps;
 
-	*new { |parent, cv, name, xy, widgetwidth=52, widgetheight=137, setupArgs|
-		^super.new.init(parent, cv, name, xy, widgetwidth, widgetheight, setupArgs)
+	*new { |parent, cv, name, bounds, setupArgs|
+		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setupArgs)
 	}
 	
-	init { |parentView, cv, name, xy, widgetwidth, widgetheight, setupArgs|
+	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=137, setupArgs|
 		var knobsize, meanVal, widgetSpecsActions, editor, cvString;
 		var tmpSetup;
 
 		thisCV = cv;
+		
+		setupArgs.isKindOf(Array).not.if { setupArgs = [setupArgs] };
 		
 		setupArgs[0] !? this.midimode_(setupArgs[0]);
 		setupArgs[1] !? this.midimean_(setupArgs[1]);
@@ -48,7 +50,7 @@ CVWidget {
 			.canFocus_(false)
 		;
 		block { |break|
-			[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+			#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
 				if(cv.spec == symbol.asSpec, { break.value(this.knob.centered_(true)) });
 			})
 		};
@@ -194,7 +196,7 @@ CVWidget {
 		if(spec.isKindOf(ControlSpec), {
 			thisCV.spec_(spec);
 			block { |break|
-				[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+				#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
 					if(thisCV.spec == symbol.asSpec, { 
 						break.value(this.knob.centered_(true));
 					}, {
@@ -251,7 +253,7 @@ CVWidget {
 			.enterKeyAction_({ |ws|
 				specsActions[ws.value].value;
 				block { |break|
-					[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+					#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
 						if(widget.spec == symbol.asSpec, { 
 							break.value(widget.knob.centered_(true));
 						}, {
@@ -289,7 +291,7 @@ CVWidget {
 					("result:"+view.string.interpret).postln;
 					widget.spec_(view.string.interpret);
 					block { |break|
-						[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+						#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
 							if(widget.spec == symbol.asSpec, { 
 								break.value(this.knob.centered_(true));
 							}, {
