@@ -2,8 +2,9 @@
 CVCenter {
 
 	classvar <cvsList, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
-	classvar <>midimode = 0, <>midimean = 64, <>midistring = "";  
-	classvar 	widgetwidth = 52, widgetheight = 136, colwidth, rowheight, <widgetStates/*, tabLabels*/;
+	classvar <>midimode = 0, <>midimean = 64, <>midistring = "";
+	classvar <>ctrlButtonMode, controlButtonKeys;
+	classvar widgetwidth = 52, widgetheight = 136, colwidth, rowheight, <widgetStates;
 	classvar <tabProperties, colors, nextColor;
 	
 	*new { |cvs...setUpArgs|
@@ -52,21 +53,22 @@ CVCenter {
 	}
 		
 	*gui { |tab...cvs|
-		var rowwidth, colcount;
-		var cvTabIndex;
+		var flow, rowwidth, colcount;
+		var cvTabIndex, order, orderedCVs;
 		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, removedKeys, skipJacks;
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
 			
 		cvs !? { this.put(*cvs) };
 		
-//		this.setup.postln;
-
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 
 			window = Window("CVCenter"+this.midistring, Rect(0, 0, 335, 200));
 			window.view.background_(Color.black);
-						
-//			tabLabels ?? { if(tab.isNil, { tabLabels = ["default"] }, { tabLabels = [tab.asString] }) };
+			flow = FlowLayout(window.bounds.insetBy(4));
+			window.view.decorator = flow;
+			flow.gap_(0@0);
+			flow.shift(0, 0);
+
 			
 			if(tabProperties.size < 1, {
 				tabProperties = tabProperties.add(());
@@ -79,22 +81,27 @@ CVCenter {
 			labelColors = tabProperties.collect(_.tabColor);
 			unfocusedColors = tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) });
 			tabProperties.postln;
-//			("tab-properties:"+tabProperties).postln;
 			
 			tabs = TabbedView(
 				window, 
-				Rect(0, 0, window.bounds.width, window.bounds.height-30), 
+				Rect(0, 0, flow.bounds.width, flow.bounds.height-50), 
 				labels: tabLabels, 
 				scroll: true
 			);
 			tabs.view.resize_(5);
 			tabs.labelColors_(labelColors);
+			tabs.labelPadding_(5);
 			tabs.unfocusedColors_(unfocusedColors);
 			tabs.font_(GUI.font.new("Helvetica", 9));
 			tabs.tabCurve_(3);
 			tabs.stringColor_(Color.black);
 			tabs.stringFocusedColor_(Color.white);
 			tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
+			
+			flow.shift(0, 0);
+			
+			switchBoard = ScrollView(window, Rect(0, 0, flow.bounds.width, 50));
+			switchBoard.resize_(8);
 
 			window.onClose_({
 				cvWidgets.keysValuesDo({ |k, w|
@@ -108,8 +115,6 @@ CVCenter {
 					widgetStates[k].midiCtrl = w.midiCtrl.string;
 				});
 				tabProperties.do(_.nextPos_(0@0));
-//				tabLabels = tabs.labelNames;
-//				("widgetStates at gui-close:"+widgetStates).postcs;
 			});
 
 			thisNextPos = 0@0;
@@ -119,7 +124,11 @@ CVCenter {
 			colcount = rowwidth.div(colwidth);
 			rowwidth = colcount * colwidth;
 			
-			cvsList.keysValuesDo({ |k, v|
+			order = cvsList.order;
+			orderedCVs = cvsList.atAll(order);
+			order.postln;
+			
+			order.do({ |k, i|
 				if(widgetStates.size < 1, { cvTabIndex = 0 }, {
 					if(widgetStates[k].isNil, {
 						cvTabIndex = 0;
@@ -128,7 +137,6 @@ CVCenter {
 					})
 				});
 				
-				["widget-state now:"+widgetStates[k], "tab-properties:"+tabProperties[cvTabIndex]].postln;
 				if(tabProperties[cvTabIndex].nextPos.isNil, { 
 					thisNextPos = 0@0;
 				}, { 
@@ -136,9 +144,9 @@ CVCenter {
 				});
 					
 				cvWidgets[k] = CVWidget(
-					tabs.views[cvTabIndex], v, k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight), this.setup
+					tabs.views[cvTabIndex], orderedCVs[i], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight), this.setup
 				);
-				
+								
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 				
 				widgetStates[k] !? {
@@ -153,7 +161,6 @@ CVCenter {
 					cvWidgets[k].midiCtrl.string_(widgetStates[k].midiCtrl);
 				};
 				widgetStates.put(k, (tabIndex: cvTabIndex));
-//				("widgetStates at widget-creation:"+widgetStates).postln;
 				if(thisNextPos.x+colwidth > rowwidth, {
 					// jump to next row
 					tabProperties[cvTabIndex].nextPos = 0@(thisNextPos.y+rowheight);
@@ -178,21 +185,21 @@ CVCenter {
 				if(cvsList.size != lastUpdate, {
 					if(cvsList.size > lastUpdate and:{ cvWidgets.size <= lastUpdate }, {
 						this.prAddToGui;
+						this.prUpdateSwitchboard;
 					});
 					if(cvsList.size < lastUpdate, {
 						removedKeys = cvWidgets.keys.difference(cvsList.keys);
-						("removed from CVCenter:"+removedKeys).postln;
 						removedKeys.do({ |k|
 							cvWidgets[k].remove;
 							cvWidgets.removeAt(k);
 						});
 						this.prRegroupWidgets(tabs.activeTab);
+						this.prUpdateSwitchboard;
 					});
 					lastUpdate = cvsList.size;
 				});
 				try {
 					if(window.bounds.width != lastUpdateWidth, {
-//						"window-size changed".postln;
 						this.prRegroupWidgets(tabs.activeTab);
 					})
 				};
@@ -249,7 +256,6 @@ CVCenter {
 		
 	*use { |key, spec, value, tab|
 		var thiskey, thisspec, thisval;
-//		[key, spec, value].postln;		
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		
 		thiskey = key.asSymbol;
@@ -269,7 +275,7 @@ CVCenter {
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 			this.gui(tab.asSymbol);
 		}, {
-			("now adding:"+tab.asString).postln;
+//			("now adding:"+tab.asString).postln;
 			this.prAddToGui(tab);
 		});
 		^cvsList.at(key.asSymbol);
@@ -319,20 +325,15 @@ CVCenter {
 		var rowwidth, colcount;
 		var cvTabIndex, tabLabels;
 		var thisNextPos;
-		
-//		("prAddToGui called with:"+tab).postln;
-		
+				
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 		
 		if(tab.notNil, {
-			("tab now:"+tab).postln;
 			if(tabLabels.includes(tab.asSymbol), {
 				cvTabIndex = tabLabels.indexOf(tab.asSymbol);
-				("tab exists at tab-index"+cvTabIndex).postln;
 			}, {
 				tabs.add(tab);
 				cvTabIndex = tabLabels.size;
-				("tab doesn't exist. new index:"+cvTabIndex).postln;
 				tabProperties = tabProperties.add((tabLabel: tab, tabColor: nextColor.next));
 			})
 		}, {
@@ -344,10 +345,8 @@ CVCenter {
 		
 		if(tabProperties[cvTabIndex].nextPos.notNil, {
 			thisNextPos = tabProperties[cvTabIndex].nextPos;
-			("nextPos not nil:"+thisNextPos).postln;
 		}, {
 			thisNextPos = 0@0;
-			("nextPos is nil:"+thisNextPos).postln;
 		});
 						
 		
@@ -361,7 +360,6 @@ CVCenter {
 		widgetKeys = cvWidgets.keys;
 		thisKeys = allCVKeys.difference(widgetKeys);
 		thisKeys.do({ |k|
-			["update from thisKeys", k, thisNextPos, tabProperties[cvTabIndex].nextPos].postln;
 			cvWidgets[k] = CVWidget(tabs.views[cvTabIndex], cvsList[k], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight), this.setup);
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 			if(thisNextPos.x+colwidth >= rowwidth, {
@@ -375,13 +373,13 @@ CVCenter {
 			widgetStates.put(k, (tabIndex: cvTabIndex));
 			tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
 			tabs.focus(cvTabIndex);
-//			("tab-properties:"+tabProperties).postln;
 		});
+		this.prRegroupWidgets(cvTabIndex);
 		window.front;
 	}
 	
 	*prRegroupWidgets { |tabIndex|
-		var rowwidth, rowheight, colcount, colwidth, widgetwidth, widgetheight, thisNextPos;
+		var rowwidth, rowheight, colcount, colwidth, widgetwidth, widgetheight, thisNextPos, order, orderedWidgets;
 				
 		widgetwidth = 52;
 		colwidth = widgetwidth+1; // add a small gap between widgets
@@ -392,17 +390,15 @@ CVCenter {
 		rowwidth = colcount * colwidth;
 		thisNextPos = 0@0;
 		
-		tabIndex !? {						
-			cvWidgets.keysValuesDo({ |k, v|
+		tabIndex !? {	
+			order = cvWidgets.order;
+			orderedWidgets = cvWidgets.atAll(order);
+			order.do({ |k, i|
 				if(tabIndex == widgetStates[k].tabIndex, {
-//					[k, v, widgetStates[k].tabIndex, thisNextPos, tabProperties[widgetStates[k].tabIndex].nextPos].postln;
 					if(thisNextPos != (0@0), { 
-//						["false", thisNextPos].postln; 
 						thisNextPos = tabProperties[widgetStates[k].tabIndex].nextPos;
 					});
-//					["next Position:"+tabProperties[widgetStates[k].tabIndex].nextPos, "next tab-index:"+widgetStates[k].tabIndex].postln;
-					v.widgetXY_(thisNextPos);
-//					[thisNextPos.x+colwidth, rowwidth].postln;
+					orderedWidgets[i].widgetXY_(thisNextPos);
 					if(thisNextPos.x+colwidth >= rowwidth, {
 						// jump to next row
 						tabProperties[widgetStates[k].tabIndex].nextPos = thisNextPos = 0@(thisNextPos.y+rowheight);
@@ -413,6 +409,21 @@ CVCenter {
 				})
 			})
 		}
+	}
+	
+	*prUpdateSwitchboard {
+//		("controlButtons:"+controlButtons).postln;
+		controlButtonKeys ? controlButtonKeys = IdentityDictionary();
+		cvWidgets.pairsDo({ |k, wdgt|
+//			wdgt.midiCtrl.value.postln;
+			if(wdgt.midiCtrl.value != "ctrl", {
+				controlButtonKeys.put(k, (
+					uid: wdgt.midiSrc.value, 
+					chan: wdgt.midiChan.value, 
+					ctrl: wdgt.midiCtrl.value
+				))
+			})
+		});
 	}
 			
 }
