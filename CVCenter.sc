@@ -62,7 +62,7 @@ CVCenter {
 		
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 
-			window = Window("CVCenter"+this.midistring, Rect(0, 0, 335, 200));
+			window = Window("CVCenter"+this.midistring, Rect(0, 0, 400, 210));
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
 			window.view.decorator = flow;
@@ -113,6 +113,7 @@ CVCenter {
 					widgetStates[k].midiSrc = w.midiSrc.string;
 					widgetStates[k].midiChan = w.midiChan.string;
 					widgetStates[k].midiCtrl = w.midiCtrl.string;
+					w.cc !? { widgetStates[k].cc = w.cc };
 				});
 				tabProperties.do(_.nextPos_(0@0));
 			});
@@ -159,8 +160,9 @@ CVCenter {
 					cvWidgets[k].midiSrc.string_(widgetStates[k].midiSrc);
 					cvWidgets[k].midiChan.string_(widgetStates[k].midiChan);
 					cvWidgets[k].midiCtrl.string_(widgetStates[k].midiCtrl);
+					widgetStates[k].cc !? { cvWidgets[k].cc_(widgetStates[k].cc) };
 				};
-				widgetStates.put(k, (tabIndex: cvTabIndex));
+				widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: false));
 				if(thisNextPos.x+colwidth > rowwidth, {
 					// jump to next row
 					tabProperties[cvTabIndex].nextPos = 0@(thisNextPos.y+rowheight);
@@ -205,6 +207,25 @@ CVCenter {
 				};
 				lastUpdateWidth = window.bounds.width;
 				lastSetUp = this.setup;
+				cvWidgets.pairsDo({ |k, wdgt|
+//					[wdgt.cc, widgetStates[k].addedFunc].postln;
+					wdgt.cc !? { 
+						if(widgetStates[k].addedFunc == false, {
+							"adding".postln;
+							wdgt.cc.function_(
+								wdgt.cc.function.addFunc({ 
+									{ tabs.focus(widgetStates[k].tabIndex) }.defer
+								})
+							);
+							widgetStates[k].addedFunc = true;
+						})
+					};
+					wdgt.cc ?? {
+						if(widgetStates[k].addedFunc == true, {
+							widgetStates[k].addedFunc = false
+						})
+					}
+				})
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});
 	}	
@@ -370,7 +391,7 @@ CVCenter {
 				tabProperties[cvTabIndex].nextPos = thisNextPos = thisNextPos.x+colwidth@(thisNextPos.y);
 			});
 			[cvTabIndex, thisNextPos].postln;
-			widgetStates.put(k, (tabIndex: cvTabIndex));
+			widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: false));
 			tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
 			tabs.focus(cvTabIndex);
 		});
@@ -411,19 +432,4 @@ CVCenter {
 		}
 	}
 	
-	*prUpdateSwitchboard {
-//		("controlButtons:"+controlButtons).postln;
-		controlButtonKeys ? controlButtonKeys = IdentityDictionary();
-		cvWidgets.pairsDo({ |k, wdgt|
-//			wdgt.midiCtrl.value.postln;
-			if(wdgt.midiCtrl.value != "ctrl", {
-				controlButtonKeys.put(k, (
-					uid: wdgt.midiSrc.value, 
-					chan: wdgt.midiChan.value, 
-					ctrl: wdgt.midiCtrl.value
-				))
-			})
-		});
-	}
-			
 }
