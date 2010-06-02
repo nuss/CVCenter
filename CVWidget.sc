@@ -85,12 +85,6 @@ CVWidget {
 						0.01.wait;
 						if(ml.value == 1, {
 							this.cc = CCResponder({ |src, chan, ctrl, val|
-//								if(CCResponder.ccnumr[ctrl].size > 1, {
-//									CCResponder.ccnumr[ctrl][0].remove;
-//								});
-//								this.midiSetUp.isArray.not.if { 
-//									this.midiSetUp_(this.midiSetUp.asArray.flat);
-//								};
 								this.midimode.switch(
 									0, { 
 										if(val/127 < (cv.input+(softWithin/2)) and: {
@@ -126,7 +120,7 @@ CVWidget {
 							this.cc.learn;
 							nil.yield;
 						}, {
-							[this, this.cc].postln;
+//							[this, this.cc].postln;
 							this.cc.remove;
 							this.cc = nil;
 							this.midiSrc.string_("source")
