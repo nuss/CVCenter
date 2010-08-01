@@ -2,13 +2,15 @@
 CVCenter {
 
 	classvar <cvsList, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
-	classvar <>midimode = 0, <>midimean = 64, <>midistring = "", <numccs;
-	classvar <>ctrlButtonMode = 0, controlButtonKeys, controlButtons, nextButtonPos;
-	classvar widgetwidth = 52, widgetheight = 136, colwidth, rowheight, <widgetStates;
+	classvar <>midimode, <>midimean, <>midistring, <numccs;
+	classvar controlButtonKeys, controlButtons, nextButtonPos;
+	classvar <>ctrlButtonMode = 0, <>ctrlButtonBank;
+	classvar widgetwidth = 52, widgetheight = 120, colwidth, rowheight, <widgetStates;
 	classvar <tabProperties, colors, nextColor;
 	
 	*new { |cvs...setUpArgs|
 		var r, g, b;
+
 		if(cvsList.isNil, {
 			cvsList = IdentityDictionary.new;
 			cvWidgets = IdentityDictionary.new;
@@ -17,7 +19,9 @@ CVCenter {
 			colors = List();
 			tabProperties = [];
 			
-			this.prSetup(*setUpArgs);
+			("setUpArgs:"+setUpArgs).postln;
+			if(setUpArgs.size > 0, { this.prSetup(*setUpArgs) });
+			
 			
 			r.do({ |red|
 				g.do({ |green|
@@ -27,7 +31,8 @@ CVCenter {
 				})
 			});
 			
-			nextColor = Pxrand(colors, inf).asStream;
+			colors.postln;
+			nextColor = Pseq(colors.reverse, inf).asStream;
 			
 			if(cvs.isNil, {
 				nextCVKey = 1;
@@ -62,30 +67,31 @@ CVCenter {
 		
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 
-			window = Window("CVCenter"+this.midistring, Rect(0, 0, 400, 210));
+			window = Window("CVCenter", Rect(0, 0, 400, 210));
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
 			window.view.decorator = flow;
-			flow.gap_(0@0);
+			flow.margin_(4@0);
+			flow.gap_(0@4);
 			flow.shift(0, 0);
 
-			controlButtonKeys ? controlButtonKeys = IdentityDictionary();
+			controlButtonKeys ?? { controlButtonKeys = IdentityDictionary() };
 			
 			if(tabProperties.size < 1, {
 				tabProperties = tabProperties.add(());
 				if(tab.isNil, { tabProperties[0].tabLabel = "default" }, { tabProperties[0].tabLabel = tab.asString });
 				tabProperties[0].tabColor = nextColor.next;
-				tabProperties.postln;
+//				tabProperties.postln;
 			});
 			
 			tabLabels = tabProperties.collect(_.tabLabel);
 			labelColors = tabProperties.collect(_.tabColor);
 			unfocusedColors = tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) });
-			tabProperties.postln;
+//			tabProperties.postln;
 			
 			tabs = TabbedView(
 				window, 
-				Rect(0, 0, flow.bounds.width, flow.bounds.height-50), 
+				Rect(0, 0, flow.bounds.width, flow.bounds.height-60), 
 				labels: tabLabels, 
 				scroll: true
 			);
@@ -93,7 +99,7 @@ CVCenter {
 			tabs.labelColors_(labelColors);
 			tabs.labelPadding_(5);
 			tabs.unfocusedColors_(unfocusedColors);
-			tabs.font_(GUI.font.new("Helvetica", 9));
+			tabs.font_(GUI.font.new("Helvetica", 10));
 			tabs.tabCurve_(3);
 			tabs.stringColor_(Color.black);
 			tabs.stringFocusedColor_(Color(0.0, 0.0, 0.5, 1.0));
@@ -128,7 +134,7 @@ CVCenter {
 			
 			order = cvsList.order;
 			orderedCVs = cvsList.atAll(order);
-			order.postln;
+//			order.postln;
 			
 			order.do({ |k, i|
 				if(widgetStates.size < 1, { cvTabIndex = 0 }, {
@@ -182,7 +188,7 @@ CVCenter {
 				lastUpdate ?? { lastUpdate = cvsList.size };
 				lastSetUp !? {
 					if(this.setup != lastSetUp, {
-						this.prSetup;
+						this.prSetup(*this.setup);
 					})
 				};	
 				if(cvsList.size != lastUpdate, {
@@ -209,7 +215,7 @@ CVCenter {
 				lastUpdateWidth = window.bounds.width;
 				lastSetUp = this.setup;
 				numccs !? { lastNumCCs = numccs };
-				lastCCs ? lastCCs = controlButtonKeys;
+				lastCCs ?? { lastCCs = controlButtonKeys };
 				numccs = controlButtonKeys.size;
 //				[numccs, lastNumCCs].postln;
 				cvWidgets.pairsDo({ |k, wdgt|
@@ -256,7 +262,7 @@ CVCenter {
 						numccs = controlButtonKeys.size;
 						lastNumCCs !? {
 							if(numccs < lastNumCCs, {
-								["removed", numccs, lastNumCCs].postln;
+//								["removed", numccs, lastNumCCs].postln;
 //								removedKeys = 
 							})
 						}
@@ -330,7 +336,7 @@ CVCenter {
 		});
 		
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
-			this.gui(tab.asSymbol);
+			this.gui(tab);
 		}, {
 //			("now adding:"+tab.asString).postln;
 			this.prAddToGui(tab);
@@ -358,22 +364,24 @@ CVCenter {
 	}
 	
 	*setup {
-		^[this.midimode, this.midimean, this.midistring];
+		^[this.midimode, this.midimean, this.midistring, this.ctrlButtonBank];
 	}
 	
 	// private Methods - not to be used directly
 	
-	*prSetup { |argMode, argMean, argString|
+	*prSetup { |argMode, argMean, argString, argCButtonBank|
+		("setup-args:"+[argMode, argMean, argString, argCButtonBank]).postln;
 		argMode !? { this.midimode_(argMode) };
 		argMean !? { this.midimean_(argMean) };
 		argString !? { this.midistring_(argString.asString) };
+		argCButtonBank !? { this.ctrlButtonBank_(argCButtonBank) };
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
 			window.name = "CVCenter"+midistring.asString;
 			cvWidgets.keysValuesDo({ |k, cv| 
-				cv.midimode_(this.midimode); 
-				cv.midimean_(this.midimean);
-				cv.midistring_(this.midistring.asString);
-			})
+				this.midimode !? { cv.midimode_(this.midimode) }; 
+				this.midimean !? { cv.midimean_(this.midimean) };
+				this.midistring !? { cv.midistring_(this.midistring.asString) };
+				this.ctrlButtonBank !? { cv.ctrlButtonBank_(this.ctrlButtonBank) }; 			})
 		})
 	}
 			
@@ -382,19 +390,24 @@ CVCenter {
 		var rowwidth, colcount;
 		var cvTabIndex, tabLabels;
 		var thisNextPos;
-				
+		
+//		("tab passed to prAddToGui:"+tab).postln;
+		
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 		
 		if(tab.notNil, {
 			if(tabLabels.includes(tab.asSymbol), {
 				cvTabIndex = tabLabels.indexOf(tab.asSymbol);
+//				("tab is not nil and included in the list of current tabs:"+cvTabIndex).postln;
 			}, {
 				tabs.add(tab);
 				cvTabIndex = tabLabels.size;
 				tabProperties = tabProperties.add((tabLabel: tab, tabColor: nextColor.next));
+//				("tab is not nil and not included in the list of current tabs:"+cvTabIndex).postln;
 			})
 		}, {
 			cvTabIndex = tabs.activeTab;
+//			("tab is nil:"+cvTabIndex).postln;
 		});
 		
 		tabs.labelColors_(tabProperties.collect(_.tabColor));
@@ -405,7 +418,8 @@ CVCenter {
 		}, {
 			thisNextPos = 0@0;
 		});
-						
+		
+		("next widget added now at:"+thisNextPos).postln;				
 		
 		colwidth = widgetwidth+1; // add a small gap between widgets
 		rowheight = widgetheight+1;
@@ -436,11 +450,9 @@ CVCenter {
 	}
 	
 	*prRegroupWidgets { |tabIndex|
-		var rowwidth, rowheight, colcount, colwidth, widgetwidth, widgetheight, thisNextPos, order, orderedWidgets;
+		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets;
 				
-		widgetwidth = 52;
 		colwidth = widgetwidth+1; // add a small gap between widgets
-		widgetheight = 136;
 		rowheight = widgetheight+1;
 		rowwidth = window.bounds.width-15;
 		colcount = rowwidth.div(colwidth);
@@ -469,26 +481,39 @@ CVCenter {
 	}		
 	
 	*prUpdateSwitchboard { |widgetKey, labelKeys, tabIndex, tabColor|
-		var bounds, label, color, buttonWidth;
+		var bounds, label, color, buttonWidth, ctrl, ctrlNum;
 		
 		("*prUpdateSwitchboard called with widgetKey:"+widgetKey).postln;
+		
+		ctrl = labelKeys.ctrl.asInt;
+		
+		ctrlButtonBank !? {
+			if(ctrl%ctrlButtonBank == 0, {
+				ctrlNum = ctrlButtonBank.asString;
+			}, {
+				ctrlNum = (ctrl%ctrlButtonBank).asString;
+			});
+			ctrl = ((ctrl/ctrlButtonBank).ceil).asString++":"++ctrlNum;
+		};
+		
+//		ctrl.postln;
 		
 		nextButtonPos ?? { nextButtonPos = 0@0 };
 		ctrlButtonMode.switch(
 			0, { 
-				buttonWidth = 20;
+				buttonWidth = 27;
 				bounds = Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, 15); 
-				label = [labelKeys.ctrl, Color.black, tabColor];
+				label = [ctrl.asString, Color.black, tabColor];
 			},
 			1, { 
-				buttonWidth = 40;
+				buttonWidth = 47;
 				bounds = Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, 15); 
-				label = [labelKeys.ctrl+"|"+labelKeys.chan, Color.black, tabColor];
+				label = [ctrl.asString+"|"+labelKeys.chan, Color.black, tabColor];
 			},
 			2, { 
 				buttonWidth = 100;
 				bounds = Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, 15); 
-				label = [labelKeys.ctrl+"|"+labelKeys.chan+"|"+labelKeys.src, Color.black, tabColor];
+				label = [ctrl.asString+"|"+labelKeys.chan+"|"+labelKeys.src, Color.black, tabColor];
 			}
 		);
 		

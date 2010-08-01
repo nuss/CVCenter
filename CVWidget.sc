@@ -4,49 +4,56 @@ CVWidget {
 	classvar <editorWindow, <window;
 
 //	var <>midiSetUp, thisCV;
-	var thisCV;
-	var <>midimode = 0, <>midimean = 64, <>midistring = ""; 
+	var thisCV, thisGuiEls;
+	var <>midimode = 0, <>midimean = 64, <>midistring = "";
+	var <>ctrlButtonBank; 
 	var <>widgetBg, <>label, <>nameField, <>knob, <>numVal, <>specBut, <>midiHead, <>midiLearn, <>midiSrc, <>midiChan, <>midiCtrl, <>editor;
 	var <>cc, <>softWithin = 0.1, spec;
 	var <visible;
 	var widgetXY, widgetProps;
 
-	*new { |parent, cv, name, bounds, setupArgs|
-		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setupArgs)
+	*new { |parent, cv, name, bounds, setUpArgs|
+		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs)
 	}
 	
-	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=137, setupArgs|
-		var knobsize, meanVal, widgetSpecsActions, editor, cvString;
-		var tmpSetup;
-
+	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=120, setUpArgs|
+		var knobsize, flow, meanVal, widgetSpecsActions, editor, cvString;
+		var tmpSetup, thisToggleColor;
+		parentView.background.postln;
+		
 		thisCV = cv;
+//		("widget"+name.asString+"initialized with setup:"+[this.setup, setUpArgs]).postln;
+		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
-		setupArgs.isKindOf(Array).not.if { setupArgs = [setupArgs] };
-		
-		setupArgs[0] !? this.midimode_(setupArgs[0]);
-		setupArgs[1] !? this.midimean_(setupArgs[1]);
-		setupArgs[2] !? this.midistring_(setupArgs[2].asString);
+		setUpArgs[0] !? { this.midimode_(setUpArgs[0]) };
+		setUpArgs[1] !? { this.midimean_(setUpArgs[1]) };
+		setUpArgs[2] !? { this.midistring_(setUpArgs[2].asString) };
 				
-		knobsize = widgetwidth-10;
+		knobsize = widgetwidth-14;
 		
 		this.widgetBg = UserView(parentView, Rect(xy.x, xy.y, widgetwidth, widgetheight))
-			.focusColor_(Color(alpha: 0))
+			.focusColor_(Color(alpha: 1.0))
 			.background_(Color.white)
 		;
-		this.label = StaticText(parentView, Rect(xy.x+1, xy.y+1, widgetwidth-2, 12))
-			.background_(Color(green:(255.div(4)/255)))
-			.stringColor_(Color.white)
-			.string_(""+name.asString)
+		this.label = Button(parentView, Rect(xy.x+1, xy.y+1, widgetwidth-2, 15))
+			.states_([
+				[""+name.asString, Color.white, Color.blue],
+				[""+name.asString, Color.black, Color.yellow],
+			])
 			.font_(Font("Helvetica", 9))
+			.action_({ |b|
+				this.toggleComment(b.value);
+			})
 		;
-		this.nameField = TextField(parentView, Rect(xy.x+1, xy.y+13, widgetwidth-2, 12))
+		this.nameField = TextField(parentView, Rect(this.label.bounds.left, this.label.bounds.top+this.label.bounds.height, widgetwidth-2, widgetheight-this.label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.value_(name.asString)
 			.action_({ |nf| nf.value_(nf.value) })
+			.visible_(false)
 		;
-		this.knob = Knob(parentView, Rect(xy.x+(widgetwidth/2-(knobsize/2)), xy.y+27, knobsize, knobsize))
+		this.knob = Knob(parentView, Rect(xy.x+(widgetwidth/2-(knobsize/2)), xy.y+16, knobsize, knobsize))
 			.canFocus_(false)
 		;
 		block { |break|
@@ -54,11 +61,11 @@ CVWidget {
 				if(cv.spec == symbol.asSpec, { break.value(this.knob.centered_(true)) });
 			})
 		};
-		this.numVal = NumberBox(parentView, Rect(xy.x+1, xy.y+knobsize+23, widgetwidth-2, 15))
+		this.numVal = NumberBox(parentView, Rect(xy.x+1, xy.y+knobsize+12, widgetwidth-2, 15))
 			.value_(cv.value)
 			.action_({ |nv| cv.value_(nv.value) })
 		;
-		this.specBut = Button(parentView, Rect(xy.x+1, xy.y+knobsize+38, widgetwidth-2, 15))
+		this.specBut = Button(parentView, Rect(xy.x+1, xy.y+knobsize+27, widgetwidth-2, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
@@ -66,13 +73,13 @@ CVWidget {
 				CVWidget.editorWindow_(this, name);
 			})
 		;
-		this.midiHead = Button(parentView, Rect(xy.x+1, xy.y+knobsize+54, widgetwidth-17, 15))
+		this.midiHead = Button(parentView, Rect(xy.x+1, xy.y+knobsize+43, widgetwidth-17, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
 			.action_({ |ms| })
 		;
-		this.midiLearn = Button(parentView, Rect(xy.x+widgetwidth-16, xy.y+knobsize+54, 15, 15))
+		this.midiLearn = Button(parentView, Rect(xy.x+widgetwidth-16, xy.y+knobsize+43, 15, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
@@ -85,8 +92,21 @@ CVWidget {
 						0.01.wait;
 						if(ml.value == 1, {
 							this.cc = CCResponder({ |src, chan, ctrl, val|
+								var ctrlString;
+								[src, chan, ctrl, val].postln;
+								ctrlString = ctrl+1;
+								
+								this.ctrlButtonBank !? {
+									if(ctrlString%ctrlButtonBank == 0, {
+										ctrlString = ctrlButtonBank.asString;
+									}, {
+										ctrlString = (ctrlString%ctrlButtonBank).asString;
+									});
+									ctrlString = ((ctrl+1/ctrlButtonBank).ceil).asString++":"++ctrlString;
+								};								
 								this.midimode.switch(
 									0, { 
+										("selected is 0:"+this.setup).postln;
 										if(val/127 < (cv.input+(softWithin/2)) and: {
 											val/127 > (cv.input-(softWithin/2));
 										}, { 
@@ -94,6 +114,7 @@ CVWidget {
 										})
 									},
 									1, { 
+										("selected is 1:"+this.setup).postln;
 										meanVal = this.midimean;
 										cv.input_(cv.input+((val-meanVal)/127)) 
 									}
@@ -108,7 +129,7 @@ CVWidget {
 											.background_(Color.red)
 											.stringColor_(Color.white)
 										;
-										this.midiCtrl.string_((ctrl+1).asString)
+										this.midiCtrl.string_(ctrlString.asString)
 											.background_(Color.red)
 											.stringColor_(Color.white)
 										;
@@ -142,7 +163,7 @@ CVWidget {
 				}.fork(AppClock)
 			})
 		;
-		this.midiSrc = TextField(parentView, Rect(xy.x+1, xy.y+knobsize+69, widgetwidth-2, 12))
+		this.midiSrc = TextField(parentView, Rect(xy.x+1, xy.y+knobsize+58, widgetwidth-2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_("source")
@@ -150,7 +171,7 @@ CVWidget {
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		;
-		this.midiChan = TextField(parentView, Rect(xy.x+1, xy.y+knobsize+81, widgetwidth-2/2, 12))
+		this.midiChan = TextField(parentView, Rect(xy.x+1, xy.y+knobsize+70, widgetwidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_("chan")
@@ -158,7 +179,7 @@ CVWidget {
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		;
-		this.midiCtrl = TextField(parentView, Rect(xy.x+(widgetwidth-2/2)+1, xy.y+knobsize+81, widgetwidth-2/2, 12))
+		this.midiCtrl = TextField(parentView, Rect(xy.x+(widgetwidth-2/2)+1, xy.y+knobsize+70, widgetwidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_("ctrl")
@@ -168,10 +189,12 @@ CVWidget {
 		;
 		
 		[this.knob, this.numVal].do({ |view| cv.connect(view) });
+		thisGuiEls = [this.knob, this.numVal, this.specBut, this.midiHead, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl];
+
 	}
 	
 	setup {
-		^[this.midimode, this.midimean, this.midistring];
+		^[this.midimode, this.midimean, this.midistring, this.ctrlButtonBank];
 	}
 	
 	visible_ { |visible|
@@ -184,6 +207,23 @@ CVWidget {
 				[this.widgetBg, this.label, this.nameField, this.knob, this.numVal, this.specBut, this.midiHead, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl].do(_.visible_(false));
 			})
 		})
+	}
+	
+	toggleComment { |visible|
+		visible.switch(
+			0, { 
+				thisGuiEls.do({ |el| 
+					el.visible_(true);
+					this.nameField.visible_(false);
+				})
+			},
+			1, {
+				thisGuiEls.do({ |el|
+					el.visible_(false);
+					this.nameField.visible_(true);
+				})
+			}
+		)
 	}
 	
 	spec_ { |spec|
@@ -276,7 +316,8 @@ CVWidget {
 		;
 		cvString = widget.spec.asString.split($ );
 		cvString = cvString[1..cvString.size-1].join(" ");
-		editor.string_("// edit and hit <enter>\n// the string must represent a valid ControlSpec\n// e.g. \\freq.asSpec\n// or [20, 400].asSpec\n// or ControlSpec(23, 653, \\exp, 1.0, 312, \" hz\")\n// have a look at the ControlSpec-helpfile ...\n\n"++cvString)
+		editor
+			.string_("// edit and hit <enter>\n// the string must represent a valid ControlSpec\n// e.g. \\freq.asSpec\n// or [20, 400].asSpec\n// or ControlSpec(23, 653, \\exp, 1.0, 312, \" hz\")\n// have a look at the ControlSpec-helpfile ...\n\n"++cvString)
 			.visible_(false)
 			.syntaxColorize
 			.enterInterpretsSelection_(false)
