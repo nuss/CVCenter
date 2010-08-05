@@ -3,7 +3,7 @@ CVCenter {
 
 	classvar <cvsList, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
 	classvar <>midimode, <>midimean, <>midistring, <numccs;
-	classvar controlButtonKeys, controlButtons, nextButtonPos;
+	classvar <controlButtonKeys, <controlButtons, <nextButtonPos;
 	classvar <>ctrlButtonMode = 0, <>ctrlButtonBank;
 	classvar widgetwidth = 52, widgetheight = 120, colwidth, rowheight, <widgetStates;
 	classvar <tabProperties, colors, nextColor;
@@ -19,7 +19,7 @@ CVCenter {
 			colors = List();
 			tabProperties = [];
 			
-			("setUpArgs:"+setUpArgs).postln;
+//			("setUpArgs:"+setUpArgs).postln;
 			if(setUpArgs.size > 0, { this.prSetup(*setUpArgs) });
 			
 			
@@ -31,8 +31,8 @@ CVCenter {
 				})
 			});
 			
-			colors.postln;
-			nextColor = Pseq(colors.reverse, inf).asStream;
+//			colors.postln;
+			nextColor = Pxrand(colors, inf).asStream;
 			
 			if(cvs.isNil, {
 				nextCVKey = 1;
@@ -61,6 +61,7 @@ CVCenter {
 		var flow, rowwidth, colcount;
 		var cvTabIndex, order, orderedCVs;
 		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, lastNumCCs, lastCCs, removedKeys, skipJacks;
+		var lastCtrlBtnsMode;
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
 			
 		cvs !? { this.put(*cvs) };
@@ -194,7 +195,6 @@ CVCenter {
 				if(cvsList.size != lastUpdate, {
 					if(cvsList.size > lastUpdate and:{ cvWidgets.size <= lastUpdate }, {
 						this.prAddToGui;
-//						this.prUpdateSwitchboard;
 					});
 					if(cvsList.size < lastUpdate, {
 						removedKeys = cvWidgets.keys.difference(cvsList.keys);
@@ -203,7 +203,6 @@ CVCenter {
 							cvWidgets.removeAt(k);
 						});
 						this.prRegroupWidgets(tabs.activeTab);
-						this.prUpdateSwitchboard;
 					});
 					lastUpdate = cvsList.size;
 				});
@@ -214,59 +213,34 @@ CVCenter {
 				};
 				lastUpdateWidth = window.bounds.width;
 				lastSetUp = this.setup;
-				numccs !? { lastNumCCs = numccs };
-				lastCCs ?? { lastCCs = controlButtonKeys };
-				numccs = controlButtonKeys.size;
-//				[numccs, lastNumCCs].postln;
 				cvWidgets.pairsDo({ |k, wdgt|
-//					[wdgt.cc, widgetStates[k].addedFunc].postln;
 					wdgt.cc !? {
-//						[k, wdgt, "cc added"].postln;
 						if(widgetStates[k].addedFunc == false, {
 							wdgt.cc.function_(
 								wdgt.cc.function.addFunc({ 
-									{ tabs.focus(widgetStates[k].tabIndex) }.defer
+									{ 
+										tabs.focus(widgetStates[k].tabIndex);
+										cvWidgets.do({ |w|
+											if(w === wdgt, {
+												wdgt.widgetBg.focusColor_(Color.green).focus(true);
+											}, {
+												wdgt.widgetBg.focusColor_(Color(alpha: 0)).focus(false);
+											})
+										}) 
+									}.defer
 								})
 							);
 							widgetStates[k].addedFunc = true;
 						});
-						controlButtonKeys[k] ?? {
-							if(wdgt.midiSrc.value != "source" or:{
-								wdgt.midiChan.value != "chan" or:{
-									wdgt.midiCtrl.value != "ctrl"
-								}
-							}, {
-								controlButtonKeys[k] = (src: wdgt.midiSrc.value, chan: wdgt.midiChan.value, ctrl: wdgt.midiCtrl.value);
-							})
-						};
-						numccs = controlButtonKeys.size;
-//						[controlButtonKeys, numccs].postln;
-						lastNumCCs !? {
-							if(numccs > lastNumCCs, {
-//								["added", numccs, lastNumCCs].postln;
-								this.prUpdateSwitchboard(
-									k,
-									controlButtonKeys[k], 
-									widgetStates[k].tabIndex, 
-									tabProperties[widgetStates[k].tabIndex].tabColor
-								)
-							})
-						}
 					};
 					wdgt.cc ?? {
-//						[k, "cc removed"].postln;
 						if(widgetStates[k].addedFunc == true, {
 							widgetStates[k].addedFunc = false
 						});
-						controlButtonKeys[k] = nil;
-						numccs = controlButtonKeys.size;
-						lastNumCCs !? {
-							if(numccs < lastNumCCs, {
-//								["removed", numccs, lastNumCCs].postln;
-//								removedKeys = 
-							})
-						}
-					}
+					};
+					wdgt.midiLearn.action_(
+						wdgt.midiLearn.action.addFunc( this.prAddCtrlButton )
+					)
 				})
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});
@@ -370,13 +344,13 @@ CVCenter {
 	// private Methods - not to be used directly
 	
 	*prSetup { |argMode, argMean, argString, argCButtonBank|
-		("setup-args:"+[argMode, argMean, argString, argCButtonBank]).postln;
+//		("setup-args:"+[argMode, argMean, argString, argCButtonBank]).postln;
 		argMode !? { this.midimode_(argMode) };
 		argMean !? { this.midimean_(argMean) };
 		argString !? { this.midistring_(argString.asString) };
 		argCButtonBank !? { this.ctrlButtonBank_(argCButtonBank) };
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
-			window.name = "CVCenter"+midistring.asString;
+			window.name = "CVCenter";
 			cvWidgets.keysValuesDo({ |k, cv| 
 				this.midimode !? { cv.midimode_(this.midimode) }; 
 				this.midimean !? { cv.midimean_(this.midimean) };
@@ -419,7 +393,7 @@ CVCenter {
 			thisNextPos = 0@0;
 		});
 		
-		("next widget added now at:"+thisNextPos).postln;				
+//		("next widget added now at:"+thisNextPos).postln;				
 		
 		colwidth = widgetwidth+1; // add a small gap between widgets
 		rowheight = widgetheight+1;
@@ -480,68 +454,57 @@ CVCenter {
 		}
 	}		
 	
-	*prUpdateSwitchboard { |widgetKey, labelKeys, tabIndex, tabColor|
-		var bounds, label, color, buttonWidth, ctrl, ctrlNum;
-		
-		("*prUpdateSwitchboard called with widgetKey:"+widgetKey).postln;
-		
-		ctrl = labelKeys.ctrl.asInt;
-		
-		ctrlButtonBank !? {
-			if(ctrl%ctrlButtonBank == 0, {
-				ctrlNum = ctrlButtonBank.asString;
-			}, {
-				ctrlNum = (ctrl%ctrlButtonBank).asString;
-			});
-			ctrl = ((ctrl/ctrlButtonBank).ceil).asString++":"++ctrlNum;
-		};
-		
-//		ctrl.postln;
-		
-		nextButtonPos ?? { nextButtonPos = 0@0 };
-		ctrlButtonMode.switch(
-			0, { 
-				buttonWidth = 27;
-				bounds = Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, 15); 
-				label = [ctrl.asString, Color.black, tabColor];
-			},
-			1, { 
-				buttonWidth = 47;
-				bounds = Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, 15); 
-				label = [ctrl.asString+"|"+labelKeys.chan, Color.black, tabColor];
-			},
-			2, { 
-				buttonWidth = 100;
-				bounds = Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, 15); 
-				label = [ctrl.asString+"|"+labelKeys.chan+"|"+labelKeys.src, Color.black, tabColor];
-			}
-		);
+	*prAddCtrlButton { 
+		var bounds, labelString, label, color, buttonWidth, ctrl, ctrlNum, numccs, btnTabKeys;
 		
 		controlButtons ?? { controlButtons = IdentityDictionary() };
+		btnTabKeys = cvWidgets.select({ |wdgt| wdgt.cc.notNil and:{ wdgt.midiCtrl.string != "ctrl" }}).keys.asArray;
 
-		controlButtons[widgetKey] !? {
-			controlButtons.removeAt(widgetKey)
-		};
+		nextButtonPos ?? { nextButtonPos = 0@0 };
 
-		controlButtons[widgetKey] ?? {
-			controlButtons.put(
-				widgetKey, 
-				Button(switchBoard, bounds)
-			);
-			controlButtons[widgetKey].states_([label]);
-			controlButtons[widgetKey].font_(Font("Helvetica", 9));
-			controlButtons[widgetKey].action_({ tabs.focus(tabIndex) });
-		};
+		ctrlButtonMode.switch(
+			0, { buttonWidth = 27 },
+			1, { buttonWidth = 47 },
+			2, { buttonWidth = 100 }
+		);
 		
-//		[controlButtons, switchBoard.bounds.width].postln;
-		
-		if(nextButtonPos.x+buttonWidth >= (switchBoard.bounds.width-80), {
-			nextButtonPos = 0@(nextButtonPos.y+15);
-		}, {
-			nextButtonPos = nextButtonPos.x+buttonWidth@nextButtonPos.y;
-		});
-		
-//		("controlButtons:"+controlButtons).postln;
+		btnTabKeys.do({ |key|
+			controlButtons[key] ?? {
+				ctrlButtonMode.switch(
+					0, { labelString = cvWidgets[key].midiCtrl.string },
+					1, { labelString = cvWidgets[key].midiCtrl.string+":"+cvWidgets[key].midiChan.string },
+					2, { labelString = cvWidgets[key].midiCtrl.string+":"+cvWidgets[key].midiChan.string+":"+cvWidgets[key].midiSrc.string }
+				);
+							
+				controlButtons.put(
+					key,
+					Button(
+						switchBoard,
+						Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, 15)
+					)
+					.states_([
+						[labelString, Color.black, tabProperties[widgetStates[key].tabIndex].tabColor]
+					])
+					.font_(Font("Helvetica", 9))
+					.action_({ 
+						tabs.focus(widgetStates[key].tabIndex);
+						cvWidgets.pairsDo({ |k, wdgt|
+							if(k == key, {
+								wdgt.widgetBg.focusColor_(Color.green).focus(true);
+							}, {
+								wdgt.widgetBg.focusColor_(Color(alpha: 0)).focus(false);
+							})
+						})
+					})
+				);
+								
+				if(nextButtonPos.x+buttonWidth >= (switchBoard.bounds.width-80), {
+					nextButtonPos = 0@(nextButtonPos.y+15);
+				}, {
+					nextButtonPos = nextButtonPos.x+buttonWidth@nextButtonPos.y;
+				});
+			}
+		})
 	}
-			
+				
 }

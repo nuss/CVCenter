@@ -93,7 +93,7 @@ CVWidget {
 						if(ml.value == 1, {
 							this.cc = CCResponder({ |src, chan, ctrl, val|
 								var ctrlString;
-								[src, chan, ctrl, val].postln;
+//								[src, chan, ctrl, val].postln;
 								ctrlString = ctrl+1;
 								
 								this.ctrlButtonBank !? {
@@ -106,7 +106,7 @@ CVWidget {
 								};								
 								this.midimode.switch(
 									0, { 
-										("selected is 0:"+this.setup).postln;
+//										("selected is 0:"+this.setup).postln;
 										if(val/127 < (cv.input+(softWithin/2)) and: {
 											val/127 > (cv.input-(softWithin/2));
 										}, { 
@@ -114,7 +114,7 @@ CVWidget {
 										})
 									},
 									1, { 
-										("selected is 1:"+this.setup).postln;
+//										("selected is 1:"+this.setup).postln;
 										meanVal = this.midimean;
 										cv.input_(cv.input+((val-meanVal)/127)) 
 									}
