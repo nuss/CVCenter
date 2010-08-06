@@ -4,7 +4,7 @@ CVCenter {
 	classvar <cvsList, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
 	classvar <>midimode, <>midimean, <>midistring, <numccs;
 	classvar <controlButtonKeys, <controlButtons, <nextButtonPos;
-	classvar <>ctrlButtonMode = 0, <>ctrlButtonBank;
+	classvar <>ctrlButtonBank, currentButtonStates;
 	classvar widgetwidth = 52, widgetheight = 120, colwidth, rowheight, <widgetStates;
 	classvar <tabProperties, colors, nextColor;
 	
@@ -60,7 +60,7 @@ CVCenter {
 	*gui { |tab...cvs|
 		var flow, rowwidth, colcount;
 		var cvTabIndex, order, orderedCVs;
-		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, lastNumCCs, lastCCs, removedKeys, skipJacks;
+		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
 		var lastCtrlBtnsMode;
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
 			
@@ -241,7 +241,23 @@ CVCenter {
 					wdgt.midiLearn.action_(
 						wdgt.midiLearn.action.addFunc( this.prAddCtrlButton )
 					)
-				})
+				});
+				controlButtons !? {
+					if(lastCtrlBtnBank != ctrlButtonBank, {
+						this.prUpdateSwitchboardSetup
+					});
+					controlButtons.pairsDo({ |k, btn|
+						currentButtonStates[k] = [
+							cvWidgets[k].midiCtrl.string, 
+							Color.black, 
+							tabProperties[widgetStates[k].tabIndex].tabColor
+						];
+//						currentButtonStates[k].postln;
+						btn.states_([currentButtonStates[k]]);
+						window.refresh;
+					});
+					lastCtrlBtnBank = ctrlButtonBank;
+				}
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});
 	}	
@@ -355,7 +371,9 @@ CVCenter {
 				this.midimode !? { cv.midimode_(this.midimode) }; 
 				this.midimean !? { cv.midimean_(this.midimean) };
 				this.midistring !? { cv.midistring_(this.midistring.asString) };
-				this.ctrlButtonBank !? { cv.ctrlButtonBank_(this.ctrlButtonBank) }; 			})
+//				this.ctrlButtonBank !? { cv.ctrlButtonBank_(this.ctrlButtonBank) }; 
+				cv.ctrlButtonBank_(this.ctrlButtonBank); 
+			})
 		})
 	}
 			
@@ -455,36 +473,45 @@ CVCenter {
 	}		
 	
 	*prAddCtrlButton { 
-		var bounds, labelString, label, color, buttonWidth, ctrl, ctrlNum, numccs, btnTabKeys;
+		var buttonWidth, btnTabKeys;
 		
+		currentButtonStates ?? { currentButtonStates = IdentityDictionary() };
+		
+		if(ctrlButtonBank.notNil and:{
+			ctrlButtonBank.isInteger and:{
+				ctrlButtonBank > 1
+			}
+		}, {
+			buttonWidth = 30
+		}, {
+			buttonWidth = 18
+		});
+				
 		controlButtons ?? { controlButtons = IdentityDictionary() };
 		btnTabKeys = cvWidgets.select({ |wdgt| wdgt.cc.notNil and:{ wdgt.midiCtrl.string != "ctrl" }}).keys.asArray;
 
 		nextButtonPos ?? { nextButtonPos = 0@0 };
-
-		ctrlButtonMode.switch(
-			0, { buttonWidth = 27 },
-			1, { buttonWidth = 47 },
-			2, { buttonWidth = 100 }
-		);
 		
 		btnTabKeys.do({ |key|
 			controlButtons[key] ?? {
-				ctrlButtonMode.switch(
-					0, { labelString = cvWidgets[key].midiCtrl.string },
-					1, { labelString = cvWidgets[key].midiCtrl.string+":"+cvWidgets[key].midiChan.string },
-					2, { labelString = cvWidgets[key].midiCtrl.string+":"+cvWidgets[key].midiChan.string+":"+cvWidgets[key].midiSrc.string }
+				currentButtonStates.put(
+					key,
+					[
+						cvWidgets[key].midiCtrl.string, 
+						Color.black, 
+						tabProperties[widgetStates[key].tabIndex].tabColor
+					]
 				);
-							
+				
+				["currentButtonStates:"+currentButtonStates].postln;
+
 				controlButtons.put(
 					key,
 					Button(
 						switchBoard,
 						Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, 15)
 					)
-					.states_([
-						[labelString, Color.black, tabProperties[widgetStates[key].tabIndex].tabColor]
-					])
+					.states_([currentButtonStates[key]])
 					.font_(Font("Helvetica", 9))
 					.action_({ 
 						tabs.focus(widgetStates[key].tabIndex);
@@ -505,6 +532,44 @@ CVCenter {
 				});
 			}
 		})
+	}
+	
+	*prUpdateSwitchboardSetup {
+		var buttonWidth;
+		
+		"prUpdateSwitchboardSetup triggered".postln;
+
+		if(ctrlButtonBank.notNil and:{
+			ctrlButtonBank.isInteger and:{
+				ctrlButtonBank > 1
+			}
+		}, {
+			"now should update to new width".postln;
+			buttonWidth = 30
+		}, {
+			buttonWidth = 18
+		});
+
+		nextButtonPos = 0@0;
+		
+		controlButtons.pairsDo({ |key, btn|
+//			currentButtonStates = [
+//				cvWidgets[key].midiCtrl.string, 
+//				Color.black, 
+//				tabProperties[widgetStates[key].tabIndex].tabColor
+//			];
+//			["currentButtonStates:"+currentButtonStates].postln;
+
+//			[labelString, labelString.class, buttonWidth].postln;
+			btn.bounds_(Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, btn.bounds.height));
+//			btn.states_([currentButtonStates]);
+			
+			if(nextButtonPos.x+buttonWidth >= (switchBoard.bounds.width-80), {
+				nextButtonPos = 0@(nextButtonPos.y+15);
+			}, {
+				nextButtonPos = nextButtonPos.x+buttonWidth@nextButtonPos.y;
+			})
+		})	
 	}
 				
 }

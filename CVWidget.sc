@@ -28,6 +28,7 @@ CVWidget {
 		setUpArgs[0] !? { this.midimode_(setUpArgs[0]) };
 		setUpArgs[1] !? { this.midimean_(setUpArgs[1]) };
 		setUpArgs[2] !? { this.midistring_(setUpArgs[2].asString) };
+		setUpArgs[3] !? { this.ctrlButtonBank_(setUpArgs[3]) };
 				
 		knobsize = widgetwidth-14;
 		
@@ -94,16 +95,18 @@ CVWidget {
 							this.cc = CCResponder({ |src, chan, ctrl, val|
 								var ctrlString;
 //								[src, chan, ctrl, val].postln;
-								ctrlString = ctrl+1;
-								
-								this.ctrlButtonBank !? {
+//								ctrlString = ctrl+1;
+																				ctrlString ? ctrlString = ctrl+1;
+
+								if(this.ctrlButtonBank.notNil, {
 									if(ctrlString%ctrlButtonBank == 0, {
 										ctrlString = ctrlButtonBank.asString;
 									}, {
 										ctrlString = (ctrlString%ctrlButtonBank).asString;
 									});
 									ctrlString = ((ctrl+1/ctrlButtonBank).ceil).asString++":"++ctrlString;
-								};								
+								}, {
+									ctrlString = ctrl+1;								});								
 								this.midimode.switch(
 									0, { 
 //										("selected is 0:"+this.setup).postln;
