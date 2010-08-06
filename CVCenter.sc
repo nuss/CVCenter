@@ -201,8 +201,12 @@ CVCenter {
 						removedKeys.do({ |k|
 							cvWidgets[k].remove;
 							cvWidgets.removeAt(k);
+							controlButtons[k].postln;
+							controlButtons[k].remove;
+							controlButtons.removeAt(k);
 						});
 						this.prRegroupWidgets(tabs.activeTab);
+						this.prUpdateSwitchboardSetup;
 					});
 					lastUpdate = cvsList.size;
 				});
@@ -219,12 +223,11 @@ CVCenter {
 							wdgt.cc.function_(
 								wdgt.cc.function.addFunc({ 
 									{ 
+//										("CCResponder \\"++k+"focuses tab"+widgetStates[k].tabIndex+"now").postln;
 										tabs.focus(widgetStates[k].tabIndex);
 										cvWidgets.do({ |w|
 											if(w === wdgt, {
 												wdgt.widgetBg.focusColor_(Color.green).focus(true);
-											}, {
-												wdgt.widgetBg.focusColor_(Color(alpha: 0)).focus(false);
 											})
 										}) 
 									}.defer
@@ -252,8 +255,12 @@ CVCenter {
 							Color.black, 
 							tabProperties[widgetStates[k].tabIndex].tabColor
 						];
-//						currentButtonStates[k].postln;
 						btn.states_([currentButtonStates[k]]);
+						if(btn.states.flatten(1)[0] == "ctrl", {
+							btn.remove;
+							controlButtons.removeAt(k);
+							this.prUpdateSwitchboardSetup;
+						});
 						window.refresh;
 					});
 					lastCtrlBtnBank = ctrlButtonBank;
@@ -292,6 +299,7 @@ CVCenter {
 		var lastVal;
 		lastVal = cvsList.at(key.asSymbol).value;
 		cvsList.removeAt(key.asSymbol);
+		cvWidgets[key].cc !? { cvWidgets[key].cc.remove };
 		^lastVal;
 	}
 	
@@ -518,8 +526,6 @@ CVCenter {
 						cvWidgets.pairsDo({ |k, wdgt|
 							if(k == key, {
 								wdgt.widgetBg.focusColor_(Color.green).focus(true);
-							}, {
-								wdgt.widgetBg.focusColor_(Color(alpha: 0)).focus(false);
 							})
 						})
 					})
@@ -553,16 +559,7 @@ CVCenter {
 		nextButtonPos = 0@0;
 		
 		controlButtons.pairsDo({ |key, btn|
-//			currentButtonStates = [
-//				cvWidgets[key].midiCtrl.string, 
-//				Color.black, 
-//				tabProperties[widgetStates[key].tabIndex].tabColor
-//			];
-//			["currentButtonStates:"+currentButtonStates].postln;
-
-//			[labelString, labelString.class, buttonWidth].postln;
 			btn.bounds_(Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, btn.bounds.height));
-//			btn.states_([currentButtonStates]);
 			
 			if(nextButtonPos.x+buttonWidth >= (switchBoard.bounds.width-80), {
 				nextButtonPos = 0@(nextButtonPos.y+15);
@@ -571,5 +568,8 @@ CVCenter {
 			})
 		})	
 	}
-				
+	
+	*prRemoveFromSwitchboard {
+		
+	}			
 }
