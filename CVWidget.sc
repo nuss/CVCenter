@@ -19,7 +19,6 @@ CVWidget {
 	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=120, setUpArgs|
 		var knobsize, flow, meanVal, widgetSpecsActions, editor, cvString;
 		var tmpSetup, thisToggleColor;
-		parentView.background.postln;
 		
 		thisCV = cv;
 //		("widget"+name.asString+"initialized with setup:"+[this.setup, setUpArgs]).postln;
@@ -99,6 +98,7 @@ CVWidget {
 																				ctrlString ? ctrlString = ctrl+1;
 
 								if(this.ctrlButtonBank.notNil, {
+//									"ctrlButtonBank is not nil".postln;
 									if(ctrlString%ctrlButtonBank == 0, {
 										ctrlString = ctrlButtonBank.asString;
 									}, {
@@ -106,6 +106,7 @@ CVWidget {
 									});
 									ctrlString = ((ctrl+1/ctrlButtonBank).ceil).asString++":"++ctrlString;
 								}, {
+//									"ctrlButtonBank is nil".postln;
 									ctrlString = ctrl+1;								});								
 								this.midimode.switch(
 									0, { 

@@ -4,7 +4,7 @@ CVCenter {
 	classvar <cvsList, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
 	classvar <>midimode, <>midimean, <>midistring, <numccs;
 	classvar <controlButtonKeys, <controlButtons, <nextButtonPos;
-	classvar <>ctrlButtonBank, currentButtonStates;
+	classvar <>ctrlButtonBank, currentButtonStates, guiClosed = false/*, buttonProps*/;
 	classvar widgetwidth = 52, widgetheight = 120, colwidth, rowheight, <widgetStates;
 	classvar <tabProperties, colors, nextColor;
 	
@@ -20,8 +20,7 @@ CVCenter {
 			tabProperties = [];
 			
 //			("setUpArgs:"+setUpArgs).postln;
-			if(setUpArgs.size > 0, { this.prSetup(*setUpArgs) });
-			
+			if(setUpArgs.size > 0, { "prSetup called in *new".postln; this.prSetup(*setUpArgs) });
 			
 			r.do({ |red|
 				g.do({ |green|
@@ -109,10 +108,12 @@ CVCenter {
 			flow.shift(0, 0);
 			
 			switchBoard = ScrollView(window, Rect(0, 0, flow.bounds.width, 50));
+//			buttonProps !? { this.prAddCtrlButton }
+			switchBoard ?? { switchBoard = ScrollView(window, Rect(0, 0, flow.bounds.width, 50)) };
 			switchBoard.resize_(8);
 
 			window.onClose_({
-				cvWidgets.keysValuesDo({ |k, w|
+				cvWidgets.pairsDo({ |k, w|
 					widgetStates[k].nameField = w.nameField.string;
 					widgetStates[k].midiEdit = w.midiHead.enabled;
 					widgetStates[k].midiLearn = w.midiLearn.value;
@@ -124,6 +125,10 @@ CVCenter {
 					w.cc !? { widgetStates[k].cc = w.cc };
 				});
 				tabProperties.do(_.nextPos_(0@0));
+				controlButtons = nil;
+				cvWidgets = IdentityDictionary();
+				nextButtonPos = 0@0;
+				guiClosed = true;
 			});
 
 			thisNextPos = 0@0;
@@ -151,10 +156,12 @@ CVCenter {
 				}, { 
 					thisNextPos = tabProperties[cvTabIndex].nextPos;
 				});
-					
+				
 				cvWidgets[k] = CVWidget(
 					tabs.views[cvTabIndex], orderedCVs[i], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight), this.setup
 				);
+				
+				controlButtons !? { this.prAddCtrlButton };
 								
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 				
@@ -189,6 +196,7 @@ CVCenter {
 				lastUpdate ?? { lastUpdate = cvsList.size };
 				lastSetUp !? {
 					if(this.setup != lastSetUp, {
+						("now updating widget-setups:"+this.setup).postln;
 						this.prSetup(*this.setup);
 					})
 				};	
@@ -206,6 +214,7 @@ CVCenter {
 							controlButtons.removeAt(k);
 						});
 						this.prRegroupWidgets(tabs.activeTab);
+//						"it happens at 1".postln;
 						this.prUpdateSwitchboardSetup;
 					});
 					lastUpdate = cvsList.size;
@@ -213,6 +222,7 @@ CVCenter {
 				try {
 					if(window.bounds.width != lastUpdateWidth, {
 						this.prRegroupWidgets(tabs.activeTab);
+						this.prUpdateSwitchboardSetup;
 					})
 				};
 				lastUpdateWidth = window.bounds.width;
@@ -247,7 +257,9 @@ CVCenter {
 				});
 				controlButtons !? {
 					if(lastCtrlBtnBank != ctrlButtonBank, {
-						this.prUpdateSwitchboardSetup
+						"should be triggered even if gui has been closed and re-oppened again".postln;
+						if(guiClosed.not, { this.prUpdateSwitchboardSetup });
+						guiClosed = false;
 					});
 					controlButtons.pairsDo({ |k, btn|
 						currentButtonStates[k] = [
@@ -259,6 +271,7 @@ CVCenter {
 						if(btn.states.flatten(1)[0] == "ctrl", {
 							btn.remove;
 							controlButtons.removeAt(k);
+//							"it happens at 3".postln;
 							this.prUpdateSwitchboardSetup;
 						});
 						window.refresh;
@@ -374,12 +387,11 @@ CVCenter {
 		argString !? { this.midistring_(argString.asString) };
 		argCButtonBank !? { this.ctrlButtonBank_(argCButtonBank) };
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
-			window.name = "CVCenter";
-			cvWidgets.keysValuesDo({ |k, cv| 
+//			window.name = "CVCenter";
+			cvWidgets.pairsDo({ |k, cv| 
 				this.midimode !? { cv.midimode_(this.midimode) }; 
 				this.midimean !? { cv.midimean_(this.midimean) };
 				this.midistring !? { cv.midistring_(this.midistring.asString) };
-//				this.ctrlButtonBank !? { cv.ctrlButtonBank_(this.ctrlButtonBank) }; 
 				cv.ctrlButtonBank_(this.ctrlButtonBank); 
 			})
 		})
@@ -497,6 +509,8 @@ CVCenter {
 				
 		controlButtons ?? { controlButtons = IdentityDictionary() };
 		btnTabKeys = cvWidgets.select({ |wdgt| wdgt.cc.notNil and:{ wdgt.midiCtrl.string != "ctrl" }}).keys.asArray;
+		
+//		("btnTabKeys:"+btnTabKeys).postln;
 
 		nextButtonPos ?? { nextButtonPos = 0@0 };
 		
@@ -511,8 +525,6 @@ CVCenter {
 					]
 				);
 				
-				["currentButtonStates:"+currentButtonStates].postln;
-
 				controlButtons.put(
 					key,
 					Button(
@@ -569,7 +581,4 @@ CVCenter {
 		})	
 	}
 	
-	*prRemoveFromSwitchboard {
-		
-	}			
 }
