@@ -157,7 +157,7 @@ CVCenter {
 					thisNextPos = tabProperties[cvTabIndex].nextPos;
 				});
 				
-				cvWidgets[k] = CVWidget(
+				cvWidgets[k] = CVWidgetKnob(
 					tabs.views[cvTabIndex], orderedCVs[i], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight), this.setup
 				);
 				
@@ -443,7 +443,7 @@ CVCenter {
 		widgetKeys = cvWidgets.keys;
 		thisKeys = allCVKeys.difference(widgetKeys);
 		thisKeys.do({ |k|
-			cvWidgets[k] = CVWidget(tabs.views[cvTabIndex], cvsList[k], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight), this.setup);
+			cvWidgets[k] = CVWidgetKnob(tabs.views[cvTabIndex], cvsList[k], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight), this.setup);
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 			if(thisNextPos.x+colwidth >= rowwidth, {
 				// jump to next row
