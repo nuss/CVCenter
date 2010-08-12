@@ -2,5 +2,7 @@ CVCenter resp. CVWidget are is a convenience class for using GUI-elements, MIDI-
 
 For more info check out CVCenter.html resp. CVWidget.html.
 
-Installation: Put all content of CVCenter in
+Installation: 
+1) get SuperCollider from http://supercollider.sourceforge.net/downloads/
+2) after installing SuperCollider put all content of CVCenter in
 ~/Library/Application Support/SuperCollider/Extensions/ (Mac)
