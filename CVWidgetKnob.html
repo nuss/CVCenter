@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title></title>
+<meta name="Generator" content="Cocoa HTML Writer">
+<meta name="CocoaVersion" content="949.54">
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; min-height: 17.0px}
+p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
+p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco}
+p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; min-height: 14.0px}
+p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #000000}
+p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #000000; min-height: 14.0px}
+p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #bf0000}
+span.s1 {font: 19.0px Helvetica}
+span.s2 {color: #35596e}
+span.s3 {color: #000000}
+span.s4 {color: #315a73}
+span.s5 {color: #0000ff}
+span.s6 {color: #003bdf}
+span.s7 {text-decoration: underline ; color: #002fd7}
+span.s8 {color: #395869}
+span.s9 {font: 12.0px Helvetica}
+span.s10 {color: #0000bf}
+span.s11 {color: #007300}
+span.s12 {color: #666666}
+span.s13 {color: #990099}
+span.s14 {color: #2c5a7a}
+span.Apple-tab-span {white-space:pre}
+</style>
+</head>
+<body>
+<p class="p1"><span class="s1"><b>CVWidgetKnob </b></span><b>a widget, wrapping <i>one</i> CV, providing a knob and a number-field for mouse-/keyboard-control resp. an automated midi-learn functionality to connect to midi-sliders on external hardware</b></p>
+<p class="p2"><br></p>
+<p class="p1"><b>inherits from: </b><a href="SC://Object"><span class="s2"><b>Object</b></span></a><span class="s3"><b> : CVWidget</b></span></p>
+<p class="p1"><b>dependencies: </b><a href="../../../quarks/Conductor/help/Conductor-Help/Conductor.html"><span class="s2"><b>Conductor</b></span></a><b> (</b><a href="SC://Quarks"><span class="s4"><b>Quarks</b></span></a><b>)</b></p>
+<p class="p2"><br></p>
+<p class="p1">A<b> CVWidget </b>resp. its subclasses are supposed to be convenient GUI-classes similar to <a href="SC://EZSlider"><span class="s2"><b>EZGui</b></span></a><b> </b>resp. its subclasses <a href="SC://EZSlider"><span class="s5"><b>EZSlider</b></span></a>, <a href="../../../../../../../../Applications/SuperCollider3/common/build/Help/GUI/EZ-GUI/EZKnob.html"><span class="s6"><b>EZKnob</b></span></a><span class="s6">, <a href="../../../../../../../../Applications/SuperCollider3/common/build/Help/GUI/EZ-GUI/EZRanger.html"><span class="s7"><b>EZRanger</b></span></a></span><span class="s7"> </span>etc. and it should be possible to use it any GUI. However, its primary purpose is not the use as such. Much rather it should be understood as a module for <a href="CVCenter.html"><span class="s2"><b>CVCenter</b></span></a>.</p>
+<p class="p2"><br></p>
+<p class="p1">A CVWidget is GUI-representation of a <a href="../../../quarks/Conductor/help/Conductor-Help/CV.html"><span class="s8"><b>CV</b></span></a><b> </b>(requires the <a href="../../../quarks/Conductor/help/Conductor-Help/Conductor.html"><span class="s8"><b>Conductor</b></span></a>-Quark to be installed). Instantiating a CVWidget as an element in a GUI automatically instantiates a <a href="../../../quarks/Conductor/help/Conductor-Help/CV.html"><span class="s8"><b>CV</b></span></a> that can be controlled by a slider (a <a href="SC://Knob"><span class="s8"><b>Knob</b></span></a>), a numerical input (a <a href="SC://NumberBox"><span class="s8"><b>NumberBox</b></span></a>) or a MIDI-device. CVWidgets have a built in MIDI-learn capability (see also <a href="SC://CCResponder"><span class="s8"><b>CCResponder</b></span></a>) - a slider or fader of a connected MIDI-device will automatically be connected if the MIDi-learn button is clicked in the widget.<span class="Apple-tab-span">	</span></p>
+<p class="p3"><br></p>
+<p class="p4"><b>Creation</b></p>
+<p class="p3"><br></p>
+<p class="p1"><b>*new(parent, cv, name, bounds, setUpArgs)</b></p>
+<p class="p1"><b><span class="Apple-tab-span">	</span>parent</b> - the parent view: e.g. a Window or a TabbedView</p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>cv</b> - a CV (have a look at the CV helpfile for mor information on that)</p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>name</b> - each CVWidget will have a label displaying this name</p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>bounds</b> - an instance of <b>Rect</b>. The default widget-width will be 52 pixel, the widget-height will be 137 pixel.<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>setUpArgs</b> - an array reflecting the setup of the connected external MIDI-device. If the setup consits of a single value (e.g.: 0) it will internally be converted into an array.<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-tab-span">	</span>If not given explicitely new widgets will be instantiated with the following values:</p>
+<p class="p5"><span class="Apple-tab-span">	</span>[ 0, 64, "", nil ]</p>
+<p class="p1"><span class="Apple-tab-span">	</span>which stands for <i>midimode</i>: 0, <i>midimean</i>: 64, <i>midistring</i>: empty string, <i>ctrlButtonBank</i>: nil<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-tab-span">	</span>Currently two different (midi)modes are supported (represented by <i>midimode</i> ):</p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>0: MIDI-output is 0-127</p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>1: MIDI-output is a mean-value +/- in-/decrement. If no value for <i>midimean</i> (second slot in setUpArgs) is given 64 is assumed to be the default value for <i>midimean</i>.</p>
+<p class="p1"><span class="Apple-tab-span">	</span>Default mode is 0.</p>
+<p class="p1"><span class="Apple-tab-span">	</span><i>ctrlButtonBank</i> is a special parameter that can always be set to nil. However, if you work with a device like a Doepfer Pocket-Dial, which provides 16 hardware-knobs but 4 different banks, resulting in 64 possible controllers, <i>ctrlButtonBank</i> can be set to 16 (the number of controllers in one bank). This should make working with the gui more convenient as the controller-number will not simply be displayed as one in a consecutive row of numbers (e.g. 1-64) - rather as a combination of <i>bank</i>:<i>ctrl-nr </i>(e.g. 3:10 will stand for bank nr. 3 and controller 10). <i>ctrlButtonBank</i> should always be set to the number of knobs/sliders available in one bank.</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><b>Note:</b> Setting a CVWidget to mode 1 will only make sense if your MIDI-device supports it. In this mode a MIDI-slider is assumed to output an in-/decremental value, not an absolute value between 0 and 127. However, the output is not assumed to be the increment/decrement only. Rather it will be the <i>mean</i> value +/- increment which makes it necessary to substract <i>mean</i> from the output (e.g. if the output equals 68 and <i>mean </i>is 64, a<i> </i>value of 64 is substracted and the result will be 4).</p>
+<p class="p2"><br></p>
+<p class="p1"><b>softWithin_(val)</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span>val - by default 0.1</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><span class="Apple-tab-span">	</span>a convenience method for the use in mode 0 (output: 0-127, non-endless). A new value (input) of a CV is set by a MIDI-slider only if the slider's value is within +/- softWithin/2 to the current value (input) of the CV, avoiding abrupt changes.</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><b>softWithin</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span>returns the softWithin-value (defaults to 0.1 if not set explicitely)</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><b>midimode_</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span>0 - the default mode. The output reflects the absolute position of the adjecant slider.<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-tab-span">	</span>1 - in- resp. decremental output. The Output will be a mean-value (default: 64, see method <b>midimean_</b>) +/- in- or decrement (determined be the the slider's accelaration)</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><b>midimean_</b><span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-tab-span">	</span>default: 64. Only relevant for midimode == 1. It reflects the default output of a midislider in neutral position.</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><b>midistring_</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span>A string, that may display details of your current midi-settings (certain details like the midi-silder's source-id, the channel, the controller-number will automatically displayed when a widget gets instantiated)</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><b>ctrlButtonBank_</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span>As midi-devices may have a number of different banks at limited number of sliders this offers some convenience in a way that the GUI will display the bank and its sliders from 1 to the max. number of hardware sliders. E.g. on a Doepfer Pocket Dial which has 16 sliders and 4 banks a setting like</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p5"><span class="s9"><span class="Apple-tab-span">	</span></span>CVCenter.ctrlButtonBank_(16)</p>
+<p class="p6"><span class="Apple-tab-span">	</span></p>
+<p class="p1">will display the sliders in each bank like the following: 1:1..16, 2:1..16, 3:1..16, 4:1..16. Thus, slider number 36 (which is returned by the function within the corresponding CCResponder as 35) will be displayed as 3:4 (bank nr. 3, slider number 4 - corresponding to the number printed on the device and the selected bank).<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p1"><b>setup</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span>A convenience-method, returning<span class="Apple-converted-space"> </span></p>
+<p class="p5"><span class="s9"><span class="Apple-tab-span">	</span></span>[midimode, midimean, midistring, ctrlButtonBank]</p>
+<p class="p2"><br></p>
+<p class="p4"><b>Example</b></p>
+<p class="p3"><br></p>
+<p class="p7">(</p>
+<p class="p7"><span class="s10">var</span> win;</p>
+<p class="p7">~cv = <span class="s10">CV</span>.new(<span class="s11">\boostcut</span>.asSpec);<span class="Apple-converted-space"> </span></p>
+<p class="p7">win = <span class="s10">Window</span>(<span class="s12">"CVWidget"</span>, <span class="s10">Rect</span>(<span class="s13">50</span>, <span class="s13">50</span>, <span class="s13">72</span>, <span class="s13">140</span>));</p>
+<p class="p7">~wdgt = <span class="s10">CVWidgetKnob</span>(win, ~cv, <span class="s12">"CV test"</span>, <span class="s10">Rect</span>(<span class="s13">10</span>, <span class="s13">10</span>, <span class="s13">52</span>, <span class="s13">121</span>));</p>
+<p class="p7">win.front;</p>
+<p class="p7">)</p>
+<p class="p8"><br></p>
+<p class="p9">// change the Spec of the CV</p>
+<p class="p9">// change is reflected in the widget immediately</p>
+<p class="p9">// can also be done through the "edit Spec" button in the widget</p>
+<p class="p7">~wdgt.spec_(<span class="s11">\freq</span>.asSpec)</p>
+<p class="p8"><br></p>
+<p class="p9">// change the MIDI-setup</p>
+<p class="p9">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
+<p class="p9"><span class="s3">~wdgt.midimode_(</span><span class="s13">1</span><span class="s3">); </span>// in-/decremental output mode</p>
+<p class="p9"><span class="s3">~wdgt.midimean_(</span><span class="s13">64</span><span class="s3">); </span>// only necessary if midimode == 1</p>
+<p class="p9"><span class="s3">~wdgt.midistring_(</span><span class="s12">"in-/decremtal"</span><span class="s3">); </span>// an arbitrary string displaying some info about the midi-setting of the widget</p>
+<p class="p9"><span class="s3">~wdgt.ctrlButtonBank_(</span><span class="s13">16</span><span class="s3">); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
+<p class="p8"><br></p>
+<p class="p9">// set some Synth-Controls<span class="Apple-converted-space"> </span></p>
+<p class="p7">a = { <span class="s10">|freq=440|</span> <span class="s10">SinOsc</span>.ar(freq, mul: <span class="s13">0.4</span>) }.play</p>
+<p class="p7">~cv.action_({ |cv| a.set(<span class="s11">\freq</span>, cv.value) })</p>
+<p class="p2"><br></p>
+<p class="p4"><b>about the GUI</b></p>
+<p class="p3"><br></p>
+<p class="p1">The Elements within the GUI should be more or less selfexplanatory. However, one might ask why there the name is reflected twice - once as a non-editable label, once as an editable textfield. The reason for this is, that within <a href="CVCenter.html"><span class="s14"><b>CVCenter</b></span></a> the label will reflect the key-name under which a CV has been added to <b>CVCenter</b>. The key may or may not reflect a key of a pattern or a control of a synth. However, a CV as part of <b>CVCenter</b> may be used in any context, so it may be useful to be able to add some addititional information, independantly from the key-name.</p>
+<p class="p1">Within every CVWidget there is a blue button, labeled "L". This stands for "learn" - when clicked the button-color turns to red and the label becomes "X". In this state the first MIDI-slider that gets moved gets connected to the particular CVWidget resp. the parameters controlled by it.</p>
+<p class="p1">Last but not least you will find a (non-functional) button named "MIDI" - this should become a shortcut to the widget's MIDI-setup. As it is currently not known to the author which different setups will be useful to provide this functionality shall be implemented at a later point.</p>
+</body>
+</html>
