@@ -4,7 +4,7 @@ CVWidget {
 	classvar <editorWindow, <window;
 	var <>midimode = 0, <>midimean = 64, <>midistring = "", <>ctrlButtonBank, <>softWithin = 0.1;
 	var visibleGuiEls, allGuiEls;
-	var <>nameField, <>widgetBg; // elements contained in any kind CVWidget
+	var <>widgetBg, <>label, <>nameField; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps;
 
 	setup {
@@ -16,7 +16,13 @@ CVWidget {
 			^nil;
 		}, {
 			if(visible, {
-				allGuiEls.do(_.visible_(true));
+				allGuiEls.do({ |el| 
+					if(el === this.nameField, {
+						el.visible_(false);
+					}, {
+						el.visible_(true);
+					})	
+				});
 			}, {
 				allGuiEls.do(_.visible_(false));
 			})
@@ -60,16 +66,26 @@ CVWidget {
 		^this.widgetBg.bounds.width@this.widgetBg.bounds.height;
 	}
 	
+	bounds {
+		^Rect(this.widgetXY.x, this.widgetXY.y, this.widgetProps.x, this.widgetProps.y);
+	}
+	
 	remove {
 		allGuiEls.do(_.remove);
 	}
 	
-	*editorWindow_ { |widget, widgetName|
-		var specsList, specsActions, editor, cvString;
+	*editorWindow_ { |widget, widgetName, hilo|
+		var specsList, specsActions, editor, cvString, slot;
 		
-		if(Window.allWindows.select({ |w| "^Widget-Spec Editor:".matchRegexp(w.name) == true }).size < 1, {			window = Window("Widget-Spec Editor:"+widgetName, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 330, 200));
+		if(hilo.notNil, {
+			slot = "["++hilo.asString++"]";
 		}, {
-			window.name_("Widget-Spec Editor:"+widgetName);
+			slot = "";
+		});
+		
+		if(Window.allWindows.select({ |w| "^Widget-Spec Editor:".matchRegexp(w.name) == true }).size < 1, {			window = Window("Widget-Spec Editor:"+widgetName+slot, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 330, 200));
+		}, {
+			window.name_("Widget-Spec Editor:"+widgetName+slot);
 		});
 		specsList = ListView(window, Rect(0, 0, window.bounds.width, window.bounds.height))
 			.resize_(5)
@@ -79,15 +95,17 @@ CVWidget {
 			.visible_(true)
 			.enterKeyAction_({ |ws|
 				specsActions[ws.value].value;
-				block { |break|
-					#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
-						if(widget.spec == symbol.asSpec, { 
-							break.value(widget.knob.centered_(true));
-						}, {
-							widget.knob.centered_(false);
-						})			
-					})
-				};
+				if(widget.class === CVWidgetKnob, {
+					block { |break|
+						#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+							if(widget.spec == symbol.asSpec, { 
+								break.value(widget.knob.centered_(true));
+							}, {
+								widget.knob.centered_(false);
+							})			
+						})
+					}
+				});
 				[ws.value, ws.items[ws.value]].postln;
 			})
 		;
@@ -98,16 +116,27 @@ CVWidget {
 		Spec.specs.keysValuesDo({ |k, v|
 			if(v.isKindOf(ControlSpec), {
 				specsList.items_(specsList.items.add(k++":"+v));
-				specsActions = specsActions.add({ 
-					widget.spec_(v);
-					window.close;
+				if(hilo.notNil, {
+					specsActions = specsActions.add({ 
+						widget.spec_(v, hilo);
+						window.close;
+					})
+				}, {
+					specsActions = specsActions.add({ 
+						widget.spec_(v);
+						window.close;
+					})
 				})
 			})
 		});
 		editor = TextView(window, Rect(0, 0, window.bounds.width, window.bounds.height))
 			.resize_(5)
 		;
-		cvString = widget.spec.asString.split($ );
+		if(hilo.notNil, {
+			cvString = widget.spec(hilo).asString.split($ );
+		}, {
+			cvString = widget.spec.asString.split($ );
+		});
 		cvString = cvString[1..cvString.size-1].join(" ");
 		editor
 			.string_("// edit and hit <enter>\n// the string must represent a valid ControlSpec\n// e.g. \\freq.asSpec\n// or [20, 400].asSpec\n// or ControlSpec(23, 653, \\exp, 1.0, 312, \" hz\")\n// have a look at the ControlSpec-helpfile ...\n\n"++cvString)
@@ -117,16 +146,20 @@ CVWidget {
 			.keyDownAction_({ |view, char, modifiers, unicode, keycode|
 				if(unicode == 3, {
 					("result:"+view.string.interpret).postln;
-					widget.spec_(view.string.interpret);
-					block { |break|
-						#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
-							if(widget.spec == symbol.asSpec, { 
-								break.value(this.knob.centered_(true));
-							}, {
-								widget.knob.centered_(false);
-							})			
-						})
-					};
+					if(hilo.isNil, {
+						widget.spec_(view.string.interpret);
+						block { |break|
+							#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+								if(widget.spec == symbol.asSpec, { 
+									break.value(this.knob.centered_(true));
+								}, {
+									widget.knob.centered_(false);
+								})			
+							})
+						}
+					}, {
+						widget.spec_(view.string.interpret, hilo);
+					});
 					window.close;
 				});
 				if(unicode == 13 or: { 
@@ -148,7 +181,7 @@ CVWidget {
 CVWidgetKnob : CVWidget {
 
 	var thisCV;
-	var <>label, <>knob, <>numVal, <>specBut, <>midiHead, <>midiLearn, <>midiSrc, <>midiChan, <>midiCtrl, <>editor;
+	var <>knob, <>numVal, <>specBut, <>midiHead, <>midiLearn, <>midiSrc, <>midiChan, <>midiCtrl;
 	var <>cc, spec;
 
 	*new { |parent, cv, name, bounds, setUpArgs|
@@ -156,7 +189,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=120, setUpArgs|
-		var knobsize, flow, meanVal, widgetSpecsActions, editor, cvString;
+		var knobsize, meanVal, widgetSpecsActions, editor, cvString;
 		var tmpSetup, thisToggleColor/*, oneShot*/;
 		
 		thisCV = cv;
@@ -202,7 +235,6 @@ CVWidgetKnob : CVWidget {
 		};
 		this.numVal = NumberBox(parentView, Rect(xy.x+1, xy.y+knobsize+12, widgetwidth-2, 15))
 			.value_(cv.value)
-			.action_({ |nv| cv.value_(nv.value) })
 		;
 		this.specBut = Button(parentView, Rect(xy.x+1, xy.y+knobsize+27, widgetwidth-2, 15))
 			.font_(Font("Helvetica", 9))
@@ -233,7 +265,7 @@ CVWidgetKnob : CVWidget {
 							this.cc = CCResponder({ |src, chan, ctrl, val|
 								var ctrlString;
 //								[src, chan, ctrl, val].postln;
-																				ctrlString ? ctrlString = ctrl+1;
+								ctrlString ? ctrlString = ctrl+1;
 
 								if(this.ctrlButtonBank.notNil, {
 									if(ctrlString%ctrlButtonBank == 0, {
@@ -331,7 +363,7 @@ CVWidgetKnob : CVWidget {
 		allGuiEls = [this.widgetBg, this.label, this.nameField, this.knob, this.numVal, this.specBut, this.midiHead, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl]
 	}
 
-		spec_ { |spec|
+	spec_ { |spec|
 		if(spec.isKindOf(ControlSpec), {
 			thisCV.spec_(spec);
 			block { |break|
@@ -350,6 +382,343 @@ CVWidgetKnob : CVWidget {
 	
 	spec {
 		^thisCV.spec;
+	}
+	
+}
+
+CVWidget2D : CVWidget {
+	var thisCV, midiLearnActions;
+	var <>slider2d, <>rangeSlider;
+	var <>numValHi, <>numValLo, <>specButHi, <>specButLo;
+	var <>midiHeadLo, <>midiLearnLo, <>midiSrcLo, <>midiChanLo, <>midiCtrlLo;
+	var <>midiHeadHi, <>midiLearnHi, <>midiSrcHi, <>midiChanHi, <>midiCtrlHi;
+	var <>ccLo, <>ccHi, specLo, specHi;
+
+	*new { |parent, cvs, name, bounds, setUpArgs|
+		^super.new.init(parent, cvs[0], cvs[1], name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs)
+	}
+	
+	init { |parentView, cvLo, cvHi, name, xy, widgetwidth=122, widgetheight=122, setUpArgs|
+		var meanVal, widgetSpecsAction, editor, cvString;
+		var tmpSetup, thisToggleColor, nextY, rightBarX=widgetwidth-41;
+		
+		thisCV = (lo: cvLo, hi: cvHi);
+		
+		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
+		
+		setUpArgs[0] !? { this.midimode_(setUpArgs[0]) };
+		setUpArgs[1] !? { this.midimean_(setUpArgs[1]) };
+		setUpArgs[2] !? { this.midistring_(setUpArgs[2].asString) };
+		setUpArgs[3] !? { this.ctrlButtonBank_(setUpArgs[3]) };
+
+		this.widgetBg = UserView(parentView, Rect(xy.x, xy.y, widgetwidth, widgetheight))
+			.focusColor_(Color(alpha: 1.0))
+			.background_(Color.white)
+		;
+		this.label= Button(parentView, Rect(xy.x+1, xy.y+1, widgetwidth-42, 15))
+			.states_([
+				[""++name.asString, Color.white, Color.blue],
+				[""++name.asString, Color.black, Color.yellow],
+			])
+			.font_(Font("Helvetica", 9))
+			.action_({ |b|
+				this.toggleComment(b.value);
+			})
+			.canFocus_(false)
+		;
+		nextY = this.label.bounds.top+this.label.bounds.height;
+		this.nameField = TextField(parentView, Rect(xy.x+1, nextY, widgetwidth-42, widgetheight-this.label.bounds.height-2))
+			.background_(Color.white)
+			.font_(Font("Helvetica", 9))
+			.focusColor_(Color(alpha: 0))
+			.value_(name.asString)
+			.action_({ |nf| nf.value_(nf.value) })
+			.visible_(false)
+		;
+		this.slider2d = Slider2D(parentView, Rect(xy.x+1, nextY, widgetwidth-42, widgetwidth-47))
+			.canFocus_(false)
+			.background_(Color.white)
+			.knobColor_(Color.red)
+		;
+		nextY = nextY+this.slider2d.bounds.height;
+		this.rangeSlider = RangeSlider(parentView, Rect(
+			xy.x+1, 
+			nextY,
+			widgetwidth-42,
+			15
+		))
+		.canFocus_(false)
+		.background_(Color.white);
+		nextY = nextY+this.rangeSlider.bounds.height;
+		this.numValLo = NumberBox(parentView);
+		this.numValHi = NumberBox(parentView);
+		
+		[this.numValLo, [xy.x+1, cvLo], this.numValHi, [xy.x+(widgetwidth-42/2), cvHi]].pairsDo({ |k, v|
+			k.bounds_(Rect(
+				v[0], 
+				nextY,
+				this.rangeSlider.bounds.width/2,
+				15
+			));
+			k.value_(v[1].value);
+			k.canFocus_(false)
+		});
+		
+		this.specButLo = Button(parentView);
+		this.specButHi = Button(parentView);
+		this.midiHeadLo = Button(parentView);
+		this.midiHeadHi = Button(parentView);
+		this.midiLearnLo = Button(parentView);
+		this.midiLearnHi = Button(parentView);
+		this.midiSrcLo = TextField(parentView);
+		this.midiSrcHi = TextField(parentView);
+		this.midiChanLo = TextField(parentView);
+		this.midiChanHi = TextField(parentView);
+		this.midiCtrlLo = TextField(parentView);
+		this.midiCtrlHi = TextField(parentView);
+		
+		nextY = xy.y+1;
+
+		[this.specButHi, [nextY, \hi], this.specButLo, [nextY+60, \lo]].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 12))
+			.font_(Font("Helvetica", 7))
+			.focusColor_(Color(alpha: 0))
+			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
+			.action_({ |btn|
+				CVWidget.editorWindow_(this, name, v[1]);
+			})
+		});
+		
+		nextY = nextY+12;
+				
+		[this.midiHeadHi, nextY, this.midiHeadLo, nextY+60].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v, 28, 12))
+			.font_(Font("Helvetica", 7))
+			.focusColor_(Color(alpha: 0))
+			.states_([["MIDI", Color.black, Color(alpha: 0)]])
+			.action_({ |ms|  ms.postln })
+		});
+		
+		
+		[this.midiLearnHi, nextY, this.midiLearnLo, nextY+60].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX+midiHeadLo.bounds.width, v, 12, 12))
+			.font_(Font("Helvetica", 7))
+			.focusColor_(Color(alpha: 0))
+			.states_([
+				["L", Color.white, Color.blue],
+				["X", Color.white, Color.red]
+			])
+		});
+		
+		nextY = nextY+12;
+		
+		[this.midiSrcHi, [nextY, "Hi"], this.midiSrcLo, [nextY+60, "Lo"]].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 12))
+			.font_(Font("Helvetica", 8.5))
+			.focusColor_(Color(alpha: 0))
+			.string_("source"+v[1])
+			.canFocus_(false)
+			.background_(Color(alpha: 0))
+			.stringColor_(Color.black)
+		});
+
+		nextY = nextY+12;
+
+		[this.midiChanHi, [nextY, "Hi"], this.midiChanLo, [nextY+60, "Lo"]].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 12))
+			.font_(Font("Helvetica", 8.5))
+			.focusColor_(Color(alpha: 0))
+			.string_("chan"+v[1])
+			.canFocus_(false)
+			.background_(Color(alpha: 0))
+			.stringColor_(Color.black)
+		});
+
+		nextY = nextY+12;
+
+		[this.midiCtrlHi, [nextY, "Hi"], this.midiCtrlLo, [nextY+60, "Lo"]].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 12))
+			.font_(Font("Helvetica", 8.5))
+			.focusColor_(Color(alpha: 0))
+			.string_("ctrl"+v[1])
+			.canFocus_(false)
+			.background_(Color(alpha: 0))
+			.stringColor_(Color.black)
+		});
+		
+		
+		this.midiLearnHi.action_({ |ml|
+			{
+				loop {
+					0.01.wait;
+					if(ml.value == 1, {
+						this.ccHi = CCResponder({ |src, chan, ctrl, val|
+							var ctrlString;
+//								[src, chan, ctrl, val].postln;
+							ctrlString ? ctrlString = ctrl+1;
+
+							if(this.ctrlButtonBank.notNil, {
+								if(ctrlString%ctrlButtonBank == 0, {
+									ctrlString = ctrlButtonBank.asString;
+								}, {
+									ctrlString = (ctrlString%ctrlButtonBank).asString;
+								});
+								ctrlString = ((ctrl+1/ctrlButtonBank).ceil).asString++":"++ctrlString;
+							}, {
+								ctrlString = ctrl+1;							});								
+							this.midimode.switch(
+								0, { 
+									if(val/127 < (cvHi.input+(softWithin/2)) and: {
+										val/127 > (cvHi.input-(softWithin/2));
+									}, { 
+										cvHi.input_(val/127);
+									})
+								},
+								1, { 
+									meanVal = this.midimean;
+									cvHi.input_(cvHi.input+((val-meanVal)/127)) 
+								}
+							);
+							{
+								try {
+									this.midiSrcHi.string_(src.asString)
+										.background_(Color.red)
+										.stringColor_(Color.white)
+									;
+									this.midiChanHi.string_((chan+1).asString)
+										.background_(Color.red)
+										.stringColor_(Color.white)
+									;
+									this.midiCtrlHi.string_(ctrlString.asString)
+										.background_(Color.red)
+										.stringColor_(Color.white)
+									;
+									this.midiHeadHi.enabled_(false);
+								}
+							}.defer;
+						});
+						this.ccHi.learn;
+//							oneShot = this.cc.oneShotLearn;
+						nil.yield;
+					}, {
+//							oneShot !? { oneShot.remove };
+						this.ccHi.remove;
+						this.ccHi = nil;
+						this.midiSrcHi.string_("source")
+							.background_(Color(alpha: 0))
+							.stringColor_(Color.black)
+						;
+						this.midiChanHi.string_("chan")
+							.background_(Color(alpha: 0))
+							.stringColor_(Color.black)
+						;
+						this.midiCtrlHi.string_("ctrl")
+							.background_(Color(alpha: 0))
+							.stringColor_(Color.black)
+						;
+						this.midiHeadHi.enabled_(true);
+						nil.yield;
+					})
+				}
+			}.fork(AppClock)
+		});
+			
+		this.midiLearnLo.action_({ |ml|
+			{
+				loop {
+					0.01.wait;
+					if(ml.value == 1, {
+						this.ccLo = CCResponder({ |src, chan, ctrl, val|
+							var ctrlString;
+//								[src, chan, ctrl, val].postln;
+							ctrlString ? ctrlString = ctrl+1;
+
+							if(this.ctrlButtonBank.notNil, {
+								if(ctrlString%ctrlButtonBank == 0, {
+									ctrlString = ctrlButtonBank.asString;
+								}, {
+									ctrlString = (ctrlString%ctrlButtonBank).asString;
+								});
+								ctrlString = ((ctrl+1/ctrlButtonBank).ceil).asString++":"++ctrlString;
+							}, {
+								ctrlString = ctrl+1;							});								
+							this.midimode.switch(
+								0, { 
+									if(val/127 < (cvLo.input+(softWithin/2)) and: {
+										val/127 > (cvLo.input-(softWithin/2));
+									}, { 
+										cvLo.input_(val/127);
+									})
+								},
+								1, { 
+									meanVal = this.midimean;
+									cvLo.input_(cvLo.input+((val-meanVal)/127)) 
+								}
+							);
+							{
+								try {
+									this.midiSrcLo.string_(src.asString)
+										.background_(Color.red)
+										.stringColor_(Color.white)
+									;
+									this.midiChanLo.string_((chan+1).asString)
+										.background_(Color.red)
+										.stringColor_(Color.white)
+									;
+									this.midiCtrlLo.string_(ctrlString.asString)
+										.background_(Color.red)
+										.stringColor_(Color.white)
+									;
+									this.midiHeadLo.enabled_(false);
+								}
+							}.defer;
+						});
+						this.ccLo.learn;
+//							oneShot = this.cc.oneShotLearn;
+						nil.yield;
+					}, {
+//							oneShot !? { oneShot.remove };
+						this.ccLo.remove;
+						this.ccLo = nil;
+						this.midiSrcLo.string_("source")
+							.background_(Color(alpha: 0))
+							.stringColor_(Color.black)
+						;
+						this.midiChanLo.string_("chan")
+							.background_(Color(alpha: 0))
+							.stringColor_(Color.black)
+						;
+						this.midiCtrlLo.string_("ctrl")
+							.background_(Color(alpha: 0))
+							.stringColor_(Color.black)
+						;
+						this.midiHeadLo.enabled_(true);
+						nil.yield;
+					})
+				}
+			}.fork(AppClock)
+		});
+		
+		[this.slider2d, this.rangeSlider, this.numValLo, this.numValHi].postln;
+		
+		[this.slider2d, this.rangeSlider].do({ |view| [cvLo, cvHi].connect(view) });
+		cvLo.connect(this.numValLo);
+		cvHi.connect(this.numValHi);
+	}
+	
+	spec_ { |spec, hilo|
+		if(hilo.isNil or:{ [\hi, \lo].includes(hilo).not }, {
+			Error("In order to set the inbuilt spec you must provide either \lo or \hi, indicating which spec shall be set").throw;	
+		});
+		if(spec.isKindOf(ControlSpec), {
+			thisCV[hilo].spec_(spec);
+		}, {
+			Error("Please provide a valid ControlSpec!").throw;
+		})
+	}
+	
+	spec { |hilo|
+		^thisCV[hilo].spec;
 	}
 	
 }

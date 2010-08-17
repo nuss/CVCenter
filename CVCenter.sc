@@ -1,18 +1,18 @@
 
 CVCenter {
 
-	classvar <cvsList, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
+	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
 	classvar <>midimode, <>midimean, <>midistring, <numccs;
 	classvar <controlButtonKeys, <controlButtons, <nextButtonPos;
 	classvar <>ctrlButtonBank, currentButtonStates, guiClosed = false/*, buttonProps*/;
-	classvar widgetwidth = 52, widgetheight = 120, colwidth, rowheight, <widgetStates;
+	classvar widgetwidth = 52, widgetheight = 122, colwidth, rowheight, <widgetStates;
 	classvar <tabProperties, colors, nextColor;
 	
 	*new { |cvs...setUpArgs|
 		var r, g, b;
 
-		if(cvsList.isNil, {
-			cvsList = IdentityDictionary.new;
+		if(all.isNil, {
+			all = IdentityDictionary.new;
 			cvWidgets = IdentityDictionary.new;
 			widgetStates = IdentityDictionary.new;
 			r = g = b = (0.5, 0.55 .. 0.7);
@@ -45,12 +45,12 @@ CVCenter {
 				}, {
 					cvs.keysValuesDo({ |k, v|
 						if("^cv[0-9]".matchRegexp(k.asString).not, {
-							cvsList.put(k.asSymbol, v);
+							all.put(k.asSymbol, v);
 						}, {
 							"Your given key-name matches the reserved names for new keys in the CVCenter. Please choose a different name.".warn;
 						})
 					});
-					("CVs added so far:"+cvsList).postln;
+					("CVs added so far:"+all).postln;
 				})
 			})
 		})
@@ -138,8 +138,8 @@ CVCenter {
 			colcount = rowwidth.div(colwidth);
 			rowwidth = colcount * colwidth;
 			
-			order = cvsList.order;
-			orderedCVs = cvsList.atAll(order);
+			order = all.order;
+			orderedCVs = all.atAll(order);
 //			order.postln;
 			
 			order.do({ |k, i|
@@ -193,19 +193,19 @@ CVCenter {
 		skipJacks = SkipJack.all.collect({ |r| r.name == "CVCenter-Updater" });
 		if(skipJacks.includes(true).not, {
 			updateRoutine = SkipJack({
-				lastUpdate ?? { lastUpdate = cvsList.size };
+				lastUpdate ?? { lastUpdate = all.size };
 				lastSetUp !? {
 					if(this.setup != lastSetUp, {
 						("now updating widget-setups:"+this.setup).postln;
 						this.prSetup(*this.setup);
 					})
 				};	
-				if(cvsList.size != lastUpdate, {
-					if(cvsList.size > lastUpdate and:{ cvWidgets.size <= lastUpdate }, {
+				if(all.size != lastUpdate, {
+					if(all.size > lastUpdate and:{ cvWidgets.size <= lastUpdate }, {
 						this.prAddToGui;
 					});
-					if(cvsList.size < lastUpdate, {
-						removedKeys = cvWidgets.keys.difference(cvsList.keys);
+					if(all.size < lastUpdate, {
+						removedKeys = cvWidgets.keys.difference(all.keys);
 						removedKeys.do({ |k|
 							cvWidgets[k].remove;
 							cvWidgets.removeAt(k);
@@ -217,7 +217,7 @@ CVCenter {
 //						"it happens at 1".postln;
 						this.prUpdateSwitchboardSetup;
 					});
-					lastUpdate = cvsList.size;
+					lastUpdate = all.size;
 				});
 				try {
 					if(window.bounds.width != lastUpdateWidth, {
@@ -283,7 +283,7 @@ CVCenter {
 	}	
 	
 	*put { |...args|
-		var inputArgs, overwrite=false;
+		var inputArgs, overwrite=false, tmp;
 		inputArgs = args;
 		if(inputArgs.size.odd, {
 			overwrite = inputArgs.pop;
@@ -293,14 +293,27 @@ CVCenter {
 		});
 		this.new;
 		inputArgs.pairsDo({ |key, cv|
-			if(cv.isKindOf(CV).not, {
-				Error("The value provided for key '"++key.asString++"' doesn't appear to be a CV.\nPlease choose a valid input!").throw;
+			[key, cv].postln;
+			if(cv.isKindOf(CV).not and:{ cv.isKindOf(Array).not }, {
+				Error("CVCenter expects a single CV or an array of CVs as input!").throw;			}); 
+			[cv].flat.do({ |cv|
+				if(cv.isKindOf(CV).not, {
+					Error("The value provided for key '"++key.asString++"' doesn't appear to be a CV.\nPlease choose a valid input!").throw;
+				})
 			});
+			if(cv.isKindOf(Array) and:{ cv.size == 2 }, {
+				tmp = cv.copy;
+				[\lo, \hi].do({ |key, i|
+					cv.isKindOf(Event).not.if { cv = () };
+					cv.put(key, tmp[i]);
+				})
+			});
+					
 			if(overwrite, {
-				cvsList.put(key.asSymbol, cv);
+				all.put(key.asSymbol, cv);
 			}, {
-				if(cvsList.matchAt(key.asSymbol).isNil, {
-					cvsList.put(key.asSymbol, cv);
+				if(all.matchAt(key.asSymbol).isNil, {
+					all.put(key.asSymbol, cv);
 				}, {
 					("There is already a CV stored under the name '"++key.asString++"'. \nPlease choose a different key-name!").warn;
 				})
@@ -310,40 +323,56 @@ CVCenter {
 		
 	*removeAt { |key|
 		var lastVal;
-		lastVal = cvsList.at(key.asSymbol).value;
-		cvsList.removeAt(key.asSymbol);
+		lastVal = all.at(key.asSymbol).value;
+		all.removeAt(key.asSymbol);
 		cvWidgets[key].cc !? { cvWidgets[key].cc.remove };
 		^lastVal;
 	}
 	
 	*removeAll { |...keys|
 		if(keys.size < 1, { 
-			cvsList.keys.do(cvsList.removeAt(_)); 
+			all.keys.do(all.removeAt(_)); 
 		}, { 
-			keys.do(cvsList.removeAt(_)); 
+			keys.do(all.removeAt(_)); 
 		});
 	}
 	
 	*at { |key|
-		^cvsList.at(key.asSymbol);
+		^all.at(key.asSymbol);
 	}
 		
-	*use { |key, spec, value, tab|
-		var thiskey, thisspec, thisval;
+	*use { |key, spec, value, tab, slot|
+		var thiskey, thisspec, thisval, thisslot;
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
-		
-		thiskey = key.asSymbol;
-		cvsList ?? { this.new };
+		slot !? {
+			thisslot = slot.asSymbol.toLower;
+			if([\lo, \hi].detect({ |sbl| sbl === thisslot }).class !== Symbol, {
+				Error("Looks like you wanted to create a multi-dimensional widget. However, the given parameter"+slot+"is not valid!").throw;
+			});
+		};
 				
-		if(cvsList.keys.asArray.indexOfEqual(thiskey).isNil, {
+		thiskey = key.asSymbol;
+		all ?? { this.new };
+				
+		if(all.keys.asArray.indexOfEqual(thiskey).isNil, {
 			thisspec = spec ?? { thisspec = ControlSpec.new };
 			thisval = value ?? { thisval = thisspec.default };
-			cvsList.put(key.asSymbol, CV.new(thisspec, thisval));
+			thisslot.class.switch(
+				Symbol, {
+					if(thisslot == \lo or: { thisslot == \hi }, {
+						[\lo, \hi].do({ |slot|
+							all[key.asSymbol] ?? { all.put(key.asSymbol, ()) };
+							all[key.asSymbol][slot] = CV.new(thisspec.copy, thisval.copy);
+						})
+					})
+				}, 
+				{ all.put(key.asSymbol, CV.new(thisspec, thisval)) };
+			)
 		}, {
-			// sanity check - condition shouldn't return true anyway
-			if(this.at(thiskey).isNil or: { this.at(thiskey).isKindOf(CV).not }, {
-				cvsList.put(key.asSymbol, CV.new(thisspec, thisval));
-			})
+			if(all[key.asSymbol].isKindOf(Event) and:{ slot.notNil }, {
+				spec !? { all[key.asSymbol][thisslot].spec_(spec) };
+				value !? { all[key.asSymbol][thisslot].value_(value) };
+			}) 
 		});
 		
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
@@ -352,7 +381,7 @@ CVCenter {
 //			("now adding:"+tab.asString).postln;
 			this.prAddToGui(tab);
 		});
-		^cvsList.at(key.asSymbol);
+		^all.at(key.asSymbol);
 	}
 	
 	*softWithin_ { |val|
@@ -439,11 +468,11 @@ CVCenter {
 		colcount = rowwidth.div(colwidth);
 		rowwidth = colcount * colwidth;
 		
-		allCVKeys = cvsList.keys;
+		allCVKeys = all.keys;
 		widgetKeys = cvWidgets.keys;
 		thisKeys = allCVKeys.difference(widgetKeys);
 		thisKeys.do({ |k|
-			cvWidgets[k] = CVWidgetKnob(tabs.views[cvTabIndex], cvsList[k], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight), this.setup);
+			cvWidgets[k] = CVWidgetKnob(tabs.views[cvTabIndex], all[k], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight), this.setup);
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 			if(thisNextPos.x+colwidth >= rowwidth, {
 				// jump to next row
