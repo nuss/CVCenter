@@ -275,7 +275,10 @@ CVWidgetKnob : CVWidget {
 									});
 									ctrlString = ((ctrl+1/ctrlButtonBank).ceil).asString++":"++ctrlString;
 								}, {
-									ctrlString = ctrl+1;								});								
+									ctrlString = ctrl+1;
+								});
+
+//								this.setup.postln;
 								this.midimode.switch(
 									0, { 
 										if(val/127 < (cv.input+(softWithin/2)) and: {
@@ -415,7 +418,7 @@ CVWidget2D : CVWidget {
 			.focusColor_(Color(alpha: 1.0))
 			.background_(Color.white)
 		;
-		this.label= Button(parentView, Rect(xy.x+1, xy.y+1, widgetwidth-42, 15))
+		this.label= Button(parentView, Rect(xy.x+1, xy.y+1, widgetwidth-2, 15))
 			.states_([
 				[""++name.asString, Color.white, Color.blue],
 				[""++name.asString, Color.black, Color.yellow],
@@ -427,7 +430,7 @@ CVWidget2D : CVWidget {
 			.canFocus_(false)
 		;
 		nextY = this.label.bounds.top+this.label.bounds.height;
-		this.nameField = TextField(parentView, Rect(xy.x+1, nextY, widgetwidth-42, widgetheight-this.label.bounds.height-2))
+		this.nameField = TextField(parentView, Rect(xy.x+1, nextY, widgetwidth-2, widgetheight-this.label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
@@ -461,7 +464,7 @@ CVWidget2D : CVWidget {
 				15
 			));
 			k.value_(v[1].value);
-			k.canFocus_(false)
+//			k.canFocus_(false)
 		});
 		
 		this.specButLo = Button(parentView);
@@ -477,11 +480,11 @@ CVWidget2D : CVWidget {
 		this.midiCtrlLo = TextField(parentView);
 		this.midiCtrlHi = TextField(parentView);
 		
-		nextY = xy.y+1;
+		nextY = xy.y+1+this.label.bounds.height;
 
-		[this.specButHi, [nextY, \hi], this.specButLo, [nextY+60, \lo]].pairsDo({ |k, v|
-			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 12))
-			.font_(Font("Helvetica", 7))
+		[this.specButHi, [nextY, \hi], this.specButLo, [nextY+52, \lo]].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 13))
+			.font_(Font("Helvetica", 8))
 			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
 			.action_({ |btn|
@@ -489,10 +492,10 @@ CVWidget2D : CVWidget {
 			})
 		});
 		
-		nextY = nextY+12;
+		nextY = nextY+14;
 				
-		[this.midiHeadHi, nextY, this.midiHeadLo, nextY+60].pairsDo({ |k, v|
-			k.bounds_(Rect(xy.x+rightBarX, v, 28, 12))
+		[this.midiHeadHi, nextY, this.midiHeadLo, nextY+52].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v, 28, 13))
 			.font_(Font("Helvetica", 7))
 			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
@@ -500,8 +503,8 @@ CVWidget2D : CVWidget {
 		});
 		
 		
-		[this.midiLearnHi, nextY, this.midiLearnLo, nextY+60].pairsDo({ |k, v|
-			k.bounds_(Rect(xy.x+rightBarX+midiHeadLo.bounds.width, v, 12, 12))
+		[this.midiLearnHi, nextY, this.midiLearnLo, nextY+52].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX+midiHeadLo.bounds.width, v, 12, 13))
 			.font_(Font("Helvetica", 7))
 			.focusColor_(Color(alpha: 0))
 			.states_([
@@ -510,10 +513,10 @@ CVWidget2D : CVWidget {
 			])
 		});
 		
-		nextY = nextY+12;
+		nextY = nextY+13;
 		
-		[this.midiSrcHi, [nextY, "Hi"], this.midiSrcLo, [nextY+60, "Lo"]].pairsDo({ |k, v|
-			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 12))
+		[this.midiSrcHi, [nextY, "Hi"], this.midiSrcLo, [nextY+52, "Lo"]].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("source"+v[1])
@@ -522,10 +525,10 @@ CVWidget2D : CVWidget {
 			.stringColor_(Color.black)
 		});
 
-		nextY = nextY+12;
+		nextY = nextY+13;
 
-		[this.midiChanHi, [nextY, "Hi"], this.midiChanLo, [nextY+60, "Lo"]].pairsDo({ |k, v|
-			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 12))
+		[this.midiChanHi, [nextY, "Hi"], this.midiChanLo, [nextY+52, "Lo"]].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v[0], 15, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("chan"+v[1])
@@ -534,10 +537,10 @@ CVWidget2D : CVWidget {
 			.stringColor_(Color.black)
 		});
 
-		nextY = nextY+12;
+//		nextY = nextY+12;
 
-		[this.midiCtrlHi, [nextY, "Hi"], this.midiCtrlLo, [nextY+60, "Lo"]].pairsDo({ |k, v|
-			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 12))
+		[this.midiCtrlHi, [nextY, "Hi"], this.midiCtrlLo, [nextY+52, "Lo"]].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX+15, v[0], 25, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("ctrl"+v[1])
@@ -604,15 +607,15 @@ CVWidget2D : CVWidget {
 //							oneShot !? { oneShot.remove };
 						this.ccHi.remove;
 						this.ccHi = nil;
-						this.midiSrcHi.string_("source")
+						this.midiSrcHi.string_("source Hi")
 							.background_(Color(alpha: 0))
 							.stringColor_(Color.black)
 						;
-						this.midiChanHi.string_("chan")
+						this.midiChanHi.string_("chan Hi")
 							.background_(Color(alpha: 0))
 							.stringColor_(Color.black)
 						;
-						this.midiCtrlHi.string_("ctrl")
+						this.midiCtrlHi.string_("ctrl Hi")
 							.background_(Color(alpha: 0))
 							.stringColor_(Color.black)
 						;
@@ -641,7 +644,8 @@ CVWidget2D : CVWidget {
 								});
 								ctrlString = ((ctrl+1/ctrlButtonBank).ceil).asString++":"++ctrlString;
 							}, {
-								ctrlString = ctrl+1;							});								
+								ctrlString = ctrl+1;							});
+							
 							this.midimode.switch(
 								0, { 
 									if(val/127 < (cvLo.input+(softWithin/2)) and: {
@@ -680,15 +684,15 @@ CVWidget2D : CVWidget {
 //							oneShot !? { oneShot.remove };
 						this.ccLo.remove;
 						this.ccLo = nil;
-						this.midiSrcLo.string_("source")
+						this.midiSrcLo.string_("source Lo")
 							.background_(Color(alpha: 0))
 							.stringColor_(Color.black)
 						;
-						this.midiChanLo.string_("chan")
+						this.midiChanLo.string_("chan Lo")
 							.background_(Color(alpha: 0))
 							.stringColor_(Color.black)
 						;
-						this.midiCtrlLo.string_("ctrl")
+						this.midiCtrlLo.string_("ctrl Lo")
 							.background_(Color(alpha: 0))
 							.stringColor_(Color.black)
 						;
@@ -699,11 +703,13 @@ CVWidget2D : CVWidget {
 			}.fork(AppClock)
 		});
 		
-		[this.slider2d, this.rangeSlider, this.numValLo, this.numValHi].postln;
+//		[this.slider2d, this.rangeSlider, this.numValLo, this.numValHi].postln;
 		
 		[this.slider2d, this.rangeSlider].do({ |view| [cvLo, cvHi].connect(view) });
 		cvLo.connect(this.numValLo);
 		cvHi.connect(this.numValHi);
+		visibleGuiEls = [this.slider2d, this.rangeSlider, this.numValHi, this.numValLo, this.specButHi, this.specButLo, this.midiHeadHi, this.midiHeadLo, this.midiLearnHi, this.midiLearnLo, this.midiSrcHi, this.midiSrcLo, this.midiChanHi, this.midiChanLo, this.midiCtrlHi, this.midiCtrlLo];
+		allGuiEls = [this.widgetBg, this.label, this.nameField, this.slider2d, this.rangeSlider, this.numValHi, this.numValLo, this.specButHi, this.specButLo, this.midiHeadHi, this.midiHeadLo, this.midiLearnHi, this.midiLearnLo, this.midiSrcHi, this.midiSrcLo, this.midiChanHi, this.midiChanLo, this.midiCtrlHi, this.midiCtrlLo]
 	}
 	
 	spec_ { |spec, hilo|
