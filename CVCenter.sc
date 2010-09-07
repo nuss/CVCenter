@@ -480,7 +480,7 @@ CVCenter {
 		slot !? {
 			thisslot = slot.asString.toLower.asSymbol;
 			if([\lo, \hi].detect({ |sbl| sbl === thisslot }).class !== Symbol, {
-				Error("Looks like you wanted to create a multi-dimensional widget. However, the given parameter"+slot+"is not valid!").throw;
+				Error("Looks like you wanted to create a multi-dimensional widget. However, the given slot-value"+slot+"is not valid!").throw;
 			});
 		};
 				
@@ -492,7 +492,7 @@ CVCenter {
 			thisval = value ?? { thisval = thisspec.default };
 			thisslot.class.switch(
 				Symbol, {
-					if(thisslot == \lo or: { thisslot == \hi }, {
+					if(thisslot === \lo or: { thisslot === \hi }, {
 						[\lo, \hi].do({ |slot|
 							all[key.asSymbol] ?? { all.put(key.asSymbol, ()) };
 							all[key.asSymbol][slot] = CV.new(thisspec.copy, thisval.copy);
@@ -514,7 +514,7 @@ CVCenter {
 //			("now adding:"+tab.asString).postln;
 			this.prAddToGui(tab);
 		});
-
+		
 		if(slot.notNil, {
 			^all.at(key.asSymbol)[slot.asSymbol];
 		}, {
