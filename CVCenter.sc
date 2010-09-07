@@ -478,7 +478,7 @@ CVCenter {
 		var thiskey, thisspec, thisval, thisslot;
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		slot !? {
-			thisslot = slot.asSymbol.toLower;
+			thisslot = slot.asString.toLower.asSymbol;
 			if([\lo, \hi].detect({ |sbl| sbl === thisslot }).class !== Symbol, {
 				Error("Looks like you wanted to create a multi-dimensional widget. However, the given parameter"+slot+"is not valid!").throw;
 			});
