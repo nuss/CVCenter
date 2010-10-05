@@ -73,6 +73,108 @@ CVWidget {
 	remove {
 		allGuiEls.do(_.remove);
 	}
+
+	// private
+	prCCResponderAdd { |cv, learnBut, srcField, chanField, ctrlField, headBut, key| 
+		var cc;
+		learnBut.action_({ |but|
+			{
+				loop {
+					0.01.wait;
+					if(but.value == 1, {
+//						"adding a new CCResponder".postln;
+						cc = CCResponder({ |src, chan, ctrl, val|
+							var ctrlString, meanVal;
+//							[src, chan, ctrl, val].postln;
+							ctrlString ? ctrlString = ctrl+1;
+	
+							if(this.ctrlButtonBank.notNil, {
+								if(ctrlString%this.ctrlButtonBank == 0, {
+									ctrlString = this.ctrlButtonBank.asString;
+								}, {
+									ctrlString = (ctrlString%this.ctrlButtonBank).asString;
+								});
+								ctrlString = ((ctrl+1/this.ctrlButtonBank).ceil).asString++":"++ctrlString;
+							}, {
+								ctrlString = ctrl+1;
+							});
+	
+	//						this.setup.postln;
+							this.midimode.switch(
+								0, { 
+									if(val/127 < (cv.input+(softWithin/2)) and: {
+										val/127 > (cv.input-(softWithin/2));
+									}, { 
+										cv.input_(val/127);
+									})
+								},
+								1, { 
+									meanVal = this.midimean;
+									cv.input_(cv.input+((val-meanVal)/127)) 
+								}
+							);
+							{
+								try {
+									srcField.string_(src.asString)
+										.background_(Color.red)
+										.stringColor_(Color.white)
+									;
+									chanField.string_((chan+1).asString)
+										.background_(Color.red)
+										.stringColor_(Color.white)
+									;
+									ctrlField.string_(ctrlString.asString)
+										.background_(Color.red)
+										.stringColor_(Color.white)
+									;
+									headBut.enabled_(false);
+								}
+							}.defer;
+						});
+						cc.learn;
+						key.switch(
+							\hi, { this.ccHi = cc },
+							\lo, { this.ccLo = cc },
+							{ this.cc = cc }
+						);
+//						oneShot = this.cc.oneShotLearn;
+						nil.yield;
+					}, {
+						"no CCResponder yet or just removing the existing one".postln;
+//						oneShot !? { oneShot.remove };
+						key.switch(
+							\hi, { 
+								this.ccHi.remove; 
+								this.ccHi = nil;
+							},
+							\lo, {
+								this.ccLo.remove;
+								this.ccLo = nil;
+							}, {
+								this.cc.remove; 
+								this.cc = nil;
+							}
+						);
+						srcField.string_("source")
+							.background_(Color(alpha: 0))
+							.stringColor_(Color.black)
+						;
+						chanField.string_("chan")
+							.background_(Color(alpha: 0))
+							.stringColor_(Color.black)
+						;
+						ctrlField.string_("ctrl")
+							.background_(Color(alpha: 0))
+							.stringColor_(Color.black)
+						;
+						headBut.enabled_(true);
+						nil.yield;
+					})
+				}
+			}.fork(AppClock);
+		})
+		^cc;
+	}
 	
 	*editorWindow_ { |widget, widgetName, hilo|
 		var specsList, specsActions, editor, cvString, slot;
@@ -257,84 +359,6 @@ CVWidgetKnob : CVWidget {
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
 			])
-			.action_({ |ml|
-				{
-					loop {
-						0.01.wait;
-						if(ml.value == 1, {
-							this.cc = CCResponder({ |src, chan, ctrl, val|
-								var ctrlString;
-//								[src, chan, ctrl, val].postln;
-								ctrlString ? ctrlString = ctrl+1;
-
-								if(this.ctrlButtonBank.notNil, {
-									if(ctrlString%ctrlButtonBank == 0, {
-										ctrlString = ctrlButtonBank.asString;
-									}, {
-										ctrlString = (ctrlString%ctrlButtonBank).asString;
-									});
-									ctrlString = ((ctrl+1/ctrlButtonBank).ceil).asString++":"++ctrlString;
-								}, {
-									ctrlString = ctrl+1;
-								});
-
-//								this.setup.postln;
-								this.midimode.switch(
-									0, { 
-										if(val/127 < (cv.input+(softWithin/2)) and: {
-											val/127 > (cv.input-(softWithin/2));
-										}, { 
-											cv.input_(val/127);
-										})
-									},
-									1, { 
-										meanVal = this.midimean;
-										cv.input_(cv.input+((val-meanVal)/127)) 
-									}
-								);
-								{
-									try {
-										this.midiSrc.string_(src.asString)
-											.background_(Color.red)
-											.stringColor_(Color.white)
-										;
-										this.midiChan.string_((chan+1).asString)
-											.background_(Color.red)
-											.stringColor_(Color.white)
-										;
-										this.midiCtrl.string_(ctrlString.asString)
-											.background_(Color.red)
-											.stringColor_(Color.white)
-										;
-										this.midiHead.enabled_(false);
-									}
-								}.defer;
-							});
-							this.cc.learn;
-//							oneShot = this.cc.oneShotLearn;
-							nil.yield;
-						}, {
-//							oneShot !? { oneShot.remove };
-							this.cc.remove;
-							this.cc = nil;
-							this.midiSrc.string_("source")
-								.background_(Color(alpha: 0))
-								.stringColor_(Color.black)
-							;
-							this.midiChan.string_("chan")
-								.background_(Color(alpha: 0))
-								.stringColor_(Color.black)
-							;
-							this.midiCtrl.string_("ctrl")
-								.background_(Color(alpha: 0))
-								.stringColor_(Color.black)
-							;
-							this.midiHead.enabled_(true);
-							nil.yield;
-						})
-					}
-				}.fork(AppClock)
-			})
 		;
 		this.midiSrc = TextField(parentView, Rect(xy.x+1, xy.y+knobsize+58, widgetwidth-2, 12))
 			.font_(Font("Helvetica", 9))
@@ -360,6 +384,8 @@ CVWidgetKnob : CVWidget {
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		;
+
+		this.prCCResponderAdd(cv, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl, this.midiHead);
 		
 		[this.knob, this.numVal].do({ |view| cv.connect(view) });
 		visibleGuiEls = [this.knob, this.numVal, this.specBut, this.midiHead, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl];
@@ -515,11 +541,11 @@ CVWidget2D : CVWidget {
 		
 		nextY = nextY+13;
 		
-		[this.midiSrcHi, [nextY, "Hi"], this.midiSrcLo, [nextY+52, "Lo"]].pairsDo({ |k, v|
-			k.bounds_(Rect(xy.x+rightBarX, v[0], 40, 13))
+		[this.midiSrcHi, nextY, this.midiSrcLo, nextY+52].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v, 40, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
-			.string_("source"+v[1])
+			.string_("source")
 			.canFocus_(false)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
@@ -527,11 +553,11 @@ CVWidget2D : CVWidget {
 
 		nextY = nextY+13;
 
-		[this.midiChanHi, [nextY, "Hi"], this.midiChanLo, [nextY+52, "Lo"]].pairsDo({ |k, v|
-			k.bounds_(Rect(xy.x+rightBarX, v[0], 15, 13))
+		[this.midiChanHi, nextY, this.midiChanLo, nextY+52].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX, v, 15, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
-			.string_("chan"+v[1])
+			.string_("chan")
 			.canFocus_(false)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
@@ -539,176 +565,25 @@ CVWidget2D : CVWidget {
 
 //		nextY = nextY+12;
 
-		[this.midiCtrlHi, [nextY, "Hi"], this.midiCtrlLo, [nextY+52, "Lo"]].pairsDo({ |k, v|
-			k.bounds_(Rect(xy.x+rightBarX+15, v[0], 25, 13))
+		[this.midiCtrlHi, nextY, this.midiCtrlLo, nextY+52].pairsDo({ |k, v|
+			k.bounds_(Rect(xy.x+rightBarX+15, v, 25, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
-			.string_("ctrl"+v[1])
+			.string_("ctrl")
 			.canFocus_(false)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		});
 		
-		
-		this.midiLearnHi.action_({ |ml|
-			{
-				loop {
-					0.01.wait;
-					if(ml.value == 1, {
-						this.ccHi = CCResponder({ |src, chan, ctrl, val|
-							var ctrlString;
-//								[src, chan, ctrl, val].postln;
-							ctrlString ? ctrlString = ctrl+1;
-
-							if(this.ctrlButtonBank.notNil, {
-								if(ctrlString%ctrlButtonBank == 0, {
-									ctrlString = ctrlButtonBank.asString;
-								}, {
-									ctrlString = (ctrlString%ctrlButtonBank).asString;
-								});
-								ctrlString = ((ctrl+1/ctrlButtonBank).ceil).asString++":"++ctrlString;
-							}, {
-								ctrlString = ctrl+1;							});								
-							this.midimode.switch(
-								0, { 
-									if(val/127 < (cvHi.input+(softWithin/2)) and: {
-										val/127 > (cvHi.input-(softWithin/2));
-									}, { 
-										cvHi.input_(val/127);
-									})
-								},
-								1, { 
-									meanVal = this.midimean;
-									cvHi.input_(cvHi.input+((val-meanVal)/127)) 
-								}
-							);
-							{
-								try {
-									this.midiSrcHi.string_(src.asString)
-										.background_(Color.red)
-										.stringColor_(Color.white)
-									;
-									this.midiChanHi.string_((chan+1).asString)
-										.background_(Color.red)
-										.stringColor_(Color.white)
-									;
-									this.midiCtrlHi.string_(ctrlString.asString)
-										.background_(Color.red)
-										.stringColor_(Color.white)
-									;
-									this.midiHeadHi.enabled_(false);
-								}
-							}.defer;
-						});
-						this.ccHi.learn;
-//							oneShot = this.cc.oneShotLearn;
-						nil.yield;
-					}, {
-//							oneShot !? { oneShot.remove };
-						this.ccHi.remove;
-						this.ccHi = nil;
-						this.midiSrcHi.string_("source Hi")
-							.background_(Color(alpha: 0))
-							.stringColor_(Color.black)
-						;
-						this.midiChanHi.string_("chan Hi")
-							.background_(Color(alpha: 0))
-							.stringColor_(Color.black)
-						;
-						this.midiCtrlHi.string_("ctrl Hi")
-							.background_(Color(alpha: 0))
-							.stringColor_(Color.black)
-						;
-						this.midiHeadHi.enabled_(true);
-						nil.yield;
-					})
-				}
-			}.fork(AppClock)
-		});
-			
-		this.midiLearnLo.action_({ |ml|
-			{
-				loop {
-					0.01.wait;
-					if(ml.value == 1, {
-						this.ccLo = CCResponder({ |src, chan, ctrl, val|
-							var ctrlString;
-//								[src, chan, ctrl, val].postln;
-							ctrlString ? ctrlString = ctrl+1;
-
-							if(this.ctrlButtonBank.notNil, {
-								if(ctrlString%ctrlButtonBank == 0, {
-									ctrlString = ctrlButtonBank.asString;
-								}, {
-									ctrlString = (ctrlString%ctrlButtonBank).asString;
-								});
-								ctrlString = ((ctrl+1/ctrlButtonBank).ceil).asString++":"++ctrlString;
-							}, {
-								ctrlString = ctrl+1;							});
-							
-							this.midimode.switch(
-								0, { 
-									if(val/127 < (cvLo.input+(softWithin/2)) and: {
-										val/127 > (cvLo.input-(softWithin/2));
-									}, { 
-										cvLo.input_(val/127);
-									})
-								},
-								1, { 
-									meanVal = this.midimean;
-									cvLo.input_(cvLo.input+((val-meanVal)/127)) 
-								}
-							);
-							{
-								try {
-									this.midiSrcLo.string_(src.asString)
-										.background_(Color.red)
-										.stringColor_(Color.white)
-									;
-									this.midiChanLo.string_((chan+1).asString)
-										.background_(Color.red)
-										.stringColor_(Color.white)
-									;
-									this.midiCtrlLo.string_(ctrlString.asString)
-										.background_(Color.red)
-										.stringColor_(Color.white)
-									;
-									this.midiHeadLo.enabled_(false);
-								}
-							}.defer;
-						});
-						this.ccLo.learn;
-//							oneShot = this.cc.oneShotLearn;
-						nil.yield;
-					}, {
-//							oneShot !? { oneShot.remove };
-						this.ccLo.remove;
-						this.ccLo = nil;
-						this.midiSrcLo.string_("source Lo")
-							.background_(Color(alpha: 0))
-							.stringColor_(Color.black)
-						;
-						this.midiChanLo.string_("chan Lo")
-							.background_(Color(alpha: 0))
-							.stringColor_(Color.black)
-						;
-						this.midiCtrlLo.string_("ctrl Lo")
-							.background_(Color(alpha: 0))
-							.stringColor_(Color.black)
-						;
-						this.midiHeadLo.enabled_(true);
-						nil.yield;
-					})
-				}
-			}.fork(AppClock)
-		});
-		
-//		[this.slider2d, this.rangeSlider, this.numValLo, this.numValHi].postln;
+		this.prCCResponderAdd(cvHi, this.midiLearnHi, this.midiSrcHi, this.midiChanHi, this.midiCtrlHi, this.midiHeadHi, \hi);
+		this.prCCResponderAdd(cvLo, this.midiLearnLo, this.midiSrcLo, this.midiChanLo, this.midiCtrlLo, this.midiHeadLo, \lo);
 		
 		[this.slider2d, this.rangeSlider].do({ |view| [cvLo, cvHi].connect(view) });
 		cvLo.connect(this.numValLo);
 		cvHi.connect(this.numValHi);
+
 		visibleGuiEls = [this.slider2d, this.rangeSlider, this.numValHi, this.numValLo, this.specButHi, this.specButLo, this.midiHeadHi, this.midiHeadLo, this.midiLearnHi, this.midiLearnLo, this.midiSrcHi, this.midiSrcLo, this.midiChanHi, this.midiChanLo, this.midiCtrlHi, this.midiCtrlLo];
+
 		allGuiEls = [this.widgetBg, this.label, this.nameField, this.slider2d, this.rangeSlider, this.numValHi, this.numValLo, this.specButHi, this.specButLo, this.midiHeadHi, this.midiHeadLo, this.midiLearnHi, this.midiLearnLo, this.midiSrcHi, this.midiSrcLo, this.midiChanHi, this.midiChanLo, this.midiCtrlHi, this.midiCtrlLo]
 	}
 	

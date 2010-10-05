@@ -20,7 +20,9 @@ CVCenter {
 			tabProperties = [];
 			
 //			("setUpArgs:"+setUpArgs).postln;
-			if(setUpArgs.size > 0, { this.prSetup(*setUpArgs) });
+			if(setUpArgs.size > 0, { 
+				this.prSetup(*setUpArgs) 
+			});
 			
 			r.do({ |red|
 				g.do({ |green|
@@ -60,7 +62,7 @@ CVCenter {
 		var flow, rowwidth, colcount;
 		var cvTabIndex, order, orderedCVs;
 		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
-		var lastCtrlBtnsMode;
+		var lastCtrlBtnsMode, swFlow;
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
 		var widgetwidth, widgetheight=122, colwidth, rowheight;
 		var funcToAdd;
@@ -70,6 +72,7 @@ CVCenter {
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 
 			window = Window("CVCenter", Rect(0, 0, 400, 210));
+			window.background_(Color.black);
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
 			window.view.decorator = flow;
@@ -108,7 +111,7 @@ CVCenter {
 			flow.shift(0, 0);
 			
 			switchBoard = ScrollView(window, Rect(0, 0, flow.bounds.width, 50));
-			switchBoard ?? { switchBoard = ScrollView(window, Rect(0, 0, flow.bounds.width, 50)) };
+			switchBoard.decorator = swFlow = FlowLayout(switchBoard.bounds, 0@0, 0@0);
 			switchBoard.resize_(8);
 
 			window.onClose_({
@@ -128,6 +131,8 @@ CVCenter {
 						CVWidget2D, {
 							widgetStates[k].midiEditHi = w.midiHeadHi.enabled;
 							widgetStates[k].midiEditLo = w.midiHeadLo.enabled;
+							widgetStates[k].midiLearnHi = w.midiLearnHi.value;
+							widgetStates[k].midiLearnLo = w.midiLearnLo.value;
 							widgetStates[k].midiBgHi = w.midiSrcHi.background; 
 							widgetStates[k].midiStrColorHi = w.midiSrcHi.stringColor;
 							widgetStates[k].midiSrcHi = w.midiSrcHi.string;
@@ -175,19 +180,35 @@ CVCenter {
 				
 				if(orderedCVs[i].class === Event and:{ 
 					orderedCVs[i].keys.includesAny([\lo, \hi])				}, {
-					"and now a 2D widget".postln;
+//					"and now a 2D widget".postln;
 					cvWidgets[k] = CVWidget2D(
 						tabs.views[cvTabIndex], [orderedCVs[i].lo, orderedCVs[i].hi], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 122, widgetheight), this.setup
-					)
+					);
+					// to be tested in depth ...
+					if(cvWidgets[k].midiLearnLo.action.class != FunctionList, {
+						cvWidgets[k].midiLearnLo.action_(
+							cvWidgets[k].midiLearnLo.action.addFunc({ this.prAddControlButton(k, \ccLo) })
+						)
+					});
+					if(cvWidgets[k].midiLearnHi.action.class != FunctionList, {
+						cvWidgets[k].midiLearnHi.action_(
+							cvWidgets[k].midiLearnHi.action.addFunc({ this.prAddControlButton(k, \ccHi) })
+						)
+					})
 				}, {
-					"and now a knob widget".postln;
+//					this.setup.postln;
+//					"and now a knob widget".postln;
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex], orderedCVs[i], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight), this.setup
-					)
+					);
+					// to be tested in depth ...
+					if(cvWidgets[k].midiLearn.action.class != FunctionList, {
+						cvWidgets[k].midiLearn.action_(
+							cvWidgets[k].midiLearn.action.addFunc({ this.prAddControlButton(k) })
+						)
+					})
 				});
-				
-				controlButtons !? { this.prAddCtrlButton };
-								
+												
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 				
 				widgetStates[k] !? {
@@ -196,6 +217,8 @@ CVCenter {
 					widgetStates[k].midiEditHi !? { cvWidgets[k].midiHeadHi.enabled_(widgetStates[k].midiEditHi) };
 					widgetStates[k].midiEditLo !? { cvWidgets[k].midiHeadLo.enabled_(widgetStates[k].midiEditLo) };
 					widgetStates[k].midiLearn !? { cvWidgets[k].midiLearn.value_(widgetStates[k].midiLearn) };
+					widgetStates[k].midiLearnHi !? { cvWidgets[k].midiLearnHi.value_(widgetStates[k].midiLearnHi) };
+					widgetStates[k].midiLearnLo !? { cvWidgets[k].midiLearnLo.value_(widgetStates[k].midiLearnLo) };
 					widgetStates[k].midiBg !? {
 						[cvWidgets[k].midiSrc, cvWidgets[k].midiChan, cvWidgets[k].midiCtrl].do({ |view|
 							view.background_(widgetStates[k].midiBg);
@@ -223,9 +246,18 @@ CVCenter {
 					widgetStates[k].midiCtrl !? { cvWidgets[k].midiCtrl.string_(widgetStates[k].midiCtrl) };
 					widgetStates[k].midiCtrlHi !? { cvWidgets[k].midiCtrlHi.string_(widgetStates[k].midiCtrlHi) };
 					widgetStates[k].midiCtrlLo !? { cvWidgets[k].midiCtrlLo.string_(widgetStates[k].midiCtrlLo) };
-					widgetStates[k].cc !? { cvWidgets[k].cc_(widgetStates[k].cc) };
-					widgetStates[k].ccHi !? { cvWidgets[k].ccHi_(widgetStates[k].ccHi) };
-					widgetStates[k].ccLo !? { cvWidgets[k].ccLo_(widgetStates[k].ccLo) };
+					widgetStates[k].cc !? { 
+						cvWidgets[k].cc_(widgetStates[k].cc);
+						this.prAddControlButton(k);
+					};
+					widgetStates[k].ccHi !? { 
+						cvWidgets[k].ccHi_(widgetStates[k].ccHi);
+						this.prAddControlButton(k, \ccHi);
+					};
+					widgetStates[k].ccLo !? { 
+						cvWidgets[k].ccLo_(widgetStates[k].ccLo);
+						this.prAddControlButton(k, \ccLo);
+					};
 				};
 				if(all[k].class === Event and:{ 
 					all[k].keys.includesAny([\lo, \hi])
@@ -252,11 +284,13 @@ CVCenter {
 		skipJacks = SkipJack.all.collect({ |r| r.name == "CVCenter-Updater" });
 		if(skipJacks.includes(true).not, {
 			updateRoutine = SkipJack({
+//				this.prUpdateSwitchboardSetup;
 				lastUpdate ?? { lastUpdate = all.size };
 				lastSetUp !? {
 					if(this.setup != lastSetUp, {
-						("now updating widget-setups:"+this.setup).postln;
+//						("now updating widget-setups:"+[this.setup, lastSetUp]).postln;
 						this.prSetup(*this.setup);
+						this.prUpdateSwitchboard(true);
 					})
 				};	
 				if(all.size != lastUpdate, {
@@ -273,133 +307,58 @@ CVCenter {
 						});
 						this.prRegroupWidgets(tabs.activeTab);
 //						"it happens at 1".postln;
-						this.prUpdateSwitchboardSetup;
+//						this.prUpdateSwitchboardSetup;
 					});
 					lastUpdate = all.size;
 				});
 				try {
 					if(window.bounds.width != lastUpdateWidth, {
 						this.prRegroupWidgets(tabs.activeTab);
-						this.prUpdateSwitchboardSetup;
+						this.prUpdateSwitchboard;
+//						this.prUpdateSwitchboardSetup;
 					})
 				};
 				lastUpdateWidth = window.bounds.width;
 				lastSetUp = this.setup;
-				cvWidgets.pairsDo({ |k, wdgt|
-//					widgetStates[k].postln;
-					funcToAdd = { 
-						{ 
-							tabs.focus(widgetStates[k].tabIndex);
-							cvWidgets.do({ |w|
-								if(w === wdgt, {
-									wdgt.widgetBg.focusColor_(Color.green).focus(true);
-								})
-							}) 
-						}.defer
-					};
-					if(wdgt.respondsTo(\cc), {
-						wdgt.cc !? {
-							if(widgetStates[k].addedFunc == false, {
-								wdgt.cc.function_(
-									wdgt.cc.function.addFunc(funcToAdd)
-								);
-								widgetStates[k].addedFunc = true;
-							});
-						};
-						wdgt.cc ?? {
-							if(widgetStates[k].addedFunc == true, {
-								widgetStates[k].addedFunc = false
-							});
-						};
-						wdgt.midiLearn.action_(
-							wdgt.midiLearn.action.addFunc( this.prAddCtrlButton )
-						)
-					});
-					if(wdgt.respondsTo(\ccLo) and:{ wdgt.respondsTo(\ccHi) }, {
-						wdgt.ccLo !? {
-							if(widgetStates[k].addedFunc.lo == false, {
-								wdgt.ccLo.function_(
-									wdgt.ccLo.function.addFunc(funcToAdd)
-								);
-								widgetStates[k].addedFunc.lo = true;
-							});
-						};
-						wdgt.ccHi !? {
-							if(widgetStates[k].addedFunc.hi == false, {
-								wdgt.ccHi.function_(
-									wdgt.ccHi.function.addFunc(funcToAdd)
-								);
-								widgetStates[k].addedFunc.hi = true;
-							});
-						};
-						wdgt.ccLo ?? {
-							if(widgetStates[k].addedFunc.lo == true, {
-								widgetStates[k].addedFunc.lo = false
-							});
-						};
-						wdgt.ccHi ?? {
-							if(widgetStates[k].addedFunc.hi == true, {
-								widgetStates[k].addedFunc.hi = false
-							});
-						};
-						wdgt.midiLearnLo.action_(
-							wdgt.midiLearnLo.action.addFunc( this.prAddCtrlButton )
-						);
-						wdgt.midiLearnHi.action_(
-							wdgt.midiLearnHi.action.addFunc( this.prAddCtrlButton )
-						)
-					})
-				});
+//				lastSetUp.postln;
+				this.prAddFuncToCC;
 				controlButtons !? {
 //					controlButtons.postln;
 					if(lastCtrlBtnBank != ctrlButtonBank, {
 //						"should be triggered even if gui has been closed and re-oppened again".postln;
-						if(guiClosed.not, { this.prUpdateSwitchboardSetup });
+//						if(guiClosed.not, { this.prUpdateSwitchboardSetup });
 						guiClosed = false;
 					});
 					controlButtons.pairsDo({ |k, btn|
 						if(btn.class === Event and:{
-							btn.keys.includesAny([\hi, \lo])
+							btn.keys.includesAny([\ccHi, \ccLo])
 						}, {
-							[\hi, \lo].do({ |hilo|
+							[\ccHi, \ccLo].do({ |hilo|
 								btn[hilo] !? {
-									if(hilo == \hi, {
+									if(hilo == \ccHi, {
 										btn[hilo].states_([[
 											cvWidgets[k].midiCtrlHi.string, 
 											Color.black,
 											tabProperties[widgetStates[k].tabIndex].tabColor
 										]])
 									});
-									if(hilo == \lo, {
+									if(hilo == \ccLo, {
 										btn[hilo].states_([[
 											cvWidgets[k].midiCtrlLo.string, 
 											Color.black,
 											tabProperties[widgetStates[k].tabIndex].tabColor
 										]])
 									});
-									if(btn[hilo].states.flatten(1)[0] == "ctrl Hi" or:{
-										btn[hilo].states.flatten(1)[0] == "ctrl Lo"
-									}, {
-										btn[hilo].remove;
-										controlButtons.removeAt(k);
-			//							"it happens at 3".postln;
-										this.prUpdateSwitchboardSetup;
-									});
 									window.refresh;
 								}
 							})
 						}, {
+//							("false func triggered:"+[k, btn]).postln;
 							btn.states_([[
 								cvWidgets[k].midiCtrl.string, 
 								Color.black, 
 								tabProperties[widgetStates[k].tabIndex].tabColor
 							]]);
-							if(btn.states.flatten(1)[0] == "ctrl", {
-								btn.remove;
-								controlButtons.removeAt(k);
-	//							"it happens at 3".postln;
-								this.prUpdateSwitchboardSetup;
-							});
 							window.refresh;
 						})
 					});
@@ -453,10 +412,24 @@ CVCenter {
 		lastVal = all.at(key.asSymbol).value;
 		all.removeAt(key.asSymbol);
 		cvWidgets[key].class.switch(
-			CVWidgetKnob, { cvWidgets[key].cc !? { cvWidgets[key].cc.remove } },
+			CVWidgetKnob, { 
+				cvWidgets[key].cc !? { cvWidgets[key].cc.remove };
+				controlButtons[key] !? { 
+					controlButtons[key].remove;
+					controlButtons.removeAt(key);
+				}
+			},
 			CVWidget2D, {
 				cvWidgets[key].ccHi !? { cvWidgets[key].ccHi.remove };
 				cvWidgets[key].ccLo !? { cvWidgets[key].ccLo.remove };
+				controlButtons[key] !? {
+					controlButtons[key][\ccLo] !? {
+						controlButtons[key][\ccLo].remove;					};
+					controlButtons[key][\ccHi] !? {
+						controlButtons[key][\ccHi].remove;
+					}
+				};
+				controlButtons.removeAt(key);
 			}
 		);
 		^lastVal;
@@ -509,9 +482,11 @@ CVCenter {
 		});
 		
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
+//			("this.gui:"+this.setup).postln;
 			this.gui(tab);
 		}, {
 //			("now adding:"+tab.asString).postln;
+//			("this.prAddToGui:"+this.setup).postln;
 			this.prAddToGui(tab);
 		});
 		
@@ -548,12 +523,12 @@ CVCenter {
 	// private Methods - not to be used directly
 	
 	*prSetup { |argMode, argMean, argString, argCButtonBank|
-//		("setup-args:"+[argMode, argMean, argString, argCButtonBank]).postln;
 		argMode !? { this.midimode_(argMode) };
 		argMean !? { this.midimean_(argMean) };
 		argString !? { this.midistring_(argString.asString) };
 		argCButtonBank !? { this.ctrlButtonBank_(argCButtonBank) };
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
+			("setup-args:"+[argMode, argMean, argString, argCButtonBank]).postln;
 			cvWidgets.pairsDo({ |k, wdgt| 
 				this.midimode !? { wdgt.midimode_(this.midimode) }; 
 				this.midimean !? { wdgt.midimean_(this.midimean) };
@@ -570,7 +545,7 @@ CVCenter {
 		var thisNextPos;
 		var widgetwidth, widgetheight=122, colwidth, rowheight;
 		
-//		("tab passed to prAddToGui:"+tab).postln;
+		("tab passed to prAddToGui:"+[tab, this.setup]).postln;
 		
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 		
@@ -608,9 +583,25 @@ CVCenter {
 				all[k].keys.includesAny([\hi, \lo])
 			}, {
 				cvWidgets[k] = CVWidget2D(tabs.views[cvTabIndex], [all[k].lo, all[k].hi], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 122, widgetheight), this.setup);
+				// to be tested in depth ...
+				if(cvWidgets[k].midiLearnLo.action.class != FunctionList, {
+					cvWidgets[k].midiLearnLo.action_(
+						cvWidgets[k].midiLearnLo.action.addFunc({ this.prAddControlButton(k, \ccLo) })
+					)
+				});
+				if(cvWidgets[k].midiLearnHi.action.class != FunctionList, {
+					cvWidgets[k].midiLearnHi.action_(
+						cvWidgets[k].midiLearnHi.action.addFunc({ this.prAddControlButton(k, \ccHi) })
+					)
+				});
 				widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: (hi: false, lo: false)));
 			}, {	
 				cvWidgets[k] = CVWidgetKnob(tabs.views[cvTabIndex], all[k], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight), this.setup);
+				if(cvWidgets[k].midiLearn.action != FunctionList, {
+					cvWidgets[k].midiLearn.action_(
+						cvWidgets[k].midiLearn.action.addFunc({ this.prAddControlButton(k) })
+					)
+				});
 				widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: false));
 			});
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
@@ -659,21 +650,11 @@ CVCenter {
 				})
 			})
 		}
-	}		
+	}	
 	
-	*prAddCtrlButton { 
-		var buttonWidth, btnTabKeys;
-		var nextPosFunc;
+	*prAddControlButton { |key, slot|
+		var buttonWidth;
 		
-		nextPosFunc = {
-			("nextPosFunc called:"+nextButtonPos).postln;
-			if(nextButtonPos.x+buttonWidth >= (switchBoard.bounds.width-buttonWidth), {
-				nextButtonPos = 0@(nextButtonPos.y+15);
-			}, {
-				nextButtonPos = nextButtonPos.x+buttonWidth@nextButtonPos.y;
-			})
-		};
-				
 		if(ctrlButtonBank.notNil and:{
 			ctrlButtonBank.isInteger and:{
 				ctrlButtonBank > 1
@@ -683,139 +664,169 @@ CVCenter {
 		}, {
 			buttonWidth = 18
 		});
-				
+
 		controlButtons ?? { controlButtons = IdentityDictionary() };
-		btnTabKeys = IdentityDictionary();
-		cvWidgets.pairsDo({ |k, wdgt|
-			wdgt.class.switch(
-				CVWidgetKnob, { 
-					if(wdgt.cc.notNil and:{ wdgt.midiCtrl.string != "ctrl" }, {
-						btnTabKeys.put(k.asSymbol, wdgt.midiCtrl.string)
-					}) 
-				},
-				CVWidget2D, {
-					if((wdgt.ccLo.notNil and:{ wdgt.midiCtrlLo.string != "ctrl Lo" }) || (wdgt.ccHi.notNil and:{ wdgt.midiCtrlHi.string != "ctrl Hi" }), {
-						btnTabKeys.put(k.asSymbol, ());
-						if(wdgt.ccLo.notNil and:{ wdgt.midiCtrlLo.string != "ctrl Lo" }, { 
-							btnTabKeys[k.asSymbol].lo = wdgt.midiCtrlLo.string
-						});
-						if(wdgt.ccHi.notNil and:{ wdgt.midiCtrlHi.string != "ctrl Hi" }, { 
-							btnTabKeys[k.asSymbol].hi = wdgt.midiCtrlHi.string 
-						});
-					})
-				}
+		
+		if(slot.isNil, {
+			this.prAddCtrlBtn(key, buttonWidth);
+		}, {
+			this.prAdd2DCtrlBtn(key, slot, buttonWidth);
+		});
+		switchBoard.reflow;
+	}
+	
+	*prAddCtrlBtn { |key, buttonWidth|
+		var val;
+		
+		if(controlButtons[key].isNil, {
+			val = cvWidgets[key].midiCtrl.string;
+			controlButtons.put(
+				key,
+				Button(
+					switchBoard,
+					buttonWidth@15
+				)
+				.states_([[
+					val, 
+					Color.black, 
+					tabProperties[widgetStates[key].tabIndex].tabColor
+				]])
+				.font_(Font("Helvetica", 9))
+				.action_({ 
+					tabs.focus(widgetStates[key].tabIndex);
+					cvWidgets[key].widgetBg.focusColor_(Color.green).focus(true);
+				})
 			)
+		}, {
+			controlButtons[key].remove;
+			controlButtons.removeAt(key);
+		});
+	}
+	
+	*prAdd2DCtrlBtn { |key, slot, buttonWidth|
+		var val;
+		
+		if(controlButtons[key].isNil, {
+			controlButtons.put(key, ());
 		});
 		
-//		("btnTabKeys:"+btnTabKeys).postln;
-
-		nextButtonPos ?? { nextButtonPos = 0@0 };
-		
-		btnTabKeys.pairsDo({ |key, val|
-//			[key, val].postln;
-//			[key, val, val.class, val.keys.includesAny([\lo, \hi])].postln;
-			
-			if(val.class === Event and:{
-				val.keys.includesAny([\lo, \hi])
+		if(controlButtons[key][slot].isNil, {
+			if(slot == "ccHi", {
+				val = cvWidgets[key].midiCtrlHi.string;
 			}, {
-				controlButtons[key] ?? { controlButtons.put(key, ()) };
-				[\lo, \hi].do({ |hilo|
-					val.keys.includes(hilo).if{ 
-//						("currentButtonStates:"+currentButtonStates).postln;
-						controlButtons[key][hilo] ?? {
-							controlButtons[key].put(
-								hilo,
-								Button(
-									switchBoard,
-									Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, 15)
-								)
-								.states_([[
-									val[hilo],
-									Color.black,
-									tabProperties[widgetStates[key].tabIndex].tabColor
-								]])
-								.font_(Font("Helvetica", 9))
-								.action_({ 
-									tabs.focus(widgetStates[key].tabIndex);
-									cvWidgets.pairsDo({ |k, wdgt|
-										if(k == key, {
-											wdgt.widgetBg.focusColor_(Color.green).focus(true);
-										})
-									})
-								})
-							);
-							nextPosFunc.();
-						}
-					}
+				val = cvWidgets[key].midiCtrlLo.string;
+			});			
+			controlButtons[key].put(
+				slot,
+				Button(
+					switchBoard,
+					buttonWidth@15
+				)
+				.states_([[
+					val, 
+					Color.black, 
+					tabProperties[widgetStates[key].tabIndex].tabColor
+				]])
+				.font_(Font("Helvetica", 9))
+				.action_({ 
+					tabs.focus(widgetStates[key].tabIndex);
+					cvWidgets[key].widgetBg.focusColor_(Color.green).focus(true);
 				})
-			}, {
-				controlButtons[key] ?? {
-//					("now putting in the next ctrl-button:"+val).postln;
-					controlButtons.put(
-						key,
-						Button(
-							switchBoard,
-							Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, 15)
-						)
-						.states_([[
-							val, 
-							Color.black, 
-							tabProperties[widgetStates[key].tabIndex].tabColor
-						]])
-						.font_(Font("Helvetica", 9))
-						.action_({ 
-							tabs.focus(widgetStates[key].tabIndex);
-							cvWidgets.pairsDo({ |k, wdgt|
-								if(k == key, {
-									wdgt.widgetBg.focusColor_(Color.green).focus(true);
-								})
-							})
-						})
-					);
-					nextPosFunc.();
-				}
-			})
+			)
+		}, {
+			controlButtons[key][slot].remove;
+			controlButtons[key].removeAt(slot);
+			if(controlButtons[key].size == 0, { controlButtons.removeAt(key) });
 		})
 	}
 	
-	*prUpdateSwitchboardSetup {
-		var buttonWidth, nextPosFunc;
+	*prUpdateSwitchboard { |updateButtons=false|
+		var buttonWidth;
 		
-		"prUpdateSwitchboardSetup triggered".postln;
-
-		if(ctrlButtonBank.notNil and:{
-			ctrlButtonBank.isInteger and:{
-				ctrlButtonBank > 1
-			}
-		}, {
-//			"now should update to new width".postln;
-			buttonWidth = 30
-		}, {
-			buttonWidth = 18
+		if(updateButtons, {
+			if(ctrlButtonBank.notNil and:{
+				ctrlButtonBank.isInteger and:{
+					ctrlButtonBank > 1
+				}
+			}, {
+				buttonWidth = 30
+			}, {
+				buttonWidth = 18
+			});
+			
+			controlButtons.pairsDo({ |key, btn|
+				if(btn.class == Event, {
+					btn.do({ |b| b.bounds_(Rect(b.bounds.left, b.bounds.top, buttonWidth, b.bounds.height)) });
+				}, {
+					btn.bounds_(Rect(btn.bounds.left, btn.bounds.top, buttonWidth, btn.bounds.height));				});
+			})
 		});
-
-		nextButtonPos = 0@0;
 		
-		nextPosFunc = {
-			if(nextButtonPos.x+buttonWidth >= (switchBoard.bounds.width-buttonWidth), {
-				nextButtonPos = 0@(nextButtonPos.y+15);
-			}, {
-				nextButtonPos = nextButtonPos.x+buttonWidth@nextButtonPos.y;
+		switchBoard.decorator.bounds_(switchBoard.bounds);
+		switchBoard.reflow;
+	}
+	
+	*prAddFuncToCC {
+		var funcToAdd;
+		cvWidgets.pairsDo({ |k, wdgt|
+//			widgetStates[k].postln;
+			funcToAdd = { 
+				{ 
+					tabs.focus(widgetStates[k].tabIndex);
+					cvWidgets[k].widgetBg.focusColor_(Color.green).focus(true);
+				}.defer
+			};
+			if(wdgt.respondsTo(\cc), {
+				wdgt.cc !? {
+					if(widgetStates[k].addedFunc == false and:{
+						wdgt.cc.function.class != FunctionList
+					}, {
+						wdgt.cc.function_(
+//							"adding another function".postln;
+							wdgt.cc.function.addFunc(funcToAdd)
+						);
+						widgetStates[k].addedFunc = true;
+					});
+				};
+				wdgt.cc ?? {
+					if(widgetStates[k].addedFunc == true, {
+						widgetStates[k].addedFunc = false
+					});
+				};
+			});
+			if(wdgt.respondsTo(\ccLo) and:{ wdgt.respondsTo(\ccHi) }, {
+				wdgt.ccLo !? {
+					if(widgetStates[k].addedFunc.lo == false and:{
+						wdgt.ccLo.function.class != FunctionList
+					}, {
+						wdgt.ccLo.function_(
+							wdgt.ccLo.function.addFunc(funcToAdd)
+						);
+						widgetStates[k].addedFunc.lo = true;
+					});
+				};
+				wdgt.ccHi !? {
+					if(widgetStates[k].addedFunc.hi == false and:{
+						wdgt.ccHi.function.class != FunctionList
+					}, {
+						wdgt.ccHi.function_(
+							wdgt.ccHi.function.addFunc(funcToAdd)
+						);
+						widgetStates[k].addedFunc.hi = true;
+					});
+				};
+				wdgt.ccLo ?? {
+					if(widgetStates[k].addedFunc.lo == true, {
+						widgetStates[k].addedFunc.lo = false
+					});
+				};
+				wdgt.ccHi ?? {
+					if(widgetStates[k].addedFunc.hi == true, {
+						widgetStates[k].addedFunc.hi = false
+					});
+				};
 			})
-		};
-		
-		controlButtons.pairsDo({ |key, btn|
-//			[key, btn].postln;
-			if(btn.class == Event, {
-				btn.do({ |b|
-					b.bounds_(Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, b.bounds.height));
-					nextPosFunc.();
-				})
-			}, {
-				btn.bounds_(Rect(nextButtonPos.x, nextButtonPos.y, buttonWidth, btn.bounds.height));
-				nextPosFunc.();
-			})
-		})	
+		})
 	}
 	
 }
