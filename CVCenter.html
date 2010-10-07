@@ -14,22 +14,20 @@ p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
 p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; min-height: 17.0px}
 p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco}
 p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; min-height: 14.0px}
-p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #816967; min-height: 14.0px}
-p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #b42a27}
-p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #0026ad}
-p.p11 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #236b22}
-span.s1 {color: #3c5765}
-span.s2 {color: #003fc3}
-span.s3 {color: #0853af}
-span.s4 {font: 11.0px Lucida Grande}
-span.s5 {font: 12.0px Helvetica}
-span.s6 {font: 10.0px Monaco}
-span.s7 {color: #205a8b}
-span.s8 {color: #000000}
-span.s9 {color: #236b22}
-span.s10 {color: #0026ad}
-span.s11 {color: #8f2f8f}
-span.s12 {color: #666666}
+p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #7f6b69; min-height: 14.0px}
+p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #ab3b37}
+p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #00339d}
+p.p11 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #30652f}
+span.s1 {color: #3f5662}
+span.s2 {color: #0049b2}
+span.s3 {color: #1157a1}
+span.s4 {font: 12.0px Helvetica}
+span.s5 {font: 10.0px Monaco}
+span.s6 {color: #000000}
+span.s7 {color: #30652f}
+span.s8 {color: #00339d}
+span.s9 {color: #874187}
+span.s10 {color: #666666}
 span.Apple-tab-span {white-space:pre}
 </style>
 </head>
@@ -47,11 +45,8 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><i><span class="Apple-tab-span">	</span>There should be no need to call *new directly as other methods will do this internally.</i></p>
 <p class="p3"><span class="Apple-tab-span">	</span><b>cvs</b> - a Dictionary, an IdentyDictionary or an Event, containing one or more CVs as key-value pair</p>
 <p class="p3"><span class="Apple-tab-span">	</span><b>setUpArgs</b> - an array of setup-arguments.</p>
-<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>The following can be set by a single integer value:</p>
-<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>0 // for MIDI-sliders sending 0-127</p>
-<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>1 // in-/decremental (e.g. turning a slider right means an output of mean + increment, which can be +1 or more, depending on how fast the slider is turned).<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[midimode, midimean, midistring] <span class="Apple-tab-span">	</span>// when an array is given its first slot will set <span class="s4">uSV7LPpyiGT</span>, the second goes in<b> *midimean_</b>, which is only relevant only if midimode == 1. It stands for the default midi-output that has to be substracted in order to get an in-/decremental output (on a Doepfer PocketDial it is 64). The third slot stands for <b>*midistring_</b>.</p>
-<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>more setup-options may be added at later point ...<span class="Apple-tab-span">	</span></p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[midimode, midiresolution, midimean, midistring, ctrlButtonBank, softWithin]<span class="Apple-converted-space"> <span class="Apple-tab-span">	</span></span></p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>For an explanation for the meaning of each slot see below.</p>
 <p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
 <p class="p3">The following setter-methods determine a global setup for all CVWidgets contained in CVCenter. They are implemented as simple getters/setters with inbuilt logic besides their getter/setter functionality. You can set e.g. CVCenter.midimode_(1) <i>before</i> actually calling CVCenter.new and CVCenter will remember the setting.<span class="Apple-converted-space"> </span></p>
 <p class="p3">When a setter is called while CVCenter-gui is visible, the inbuilt SkipJack-machanism will grab a newly set value every 0.5 seconds, thus updating CVCenter's setup.</p>
@@ -60,6 +55,10 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><span class="Apple-tab-span">	</span>0: MIDI-output is 0-127</p>
 <p class="p3"><span class="Apple-tab-span">	</span>1: MIDI-output is a mean-value +/- in-/decrement. If no value for <i>mean</i> is given in the setup-array 64 is assumed to be the default value for <i>mean</i>.</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p3"><b>*midiresolution_</b></p>
+<p class="p3"><span class="Apple-tab-span">	</span>default: 1</p>
+<p class="p3"><span class="Apple-tab-span">	</span>This parameter will only have an effect if midimode is set to 1 (endless faders). It determines the resolution of each fader. Higher values will result in a lower resolution, lower will have the opposite effect.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
 <p class="p3"><b>*midimean_</b><span class="Apple-converted-space"> </span></p>
 <p class="p3"><span class="Apple-tab-span">	</span>default: 64. Only relevant for midimode == 1. It reflects the default output of a midislider in neutral position.</p>
 <p class="p2"><br></p>
@@ -69,16 +68,22 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><b>*ctrlButtonBank_</b></p>
 <p class="p3"><b><span class="Apple-tab-span">	</span></b>As midi-devices may have a number of different banks at limited number of sliders this offers some convenience in a way that the GUI will display the bank and its sliders from 1 to the max. number of hardware sliders. E.g. on a Doepfer Pocket Dial which has 16 sliders and 4 banks a setting like</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p6"><span class="s5"><span class="Apple-tab-span">	</span></span>CVCenter.ctrlButtonBank_(16)</p>
+<p class="p6"><span class="s4"><span class="Apple-tab-span">	</span></span>CVCenter.ctrlButtonBank_(16)</p>
 <p class="p7"><span class="Apple-tab-span">	</span></p>
 <p class="p3">will display the sliders in each bank like the following: 1:1..16, 2:1..16, 3:1..16, 4:1..16. Thus, slider number 36 (which is returned by the function within the corresponding CCResponder as 35) will be displayed as 3:4 (bank nr. 3, slider number 4 - corresponding to the number printed on the device and the selected bank).<span class="Apple-converted-space"> </span></p>
-<p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p2"><b></b><br></p>
+<p class="p3"><b>*softWithin_(val)</b></p>
+<p class="p3"><b><span class="Apple-tab-span">	</span></b>val - 0.1 by default</p>
+<p class="p3"><span class="Apple-tab-span">	</span>This method is only if CVCenter is used in connection with MIDI-devices that have no endless-faders: By default moving a slider on such a device will return a value between 0 and 127. This would usually lead to unwanted "jumps" if e.g. a value that has been set by a MIDI-slider and got changed then again in the GUI is changed again by the MIDI-slider - the MIDI-slider is still in its old position while the value has been changed to something else. Thus the value would usually jump back to the value of the MIDI-slider and then follow its new setting.</p>
+<p class="p3"><span class="Apple-tab-span">	</span>*softWithin_ prevents this unwanted behaviour by allowing a new value to be set via MIDI-slider only if its value is within +/- val/2. You will recognize that you first have to move the slider onto the a certain point which represent the current value of the underlying CV +/- the tolerance set by val.</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p3">Each of the previously mentioned setter-methods are implemented as getters as well, which allows you to retrieve its values individually. Alternatively you may use *setup to retrieve all values at once:</p>
+<p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
 <p class="p3"><b>*setup</b></p>
 <p class="p3"><span class="Apple-tab-span">	</span>A convenience-method, returning<span class="Apple-converted-space"> </span></p>
-<p class="p6"><span class="s5"><span class="Apple-tab-span">	</span></span>[midimode, midimean, midistring, ctrlButtonBank]</p>
+<p class="p6"><span class="s4"><span class="Apple-tab-span">	</span></span>[midimode, midiresolution, midimean, midistring, ctrlButtonBank, softWithin]</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p3">If no setup is provided explicitely for <b>CVCenter</b> by default it will be set to 0 - MIDI-sliders returning values from 0-127.</p>
-<p class="p3">By default any of the previously described setters apply globally to all widgets within <b>CVCenter</b>.<span class="Apple-converted-space"> </span></p>
+<p class="p3">If no explicite setup is provided (by setting *midimode_, *midiresolution_ etc) for <b>CVCenter</b> *setup will return <span class="s5">[nil, nil, nil, nil, nil, nil]</span>. In this case the individual settings of each widget will apply (set by their instance-methods midimode_, midiresolution_ etc.).</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p3"><b>*use(key, cv, value, tab)</b></p>
 <p class="p3"><span class="Apple-tab-span">	</span>key - the key under which the CV-instance will be added to the CVCenter</p>
@@ -105,7 +110,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><i><span class="Apple-tab-span">	</span>If no arguments are given all CVs referenced by CVCenter.cvsList will be removed!</i></p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p3"><b>*gui(tab, key1, cv1, key2, cv2 ..., overwrite)</b></p>
-<p class="p3"><span class="Apple-tab-span">	</span>tab - a symbol or a string indicating the tab under which the widgets shall appear. If the GUI is already present this parameter will be ignored, instead the widgets will appear under the tab that is currently focused. If CVCenter is initialised via *gui and no tab is given, the first tab (under which the widgets will appear) will be named "default". <b>Note! if tab is omitted the argument-list has to be provided as an explicit array:</b> <span class="s6">cvs:[key1, cv1, key2, cv2, ... keyN, cvN]<span class="Apple-converted-space"> </span></span></p>
+<p class="p3"><span class="Apple-tab-span">	</span>tab - a symbol or a string indicating the tab under which the widgets shall appear. If the GUI is already present this parameter will be ignored, instead the widgets will appear under the tab that is currently focused. If CVCenter is initialised via *gui and no tab is given, the first tab (under which the widgets will appear) will be named "default". <b>Note! if tab is omitted the argument-list has to be provided as an explicit array:</b> <span class="s5">cvs:[key1, cv1, key2, cv2, ... keyN, cvN]<span class="Apple-converted-space"> </span></span></p>
 <p class="p3"><span class="Apple-tab-span">	</span>keys, cv - instances of CV at key 1-n</p>
 <p class="p3"><span class="Apple-tab-span">	</span>overwrite - a boolean wether CVs should overwrite existing ones. default: false.</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
@@ -113,63 +118,53 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><span class="Apple-tab-span">	</span>If keys that are already contained in CVCenter.cvsList are provided as arguments a warning will be issued. If overwrite is set to <i>true </i>key resp. cv will overwrite CV-instances at the given keys in CVCenter.cvsList.</p>
 <p class="p3"><span class="Apple-tab-span">	</span>Keys (resp. the CV-instances added at the given key) that are not already in CVCenter.cvsList will be added to the CVCenter, other CV-instances already stored remain untouched.</p>
 <p class="p3"><span class="Apple-tab-span">	</span>softWithin</p>
-<p class="p3"><b>*softWithin_(val)</b></p>
-<p class="p3"><b><span class="Apple-tab-span">	</span></b>val - 0.1 by default</p>
-<p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p3"><span class="Apple-tab-span">	</span>This method is only if CVCenter is used in connection with MIDI-devices that have no endless-faders: By default moving a slider on such a device will return a value between 0 and 127. This would usually lead to unwanted "jumps" if e.g. a value that has been set by a MIDI-slider and got changed then again in the GUI is changed again by the MIDI-slider - the MIDI-slider is still in its old position while the value has been changed to something else. Thus the value would usually jump back to the value of the MIDI-slider and then follow its new setting.</p>
-<p class="p3"><span class="Apple-tab-span">	</span>*softWithin prevents this unwanted behaviour by allowing a new value to be set via MIDI-slider only if its value is within +/- val/2. You will recognize that you first have to move the slider onto the a certain point which represent the current value of the underlying CV +/- the tolerance set by val.</p>
-<p class="p3"><span class="Apple-tab-span">	</span>*softWithin sets a global value for all CVWidgets in CVCenter. However values for each CV can also be set individually - see <a href="CVWidget.html"><span class="s7"><b>CVWidget</b></span></a></p>
 <p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
-<p class="p3"><b>*softWithin<span class="Apple-converted-space"> </span></b></p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-tab-span">	</span>returns the softWithin-values for all sliders in CVCenter - though CVCenter.softWithin_(0.1) only lets you set a global value it really sets the softWithinsoftWithinsoftWithinsoftWithin for each cvWidget.</p>
-<p class="p2"><br></p>
 <p class="p4"><b>Example</b></p>
 <p class="p7"><br></p>
 <p class="p8"><br></p>
 <p class="p9">// open the GUI</p>
-<p class="p10">CVCenter<span class="s8">.gui</span></p>
+<p class="p10">CVCenter<span class="s6">.gui</span></p>
 <p class="p7"><br></p>
 <p class="p9">// add some more CVs</p>
 <p class="p9">// will immediatly be reflected in the GUI</p>
-<p class="p10">CVCenter<span class="s8">.put(</span></p>
-<p class="p9"><span class="s8"><span class="Apple-tab-span">	</span></span><span class="s9">\test1</span><span class="s8">, </span><span class="s10">CV</span><span class="s8">(</span><span class="s9">\pan</span><span class="s8">.asSpec), </span>// will be ignored - \test1 has already been added</p>
-<p class="p11"><span class="s8"><span class="Apple-tab-span">	</span></span>\test4<span class="s8">, </span><span class="s10">CV</span><span class="s8">(</span>\boostcut<span class="s8">.asSpec)</span></p>
+<p class="p10">CVCenter<span class="s6">.put(</span></p>
+<p class="p9"><span class="s6"><span class="Apple-tab-span">	</span></span><span class="s7">\test1</span><span class="s6">, </span><span class="s8">CV</span><span class="s6">(</span><span class="s7">\pan</span><span class="s6">.asSpec), </span>// will be ignored - \test1 has already been added</p>
+<p class="p11"><span class="s6"><span class="Apple-tab-span">	</span></span>\test4<span class="s6">, </span><span class="s8">CV</span><span class="s6">(</span>\boostcut<span class="s6">.asSpec)</span></p>
 <p class="p6">)</p>
 <p class="p7"><br></p>
 <p class="p9">// calling .gui on the CVCenter again will not bring up another window</p>
 <p class="p9">// if the GUI is closed it will be opened again</p>
-<p class="p10">CVCenter<span class="s8">.gui</span></p>
+<p class="p10">CVCenter<span class="s6">.gui</span></p>
 <p class="p7"><br></p>
 <p class="p9">// in a pattern</p>
 <p class="p9">// all widgets used in the following Pbind will be added to the "default"-tab<span class="Apple-converted-space"> </span></p>
 <p class="p9">// if no CVCenter-GUI is present resp. CVCenter hasn't been initialised yet.</p>
-<p class="p6">p = <span class="s10">Pbind</span>(</p>
-<p class="p6"><span class="Apple-tab-span">	</span><span class="s9">\dur</span>, <span class="s10">Prand</span>([<span class="s10">Pn</span>(<span class="s11">1</span>/<span class="s11">8</span>, <span class="s11">4</span>), <span class="s10">Pn</span>(<span class="s11">1</span>/<span class="s11">4</span>, <span class="s11">2</span>)], <span class="s10">inf</span>),<span class="Apple-converted-space"> </span></p>
-<p class="p9"><span class="s8"><span class="Apple-tab-span">	</span></span>// new keys will be added to CVCenter.cvsList and displayed in the GUI immediatly</p>
-<p class="p9"><span class="s8"><span class="Apple-tab-span">	</span></span>// widget 'amp' will be added to a new tab named 'someTab'</p>
-<p class="p6"><span class="Apple-tab-span">	</span><span class="s9">\amp</span>, <span class="s10">CVCenter</span>.use(<span class="s9">\amp</span>, [<span class="s11">0.0</span>, <span class="s11">1.0</span>].asSpec, <span class="s11">0.2</span>, <span class="s9">\someTab</span>),<span class="Apple-converted-space"> </span></p>
-<p class="p9"><span class="s8"><span class="Apple-tab-span">	</span></span>// a CVCenter slot can be used in combination with other Patterns as well</p>
-<p class="p9"><span class="s8"><span class="Apple-tab-span">	</span></span>// widget 'test4' already exists in the 'default' tab - so it will *not* be added to \someTab</p>
-<p class="p6"><span class="Apple-tab-span">	</span><span class="s9">\freq</span>, <span class="s10">Prand</span>([<span class="s11">64</span>, <span class="s11">66</span>, <span class="s11">67</span>, <span class="s11">69</span>, <span class="s11">71</span>, <span class="s11">72</span>].midicps, <span class="s10">inf</span>) + <span class="s10">CVCenter</span>.use(<span class="s9">\test4</span>, <span class="s9">\freq</span>.asSpec, <span class="s11">20</span>, <span class="s9">\someTab</span>)</p>
+<p class="p6">p = <span class="s8">Pbind</span>(</p>
+<p class="p6"><span class="Apple-tab-span">	</span><span class="s7">\dur</span>, <span class="s8">Prand</span>([<span class="s8">Pn</span>(<span class="s9">1</span>/<span class="s9">8</span>, <span class="s9">4</span>), <span class="s8">Pn</span>(<span class="s9">1</span>/<span class="s9">4</span>, <span class="s9">2</span>)], <span class="s8">inf</span>),<span class="Apple-converted-space"> </span></p>
+<p class="p9"><span class="s6"><span class="Apple-tab-span">	</span></span>// new keys will be added to CVCenter.cvsList and displayed in the GUI immediatly</p>
+<p class="p9"><span class="s6"><span class="Apple-tab-span">	</span></span>// widget 'amp' will be added to a new tab named 'someTab'</p>
+<p class="p6"><span class="Apple-tab-span">	</span><span class="s7">\amp</span>, <span class="s8">CVCenter</span>.use(<span class="s7">\amp</span>, [<span class="s9">0.0</span>, <span class="s9">1.0</span>].asSpec, <span class="s9">0.2</span>, <span class="s7">\someTab</span>),<span class="Apple-converted-space"> </span></p>
+<p class="p9"><span class="s6"><span class="Apple-tab-span">	</span></span>// a CVCenter slot can be used in combination with other Patterns as well</p>
+<p class="p9"><span class="s6"><span class="Apple-tab-span">	</span></span>// widget 'test4' already exists in the 'default' tab - so it will *not* be added to \someTab</p>
+<p class="p6"><span class="Apple-tab-span">	</span><span class="s7">\freq</span>, <span class="s8">Prand</span>([<span class="s9">64</span>, <span class="s9">66</span>, <span class="s9">67</span>, <span class="s9">69</span>, <span class="s9">71</span>, <span class="s9">72</span>].midicps, <span class="s8">inf</span>) + <span class="s8">CVCenter</span>.use(<span class="s7">\test4</span>, <span class="s7">\freq</span>.asSpec, <span class="s9">20</span>, <span class="s7">\someTab</span>)</p>
 <p class="p6">).play</p>
 <p class="p7"><br></p>
 <p class="p9">// add another widget to another tab</p>
 <p class="p7"><br></p>
 <p class="p7"><br></p>
 <p class="p9">// change the MIDI-setup</p>
-<p class="p6"><span class="s10">CVCenter</span>.midimode_(<span class="s11">1</span>)</p>
+<p class="p6"><span class="s8">CVCenter</span>.midimode_(<span class="s9">1</span>)</p>
 <p class="p7"><br></p>
 <p class="p9">// removing a CV-instance while a Pattern is playing<span class="Apple-converted-space"> </span></p>
 <p class="p9">// should be safe since removeAt will return its last value</p>
-<p class="p6"><span class="s10">CVCenter</span>.removeAt(<span class="s9">\test4</span>)</p>
-<p class="p9"><span class="s10">CVCenter</span><span class="s8">.removeAll </span>// remove all elements from CVCenter if no keys are given</p>
+<p class="p6"><span class="s8">CVCenter</span>.removeAt(<span class="s7">\test4</span>)</p>
+<p class="p9"><span class="s8">CVCenter</span><span class="s6">.removeAll </span>// remove all elements from CVCenter if no keys are given</p>
 <p class="p7"><br></p>
 <p class="p9">// Synth-controls can also be set using a CVs .action_</p>
 <p class="p9">// a newly instantiated CV can be used in any context later on</p>
-<p class="p11"><span class="s8">a = </span><span class="s10">Synth</span><span class="s8">(</span>\default<span class="s8">)</span></p>
+<p class="p11"><span class="s6">a = </span><span class="s8">Synth</span><span class="s6">(</span>\default<span class="s6">)</span></p>
 <p class="p9">// the widget will be added to a tab named "Synth-Controls"</p>
-<p class="p6"><span class="s10">CVCenter</span>.use(<span class="s9">\freqCV</span>, <span class="s9">\freq</span>.asSpec, <span class="s12">"Synth-Controls"</span>).action_({ <span class="s10">|cv|</span> a.set(<span class="s9">\freq</span>, cv.value) })</p>
+<p class="p6"><span class="s8">CVCenter</span>.use(<span class="s7">\freqCV</span>, <span class="s7">\freq</span>.asSpec, <span class="s10">"Synth-Controls"</span>).action_({ <span class="s8">|cv|</span> a.set(<span class="s7">\freq</span>, cv.value) })</p>
 <p class="p2"><br></p>
 <p class="p4"><b>about the GUI</b></p>
 <p class="p5"><br></p>

@@ -2,13 +2,13 @@
 CVWidget {
 
 	classvar <editorWindow, <window;
-	var <>midimode = 0, <>midimean = 64, <>midistring = "", <>ctrlButtonBank, <>softWithin = 0.1;
+	var <>midimode = 0, <>midimean = 64, <>midistring = "", <>ctrlButtonBank, <>midiresolution=1, <>softWithin = 0.1;
 	var visibleGuiEls, allGuiEls;
 	var <>widgetBg, <>label, <>nameField; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps;
 
 	setup {
-		^[this.midimode, this.midimean, this.midistring, this.ctrlButtonBank];
+		^[this.midimode, this.midiresolution, this.midimean, this.midistring, this.ctrlButtonBank, this.softwithin];
 	}
 	
 	visible_ { |visible|
@@ -110,7 +110,7 @@ CVWidget {
 								},
 								1, { 
 									meanVal = this.midimean;
-									cv.input_(cv.input+((val-meanVal)/127)) 
+									cv.input_(cv.input+((val-meanVal)/127*this.midiresolution)) 
 								}
 							);
 							{
@@ -299,9 +299,11 @@ CVWidgetKnob : CVWidget {
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
 		setUpArgs[0] !? { this.midimode_(setUpArgs[0]) };
-		setUpArgs[1] !? { this.midimean_(setUpArgs[1]) };
-		setUpArgs[2] !? { this.midistring_(setUpArgs[2].asString) };
-		setUpArgs[3] !? { this.ctrlButtonBank_(setUpArgs[3]) };
+		setUpArgs[1] !? { this.midiresolution_(setUpArgs[1]) };
+		setUpArgs[2] !? { this.midimean_(setUpArgs[2]) };
+		setUpArgs[3] !? { this.midistring_(setUpArgs[3].asString) };
+		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
+		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
 				
 		knobsize = widgetwidth-14;
 		
@@ -436,9 +438,11 @@ CVWidget2D : CVWidget {
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
 		setUpArgs[0] !? { this.midimode_(setUpArgs[0]) };
-		setUpArgs[1] !? { this.midimean_(setUpArgs[1]) };
-		setUpArgs[2] !? { this.midistring_(setUpArgs[2].asString) };
-		setUpArgs[3] !? { this.ctrlButtonBank_(setUpArgs[3]) };
+		setUpArgs[1] !? { this.midiresolution_(setUpArgs[1]) };
+		setUpArgs[2] !? { this.midimean_(setUpArgs[2]) };
+		setUpArgs[3] !? { this.midistring_(setUpArgs[3].asString) };
+		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
+		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
 
 		this.widgetBg = UserView(parentView, Rect(xy.x, xy.y, widgetwidth, widgetheight))
 			.focusColor_(Color(alpha: 1.0))

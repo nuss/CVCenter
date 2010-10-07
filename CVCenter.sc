@@ -2,7 +2,7 @@
 CVCenter {
 
 	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
-	classvar <>midimode, <>midimean, <>midistring, <numccs;
+	classvar <>midimode, <>midiresolution, <>midimean, <>midistring, <>softWithin, <numccs;
 	classvar /*<controlButtonKeys, */<controlButtons, <nextButtonPos;
 	classvar <>ctrlButtonBank, currentButtonStates, guiClosed = false/*, buttonProps*/;
 	classvar /*widgetwidth = 52, widgetheight = 122, colwidth, rowheight, */<widgetStates;
@@ -72,7 +72,7 @@ CVCenter {
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 
 			window = Window("CVCenter", Rect(0, 0, 400, 210));
-			window.background_(Color.black);
+//			window.background_(Color.black);
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
 			window.view.decorator = flow;
@@ -497,43 +497,28 @@ CVCenter {
 		})
 	}
 	
-	*softWithin_ { |val|
-		cvWidgets !? {
-			cvWidgets.do({ |wdgt|
-				wdgt.softWithin_(val);
-			})
-		}
-	}
-	
-	*softWithin {
-		var softWithins;
-		cvWidgets !? {
-			softWithins = [];
-			cvWidgets.do({ |wdgt|
-				softWithins = softWithins.add(wdgt.softWhithin)
-			});
-			^softWithins;
-		}
-	}
-	
 	*setup {
-		^[this.midimode, this.midimean, this.midistring, this.ctrlButtonBank];
+		^[this.midimode, this.midiresolution, this.midimean, this.midistring, this.ctrlButtonBank, this.softWithin];
 	}
 	
 	// private Methods - not to be used directly
 	
-	*prSetup { |argMode, argMean, argString, argCButtonBank|
+	*prSetup { |argMode, argResolution, argMean, argString, argCButtonBank, argSoftWithin|
 		argMode !? { this.midimode_(argMode) };
+		argResolution !? { this.midiresolution_(argResolution) };
 		argMean !? { this.midimean_(argMean) };
 		argString !? { this.midistring_(argString.asString) };
 		argCButtonBank !? { this.ctrlButtonBank_(argCButtonBank) };
+		argSoftWithin !? { this.softWithin_(argSoftWithin) };
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
-			("setup-args:"+[argMode, argMean, argString, argCButtonBank]).postln;
+			("setup-args:"+[argMode, argResolution, argMean, argString, argCButtonBank, argSoftWithin]).postln;
 			cvWidgets.pairsDo({ |k, wdgt| 
-				this.midimode !? { wdgt.midimode_(this.midimode) }; 
+				this.midimode !? { wdgt.midimode_(this.midimode) };
+				this.midiresolution !? { wdgt.midiresolution_(this.midiresolution) };
 				this.midimean !? { wdgt.midimean_(this.midimean) };
 				this.midistring !? { wdgt.midistring_(this.midistring.asString) };
 				wdgt.ctrlButtonBank_(this.ctrlButtonBank);
+				this.softWithin !? { wdgt.softWithin_(this.softWithin) };
 			})
 		})
 	}
