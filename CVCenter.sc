@@ -40,7 +40,7 @@ CVCenter {
 			}, {		
 				if(cvs.isKindOf(Dictionary).not and:{
 					cvs.isKindOf(IdentityDictionary).not and:{
-						cvs.isKindOf(Event).not	
+						cvs.isKindOf(Event).not
 					}
 				}, {
 					Error("Arguments for CVCenter have to be either a Dictionary, an IdentityDictionary or an Event.").throw;
@@ -72,15 +72,13 @@ CVCenter {
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 
 			window = Window("CVCenter", Rect(0, 0, 400, 210));
-//			window.background_(Color.black);
+			window.background_(Color.black);
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
 			window.view.decorator = flow;
 			flow.margin_(4@0);
 			flow.gap_(0@4);
 			flow.shift(0, 0);
-
-//			controlButtonKeys ?? { controlButtonKeys = IdentityDictionary() };
 			
 			if(tabProperties.size < 1, {
 				tabProperties = tabProperties.add(());
@@ -93,7 +91,7 @@ CVCenter {
 			unfocusedColors = tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) });
 			
 			tabs = TabbedView(
-				window, 
+				window,
 				Rect(0, 0, flow.bounds.width, flow.bounds.height-60), 
 				labels: tabLabels, 
 				scroll: true
@@ -146,7 +144,7 @@ CVCenter {
 							w.ccHi !? { widgetStates[k].ccHi = w.ccHi };
 							w.ccLo !? { widgetStates[k].ccLo = w.ccLo };
 						}
-					)					
+					)
 				});
 				tabProperties.do(_.nextPos_(0@0));
 				controlButtons = nil;
@@ -179,8 +177,9 @@ CVCenter {
 				});
 				
 				if(orderedCVs[i].class === Event and:{ 
-					orderedCVs[i].keys.includesAny([\lo, \hi])				}, {
-//					"and now a 2D widget".postln;
+					orderedCVs[i].keys.includesAny([\lo, \hi])
+				}, {
+//				"and now a 2D widget".postln;
 					cvWidgets[k] = CVWidget2D(
 						tabs.views[cvTabIndex], [orderedCVs[i].lo, orderedCVs[i].hi], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 122, widgetheight), this.setup
 					);
@@ -208,7 +207,7 @@ CVCenter {
 						)
 					})
 				});
-												
+
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 				
 				widgetStates[k] !? {
@@ -302,8 +301,12 @@ CVCenter {
 						removedKeys.do({ |k|
 							cvWidgets[k].remove;
 							cvWidgets.removeAt(k);
-							controlButtons[k].remove;
-							controlButtons.removeAt(k);
+							controlButtons !? {
+								controlButtons[k] !? {
+									controlButtons[k].remove;
+									controlButtons.removeAt(k)
+								}
+							};
 						});
 						this.prRegroupWidgets(tabs.activeTab);
 //						"it happens at 1".postln;
@@ -414,22 +417,28 @@ CVCenter {
 		cvWidgets[key].class.switch(
 			CVWidgetKnob, { 
 				cvWidgets[key].cc !? { cvWidgets[key].cc.remove };
-				controlButtons[key] !? { 
-					controlButtons[key].remove;
-					controlButtons.removeAt(key);
+				controlButtons !? {
+					controlButtons[key] !? { 
+						controlButtons[key].postln;
+						controlButtons[key].remove;
+						controlButtons.removeAt(key);
+					}
 				}
 			},
 			CVWidget2D, {
 				cvWidgets[key].ccHi !? { cvWidgets[key].ccHi.remove };
 				cvWidgets[key].ccLo !? { cvWidgets[key].ccLo.remove };
-				controlButtons[key] !? {
-					controlButtons[key][\ccLo] !? {
-						controlButtons[key][\ccLo].remove;					};
-					controlButtons[key][\ccHi] !? {
-						controlButtons[key][\ccHi].remove;
+				controlButtons !? {
+					controlButtons[key] !? {
+						controlButtons[key][\ccLo] !? {
+							controlButtons[key][\ccLo].remove;
+						};
+						controlButtons[key][\ccHi] !? {
+							controlButtons[key][\ccHi].remove;
+						};
+						controlButtons.removeAt(key);
 					}
-				};
-				controlButtons.removeAt(key);
+				}
 			}
 		);
 		^lastVal;
