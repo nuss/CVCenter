@@ -72,7 +72,7 @@ CVCenter {
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
 
 			window = Window("CVCenter", Rect(0, 0, 400, 210));
-			window.background_(Color.black);
+			if(Quarks.isInstalled("wslib"), { window.background_(Color.black) });
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
 			window.view.decorator = flow;

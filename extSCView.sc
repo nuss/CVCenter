@@ -1,6 +1,6 @@
 
 +SCView {
-	reflow { 
+	reflow {
 		var children, decorator;
 		children = this.children;
 		decorator = this.decorator;

@@ -21,7 +21,7 @@ CVWidget {
 						el.visible_(false);
 					}, {
 						el.visible_(true);
-					})	
+					})
 				});
 			}, {
 				allGuiEls.do(_.visible_(false));
@@ -204,7 +204,7 @@ CVWidget {
 								break.value(widget.knob.centered_(true));
 							}, {
 								widget.knob.centered_(false);
-							})			
+							})
 						})
 					}
 				});
@@ -475,7 +475,7 @@ CVWidget2D : CVWidget {
 		;
 		nextY = nextY+this.slider2d.bounds.height;
 		this.rangeSlider = RangeSlider(parentView, Rect(
-			xy.x+1, 
+			xy.x+1,
 			nextY,
 			widgetwidth-42,
 			15
