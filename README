@@ -4,5 +4,10 @@ For more info check out CVCenter.html resp. CVWidget.html.
 
 Installation: 
 1) get SuperCollider from http://supercollider.sourceforge.net/downloads/
-2) after installing SuperCollider put all content of CVCenter in
+2) install the required extensions via the Quarks-mechanism:
+	a) Conductor
+	b) TabbedView
+	c) wslib (optional)
+	see the Quarks-helpfile for more information how to do this.
+2) after installing SuperCollider and the required extensions put all content of CVCenter in
 ~/Library/Application Support/SuperCollider/Extensions/ (Mac)
