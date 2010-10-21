@@ -8,6 +8,6 @@ Installation:
 	a) Conductor
 	b) TabbedView
 	c) wslib (optional)
-	see the Quarks-helpfile for more information how to do this.
+	see the Quarks-helpfile for more information on how to do this.
 2) after installing SuperCollider and the required extensions put all content of CVCenter in
 ~/Library/Application Support/SuperCollider/Extensions/ (Mac)
