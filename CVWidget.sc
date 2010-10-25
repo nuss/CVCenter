@@ -2,7 +2,8 @@
 CVWidget {
 
 	classvar <editorWindow, <window;
-	var <>midimode = 0, <>midimean = 64, <>midistring = "", <>ctrlButtonBank, <>midiresolution=1, <>softWithin = 0.1;
+	var <>midimode = 0, <>midimean = 64, <>midistring = "", <>ctrlButtonBank, <>midiresolution = 1, <>softWithin = 0.1;
+	var <>calibrate = true; // OSC-settings
 	var visibleGuiEls, allGuiEls;
 	var <>widgetBg, <>label, <>nameField; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps;
@@ -285,6 +286,7 @@ CVWidgetKnob : CVWidget {
 	var thisCV;
 	var <>knob, <>numVal, <>specBut, <>midiHead, <>midiLearn, <>midiSrc, <>midiChan, <>midiCtrl;
 	var <>cc, spec;
+	var <>oscMapping = \linlin, <>calibConstraints, <>oscResponder;
 
 	*new { |parent, cv, name, bounds, setUpArgs|
 		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs)
@@ -415,6 +417,36 @@ CVWidgetKnob : CVWidget {
 		^thisCV.spec;
 	}
 	
+	oscConnect { |addr=nil, name, oscMsgIndex|
+		this.oscResponder = OSCresponderNode(addr, name.asSymbol, { |t, r, msg|
+			if(calibrate, { 
+				if(calibConstraints.isNil, {
+					calibConstraints = (lo: msg[oscMsgIndex], hi: msg[oscMsgIndex]);
+				}, {
+					if(msg[oscMsgIndex] < calibConstraints.lo, { calibConstraints.lo = msg[oscMsgIndex] });
+					if(msg[oscMsgIndex] > calibConstraints.hi, { calibConstraints.hi = msg[oscMsgIndex] });
+				})
+			}, {
+				if(calibConstraints.isNil, {
+					calibConstraints = (lo: 0, hi: 0);
+				})	
+			});
+			thisCV.value_(
+				msg[oscMsgIndex].perform(
+					this.oscMapping,
+					calibConstraints.lo, calibConstraints.hi,
+					this.spec.minval, this.spec.maxval,
+					\minmax
+				)
+			);
+		}).add
+	}
+	
+	oscResponderRemove {
+		this.oscResponder.remove;
+		this.calibConstraints_(nil);	
+	}
+	
 }
 
 CVWidget2D : CVWidget {
@@ -424,6 +456,9 @@ CVWidget2D : CVWidget {
 	var <>midiHeadLo, <>midiLearnLo, <>midiSrcLo, <>midiChanLo, <>midiCtrlLo;
 	var <>midiHeadHi, <>midiLearnHi, <>midiSrcHi, <>midiChanHi, <>midiCtrlHi;
 	var <>ccLo, <>ccHi, specLo, specHi;
+	var <>oscMappingLo = \linlin, <>oscMappingHi = \linlin;
+	var <>calibConstraintsLo, <>oscResponderLo;
+	var <>calibConstraintsHi, <>oscResponderHi;
 
 	*new { |parent, cvs, name, bounds, setUpArgs|
 		^super.new.init(parent, cvs[0], cvs[1], name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs)
@@ -604,6 +639,70 @@ CVWidget2D : CVWidget {
 	
 	spec { |hilo|
 		^thisCV[hilo].spec;
+	}
+	
+	oscConnect { |addr=nil, name, oscMsgIndex, hilo|
+		hilo ?? { Error("Please provide the CV's key \('hi' or 'lo')!").throw };
+		if(hilo.asSymbol === \lo, {
+			this.oscResponderLo = OSCresponderNode(addr, name.asSymbol, { |t, r, msg|
+				if(calibrate, { 
+					if(calibConstraintsLo.isNil, {
+						calibConstraintsLo = (lo: msg[oscMsgIndex], hi: msg[oscMsgIndex]);
+					}, {
+						if(msg[oscMsgIndex] < calibConstraintsLo.lo, { calibConstraintsLo.lo = msg[oscMsgIndex] });
+						if(msg[oscMsgIndex] > calibConstraintsLo.hi, { calibConstraintsLo.hi = msg[oscMsgIndex] });
+					})
+				}, {
+					if(calibConstraintsLo.isNil, {
+						calibConstraintsLo = (lo: 0, hi: 0);
+					})	
+				});
+				thisCV[\lo].value_(
+					msg[oscMsgIndex].perform(
+						this.oscMappingLo,
+						this.calibConstraintsLo.lo, this.calibConstraintsLo.hi,
+						thisCV[hilo].spec.minval, thisCV[hilo].spec.maxval,
+						\minmax
+					)
+				)
+			}).add
+		});
+		if(hilo.asSymbol === \hi, {
+			this.oscResponderHi = OSCresponderNode(addr, name.asSymbol, { |t, r, msg|
+				if(calibrate, { 
+					if(calibConstraintsHi.isNil, {
+						calibConstraintsHi = (lo: msg[oscMsgIndex], hi: msg[oscMsgIndex]);
+					}, {
+						if(msg[oscMsgIndex] < calibConstraintsHi.lo, { calibConstraintsHi.lo = msg[oscMsgIndex] });
+						if(msg[oscMsgIndex] > calibConstraintsHi.hi, { calibConstraintsHi.hi = msg[oscMsgIndex] });
+					})
+				}, {
+					if(calibConstraintsHi.isNil, {
+						calibConstraintsHi = (lo: 0, hi: 0);
+					})	
+				});
+				thisCV[\hi].value_(
+					msg[oscMsgIndex].perform(
+						this.oscMappingHi,
+						this.calibConstraintsHi.lo, this.calibConstraintsHi.hi,
+						thisCV[hilo].spec.minval, thisCV[hilo].spec.maxval,
+						\minmax
+					)
+				)
+			}).add
+		})
+	}
+	
+	oscResponderRemove { |hilo|
+		hilo ?? { Error("Please provide the CV's key \(\hi or \lo\)!").throw };
+		if(hilo.asSymbol === \hi, {
+			this.oscResponderHi.remove;
+			this.calibConstraintsHi_(nil);	
+		});
+		if(hilo.asSymbol === \lo, {
+			this.oscResponderLo.remove;
+			this.calibConstraintsLo_(nil);	
+		})
 	}
 	
 }
