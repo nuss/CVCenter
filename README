@@ -1,4 +1,4 @@
-CVCenter resp. CVWidget are is a convenience class for using GUI-elements, MIDI-sliders in combination with with Patterns. CVCenter itself is more or less a container of CVs. Each of them can be connected to an unlimited number GUI-elements or/and control parameters in running Synths or set values in Patterns. As CV inherits from Stream any instance can be used as any other Pattern (Pseq, Prand, Pwhite etcetc.).
+CVCenter s supposed to be a graphical control-interface that lets you connect synth-controls or controls within patterns to hardware midi-sliders or OSC-controllers. CVCenter itself is more or less a container of CVs, each represented by CVWidgets (currently CVWidgetKnob and CVWidget2D). Each of them can be connected to an unlimited number GUI-elements or/and control parameters in running Synths or set values in Patterns. As CV inherits from Stream any instance can be used as any other Pattern (Pseq, Prand, Pwhite etcetc.).
 
 For more info check out CVCenter.html resp. CVWidget.html.
 
