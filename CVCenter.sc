@@ -64,14 +64,14 @@ CVCenter {
 		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
 		var lastCtrlBtnsMode, swFlow;
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
-		var widgetwidth, widgetheight=122, colwidth, rowheight;
+		var widgetwidth, widgetheight=166, colwidth, rowheight;
 		var funcToAdd;
 			
 		cvs !? { this.put(*cvs) };
 		
-		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
-
-			window = Window("CVCenter", Rect(0, 0, 400, 210));
+		if(window.isNil or:{ window.isClosed }, {
+//			Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1
+			window = Window("CVCenter", Rect(0, 0, 450, 250));
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.black) });
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
@@ -490,7 +490,8 @@ CVCenter {
 			}) 
 		});
 		
-		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1, {
+		if(window.isNil or:{ window.isClosed }, {
+//			Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1
 //			("this.gui:"+this.setup).postln;
 			this.gui(tab);
 		}, {
@@ -537,7 +538,7 @@ CVCenter {
 		var rowwidth, colcount;
 		var cvTabIndex, tabLabels;
 		var thisNextPos;
-		var widgetwidth, widgetheight=122, colwidth, rowheight;
+		var widgetwidth, widgetheight=166, colwidth, rowheight;
 		
 		("tab passed to prAddToGui:"+[tab, this.setup]).postln;
 		
@@ -618,7 +619,7 @@ CVCenter {
 	
 	*prRegroupWidgets { |tabIndex|
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets;
-		var widgetwidth, widgetheight=122;
+		var widgetwidth, widgetheight=166;
 				
 		rowheight = widgetheight+1;
 		thisNextPos = 0@0;

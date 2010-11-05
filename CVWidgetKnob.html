@@ -13,22 +13,24 @@ p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; min-height: 17.0p
 p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
 p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; min-height: 14.0px}
 p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco}
-p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #ab3b37}
+p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #000000}
+p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #000000; min-height: 14.0px}
+p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #bf0000}
 span.s1 {font: 19.0px Helvetica}
-span.s2 {color: #3c5765}
-span.s3 {color: #395869}
-span.s4 {color: #0043d1}
-span.s5 {color: #0051ba}
-span.s6 {color: #0049b2}
-span.s7 {text-decoration: underline ; color: #0049b2}
-span.s8 {color: #3f5662}
+span.s2 {color: #3f5662}
+span.s3 {color: #3c5765}
+span.s4 {color: #004dbf}
+span.s5 {color: #0b56ab}
+span.s6 {color: #084fa3}
+span.s7 {text-decoration: underline ; color: #084fa3}
+span.s8 {color: #41555f}
 span.s9 {font: 12.0px Helvetica}
-span.s10 {color: #00339d}
-span.s11 {color: #30652f}
+span.s10 {color: #0000bf}
+span.s11 {color: #007300}
 span.s12 {color: #666666}
-span.s13 {color: #874187}
+span.s13 {color: #990099}
 span.s14 {color: #000000}
-span.s15 {color: #35596e}
+span.s15 {color: #395869}
 span.Apple-tab-span {white-space:pre}
 </style>
 </head>
@@ -92,33 +94,33 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2"><br></p>
 <p class="p1"><b>setup</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>A convenience-method, returning<span class="Apple-converted-space"> </span></p>
-<p class="p6"><span class="s9"><span class="Apple-tab-span">	</span></span>[midimode, midimean, midistring, ctrlButtonBank]</p>
+<p class="p6"><span class="s9"><span class="Apple-tab-span">	</span></span>[midimode, midimean, midistring, ctrlButtonBank, softwithin]</p>
 <p class="p2"><br></p>
 <p class="p4"><b>Example</b></p>
 <p class="p3"><br></p>
-<p class="p6">(</p>
-<p class="p6"><span class="s10">var</span> win;</p>
-<p class="p6">~cv = <span class="s10">CV</span>.new(<span class="s11">\boostcut</span>.asSpec);<span class="Apple-converted-space"> </span></p>
-<p class="p6">win = <span class="s10">Window</span>(<span class="s12">"CVWidget"</span>, <span class="s10">Rect</span>(<span class="s13">50</span>, <span class="s13">50</span>, <span class="s13">72</span>, <span class="s13">140</span>));</p>
-<p class="p6">~wdgt = <span class="s10">CVWidgetKnob</span>(win, ~cv, <span class="s12">"CV test"</span>, <span class="s10">Rect</span>(<span class="s13">10</span>, <span class="s13">10</span>, <span class="s13">52</span>, <span class="s13">121</span>));</p>
-<p class="p6">win.front;</p>
-<p class="p6">)</p>
-<p class="p5"><br></p>
-<p class="p7">// change the Spec of the CV</p>
-<p class="p7">// change is reflected in the widget immediately</p>
-<p class="p7">// can also be done through the "edit Spec" button in the widget</p>
-<p class="p6">~wdgt.spec_(<span class="s11">\freq</span>.asSpec)</p>
-<p class="p5"><br></p>
-<p class="p7">// change the MIDI-setup</p>
-<p class="p7">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
-<p class="p7"><span class="s14">~wdgt.midimode_(</span><span class="s13">1</span><span class="s14">); </span>// in-/decremental output mode</p>
-<p class="p7"><span class="s14">~wdgt.midimean_(</span><span class="s13">64</span><span class="s14">); </span>// only necessary if midimode == 1</p>
-<p class="p7"><span class="s14">~wdgt.midistring_(</span><span class="s12">"in-/decremtal"</span><span class="s14">); </span>// an arbitrary string displaying some info about the midi-setting of the widget</p>
-<p class="p7"><span class="s14">~wdgt.ctrlButtonBank_(</span><span class="s13">16</span><span class="s14">); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
-<p class="p5"><br></p>
-<p class="p7">// set some Synth-Controls<span class="Apple-converted-space"> </span></p>
-<p class="p6">a = { <span class="s10">|freq=440|</span> <span class="s10">SinOsc</span>.ar(freq, mul: <span class="s13">0.4</span>) }.play</p>
-<p class="p6">~cv.action_({ |cv| a.set(<span class="s11">\freq</span>, cv.value) })</p>
+<p class="p7">(</p>
+<p class="p7"><span class="s10">var</span> win;</p>
+<p class="p7">~cv = <span class="s10">CV</span>.new(<span class="s11">\boostcut</span>.asSpec);<span class="Apple-converted-space"> </span></p>
+<p class="p7">win = <span class="s10">Window</span>(<span class="s12">"CVWidget"</span>, <span class="s10">Rect</span>(<span class="s13">50</span>, <span class="s13">50</span>, <span class="s13">72</span>, <span class="s13">140</span>));</p>
+<p class="p7">~wdgt = <span class="s10">CVWidgetKnob</span>(win, ~cv, <span class="s12">"CV test"</span>, <span class="s10">Rect</span>(<span class="s13">10</span>, <span class="s13">10</span>, <span class="s13">52</span>, <span class="s13">121</span>));</p>
+<p class="p7">win.front;</p>
+<p class="p7">)</p>
+<p class="p8"><br></p>
+<p class="p9">// change the Spec of the CV</p>
+<p class="p9">// change is reflected in the widget immediately</p>
+<p class="p9">// can also be done through the "edit Spec" button in the widget</p>
+<p class="p7">~wdgt.spec_(<span class="s11">\freq</span>.asSpec)</p>
+<p class="p8"><br></p>
+<p class="p9">// change the MIDI-setup</p>
+<p class="p9">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
+<p class="p9"><span class="s14">~wdgt.midimode_(</span><span class="s13">1</span><span class="s14">); </span>// in-/decremental output mode</p>
+<p class="p9"><span class="s14">~wdgt.midimean_(</span><span class="s13">64</span><span class="s14">); </span>// only necessary if midimode == 1</p>
+<p class="p9"><span class="s14">~wdgt.midistring_(</span><span class="s12">"in-/decremtal"</span><span class="s14">); </span>// an arbitrary string displaying some info about the midi-setting of the widget</p>
+<p class="p9"><span class="s14">~wdgt.ctrlButtonBank_(</span><span class="s13">16</span><span class="s14">); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
+<p class="p8"><br></p>
+<p class="p9">// set some Synth-Controls<span class="Apple-converted-space"> </span></p>
+<p class="p7">a = { <span class="s10">|freq=440|</span> <span class="s10">SinOsc</span>.ar(freq, mul: <span class="s13">0.4</span>) }.play</p>
+<p class="p7">~cv.action_({ <span class="s10">|cv|</span> a.set(<span class="s11">\freq</span>, cv.value) })</p>
 <p class="p2"><br></p>
 <p class="p4"><b>about the GUI</b></p>
 <p class="p3"><br></p>

@@ -3,13 +3,14 @@ CVWidget {
 
 	classvar <editorWindow, <window;
 	var <>midimode = 0, <>midimean = 64, <>midistring = "", <>ctrlButtonBank, <>midiresolution = 1, <>softWithin = 0.1;
-	var <>calibrate = true; // OSC-settings
+	var <>prCalibrate = true; // OSC-settings
 	var visibleGuiEls, allGuiEls;
 	var <>widgetBg, <>label, <>nameField; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps;
+	var <>calibModel;
 
 	setup {
-		^[this.midimode, this.midiresolution, this.midimean, this.midistring, this.ctrlButtonBank, this.softwithin];
+		^[this.midimode, this.midiresolution, this.midimean, this.midistring, this.ctrlButtonBank, this.softwithin, this.prCalibrate];
 	}
 	
 	visible_ { |visible|
@@ -178,7 +179,7 @@ CVWidget {
 	}
 	
 	*editorWindow_ { |widget, widgetName, hilo|
-		var specsList, specsActions, editor, cvString, slot;
+		var /*window, */specsList, specsActions, editor, cvString, slot;
 		
 		if(hilo.notNil, {
 			slot = "["++hilo.asString++"]";
@@ -186,10 +187,14 @@ CVWidget {
 			slot = "";
 		});
 		
-		if(Window.allWindows.select({ |w| "^Widget-Spec Editor:".matchRegexp(w.name) == true }).size < 1, {			window = Window("Widget-Spec Editor:"+widgetName+slot, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 330, 200));
+		if(Window.allWindows.select({ |w| "^Widget-Spec Editor:".matchRegexp(w.name) == true }).size < 1, {
+			window = Window("Widget-Spec Editor:"+widgetName+slot, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 330, 200));
 		}, {
 			window.name_("Widget-Spec Editor:"+widgetName+slot);
 		});
+		
+		if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
+
 		specsList = ListView(window, Rect(0, 0, window.bounds.width, window.bounds.height))
 			.resize_(5)
 			.background_(Color.white)
@@ -278,7 +283,7 @@ CVWidget {
 		;
 		window.front;
 	}
-	
+		
 }
 
 CVWidgetKnob : CVWidget {
@@ -286,18 +291,21 @@ CVWidgetKnob : CVWidget {
 	var thisCV;
 	var <>knob, <>numVal, <>specBut, <>midiHead, <>midiLearn, <>midiSrc, <>midiChan, <>midiCtrl;
 	var <>cc, spec;
+	var <>oscEditBut, <>calibBut, <>oscEditor;
 	var <>oscMapping = \linlin, <>calibConstraints, <>oscResponder;
+	var <>mapConstrainterLo, <>mapConstrainterHi;
+//	var <calibModel;
 
-	*new { |parent, cv, name, bounds, setUpArgs|
-		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs)
+	*new { |parent, cv, name, bounds, setUpArgs, model|
+		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs/*, model*/)
 	}
 	
-	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=120, setUpArgs|
+	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=166, setUpArgs/*, model*/|
 		var knobsize, meanVal, widgetSpecsActions, editor, cvString;
 		var tmpSetup, thisToggleColor/*, oneShot*/;
+		var calibController;
 		
 		thisCV = cv;
-//		("widget"+name.asString+"initialized with setup:"+[this.setup, setUpArgs]).postln;
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
 		setUpArgs[0] !? { this.midimode_(setUpArgs[0]) };
@@ -306,6 +314,11 @@ CVWidgetKnob : CVWidget {
 		setUpArgs[3] !? { this.midistring_(setUpArgs[3].asString) };
 		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
+		setUpArgs[6] !? { this.calibrate_(setUpArgs[6]) };
+		
+		this.calibModel = Ref(this.prCalibrate);
+		this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0));
+		this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0));
 				
 		knobsize = widgetwidth-14;
 		
@@ -388,14 +401,75 @@ CVWidgetKnob : CVWidget {
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		;
+		this.oscEditBut = Button(parentView, Rect(xy.x+1, xy.y+knobsize+82, widgetwidth-2, 30))
+			.font_(Font("Helvetica", 9))
+			.focusColor_(Color(alpha: 0))
+			.states_([
+				["edit OSC", Color.black, Color.clear]
+			])
+			.action_({ |oscb|
+				this.oscEditor_(CVWidgetOSCEditor(this, name))
+			})
+		;
+		this.calibBut = Button(parentView, Rect(xy.x+1, xy.y+knobsize+112, widgetwidth-2, 15))
+			.font_(Font("Helvetica", 9))
+			.focusColor_(Color(alpha: 0))
+			.states_([
+				["calibrating", Color.white, Color.red],
+				["calibrate", Color.black, Color.green]
+			])
+		;
+		
+		calibController = SimpleController(this.calibModel);
 
+		calibController.put(\value, { |theChanger, what, moreArgs|
+//			[theChanger.value, what, moreArgs].postln;
+			this.prCalibrate_(theChanger.value);
+			theChanger.value.switch(
+				true, { 
+					this.calibBut.value_(0);
+					this.oscEditor !? { 
+						this.oscEditor.calibBut.value_(0);
+						this.oscEditor.calibButAdv.value_(0);
+					}
+				},
+				false, { 
+					this.calibBut.value_(1);
+					this.oscEditor !? { 
+						this.oscEditor.calibBut.value_(1);
+						this.oscEditor.calibButAdv.value_(1);
+					}
+				}
+			)
+		});
+
+		this.calibBut.action_({ |cb|
+			cb.value.switch(
+				0, { this.calibModel.value_(true).changed(\value) },
+				1, { this.calibModel.value_(false).changed(\value) }
+			)
+		});
+		
+		this.calibBut.onClose_({ calibController.remove });
+		
 		this.prCCResponderAdd(cv, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl, this.midiHead);
 		
 		[this.knob, this.numVal].do({ |view| cv.connect(view) });
-		visibleGuiEls = [this.knob, this.numVal, this.specBut, this.midiHead, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl];
-		allGuiEls = [this.widgetBg, this.label, this.nameField, this.knob, this.numVal, this.specBut, this.midiHead, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl]
+		visibleGuiEls = [this.knob, this.numVal, this.specBut, this.midiHead, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl, this.oscEditBut, this.calibBut];
+		allGuiEls = [this.widgetBg, this.label, this.nameField, this.knob, this.numVal, this.specBut, this.midiHead, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl, this.oscEditBut, this.calibBut]
 	}
-
+	
+	calibrate_ { |bool|
+		if(bool.isKindOf(Boolean).not, {
+			Error("calibration can only be set to true or false!").throw;
+		});
+		this.calibModel.value_(bool).changed(\value);
+	}
+	
+	calibrate {
+		^this.prCalibrate;
+	}
+	
 	spec_ { |spec|
 		if(spec.isKindOf(ControlSpec), {
 			thisCV.spec_(spec);
@@ -419,13 +493,15 @@ CVWidgetKnob : CVWidget {
 	
 	oscConnect { |addr=nil, name, oscMsgIndex|
 		this.oscResponder = OSCresponderNode(addr, name.asSymbol, { |t, r, msg|
-			if(calibrate, { 
+			if(this.prCalibrate, { 
 				if(calibConstraints.isNil, {
 					calibConstraints = (lo: msg[oscMsgIndex], hi: msg[oscMsgIndex]);
 				}, {
 					if(msg[oscMsgIndex] < calibConstraints.lo, { calibConstraints.lo = msg[oscMsgIndex] });
 					if(msg[oscMsgIndex] > calibConstraints.hi, { calibConstraints.hi = msg[oscMsgIndex] });
-				})
+				});
+				this.mapConstrainterLo.value_(calibConstraints.lo);
+				this.mapConstrainterHi.value_(calibConstraints.hi);
 			}, {
 				if(calibConstraints.isNil, {
 					calibConstraints = (lo: 0, hi: 0);
@@ -478,6 +554,7 @@ CVWidget2D : CVWidget {
 		setUpArgs[3] !? { this.midistring_(setUpArgs[3].asString) };
 		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
+		setUpArgs[6] !? { this.prCalibrate_(setUpArgs[6]) };
 
 		this.widgetBg = UserView(parentView, Rect(xy.x, xy.y, widgetwidth, widgetheight))
 			.focusColor_(Color(alpha: 1.0))
@@ -645,7 +722,7 @@ CVWidget2D : CVWidget {
 		hilo ?? { Error("Please provide the CV's key \('hi' or 'lo')!").throw };
 		if(hilo.asSymbol === \lo, {
 			this.oscResponderLo = OSCresponderNode(addr, name.asSymbol, { |t, r, msg|
-				if(calibrate, { 
+				if(this.prCalibrate, { 
 					if(calibConstraintsLo.isNil, {
 						calibConstraintsLo = (lo: msg[oscMsgIndex], hi: msg[oscMsgIndex]);
 					}, {
@@ -669,7 +746,7 @@ CVWidget2D : CVWidget {
 		});
 		if(hilo.asSymbol === \hi, {
 			this.oscResponderHi = OSCresponderNode(addr, name.asSymbol, { |t, r, msg|
-				if(calibrate, { 
+				if(this.prCalibrate, { 
 					if(calibConstraintsHi.isNil, {
 						calibConstraintsHi = (lo: msg[oscMsgIndex], hi: msg[oscMsgIndex]);
 					}, {
