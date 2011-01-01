@@ -291,7 +291,7 @@ CVWidgetKnob : CVWidget {
 	var thisCV;
 	var <>knob, <>numVal, <>specBut, <>midiHead, <>midiLearn, <>midiSrc, <>midiChan, <>midiCtrl;
 	var <>cc, spec;
-	var <>oscEditBut, <>calibBut, <>oscEditor;
+	var <>oscEditBut, <>calibBut, /*<>oscEditor,*/ <>editor;
 	var <>oscMapping = \linlin, <>calibConstraints, <>oscResponder;
 	var <>mapConstrainterLo, <>mapConstrainterHi;
 //	var <calibModel;
@@ -317,8 +317,8 @@ CVWidgetKnob : CVWidget {
 		setUpArgs[6] !? { this.calibrate_(setUpArgs[6]) };
 		
 		this.calibModel = Ref(this.prCalibrate);
-		this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0));
-		this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0));
+		this.mapConstrainterLo ?? { this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0)) };
+		this.mapConstrainterHi ?? { this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0)) };
 				
 		knobsize = widgetwidth-14;
 		
@@ -360,14 +360,18 @@ CVWidgetKnob : CVWidget {
 			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
 			.action_({ |btn|
-				CVWidget.editorWindow_(this, name);
+//				CVWidget.editorWindow_(this, name);
+//				[this, name].postln;
+				this.editor_(CVWidgetEditor(this, name, 0, this.calibModel));
 			})
 		;
 		this.midiHead = Button(parentView, Rect(xy.x+1, xy.y+knobsize+43, widgetwidth-17, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
-			.action_({ |ms| })
+			.action_({ |ms|
+				this.editor_(CVWidgetEditor(this, name, 1, this.calibModel));
+			})
 		;
 		this.midiLearn = Button(parentView, Rect(xy.x+widgetwidth-16, xy.y+knobsize+43, 15, 15))
 			.font_(Font("Helvetica", 9))
@@ -408,7 +412,15 @@ CVWidgetKnob : CVWidget {
 				["edit OSC", Color.black, Color.clear]
 			])
 			.action_({ |oscb|
-				this.oscEditor_(CVWidgetOSCEditor(this, name))
+				this.editor_(CVWidgetEditor(this, name, 2, this.calibModel));
+//				this.oscEditor_(CVWidgetOSCEditor(this, name, this.calibModel));
+//				[this.oscEditor.calibNumBoxes.lo, this.oscEditor.calibNumBoxes.loAdv].postln;
+//				[this.oscEditor.calibNumBoxes.lo, this.oscEditor.calibNumBoxes.loAdv].do(this.mapConstrainterLo.connect(_));
+//				[this.oscEditor.calibNumBoxes.hi, this.oscEditor.calibNumBoxes.hiAdv].do(this.mapConstrainterHi.connect(_));
+//				[this.oscEditor.calibNumBoxes.lo, this.oscEditor.calibNumBoxes.loAdv].do(this.mapConstrainterLo.connect(_));
+//				[this.oscEditor.calibNumBoxes.hi, this.oscEditor.calibNumBoxes.hiAdv].do(this.mapConstrainterHi.connect(_));
+				this.mapConstrainterLo.connect(this.editor.calibNumBoxes.lo);
+				this.mapConstrainterHi.connect(this.editor.calibNumBoxes.hi);
 			})
 		;
 		this.calibBut = Button(parentView, Rect(xy.x+1, xy.y+knobsize+112, widgetwidth-2, 15))
@@ -428,16 +440,38 @@ CVWidgetKnob : CVWidget {
 			theChanger.value.switch(
 				true, { 
 					this.calibBut.value_(0);
-					this.oscEditor !? { 
-						this.oscEditor.calibBut.value_(0);
-						this.oscEditor.calibButAdv.value_(0);
+//					this.oscEditor !? {
+//						this.oscEditor.calibBut.value_(0);
+//						this.oscEditor.calibButAdv.value_(0);
+//						this.mapConstrainterLo ?? { this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0)) };
+//						this.mapConstrainterHi ?? { this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0)) };
+//						[this.oscEditor.calibNumBoxes.lo, this.oscEditor.calibNumBoxes.loAdv].do(this.mapConstrainterLo.connect(_));
+//						[this.oscEditor.calibNumBoxes.hi, this.oscEditor.calibNumBoxes.hiAdv].do(this.mapConstrainterHi.connect(_));
+//					}
+					this.editor !? {
+						this.editor.calibBut.value_(0);
+						this.mapConstrainterLo ?? { 
+							this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0));
+							this.mapConstrainterLo.connect(this.editor.calibNumBoxes.lo);
+						};
+						this.mapConstrainterHi ?? { 
+							this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0));
+							this.mapConstrainterHi.connect(this.editor.calibNumBoxes.hi);
+						};
 					}
 				},
 				false, { 
 					this.calibBut.value_(1);
-					this.oscEditor !? { 
-						this.oscEditor.calibBut.value_(1);
-						this.oscEditor.calibButAdv.value_(1);
+//					this.oscEditor !? { 
+//						this.oscEditor.calibBut.value_(1);
+//						this.oscEditor.calibButAdv.value_(1);
+//						[this.mapConstrainterLo, this.mapConstrainterHi].do({ |cv| cv = nil; });
+////						[this.mapConstrainterLo, this.mapConstrainterHi].do(_.remove);
+//					}
+					this.editor !? {
+						this.editor.calibBut.value_(1);
+						[this.mapConstrainterLo, this.mapConstrainterHi].do({ |cv| cv = nil; });
+//						[this.mapConstrainterLo, this.mapConstrainterHi].do(_.remove);
 					}
 				}
 			)
@@ -472,6 +506,7 @@ CVWidgetKnob : CVWidget {
 	
 	spec_ { |spec|
 		if(spec.isKindOf(ControlSpec), {
+			
 			thisCV.spec_(spec);
 			block { |break|
 				#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
@@ -705,7 +740,7 @@ CVWidget2D : CVWidget {
 	
 	spec_ { |spec, hilo|
 		if(hilo.isNil or:{ [\hi, \lo].includes(hilo).not }, {
-			Error("In order to set the inbuilt spec you must provide either \lo or \hi, indicating which spec shall be set").throw;	
+			Error("In order to set the inbuilt spec you must provide either \lo or \hi, indicating which spec shall be set").throw;
 		});
 		if(spec.isKindOf(ControlSpec), {
 			thisCV[hilo].spec_(spec);
