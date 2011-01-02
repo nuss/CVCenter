@@ -301,6 +301,8 @@ CVWidgetEditor {
 	}
 	
 	isClosed { |widgetName|
-		^allWindows[widgetName.asSymbol].window.isClosed;
+		allWindows[widgetName.asSymbol].window !? {
+			^allWindows[widgetName.asSymbol].window.isClosed;
+		}
 	}
 }

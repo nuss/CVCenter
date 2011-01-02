@@ -452,7 +452,8 @@ CVWidgetKnob : CVWidget {
 			theChanger.value.switch(
 				true, { 
 					this.calibBut.value_(0);
-					this.editor !? {
+//					this.editor !? { ("this.editor is closed?"+this.editor.isClosed(name)).postln };
+					if(this.editor.notNil and:{ this.editor.isClosed(name).not }, {
 						this.editor.calibBut.value_(0);
 						this.mapConstrainterLo ?? { 
 							this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0));
@@ -462,14 +463,14 @@ CVWidgetKnob : CVWidget {
 							this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0));
 							this.mapConstrainterHi.connect(this.editor.calibNumBoxes.hi);
 						};
-					}
+					})
 				},
 				false, { 
 					this.calibBut.value_(1);
-					this.editor !? {
+					if(this.editor.notNil and:{ this.editor.isClosed(name).not }, {
 						this.editor.calibBut.value_(1);
 						[this.mapConstrainterLo, this.mapConstrainterHi].do({ |cv| cv = nil; });
-					}
+					})
 				}
 			)
 		});
