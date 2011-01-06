@@ -3,6 +3,7 @@ CVCenter {
 
 	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
 	classvar <>midimode, <>midiresolution, <>midimean, <>midistring, <>softWithin, <numccs;
+	classvar <>guix, <>guiy, <>guiwidth, <>guiheight; 
 	classvar /*<controlButtonKeys, */<controlButtons, <nextButtonPos;
 	classvar <>ctrlButtonBank, currentButtonStates, guiClosed = false/*, buttonProps*/;
 	classvar /*widgetwidth = 52, widgetheight = 122, colwidth, rowheight, */<widgetStates;
@@ -69,9 +70,14 @@ CVCenter {
 			
 		cvs !? { this.put(*cvs) };
 		
+		this.guix ?? { this.guix_(0) };
+		this.guiy ?? { this.guiy_(0) };
+		this.guiwidth ?? { this.guiwidth_(500) };
+		this.guiheight ?? { this.guiheight_(250) };
+		
 		if(window.isNil or:{ window.isClosed }, {
 //			Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1
-			window = Window("CVCenter", Rect(0, 0, 450, 250));
+			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.black) });
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
@@ -509,6 +515,24 @@ CVCenter {
 	
 	*setup {
 		^[this.midimode, this.midiresolution, this.midimean, this.midistring, this.ctrlButtonBank, this.softWithin];
+	}
+	
+	*guiMoveTo { |point|
+		if(point.isKindOf(Point).not, {
+			Error("guiMoveTo expects a Point in the form of e.g. 0@0").throw;
+		});
+		this.guix_(point.x);
+		this.guiy_(point.y);
+		window.bounds_(Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
+	}
+	
+	*guiChangeDimensions { |point|
+		if(point.isKindOf(Point).not, {
+			Error("guiMoveTo expects a Point in the form of e.g. 0@0").throw;
+		});
+		this.guiwidth_(point.x);
+		this.guiheight_(point.y);
+		window.bounds_(Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
 	}
 	
 	// private Methods - not to be used directly

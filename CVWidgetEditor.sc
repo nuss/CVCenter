@@ -2,6 +2,9 @@ CVWidgetEditor {
 	classvar allWindows;
 	var <>window, <>tabs;
 	var <>calibBut, <>calibNumBoxes;
+	var <>nameField;
+	var <>mappingSelect;
+	var <>connectorBut;
 	
 	*new { |widget, widgetName, tab, calibModel, hilo|
 		^super.new.init(widget, widgetName, tab, calibModel, hilo)
@@ -12,8 +15,8 @@ CVWidgetEditor {
 		var tabs, specsList, specsActions, editor, cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var inputConstraintLoField, inputConstraintHiField;
-		var addrField, nameField, indexField, connectorBut, connectorButAdv;
-		var mappingSelect;
+		var addrField, addr, indexField/*, connectorBut*/;
+		var mappingSelectItems/*, mappingModes*/;
 		
 		staticTextFont = Font(Font.defaultSansFace, 10);
 		staticTextColor = Color(0.2, 0.2, 0.2);
@@ -170,7 +173,7 @@ CVWidgetEditor {
 				.string_("OSC-typetag, beginning with a slash: e.g. /my/typetag.")
 			;
 	
-			nameField = TextField(allWindows[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@15)
+			this.nameField = TextField(allWindows[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -209,6 +212,7 @@ CVWidgetEditor {
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(0)
+				.enabled_(false)
 			;
 			
 			flow2.shift(5, 0);
@@ -217,6 +221,7 @@ CVWidgetEditor {
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(0)
+				.enabled_(false)
 			;
 			
 			flow2.shift(5, 0);
@@ -246,24 +251,41 @@ CVWidgetEditor {
 	
 			flow2.shift(5, 0);
 			
-			mappingSelect = PopUpMenu(allWindows[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@20)
-				.font_(Font("Helvetica", 14))
-				.items_([
-					"linear -> linear",
-					"linear -> exponential",
-					"exponential -> linear",
-					"exponential -> exponential"
-				])
-			;
+//			if(widget.spec.minval <= 0.0 or:{
+//				widget.spec.maxval <= 0.0
+//			}, {
+//				mappingSelectItems = ["linlin", "explin"];
+//			}, {
+//				mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
+//			});
 			
+			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
+			
+			this.mappingSelect = PopUpMenu(allWindows[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@20)
+				.font_(Font("Helvetica", 14))
+				.items_(mappingSelectItems)
+				.action_({ |ms|
+					widget.oscMapping_(ms.item);
+				})
+			;
+						
 			flow2.shift(0, 0);
 	
-			connectorBut = Button(allWindows[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@25)
+			this.connectorBut = Button(allWindows[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@25)
 				.font_(staticTextFont)
 				.states_([
 					["connect OSC-controller", Color.white, Color.blue],
 					["disconnect OSC-controller", Color.white, Color.red]
 				])
+				.action_({ |cb|
+					cb.value.switch(
+						1, { 
+							if(addrField.value.size > 6, { addr = addrField.value });
+							widget.oscConnect(addr, nameField.value, indexField.value.asInt);
+						},
+						0, { widget.oscResponderRemove }
+					)
+				})
 			;
 
 			this.calibNumBoxes = (lo: inputConstraintLoField, hi: inputConstraintHiField);
@@ -280,24 +302,16 @@ CVWidgetEditor {
 				false, { this.calibBut.value_(1) }
 			);
 	
-			if(widget.calibrate, {
-				inputConstraintHiField.enabled_(true);
-				inputConstraintLoField.enabled_(true);
-			}, {
-				inputConstraintHiField.enabled_(false);
-				inputConstraintLoField.enabled_(false);
-			})
 		});
 		
-		[allWindows[widgetName.asSymbol], this.calibBut].postln;
-
 		tab !? { 
 			allWindows[widgetName.asSymbol].tabs.focus(tab);		};
 		allWindows[widgetName.asSymbol].window.front;
 	}
 	
-	front { |widgetName|
+	front { |widgetName, tab|
 		allWindows[widgetName.asSymbol].window.front;
+		tab !? allWindows[widgetName.asSymbol].tabs.focus(tab);
 	}
 	
 	isClosed { |widgetName|
