@@ -1,13 +1,14 @@
 
 CVWidget {
 
-	classvar <editorWindow, <window;
+//	classvar <responderMsgIndices;
 	var <>midimode = 0, <>midimean = 64, <>midistring = "", <>ctrlButtonBank, <>midiresolution = 1, <>softWithin = 0.1;
 	var <>prCalibrate = true; // OSC-settings
 	var visibleGuiEls, allGuiEls;
 	var <>widgetBg, <>label, <>nameField; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps;
-	var <>calibModel, <>specModel, <>oscInputRangeModel, <>oscConnectionModel;
+//	var <>calibModel, <>specModel, <>oscInputRangeModel, <>oscConnectionModel;
+	var <>controllersAndModels;
 
 	setup {
 		^[this.midimode, this.midiresolution, this.midimean, this.midistring, this.ctrlButtonBank, this.softwithin, this.prCalibrate];
@@ -190,17 +191,17 @@ CVWidgetKnob : CVWidget {
 	var <>mapConstrainterLo, <>mapConstrainterHi;
 //	var <>oscInputRangeController;
 
-	*new { |parent, cv, name, bounds, setUpArgs, model|
-		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs/*, model*/)
+	*new { |parent, cv, name, bounds, setUpArgs, controllersAndModels|
+		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs, controllersAndModels)
 	}
 	
-	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=166, setUpArgs/*, model*/|
+	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=166, setUpArgs, controllersAndModels|
 		var knobsize, meanVal, widgetSpecsActions, editor, cvString;
 		var tmpSetup, thisToggleColor/*, oneShot*/;
-		var calibController;
-		var specController;
-		var oscInputRangeController;
-		var oscConnectionController;
+//		var calibController;
+//		var specController;
+//		var oscInputRangeController;
+//		var oscConnectionController;
 		
 		thisCV = cv;
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
@@ -213,14 +214,40 @@ CVWidgetKnob : CVWidget {
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
 		setUpArgs[6] !? { this.calibrate_(setUpArgs[6]) };
 		
-		this.calibModel = Ref(this.prCalibrate);
+		if(controllersAndModels.notNil, {
+			this.controllersAndModels = controllersAndModels
+		}, {
+			this.controllersAndModels = ();
+		});
+		
+		this.controllersAndModels.calibModelController ?? {
+			this.controllersAndModels.calibModelController = ();
+		};
+		this.controllersAndModels.calibModelController.model ?? {
+			this.controllersAndModels.calibModelController.model = Ref(this.prCalibrate);
+		};
+		this.controllersAndModels.specModelController ?? {
+			this.controllersAndModels.specModelController = ();
+		};
+		this.controllersAndModels.specModelController.model ?? { 
+			this.controllersAndModels.specModelController.model = Ref(this.spec);
+		};
+		this.controllersAndModels.oscInputRangeModelController ?? {
+			this.controllersAndModels.oscInputRangeModelController = ();
+		};
+		this.controllersAndModels.oscInputRangeModelController.model ?? {
+			this.controllersAndModels.oscInputRangeModelController.model = Ref([0.00001, 0.00001]);
+		};
+		this.controllersAndModels.oscConnectionModelController ?? {
+			this.controllersAndModels.oscConnectionModelController = ();
+		};
+		this.controllersAndModels.oscConnectionModelController.model ?? {
+			this.controllersAndModels.oscConnectionModelController.model = Ref(false);
+		};
+				
 		this.mapConstrainterLo ?? { this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0)) };
 		this.mapConstrainterHi ?? { this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0)) };
 		
-		this.specModel = Ref(this.spec);
-		this.oscInputRangeModel = Ref([0.00001, 0.00001]);
-		this.oscConnectionModel = Ref(false);
-				
 		knobsize = widgetwidth-14;
 		
 		this.widgetBg = UserView(parentView, Rect(xy.x, xy.y, widgetwidth, widgetheight))
@@ -262,10 +289,11 @@ CVWidgetKnob : CVWidget {
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
 			.action_({ |btn|
 				if(this.editor.isNil or:{ this.editor.isClosed(name) }, {
-					this.editor_(CVWidgetEditor(this, name, 0, this.calibModel))
+					this.editor_(CVWidgetEditor(this, name, 0))
 				}, {
 					this.editor.front(name, 0)
 				});
+				this.oscConnectionModelController.model.value_(this.oscConnectionModelController.model.value).changed(\value);
 			})
 		;
 		this.midiHead = Button(parentView, Rect(xy.x+1, xy.y+knobsize+43, widgetwidth-17, 15))
@@ -274,10 +302,13 @@ CVWidgetKnob : CVWidget {
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
 			.action_({ |ms|
 				if(this.editor.isNil or:{ this.editor.isClosed(name) }, {
-					this.editor_(CVWidgetEditor(this, name, 1, this.calibModel))
+					this.editor_(CVWidgetEditor(this, name, 1))
 				}, {
 					this.editor.front(name, 1)
 				});
+				this.controllersAndModels.oscConnectionModelController.model.value_(
+					this.controllersAndModels.oscConnectionModelController.model.value;
+				).changed(\value);
 			})
 		;
 		this.midiLearn = Button(parentView, Rect(xy.x+widgetwidth-16, xy.y+knobsize+43, 15, 15))
@@ -320,14 +351,17 @@ CVWidgetKnob : CVWidget {
 			])
 			.action_({ |oscb|
 				if(this.editor.isNil or:{ this.editor.isClosed(name) }, {
-					this.editor_(CVWidgetEditor(this, name, 2, this.calibModel))
+					this.editor_(CVWidgetEditor(this, name, 2))
 				}, {
 					this.editor.front(name, 2)
 				});
 				this.editor.calibNumBoxes !? {
 					this.mapConstrainterLo.connect(this.editor.calibNumBoxes.lo);
 					this.mapConstrainterHi.connect(this.editor.calibNumBoxes.hi);
-				}
+				};
+				this.controllersAndModels.oscConnectionModelController.model.value_(
+					this.controllersAndModels.oscConnectionModelController.model.value;
+				).changed(\value);
 			})
 		;
 		this.calibBut = Button(parentView, Rect(xy.x+1, xy.y+knobsize+112, widgetwidth-2, 15))
@@ -339,9 +373,11 @@ CVWidgetKnob : CVWidget {
 			])
 		;
 		
-		calibController = SimpleController(this.calibModel);
+		this.controllersAndModels.calibModelController.controller ?? { 
+			this.controllersAndModels.calibModelController.controller = SimpleController(this.controllersAndModels.calibModelController.model);
+		};
 
-		calibController.put(\value, { |theChanger, what, moreArgs|
+		this.controllersAndModels.calibModelController.controller.put(\value, { |theChanger, what, moreArgs|
 //			[theChanger.value, what, moreArgs, this.editor.calibBut, this.calibBut].postln;
 			this.prCalibrate_(theChanger.value);
 			theChanger.value.switch(
@@ -365,7 +401,9 @@ CVWidgetKnob : CVWidget {
 					if(this.editor.notNil and:{ this.editor.isClosed(name).not }, {
 						this.editor.calibBut.value_(1);
 						[this.mapConstrainterLo, this.mapConstrainterHi].do({ |cv| cv = nil; });
-						[this.editor.calibNumBoxes.lo, this.editor.calibNumBoxes.hi].do(_.enabled_(true));
+						if(this.controllersAndModels.oscConnectionModelController.model.value == false, {
+							[this.editor.calibNumBoxes.lo, this.editor.calibNumBoxes.hi].do(_.enabled_(true));
+						})
 					})
 				}
 			)
@@ -373,16 +411,27 @@ CVWidgetKnob : CVWidget {
 
 		this.calibBut.action_({ |cb|
 			cb.value.switch(
-				0, { this.calibModel.value_(true).changed(\value) },
-				1, { this.calibModel.value_(false).changed(\value) }
+				0, { this.controllersAndModels.calibModelController.model.value_(true).changed(\value) },
+				1, { this.controllersAndModels.calibModelController.model.value_(false).changed(\value) }
 			)
 		});
 		
-		this.calibBut.onClose_({ calibController.remove });
+//		if(this.editor.notNil and:{
+//			this.editor.isClosed(name).not	
+//		}, {
+//			this.editor.calibBut.action_({ |but|
+//				but.value.switch(
+//					0, { calibModel.value_(true).changed(\value) },
+//					1, { calibModel.value_(false).changed(\value) }
+//				)
+//			})
+//		});
+				
+		this.controllersAndModels.specModelController.controller ?? {
+			this.controllersAndModels.specModelController.controller = SimpleController(this.controllersAndModels.specModelController.model);
+		};
 		
-		specController = SimpleController(this.specModel);
-		
-		specController.put(\value, { |theChanger, what, moreArgs|
+		this.controllersAndModels.specModelController.controller.put(\value, { |theChanger, what, moreArgs|
 			var tmpMapping;
 			[theChanger.value.minval, theChanger.value.maxval].postln;
 			if(theChanger.value.minval <= 0.0 or:{
@@ -422,10 +471,11 @@ CVWidgetKnob : CVWidget {
 			}
 		});
 		
-		this.specBut.onClose_({ specController.remove });
-		
-		oscInputRangeController = SimpleController(this.oscInputRangeModel);
-		oscInputRangeController.put(\value, { |theChanger, what, moreArgs|
+		this.controllersAndModels.oscInputRangeModelController.controller ?? {
+			this.controllersAndModels.oscInputRangeModelController.controller = SimpleController(this.controllersAndModels.oscInputRangeModelController.model);
+		};
+
+		this.controllersAndModels.oscInputRangeModelController.controller.put(\value, { |theChanger, what, moreArgs|
 			if(theChanger.value[0] <= 0 or:{
 				theChanger.value[1] <= 0
 			}, {
@@ -456,27 +506,29 @@ CVWidgetKnob : CVWidget {
 			})
 		});
 				
-		oscConnectionController = SimpleController(this.oscConnectionModel);
-
-		oscConnectionController.put(\value, { |theChanger, what, moreArgs|
+		this.controllersAndModels.oscConnectionModelController.controller ?? {
+			this.controllersAndModels.oscConnectionModelController.controller = SimpleController(this.controllersAndModels.oscConnectionModelController.model);
+		};
+		
+		this.controllersAndModels.oscConnectionModelController.controller.put(\value, { |theChanger, what, moreArgs|
 			if(theChanger.value.size == 3, {
-//				[theChanger.value, what, moreArgs].postln;
 				this.oscResponder = OSCresponderNode(theChanger.value[0], theChanger.value[1].asSymbol, { |t, r, msg|
+//					[t, r, msg, theChanger.value, this.controllersAndModels.oscConnectionModelController.model.value].postln;
 					if(this.prCalibrate, { 
 						if(calibConstraints.isNil, {
 							calibConstraints = (lo: msg[theChanger.value[2]], hi: msg[theChanger.value[2]]);
 						}, {
 							if(msg[theChanger.value[2]] < calibConstraints.lo, { 
 								calibConstraints.lo = msg[theChanger.value[2]];
-								this.oscInputRangeModel.value_([
+								this.controllersAndModels.oscInputRangeModelController.model.value_([
 									msg[theChanger.value[2]], 
-									this.oscInputRangeModel.value[1]
+									this.controllersAndModels.oscInputRangeModelController.model.value[1]
 								]).changed(\value);
 							});
 							if(msg[theChanger.value[2]] > calibConstraints.hi, {
 								calibConstraints.hi = msg[theChanger.value[2]];
-								this.oscInputRangeModel.value_([
-									this.oscInputRangeModel.value[0], 
+								this.controllersAndModels.oscInputRangeModelController.model.value_([
+									this.controllersAndModels.oscInputRangeModelController.model.value[0], 
 									msg[theChanger.value[2]]
 								]).changed(\value);
 							});
@@ -486,7 +538,7 @@ CVWidgetKnob : CVWidget {
 					}, {
 						if(calibConstraints.isNil, {
 		//					calibConstraints = (lo: 0, hi: 0);
-							calibConstraints = (lo: this.oscInputRangeModel.value[0], hi: this.oscInputRangeModel.value[1]);
+							calibConstraints = (lo: this.controllersAndModels.oscInputRangeModelController.model.value[0], hi: this.controllersAndModels.oscInputRangeModelController.model.value[1]);
 						}/*, {
 							this.calibConstraints.lo = this.editor.calibNumBoxes.lo.value;
 							this.calibConstraints.hi = this.editor.calibNumBoxes.hi.value;
@@ -507,32 +559,59 @@ CVWidgetKnob : CVWidget {
 				if(this.editor.notNil and:{
 					this.editor.isClosed(name).not
 				}, {
+					this.editor.addrField.string_(theChanger.value[0].asString);
+					this.editor.nameField.enabled_(false).string_(theChanger.value[1].asString);
+					if(this.prCalibrate, {
+						[this.editor.inputConstraintLoField, this.editor.inputConstraintHiField].do(_.enabled_(false));
+					});
+					this.editor.indexField.value_(theChanger.value[2]).enabled_(false);
 					this.editor.connectorBut.value_(1);
-					this.editor.nameField.enabled_(false);
 				});
-//				parentView.refresh;
+				this.oscEditBut.refresh;
 			});
 			if(theChanger.value == false, {
+//				"now removing the responder".postln;
 				this.oscResponder.remove;
 				this.oscEditBut.states_([
 					["edit OSC", Color.black, Color.clear]
 				]);
-				this.oscInputRangeModel_(`[0.0, 0.0]);
+				this.controllersAndModels.oscInputRangeModelController.model.value_([0.00001, 0.00001]).changed(\value);
 				this.calibConstraints_(nil);
 				if(this.editor.notNil and:{
 					this.editor.isClosed(name).not
 				}, {
+					this.editor.addrField.string_("");
+					this.editor.nameField.enabled_(true).string_("/my/typetag");
+					this.editor.inputConstraintLoField.value_(
+						this.controllersAndModels.oscInputRangeModelController.model.value[0];
+					);
+					this.editor.inputConstraintHiField.value_(
+						this.controllersAndModels.oscInputRangeModelController.model.value[1];
+					);
+					if(this.prCalibrate.not, {
+						[this.editor.inputConstraintLoField, this.editor.inputConstraintHiField].do(_.enabled_(true));
+					});
+					this.editor.indexField.value_(1).enabled_(true);
 					this.editor.connectorBut.value_(0);
-					this.editor.nameField.enabled_(true);
 				});
-//				parentView.refresh;
-			})
+				this.oscEditBut.refresh;
+			});
 		});
 		
-		this.oscEditBut.onClose_({ 
-			oscInputRangeController.remove;
-			oscConnectionController.remove;
-		});
+//		this.oscEditBut.onClose_({ 
+////			if(this.oscResponder.value == false and:{
+////				OSCresponder.all.asArray.select({ |resp| resp.cmdName == this.oscResponder.cmdName }).size < 2
+////			}, {
+//				this.controllersAndModels.controllersAndModels.oscConnectionModelController.modelController.controller.remove;
+//				this.controllersAndModels.oscConnectionModelController.controller.remove;
+////			})
+//		});
+////		if(this.oscResponder.value == false and:{
+////			OSCresponder.all.asArray.select({ |resp| resp.cmdName == this.oscResponder.cmdName }).size < 2
+////		}, {
+//			this.specBut.onClose_({ this.controllersAndModels.specModelController.controller.remove });
+//			this.calibBut.onClose_({ this.controllersAndModels.calibModelController.controller.remove });
+////		});
 		
 		this.prCCResponderAdd(cv, this.midiLearn, this.midiSrc, this.midiChan, this.midiCtrl, this.midiHead);
 		
@@ -545,7 +624,7 @@ CVWidgetKnob : CVWidget {
 		if(bool.isKindOf(Boolean).not, {
 			Error("calibration can only be set to true or false!").throw;
 		});
-		this.calibModel.value_(bool).changed(\value);
+		this.controllersAndModels.calibModelController.model.value_(bool).changed(\value);
 	}
 	
 	calibrate {
@@ -556,7 +635,7 @@ CVWidgetKnob : CVWidget {
 		if(spec.isKindOf(ControlSpec).not, {
 			Error("Please provide a valid ControlSpec!").throw;
 		});
-		this.specModel.value_(spec).changed(\value);
+		this.controllersAndModels.specModelController.model.value_(spec).changed(\value);
 	}
 	
 	spec {
@@ -574,8 +653,12 @@ CVWidgetKnob : CVWidget {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		}, {
 			this.prOSCMapping_(mapping.asSymbol);
-			this.oscInputRangeModel.value_(this.oscInputRangeModel.value).changed(\value);
-			this.specModel.value_(this.specModel.value).changed(\value);
+			this.controllersAndModels.oscConnectionModelController.model.value_(
+				this.controllersAndModels.oscConnectionModelController.model.value;
+			).changed(\value);
+			this.controllersAndModels.specModelController.model.value_(
+				this.controllersAndModels.specModelController.model.value;
+			).changed(\value);
 		})
 	}
 	
@@ -585,58 +668,22 @@ CVWidgetKnob : CVWidget {
 	
 	oscConnect { |addr=nil, name, oscMsgIndex|
 		if(addr.notNil, {
-			if("^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$".matchRegexp(addr).not, {
+			if("^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$".matchRegexp(addr.asString).not, {
 				Error("You have to supply an IP-address or nil as first argument to oscConnect").throw;
 			})
 		});
-		if("^\/".matchRegexp(name).not, {
+		if("^\/".matchRegexp(name.asString).not, {
 			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as second argument to oscConnect").throw;
 		});
 		if(oscMsgIndex.isKindOf(Integer).not, {
 			Error("You have to supply an integer as third argument to oscConnect").throw;
 		});
-		this.oscConnectionModel.value_([addr, name, oscMsgIndex]).changed(\value);
-//		this.oscResponder = OSCresponderNode(addr, name.asSymbol, { |t, r, msg|
-//			if(this.prCalibrate, { 
-//				if(calibConstraints.isNil, {
-//					calibConstraints = (lo: msg[oscMsgIndex], hi: msg[oscMsgIndex]);
-//				}, {
-//					if(msg[oscMsgIndex] < calibConstraints.lo, { 
-//						calibConstraints.lo = msg[oscMsgIndex];
-//						this.oscInputRangeModel.value_([msg[oscMsgIndex], this.oscInputRangeModel.value[1]]).changed(\value);
-//					});
-//					if(msg[oscMsgIndex] > calibConstraints.hi, {
-//						calibConstraints.hi = msg[oscMsgIndex];
-//						this.oscInputRangeModel.value_([this.oscInputRangeModel.value[0], msg[oscMsgIndex]]).changed(\value);
-//					});
-//				});
-//				this.mapConstrainterLo.value_(calibConstraints.lo);
-//				this.mapConstrainterHi.value_(calibConstraints.hi);
-//			}, {
-//				if(calibConstraints.isNil, {
-////					calibConstraints = (lo: 0, hi: 0);
-//					calibConstraints = (lo: this.oscInputRangeModel.value[0], hi: this.oscInputRangeModel.value[1]);
-//				}/*, {
-//					this.calibConstraints.lo = this.editor.calibNumBoxes.lo.value;
-//					this.calibConstraints.hi = this.editor.calibNumBoxes.hi.value;
-//				}*/)	
-//			});
-//			thisCV.value_(
-//				msg[oscMsgIndex].perform(
-//					this.prOSCMapping,
-//					calibConstraints.lo, calibConstraints.hi,
-//					this.spec.minval, this.spec.maxval,
-//					\minmax
-//				)
-//			);
-//		}).add
+		this.controllersAndModels.oscConnectionModelController.model.value_([addr, name, oscMsgIndex]).changed(\value);
 	}
 	
 	oscResponderRemove {
-		this.oscConnectionModel.value_(false).changed(\value);
-//		this.oscResponder.remove;
-//		this.oscInputRangeModel_(`[0.0, 0.0]);
-//		this.calibConstraints_(nil);
+		this.controllersAndModels.oscConnectionModelController.model.value_(false).changed(\value);
+		this.controllersAndModels.oscInputRangeModelController.model.value_([0.00001, 0.00001]).changed(\value);
 	}
 	
 }
