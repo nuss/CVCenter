@@ -143,7 +143,7 @@ CVWidget {
 //						oneShot = this.cc.oneShotLearn;
 						nil.yield;
 					}, {
-						"no CCResponder yet or just removing the existing one".postln;
+//						"no CCResponder yet or just removing the existing one".postln;
 //						oneShot !? { oneShot.remove };
 						key.switch(
 							\hi, { 
@@ -197,11 +197,7 @@ CVWidgetKnob : CVWidget {
 	
 	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=166, setUpArgs, controllersAndModels|
 		var knobsize, meanVal, widgetSpecsActions, editor, cvString;
-		var tmpSetup, thisToggleColor/*, oneShot*/;
-//		var calibController;
-//		var specController;
-//		var oscInputRangeController;
-//		var oscConnectionController;
+		var tmpSetup, tmpMapping;
 		
 		thisCV = cv;
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
@@ -432,8 +428,6 @@ CVWidgetKnob : CVWidget {
 		};
 		
 		this.controllersAndModels.specModelController.controller.put(\value, { |theChanger, what, moreArgs|
-			var tmpMapping;
-			[theChanger.value.minval, theChanger.value.maxval].postln;
 			if(theChanger.value.minval <= 0.0 or:{
 				theChanger.value.maxval <= 0.0
 			}, {
@@ -505,11 +499,11 @@ CVWidgetKnob : CVWidget {
 				})
 			})
 		});
-				
+
 		this.controllersAndModels.oscConnectionModelController.controller ?? {
 			this.controllersAndModels.oscConnectionModelController.controller = SimpleController(this.controllersAndModels.oscConnectionModelController.model);
 		};
-		
+
 		this.controllersAndModels.oscConnectionModelController.controller.put(\value, { |theChanger, what, moreArgs|
 			if(theChanger.value.size == 3, {
 				this.oscResponder = OSCresponderNode(theChanger.value[0], theChanger.value[1].asSymbol, { |t, r, msg|
@@ -570,7 +564,6 @@ CVWidgetKnob : CVWidget {
 				this.oscEditBut.refresh;
 			});
 			if(theChanger.value == false, {
-//				"now removing the responder".postln;
 				this.oscResponder.remove;
 				this.oscEditBut.states_([
 					["edit OSC", Color.black, Color.clear]
@@ -595,6 +588,7 @@ CVWidgetKnob : CVWidget {
 					this.editor.connectorBut.value_(0);
 				});
 				this.oscEditBut.refresh;
+//				("removing the responder done:"+this.controllersAndModels.oscConnectionModelController.model).postln;
 			});
 		});
 		
@@ -653,8 +647,8 @@ CVWidgetKnob : CVWidget {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		}, {
 			this.prOSCMapping_(mapping.asSymbol);
-			this.controllersAndModels.oscConnectionModelController.model.value_(
-				this.controllersAndModels.oscConnectionModelController.model.value;
+			this.controllersAndModels.oscInputRangeModelController.model.value_(
+				this.controllersAndModels.oscInputRangeModelController.model.value;
 			).changed(\value);
 			this.controllersAndModels.specModelController.model.value_(
 				this.controllersAndModels.specModelController.model.value;
