@@ -2,7 +2,7 @@ CVWidgetEditor {
 	classvar allEditors;
 	var <>window, <>tabs;
 	var <>calibBut, <>calibNumBoxes;
-	var <>addrField, <>nameField, <>indexField;
+	var <>nameField, <>indexField;
 	var <>inputConstraintLoField, <>inputConstraintHiField;
 	var <>mappingSelect;
 	var <>connectorBut;
@@ -16,7 +16,6 @@ CVWidgetEditor {
 		var tabs, specsList, specsActions, editor, cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var addr;
-//		var /*addrField, */addr, indexField/*, connectorBut*/;
 		var mappingSelectItems/*, mappingModes*/;
 		
 		widget ?? {
@@ -38,7 +37,7 @@ CVWidgetEditor {
 		allEditors ?? { allEditors = IdentityDictionary() };
 		
 		if(allEditors[widgetName.asSymbol].isNil or:{ allEditors[widgetName.asSymbol].window.isClosed }, {
-			this.window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 330, 260));
+			this.window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 190));
 
 			allEditors.put(widgetName.asSymbol, (window: this.window));
 
@@ -53,7 +52,7 @@ CVWidgetEditor {
 				.resize_(5)
 				.background_(Color.white)
 				.hiliteColor_(Color.blue)
-				.selectedStringColor_(Color.white)
+//				.selectedStringColor_(Color.white)
 				.visible_(true)
 				.enterKeyAction_({ |ws|
 					specsActions[ws.value].value;
@@ -156,40 +155,20 @@ CVWidgetEditor {
 			allEditors[widgetName.asSymbol].tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			allEditors[widgetName.asSymbol].tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 	
-			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@15)
+			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-20@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("Listening address address of the OSCresponder.")
-			;
-			
-			this.addrField = TextField(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@15)
-				.font_(textFieldFont)
-				.stringColor_(textFieldFontColor)
-				.background_(textFieldBg)
-			;
-			
-			flow2.shift(0, 0);
-			
-			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@15)
-				.font_(staticTextFont)
-				.stringColor_(staticTextColor)
-				.string_("OSC-typetag, beginning with a slash: e.g. /my/typetag.")
+				.string_("OSC-typetag, e.g.: /my/typetag / OSC message index")
 			;
 	
-			this.nameField = TextField(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@15)
+			this.nameField = TextField(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
+				.string_("/my/typetag")
 			;
 						
-			flow2.shift(0, 0);
-			
-			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@15)
-				.font_(staticTextFont)
-				.stringColor_(staticTextColor)
-				.string_("OSC message-index.")
-			;
-			
+			flow2.shift(5, 0);
 			
 			this.indexField = NumberBox(allEditors[widgetName.asSymbol].tabs.views[2], 36@15)
 				.font_(textFieldFont)
@@ -204,13 +183,13 @@ CVWidgetEditor {
 			
 			flow2.shift(0, 0);
 	
-			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@15)
+			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("lower and upper constraints of the OSC-input.")
 			;
 			
-			this.inputConstraintLoField = NumberBox(allEditors[widgetName.asSymbol].tabs.views[2], 50@15)
+			this.inputConstraintLoField = NumberBox(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(widget.controllersAndModels.oscInputRangeModelController.model.value[0])
@@ -219,7 +198,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 			
-			this.inputConstraintHiField = NumberBox(allEditors[widgetName.asSymbol].tabs.views[2], 50@15)
+			this.inputConstraintHiField = NumberBox(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(widget.controllersAndModels.oscInputRangeModelController.model.value[0])
@@ -228,7 +207,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 			
-			this.calibBut = Button(allEditors[widgetName.asSymbol].tabs.views[2], 115@15)
+			this.calibBut = Button(allEditors[widgetName.asSymbol].tabs.views[2], 80@15)
 				.font_(staticTextFont)
 				.states_([
 					["calibrating", Color.white, Color.red],
@@ -238,24 +217,24 @@ CVWidgetEditor {
 	
 			flow2.shift(0, 0);
 	
-			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@15)
+			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.string_("Input to Output mapping")
 			;
 			
 			flow2.shift(0, 0);
 	
-			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@15)
+			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.background_(Color.white)
-				.string_(" The current widget-spec constraints low / high:"+widget.spec.minval+"/"+widget.spec.maxval)
+				.string_(" current widget-spec constraints lo / hi:"+widget.spec.minval+"/"+widget.spec.maxval)
 			;
 	
 			flow2.shift(5, 0);
 			
 			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 			
-			this.mappingSelect = PopUpMenu(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@20)
+			this.mappingSelect = PopUpMenu(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-15@20)
 				.font_(Font("Helvetica", 14))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
@@ -265,7 +244,7 @@ CVWidgetEditor {
 						
 			flow2.shift(0, 0);
 	
-			this.connectorBut = Button(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-30@25)
+			this.connectorBut = Button(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-15@25)
 				.font_(staticTextFont)
 				.states_([
 					["connect OSC-controller", Color.white, Color.blue],
@@ -274,8 +253,10 @@ CVWidgetEditor {
 				.action_({ |cb|
 					cb.value.switch(
 						1, { 
-							if(addrField.value.size > 6, { addr = addrField.value });
-							widget.oscConnect(addr, nameField.value, indexField.value.asInt);
+							widget.oscConnect(
+								this.nameField.value, 
+								this.indexField.value.asInt
+							);
 						},
 						0, { widget.oscResponderRemove }
 					)

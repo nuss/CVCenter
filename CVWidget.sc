@@ -289,7 +289,9 @@ CVWidgetKnob : CVWidget {
 				}, {
 					this.editor.front(name, 0)
 				});
-				this.oscConnectionModelController.model.value_(this.oscConnectionModelController.model.value).changed(\value);
+				this.controllersAndModels.oscConnectionModelController.model.value_(
+					this.controllersAndModels.oscConnectionModelController.model.value
+				).changed(\value);
 			})
 		;
 		this.midiHead = Button(parentView, Rect(xy.x+1, xy.y+knobsize+43, widgetwidth-17, 15))
@@ -482,6 +484,12 @@ CVWidgetKnob : CVWidget {
 					this.editor.isClosed(name).not
 				}, {
 					{	
+						this.oscEditBut.states_([[
+							this.oscEditBut.states[0][0].split($\n)[0]++"\n"++this.prOSCMapping.asString,
+							this.oscEditBut.states[0][1],
+							this.oscEditBut.states[0][2]
+						]]);
+						this.oscEditBut.refresh;
 						this.editor.mappingSelect.value_(0);
 					}.defer
 				})		
@@ -494,8 +502,18 @@ CVWidgetKnob : CVWidget {
 							if(item.asSymbol === this.prOSCMapping, {
 								this.editor.mappingSelect.value_(i)
 							})
-						})
-					}.defer
+						});
+					}.defer;
+					if(this.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
+						{
+							this.oscEditBut.states_([[
+								this.oscEditBut.states[0][0].split($\n)[0]++"\n"++this.prOSCMapping.asString,
+								this.oscEditBut.states[0][1],
+								this.oscEditBut.states[0][2]
+							]]);
+							this.oscEditBut.refresh;
+						}.defer
+					})
 				})
 			})
 		});
@@ -505,25 +523,25 @@ CVWidgetKnob : CVWidget {
 		};
 
 		this.controllersAndModels.oscConnectionModelController.controller.put(\value, { |theChanger, what, moreArgs|
-			if(theChanger.value.size == 3, {
-				this.oscResponder = OSCresponderNode(theChanger.value[0], theChanger.value[1].asSymbol, { |t, r, msg|
+			if(theChanger.value.size == 2, {
+				this.oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, { |t, r, msg|
 //					[t, r, msg, theChanger.value, this.controllersAndModels.oscConnectionModelController.model.value].postln;
 					if(this.prCalibrate, { 
 						if(calibConstraints.isNil, {
-							calibConstraints = (lo: msg[theChanger.value[2]], hi: msg[theChanger.value[2]]);
+							calibConstraints = (lo: msg[theChanger.value[1]], hi: msg[theChanger.value[1]]);
 						}, {
-							if(msg[theChanger.value[2]] < calibConstraints.lo, { 
-								calibConstraints.lo = msg[theChanger.value[2]];
+							if(msg[theChanger.value[1]] < calibConstraints.lo, { 
+								calibConstraints.lo = msg[theChanger.value[1]];
 								this.controllersAndModels.oscInputRangeModelController.model.value_([
-									msg[theChanger.value[2]], 
+									msg[theChanger.value[1]], 
 									this.controllersAndModels.oscInputRangeModelController.model.value[1]
 								]).changed(\value);
 							});
-							if(msg[theChanger.value[2]] > calibConstraints.hi, {
-								calibConstraints.hi = msg[theChanger.value[2]];
+							if(msg[theChanger.value[1]] > calibConstraints.hi, {
+								calibConstraints.hi = msg[theChanger.value[1]];
 								this.controllersAndModels.oscInputRangeModelController.model.value_([
 									this.controllersAndModels.oscInputRangeModelController.model.value[0], 
-									msg[theChanger.value[2]]
+									msg[theChanger.value[1]]
 								]).changed(\value);
 							});
 						});
@@ -539,7 +557,7 @@ CVWidgetKnob : CVWidget {
 						}*/)	
 					});
 					thisCV.value_(
-						msg[theChanger.value[2]].perform(
+						msg[theChanger.value[1]].perform(
 							this.prOSCMapping,
 							calibConstraints.lo, calibConstraints.hi,
 							this.spec.minval, this.spec.maxval,
@@ -548,17 +566,16 @@ CVWidgetKnob : CVWidget {
 					)
 				}).add;
 				this.oscEditBut.states_([
-					[theChanger.value[1].asString++"["++theChanger.value[2].asString++"]"++"\n"++this.prOSCMapping.asString, Color.white, Color.cyan(0.5)]
+					[theChanger.value[0].asString++"["++theChanger.value[1].asString++"]"++"\n"++this.prOSCMapping.asString, Color.white, Color.cyan(0.5)]
 				]);
 				if(this.editor.notNil and:{
 					this.editor.isClosed(name).not
 				}, {
-					this.editor.addrField.string_(theChanger.value[0].asString);
-					this.editor.nameField.enabled_(false).string_(theChanger.value[1].asString);
+					this.editor.nameField.enabled_(false).string_(theChanger.value[0].asString);
 					if(this.prCalibrate, {
 						[this.editor.inputConstraintLoField, this.editor.inputConstraintHiField].do(_.enabled_(false));
 					});
-					this.editor.indexField.value_(theChanger.value[2]).enabled_(false);
+					this.editor.indexField.value_(theChanger.value[1]).enabled_(false);
 					this.editor.connectorBut.value_(1);
 				});
 				this.oscEditBut.refresh;
@@ -573,8 +590,8 @@ CVWidgetKnob : CVWidget {
 				if(this.editor.notNil and:{
 					this.editor.isClosed(name).not
 				}, {
-					this.editor.addrField.string_("");
-					this.editor.nameField.enabled_(true).string_("/my/typetag");
+//					this.editor.nameField.enabled_(true).string_("/my/typetag");
+					this.editor.nameField.enabled_(true);
 					this.editor.inputConstraintLoField.value_(
 						this.controllersAndModels.oscInputRangeModelController.model.value[0];
 					);
@@ -584,7 +601,8 @@ CVWidgetKnob : CVWidget {
 					if(this.prCalibrate.not, {
 						[this.editor.inputConstraintLoField, this.editor.inputConstraintHiField].do(_.enabled_(true));
 					});
-					this.editor.indexField.value_(1).enabled_(true);
+//					this.editor.indexField.value_(1).enabled_(true);
+					this.editor.indexField.enabled_(true);
 					this.editor.connectorBut.value_(0);
 				});
 				this.oscEditBut.refresh;
@@ -660,19 +678,25 @@ CVWidgetKnob : CVWidget {
 		^this.prOSCMapping;	
 	}
 	
-	oscConnect { |addr=nil, name, oscMsgIndex|
-		if(addr.notNil, {
-			if("^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$".matchRegexp(addr.asString).not, {
-				Error("You have to supply an IP-address or nil as first argument to oscConnect").throw;
-			})
-		});
+	oscConnect { |name, oscMsgIndex|
+//		var netAddr;
+//		[addr.class, port, name, oscMsgIndex].postln;
+//		if(addr.size > 0 and:{ addr != "nil" }, {
+//			if("^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$".matchRegexp(addr.asString).not and:{
+//				port.isKindOf(Integer).not
+//			}, {
+//				Error("You have to supply a valid IP-address and an integer as port-number if the address is not set to nil").throw;
+//			}, {
+//				netAddr = NetAddr(addr.asString, port);
+//			})
+//		});
 		if("^\/".matchRegexp(name.asString).not, {
 			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as second argument to oscConnect").throw;
 		});
 		if(oscMsgIndex.isKindOf(Integer).not, {
 			Error("You have to supply an integer as third argument to oscConnect").throw;
 		});
-		this.controllersAndModels.oscConnectionModelController.model.value_([addr, name, oscMsgIndex]).changed(\value);
+		this.controllersAndModels.oscConnectionModelController.model.value_([name, oscMsgIndex]).changed(\value);
 	}
 	
 	oscResponderRemove {
