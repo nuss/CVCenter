@@ -1,11 +1,12 @@
 CVWidgetEditor {
-	classvar allEditors;
+	classvar <allEditors;
 	var <>window, <>tabs;
 	var <>calibBut, <>calibNumBoxes;
 	var <>nameField, <>indexField;
 	var <>inputConstraintLoField, <>inputConstraintHiField;
 	var <>mappingSelect;
 	var <>connectorBut;
+	var <name;
 	
 	*new { |widget, widgetName, tab, hilo|
 		^super.new.init(widget, widgetName, tab, hilo)
@@ -17,6 +18,8 @@ CVWidgetEditor {
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var addr;
 		var mappingSelectItems/*, mappingModes*/;
+		
+		name = widgetName.asSymbol;
 		
 		widget ?? {
 			Error("CVWidgetEditor is a utility-class that should only be used in connection with an existing CVWidget").throw;
@@ -36,19 +39,19 @@ CVWidgetEditor {
 		
 		allEditors ?? { allEditors = IdentityDictionary() };
 		
-		if(allEditors[widgetName.asSymbol].isNil or:{ allEditors[widgetName.asSymbol].window.isClosed }, {
+		if(allEditors[name].isNil or:{ allEditors[name].window.isClosed }, {
 			this.window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 190));
 
-			allEditors.put(widgetName.asSymbol, (window: this.window));
+			allEditors.put(widgetName.asSymbol, (window: this.window, name: widgetName));
 
 			if(Quarks.isInstalled("wslib"), { this.window.background_(Color.white) });
 			this.tabs = TabbedView(window, Rect(0, 0, this.window.bounds.width, this.window.bounds.height), ["Specs", "MIDI", "OSC"], scroll: true);
-			allEditors[widgetName.asSymbol].tabs = this.tabs;
-			allEditors[widgetName.asSymbol].tabs.postln;
-			allEditors[widgetName.asSymbol].tabs.view.resize_(5);
-			allEditors[widgetName.asSymbol].tabs.stringFocusedColor_(Color.blue);
+			allEditors[name].tabs = this.tabs;
+			allEditors[name].tabs.postln;
+			allEditors[name].tabs.view.resize_(5);
+			allEditors[name].tabs.stringFocusedColor_(Color.blue);
 			
-			specsList = ListView(allEditors[widgetName.asSymbol].tabs.views[0], Rect(0, 0, Window.screenBounds.width, Window.screenBounds.height))
+			specsList = ListView(allEditors[name].tabs.views[0], Rect(0, 0, Window.screenBounds.width, Window.screenBounds.height))
 				.resize_(5)
 				.background_(Color.white)
 				.hiliteColor_(Color.blue)
@@ -152,16 +155,16 @@ CVWidgetEditor {
 				})
 			;
 
-			allEditors[widgetName.asSymbol].tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			allEditors[widgetName.asSymbol].tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			allEditors[name].tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			allEditors[name].tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 	
-			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-20@15)
+			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-20@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("OSC-typetag, e.g.: /my/typetag / OSC message index")
 			;
 	
-			this.nameField = TextField(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-60@15)
+			this.nameField = TextField(allEditors[name].tabs.views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -170,7 +173,7 @@ CVWidgetEditor {
 						
 			flow2.shift(5, 0);
 			
-			this.indexField = NumberBox(allEditors[widgetName.asSymbol].tabs.views[2], 36@15)
+			this.indexField = NumberBox(allEditors[name].tabs.views[2], 36@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.clipLo_(1)
@@ -183,13 +186,13 @@ CVWidgetEditor {
 			
 			flow2.shift(0, 0);
 	
-			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-15@15)
+			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("lower and upper constraints of the OSC-input.")
 			;
 			
-			this.inputConstraintLoField = NumberBox(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width/2-56@15)
+			this.inputConstraintLoField = NumberBox(allEditors[name].tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(widget.controllersAndModels.oscInputRangeModelController.model.value[0])
@@ -198,7 +201,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 			
-			this.inputConstraintHiField = NumberBox(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width/2-56@15)
+			this.inputConstraintHiField = NumberBox(allEditors[name].tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(widget.controllersAndModels.oscInputRangeModelController.model.value[0])
@@ -207,7 +210,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 			
-			this.calibBut = Button(allEditors[widgetName.asSymbol].tabs.views[2], 80@15)
+			this.calibBut = Button(allEditors[name].tabs.views[2], 80@15)
 				.font_(staticTextFont)
 				.states_([
 					["calibrating", Color.white, Color.red],
@@ -217,14 +220,14 @@ CVWidgetEditor {
 	
 			flow2.shift(0, 0);
 	
-			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-15@15)
+			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.string_("Input to Output mapping")
 			;
 			
 			flow2.shift(0, 0);
 	
-			StaticText(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-15@15)
+			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.background_(Color.white)
 				.string_(" current widget-spec constraints lo / hi:"+widget.spec.minval+"/"+widget.spec.maxval)
@@ -234,7 +237,7 @@ CVWidgetEditor {
 			
 			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 			
-			this.mappingSelect = PopUpMenu(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-15@20)
+			this.mappingSelect = PopUpMenu(allEditors[name].tabs.views[2], flow2.bounds.width-15@20)
 				.font_(Font("Helvetica", 14))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
@@ -244,7 +247,7 @@ CVWidgetEditor {
 						
 			flow2.shift(0, 0);
 	
-			this.connectorBut = Button(allEditors[widgetName.asSymbol].tabs.views[2], flow2.bounds.width-15@25)
+			this.connectorBut = Button(allEditors[name].tabs.views[2], flow2.bounds.width-15@25)
 				.font_(staticTextFont)
 				.states_([
 					["connect OSC-controller", Color.white, Color.blue],
@@ -280,18 +283,23 @@ CVWidgetEditor {
 		});
 		
 		tab !? { 
-			allEditors[widgetName.asSymbol].tabs.focus(tab);		};
-		allEditors[widgetName.asSymbol].window.front;
+			allEditors[name].tabs.focus(tab);		};
+		allEditors[name].window.front;
 	}
 	
-	front { |widgetName, tab|
-		allEditors[widgetName.asSymbol].window.front;
-		tab !? allEditors[widgetName.asSymbol].tabs.focus(tab);
+	front { |tab|
+		allEditors[name].window.front;
+		tab !? allEditors[name].tabs.focus(tab);
 	}
 	
-	isClosed { |widgetName|
-		allEditors[widgetName.asSymbol].window !? {
-			^allEditors[widgetName.asSymbol].window.isClosed;
+	close {
+		allEditors[name].window.close;
+		allEditors.removeAt(name);
+	}
+	
+	isClosed {
+		allEditors[name].window !? {
+			^allEditors[name].window.isClosed;
 		}
 	}
 }

@@ -191,11 +191,11 @@ CVWidgetKnob : CVWidget {
 	var <>mapConstrainterLo, <>mapConstrainterHi;
 //	var <>oscInputRangeController;
 
-	*new { |parent, cv, name, bounds, setUpArgs, controllersAndModels|
-		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs, controllersAndModels)
+	*new { |parent, cv, name, bounds, setUpArgs, controllersAndModels, cvcGui|
+		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs, controllersAndModels, cvcGui)
 	}
 	
-	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=166, setUpArgs, controllersAndModels|
+	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=166, setUpArgs, controllersAndModels, cvcGui|
 		var knobsize, meanVal, widgetSpecsActions, editor, cvString;
 		var tmpSetup, tmpMapping;
 		
@@ -239,6 +239,17 @@ CVWidgetKnob : CVWidget {
 		};
 		this.controllersAndModels.oscConnectionModelController.model ?? {
 			this.controllersAndModels.oscConnectionModelController.model = Ref(false);
+		};
+		
+		cvcGui ?? { 
+			parentView.onClose_({
+				if(this.editor.notNil and:{
+					this.editor.isClosed.not
+				}, {
+					this.editor.close;
+				});
+				this.controllersAndModels.do({ |mc| mc.controller.remove });
+			})
 		};
 				
 		this.mapConstrainterLo ?? { this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0)) };
@@ -284,10 +295,10 @@ CVWidgetKnob : CVWidget {
 			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
 			.action_({ |btn|
-				if(this.editor.isNil or:{ this.editor.isClosed(name) }, {
+				if(this.editor.isNil or:{ this.editor.isClosed }, {
 					this.editor_(CVWidgetEditor(this, name, 0))
 				}, {
-					this.editor.front(name, 0)
+					this.editor.front(0)
 				});
 				this.controllersAndModels.oscConnectionModelController.model.value_(
 					this.controllersAndModels.oscConnectionModelController.model.value
@@ -299,10 +310,10 @@ CVWidgetKnob : CVWidget {
 			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
 			.action_({ |ms|
-				if(this.editor.isNil or:{ this.editor.isClosed(name) }, {
+				if(this.editor.isNil or:{ this.editor.isClosed }, {
 					this.editor_(CVWidgetEditor(this, name, 1))
 				}, {
-					this.editor.front(name, 1)
+					this.editor.front(1)
 				});
 				this.controllersAndModels.oscConnectionModelController.model.value_(
 					this.controllersAndModels.oscConnectionModelController.model.value;
@@ -348,10 +359,10 @@ CVWidgetKnob : CVWidget {
 				["edit OSC", Color.black, Color.clear]
 			])
 			.action_({ |oscb|
-				if(this.editor.isNil or:{ this.editor.isClosed(name) }, {
+				if(this.editor.isNil or:{ this.editor.isClosed }, {
 					this.editor_(CVWidgetEditor(this, name, 2))
 				}, {
-					this.editor.front(name, 2)
+					this.editor.front(2)
 				});
 				this.editor.calibNumBoxes !? {
 					this.mapConstrainterLo.connect(this.editor.calibNumBoxes.lo);
@@ -381,7 +392,7 @@ CVWidgetKnob : CVWidget {
 			theChanger.value.switch(
 				true, { 
 					this.calibBut.value_(0);
-					if(this.editor.notNil and:{ this.editor.isClosed(name).not }, {
+					if(this.editor.notNil and:{ this.editor.isClosed.not }, {
 						this.editor.calibBut.value_(0);
 						this.mapConstrainterLo ?? { 
 							this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0));
@@ -396,7 +407,7 @@ CVWidgetKnob : CVWidget {
 				},
 				false, { 
 					this.calibBut.value_(1);
-					if(this.editor.notNil and:{ this.editor.isClosed(name).not }, {
+					if(this.editor.notNil and:{ this.editor.isClosed.not }, {
 						this.editor.calibBut.value_(1);
 						[this.mapConstrainterLo, this.mapConstrainterHi].do({ |cv| cv = nil; });
 						if(this.controllersAndModels.oscConnectionModelController.model.value == false, {
@@ -415,7 +426,7 @@ CVWidgetKnob : CVWidget {
 		});
 		
 //		if(this.editor.notNil and:{
-//			this.editor.isClosed(name).not	
+//			this.editor.isClosed.not	
 //		}, {
 //			this.editor.calibBut.action_({ |but|
 //				but.value.switch(
@@ -438,14 +449,14 @@ CVWidgetKnob : CVWidget {
 				}, {
 					this.prOSCMapping_(\linlin);
 					if(this.editor.notNil and:{
-						this.editor.isClosed(name).not
+						this.editor.isClosed.not
 					}, {
 						this.editor.mappingSelect.value_(0);
 					})
 				})
 			}, {
 				if(this.editor.notNil and:{
-					this.editor.isClosed(name).not	
+					this.editor.isClosed.not	
 				}, {
 					tmpMapping = this.editor.mappingSelect.item;
 					this.editor.mappingSelect.items.do({ |item, i|
@@ -481,7 +492,7 @@ CVWidgetKnob : CVWidget {
 					this.prOSCMapping_(\linlin)
 				});
 				if(this.editor.notNil and:{
-					this.editor.isClosed(name).not
+					this.editor.isClosed.not
 				}, {
 					{	
 						this.oscEditBut.states_([[
@@ -495,7 +506,7 @@ CVWidgetKnob : CVWidget {
 				})		
 			}, {
 				if(this.editor.notNil and:{
-					this.editor.isClosed(name).not	
+					this.editor.isClosed.not	
 				}, {
 					{
 						this.editor.mappingSelect.items.do({ |item, i|
@@ -569,7 +580,7 @@ CVWidgetKnob : CVWidget {
 					[theChanger.value[0].asString++"["++theChanger.value[1].asString++"]"++"\n"++this.prOSCMapping.asString, Color.white, Color.cyan(0.5)]
 				]);
 				if(this.editor.notNil and:{
-					this.editor.isClosed(name).not
+					this.editor.isClosed.not
 				}, {
 					this.editor.nameField.enabled_(false).string_(theChanger.value[0].asString);
 					if(this.prCalibrate, {
@@ -588,7 +599,7 @@ CVWidgetKnob : CVWidget {
 				this.controllersAndModels.oscInputRangeModelController.model.value_([0.00001, 0.00001]).changed(\value);
 				this.calibConstraints_(nil);
 				if(this.editor.notNil and:{
-					this.editor.isClosed(name).not
+					this.editor.isClosed.not
 				}, {
 //					this.editor.nameField.enabled_(true).string_("/my/typetag");
 					this.editor.nameField.enabled_(true);

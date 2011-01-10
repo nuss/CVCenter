@@ -8,6 +8,7 @@ CVCenter {
 	classvar <>ctrlButtonBank, currentButtonStates, guiClosed = false/*, buttonProps*/;
 	classvar /*widgetwidth = 52, widgetheight = 122, colwidth, rowheight, */<widgetStates;
 	classvar <tabProperties, colors, nextColor;
+	classvar controllersAndModels;
 	
 	*new { |cvs...setUpArgs|
 		var r, g, b;
@@ -67,6 +68,7 @@ CVCenter {
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
 		var widgetwidth, widgetheight=166, colwidth, rowheight;
 		var funcToAdd;
+		var widgetControllersAndModels;
 			
 		cvs !? { this.put(*cvs) };
 		
@@ -204,7 +206,13 @@ CVCenter {
 //					this.setup.postln;
 //					"and now a knob widget".postln;
 					cvWidgets[k] = CVWidgetKnob(
-						tabs.views[cvTabIndex], orderedCVs[i], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight), this.setup
+						tabs.views[cvTabIndex], 
+						orderedCVs[i], 
+						k, 
+						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight), 
+						this.setup,
+						widgetControllersAndModels,
+						true
 					);
 					// to be tested in depth ...
 					if(cvWidgets[k].midiLearn.action.class != FunctionList, {
@@ -563,6 +571,7 @@ CVCenter {
 		var cvTabIndex, tabLabels;
 		var thisNextPos;
 		var widgetwidth, widgetheight=166, colwidth, rowheight;
+		var widgetControllersAndModels;
 		
 		("tab passed to prAddToGui:"+[tab, this.setup]).postln;
 		
@@ -615,7 +624,15 @@ CVCenter {
 				});
 				widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: (hi: false, lo: false)));
 			}, {	
-				cvWidgets[k] = CVWidgetKnob(tabs.views[cvTabIndex], all[k], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight), this.setup);
+				cvWidgets[k] = CVWidgetKnob(
+					tabs.views[cvTabIndex], 
+					all[k], 
+					k, 
+					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight), 
+					this.setup,
+					widgetControllersAndModels,
+					true
+				);
 				if(cvWidgets[k].midiLearn.action != FunctionList, {
 					cvWidgets[k].midiLearn.action_(
 						cvWidgets[k].midiLearn.action.addFunc({ this.prAddControlButton(k) })
