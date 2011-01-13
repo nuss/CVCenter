@@ -261,7 +261,7 @@ CVWidgetEditor {
 								this.indexField.value.asInt
 							);
 						},
-						0, { widget.oscResponderRemove }
+						0, { widget.oscDisconnect }
 					)
 				})
 			;
