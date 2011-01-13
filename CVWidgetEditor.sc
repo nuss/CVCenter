@@ -1,11 +1,11 @@
 CVWidgetEditor {
 	classvar <allEditors;
-	var <>window, <>tabs;
-	var <>calibBut, <>calibNumBoxes;
-	var <>nameField, <>indexField;
-	var <>inputConstraintLoField, <>inputConstraintHiField;
-	var <>mappingSelect;
-	var <>connectorBut;
+	var <window, <tabs;
+	var <calibBut, <calibNumBoxes;
+	var <nameField, <indexField;
+	var <inputConstraintLoField, <inputConstraintHiField;
+	var <mappingSelect;
+	var <connectorBut;
 	var <name;
 	
 	*new { |widget, widgetName, tab, hilo|
@@ -40,13 +40,13 @@ CVWidgetEditor {
 		allEditors ?? { allEditors = IdentityDictionary() };
 		
 		if(allEditors[name].isNil or:{ allEditors[name].window.isClosed }, {
-			this.window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 190));
+			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 190));
 
-			allEditors.put(widgetName.asSymbol, (window: this.window, name: widgetName));
+			allEditors.put(widgetName.asSymbol, (window: window, name: widgetName));
 
-			if(Quarks.isInstalled("wslib"), { this.window.background_(Color.white) });
-			this.tabs = TabbedView(window, Rect(0, 0, this.window.bounds.width, this.window.bounds.height), ["Specs", "MIDI", "OSC"], scroll: true);
-			allEditors[name].tabs = this.tabs;
+			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
+			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC"], scroll: true);
+			allEditors[name].tabs = tabs;
 			allEditors[name].tabs.postln;
 			allEditors[name].tabs.view.resize_(5);
 			allEditors[name].tabs.stringFocusedColor_(Color.blue);
@@ -105,7 +105,7 @@ CVWidgetEditor {
 				})
 			});
 
-			editor = TextView(window, Rect(0, 0, this.window.bounds.width, this.window.bounds.height))
+			editor = TextView(window, Rect(0, 0, window.bounds.width, window.bounds.height))
 				.resize_(5)
 			;
 
@@ -164,7 +164,7 @@ CVWidgetEditor {
 				.string_("OSC-typetag, e.g.: /my/typetag / OSC message index")
 			;
 	
-			this.nameField = TextField(allEditors[name].tabs.views[2], flow2.bounds.width-60@15)
+			nameField = TextField(allEditors[name].tabs.views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -173,7 +173,7 @@ CVWidgetEditor {
 						
 			flow2.shift(5, 0);
 			
-			this.indexField = NumberBox(allEditors[name].tabs.views[2], 36@15)
+			indexField = NumberBox(allEditors[name].tabs.views[2], 36@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.clipLo_(1)
@@ -192,7 +192,7 @@ CVWidgetEditor {
 				.string_("lower and upper constraints of the OSC-input.")
 			;
 			
-			this.inputConstraintLoField = NumberBox(allEditors[name].tabs.views[2], flow2.bounds.width/2-56@15)
+			inputConstraintLoField = NumberBox(allEditors[name].tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(widget.controllersAndModels.oscInputRangeModelController.model.value[0])
@@ -201,7 +201,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 			
-			this.inputConstraintHiField = NumberBox(allEditors[name].tabs.views[2], flow2.bounds.width/2-56@15)
+			inputConstraintHiField = NumberBox(allEditors[name].tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(widget.controllersAndModels.oscInputRangeModelController.model.value[0])
@@ -210,7 +210,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 			
-			this.calibBut = Button(allEditors[name].tabs.views[2], 80@15)
+			calibBut = Button(allEditors[name].tabs.views[2], 80@15)
 				.font_(staticTextFont)
 				.states_([
 					["calibrating", Color.white, Color.red],
@@ -237,7 +237,7 @@ CVWidgetEditor {
 			
 			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 			
-			this.mappingSelect = PopUpMenu(allEditors[name].tabs.views[2], flow2.bounds.width-15@20)
+			mappingSelect = PopUpMenu(allEditors[name].tabs.views[2], flow2.bounds.width-15@20)
 				.font_(Font("Helvetica", 14))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
@@ -247,7 +247,7 @@ CVWidgetEditor {
 						
 			flow2.shift(0, 0);
 	
-			this.connectorBut = Button(allEditors[name].tabs.views[2], flow2.bounds.width-15@25)
+			connectorBut = Button(allEditors[name].tabs.views[2], flow2.bounds.width-15@25)
 				.font_(staticTextFont)
 				.states_([
 					["connect OSC-controller", Color.white, Color.blue],
@@ -257,8 +257,8 @@ CVWidgetEditor {
 					cb.value.switch(
 						1, { 
 							widget.oscConnect(
-								this.nameField.value, 
-								this.indexField.value.asInt
+								nameField.value, 
+								indexField.value.asInt
 							);
 						},
 						0, { widget.oscDisconnect }
@@ -266,9 +266,9 @@ CVWidgetEditor {
 				})
 			;
 
-			this.calibNumBoxes = (lo: inputConstraintLoField, hi: inputConstraintHiField);
+			calibNumBoxes = (lo: inputConstraintLoField, hi: inputConstraintHiField);
 			
-			this.calibBut.action_({ |but|
+			calibBut.action_({ |but|
 				but.value.switch(
 					0, { widget.controllersAndModels.calibModelController.model.value_(true).changed(\value) },
 					1, { widget.controllersAndModels.calibModelController.model.value_(false).changed(\value) }
@@ -276,14 +276,15 @@ CVWidgetEditor {
 			});
 	
 			widget.calibrate.switch(
-				true, { this.calibBut.value_(0) },
-				false, { this.calibBut.value_(1) }
+				true, { calibBut.value_(0) },
+				false, { calibBut.value_(1) }
 			);
 	
 		});
 		
 		tab !? { 
-			allEditors[name].tabs.focus(tab);		};
+			allEditors[name].tabs.focus(tab);
+		};
 		allEditors[name].window.front;
 	}
 	
