@@ -185,19 +185,29 @@ CVWidgetKnob : CVWidget {
 
 	var thisCV;
 //	var <guiElements;
-	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl;
+	var <window, <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl;
 	var <>cc, spec;
 	var <oscEditBut, <calibBut, <>editor;
 	var <>prOSCMapping = \linlin, <>calibConstraints, <>oscResponder;
 	var <>mapConstrainterLo, <>mapConstrainterHi;
 //	var <>oscInputRangeController;
 
-	*new { |parent, cv, name, bounds, setUpArgs, controllersAndModels, cvcGui|
-		^super.new.init(parent, cv, name, bounds.left@bounds.top, bounds.width, bounds.height, setUpArgs, controllersAndModels, cvcGui)
+	*new { |parent, cv, name, bounds, setUpArgs, controllersAndModels, cvcGui, server|
+		^super.new.init(
+			parent, 
+			cv, 
+			name, 
+			bounds, 
+			setUpArgs, 
+			controllersAndModels, 
+			cvcGui, 
+			server // swing compatibility. well, ...
+		)
 	}
 	
-	init { |parentView, cv, name, xy, widgetwidth=52, widgetheight=166, setUpArgs, controllersAndModels, cvcGui|
-		var knobsize, meanVal, widgetSpecsActions, editor, cvString;
+	init { |parentView, cv, name, bounds, setUpArgs, controllersAndModels, cvcGui, server|
+		var flow, thisXY, thisWidth, thisHeight, knobsize, meanVal, widgetSpecsActions, editor, cvString;
+		var nextY, knobX, knobY;
 		var tmpSetup, tmpMapping;
 		
 		thisCV = cv;
@@ -242,8 +252,27 @@ CVWidgetKnob : CVWidget {
 			this.controllersAndModels.oscConnectionModelController.model = Ref(false);
 		};
 		
+		this.mapConstrainterLo ?? { this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0)) };
+		this.mapConstrainterHi ?? { this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0)) };
+		
+		if(bounds.isNil, {		
+			thisXY = 7@0;
+			thisWidth = 52;
+			thisHeight = 166;
+		}, {
+			thisXY = bounds.left@bounds.top;
+			thisWidth = bounds.width;
+			thisHeight = bounds.height;
+		});
+		
+		if(parentView.isNil, {
+			window = Window(name, Rect(50, 50, thisWidth+14, thisHeight+7), server: server);
+		}, {
+			window = parentView;
+		});
+				
 		cvcGui ?? { 
-			parentView.onClose_({
+			window.onClose_({
 				if(this.editor.notNil and:{
 					this.editor.isClosed.not
 				}, {
@@ -252,19 +281,12 @@ CVWidgetKnob : CVWidget {
 				this.controllersAndModels.do({ |mc| mc.controller.remove });
 			})
 		};
-				
-		this.mapConstrainterLo ?? { this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0)) };
-		this.mapConstrainterHi ?? { this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0)) };
-		
-		knobsize = widgetwidth-14;
-		
-//		guiElements = ();
-		
-		widgetBg = UserView(parentView, Rect(xy.x, xy.y, widgetwidth, widgetheight))
+						
+		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 			.focusColor_(Color(alpha: 1.0))
 			.background_(Color.white)
 		;
-		label = Button(parentView, Rect(xy.x+1, xy.y+1, widgetwidth-2, 15))
+		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
 			.states_([
 				[""+name.asString, Color.white, Color.blue],
 				[""+name.asString, Color.black, Color.yellow],
@@ -274,7 +296,7 @@ CVWidgetKnob : CVWidget {
 				this.toggleComment(b.value);
 			})
 		;
-		nameField = TextField(parentView, Rect(label.bounds.left, label.bounds.top+label.bounds.height, widgetwidth-2, widgetheight-label.bounds.height-2))
+		nameField = TextField(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
@@ -282,7 +304,18 @@ CVWidgetKnob : CVWidget {
 			.action_({ |nf| nf.value_(nf.value) })
 			.visible_(false)
 		;
-		knob = Knob(parentView, Rect(xy.x+(widgetwidth/2-(knobsize/2)), xy.y+16, knobsize, knobsize))
+		knobsize = thisHeight-2-130;
+		if(knobsize >= thisWidth, {
+			knobsize = thisWidth;
+			knobY = 16+(thisHeight-128-knobsize/2);
+			knobX = thisXY.x;
+		}, {
+			"knobsize < thisWidth".postln;
+			knobsize = thisHeight-128;
+			knobX = thisWidth-knobsize/2+thisXY.x;
+			knobY = 16;
+		});			
+		knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
 			.canFocus_(false)
 		;
 		block { |break|
@@ -290,10 +323,12 @@ CVWidgetKnob : CVWidget {
 				if(cv.spec == symbol.asSpec, { break.value(knob.centered_(true)) });
 			})
 		};
-		numVal = NumberBox(parentView, Rect(xy.x+1, xy.y+knobsize+12, widgetwidth-2, 15))
+		nextY = thisHeight-117;
+		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(cv.value)
 		;
-		specBut = Button(parentView, Rect(xy.x+1, xy.y+knobsize+27, widgetwidth-2, 15))
+		nextY = nextY+numVal.bounds.height;
+		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
@@ -308,7 +343,8 @@ CVWidgetKnob : CVWidget {
 				).changed(\value);
 			})
 		;
-		midiHead = Button(parentView, Rect(xy.x+1, xy.y+knobsize+43, widgetwidth-17, 15))
+		nextY = nextY+specBut.bounds.height+1;
+		midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
@@ -323,7 +359,7 @@ CVWidgetKnob : CVWidget {
 				).changed(\value);
 			})
 		;
-		midiLearn = Button(parentView, Rect(xy.x+widgetwidth-16, xy.y+knobsize+43, 15, 15))
+		midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
@@ -331,7 +367,8 @@ CVWidgetKnob : CVWidget {
 				["X", Color.white, Color.red]
 			])
 		;
-		midiSrc = TextField(parentView, Rect(xy.x+1, xy.y+knobsize+58, widgetwidth-2, 12))
+		nextY = nextY+midiLearn.bounds.height;
+		midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_("source")
@@ -339,7 +376,8 @@ CVWidgetKnob : CVWidget {
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		;
-		midiChan = TextField(parentView, Rect(xy.x+1, xy.y+knobsize+70, widgetwidth-2/2, 12))
+		nextY = nextY+midiSrc.bounds.height;
+		midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_("chan")
@@ -347,7 +385,7 @@ CVWidgetKnob : CVWidget {
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		;
-		midiCtrl = TextField(parentView, Rect(xy.x+(widgetwidth-2/2)+1, xy.y+knobsize+70, widgetwidth-2/2, 12))
+		midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_("ctrl")
@@ -355,7 +393,8 @@ CVWidgetKnob : CVWidget {
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		;
-		oscEditBut = Button(parentView, Rect(xy.x+1, xy.y+knobsize+82, widgetwidth-2, 30))
+		nextY = nextY+midiCtrl.bounds.height+1;
+		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
@@ -376,7 +415,8 @@ CVWidgetKnob : CVWidget {
 				).changed(\value);
 			})
 		;
-		calibBut = Button(parentView, Rect(xy.x+1, xy.y+knobsize+112, widgetwidth-2, 15))
+		nextY = nextY+oscEditBut.bounds.height;
+		calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
@@ -628,7 +668,7 @@ CVWidgetKnob : CVWidget {
 	
 	spec_ { |spec|
 		if(spec.isKindOf(ControlSpec).not, {
-			Error("Please provide a valid ControlSpec!").throw;
+			Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
 		});
 		this.controllersAndModels.specModelController.model.value_(spec).changed(\value);
 	}
@@ -674,6 +714,10 @@ CVWidgetKnob : CVWidget {
 	oscDisconnect {
 		this.controllersAndModels.oscConnectionModelController.model.value_(false).changed(\value);
 		this.controllersAndModels.oscInputRangeModelController.model.value_([0.00001, 0.00001]).changed(\value);
+	}
+	
+	front {
+		window.front;
 	}
 	
 }
