@@ -198,8 +198,8 @@ CVWidgetKnob : CVWidget {
 			cv, 
 			name, 
 			bounds, 
-			setup,
 			action,
+			setup,
 			controllersAndModels, 
 			cvcGui, 
 			server // swing compatibility. well, ...
@@ -216,9 +216,7 @@ CVWidgetKnob : CVWidget {
 		}, {
 			thisCV = cv;
 		});
-		
-		("spec:"+[cv, thisCV, this.spec]).postln;
-		
+				
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
 		setUpArgs[0] !? { this.midimode_(setUpArgs[0]) };
@@ -229,7 +227,9 @@ CVWidgetKnob : CVWidget {
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
 		setUpArgs[6] !? { this.calibrate_(setUpArgs[6]) };
 		
-		action ?? { thisCV.action_(action) };
+		action !? {
+			thisCV.action_(action);
+		};
 		
 		if(controllersAndModels.notNil, {
 			this.controllersAndModels = controllersAndModels
