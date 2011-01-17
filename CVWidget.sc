@@ -192,25 +192,33 @@ CVWidgetKnob : CVWidget {
 	var <>mapConstrainterLo, <>mapConstrainterHi;
 //	var <>oscInputRangeController;
 
-	*new { |parent, cv, name, bounds, setUpArgs, controllersAndModels, cvcGui, server|
+	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
 		^super.new.init(
 			parent, 
 			cv, 
 			name, 
 			bounds, 
-			setUpArgs, 
+			setup,
+			action,
 			controllersAndModels, 
 			cvcGui, 
 			server // swing compatibility. well, ...
 		)
 	}
 	
-	init { |parentView, cv, name, bounds, setUpArgs, controllersAndModels, cvcGui, server|
+	init { |parentView, cv, name, bounds, action, setUpArgs, controllersAndModels, cvcGui, server|
 		var flow, thisXY, thisWidth, thisHeight, knobsize, meanVal, widgetSpecsActions, editor, cvString;
 		var nextY, knobX, knobY;
 		var tmpSetup, tmpMapping;
 		
-		thisCV = cv;
+		if(cv.isNil, {
+			thisCV = CV.new;
+		}, {
+			thisCV = cv;
+		});
+		
+		("spec:"+[cv, thisCV, this.spec]).postln;
+		
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
 		setUpArgs[0] !? { this.midimode_(setUpArgs[0]) };
@@ -220,6 +228,8 @@ CVWidgetKnob : CVWidget {
 		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
 		setUpArgs[6] !? { this.calibrate_(setUpArgs[6]) };
+		
+		action ?? { thisCV.action_(action) };
 		
 		if(controllersAndModels.notNil, {
 			this.controllersAndModels = controllersAndModels
@@ -319,12 +329,12 @@ CVWidgetKnob : CVWidget {
 		;
 		block { |break|
 			#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
-				if(cv.spec == symbol.asSpec, { break.value(knob.centered_(true)) });
+				if(thisCV.spec == symbol.asSpec, { break.value(knob.centered_(true)) });
 			})
 		};
 		nextY = thisHeight-117;
 		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.value_(cv.value)
+			.value_(thisCV.value)
 		;
 		nextY = nextY+numVal.bounds.height;
 		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
@@ -647,9 +657,9 @@ CVWidgetKnob : CVWidget {
 			});
 		});
 		
-		this.prCCResponderAdd(cv, midiLearn, midiSrc, midiChan, midiCtrl, midiHead);
+		this.prCCResponderAdd(thisCV, midiLearn, midiSrc, midiChan, midiCtrl, midiHead);
 		
-		[knob, numVal].do({ |view| cv.connect(view) });
+		[knob, numVal].do({ |view| thisCV.connect(view) });
 		visibleGuiEls = [knob, numVal, specBut, midiHead, midiLearn, midiSrc, midiChan, midiCtrl, oscEditBut, calibBut];
 		allGuiEls = [widgetBg, label, nameField, knob, numVal, specBut, midiHead, midiLearn, midiSrc, midiChan, midiCtrl, oscEditBut, calibBut]
 	}

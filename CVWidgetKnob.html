@@ -13,23 +13,25 @@ p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; min-height: 17.0p
 p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
 p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; min-height: 14.0px}
 p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco}
-p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #000000}
-p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #b42a27}
+p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #a34742}
 span.s1 {font: 19.0px Helvetica}
-span.s2 {color: #41555f}
-span.s3 {color: #3f5662}
-span.s4 {color: #0853af}
-span.s5 {color: #14599e}
-span.s6 {color: #105296}
-span.s7 {text-decoration: underline ; color: #105296}
-span.s8 {color: #43545c}
+span.s2 {color: #45535a}
+span.s3 {color: #43545c}
+span.s4 {color: #195995}
+span.s5 {color: #235c89}
+span.s6 {color: #1f5581}
+span.s7 {text-decoration: underline ; color: #1f5581}
+span.s8 {color: #465358}
 span.s9 {font: 12.0px Helvetica}
 span.s10 {color: #0026ad}
-span.s11 {color: #236b22}
-span.s12 {color: #666666}
-span.s13 {color: #000000}
-span.s14 {color: #8f2f8f}
-span.s15 {color: #3c5765}
+span.s11 {color: #8f2f8f}
+span.s12 {color: #003b8f}
+span.s13 {color: #386037}
+span.s14 {color: #666666}
+span.s15 {color: #236b22}
+span.s16 {color: #000000}
+span.s17 {color: #804c81}
+span.s18 {color: #41555f}
 span.Apple-tab-span {white-space:pre}
 </style>
 </head>
@@ -97,31 +99,37 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2"><br></p>
 <p class="p4"><b>Example</b></p>
 <p class="p3"><br></p>
+<p class="p6">s.boot;</p>
+<p class="p6">a = { <span class="s10">|freq=318|</span> <span class="s10">SinOsc</span>.ar({ <span class="s10">|i|</span> freq+i }!<span class="s11">2</span>) }.play;</p>
+<p class="p5"><br></p>
 <p class="p6">(</p>
-<p class="p6">~cv = <span class="s10">CV</span>.new(<span class="s11">\boostcut</span>.asSpec);<span class="Apple-converted-space"> </span></p>
-<p class="p6">~wdgt = <span class="s10">CVWidgetKnob</span>(nil, ~cv, <span class="s12">"CV test"</span>);</p>
-<p class="p7">~wdgt.front;</p>
+<p class="p6">~cv = <span class="s12">CV</span>.new(<span class="s13">\freq</span>.asSpec);<span class="Apple-converted-space"> </span></p>
+<p class="p6">~wdgt = <span class="s10">CVWidgetKnob</span>(<span class="s10">nil</span>, ~cv, <span class="s14">"CV test"</span>, action: { |cv| a.set(<span class="s15">\freq</span>, cv.value) } );</p>
+<p class="p6">~wdgt = <span class="s10">CVWidgetKnob</span>(<span class="s10">nil</span>, nil, <span class="s14">"CV test"</span>, action: { |cv| a.set(<span class="s15">\freq</span>, cv.value) } );</p>
+<p class="p6">~wdgt.front;</p>
 <p class="p6">)</p>
 <p class="p5"><br></p>
-<p class="p8">// change the Spec of the CV</p>
-<p class="p8">// change is reflected in the widget immediately</p>
-<p class="p8">// can also be done through the "edit Spec" button in the widget</p>
-<p class="p6">~wdgt.spec_(<span class="s11">\freq</span>.asSpec)</p>
+<p class="p6">a.free;</p>
 <p class="p5"><br></p>
-<p class="p8">// change the MIDI-setup</p>
-<p class="p8">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
-<p class="p8"><span class="s13">~wdgt.midimode_(</span><span class="s14">1</span><span class="s13">); </span>// in-/decremental output mode</p>
-<p class="p8"><span class="s13">~wdgt.midimean_(</span><span class="s14">64</span><span class="s13">); </span>// only necessary if midimode == 1</p>
-<p class="p8"><span class="s13">~wdgt.midistring_(</span><span class="s12">"in-/decremtal"</span><span class="s13">); </span>// an arbitrary string displaying some info about the midi-setting of the widget</p>
-<p class="p8"><span class="s13">~wdgt.ctrlButtonBank_(</span><span class="s14">16</span><span class="s13">); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
+<p class="p7">// change the Spec of the CV</p>
+<p class="p7">// change is reflected in the widget immediately</p>
+<p class="p7">// can also be done through the "edit Spec" button in the widget</p>
+<p class="p6">~wdgt.spec_(<span class="s13">\freq</span>.asSpec)</p>
 <p class="p5"><br></p>
-<p class="p8">// set some Synth-Controls<span class="Apple-converted-space"> </span></p>
-<p class="p6">a = { <span class="s10">|freq=440|</span> <span class="s10">SinOsc</span>.ar(freq, mul: <span class="s14">0.4</span>) }.play</p>
-<p class="p6">~cv.action_({ <span class="s10">|cv|</span> a.set(<span class="s11">\freq</span>, cv.value) })</p>
+<p class="p7">// change the MIDI-setup</p>
+<p class="p7">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
+<p class="p7"><span class="s16">~wdgt.midimode_(</span><span class="s17">1</span><span class="s16">); </span>// in-/decremental output mode</p>
+<p class="p7"><span class="s16">~wdgt.midimean_(</span><span class="s17">64</span><span class="s16">); </span>// only necessary if midimode == 1</p>
+<p class="p7"><span class="s16">~wdgt.midistring_(</span><span class="s14">"in-/decremtal"</span><span class="s16">); </span>// an arbitrary string displaying some info about the midi-setting of the widget</p>
+<p class="p7"><span class="s16">~wdgt.ctrlButtonBank_(</span><span class="s17">16</span><span class="s16">); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
+<p class="p5"><br></p>
+<p class="p7">// set some Synth-Controls<span class="Apple-converted-space"> </span></p>
+<p class="p6">a = { <span class="s12">|freq=440|</span> <span class="s12">SinOsc</span>.ar(freq, mul: <span class="s17">0.4</span>) }.play</p>
+<p class="p6">~cv.action_({ <span class="s12">|cv|</span> a.set(<span class="s13">\freq</span>, cv.value) })</p>
 <p class="p2"><br></p>
 <p class="p4"><b>about the GUI</b></p>
 <p class="p3"><br></p>
-<p class="p1">The Elements within the GUI should be more or less selfexplanatory. However, one might ask why there the name is reflected twice - once as a non-editable label, once as an editable textfield. The reason for this is, that within <a href="CVCenter.html"><span class="s15"><b>CVCenter</b></span></a> the label will reflect the key-name under which a CV has been added to <b>CVCenter</b>. The key may or may not reflect a key of a pattern or a control of a synth. However, a CV as part of <b>CVCenter</b> may be used in any context, so it may be useful to be able to add some addititional information, independantly from the key-name.</p>
+<p class="p1">The Elements within the GUI should be more or less selfexplanatory. However, one might ask why there the name is reflected twice - once as a non-editable label, once as an editable textfield. The reason for this is, that within <a href="CVCenter.html"><span class="s18"><b>CVCenter</b></span></a> the label will reflect the key-name under which a CV has been added to <b>CVCenter</b>. The key may or may not reflect a key of a pattern or a control of a synth. However, a CV as part of <b>CVCenter</b> may be used in any context, so it may be useful to be able to add some addititional information, independantly from the key-name.</p>
 <p class="p1">Within every CVWidget there is a blue button, labeled "L". This stands for "learn" - when clicked the button-color turns to red and the label becomes "X". In this state the first MIDI-slider that gets moved gets connected to the particular CVWidget resp. the parameters controlled by it.</p>
 <p class="p1">Last but not least you will find a (non-functional) button named "MIDI" - this should become a shortcut to the widget's MIDI-setup. As it is currently not known to the author which different setups will be useful to provide this functionality shall be implemented at a later point.</p>
 </body>

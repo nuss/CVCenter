@@ -210,9 +210,9 @@ CVCenter {
 						orderedCVs[i], 
 						k, 
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight), 
-						this.setup,
-						widgetControllersAndModels,
-						true
+						setup: this.setup,
+						controllersAndModels: widgetControllersAndModels,
+						cvcGui: true
 					);
 					// to be tested in depth ...
 					if(cvWidgets[k].midiLearn.action.class != FunctionList, {
@@ -629,9 +629,9 @@ CVCenter {
 					all[k], 
 					k, 
 					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight), 
-					this.setup,
-					widgetControllersAndModels,
-					true
+					setup: this.setup,
+					controllersAndModels: widgetControllersAndModels,
+					cvcGui: true
 				);
 				if(cvWidgets[k].midiLearn.action != FunctionList, {
 					cvWidgets[k].midiLearn.action_(
