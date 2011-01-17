@@ -260,7 +260,7 @@ CVWidgetKnob : CVWidget {
 			thisWidth = 52;
 			thisHeight = 166;
 		}, {
-			thisXY = bounds.left@bounds.top;
+			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
@@ -310,7 +310,6 @@ CVWidgetKnob : CVWidget {
 			knobY = 16+(thisHeight-128-knobsize/2);
 			knobX = thisXY.x;
 		}, {
-			"knobsize < thisWidth".postln;
 			knobsize = thisHeight-128;
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = 16;
