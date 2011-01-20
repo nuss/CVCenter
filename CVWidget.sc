@@ -188,7 +188,7 @@ CVWidgetKnob : CVWidget {
 	var <window, <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl;
 	var <>cc, spec;
 	var <oscEditBut, <calibBut, <>editor;
-	var <>prOSCMapping = \linlin, <>calibConstraints, <>oscResponder;
+	var prOSCMapping = \linlin, <>calibConstraints, <>oscResponder;
 	var <>mapConstrainterLo, <>mapConstrainterHi;
 //	var <>oscInputRangeController;
 
@@ -227,9 +227,7 @@ CVWidgetKnob : CVWidget {
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
 		setUpArgs[6] !? { this.calibrate_(setUpArgs[6]) };
 		
-		action !? {
-			thisCV.action_(action);
-		};
+		action !? { thisCV.action_(action) };
 		
 		if(controllersAndModels.notNil, {
 			this.controllersAndModels = controllersAndModels
@@ -439,7 +437,6 @@ CVWidgetKnob : CVWidget {
 		};
 
 		this.controllersAndModels.calibModelController.controller.put(\value, { |theChanger, what, moreArgs|
-//			[theChanger.value, what, moreArgs, this.editor.calibBut, this.calibBut].postln;
 			prCalibrate = (theChanger.value);
 			theChanger.value.switch(
 				true, { 
@@ -485,10 +482,10 @@ CVWidgetKnob : CVWidget {
 			if(theChanger.value.minval <= 0.0 or:{
 				theChanger.value.maxval <= 0.0
 			}, {
-				if(this.prOSCMapping == \linexp or:{
-					this.prOSCMapping == \expexp
+				if(prOSCMapping === \linexp or:{
+					prOSCMapping === \expexp
 				}, {
-					this.prOSCMapping_(\linlin);
+					prOSCMapping = \linlin;
 					if(this.editor.notNil and:{
 						this.editor.isClosed.not
 					}, {
@@ -527,22 +524,26 @@ CVWidgetKnob : CVWidget {
 			if(theChanger.value[0] <= 0 or:{
 				theChanger.value[1] <= 0
 			}, {
-				if(this.prOSCMapping == \explin or:{
-					this.prOSCMapping == \expexp
+				if(prOSCMapping === \explin or:{
+					prOSCMapping === \expexp
 				}, {
-					this.prOSCMapping_(\linlin)
+					prOSCMapping = \linlin;
 				});
 				if(this.editor.notNil and:{
 					this.editor.isClosed.not
 				}, {
 					{	
 						oscEditBut.states_([[
-							oscEditBut.states[0][0].split($\n)[0]++"\n"++this.prOSCMapping.asString,
+							oscEditBut.states[0][0].split($\n)[0]++"\n"++prOSCMapping.asString,
 							oscEditBut.states[0][1],
 							oscEditBut.states[0][2]
 						]]);
 						oscEditBut.refresh;
-						this.editor.mappingSelect.value_(0);
+						this.editor.mappingSelect.items.do({ |item, i|
+							if(item.asSymbol === prOSCMapping, {
+								this.editor.mappingSelect.value_(i);
+							})
+						})
 					}.defer
 				})		
 			}, {
@@ -551,7 +552,7 @@ CVWidgetKnob : CVWidget {
 				}, {
 					{
 						this.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === this.prOSCMapping, {
+							if(item.asSymbol === prOSCMapping, {
 								this.editor.mappingSelect.value_(i)
 							})
 						});
@@ -559,7 +560,7 @@ CVWidgetKnob : CVWidget {
 					if(oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 						{
 							oscEditBut.states_([[
-								oscEditBut.states[0][0].split($\n)[0]++"\n"++this.prOSCMapping.asString,
+								oscEditBut.states[0][0].split($\n)[0]++"\n"++prOSCMapping.asString,
 								oscEditBut.states[0][1],
 								oscEditBut.states[0][2]
 							]]);
@@ -577,7 +578,6 @@ CVWidgetKnob : CVWidget {
 		this.controllersAndModels.oscConnectionModelController.controller.put(\value, { |theChanger, what, moreArgs|
 			if(theChanger.value.size == 2, {
 				this.oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, { |t, r, msg|
-//					[t, r, msg, theChanger.value, this.controllersAndModels.oscConnectionModelController.model.value].postln;
 					if(prCalibrate, { 
 						if(calibConstraints.isNil, {
 							calibConstraints = (lo: msg[theChanger.value[1]], hi: msg[theChanger.value[1]]);
@@ -606,7 +606,7 @@ CVWidgetKnob : CVWidget {
 					});
 					thisCV.value_(
 						msg[theChanger.value[1]].perform(
-							this.prOSCMapping,
+							prOSCMapping,
 							calibConstraints.lo, calibConstraints.hi,
 							this.spec.minval, this.spec.maxval,
 							\minmax
@@ -614,7 +614,7 @@ CVWidgetKnob : CVWidget {
 					)
 				}).add;
 				oscEditBut.states_([
-					[theChanger.value[0].asString++"["++theChanger.value[1].asString++"]"++"\n"++this.prOSCMapping.asString, Color.white, Color.cyan(0.5)]
+					[theChanger.value[0].asString++"["++theChanger.value[1].asString++"]"++"\n"++prOSCMapping.asString, Color.white, Color.cyan(0.5)]
 				]);
 				if(this.editor.notNil and:{
 					this.editor.isClosed.not
@@ -696,7 +696,7 @@ CVWidgetKnob : CVWidget {
 		}, {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		}, {
-			this.prOSCMapping_(mapping.asSymbol);
+			prOSCMapping = mapping.asSymbol;
 			this.controllersAndModels.oscInputRangeModelController.model.value_(
 				this.controllersAndModels.oscInputRangeModelController.model.value;
 			).changed(\value);
@@ -707,7 +707,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	oscMapping {
-		^this.prOSCMapping;	
+		^prOSCMapping;	
 	}
 	
 	oscConnect { |name, oscMsgIndex|
