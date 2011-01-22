@@ -709,6 +709,7 @@ CVCenter {
 			this.prAdd2DCtrlBtn(key, slot, buttonWidth);
 		});
 		switchBoard.reflow;
+//		switchBoard.reflowAll;
 	}
 	
 	*prAddCtrlBtn { |key, buttonWidth|
@@ -800,6 +801,7 @@ CVCenter {
 		
 		switchBoard.decorator.bounds_(switchBoard.bounds);
 		switchBoard.reflow;
+//		switchBoard.reflowAll;
 	}
 	
 	*prAddFuncToCC {
