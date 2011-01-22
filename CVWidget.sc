@@ -283,6 +283,10 @@ CVWidgetKnob : CVWidget {
 					this.editor.isClosed.not
 				}, {
 					this.editor.close;
+				}, {
+					CVWidgetEditor.allEditors[name.asSymbol] !? {
+						CVWidgetEditor.allEditors.removeAt(name.asSymbol)
+					};
 				});
 				wdgtControllersAndModels.do({ |mc| mc.controller.remove });
 			})

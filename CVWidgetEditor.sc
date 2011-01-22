@@ -42,7 +42,7 @@ CVWidgetEditor {
 		if(allEditors[name].isNil or:{ allEditors[name].window.isClosed }, {
 			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 190));
 
-			allEditors.put(widgetName.asSymbol, (window: window, name: widgetName));
+			allEditors.put(name, (window: window, name: widgetName));
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC"], scroll: true);
@@ -303,4 +303,5 @@ CVWidgetEditor {
 			^allEditors[name].window.isClosed;
 		}
 	}
+			
 }
