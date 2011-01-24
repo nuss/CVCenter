@@ -244,6 +244,16 @@ CVWidgetEditor {
 					widget.oscMapping_(ms.item);
 				})
 			;
+			
+			if(widget.oscMapping.notNil, {
+				mappingSelectItems.do({ |item, i|
+					if(item.asSymbol === widget.oscMapping, {
+						mappingSelect.value_(i);
+					})
+				}, {
+					mappingSelect.value_(0);
+				})
+			});
 						
 			flow2.shift(0, 0);
 	
