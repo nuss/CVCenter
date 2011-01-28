@@ -195,7 +195,7 @@ CVWidgetEditor {
 			inputConstraintLoField = NumberBox(allEditors[name].tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
-				.value_(widget.wdgtControllersAndModels.oscInputRangeModelController.model.value[0])
+				.value_(widget.wdgtControllersAndModels.oscInputRange.model.value[0])
 				.enabled_(false)
 			;
 			
@@ -204,7 +204,7 @@ CVWidgetEditor {
 			inputConstraintHiField = NumberBox(allEditors[name].tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
-				.value_(widget.wdgtControllersAndModels.oscInputRangeModelController.model.value[0])
+				.value_(widget.wdgtControllersAndModels.oscInputRange.model.value[0])
 				.enabled_(false)
 			;
 			
@@ -280,8 +280,8 @@ CVWidgetEditor {
 			
 			calibBut.action_({ |but|
 				but.value.switch(
-					0, { widget.wdgtControllersAndModels.calibModelController.model.value_(true).changed(\value) },
-					1, { widget.wdgtControllersAndModels.calibModelController.model.value_(false).changed(\value) }
+					0, { widget.wdgtControllersAndModels.calibration.model.value_(true).changed(\value) },
+					1, { widget.wdgtControllersAndModels.calibration.model.value_(false).changed(\value) }
 				)
 			});
 	

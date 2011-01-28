@@ -233,29 +233,29 @@ CVWidgetKnob : CVWidget {
 			wdgtControllersAndModels = ();
 		});
 		
-		wdgtControllersAndModels.calibModelController ?? {
-			wdgtControllersAndModels.calibModelController = ();
+		wdgtControllersAndModels.calibration ?? {
+			wdgtControllersAndModels.calibration = ();
 		};
-		wdgtControllersAndModels.calibModelController.model ?? {
-			wdgtControllersAndModels.calibModelController.model = Ref(prCalibrate);
+		wdgtControllersAndModels.calibration.model ?? {
+			wdgtControllersAndModels.calibration.model = Ref(prCalibrate);
 		};
-		wdgtControllersAndModels.specModelController ?? {
-			wdgtControllersAndModels.specModelController = ();
+		wdgtControllersAndModels.cvSpec ?? {
+			wdgtControllersAndModels.cvSpec = ();
 		};
-		wdgtControllersAndModels.specModelController.model ?? { 
-			wdgtControllersAndModels.specModelController.model = Ref(this.spec);
+		wdgtControllersAndModels.cvSpec.model ?? { 
+			wdgtControllersAndModels.cvSpec.model = Ref(this.spec);
 		};
-		wdgtControllersAndModels.oscInputRangeModelController ?? {
-			wdgtControllersAndModels.oscInputRangeModelController = ();
+		wdgtControllersAndModels.oscInputRange ?? {
+			wdgtControllersAndModels.oscInputRange = ();
 		};
-		wdgtControllersAndModels.oscInputRangeModelController.model ?? {
-			wdgtControllersAndModels.oscInputRangeModelController.model = Ref([0.00001, 0.00001]);
+		wdgtControllersAndModels.oscInputRange.model ?? {
+			wdgtControllersAndModels.oscInputRange.model = Ref([0.00001, 0.00001]);
 		};
-		wdgtControllersAndModels.oscConnectionModelController ?? {
-			wdgtControllersAndModels.oscConnectionModelController = ();
+		wdgtControllersAndModels.oscConnection ?? {
+			wdgtControllersAndModels.oscConnection = ();
 		};
-		wdgtControllersAndModels.oscConnectionModelController.model ?? {
-			wdgtControllersAndModels.oscConnectionModelController.model = Ref(false);
+		wdgtControllersAndModels.oscConnection.model ?? {
+			wdgtControllersAndModels.oscConnection.model = Ref(false);
 		};
 		
 		this.mapConstrainterLo ?? { this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0)) };
@@ -347,8 +347,8 @@ CVWidgetKnob : CVWidget {
 				}, {
 					this.editor.front(0)
 				});
-				wdgtControllersAndModels.oscConnectionModelController.model.value_(
-					wdgtControllersAndModels.oscConnectionModelController.model.value
+				wdgtControllersAndModels.oscConnection.model.value_(
+					wdgtControllersAndModels.oscConnection.model.value
 				).changed(\value);
 			})
 		;
@@ -363,8 +363,8 @@ CVWidgetKnob : CVWidget {
 				}, {
 					this.editor.front(1)
 				});
-				wdgtControllersAndModels.oscConnectionModelController.model.value_(
-					wdgtControllersAndModels.oscConnectionModelController.model.value;
+				wdgtControllersAndModels.oscConnection.model.value_(
+					wdgtControllersAndModels.oscConnection.model.value;
 				).changed(\value);
 			})
 		;
@@ -419,8 +419,8 @@ CVWidgetKnob : CVWidget {
 					this.mapConstrainterLo.connect(this.editor.calibNumBoxes.lo);
 					this.mapConstrainterHi.connect(this.editor.calibNumBoxes.hi);
 				};
-				wdgtControllersAndModels.oscConnectionModelController.model.value_(
-					wdgtControllersAndModels.oscConnectionModelController.model.value;
+				wdgtControllersAndModels.oscConnection.model.value_(
+					wdgtControllersAndModels.oscConnection.model.value;
 				).changed(\value);
 			})
 		;
@@ -434,11 +434,11 @@ CVWidgetKnob : CVWidget {
 			])
 		;
 		
-		wdgtControllersAndModels.calibModelController.controller ?? { 
-			wdgtControllersAndModels.calibModelController.controller = SimpleController(wdgtControllersAndModels.calibModelController.model);
+		wdgtControllersAndModels.calibration.controller ?? { 
+			wdgtControllersAndModels.calibration.controller = SimpleController(wdgtControllersAndModels.calibration.model);
 		};
 
-		wdgtControllersAndModels.calibModelController.controller.put(\value, { |theChanger, what, moreArgs|
+		wdgtControllersAndModels.calibration.controller.put(\value, { |theChanger, what, moreArgs|
 			prCalibrate = (theChanger.value);
 			theChanger.value.switch(
 				true, { 
@@ -461,7 +461,7 @@ CVWidgetKnob : CVWidget {
 					if(this.editor.notNil and:{ this.editor.isClosed.not }, {
 						this.editor.calibBut.value_(1);
 						[this.mapConstrainterLo, this.mapConstrainterHi].do({ |cv| cv = nil; });
-						if(wdgtControllersAndModels.oscConnectionModelController.model.value == false, {
+						if(wdgtControllersAndModels.oscConnection.model.value == false, {
 							[this.editor.calibNumBoxes.lo, this.editor.calibNumBoxes.hi].do(_.enabled_(true));
 						})
 					})
@@ -471,16 +471,16 @@ CVWidgetKnob : CVWidget {
 
 		calibBut.action_({ |cb|
 			cb.value.switch(
-				0, { wdgtControllersAndModels.calibModelController.model.value_(true).changed(\value) },
-				1, { wdgtControllersAndModels.calibModelController.model.value_(false).changed(\value) }
+				0, { wdgtControllersAndModels.calibration.model.value_(true).changed(\value) },
+				1, { wdgtControllersAndModels.calibration.model.value_(false).changed(\value) }
 			)
 		});
 		
-		wdgtControllersAndModels.specModelController.controller ?? {
-			wdgtControllersAndModels.specModelController.controller = SimpleController(wdgtControllersAndModels.specModelController.model);
+		wdgtControllersAndModels.cvSpec.controller ?? {
+			wdgtControllersAndModels.cvSpec.controller = SimpleController(wdgtControllersAndModels.cvSpec.model);
 		};
 		
-		wdgtControllersAndModels.specModelController.controller.put(\value, { |theChanger, what, moreArgs|
+		wdgtControllersAndModels.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
 			if(theChanger.value.minval <= 0.0 or:{
 				theChanger.value.maxval <= 0.0
 			}, {
@@ -518,11 +518,11 @@ CVWidgetKnob : CVWidget {
 			}
 		});
 		
-		wdgtControllersAndModels.oscInputRangeModelController.controller ?? {
-			wdgtControllersAndModels.oscInputRangeModelController.controller = SimpleController(wdgtControllersAndModels.oscInputRangeModelController.model);
+		wdgtControllersAndModels.oscInputRange.controller ?? {
+			wdgtControllersAndModels.oscInputRange.controller = SimpleController(wdgtControllersAndModels.oscInputRange.model);
 		};
 
-		wdgtControllersAndModels.oscInputRangeModelController.controller.put(\value, { |theChanger, what, moreArgs|
+		wdgtControllersAndModels.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
 			if(theChanger.value[0] <= 0 or:{
 				theChanger.value[1] <= 0
 			}, {
@@ -573,11 +573,11 @@ CVWidgetKnob : CVWidget {
 			})
 		});
 
-		wdgtControllersAndModels.oscConnectionModelController.controller ?? {
-			wdgtControllersAndModels.oscConnectionModelController.controller = SimpleController(wdgtControllersAndModels.oscConnectionModelController.model);
+		wdgtControllersAndModels.oscConnection.controller ?? {
+			wdgtControllersAndModels.oscConnection.controller = SimpleController(wdgtControllersAndModels.oscConnection.model);
 		};
 
-		wdgtControllersAndModels.oscConnectionModelController.controller.put(\value, { |theChanger, what, moreArgs|
+		wdgtControllersAndModels.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
 			if(theChanger.value.size == 2, {
 				this.oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, { |t, r, msg|
 					if(prCalibrate, { 
@@ -586,15 +586,15 @@ CVWidgetKnob : CVWidget {
 						}, {
 							if(msg[theChanger.value[1]] < calibConstraints.lo, { 
 								calibConstraints.lo = msg[theChanger.value[1]];
-								wdgtControllersAndModels.oscInputRangeModelController.model.value_([
+								wdgtControllersAndModels.oscInputRange.model.value_([
 									msg[theChanger.value[1]], 
-									wdgtControllersAndModels.oscInputRangeModelController.model.value[1]
+									wdgtControllersAndModels.oscInputRange.model.value[1]
 								]).changed(\value);
 							});
 							if(msg[theChanger.value[1]] > calibConstraints.hi, {
 								calibConstraints.hi = msg[theChanger.value[1]];
-								wdgtControllersAndModels.oscInputRangeModelController.model.value_([
-									wdgtControllersAndModels.oscInputRangeModelController.model.value[0], 
+								wdgtControllersAndModels.oscInputRange.model.value_([
+									wdgtControllersAndModels.oscInputRange.model.value[0], 
 									msg[theChanger.value[1]]
 								]).changed(\value);
 							});
@@ -603,7 +603,7 @@ CVWidgetKnob : CVWidget {
 						this.mapConstrainterHi.value_(calibConstraints.hi);
 					}, {
 						if(calibConstraints.isNil, {
-							calibConstraints = (lo: wdgtControllersAndModels.oscInputRangeModelController.model.value[0], hi: wdgtControllersAndModels.oscInputRangeModelController.model.value[1]);
+							calibConstraints = (lo: wdgtControllersAndModels.oscInputRange.model.value[0], hi: wdgtControllersAndModels.oscInputRange.model.value[1]);
 						})	
 					});
 					thisCV.value_(
@@ -636,7 +636,7 @@ CVWidgetKnob : CVWidget {
 				oscEditBut.states_([
 					["edit OSC", Color.black, Color.clear]
 				]);
-				wdgtControllersAndModels.oscInputRangeModelController.model.value_([0.00001, 0.00001]).changed(\value);
+				wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
 				this.calibConstraints_(nil);
 				if(this.editor.notNil and:{
 					this.editor.isClosed.not
@@ -644,10 +644,10 @@ CVWidgetKnob : CVWidget {
 					this.editor.connectorBut.value_(0);
 					this.editor.nameField.enabled_(true);
 					this.editor.inputConstraintLoField.value_(
-						wdgtControllersAndModels.oscInputRangeModelController.model.value[0];
+						wdgtControllersAndModels.oscInputRange.model.value[0];
 					);
 					this.editor.inputConstraintHiField.value_(
-						wdgtControllersAndModels.oscInputRangeModelController.model.value[1];
+						wdgtControllersAndModels.oscInputRange.model.value[1];
 					);
 					if(prCalibrate.not, {
 						[this.editor.inputConstraintLoField, this.editor.inputConstraintHiField].do(_.enabled_(true));
@@ -670,7 +670,7 @@ CVWidgetKnob : CVWidget {
 		if(bool.isKindOf(Boolean).not, {
 			Error("calibration can only be set to true or false!").throw;
 		});
-		wdgtControllersAndModels.calibModelController.model.value_(bool).changed(\value);
+		wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
 	}
 	
 	calibrate {
@@ -681,7 +681,7 @@ CVWidgetKnob : CVWidget {
 		if(spec.isKindOf(ControlSpec).not, {
 			Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
 		});
-		wdgtControllersAndModels.specModelController.model.value_(spec).changed(\value);
+		wdgtControllersAndModels.cvSpec.model.value_(spec).changed(\value);
 	}
 	
 	spec {
@@ -699,11 +699,11 @@ CVWidgetKnob : CVWidget {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		}, {
 			prOSCMapping = mapping.asSymbol;
-			wdgtControllersAndModels.oscInputRangeModelController.model.value_(
-				wdgtControllersAndModels.oscInputRangeModelController.model.value;
+			wdgtControllersAndModels.oscInputRange.model.value_(
+				wdgtControllersAndModels.oscInputRange.model.value;
 			).changed(\value);
-			wdgtControllersAndModels.specModelController.model.value_(
-				wdgtControllersAndModels.specModelController.model.value;
+			wdgtControllersAndModels.cvSpec.model.value_(
+				wdgtControllersAndModels.cvSpec.model.value;
 			).changed(\value);
 		})
 	}
@@ -719,12 +719,12 @@ CVWidgetKnob : CVWidget {
 		if(oscMsgIndex.isKindOf(Integer).not, {
 			Error("You have to supply an integer as third argument to oscConnect").throw;
 		});
-		wdgtControllersAndModels.oscConnectionModelController.model.value_([name, oscMsgIndex]).changed(\value);
+		wdgtControllersAndModels.oscConnection.model.value_([name, oscMsgIndex]).changed(\value);
 	}
 	
 	oscDisconnect {
-		wdgtControllersAndModels.oscConnectionModelController.model.value_(false).changed(\value);
-		wdgtControllersAndModels.oscInputRangeModelController.model.value_([0.00001, 0.00001]).changed(\value);
+		wdgtControllersAndModels.oscConnection.model.value_(false).changed(\value);
+		wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
 	}
 	
 	front {
@@ -982,12 +982,12 @@ CVWidget2D : CVWidget {
 		hilo ?? { Error("Please provide the CV's key \(\hi or \lo\)!").throw };
 		if(hilo.asSymbol === \hi, {
 			this.oscResponderHi.remove;
-//			this.oscInputRangeModelHi_(`[0.0, 0.0]);
+//			this.oscInputRangeRangeModelHi_(`[0.0, 0.0]);
 			this.calibConstraintsHi_(nil);	
 		});
 		if(hilo.asSymbol === \lo, {
 			this.oscResponderLo.remove;
-//			this.oscInputRangeModelLo_(`[0.0, 0.0]);
+//			this.oscInputRangeRangeModelLo_(`[0.0, 0.0]);
 			this.calibConstraintsLo_(nil);	
 		})
 	}
