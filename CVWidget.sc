@@ -187,7 +187,7 @@ CVWidgetKnob : CVWidget {
 	var <window, <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl;
 	var <>cc, spec;
 	var <oscEditBut, <calibBut, <>editor;
-	var prOSCMapping = \linlin, <>calibConstraints, <>oscResponder;
+	var prOSCMapping = \linlin, <>calibConstraints, oscResponder;
 	var <>mapConstrainterLo, <>mapConstrainterHi;
 
 	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
@@ -208,6 +208,8 @@ CVWidgetKnob : CVWidget {
 		var flow, thisXY, thisWidth, thisHeight, knobsize, meanVal, widgetSpecsActions, editor, cvString;
 		var nextY, knobX, knobY;
 		var tmpSetup, tmpMapping;
+		
+//		("OSCresponder:"+oscResponder).postln;
 		
 		if(cv.isNil, {
 			thisCV = CV.new;
@@ -288,6 +290,7 @@ CVWidgetKnob : CVWidget {
 						CVWidgetEditor.allEditors.removeAt(name.asSymbol)
 					};
 				});
+				oscResponder !? { oscResponder.remove };
 				wdgtControllersAndModels.do({ |mc| mc.controller.remove });
 			})
 		};
@@ -579,7 +582,7 @@ CVWidgetKnob : CVWidget {
 
 		wdgtControllersAndModels.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
 			if(theChanger.value.size == 2, {
-				this.oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, { |t, r, msg|
+				oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, { |t, r, msg|
 					if(prCalibrate, { 
 						if(calibConstraints.isNil, {
 							calibConstraints = (lo: msg[theChanger.value[1]], hi: msg[theChanger.value[1]]);
@@ -632,7 +635,7 @@ CVWidgetKnob : CVWidget {
 				oscEditBut.refresh;
 			});
 			if(theChanger.value == false, {
-				this.oscResponder.remove;
+				oscResponder.remove;
 				oscEditBut.states_([
 					["edit OSC", Color.black, Color.clear]
 				]);
