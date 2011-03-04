@@ -137,12 +137,12 @@ CVWidgetKnob : CVWidget {
 		knobsize = thisHeight-2-130;
 		if(knobsize >= thisWidth, {
 			knobsize = thisWidth;
-			knobY = 16+(thisHeight-128-knobsize/2);
+			knobY = thisXY.y+16+(thisHeight-128-knobsize/2);
 			knobX = thisXY.x;
 		}, {
 			knobsize = thisHeight-128;
 			knobX = thisWidth-knobsize/2+thisXY.x;
-			knobY = 16;
+			knobY = thisXY.y+16;
 		});			
 		knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
 			.canFocus_(false)
@@ -152,7 +152,7 @@ CVWidgetKnob : CVWidget {
 				if(thisCV.spec == symbol.asSpec, { break.value(knob.centered_(true)) });
 			})
 		};
-		nextY = thisHeight-117;
+		nextY = thisXY.y+thisHeight-117;
 		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(thisCV.value)
 		;
