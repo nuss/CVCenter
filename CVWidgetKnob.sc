@@ -22,11 +22,11 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	init { |parentView, cv, name, bounds, action, setUpArgs, controllersAndModels, cvcGui, server|
-		var flow, thisXY, thisWidth, thisHeight, knobsize, meanVal, widgetSpecsActions, cvString;
+		var flow, thisname, thisXY, thisWidth, thisHeight, knobsize, meanVal, widgetSpecsActions, cvString;
 		var nextY, knobX, knobY;
 		var tmpSetup, tmpMapping;
 		
-//		("OSCresponder:"+oscResponder).postln;
+		if(name.isNil, { thisname = "knob" }, { thisname = name });
 		
 		if(cv.isNil, {
 			thisCV = CV.new;
@@ -91,7 +91,7 @@ CVWidgetKnob : CVWidget {
 		});
 		
 		if(parentView.isNil, {
-			window = Window(name, Rect(50, 50, thisWidth+14, thisHeight+7), server: server);
+			window = Window(thisname, Rect(50, 50, thisWidth+14, thisHeight+7), server: server);
 		}, {
 			window = parentView;
 		});
@@ -103,9 +103,11 @@ CVWidgetKnob : CVWidget {
 				}, {
 					editor.close;
 				}, {
-					CVWidgetEditor.allEditors[name.asSymbol] !? {
-						CVWidgetEditor.allEditors.removeAt(name.asSymbol)
-					};
+					if(CVWidgetEditor.allEditors.notNil and:{
+						CVWidgetEditor.allEditors[thisname.asSymbol]
+					}, {
+						CVWidgetEditor.allEditors.removeAt(thisname.asSymbol)
+					});
 				});
 				oscResponder !? { oscResponder.remove };
 				wdgtControllersAndModels.do({ |mc| mc.controller.remove });
@@ -118,8 +120,8 @@ CVWidgetKnob : CVWidget {
 		;
 		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
 			.states_([
-				[""+name.asString, Color.white, Color.blue],
-				[""+name.asString, Color.black, Color.yellow],
+				[""+thisname.asString, Color.white, Color.blue],
+				[""+thisname.asString, Color.black, Color.yellow],
 			])
 			.font_(Font("Helvetica", 9))
 			.action_({ |b|
@@ -130,7 +132,7 @@ CVWidgetKnob : CVWidget {
 			.background_(Color.white)
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
-			.value_(name.asString)
+			.value_(thisname.asString)
 			.action_({ |nf| nf.value_(nf.value) })
 			.visible_(false)
 		;
@@ -163,7 +165,7 @@ CVWidgetKnob : CVWidget {
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
 			.action_({ |btn|
 				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, name, 0);
+					editor = CVWidgetEditor(this, thisname, 0);
 				}, {
 					editor.front(0)
 				});
@@ -179,7 +181,7 @@ CVWidgetKnob : CVWidget {
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
 			.action_({ |ms|
 				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, name, 1);
+					editor = CVWidgetEditor(this, thisname, 1);
 				}, {
 					editor.front(1)
 				});
@@ -231,7 +233,7 @@ CVWidgetKnob : CVWidget {
 			])
 			.action_({ |oscb|
 				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, name, 2);
+					editor = CVWidgetEditor(this, thisname, 2);
 				}, {
 					editor.front(2)
 				});
