@@ -4,8 +4,8 @@ CVWidgetKnob : CVWidget {
 	var <window, <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl;
 	var <>cc, spec;
 	var <oscEditBut, <calibBut, <editor;
-	var prOSCMapping = \linlin, <>calibConstraints, oscResponder;
-	var <>mapConstrainterLo, <>mapConstrainterHi;
+	var prOSCMapping = \linlin, prCalibConstraints, oscResponder;
+	var mapConstrainterLo, mapConstrainterHi;
 
 	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
 		^super.new.init(
@@ -68,7 +68,7 @@ CVWidgetKnob : CVWidget {
 			wdgtControllersAndModels.oscInputRange = ();
 		};
 		wdgtControllersAndModels.oscInputRange.model ?? {
-			wdgtControllersAndModels.oscInputRange.model = Ref([0.00001, 0.00001]);
+			wdgtControllersAndModels.oscInputRange.model = Ref([0.0001, 0.0001]);
 		};
 		wdgtControllersAndModels.oscConnection ?? {
 			wdgtControllersAndModels.oscConnection = ();
@@ -77,8 +77,12 @@ CVWidgetKnob : CVWidget {
 			wdgtControllersAndModels.oscConnection.model = Ref(false);
 		};
 		
-		this.mapConstrainterLo ?? { this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0)) };
-		this.mapConstrainterHi ?? { this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0)) };
+		mapConstrainterLo ?? { 
+			mapConstrainterLo = CV([-inf, inf].asSpec, wdgtControllersAndModels.oscInputRange.model.value[0]);
+		};
+		mapConstrainterHi ?? { 
+			mapConstrainterHi = CV([-inf, inf].asSpec, wdgtControllersAndModels.oscInputRange.model.value[1]);
+		};
 		
 		if(bounds.isNil, {		
 			thisXY = 7@0;
@@ -238,8 +242,8 @@ CVWidgetKnob : CVWidget {
 					editor.front(2)
 				});
 				editor.calibNumBoxes !? {
-					this.mapConstrainterLo.connect(editor.calibNumBoxes.lo);
-					this.mapConstrainterHi.connect(editor.calibNumBoxes.hi);
+					mapConstrainterLo.connect(editor.calibNumBoxes.lo);
+					mapConstrainterHi.connect(editor.calibNumBoxes.hi);
 				};
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value;
@@ -267,24 +271,32 @@ CVWidgetKnob : CVWidget {
 					calibBut.value_(0);
 					if(editor.notNil and:{ editor.isClosed.not }, {
 						editor.calibBut.value_(0);
-						this.mapConstrainterLo ?? { 
-							this.mapConstrainterLo_(CV([-inf, inf].asSpec, 0.0));
-							this.mapConstrainterLo.connect(editor.calibNumBoxes.lo);
+						mapConstrainterLo ?? { 
+							mapConstrainterLo = CV([-inf, inf].asSpec, 0.00001);
+							mapConstrainterLo.connect(editor.calibNumBoxes.lo);
 						};
-						this.mapConstrainterHi ?? { 
-							this.mapConstrainterHi_(CV([-inf, inf].asSpec, 0.0));
-							this.mapConstrainterHi.connect(editor.calibNumBoxes.hi);
+						mapConstrainterHi ?? { 
+							mapConstrainterHi = CV([-inf, inf].asSpec, 0.00001);
+							mapConstrainterHi.connect(editor.calibNumBoxes.hi);
 						};
-						[editor.calibNumBoxes.lo, editor.calibNumBoxes.hi].do(_.enabled_(false))
+						[editor.calibNumBoxes.lo, editor.calibNumBoxes.hi].do({ |nb| 
+							nb.enabled_(false);
+							nb.action_(nil);
+						})
 					})
 				},
 				false, { 
 					calibBut.value_(1);
 					if(editor.notNil and:{ editor.isClosed.not }, {
 						editor.calibBut.value_(1);
-						[this.mapConstrainterLo, this.mapConstrainterHi].do({ |cv| cv = nil; });
-						if(wdgtControllersAndModels.oscConnection.model.value == false, {
-							[editor.calibNumBoxes.lo, editor.calibNumBoxes.hi].do(_.enabled_(true));
+						[mapConstrainterLo, mapConstrainterHi].do({ |cv| cv = nil; });
+						[editor.calibNumBoxes.lo, editor.calibNumBoxes.hi].do({ |nb| 
+							nb.enabled_(true);
+							nb.action_({ |b| 
+								this.oscInputConstraints_(
+									editor.calibNumBoxes.lo.value@editor.calibNumBoxes.hi.value;
+								) 
+							})
 						})
 					})
 				}
@@ -403,35 +415,35 @@ CVWidgetKnob : CVWidget {
 			if(theChanger.value.size == 2, {
 				oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, { |t, r, msg|
 					if(prCalibrate, { 
-						if(calibConstraints.isNil, {
-							calibConstraints = (lo: msg[theChanger.value[1]], hi: msg[theChanger.value[1]]);
+						if(prCalibConstraints.isNil, {
+							prCalibConstraints = (lo: msg[theChanger.value[1]], hi: msg[theChanger.value[1]]);
 						}, {
-							if(msg[theChanger.value[1]] < calibConstraints.lo, { 
-								calibConstraints.lo = msg[theChanger.value[1]];
+							if(msg[theChanger.value[1]] < prCalibConstraints.lo, { 
+								prCalibConstraints.lo = msg[theChanger.value[1]];
 								wdgtControllersAndModels.oscInputRange.model.value_([
 									msg[theChanger.value[1]], 
 									wdgtControllersAndModels.oscInputRange.model.value[1]
 								]).changed(\value);
 							});
-							if(msg[theChanger.value[1]] > calibConstraints.hi, {
-								calibConstraints.hi = msg[theChanger.value[1]];
+							if(msg[theChanger.value[1]] > prCalibConstraints.hi, {
+								prCalibConstraints.hi = msg[theChanger.value[1]];
 								wdgtControllersAndModels.oscInputRange.model.value_([
 									wdgtControllersAndModels.oscInputRange.model.value[0], 
 									msg[theChanger.value[1]]
 								]).changed(\value);
 							});
 						});
-						this.mapConstrainterLo.value_(calibConstraints.lo);
-						this.mapConstrainterHi.value_(calibConstraints.hi);
+						mapConstrainterLo.value_(prCalibConstraints.lo);
+						mapConstrainterHi.value_(prCalibConstraints.hi);
 					}, {
-						if(calibConstraints.isNil, {
-							calibConstraints = (lo: wdgtControllersAndModels.oscInputRange.model.value[0], hi: wdgtControllersAndModels.oscInputRange.model.value[1]);
-						})	
+						if(prCalibConstraints.isNil, {
+							prCalibConstraints = (lo: wdgtControllersAndModels.oscInputRange.model.value[0], hi: wdgtControllersAndModels.oscInputRange.model.value[1]);
+						})
 					});
 					thisCV.value_(
 						msg[theChanger.value[1]].perform(
 							prOSCMapping,
-							calibConstraints.lo, calibConstraints.hi,
+							prCalibConstraints.lo, prCalibConstraints.hi,
 							this.spec.minval, this.spec.maxval,
 							\minmax
 						)
@@ -458,8 +470,8 @@ CVWidgetKnob : CVWidget {
 				oscEditBut.states_([
 					["edit OSC", Color.black, Color.clear]
 				]);
-				wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
-				this.calibConstraints_(nil);
+				wdgtControllersAndModels.oscInputRange.model.value_([0.0001, 0.0001]).changed(\value);
+				prCalibConstraints = nil;
 				if(editor.notNil and:{
 					editor.isClosed.not
 				}, {
@@ -531,7 +543,25 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	oscMapping {
-		^prOSCMapping;	
+		^prOSCMapping;
+	}
+	
+	oscInputConstraints_ { |constraintsHiLo|
+//		[constraintsHiLo.class, constraintsHiLo.size, constraintsHiLo.select({ |num| num.isNumber })].postln;
+		if(constraintsHiLo.isKindOf(Point).not, {
+			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
+		}, {
+			this.calibrate_(false);
+			prCalibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
+			if(editor.notNil and:{ editor.isClosed.not }, {
+				mapConstrainterLo.value_(constraintsHiLo.x);
+				mapConstrainterHi.value_(constraintsHiLo.y);
+			})
+		})
+	}
+	
+	oscInputConstraints {
+		^[prCalibConstraints.lo, prCalibConstraints.hi];
 	}
 	
 	oscConnect { |name, oscMsgIndex|
@@ -542,6 +572,7 @@ CVWidgetKnob : CVWidget {
 			Error("You have to supply an integer as third argument to oscConnect").throw;
 		});
 		wdgtControllersAndModels.oscConnection.model.value_([name, oscMsgIndex]).changed(\value);
+		CmdPeriod.add({ this.oscDisconnect });
 	}
 	
 	oscDisconnect {
