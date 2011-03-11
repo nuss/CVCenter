@@ -102,7 +102,7 @@ CVWidgetKnob : CVWidget {
 				
 		cvcGui ?? { 
 			window.onClose_({
-				if(editor.notNil and:{
+				if(editor.notNil or:{
 					editor.isClosed.not
 				}, {
 					editor.close;
