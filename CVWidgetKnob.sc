@@ -1,4 +1,4 @@
-/* midi-refactoring */
+/* new branch: 'midi_refactoring' - midi-connections should be handled analoguesly to OSC-handling - within a MVC-logic. Moreover, there shouldn't be a new CCResponder created for each new connection, rather this should be handled within the CCResponder's function (to be investigated in depth. */
 
 CVWidgetKnob : CVWidget {
 
