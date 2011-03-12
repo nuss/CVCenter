@@ -1,3 +1,5 @@
+/* midi-refactoring */
+
 CVWidgetKnob : CVWidget {
 
 	var thisCV;
