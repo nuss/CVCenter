@@ -2,11 +2,10 @@
 
 CVWidgetKnob : CVWidget {
 
-	var thisCV;
+	var thisCV, <>cc /* keep this for now but that might change ... */;
 	var <window, <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl;
-	var <>cc, spec;
 	var <oscEditBut, <calibBut, <editor;
-	var prOSCMapping = \linlin, prCalibConstraints, oscResponder;
+	var prSpec, prOSCMapping = \linlin, prCalibConstraints, oscResponder;
 	var mapConstrainterLo, mapConstrainterHi;
 
 	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
@@ -78,7 +77,13 @@ CVWidgetKnob : CVWidget {
 		wdgtControllersAndModels.oscConnection.model ?? {
 			wdgtControllersAndModels.oscConnection.model = Ref(false);
 		};
-		
+		wdgtControllersAndModels.midiConnection ?? {
+			wdgtControllersAndModels.midiConnection = ();
+		};
+		wdgtControllersAndModels.midiConnection.model ?? {
+			wdgtControllersAndModels.midiConnection.model = Ref((learn: "L", src: "source", chan: "chan", num: "ctrl"));
+		};
+
 		mapConstrainterLo ?? { 
 			mapConstrainterLo = CV([-inf, inf].asSpec, wdgtControllersAndModels.oscInputRange.model.value[0]);
 		};
@@ -514,10 +519,10 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	spec_ { |spec|
-		if(spec.isKindOf(ControlSpec).not, {
+		if(prSpec.isKindOf(ControlSpec).not, {
 			Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
 		});
-		wdgtControllersAndModels.cvSpec.model.value_(spec).changed(\value);
+		wdgtControllersAndModels.cvSpec.model.value_(prSpec).changed(\value);
 	}
 	
 	spec {
