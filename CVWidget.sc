@@ -77,14 +77,14 @@ CVWidget {
 
 	// private
 	prCCResponderAdd { |cv, learnBut, srcField, chanField, ctrlField, headBut, key| 
-		var cc;
+		var tmpcc;
 		learnBut.action_({ |but|
 			{
 				loop {
 					0.01.wait;
 					if(but.value == 1, {
 //						"adding a new CCResponder".postln;
-						cc = CCResponder({ |src, chan, ctrl, val|
+						tmpcc = CCResponder({ |src, chan, ctrl, val|
 							var ctrlString, meanVal;
 //							[src, chan, ctrl, val].postln;
 							ctrlString ? ctrlString = ctrl+1;
@@ -132,13 +132,13 @@ CVWidget {
 								}
 							}.defer;
 						});
-						cc.learn;
+						tmpcc.learn;
 						key.switch(
-							\hi, { this.ccHi = cc },
-							\lo, { this.ccLo = cc },
-							{ this.cc = cc }
+							\hi, { this.ccHi = tmpcc },
+							\lo, { this.ccLo = tmpcc },
+							{ this.cc = tmpcc }
 						);
-//						oneShot = this.cc.oneShotLearn;
+//						oneShot = cc.oneShotLearn;
 						nil.yield;
 					}, {
 //						"no CCResponder yet or just removing the existing one".postln;
@@ -174,7 +174,7 @@ CVWidget {
 				}
 			}.fork(AppClock);
 		})
-		^cc;
+		^tmpcc;
 	}
 
 }

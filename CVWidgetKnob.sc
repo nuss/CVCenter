@@ -2,7 +2,7 @@
 
 CVWidgetKnob : CVWidget {
 
-	var thisCV, <>cc /* keep this for now but that might change ... */;
+	var thisCV, <cc, <midisrc, <midichan, <midinum /* keep this for now but that might change ... */;
 	var <window, <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl;
 	var <oscEditBut, <calibBut, <editor;
 	var prSpec, prOSCMapping = \linlin, prCalibConstraints, oscResponder;
@@ -23,9 +23,11 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	init { |parentView, cv, name, bounds, action, setUpArgs, controllersAndModels, cvcGui, server|
-		var flow, thisname, thisXY, thisWidth, thisHeight, knobsize, meanVal, widgetSpecsActions, cvString;
+		var flow, thisname, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions, cvString;
 		var nextY, knobX, knobY;
 		var tmpSetup, tmpMapping;
+		var makeCCResponder, ccResponder;
+		var ctrlString, meanVal;
 		
 		if(name.isNil, { thisname = "knob" }, { thisname = name });
 		
@@ -81,8 +83,14 @@ CVWidgetKnob : CVWidget {
 			wdgtControllersAndModels.midiConnection = ();
 		};
 		wdgtControllersAndModels.midiConnection.model ?? {
-			wdgtControllersAndModels.midiConnection.model = Ref((learn: "L", src: "source", chan: "chan", num: "ctrl"));
+			wdgtControllersAndModels.midiConnection.model = Ref(nil);
 		};
+		wdgtControllersAndModels.midiDisplay ?? {
+			wdgtControllersAndModels.midiDisplay = ();
+		};
+		wdgtControllersAndModels.midiDisplay.model ?? {
+			wdgtControllersAndModels.midiDisplay.model = Ref((src: "source", chan: "chan", ctrl: "ctrl", learn: "L"));
+		};	
 
 		mapConstrainterLo ?? { 
 			mapConstrainterLo = CV([-inf, inf].asSpec, wdgtControllersAndModels.oscInputRange.model.value[0]);
@@ -109,16 +117,16 @@ CVWidgetKnob : CVWidget {
 				
 		cvcGui ?? { 
 			window.onClose_({
-				if(editor.notNil or:{
-					editor.isClosed.not
-				}, {
-					editor.close;
-				}, {
-					if(CVWidgetEditor.allEditors.notNil and:{
-						CVWidgetEditor.allEditors[thisname.asSymbol]
+				if(editor.notNil, {
+					if(editor.isClosed.not, {
+						editor.close;
 					}, {
-						CVWidgetEditor.allEditors.removeAt(thisname.asSymbol)
-					});
+						if(CVWidgetEditor.allEditors.notNil and:{
+							CVWidgetEditor.allEditors[thisname.asSymbol].notNil;
+						}, {
+							CVWidgetEditor.allEditors.removeAt(thisname.asSymbol)
+						})
+					})
 				});
 				oscResponder !? { oscResponder.remove };
 				wdgtControllersAndModels.do({ |mc| mc.controller.remove });
@@ -214,7 +222,7 @@ CVWidgetKnob : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_("source")
-			.canFocus_(false)
+//			.canFocus_(false)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		;
@@ -223,7 +231,7 @@ CVWidgetKnob : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_("chan")
-			.canFocus_(false)
+//			.canFocus_(false)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		;
@@ -231,7 +239,7 @@ CVWidgetKnob : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_("ctrl")
-			.canFocus_(false)
+//			.canFocus_(false)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
 		;
@@ -413,6 +421,129 @@ CVWidgetKnob : CVWidget {
 				})
 			})
 		});
+		
+		wdgtControllersAndModels.midiConnection.controller ?? {
+			wdgtControllersAndModels.midiConnection.controller = SimpleController(wdgtControllersAndModels.midiConnection.model);
+		};
+		
+		wdgtControllersAndModels.midiConnection.controller.put(\value, { |theChanger, what, moreArgs|
+			if(theChanger.value.isKindOf(Event), {
+				makeCCResponder = { |argSrc, argChan, argNum|
+					CCResponder({ |src, chan, num, val|
+						ctrlString ? ctrlString = num+1;
+						if(this.ctrlButtonBank.notNil, {
+							if(ctrlString%this.ctrlButtonBank == 0, {
+								ctrlString = this.ctrlButtonBank.asString;
+							}, {
+								ctrlString = (ctrlString%this.ctrlButtonBank).asString;
+							});
+							ctrlString = ((num+1/this.ctrlButtonBank).ceil).asString++":"++ctrlString;
+						}, {
+							ctrlString = num+1;
+						});
+	
+						this.midimode.switch(
+							0, { 
+								if(val/127 < (cv.input+(softWithin/2)) and: {
+									val/127 > (cv.input-(softWithin/2));
+								}, { 
+									cv.input_(val/127);
+								})
+							},
+							1, { 
+								meanVal = this.midimean;
+								cv.input_(cv.input+((val-meanVal)/127*this.midiresolution)) 
+							}
+						);
+						src !? { midisrc = src };
+						chan !? { midichan = chan };
+						num !? { midinum = ctrlString };
+					}, argSrc, argChan, argNum, nil);
+				};
+				
+				fork {
+					block { |break|
+						loop {
+							0.01.wait;
+							if(midisrc.notNil and:{
+								midichan.notNil and:{
+									midinum.notNil;
+								}
+							}, {
+								break.value(
+									wdgtControllersAndModels.midiDisplay.model.value_(
+										(src: midisrc, chan: midichan, ctrl: midinum, learn: "X")
+									).changed(\value)
+								)
+							})
+						}
+					}
+				};
+
+				if(theChanger.value.isEmpty, {
+					cc = makeCCResponder.().learn;
+				}, {
+					cc = makeCCResponder.(theChanger.value.src, theChanger.value.chan, theChanger.value.num);
+				})
+			}, {
+				cc.remove;
+				cc = nil;
+				wdgtControllersAndModels.midiDisplay.model.value_(
+					(src: "source", chan: "chan", ctrl: "ctrl", learn: "L")
+				).changed(\value);
+				midisrc = nil; midichan = nil; midinum = nil;
+			})
+		});
+		
+		wdgtControllersAndModels.midiDisplay.controller ?? {
+			wdgtControllersAndModels.midiDisplay.controller = SimpleController(wdgtControllersAndModels.midiDisplay.model);
+		};
+		
+		wdgtControllersAndModels.midiDisplay.controller.put(\value, { |theChanger, what, moreArgs|
+			theChanger.value.learn.switch(
+				"X", {
+					defer {
+						midiSrc.string_(theChanger.value.src.asString)
+							.background_(Color.red)
+							.stringColor_(Color.white)
+							.canFocus_(false)
+						;
+						midiChan.string_((theChanger.value.chan+1).asString)
+							.background_(Color.red)
+							.stringColor_(Color.white)
+							.canFocus_(false)
+						;
+						midiCtrl.string_(theChanger.value.ctrl)
+							.background_(Color.red)
+							.stringColor_(Color.white)
+							.canFocus_(false)
+						;
+						midiLearn.value_(1)
+					}
+				},
+				"C", {},
+				"L", {
+					defer {
+						midiSrc.string_(theChanger.value.src)
+							.background_(Color.white)
+							.stringColor_(Color.black)
+							.canFocus_(true)
+						;
+						midiChan.string_(theChanger.value.chan)
+							.background_(Color.white)
+							.stringColor_(Color.black)
+							.canFocus_(true)
+						;
+						midiCtrl.string_(theChanger.value.ctrl)
+							.background_(Color.white)
+							.stringColor_(Color.black)
+							.canFocus_(true)
+						;
+						midiLearn.value_(0)
+					}
+				}
+			)
+		});
 
 		wdgtControllersAndModels.oscConnection.controller ?? {
 			wdgtControllersAndModels.oscConnection.controller = SimpleController(wdgtControllersAndModels.oscConnection.model);
@@ -497,7 +628,7 @@ CVWidgetKnob : CVWidget {
 					editor.connectorBut.value_(0);
 				});
 				oscEditBut.refresh;
-			});
+			})
 		});
 		
 		this.prCCResponderAdd(thisCV, midiLearn, midiSrc, midiChan, midiCtrl, midiHead);
@@ -554,7 +685,6 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	oscInputConstraints_ { |constraintsHiLo|
-//		[constraintsHiLo.class, constraintsHiLo.size, constraintsHiLo.select({ |num| num.isNumber })].postln;
 		if(constraintsHiLo.isKindOf(Point).not, {
 			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
 		}, {
@@ -585,6 +715,28 @@ CVWidgetKnob : CVWidget {
 	oscDisconnect {
 		wdgtControllersAndModels.oscConnection.model.value_(false).changed(\value);
 		wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
+	}
+	
+	// if all arguments are nil .learn should be triggered
+	midiConnect { |uid, chan, num|
+		var args;
+		if(this.cc.isNil, {
+			args = [uid, chan, num].select({ |param| param.notNil });
+			if(args.size < 3, {
+				args.do({ |param| 
+					if(param.isInteger.not, {
+						Error("If you provide a parameter to midiConnect it must be an Integer!").throw;
+					})
+				})
+			});
+			wdgtControllersAndModels.midiConnection.model.value_((src: uid, chan: chan, num: num)).changed(\value);
+		}, {
+			"Already connected!".warn;	
+		})
+	}
+	
+	midiDisconnect { 
+		this.cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
 	}
 	
 	front {
