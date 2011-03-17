@@ -24,6 +24,7 @@ CVWidgetKnob : CVWidget {
 	
 	init { |parentView, cv, name, bounds, action, setUpArgs, controllersAndModels, cvcGui, server|
 		var flow, thisname, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions, cvString;
+		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
 		var tmpSetup, tmpMapping;
 		var makeCCResponder, ccResponder;
@@ -209,6 +210,7 @@ CVWidgetKnob : CVWidget {
 				).changed(\value);
 			})
 		;
+		
 		midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
@@ -216,32 +218,76 @@ CVWidgetKnob : CVWidget {
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
 			])
+			.action_({ |ml|
+				ml.value.switch(
+					1, {
+						margs = [
+							[midiSrc.string, msrc], 
+							[midiChan.string, mchan], 
+							[midiCtrl.string, mctrl]
+						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
+						if(margs.select({ |i| i.notNil }).size > 0, {
+							this.midiConnect(*margs);
+						}, {
+							this.midiConnect;
+						})
+					},
+					0, { this.midiDisconnect }
+				)
+			})
 		;
 		nextY = nextY+midiLearn.bounds.height;
 		midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
-			.string_("source")
-//			.canFocus_(false)
+			.string_(msrc)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
+			.action_({ |tf|
+				if(tf.string != msrc, {
+					wdgtControllersAndModels.midiDisplay.model.value_((
+						learn: "C",
+						src: tf.string,
+						chan: wdgtControllersAndModels.midiDisplay.model.value.chan,
+						ctrl: wdgtControllersAndModels.midiDisplay.model.value.ctrl
+					)).changed(\value)
+				})
+			})
 		;
 		nextY = nextY+midiSrc.bounds.height;
 		midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
-			.string_("chan")
-//			.canFocus_(false)
+			.string_(mchan)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
+			.action_({ |tf|
+				if(tf.string != mchan, {
+					wdgtControllersAndModels.midiDisplay.model.value_((
+						learn: "C",
+						src: wdgtControllersAndModels.midiDisplay.model.value.src,
+						chan: tf.string,
+						ctrl: wdgtControllersAndModels.midiDisplay.model.value.ctrl
+					)).changed(\value)
+				})
+			})
 		;
 		midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
-			.string_("ctrl")
-//			.canFocus_(false)
+			.string_(mctrl)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
+			.action_({ |tf|
+				if(tf.string != mctrl, {
+					wdgtControllersAndModels.midiDisplay.model.value_((
+						learn: "C",
+						src: wdgtControllersAndModels.midiDisplay.model.value.src,
+						chan: wdgtControllersAndModels.midiDisplay.model.value.chan,
+						ctrl: tf.string
+					)).changed(\value)
+				})
+			})
 		;
 		nextY = nextY+midiCtrl.bounds.height+1;
 		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
@@ -521,7 +567,12 @@ CVWidgetKnob : CVWidget {
 						midiLearn.value_(1)
 					}
 				},
-				"C", {},
+				"C", {
+					midiLearn.states_([
+						["C", Color.white, Color(0.11468057974842, 0.38146154367376, 0.19677815686724)],
+						["X", Color.white, Color.red]
+					]).refresh;
+				},
 				"L", {
 					defer {
 						midiSrc.string_(theChanger.value.src)
@@ -539,7 +590,11 @@ CVWidgetKnob : CVWidget {
 							.stringColor_(Color.black)
 							.canFocus_(true)
 						;
-						midiLearn.value_(0)
+						midiLearn.states_([
+							["L", Color.white, Color.blue],
+							["X", Color.white, Color.red]
+						])
+						.value_(0).refresh;
 					}
 				}
 			)
@@ -631,7 +686,7 @@ CVWidgetKnob : CVWidget {
 			})
 		});
 		
-		this.prCCResponderAdd(thisCV, midiLearn, midiSrc, midiChan, midiCtrl, midiHead);
+//		this.prCCResponderAdd(thisCV, midiLearn, midiSrc, midiChan, midiCtrl, midiHead);
 		
 		[knob, numVal].do({ |view| thisCV.connect(view) });
 		visibleGuiEls = [knob, numVal, specBut, midiHead, midiLearn, midiSrc, midiChan, midiCtrl, oscEditBut, calibBut];
@@ -721,15 +776,10 @@ CVWidgetKnob : CVWidget {
 	midiConnect { |uid, chan, num|
 		var args;
 		if(this.cc.isNil, {
-			args = [uid, chan, num].select({ |param| param.notNil });
-			if(args.size < 3, {
-				args.do({ |param| 
-					if(param.isInteger.not, {
-						Error("If you provide a parameter to midiConnect it must be an Integer!").throw;
-					})
-				})
-			});
-			wdgtControllersAndModels.midiConnection.model.value_((src: uid, chan: chan, num: num)).changed(\value);
+			args = [uid, chan, num].select({ |param| param.notNil }).collect({ |param| param.asInt });
+			wdgtControllersAndModels.midiConnection.model.value_(
+				(src: uid, chan: chan, num: num)
+			).changed(\value);
 		}, {
 			"Already connected!".warn;	
 		})
