@@ -1,12 +1,13 @@
 /* new branch: 'midi_refactoring' - midi-connections should be handled analoguesly to OSC-handling - within a MVC-logic. Moreover, there shouldn't be a new CCResponder created for each new connection, rather this should be handled within the CCResponder's function (to be investigated in depth. */
 
 CVWidgetKnob : CVWidget {
-
+	
 	var thisCV, <cc, <midisrc, <midichan, <midinum /* keep this for now but that might change ... */;
 	var <window, <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl;
 	var <oscEditBut, <calibBut, <editor;
 	var prSpec, prOSCMapping = \linlin, prCalibConstraints, oscResponder;
 	var mapConstrainterLo, mapConstrainterHi;
+	var returnedFromActions;
 
 	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
 		^super.new.init(
@@ -50,48 +51,7 @@ CVWidgetKnob : CVWidget {
 		
 		action !? { thisCV.action_(action) };
 		
-		if(wdgtControllersAndModels.notNil, {
-			wdgtControllersAndModels = controllersAndModels;
-		}, {
-			wdgtControllersAndModels = ();
-		});
-		
-		wdgtControllersAndModels.calibration ?? {
-			wdgtControllersAndModels.calibration = ();
-		};
-		wdgtControllersAndModels.calibration.model ?? {
-			wdgtControllersAndModels.calibration.model = Ref(prCalibrate);
-		};
-		wdgtControllersAndModels.cvSpec ?? {
-			wdgtControllersAndModels.cvSpec = ();
-		};
-		wdgtControllersAndModels.cvSpec.model ?? { 
-			wdgtControllersAndModels.cvSpec.model = Ref(this.spec);
-		};
-		wdgtControllersAndModels.oscInputRange ?? {
-			wdgtControllersAndModels.oscInputRange = ();
-		};
-		wdgtControllersAndModels.oscInputRange.model ?? {
-			wdgtControllersAndModels.oscInputRange.model = Ref([0.0001, 0.0001]);
-		};
-		wdgtControllersAndModels.oscConnection ?? {
-			wdgtControllersAndModels.oscConnection = ();
-		};
-		wdgtControllersAndModels.oscConnection.model ?? {
-			wdgtControllersAndModels.oscConnection.model = Ref(false);
-		};
-		wdgtControllersAndModels.midiConnection ?? {
-			wdgtControllersAndModels.midiConnection = ();
-		};
-		wdgtControllersAndModels.midiConnection.model ?? {
-			wdgtControllersAndModels.midiConnection.model = Ref(nil);
-		};
-		wdgtControllersAndModels.midiDisplay ?? {
-			wdgtControllersAndModels.midiDisplay = ();
-		};
-		wdgtControllersAndModels.midiDisplay.model ?? {
-			wdgtControllersAndModels.midiDisplay.model = Ref((src: "source", chan: "chan", ctrl: "ctrl", learn: "L"));
-		};	
+		this.initControllersAndModels(controllersAndModels);
 
 		mapConstrainterLo ?? { 
 			mapConstrainterLo = CV([-inf, inf].asSpec, wdgtControllersAndModels.oscInputRange.model.value[0]);
@@ -241,7 +201,7 @@ CVWidgetKnob : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_(msrc)
-			.background_(Color(alpha: 0))
+			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
 				if(tf.string != msrc, {
@@ -253,13 +213,21 @@ CVWidgetKnob : CVWidget {
 					)).changed(\value)
 				})
 			})
+			.mouseDownAction_({ |tf|
+				tf.stringColor_(Color.red)
+			})
+			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+				if(unicode == 13, {
+					tf.stringColor_(Color.black);
+				})
+			}) 
 		;
 		nextY = nextY+midiSrc.bounds.height;
 		midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_(mchan)
-			.background_(Color(alpha: 0))
+			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
 				if(tf.string != mchan, {
@@ -271,12 +239,20 @@ CVWidgetKnob : CVWidget {
 					)).changed(\value)
 				})
 			})
+			.mouseDownAction_({ |tf|
+				tf.stringColor_(Color.red)
+			})
+			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+				if(unicode == 13, {
+					tf.stringColor_(Color.black);
+				})
+			}) 
 		;
 		midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_(mctrl)
-			.background_(Color(alpha: 0))
+			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
 				if(tf.string != mctrl, {
@@ -288,6 +264,15 @@ CVWidgetKnob : CVWidget {
 					)).changed(\value)
 				})
 			})
+			.mouseDownAction_({ |tf|
+				tf.stringColor_(Color.red)
+			})
+			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+				[tf, char, modifiers, unicode, keycode].postln;
+				if(unicode == 13, {
+					tf.stringColor_(Color.black);
+				})
+			}) 
 		;
 		nextY = nextY+midiCtrl.bounds.height+1;
 		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
@@ -320,6 +305,14 @@ CVWidgetKnob : CVWidget {
 				["calibrate", Color.black, Color.green]
 			])
 		;
+		
+//		returnedFromActions = this.initControllerActions(wdgtControllersAndModels);
+//
+//		thisCV = returnedFromActions.cv;
+//		cc = returnedFromActions.cc;
+//		midisrc = returnedFromActions.midisrc;
+//		midichan = returnedFromActions.midichan;
+//		midinum = returnedFromActions.midinum;
 		
 		wdgtControllersAndModels.calibration.controller ?? { 
 			wdgtControllersAndModels.calibration.controller = SimpleController(wdgtControllersAndModels.calibration.model);
@@ -685,9 +678,7 @@ CVWidgetKnob : CVWidget {
 				oscEditBut.refresh;
 			})
 		});
-		
-//		this.prCCResponderAdd(thisCV, midiLearn, midiSrc, midiChan, midiCtrl, midiHead);
-		
+				
 		[knob, numVal].do({ |view| thisCV.connect(view) });
 		visibleGuiEls = [knob, numVal, specBut, midiHead, midiLearn, midiSrc, midiChan, midiCtrl, oscEditBut, calibBut];
 		allGuiEls = [widgetBg, label, nameField, knob, numVal, specBut, midiHead, midiLearn, midiSrc, midiChan, midiCtrl, oscEditBut, calibBut]
@@ -775,7 +766,7 @@ CVWidgetKnob : CVWidget {
 	// if all arguments are nil .learn should be triggered
 	midiConnect { |uid, chan, num|
 		var args;
-		if(this.cc.isNil, {
+		if(cc.isNil, {
 			args = [uid, chan, num].select({ |param| param.notNil }).collect({ |param| param.asInt });
 			wdgtControllersAndModels.midiConnection.model.value_(
 				(src: uid, chan: chan, num: num)
@@ -786,7 +777,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	midiDisconnect { 
-		this.cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
+		cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
 	}
 	
 	front {
