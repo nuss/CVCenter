@@ -1,7 +1,7 @@
 
 CVWidget {
 
-	var <>midimode = 0, <>midimean = 64, <>midistring = "", <>ctrlButtonBank, <>midiresolution = 1, <>softWithin = 0.1;
+	var <>midimode = 0, <>midimean = 64, <>ctrlButtonBank, <>midiresolution = 1, <>softWithin = 0.1;
 	var prCalibrate = true; // OSC-calibration enabled/disabled - private
 	var visibleGuiEls, allGuiEls;
 	var <widgetBg, <label, <nameField; // elements contained in any kind of CVWidget
@@ -9,7 +9,7 @@ CVWidget {
 	var <wdgtControllersAndModels;
 
 	setup {
-		^[this.midimode, this.midiresolution, this.midimean, this.midistring, this.ctrlButtonBank, this.softwithin, prCalibrate];
+		^[this.midimode, this.midiresolution, this.midimean, this.ctrlButtonBank, this.softwithin, prCalibrate];
 	}
 	
 	visible_ { |visible|

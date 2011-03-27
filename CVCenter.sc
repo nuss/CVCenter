@@ -2,7 +2,7 @@
 CVCenter {
 
 	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
-	classvar <>midimode, <>midiresolution, <>midimean, <>midistring, <>softWithin, <numccs;
+	classvar <>midimode, <>midiresolution, <>midimean, <>softWithin, <numccs;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight; 
 	classvar /*<controlButtonKeys, */<controlButtons, <nextButtonPos;
 	classvar <>ctrlButtonBank, currentButtonStates, guiClosed = false/*, buttonProps*/;
@@ -522,7 +522,7 @@ CVCenter {
 	}
 	
 	*setup {
-		^[this.midimode, this.midiresolution, this.midimean, this.midistring, this.ctrlButtonBank, this.softWithin];
+		^[this.midimode, this.midiresolution, this.midimean, this.ctrlButtonBank, this.softWithin];
 	}
 	
 	*guiMoveTo { |point|
@@ -545,20 +545,18 @@ CVCenter {
 	
 	// private Methods - not to be used directly
 	
-	*prSetup { |argMode, argResolution, argMean, argString, argCButtonBank, argSoftWithin|
+	*prSetup { |argMode, argResolution, argMean, argCButtonBank, argSoftWithin|
 		argMode !? { this.midimode_(argMode) };
 		argResolution !? { this.midiresolution_(argResolution) };
 		argMean !? { this.midimean_(argMean) };
-		argString !? { this.midistring_(argString.asString) };
 		argCButtonBank !? { this.ctrlButtonBank_(argCButtonBank) };
 		argSoftWithin !? { this.softWithin_(argSoftWithin) };
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
-			("setup-args:"+[argMode, argResolution, argMean, argString, argCButtonBank, argSoftWithin]).postln;
+			("setup-args:"+[argMode, argResolution, argMean, argCButtonBank, argSoftWithin]).postln;
 			cvWidgets.pairsDo({ |k, wdgt| 
 				this.midimode !? { wdgt.midimode_(this.midimode) };
 				this.midiresolution !? { wdgt.midiresolution_(this.midiresolution) };
 				this.midimean !? { wdgt.midimean_(this.midimean) };
-				this.midistring !? { wdgt.midistring_(this.midistring.asString) };
 				wdgt.ctrlButtonBank_(this.ctrlButtonBank);
 				this.softWithin !? { wdgt.softWithin_(this.softWithin) };
 			})

@@ -1,6 +1,8 @@
 CVWidgetEditor {
 	classvar <allEditors;
 	var <window, <tabs;
+	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonField, <midiResolutionNB;
+	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut, <calibNumBoxes;
 	var <nameField, <indexField;
 	var <inputConstraintLoField, <inputConstraintHiField;
@@ -17,12 +19,13 @@ CVWidgetEditor {
 		var tabs, specsList, specsActions, editor, cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var addr;
+		var midiModes;
 		var mappingSelectItems/*, mappingModes*/;
 		
 		name = widgetName.asSymbol;
 		
 		widget ?? {
-			Error("CVWidgetEditor is a utility-class that should only be used in connection with an existing CVWidget").throw;
+			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
 		};
 
 		staticTextFont = Font(Font.defaultSansFace, 10);
@@ -157,6 +160,101 @@ CVWidgetEditor {
 
 			allEditors[name].tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			allEditors[name].tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			
+			// MIDI editing
+			
+			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+40@15)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("MIDI-mode: 0-127 or in/decremental")
+			;
+			
+			flow1.shift(5, 0);
+			
+			midiModes = ["0-127", "+/-"];
+			
+			midiModeSelect = PopUpMenu(allEditors[name].tabs.views[1], flow1.bounds.width/2-70@15)
+				.font_(staticTextFont)
+				.items_(midiModes)
+				.value_(widget.midimode)
+				.action_({ |ms|
+					widget.midimode(ms.value);
+				})
+			;
+			
+			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+60@15)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("MIDI-mean (in/decremental mode only)")
+			;
+			
+			flow1.shift(5, 0);
+			
+			midiMeanNB = NumberBox(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
+				.font_(staticTextFont)
+				.value_(widget.midimean)
+				.action_({ |mb|
+					widget.midimean_(mb.value)
+				})
+				.step_(1.0)
+				.clipLo_(0.0)
+			;
+			
+			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+60@15)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("minimum distance for the slider (0-127 only)")
+			;
+			
+			flow1.shift(5, 0);
+			
+			softWithinNB = NumberBox(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
+				.font_(staticTextFont)
+				.value_(widget.softWithin)
+				.action_({ |mb|
+					widget.softWithin_(mb.value)
+				})
+				.step_(0.005)
+				.clipLo_(0.01)
+				.clipHi_(0.5)
+			;
+			
+			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+60@15)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("MIDI-resolution (+/- only)")
+			;
+			
+			flow1.shift(5, 0);
+
+			midiResolutionNB = NumberBox(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
+				.font_(staticTextFont)
+				.value_(widget.midiresolution)
+				.action_({ |mb|
+					widget.midiresolution_(mb.value)
+				})
+				.step_(0.05)
+				.clipLo_(0.001)
+				.clipHi_(10.0)
+			;
+			
+			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+60@15)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("number of sliders in 1 bank")
+			;
+
+			flow1.shift(5, 0);
+			
+			ctrlButtonField = NumberBox(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
+				.font_(staticTextFont)
+				.string_(widget.ctrlButtonBank)
+				.action_({ |mb|
+					widget.ctrlButtonBank_(mb.string.asInt)
+				})
+			;
+			
+			// OSC editting
 	
 			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-20@15)
 				.font_(staticTextFont)
