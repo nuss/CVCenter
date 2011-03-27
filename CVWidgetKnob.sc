@@ -2,11 +2,9 @@
 
 CVWidgetKnob : CVWidget {
 	
-	var thisCV, <cc, <midisrc, <midichan, <midinum /* keep this for now but that might change ... */;
-	var <window, <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl;
-	var <oscEditBut, <calibBut, <editor;
-	var prSpec, prOSCMapping = \linlin, prCalibConstraints, oscResponder;
-	var mapConstrainterLo, mapConstrainterHi;
+	var thisCV/*, <cc, <midisrc, <midichan, <midinum*/ /* keep this for now but that might change ... */;
+	var <window, <guiEls, <midiOscSpecs;
+	var prSpec, midiOSCSpecs/*.oscMapping = \linlin, prCalibConstraints, oscResponder*/;
 	var returnedFromActions;
 
 	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
@@ -27,10 +25,11 @@ CVWidgetKnob : CVWidget {
 		var flow, thisname, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions, cvString;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
-		var tmpSetup, tmpMapping;
-		var makeCCResponder, ccResponder;
-		var ctrlString, meanVal;
 		
+		guiEls = ();
+		midiOSCSpecs = ();
+		midiOSCSpecs.oscMapping = \linlin;
+				
 		if(name.isNil, { thisname = "knob" }, { thisname = name });
 		
 		if(cv.isNil, {
@@ -52,13 +51,6 @@ CVWidgetKnob : CVWidget {
 		action !? { thisCV.action_(action) };
 		
 		this.initControllersAndModels(controllersAndModels);
-
-		mapConstrainterLo ?? { 
-			mapConstrainterLo = CV([-inf, inf].asSpec, wdgtControllersAndModels.oscInputRange.model.value[0]);
-		};
-		mapConstrainterHi ?? { 
-			mapConstrainterHi = CV([-inf, inf].asSpec, wdgtControllersAndModels.oscInputRange.model.value[1]);
-		};
 		
 		if(bounds.isNil, {		
 			thisXY = 7@0;
@@ -78,9 +70,9 @@ CVWidgetKnob : CVWidget {
 				
 		cvcGui ?? { 
 			window.onClose_({
-				if(editor.notNil, {
-					if(editor.isClosed.not, {
-						editor.close;
+				if(guiEls.editor.notNil, {
+					if(guiEls.editor.isClosed.not, {
+						guiEls.editor.close;
 					}, {
 						if(CVWidgetEditor.allEditors.notNil and:{
 							CVWidgetEditor.allEditors[thisname.asSymbol].notNil;
@@ -89,8 +81,8 @@ CVWidgetKnob : CVWidget {
 						})
 					})
 				});
-				oscResponder !? { oscResponder.remove };
-				wdgtControllersAndModels.do({ |mc| mc.controller.remove });
+				midiOSCSpecs.oscResponder !? { midiOSCSpecs.oscResponder.remove };
+				wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 			})
 		};
 						
@@ -126,44 +118,44 @@ CVWidgetKnob : CVWidget {
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = thisXY.y+16;
 		});			
-		knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
+		guiEls.knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
 			.canFocus_(false)
 		;
 		block { |break|
 			#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
-				if(thisCV.spec == symbol.asSpec, { break.value(knob.centered_(true)) });
+				if(thisCV.spec == symbol.asSpec, { break.value(guiEls.knob.centered_(true)) });
 			})
 		};
 		nextY = thisXY.y+thisHeight-117;
-		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		guiEls.numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(thisCV.value)
 		;
-		nextY = nextY+numVal.bounds.height;
-		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		nextY = nextY+guiEls.numVal.bounds.height;
+		guiEls.specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
 			.action_({ |btn|
-				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, thisname, 0);
+				if(guiEls.editor.isNil or:{ guiEls.editor.isClosed }, {
+					guiEls.editor = CVWidgetEditor(this, thisname, 0);
 				}, {
-					editor.front(0)
+					guiEls.editor.front(0)
 				});
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value
 				).changed(\value);
 			})
 		;
-		nextY = nextY+specBut.bounds.height+1;
-		midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
+		nextY = nextY+guiEls.specBut.bounds.height+1;
+		guiEls.midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
 			.action_({ |ms|
-				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, thisname, 1);
+				if(guiEls.editor.isNil or:{ guiEls.editor.isClosed }, {
+					guiEls.editor = CVWidgetEditor(this, thisname, 1);
 				}, {
-					editor.front(1)
+					guiEls.editor.front(1)
 				});
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value;
@@ -171,7 +163,7 @@ CVWidgetKnob : CVWidget {
 			})
 		;
 		
-		midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
+		guiEls.midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
@@ -182,9 +174,9 @@ CVWidgetKnob : CVWidget {
 				ml.value.switch(
 					1, {
 						margs = [
-							[midiSrc.string, msrc], 
-							[midiChan.string, mchan], 
-							[midiCtrl.string, mctrl]
+							[guiEls.midiSrc.string, msrc], 
+							[guiEls.midiChan.string, mchan], 
+							[guiEls.midiCtrl.string, mctrl]
 						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
 							this.midiConnect(*margs);
@@ -196,8 +188,8 @@ CVWidgetKnob : CVWidget {
 				)
 			})
 		;
-		nextY = nextY+midiLearn.bounds.height;
-		midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
+		nextY = nextY+guiEls.midiLearn.bounds.height;
+		guiEls.midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_(msrc)
@@ -222,8 +214,8 @@ CVWidgetKnob : CVWidget {
 				})
 			}) 
 		;
-		nextY = nextY+midiSrc.bounds.height;
-		midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
+		nextY = nextY+guiEls.midiSrc.bounds.height;
+		guiEls.midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_(mchan)
@@ -248,7 +240,7 @@ CVWidgetKnob : CVWidget {
 				})
 			}) 
 		;
-		midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
+		guiEls.midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_(mctrl)
@@ -274,30 +266,30 @@ CVWidgetKnob : CVWidget {
 				})
 			}) 
 		;
-		nextY = nextY+midiCtrl.bounds.height+1;
-		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
+		nextY = nextY+guiEls.midiCtrl.bounds.height+1;
+		guiEls.oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
 				["edit OSC", Color.black, Color.clear]
 			])
 			.action_({ |oscb|
-				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, thisname, 2);
+				if(guiEls.editor.isNil or:{ guiEls.editor.isClosed }, {
+					guiEls.editor = CVWidgetEditor(this, thisname, 2);
 				}, {
-					editor.front(2)
+					guiEls.editor.front(2)
 				});
-				editor.calibNumBoxes !? {
-					mapConstrainterLo.connect(editor.calibNumBoxes.lo);
-					mapConstrainterHi.connect(editor.calibNumBoxes.hi);
+				guiEls.editor.calibNumBoxes !? {
+					wdgtControllersAndModels.mapConstrainterLo.connect(guiEls.editor.calibNumBoxes.lo);
+					wdgtControllersAndModels.mapConstrainterHi.connect(guiEls.editor.calibNumBoxes.hi);
 				};
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value;
 				).changed(\value);
 			})
 		;
-		nextY = nextY+oscEditBut.bounds.height;
-		calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		nextY = nextY+guiEls.oscEditBut.bounds.height;
+		guiEls.calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
@@ -306,382 +298,34 @@ CVWidgetKnob : CVWidget {
 			])
 		;
 		
-//		returnedFromActions = this.initControllerActions(wdgtControllersAndModels);
-//
-//		thisCV = returnedFromActions.cv;
-//		cc = returnedFromActions.cc;
-//		midisrc = returnedFromActions.midisrc;
-//		midichan = returnedFromActions.midichan;
-//		midinum = returnedFromActions.midinum;
-		
-		wdgtControllersAndModels.calibration.controller ?? { 
-			wdgtControllersAndModels.calibration.controller = SimpleController(wdgtControllersAndModels.calibration.model);
-		};
-
-		wdgtControllersAndModels.calibration.controller.put(\value, { |theChanger, what, moreArgs|
-			prCalibrate = (theChanger.value);
-			theChanger.value.switch(
-				true, { 
-					calibBut.value_(0);
-					if(editor.notNil and:{ editor.isClosed.not }, {
-						editor.calibBut.value_(0);
-						mapConstrainterLo ?? { 
-							mapConstrainterLo = CV([-inf, inf].asSpec, 0.00001);
-							mapConstrainterLo.connect(editor.calibNumBoxes.lo);
-						};
-						mapConstrainterHi ?? { 
-							mapConstrainterHi = CV([-inf, inf].asSpec, 0.00001);
-							mapConstrainterHi.connect(editor.calibNumBoxes.hi);
-						};
-						[editor.calibNumBoxes.lo, editor.calibNumBoxes.hi].do({ |nb| 
-							nb.enabled_(false);
-							nb.action_(nil);
-						})
-					})
-				},
-				false, { 
-					calibBut.value_(1);
-					if(editor.notNil and:{ editor.isClosed.not }, {
-						editor.calibBut.value_(1);
-						[mapConstrainterLo, mapConstrainterHi].do({ |cv| cv = nil; });
-						[editor.calibNumBoxes.lo, editor.calibNumBoxes.hi].do({ |nb| 
-							nb.enabled_(true);
-							nb.action_({ |b| 
-								this.oscInputConstraints_(
-									editor.calibNumBoxes.lo.value@editor.calibNumBoxes.hi.value;
-								) 
-							})
-						})
-					})
-				}
-			)
-		});
-
-		calibBut.action_({ |cb|
-			cb.value.switch(
-				0, { wdgtControllersAndModels.calibration.model.value_(true).changed(\value) },
-				1, { wdgtControllersAndModels.calibration.model.value_(false).changed(\value) }
-			)
-		});
-		
-		wdgtControllersAndModels.cvSpec.controller ?? {
-			wdgtControllersAndModels.cvSpec.controller = SimpleController(wdgtControllersAndModels.cvSpec.model);
-		};
-		
-		wdgtControllersAndModels.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
-			if(theChanger.value.minval <= 0.0 or:{
-				theChanger.value.maxval <= 0.0
-			}, {
-				if(prOSCMapping === \linexp or:{
-					prOSCMapping === \expexp
-				}, {
-					prOSCMapping = \linlin;
-					if(editor.notNil and:{
-						editor.isClosed.not
-					}, {
-						editor.mappingSelect.value_(0);
-					})
-				})
-			}, {
-				if(editor.notNil and:{
-					editor.isClosed.not	
-				}, {
-					tmpMapping = editor.mappingSelect.item;
-					editor.mappingSelect.items.do({ |item, i|
-						if(item == tmpMapping, {
-							editor.mappingSelect.value_(i)
-						})
-					})
-				})
-			});
-			thisCV.spec_(theChanger.value);
-			block { |break|
-				#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
-					if(thisCV.spec == symbol.asSpec, { 
-						break.value(knob.centered_(true));
-					}, {
-						knob.centered_(false);
-					})			
-				})
-			}
-		});
-		
-		wdgtControllersAndModels.oscInputRange.controller ?? {
-			wdgtControllersAndModels.oscInputRange.controller = SimpleController(wdgtControllersAndModels.oscInputRange.model);
-		};
-
-		wdgtControllersAndModels.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
-			if(theChanger.value[0] <= 0 or:{
-				theChanger.value[1] <= 0
-			}, {
-				if(prOSCMapping === \explin or:{
-					prOSCMapping === \expexp
-				}, {
-					prOSCMapping = \linlin;
-				});
-				if(editor.notNil and:{
-					editor.isClosed.not
-				}, {
-					{	
-						oscEditBut.states_([[
-							oscEditBut.states[0][0].split($\n)[0]++"\n"++prOSCMapping.asString,
-							oscEditBut.states[0][1],
-							oscEditBut.states[0][2]
-						]]);
-						oscEditBut.refresh;
-						editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === prOSCMapping, {
-								editor.mappingSelect.value_(i);
-							})
-						})
-					}.defer
-				})		
-			}, {
-				if(editor.notNil and:{
-					editor.isClosed.not	
-				}, {
-					{
-						editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === prOSCMapping, {
-								editor.mappingSelect.value_(i)
-							})
-						});
-					}.defer;
-					if(oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
-						{
-							oscEditBut.states_([[
-								oscEditBut.states[0][0].split($\n)[0]++"\n"++prOSCMapping.asString,
-								oscEditBut.states[0][1],
-								oscEditBut.states[0][2]
-							]]);
-							oscEditBut.refresh;
-						}.defer
-					})
-				})
-			})
-		});
-		
-		wdgtControllersAndModels.midiConnection.controller ?? {
-			wdgtControllersAndModels.midiConnection.controller = SimpleController(wdgtControllersAndModels.midiConnection.model);
-		};
-		
-		wdgtControllersAndModels.midiConnection.controller.put(\value, { |theChanger, what, moreArgs|
-			if(theChanger.value.isKindOf(Event), {
-				makeCCResponder = { |argSrc, argChan, argNum|
-					CCResponder({ |src, chan, num, val|
-						ctrlString ? ctrlString = num+1;
-						if(this.ctrlButtonBank.notNil, {
-							if(ctrlString%this.ctrlButtonBank == 0, {
-								ctrlString = this.ctrlButtonBank.asString;
-							}, {
-								ctrlString = (ctrlString%this.ctrlButtonBank).asString;
-							});
-							ctrlString = ((num+1/this.ctrlButtonBank).ceil).asString++":"++ctrlString;
-						}, {
-							ctrlString = num+1;
-						});
-	
-						this.midimode.switch(
-							0, { 
-								if(val/127 < (cv.input+(softWithin/2)) and: {
-									val/127 > (cv.input-(softWithin/2));
-								}, { 
-									cv.input_(val/127);
-								})
-							},
-							1, { 
-								meanVal = this.midimean;
-								cv.input_(cv.input+((val-meanVal)/127*this.midiresolution)) 
-							}
-						);
-						src !? { midisrc = src };
-						chan !? { midichan = chan };
-						num !? { midinum = ctrlString };
-					}, argSrc, argChan, argNum, nil);
-				};
+		returnedFromActions = this.initControllerActions(wdgtControllersAndModels, guiEls, midiOSCSpecs, thisCV);
 				
-				fork {
-					block { |break|
-						loop {
-							0.01.wait;
-							if(midisrc.notNil and:{
-								midichan.notNil and:{
-									midinum.notNil;
-								}
-							}, {
-								break.value(
-									wdgtControllersAndModels.midiDisplay.model.value_(
-										(src: midisrc, chan: midichan, ctrl: midinum, learn: "X")
-									).changed(\value)
-								)
-							})
-						}
-					}
-				};
-
-				if(theChanger.value.isEmpty, {
-					cc = makeCCResponder.().learn;
-				}, {
-					cc = makeCCResponder.(theChanger.value.src, theChanger.value.chan, theChanger.value.num);
-				})
-			}, {
-				cc.remove;
-				cc = nil;
-				wdgtControllersAndModels.midiDisplay.model.value_(
-					(src: "source", chan: "chan", ctrl: "ctrl", learn: "L")
-				).changed(\value);
-				midisrc = nil; midichan = nil; midinum = nil;
-			})
-		});
-		
-		wdgtControllersAndModels.midiDisplay.controller ?? {
-			wdgtControllersAndModels.midiDisplay.controller = SimpleController(wdgtControllersAndModels.midiDisplay.model);
-		};
-		
-		wdgtControllersAndModels.midiDisplay.controller.put(\value, { |theChanger, what, moreArgs|
-			theChanger.value.learn.switch(
-				"X", {
-					defer {
-						midiSrc.string_(theChanger.value.src.asString)
-							.background_(Color.red)
-							.stringColor_(Color.white)
-							.canFocus_(false)
-						;
-						midiChan.string_((theChanger.value.chan+1).asString)
-							.background_(Color.red)
-							.stringColor_(Color.white)
-							.canFocus_(false)
-						;
-						midiCtrl.string_(theChanger.value.ctrl)
-							.background_(Color.red)
-							.stringColor_(Color.white)
-							.canFocus_(false)
-						;
-						midiLearn.value_(1)
-					}
-				},
-				"C", {
-					midiLearn.states_([
-						["C", Color.white, Color(0.11468057974842, 0.38146154367376, 0.19677815686724)],
-						["X", Color.white, Color.red]
-					]).refresh;
-				},
-				"L", {
-					defer {
-						midiSrc.string_(theChanger.value.src)
-							.background_(Color.white)
-							.stringColor_(Color.black)
-							.canFocus_(true)
-						;
-						midiChan.string_(theChanger.value.chan)
-							.background_(Color.white)
-							.stringColor_(Color.black)
-							.canFocus_(true)
-						;
-						midiCtrl.string_(theChanger.value.ctrl)
-							.background_(Color.white)
-							.stringColor_(Color.black)
-							.canFocus_(true)
-						;
-						midiLearn.states_([
-							["L", Color.white, Color.blue],
-							["X", Color.white, Color.red]
-						])
-						.value_(0).refresh;
-					}
-				}
-			)
-		});
-
-		wdgtControllersAndModels.oscConnection.controller ?? {
-			wdgtControllersAndModels.oscConnection.controller = SimpleController(wdgtControllersAndModels.oscConnection.model);
-		};
-
-		wdgtControllersAndModels.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
-			if(theChanger.value.size == 2, {
-				oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, { |t, r, msg|
-					if(prCalibrate, { 
-						if(prCalibConstraints.isNil, {
-							prCalibConstraints = (lo: msg[theChanger.value[1]], hi: msg[theChanger.value[1]]);
-						}, {
-							if(msg[theChanger.value[1]] < prCalibConstraints.lo, { 
-								prCalibConstraints.lo = msg[theChanger.value[1]];
-								wdgtControllersAndModels.oscInputRange.model.value_([
-									msg[theChanger.value[1]], 
-									wdgtControllersAndModels.oscInputRange.model.value[1]
-								]).changed(\value);
-							});
-							if(msg[theChanger.value[1]] > prCalibConstraints.hi, {
-								prCalibConstraints.hi = msg[theChanger.value[1]];
-								wdgtControllersAndModels.oscInputRange.model.value_([
-									wdgtControllersAndModels.oscInputRange.model.value[0], 
-									msg[theChanger.value[1]]
-								]).changed(\value);
-							});
-						});
-						mapConstrainterLo.value_(prCalibConstraints.lo);
-						mapConstrainterHi.value_(prCalibConstraints.hi);
-					}, {
-						if(prCalibConstraints.isNil, {
-							prCalibConstraints = (lo: wdgtControllersAndModels.oscInputRange.model.value[0], hi: wdgtControllersAndModels.oscInputRange.model.value[1]);
-						})
-					});
-					thisCV.value_(
-						msg[theChanger.value[1]].perform(
-							prOSCMapping,
-							prCalibConstraints.lo, prCalibConstraints.hi,
-							this.spec.minval, this.spec.maxval,
-							\minmax
-						)
-					)
-				}).add;
-				oscEditBut.states_([
-					[theChanger.value[0].asString++"["++theChanger.value[1].asString++"]"++"\n"++prOSCMapping.asString, Color.white, Color.cyan(0.5)]
-				]);
-				if(editor.notNil and:{
-					editor.isClosed.not
-				}, {
-					editor.connectorBut.value_(0);
-					editor.nameField.enabled_(false).string_(theChanger.value[0].asString);
-					if(prCalibrate, {
-						[editor.inputConstraintLoField, editor.inputConstraintHiField].do(_.enabled_(false));
-					});
-					editor.indexField.value_(theChanger.value[1]).enabled_(false);
-					editor.connectorBut.value_(1);
-				});
-				oscEditBut.refresh;
-			});
-			if(theChanger.value == false, {
-				oscResponder.remove;
-				oscEditBut.states_([
-					["edit OSC", Color.black, Color.clear]
-				]);
-				wdgtControllersAndModels.oscInputRange.model.value_([0.0001, 0.0001]).changed(\value);
-				prCalibConstraints = nil;
-				if(editor.notNil and:{
-					editor.isClosed.not
-				}, {
-					editor.connectorBut.value_(0);
-					editor.nameField.enabled_(true);
-					editor.inputConstraintLoField.value_(
-						wdgtControllersAndModels.oscInputRange.model.value[0];
-					);
-					editor.inputConstraintHiField.value_(
-						wdgtControllersAndModels.oscInputRange.model.value[1];
-					);
-					if(prCalibrate.not, {
-						[editor.inputConstraintLoField, editor.inputConstraintHiField].do(_.enabled_(true));
-					});
-					editor.indexField.enabled_(true);
-					editor.connectorBut.value_(0);
-				});
-				oscEditBut.refresh;
-			})
-		});
-				
-		[knob, numVal].do({ |view| thisCV.connect(view) });
-		visibleGuiEls = [knob, numVal, specBut, midiHead, midiLearn, midiSrc, midiChan, midiCtrl, oscEditBut, calibBut];
-		allGuiEls = [widgetBg, label, nameField, knob, numVal, specBut, midiHead, midiLearn, midiSrc, midiChan, midiCtrl, oscEditBut, calibBut]
+		[guiEls.knob, guiEls.numVal].do({ |view| thisCV.connect(view) });
+		visibleGuiEls = [
+			guiEls.knob, 
+			guiEls.numVal, 
+			guiEls.specBut, 
+			guiEls.midiHead, 
+			guiEls.midiLearn, 
+			guiEls.midiSrc, 
+			guiEls.midiChan, 
+			guiEls.midiCtrl, 
+			guiEls.oscEditBut, 
+			guiEls.calibBut
+		];
+		allGuiEls = [
+			widgetBg, label, nameField, 
+			guiEls.knob, 
+			guiEls.numVal, 
+			guiEls.specBut, 
+			guiEls.midiHead, 
+			guiEls.midiLearn, 
+			guiEls.midiSrc, 
+			guiEls.midiChan, 
+			guiEls.midiCtrl, 
+			guiEls.oscEditBut, 
+			guiEls.calibBut
+		]
 	}
 	
 	calibrate_ { |bool|
@@ -716,7 +360,7 @@ CVWidgetKnob : CVWidget {
 		}, {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		}, {
-			prOSCMapping = mapping.asSymbol;
+			midiOSCSpecs.oscMapping = mapping.asSymbol;
 			wdgtControllersAndModels.oscInputRange.model.value_(
 				wdgtControllersAndModels.oscInputRange.model.value;
 			).changed(\value);
@@ -727,7 +371,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	oscMapping {
-		^prOSCMapping;
+		^midiOSCSpecs.oscMapping;
 	}
 	
 	oscInputConstraints_ { |constraintsHiLo|
@@ -735,16 +379,16 @@ CVWidgetKnob : CVWidget {
 			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
 		}, {
 			this.calibrate_(false);
-			prCalibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
-			if(editor.notNil and:{ editor.isClosed.not }, {
-				mapConstrainterLo.value_(constraintsHiLo.x);
-				mapConstrainterHi.value_(constraintsHiLo.y);
+			midiOSCSpecs.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
+			if(guiEls.editor.notNil and:{ guiEls.editor.isClosed.not }, {
+				wdgtControllersAndModels.mapConstrainterLo.value_(constraintsHiLo.x);
+				wdgtControllersAndModels.mapConstrainterHi.value_(constraintsHiLo.y);
 			})
 		})
 	}
 	
 	oscInputConstraints {
-		^[prCalibConstraints.lo, prCalibConstraints.hi];
+		^[midiOSCSpecs.calibConstraints.lo, midiOSCSpecs.calibConstraints.hi];
 	}
 	
 	oscConnect { |name, oscMsgIndex|
@@ -766,7 +410,7 @@ CVWidgetKnob : CVWidget {
 	// if all arguments are nil .learn should be triggered
 	midiConnect { |uid, chan, num|
 		var args;
-		if(cc.isNil, {
+		if(midiOSCSpecs.cc.isNil, {
 			args = [uid, chan, num].select({ |param| param.notNil }).collect({ |param| param.asInt });
 			wdgtControllersAndModels.midiConnection.model.value_(
 				(src: uid, chan: chan, num: num)
@@ -777,7 +421,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	midiDisconnect { 
-		cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
+		midiOSCSpecs.cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
 	}
 	
 	front {
