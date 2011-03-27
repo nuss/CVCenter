@@ -125,14 +125,14 @@ CVCenter {
 					widgetStates[k].nameField = w.nameField.string;
 					w.class.switch(
 						CVWidgetKnob, {
-							widgetStates[k].midiEdit = w.midiHead.enabled;
-							widgetStates[k].midiLearn = w.midiLearn.value;
-							widgetStates[k].midiBg = w.midiSrc.background; 
-							widgetStates[k].midiStrColor = w.midiSrc.stringColor;
-							widgetStates[k].midiSrc = w.midiSrc.string;
-							widgetStates[k].midiChan = w.midiChan.string;
-							widgetStates[k].midiCtrl = w.midiCtrl.string;
-							w.cc !? { widgetStates[k].cc = w.cc };
+							widgetStates[k].midiEdit = w.guiEls.midiHead.enabled;
+							widgetStates[k].midiLearn = w.guiEls.midiLearn.value;
+							widgetStates[k].midiBg = w.guiEls.midiSrc.background; 
+							widgetStates[k].midiStrColor = w.guiEls.midiSrc.stringColor;
+							widgetStates[k].midiSrc = w.guiEls.midiSrc.string;
+							widgetStates[k].midiChan = w.guiEls.midiChan.string;
+							widgetStates[k].midiCtrl = w.guiEls.midiCtrl.string;
+							w.cc !? { widgetStates[k].cc = w.midiOSCSpecs.cc };
 						},
 						CVWidget2D, {
 							widgetStates[k].midiEditHi = w.midiHeadHi.enabled;
@@ -215,9 +215,9 @@ CVCenter {
 						cvcGui: true
 					);
 					// to be tested in depth ...
-					if(cvWidgets[k].midiLearn.action.class != FunctionList, {
-						cvWidgets[k].midiLearn.action_(
-							cvWidgets[k].midiLearn.action.addFunc({ this.prAddControlButton(k) })
+					if(cvWidgets[k].guiEls.midiLearn.action.class != FunctionList, {
+						cvWidgets[k].guiEls.midiLearn.action_(
+							cvWidgets[k].guiEls.midiLearn.action.addFunc({ this.prAddControlButton(k) })
 						)
 					})
 				});
@@ -226,14 +226,14 @@ CVCenter {
 				
 				widgetStates[k] !? {
 					cvWidgets[k].nameField.string_(widgetStates[k].nameField);
-					widgetStates[k].midiEdit !? { cvWidgets[k].midiHead.enabled_(widgetStates[k].midiEdit) };
+					widgetStates[k].midiEdit !? { cvWidgets[k].guiEls.midiHead.enabled_(widgetStates[k].midiEdit) };
 					widgetStates[k].midiEditHi !? { cvWidgets[k].midiHeadHi.enabled_(widgetStates[k].midiEditHi) };
 					widgetStates[k].midiEditLo !? { cvWidgets[k].midiHeadLo.enabled_(widgetStates[k].midiEditLo) };
-					widgetStates[k].midiLearn !? { cvWidgets[k].midiLearn.value_(widgetStates[k].midiLearn) };
+					widgetStates[k].midiLearn !? { cvWidgets[k].guiEls.midiLearn.value_(widgetStates[k].midiLearn) };
 					widgetStates[k].midiLearnHi !? { cvWidgets[k].midiLearnHi.value_(widgetStates[k].midiLearnHi) };
 					widgetStates[k].midiLearnLo !? { cvWidgets[k].midiLearnLo.value_(widgetStates[k].midiLearnLo) };
 					widgetStates[k].midiBg !? {
-						[cvWidgets[k].midiSrc, cvWidgets[k].midiChan, cvWidgets[k].midiCtrl].do({ |view|
+						[cvWidgets[k].guiEls.midiSrc, cvWidgets[k].guiEls.midiChan, cvWidgets[k].guiEls.midiCtrl].do({ |view|
 							view.background_(widgetStates[k].midiBg);
 							view.stringColor_(widgetStates[k].midiStrColor);
 						})
@@ -250,17 +250,17 @@ CVCenter {
 							view.stringColor_(widgetStates[k].midiStrColorLo);
 						})
 					};
-					widgetStates[k].midiSrc !? { cvWidgets[k].midiSrc.string_(widgetStates[k].midiSrc) };
+					widgetStates[k].midiSrc !? { cvWidgets[k].guiEls.midiSrc.string_(widgetStates[k].midiSrc) };
 					widgetStates[k].midiSrcHi !? { cvWidgets[k].midiSrcHi.string_(widgetStates[k].midiSrcHi) };
 					widgetStates[k].midiSrcLo !? { cvWidgets[k].midiSrcLo.string_(widgetStates[k].midiSrcLo) };
-					widgetStates[k].midiChan !? { cvWidgets[k].midiChan.string_(widgetStates[k].midiChan) };
+					widgetStates[k].midiChan !? { cvWidgets[k].guiEls.midiChan.string_(widgetStates[k].midiChan) };
 					widgetStates[k].midiChanHi !? { cvWidgets[k].midiChanHi.string_(widgetStates[k].midiChanHi) };
 					widgetStates[k].midiChanLo !? { cvWidgets[k].midiChanLo.string_(widgetStates[k].midiChanLo) };
-					widgetStates[k].midiCtrl !? { cvWidgets[k].midiCtrl.string_(widgetStates[k].midiCtrl) };
+					widgetStates[k].midiCtrl !? { cvWidgets[k].guiEls.midiCtrl.string_(widgetStates[k].midiCtrl) };
 					widgetStates[k].midiCtrlHi !? { cvWidgets[k].midiCtrlHi.string_(widgetStates[k].midiCtrlHi) };
 					widgetStates[k].midiCtrlLo !? { cvWidgets[k].midiCtrlLo.string_(widgetStates[k].midiCtrlLo) };
 					widgetStates[k].cc !? { 
-						cvWidgets[k].cc_(widgetStates[k].cc);
+						cvWidgets[k].midiOSCSpecs.cc_(widgetStates[k].cc);
 						this.prAddControlButton(k);
 					};
 					widgetStates[k].ccHi !? { 
@@ -372,7 +372,7 @@ CVCenter {
 						}, {
 //							("false func triggered:"+[k, btn]).postln;
 							btn.states_([[
-								cvWidgets[k].midiCtrl.string, 
+								cvWidgets[k].midiOSCSpecs.midiCtrl.string, 
 								Color.black, 
 								tabProperties[widgetStates[k].tabIndex].tabColor
 							]]);
@@ -430,7 +430,7 @@ CVCenter {
 		all.removeAt(key.asSymbol);
 		cvWidgets[key].class.switch(
 			CVWidgetKnob, { 
-				cvWidgets[key].cc !? { cvWidgets[key].cc.remove };
+				cvWidgets[key].midiOSCSpecs.cc !? { cvWidgets[key].midiOSCSpecs.cc.remove };
 				controlButtons !? {
 					controlButtons[key] !? { 
 						controlButtons[key].postln;
@@ -633,9 +633,9 @@ CVCenter {
 					controllersAndModels: widgetControllersAndModels,
 					cvcGui: true
 				);
-				if(cvWidgets[k].midiLearn.action != FunctionList, {
-					cvWidgets[k].midiLearn.action_(
-						cvWidgets[k].midiLearn.action.addFunc({ this.prAddControlButton(k) })
+				if(cvWidgets[k].guiEls.midiLearn.action != FunctionList, {
+					cvWidgets[k].guiEls.midiLearn.action_(
+						cvWidgets[k].guiEls.midiLearn.action.addFunc({ this.prAddControlButton(k) })
 					)
 				});
 				widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: false));
@@ -716,7 +716,7 @@ CVCenter {
 		var val;
 		
 		if(controlButtons[key].isNil, {
-			val = cvWidgets[key].midiCtrl.string;
+			val = cvWidgets[key].guiEls.midiCtrl.string;
 			controlButtons.put(
 				key,
 				Button(
