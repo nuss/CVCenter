@@ -4,7 +4,7 @@ CVWidgetKnob : CVWidget {
 	
 	var thisCV/*, <cc, <midisrc, <midichan, <midinum*/ /* keep this for now but that might change ... */;
 	var <window, <guiEls, <midiOscSpecs;
-	var prSpec, midiOSCSpecs/*.oscMapping = \linlin, prCalibConstraints, oscResponder*/;
+	var prSpec/*, midiOSCSpecs.oscMapping = \linlin, prCalibConstraints, oscResponder*/;
 	var returnedFromActions;
 
 	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
@@ -27,8 +27,8 @@ CVWidgetKnob : CVWidget {
 		var nextY, knobX, knobY;
 		
 		guiEls = ();
-		midiOSCSpecs = ();
-		midiOSCSpecs.oscMapping = \linlin;
+		midiOscSpecs = ();
+		midiOscSpecs.oscMapping = \linlin;
 				
 		if(name.isNil, { thisname = "knob" }, { thisname = name });
 		
@@ -46,6 +46,8 @@ CVWidgetKnob : CVWidget {
 		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
 		setUpArgs[6] !? { this.calibrate_(setUpArgs[6]) };
+		
+		this.setup.postln;
 		
 		action !? { thisCV.action_(action) };
 		
@@ -80,7 +82,7 @@ CVWidgetKnob : CVWidget {
 						})
 					})
 				});
-				midiOSCSpecs.oscResponder !? { midiOSCSpecs.oscResponder.remove };
+				midiOscSpecs.oscResponder !? { midiOscSpecs.oscResponder.remove };
 				wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 			})
 		};
@@ -297,7 +299,7 @@ CVWidgetKnob : CVWidget {
 			])
 		;
 		
-		returnedFromActions = this.initControllerActions(wdgtControllersAndModels, guiEls, midiOSCSpecs, thisCV);
+		returnedFromActions = this.initControllerActions(wdgtControllersAndModels, guiEls, midiOscSpecs, thisCV);
 				
 		[guiEls.knob, guiEls.numVal].do({ |view| thisCV.connect(view) });
 		visibleGuiEls = [
@@ -339,10 +341,10 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	spec_ { |spec|
-		if(prSpec.isKindOf(ControlSpec).not, {
+		if(spec.isKindOf(ControlSpec).not, {
 			Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
 		});
-		wdgtControllersAndModels.cvSpec.model.value_(prSpec).changed(\value);
+		wdgtControllersAndModels.cvSpec.model.value_(spec).changed(\value);
 	}
 	
 	spec {
@@ -359,7 +361,7 @@ CVWidgetKnob : CVWidget {
 		}, {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		}, {
-			midiOSCSpecs.oscMapping = mapping.asSymbol;
+			midiOscSpecs.oscMapping = mapping.asSymbol;
 			wdgtControllersAndModels.oscInputRange.model.value_(
 				wdgtControllersAndModels.oscInputRange.model.value;
 			).changed(\value);
@@ -370,7 +372,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	oscMapping {
-		^midiOSCSpecs.oscMapping;
+		^midiOscSpecs.oscMapping;
 	}
 	
 	oscInputConstraints_ { |constraintsHiLo|
@@ -378,7 +380,7 @@ CVWidgetKnob : CVWidget {
 			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
 		}, {
 			this.calibrate_(false);
-			midiOSCSpecs.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
+			midiOscSpecs.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
 			if(guiEls.editor.notNil and:{ guiEls.editor.isClosed.not }, {
 				wdgtControllersAndModels.mapConstrainterLo.value_(constraintsHiLo.x);
 				wdgtControllersAndModels.mapConstrainterHi.value_(constraintsHiLo.y);
@@ -387,7 +389,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	oscInputConstraints {
-		^[midiOSCSpecs.calibConstraints.lo, midiOSCSpecs.calibConstraints.hi];
+		^[midiOscSpecs.calibConstraints.lo, midiOscSpecs.calibConstraints.hi];
 	}
 	
 	oscConnect { |name, oscMsgIndex|
@@ -409,7 +411,7 @@ CVWidgetKnob : CVWidget {
 	// if all arguments are nil .learn should be triggered
 	midiConnect { |uid, chan, num|
 		var args;
-		if(midiOSCSpecs.cc.isNil, {
+		if(midiOscSpecs.cc.isNil, {
 			args = [uid, chan, num].select({ |param| param.notNil }).collect({ |param| param.asInt });
 			wdgtControllersAndModels.midiConnection.model.value_(
 				(src: uid, chan: chan, num: num)
@@ -420,7 +422,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	midiDisconnect { 
-		midiOSCSpecs.cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
+		midiOscSpecs.cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
 	}
 	
 	front {
