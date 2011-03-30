@@ -2,7 +2,7 @@
 CVCenter {
 
 	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
-	classvar <>midimode, <>midiresolution, <>midimean, <>softWithin, <numccs;
+	classvar <>midiMode, <>midiResolution, <>midiMean, <>softWithin, <numccs;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight; 
 	classvar /*<controlButtonKeys, */<controlButtons, <nextButtonPos;
 	classvar <>ctrlButtonBank, currentButtonStates, guiClosed = false/*, buttonProps*/;
@@ -132,7 +132,7 @@ CVCenter {
 							widgetStates[k].midiSrc = w.guiEls.midiSrc.string;
 							widgetStates[k].midiChan = w.guiEls.midiChan.string;
 							widgetStates[k].midiCtrl = w.guiEls.midiCtrl.string;
-							w.cc !? { widgetStates[k].cc = w.midiOSCSpecs.cc };
+							w.cc !? { widgetStates[k].cc = w.midiOscSpecss.cc };
 						},
 						CVWidget2D, {
 							widgetStates[k].midiEditHi = w.midiHeadHi.enabled;
@@ -260,7 +260,7 @@ CVCenter {
 					widgetStates[k].midiCtrlHi !? { cvWidgets[k].midiCtrlHi.string_(widgetStates[k].midiCtrlHi) };
 					widgetStates[k].midiCtrlLo !? { cvWidgets[k].midiCtrlLo.string_(widgetStates[k].midiCtrlLo) };
 					widgetStates[k].cc !? { 
-						cvWidgets[k].midiOSCSpecs.cc_(widgetStates[k].cc);
+						cvWidgets[k].midiOscSpecs.cc_(widgetStates[k].cc);
 						this.prAddControlButton(k);
 					};
 					widgetStates[k].ccHi !? { 
@@ -372,7 +372,7 @@ CVCenter {
 						}, {
 //							("false func triggered:"+[k, btn]).postln;
 							btn.states_([[
-								cvWidgets[k].midiOSCSpecs.midiCtrl.string, 
+								cvWidgets[k].midiOscSpecs.midiCtrl.string, 
 								Color.black, 
 								tabProperties[widgetStates[k].tabIndex].tabColor
 							]]);
@@ -430,7 +430,7 @@ CVCenter {
 		all.removeAt(key.asSymbol);
 		cvWidgets[key].class.switch(
 			CVWidgetKnob, { 
-				cvWidgets[key].midiOSCSpecs.cc !? { cvWidgets[key].midiOSCSpecs.cc.remove };
+				cvWidgets[key].midiOscSpecs.cc !? { cvWidgets[key].midiOscSpecs.cc.remove };
 				controlButtons !? {
 					controlButtons[key] !? { 
 						controlButtons[key].postln;
@@ -522,7 +522,7 @@ CVCenter {
 	}
 	
 	*setup {
-		^[this.midimode, this.midiresolution, this.midimean, this.ctrlButtonBank, this.softWithin];
+		^[this.midiMode, this.midiResolution, this.midiMean, this.ctrlButtonBank, this.softWithin];
 	}
 	
 	*guiMoveTo { |point|
@@ -546,17 +546,17 @@ CVCenter {
 	// private Methods - not to be used directly
 	
 	*prSetup { |argMode, argResolution, argMean, argCButtonBank, argSoftWithin|
-		argMode !? { this.midimode_(argMode) };
-		argResolution !? { this.midiresolution_(argResolution) };
-		argMean !? { this.midimean_(argMean) };
+		argMode !? { this.midiMode_(argMode) };
+		argResolution !? { this.midiResolution_(argResolution) };
+		argMean !? { this.midiMean_(argMean) };
 		argCButtonBank !? { this.ctrlButtonBank_(argCButtonBank) };
 		argSoftWithin !? { this.softWithin_(argSoftWithin) };
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
 			("setup-args:"+[argMode, argResolution, argMean, argCButtonBank, argSoftWithin]).postln;
 			cvWidgets.pairsDo({ |k, wdgt| 
-				this.midimode !? { wdgt.midimode_(this.midimode) };
-				this.midiresolution !? { wdgt.midiresolution_(this.midiresolution) };
-				this.midimean !? { wdgt.midimean_(this.midimean) };
+				this.midiMode !? { wdgt.midiMode_(this.midiMode) };
+				this.midiResolution !? { wdgt.midiResolution_(this.midiResolution) };
+				this.midiMean !? { wdgt.midiMean_(this.midiMean) };
 				wdgt.ctrlButtonBank_(this.ctrlButtonBank);
 				this.softWithin !? { wdgt.softWithin_(this.softWithin) };
 			})

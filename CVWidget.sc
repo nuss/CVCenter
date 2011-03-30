@@ -1,7 +1,7 @@
 
 CVWidget {
 
-	var <>midimode = 0, <>midimean = 64, <>ctrlButtonBank, <>midiresolution = 1, <>softWithin = 0.1;
+	var prMidiMode = 0, prMidiMean = 64, prCtrlButtonBank, prMidiResolution = 1, prSoftWithin = 0.1;
 	var prCalibrate = true; // OSC-calibration enabled/disabled - private
 	var visibleGuiEls, allGuiEls;
 	var <widgetBg, <label, <nameField; // elements contained in any kind of CVWidget
@@ -9,7 +9,7 @@ CVWidget {
 	var <wdgtControllersAndModels;
 
 	setup {
-		^[this.midimode, this.midiresolution, this.midimean, this.ctrlButtonBank, this.softwithin, prCalibrate];
+		^[this.midiMode, this.midiResolution, this.midiMean, this.ctrlButtonBank, this.softWithin, prCalibrate];
 	}
 	
 	visible_ { |visible|
@@ -75,6 +75,95 @@ CVWidget {
 		allGuiEls.do(_.remove);
 	}
 	
+	midiMode_ { |mode|
+		prMidiMode = mode;
+		wdgtControllersAndModels.midiOptions.model.value_(
+			(
+				midiMode: prMidiMode,
+				midiMean: prMidiMean,
+				ctrlButtonBank: prCtrlButtonBank,
+				midiResolution: prMidiResolution,
+				softWithin: prSoftWithin
+			)
+		).changed(\value);
+	}
+	
+	midiMode {
+		^prMidiMode;	
+	}
+	
+	midiMean_ { |meanval|
+		prMidiMean = meanval;
+		wdgtControllersAndModels.midiOptions.model.value_(
+			(
+				midiMode: prMidiMode,
+				midiMean: prMidiMean,
+				ctrlButtonBank: prCtrlButtonBank,
+				midiResolution: prMidiResolution,
+				softWithin: prSoftWithin
+			)
+		).changed(\value);
+	}
+	
+	midiMean	{
+		^prMidiMean;	
+	}
+	
+	softWithin_ { |threshold|
+		prSoftWithin = threshold;
+		wdgtControllersAndModels.midiOptions.model.value_(
+			(
+				midiMode: prMidiMode,
+				midiMean: prMidiMean,
+				ctrlButtonBank: prCtrlButtonBank,
+				midiResolution: prMidiResolution,
+				softWithin: prSoftWithin
+			)
+		).changed(\value);
+	}
+	
+	softWithin {
+		^prSoftWithin;
+	}
+	
+	ctrlButtonBank_ { |numSliders|
+		prCtrlButtonBank = numSliders;
+		wdgtControllersAndModels.midiOptions.model.value_(
+			(
+				midiMode: prMidiMode,
+				midiMean: prMidiMean,
+				ctrlButtonBank: prCtrlButtonBank,
+				midiResolution: prMidiResolution,
+				softWithin: prSoftWithin
+			)
+		).changed(\value);
+	}
+	
+	ctrlButtonBank {
+		^prCtrlButtonBank;
+	}
+	
+	midiResolution_ { |resolution|
+		if(resolution.isNumber.not, {
+			Error("The value passed in for midiResolution must be a float or an integer - lower values result in a higher resolution and vice versa. midiResolution only applies for in-/decremental midiMode").throw;
+		}, {
+			prMidiResolution = resolution;
+			wdgtControllersAndModels.midiOptions.model.value_(
+				(
+					midiMode: prMidiMode,
+					midiMean: prMidiMean,
+					ctrlButtonBank: prCtrlButtonBank,
+					midiResolution: prMidiResolution,
+					softWithin: prSoftWithin
+				)
+			).changed(\value);
+		})
+	}
+	
+	midiResolution {
+		^prMidiResolution;
+	}
+	
 	initControllersAndModels { |controllersAndModels, key|
 		var wcm;
 		if(wdgtControllersAndModels.notNil, {
@@ -124,6 +213,20 @@ CVWidget {
 		};
 		wcm.midiDisplay.model ?? {
 			wcm.midiDisplay.model = Ref((src: "source", chan: "chan", ctrl: "ctrl", learn: "L"));
+		};
+		wcm.midiOptions ?? {
+			wcm.midiOptions = ();
+		};
+		wcm.midiOptions.model ?? {
+			wcm.midiOptions.model = Ref(
+				(
+					midiMode: prMidiMode, 
+					midiMean: prMidiMean, 
+					ctrlButtonBank: prCtrlButtonBank, 
+					midiResolution: prMidiResolution, 
+					softWithin: prSoftWithin
+				)
+			)
 		};
 		wcm.mapConstrainterLo ?? { 
 			wcm.mapConstrainterLo = CV([-inf, inf].asSpec, wdgtControllersAndModels.oscInputRange.model.value[0]);
@@ -318,17 +421,17 @@ CVWidget {
 							ctrlString = num+1;
 						});
 	
-						this.midimode.switch(
+						this.midiMode.switch(
 							0, { 
-								if(val/127 < (cv.input+(softWithin/2)) and: {
-									val/127 > (cv.input-(softWithin/2));
+								if(val/127 < (cv.input+(prSoftWithin/2)) and: {
+									val/127 > (cv.input-(prSoftWithin/2));
 								}, { 
 									cv.input_(val/127);
 								})
 							},
 							1, { 
-								meanVal = this.midimean;
-								cv.input_(cv.input+((val-meanVal)/127*this.midiresolution)) 
+								meanVal = this.midiMean;
+								cv.input_(cv.input+((val-meanVal)/127*this.midiResolution)) 
 							}
 						);
 						src !? { midiOscSpecs.midisrc = src };
@@ -395,13 +498,43 @@ CVWidget {
 							.canFocus_(false)
 						;
 						thisGuiEls.midiLearn.value_(1)
-					}
+					};
+					if(thisGuiEls.editor.notNil and:{
+						thisGuiEls.editor.isClosed.not
+					}, {
+						defer {
+							thisGuiEls.editor.midiSrcField.string_(theChanger.value.src.asString)
+								.background_(Color.red)
+								.stringColor_(Color.white)
+								.canFocus_(false)
+							;
+							thisGuiEls.editor.midiChanField.string_((theChanger.value.chan+1).asString)
+								.background_(Color.red)
+								.stringColor_(Color.white)
+								.canFocus_(false)
+							;
+							thisGuiEls.editor.midiCtrlField.string_(theChanger.value.ctrl)
+								.background_(Color.red)
+								.stringColor_(Color.white)
+								.canFocus_(false)
+							;
+							thisGuiEls.editor.midiLearnBut.value_(1)
+						}
+					})
 				},
 				"C", {
 					thisGuiEls.midiLearn.states_([
 						["C", Color.white, Color(0.11468057974842, 0.38146154367376, 0.19677815686724)],
 						["X", Color.white, Color.red]
 					]).refresh;
+					if(thisGuiEls.editor.notNil and:{
+						thisGuiEls.editor.isClosed.not
+					}, {
+						thisGuiEls.editor.midiLearnBut.states_([
+							["C", Color.white, Color(0.11468057974842, 0.38146154367376, 0.19677815686724)],
+							["X", Color.white, Color.red]
+						]).refresh;
+					})
 				},
 				"L", {
 					defer {
@@ -425,9 +558,47 @@ CVWidget {
 							["X", Color.white, Color.red]
 						])
 						.value_(0).refresh;
-					}
+					};
+					if(thisGuiEls.editor.notNil and:{
+						thisGuiEls.editor.isClosed.not
+					}, {
+						defer {
+							thisGuiEls.editor.midiSrcField.string_(theChanger.value.src)
+								.background_(Color.white)
+								.stringColor_(Color.black)
+								.canFocus_(true)
+							;
+							thisGuiEls.editor.midiChanField.string_(theChanger.value.chan)
+								.background_(Color.white)
+								.stringColor_(Color.black)
+								.canFocus_(true)
+							;
+							thisGuiEls.editor.midiCtrlField.string_(theChanger.value.ctrl)
+								.background_(Color.white)
+								.stringColor_(Color.black)
+								.canFocus_(true)
+							;
+							thisGuiEls.editor.midiLearnBut.value_(0)
+						}
+					})
 				}
 			)
+		});
+
+		wcm.midiOptions.controller ?? {
+			wcm.midiOptions.controller = SimpleController(wcm.midiOptions.model);
+		};
+		
+		wcm.midiOptions.controller.put(\value, { |theChanger, what, moreArgs|
+			if(thisGuiEls.editor.notNil and:{
+				thisGuiEls.editor.isClosed.not
+			}, {
+				thisGuiEls.editor.midiModeSelect.value_(theChanger.value.midiMode);
+				thisGuiEls.editor.midiMeanNB.value_(theChanger.value.midiMean);
+				thisGuiEls.editor.softWithinNB.value_(theChanger.value.softWithin);
+				thisGuiEls.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
+				thisGuiEls.editor.ctrlButtonBankField.value_(theChanger.value.ctrlButtonBank);
+			})
 		});
 
 		wcm.oscConnection.controller ?? {

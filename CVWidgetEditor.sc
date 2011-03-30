@@ -1,7 +1,7 @@
 CVWidgetEditor {
 	classvar <allEditors;
 	var <window, <tabs;
-	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonField, <midiResolutionNB;
+	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut, <calibNumBoxes;
 	var <nameField, <indexField;
@@ -18,6 +18,7 @@ CVWidgetEditor {
 		var flow1, flow2;
 		var tabs, specsList, specsActions, editor, cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
+		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var addr;
 		var midiModes;
 		var mappingSelectItems/*, mappingModes*/;
@@ -176,9 +177,9 @@ CVWidgetEditor {
 			midiModeSelect = PopUpMenu(allEditors[name].tabs.views[1], flow1.bounds.width/2-70@15)
 				.font_(staticTextFont)
 				.items_(midiModes)
-				.value_(widget.midimode)
+				.value_(widget.midiMode)
 				.action_({ |ms|
-					widget.midimode(ms.value);
+					widget.midiMode(ms.value);
 				})
 			;
 			
@@ -192,9 +193,9 @@ CVWidgetEditor {
 			
 			midiMeanNB = NumberBox(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
-				.value_(widget.midimean)
+				.value_(widget.midiMean)
 				.action_({ |mb|
-					widget.midimean_(mb.value)
+					widget.midiMean_(mb.value)
 				})
 				.step_(1.0)
 				.clipLo_(0.0)
@@ -229,9 +230,9 @@ CVWidgetEditor {
 
 			midiResolutionNB = NumberBox(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
-				.value_(widget.midiresolution)
+				.value_(widget.midiResolution)
 				.action_({ |mb|
-					widget.midiresolution_(mb.value)
+					widget.midiResolution_(mb.value)
 				})
 				.step_(0.05)
 				.clipLo_(0.001)
@@ -241,17 +242,68 @@ CVWidgetEditor {
 			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("number of sliders in 1 bank")
+				.string_("number of sliders per bank")
 			;
 
 			flow1.shift(5, 0);
 			
-			ctrlButtonField = NumberBox(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
+			ctrlButtonBankField = TextField(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
 				.string_(widget.ctrlButtonBank)
 				.action_({ |mb|
 					widget.ctrlButtonBank_(mb.string.asInt)
 				})
+			;
+			
+			flow1.shift(0, 10);
+						
+			midiLearnBut = Button(allEditors[name].tabs.views[1], 15@15)
+				.font_(staticTextFont)
+				.states_([
+					["L", Color.white, Color.blue],
+					["X", Color.white, Color.red]
+				])
+				.action_({ |ml|
+					ml.value.switch(
+						1, {
+							margs = [
+								[widget.guiEls.midiSrc.string, msrc], 
+								[widget.guiEls.midiChan.string, mchan], 
+								[widget.guiEls.midiCtrl.string, mctrl]
+							].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
+							if(margs.select({ |i| i.notNil }).size > 0, {
+								widget.midiConnect(*margs);
+							}, {
+								widget.midiConnect;
+							})
+						},
+						0, { widget.midiDisconnect }
+					)
+				})
+			;
+			
+			flow1.shift(0, 0);
+			
+			midiSrcField = TextField(allEditors[name].tabs.views[1], flow1.bounds.width-165@15)
+				.font_(staticTextFont)
+				.string_(msrc)
+				.background_(Color.white)
+			;
+			
+			flow1.shift(0, 0);
+			
+			midiChanField = TextField(allEditors[name].tabs.views[1], 60@15)
+				.font_(staticTextFont)
+				.string_(mchan)
+				.background_(Color.white)
+			;
+			
+			flow1.shift(0, 0);
+			
+			midiCtrlField = TextField(allEditors[name].tabs.views[1], 60@15)
+				.font_(staticTextFont)
+				.string_(mctrl)
+				.background_(Color.white)
 			;
 			
 			// OSC editting

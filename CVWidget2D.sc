@@ -21,10 +21,10 @@ CVWidget2D : CVWidget {
 		
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
-		setUpArgs[0] !? { this.midimode_(setUpArgs[0]) };
-		setUpArgs[1] !? { this.midiresolution_(setUpArgs[1]) };
-		setUpArgs[2] !? { this.midimean_(setUpArgs[2]) };
-		setUpArgs[3] !? { this.midistring_(setUpArgs[3].asString) };
+		setUpArgs[0] !? { this.midiMode_(setUpArgs[0]) };
+		setUpArgs[1] !? { this.midiResolution_(setUpArgs[1]) };
+		setUpArgs[2] !? { this.midiMean_(setUpArgs[2]) };
+//		setUpArgs[3] !? { this.midistring_(setUpArgs[3].asString) };
 		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
 		setUpArgs[6] !? { prCalibrate = (setUpArgs[6]) };

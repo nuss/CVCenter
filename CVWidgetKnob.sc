@@ -40,15 +40,13 @@ CVWidgetKnob : CVWidget {
 				
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
-		setUpArgs[0] !? { this.midimode_(setUpArgs[0]) };
-		setUpArgs[1] !? { this.midiresolution_(setUpArgs[1]) };
-		setUpArgs[2] !? { this.midimean_(setUpArgs[2]) };
+		setUpArgs[0] !? { this.midiMode_(setUpArgs[0]) };
+		setUpArgs[1] !? { this.midiResolution_(setUpArgs[1]) };
+		setUpArgs[2] !? { this.midiMean_(setUpArgs[2]) };
 		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
 		setUpArgs[6] !? { this.calibrate_(setUpArgs[6]) };
-		
-		this.setup.postln;
-		
+				
 		action !? { thisCV.action_(action) };
 		
 		this.initControllersAndModels(controllersAndModels);
@@ -118,7 +116,7 @@ CVWidgetKnob : CVWidget {
 			knobsize = thisHeight-128;
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = thisXY.y+16;
-		});			
+		});						
 		guiEls.knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
 			.canFocus_(false)
 		;
@@ -143,7 +141,10 @@ CVWidgetKnob : CVWidget {
 					guiEls.editor.front(0)
 				});
 				wdgtControllersAndModels.oscConnection.model.value_(
-					wdgtControllersAndModels.oscConnection.model.value
+					wdgtControllersAndModels.oscConnection.model.value;
+				).changed(\value);
+				wdgtControllersAndModels.midiConnection.model.value_(
+					wdgtControllersAndModels.midiConnection.model.value
 				).changed(\value);
 			})
 		;
@@ -160,6 +161,9 @@ CVWidgetKnob : CVWidget {
 				});
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value;
+				).changed(\value);
+				wdgtControllersAndModels.midiConnection.model.value_(
+					wdgtControllersAndModels.midiConnection.model.value
 				).changed(\value);
 			})
 		;
@@ -287,6 +291,10 @@ CVWidgetKnob : CVWidget {
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value;
 				).changed(\value);
+				wdgtControllersAndModels.midiConnection.model.value_(
+					wdgtControllersAndModels.midiConnection.model.value
+				).changed(\value);
+
 			})
 		;
 		nextY = nextY+guiEls.oscEditBut.bounds.height;

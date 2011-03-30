@@ -14,22 +14,22 @@ p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
 p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; min-height: 17.0px}
 p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco}
 p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; min-height: 14.0px}
-p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #7d6c6b; min-height: 14.0px}
-p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #a34742}
-p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #003b8f}
-p.p11 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #386037}
-span.s1 {color: #41555f}
-span.s2 {color: #084fa3}
-span.s3 {color: #195995}
-span.s4 {color: #0000ff}
+p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #7b6d6c; min-height: 14.0px}
+p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #9c4f4b}
+p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #074083}
+p.p11 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #3e5c3d}
+span.s1 {color: #43545c}
+span.s2 {color: #105296}
+span.s3 {color: #205a8b}
+span.s4 {color: #0032e6}
 span.s5 {font: 12.0px Helvetica}
 span.s6 {font: 10.0px Monaco}
-span.s7 {color: #0026ad}
-span.s8 {color: #236b22}
+span.s7 {color: #00339d}
+span.s8 {color: #30652f}
 span.s9 {color: #000000}
-span.s10 {color: #386037}
-span.s11 {color: #003b8f}
-span.s12 {color: #804c81}
+span.s10 {color: #3e5c3d}
+span.s11 {color: #074083}
+span.s12 {color: #7b547c}
 span.s13 {color: #666666}
 span.Apple-tab-span {white-space:pre}
 </style>
@@ -48,26 +48,23 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><i><span class="Apple-tab-span">	</span>There should be no need to call *new directly as other methods will do this internally.</i></p>
 <p class="p3"><span class="Apple-tab-span">	</span><b>cvs</b> - a Dictionary, an IdentyDictionary or an Event, containing one or more CVs as key-value pair</p>
 <p class="p3"><span class="Apple-tab-span">	</span><b>setUpArgs</b> - an array of setup-arguments.</p>
-<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[midimode, midiresolution, midimean, midistring, ctrlButtonBank, softWithin]<span class="Apple-converted-space"> <span class="Apple-tab-span">	</span></span></p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[midiMode, midiResolution, midiMean, midistring, ctrlButtonBank, softWithin]<span class="Apple-converted-space"> <span class="Apple-tab-span">	</span></span></p>
 <p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>For an explanation for the meaning of each slot see below.</p>
 <p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
-<p class="p3">The following setter-methods determine a global setup for all CVWidgets contained in CVCenter. They are implemented as simple getters/setters with inbuilt logic besides their getter/setter functionality. You can set e.g. CVCenter.midimode_(1) <i>before</i> actually calling CVCenter.new and CVCenter will remember the setting.<span class="Apple-converted-space"> </span></p>
+<p class="p3">The following setter-methods determine a global setup for all CVWidgets contained in CVCenter. They are implemented as simple getters/setters with inbuilt logic besides their getter/setter functionality. You can set e.g. CVCenter.midiMode_(1) <i>before</i> actually calling CVCenter.new and CVCenter will remember the setting.<span class="Apple-converted-space"> </span></p>
 <p class="p3">When a setter is called while CVCenter-gui is visible, the inbuilt SkipJack-machanism will grab a newly set value every 0.5 seconds, thus updating CVCenter's setup.</p>
 <p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
-<p class="p3"><b>*midimode_</b></p>
+<p class="p3"><b>*midiMode_</b></p>
 <p class="p3"><span class="Apple-tab-span">	</span>0: MIDI-output is 0-127</p>
 <p class="p3"><span class="Apple-tab-span">	</span>1: MIDI-output is a mean-value +/- in-/decrement. If no value for <i>mean</i> is given in the setup-array 64 is assumed to be the default value for <i>mean</i>.</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p3"><b>*midiresolution_</b></p>
+<p class="p3"><b>*midiResolution_</b></p>
 <p class="p3"><span class="Apple-tab-span">	</span>default: 1</p>
-<p class="p3"><span class="Apple-tab-span">	</span>This parameter will only have an effect if midimode is set to 1 (endless faders). It determines the resolution of each fader. Higher values will result in a lower resolution, lower values will have the opposite effect.<span class="Apple-converted-space"> </span></p>
+<p class="p3"><span class="Apple-tab-span">	</span>This parameter will only have an effect if midiMode is set to 1 (endless faders). It determines the resolution of each fader. Higher values will result in a lower resolution, lower values will have the opposite effect.<span class="Apple-converted-space"> </span></p>
 <p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
-<p class="p3"><b>*midimean_</b><span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-tab-span">	</span>default: 64. Only relevant for midimode == 1. It reflects the default output of a midislider in neutral position.</p>
+<p class="p3"><b>*midiMean_</b><span class="Apple-converted-space"> </span></p>
+<p class="p3"><span class="Apple-tab-span">	</span>default: 64. Only relevant for midiMode == 1. It reflects the default output of a midislider in neutral position.</p>
 <p class="p2"><br></p>
-<p class="p3"><b>*midistring_</b></p>
-<p class="p3"><span class="Apple-tab-span">	</span>A string, that may display details of your current midi-settings (certain details like the midi-silder's source-id, the channel, the controller-number will automatically displayed when a widget gets instantiated)</p>
-<p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p3"><b>*ctrlButtonBank_</b></p>
 <p class="p3"><b><span class="Apple-tab-span">	</span></b>As midi-devices may have a number of different banks at limited number of sliders this offers some convenience in a way that the GUI will display the bank and its sliders from 1 to the max. number of hardware sliders. E.g. on a Doepfer Pocket Dial which has 16 sliders and 4 banks a setting like</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
@@ -84,9 +81,9 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
 <p class="p3"><b>*setup</b></p>
 <p class="p3"><span class="Apple-tab-span">	</span>A convenience-method, returning<span class="Apple-converted-space"> </span></p>
-<p class="p6"><span class="s5"><span class="Apple-tab-span">	</span></span>[midimode, midiresolution, midimean, midistring, ctrlButtonBank, softWithin]</p>
+<p class="p6"><span class="s5"><span class="Apple-tab-span">	</span></span>[midiMode, midiResolution, midiMean, midistring, ctrlButtonBank, softWithin]</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p3">If no explicite setup is provided (by setting *midimode_, *midiresolution_ etc) for <b>CVCenter</b> *setup will return <span class="s6">[nil, nil, nil, nil, nil, nil]</span>. In this case the individual settings of each widget will apply (set by their instance-methods midimode_, midiresolution_ etc.).</p>
+<p class="p3">If no explicite setup is provided (by setting *midiMode_, *midiResolution_ etc) for <b>CVCenter</b> *setup will return <span class="s6">[nil, nil, nil, nil, nil, nil]</span>. In this case the individual settings of each widget will apply (set by their instance-methods midiMode_, midiResolution_ etc.).</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p3"><b>*use(key, cv, value, tab, slot)</b></p>
 <p class="p3"><span class="Apple-tab-span">	</span>key - the key under which the CV-instance will be added to the CVCenter</p>
@@ -165,7 +162,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p7"><br></p>
 <p class="p7"><br></p>
 <p class="p9">// change the MIDI-setup</p>
-<p class="p6"><span class="s11">CVCenter</span>.midimode_(<span class="s12">1</span>)</p>
+<p class="p6"><span class="s11">CVCenter</span>.midiMode_(<span class="s12">1</span>)</p>
 <p class="p7"><br></p>
 <p class="p9">// removing a CV-instance while a Pattern is playing<span class="Apple-converted-space"> </span></p>
 <p class="p9">// should be safe since removeAt will return its last value</p>
