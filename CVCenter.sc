@@ -203,8 +203,7 @@ CVCenter {
 						)
 					})
 				}, {
-//					this.setup.postln;
-//					"and now a knob widget".postln;
+					("setup:"+this.setup).postln;
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex], 
 						orderedCVs[i], 
@@ -553,7 +552,8 @@ CVCenter {
 		argSoftWithin !? { this.softWithin_(argSoftWithin) };
 		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
 			("setup-args:"+[argMode, argResolution, argMean, argCButtonBank, argSoftWithin]).postln;
-			cvWidgets.pairsDo({ |k, wdgt| 
+			cvWidgets.pairsDo({ |k, wdgt|
+				"does it happen here?".postln;
 				this.midiMode !? { wdgt.midiMode_(this.midiMode) };
 				this.midiResolution !? { wdgt.midiResolution_(this.midiResolution) };
 				this.midiMean !? { wdgt.midiMean_(this.midiMean) };

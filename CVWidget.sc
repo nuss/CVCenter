@@ -77,77 +77,7 @@ CVWidget {
 	
 	midiMode_ { |mode|
 		prMidiMode = mode;
-		wdgtControllersAndModels.midiOptions.model.value_(
-			(
-				midiMode: prMidiMode,
-				midiMean: prMidiMean,
-				ctrlButtonBank: prCtrlButtonBank,
-				midiResolution: prMidiResolution,
-				softWithin: prSoftWithin
-			)
-		).changed(\value);
-	}
-	
-	midiMode {
-		^prMidiMode;	
-	}
-	
-	midiMean_ { |meanval|
-		prMidiMean = meanval;
-		wdgtControllersAndModels.midiOptions.model.value_(
-			(
-				midiMode: prMidiMode,
-				midiMean: prMidiMean,
-				ctrlButtonBank: prCtrlButtonBank,
-				midiResolution: prMidiResolution,
-				softWithin: prSoftWithin
-			)
-		).changed(\value);
-	}
-	
-	midiMean	{
-		^prMidiMean;	
-	}
-	
-	softWithin_ { |threshold|
-		prSoftWithin = threshold;
-		wdgtControllersAndModels.midiOptions.model.value_(
-			(
-				midiMode: prMidiMode,
-				midiMean: prMidiMean,
-				ctrlButtonBank: prCtrlButtonBank,
-				midiResolution: prMidiResolution,
-				softWithin: prSoftWithin
-			)
-		).changed(\value);
-	}
-	
-	softWithin {
-		^prSoftWithin;
-	}
-	
-	ctrlButtonBank_ { |numSliders|
-		prCtrlButtonBank = numSliders;
-		wdgtControllersAndModels.midiOptions.model.value_(
-			(
-				midiMode: prMidiMode,
-				midiMean: prMidiMean,
-				ctrlButtonBank: prCtrlButtonBank,
-				midiResolution: prMidiResolution,
-				softWithin: prSoftWithin
-			)
-		).changed(\value);
-	}
-	
-	ctrlButtonBank {
-		^prCtrlButtonBank;
-	}
-	
-	midiResolution_ { |resolution|
-		if(resolution.isNumber.not, {
-			Error("The value passed in for midiResolution must be a float or an integer - lower values result in a higher resolution and vice versa. midiResolution only applies for in-/decremental midiMode").throw;
-		}, {
-			prMidiResolution = resolution;
+		wdgtControllersAndModels !? {
 			wdgtControllersAndModels.midiOptions.model.value_(
 				(
 					midiMode: prMidiMode,
@@ -157,7 +87,83 @@ CVWidget {
 					softWithin: prSoftWithin
 				)
 			).changed(\value);
-		})
+		}
+	}
+	
+	midiMode {
+		^prMidiMode;	
+	}
+	
+	midiMean_ { |meanval|
+		prMidiMean = meanval;
+		wdgtControllersAndModels !? {
+			wdgtControllersAndModels.midiOptions.model.value_(
+				(
+					midiMode: prMidiMode,
+					midiMean: prMidiMean,
+					ctrlButtonBank: prCtrlButtonBank,
+					midiResolution: prMidiResolution,
+					softWithin: prSoftWithin
+				)
+			).changed(\value);
+		}
+	}
+	
+	midiMean	{
+		^prMidiMean;	
+	}
+	
+	softWithin_ { |threshold|
+		prSoftWithin = threshold;
+		wdgtControllersAndModels !? {
+			wdgtControllersAndModels.midiOptions.model.value_(
+				(
+					midiMode: prMidiMode,
+					midiMean: prMidiMean,
+					ctrlButtonBank: prCtrlButtonBank,
+					midiResolution: prMidiResolution,
+					softWithin: prSoftWithin
+				)
+			).changed(\value);
+		}
+	}
+	
+	softWithin {
+		^prSoftWithin;
+	}
+	
+	ctrlButtonBank_ { |numSliders|
+		prCtrlButtonBank = numSliders;
+		wdgtControllersAndModels !? {
+			wdgtControllersAndModels.midiOptions.model.value_(
+				(
+					midiMode: prMidiMode,
+					midiMean: prMidiMean,
+					ctrlButtonBank: prCtrlButtonBank,
+					midiResolution: prMidiResolution,
+					softWithin: prSoftWithin
+				)
+			).changed(\value);
+		}
+	}
+	
+	ctrlButtonBank {
+		^prCtrlButtonBank;
+	}
+	
+	midiResolution_ { |resolution|
+		prMidiResolution = resolution;
+		wdgtControllersAndModels !? {
+			wdgtControllersAndModels.midiOptions.model.value_(
+				(
+					midiMode: prMidiMode,
+					midiMean: prMidiMean,
+					ctrlButtonBank: prCtrlButtonBank,
+					midiResolution: prMidiResolution,
+					softWithin: prSoftWithin
+				)
+			).changed(\value);
+		}
 	}
 	
 	midiResolution {
@@ -166,6 +172,7 @@ CVWidget {
 	
 	initControllersAndModels { |controllersAndModels, key|
 		var wcm;
+				
 		if(wdgtControllersAndModels.notNil, {
 			wdgtControllersAndModels = controllersAndModels;
 		}, {
@@ -177,7 +184,7 @@ CVWidget {
 		};
 		
 		wcm = wdgtControllersAndModels;
-				
+						
 		wcm.calibration ?? {
 			wcm.calibration = ();
 		};
