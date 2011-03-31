@@ -585,7 +585,11 @@ CVWidget {
 								.stringColor_(Color.black)
 								.canFocus_(true)
 							;
-							thisGuiEls.editor.midiLearnBut.value_(0)
+							thisGuiEls.editor.midiLearnBut.states_([
+								["L", Color.white, Color.blue],
+								["X", Color.white, Color.red]
+							])
+							.value_(0)
 						}
 					})
 				}

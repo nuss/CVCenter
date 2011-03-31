@@ -2,7 +2,7 @@
 
 CVWidgetKnob : CVWidget {
 	
-	var thisCV/*, <cc, <midisrc, <midichan, <midinum*/ /* keep this for now but that might change ... */;
+	var <widgetCV/*, <cc, <midisrc, <midichan, <midinum*/ /* keep this for now but that might change ... */;
 	var <window, <guiEls, <midiOscSpecs;
 	var prSpec/*, midiOSCSpecs.oscMapping = \linlin, prCalibConstraints, oscResponder*/;
 	var returnedFromActions;
@@ -33,9 +33,9 @@ CVWidgetKnob : CVWidget {
 		if(name.isNil, { thisname = "knob" }, { thisname = name });
 		
 		if(cv.isNil, {
-			thisCV = CV.new;
+			widgetCV = CV.new;
 		}, {
-			thisCV = cv;
+			widgetCV = cv;
 		});
 				
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
@@ -47,7 +47,7 @@ CVWidgetKnob : CVWidget {
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
 		setUpArgs[6] !? { this.calibrate_(setUpArgs[6]) };
 				
-		action !? { thisCV.action_(action) };
+		action !? { widgetCV.action_(action) };
 		
 		this.initControllersAndModels(controllersAndModels);
 		
@@ -122,12 +122,12 @@ CVWidgetKnob : CVWidget {
 		;
 		block { |break|
 			#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
-				if(thisCV.spec == symbol.asSpec, { break.value(guiEls.knob.centered_(true)) });
+				if(widgetCV.spec == symbol.asSpec, { break.value(guiEls.knob.centered_(true)) });
 			})
 		};
 		nextY = thisXY.y+thisHeight-117;
 		guiEls.numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.value_(thisCV.value)
+			.value_(widgetCV.value)
 		;
 		nextY = nextY+guiEls.numVal.bounds.height;
 		guiEls.specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
@@ -307,9 +307,9 @@ CVWidgetKnob : CVWidget {
 			])
 		;
 		
-		returnedFromActions = this.initControllerActions(wdgtControllersAndModels, guiEls, midiOscSpecs, thisCV);
+		returnedFromActions = this.initControllerActions(wdgtControllersAndModels, guiEls, midiOscSpecs, widgetCV);
 				
-		[guiEls.knob, guiEls.numVal].do({ |view| thisCV.connect(view) });
+		[guiEls.knob, guiEls.numVal].do({ |view| widgetCV.connect(view) });
 		visibleGuiEls = [
 			guiEls.knob, 
 			guiEls.numVal, 
@@ -356,7 +356,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	spec {
-		^thisCV.spec;
+		^widgetCV.spec;
 	}
 	
 	oscMapping_ { |mapping|
@@ -431,6 +431,10 @@ CVWidgetKnob : CVWidget {
 	
 	midiDisconnect { 
 		midiOscSpecs.cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
+	}
+	
+	cvAction_ { |func|
+		widgetCV.action_(func);
 	}
 	
 	front {
