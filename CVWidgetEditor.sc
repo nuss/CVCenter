@@ -1,6 +1,7 @@
 CVWidgetEditor {
 	classvar <allEditors;
 	var <window, <tabs;
+	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut, <calibNumBoxes;
@@ -15,8 +16,8 @@ CVWidgetEditor {
 	}
 
 	init { |widget, widgetName, tab, hilo|
-		var flow1, flow2;
-		var tabs, specsList, specsActions, editor, cvString, slotHiLo;
+		var flow0, flow1, flow2;
+		var tabs, /*specsActions, editor, */cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var addr;
@@ -55,62 +56,14 @@ CVWidgetEditor {
 			allEditors[name].tabs.view.resize_(5);
 			allEditors[name].tabs.stringFocusedColor_(Color.blue);
 			
-			specsList = ListView(allEditors[name].tabs.views[0], Rect(0, 0, Window.screenBounds.width, Window.screenBounds.height))
-				.resize_(5)
-				.background_(Color.white)
-				.hiliteColor_(Color.blue)
-//				.selectedStringColor_(Color.white)
-				.visible_(true)
-				.enterKeyAction_({ |ws|
-					specsActions[ws.value].value;
-					if(widget.class === CVWidgetKnob, {
-						block { |break|
-							#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
-								if(widget.spec == symbol.asSpec, { 
-									break.value(widget.knob.centered_(true));
-								}, {
-									widget.knob.centered_(false);
-								})
-							})
-						}
-					});
-					[ws.value, ws.items[ws.value]].postln;
-				})
-			;
+			allEditors[name].tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			allEditors[name].tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			allEditors[name].tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			
-			specsActions = [
-				{ specsList.visible_(false); editor.visible_(true) },
-			];
-			
-			specsList.items_(specsList.items.add(widget.spec.asString));
-
-			Spec.specs.pairsDo({ |k, v|
-				if(v.isKindOf(ControlSpec), {
-					specsList.items_(specsList.items.add(k++":"+v));
-					if(hilo.notNil, {
-						specsActions = specsActions.add({ 
-							widget.spec_(v, hilo);
-							specsList.items_(
-								[v.asString] ++ specsList.items[1..(specsList.items.size-1)]
-							);
-							specsList.visible_(true);
-							editor.visible_(false);
-						})
-					}, {
-						specsActions = specsActions.add({ 
-							widget.spec_(v);
-							specsList.items_(
-								[v.asString] ++ specsList.items[1..(specsList.items.size-1)]
-							);
-							specsList.visible_(true);
-							editor.visible_(false);
-						})
-					})
-				})
-			});
-
-			editor = TextView(window, Rect(0, 0, window.bounds.width, window.bounds.height))
-				.resize_(5)
+			StaticText(allEditors[name].tabs.views[0], flow0.bounds.width-20@95)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq.asSpec \nor [20, 20000, \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
 			;
 
 			if(hilo.notNil, {
@@ -120,48 +73,45 @@ CVWidgetEditor {
 			});
 
 			cvString = cvString[1..cvString.size-1].join(" ");
-
-			editor
-				.string_("// edit and hit <enter>\n// the string must represent a valid ControlSpec\n// e.g. \\freq.asSpec\n// or [20, 400].asSpec\n// or ControlSpec(23, 653, \\exp, 1.0, 312, \" hz\")\n// have a look at the ControlSpec-helpfile ...\n\n"++cvString)
-				.visible_(false)
-				.syntaxColorize
-				.enterInterpretsSelection_(false)
-				.keyDownAction_({ |view, char, modifiers, unicode, keycode|
-					if(unicode == 3, {
-						("result:"+view.string.interpret).postln;
-						if(hilo.isNil, {
-							widget.spec_(view.string.interpret);
-							block { |break|
-								#[\pan, \boostcut, \bipolar, \detune].do({ |symbol|
-									if(widget.spec == symbol.asSpec, { 
-										break.value(widget.knob.centered_(true));
-									}, {
-										widget.knob.centered_(false);
-									})			
-								})
-							}
-						}, {
-							widget.spec_(view.string.interpret, hilo);
-						});
-						specsList.visible_(true);
-						specsList.items_([view.string.interpret.asString] ++ specsList.items[1..(specsList.items.size-1)]);
-						editor.visible_(false)
-					});
-					if(unicode == 13 or: { 
-						unicode == 32 or: {
-							unicode == 3 or: {
-								unicode == 46
-							}
-						}
-					}, {
-						view.syntaxColorize;
-					})
+			
+			specField = TextField(allEditors[name].tabs.views[0], flow0.bounds.width-20@15)
+				.font_(staticTextFont)
+				.string_(cvString)
+				.action_({ |tf|
+					widget.spec_(tf.string.interpret)
 				})
 			;
-
-			allEditors[name].tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			allEditors[name].tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			
+			flow0.shift(0, 5);
+
+			specsList = PopUpMenu(allEditors[name].tabs.views[0], flow0.bounds.width-20@20)
+				.action_({ |sl|
+					widget.spec_(specsListSpecs[sl.value]);
+				})
+			;
+			
+			if(widget.editorEnv.specsListSpecs.isNil, { 
+				specsListSpecs = List() 
+			}, {
+				specsListSpecs = widget.editorEnv.specsListSpecs;
+			});
+			
+			if(widget.editorEnv.specsListItems.notNil, {
+				specsList.items_(widget.editorEnv.specsListItems);
+			}, {
+				Spec.specs.pairsDo({ |k, v|
+					if(v.isKindOf(ControlSpec), {
+						specsList.items_(specsList.items.add(k++":"+v));
+						specsListSpecs.add(v);
+					})
+				})
+			});
+			
+			window.onClose_({
+				widget.editorEnv.specsListSpecs = specsListSpecs;
+				widget.editorEnv.specsListItems = specsList.items;
+			});
+						
 			// MIDI editing
 			
 			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+40@15)
@@ -267,9 +217,9 @@ CVWidgetEditor {
 					ml.value.switch(
 						1, {
 							margs = [
-								[widget.guiEls.midiSrc.string, msrc], 
-								[widget.guiEls.midiChan.string, mchan], 
-								[widget.guiEls.midiCtrl.string, mctrl]
+								[widget.guiEnv.midiSrc.string, msrc], 
+								[widget.guiEnv.midiChan.string, mchan], 
+								[widget.guiEnv.midiCtrl.string, mctrl]
 							].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 							if(margs.select({ |i| i.notNil }).size > 0, {
 								widget.midiConnect(*margs);
@@ -288,6 +238,25 @@ CVWidgetEditor {
 				.font_(staticTextFont)
 				.string_(msrc)
 				.background_(Color.white)
+				.action_({ |tf|
+					if(tf.string != mctrl, {
+						widget.wdgtControllersAndModels.midiDisplay.model.value_((
+							learn: "C",
+							src: widget.wdgtControllersAndModels.midiDisplay.model.value.src,
+							chan: widget.wdgtControllersAndModels.midiDisplay.model.value.chan,
+							ctrl: tf.string
+						)).changed(\value)
+					})
+				})
+				.mouseDownAction_({ |tf|
+					tf.stringColor_(Color.red)
+				})
+				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+					[tf, char, modifiers, unicode, keycode].postln;
+					if(unicode == 13, {
+						tf.stringColor_(Color.black);
+					})
+				}) 
 			;
 			
 			flow1.shift(0, 0);
@@ -296,6 +265,25 @@ CVWidgetEditor {
 				.font_(staticTextFont)
 				.string_(mchan)
 				.background_(Color.white)
+				.action_({ |tf|
+					if(tf.string != mctrl, {
+						widget.wdgtControllersAndModels.midiDisplay.model.value_((
+							learn: "C",
+							src: widget.wdgtControllersAndModels.midiDisplay.model.value.src,
+							chan: widget.wdgtControllersAndModels.midiDisplay.model.value.chan,
+							ctrl: tf.string
+						)).changed(\value)
+					})
+				})
+				.mouseDownAction_({ |tf|
+					tf.stringColor_(Color.red)
+				})
+				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+					[tf, char, modifiers, unicode, keycode].postln;
+					if(unicode == 13, {
+						tf.stringColor_(Color.black);
+					})
+				}) 
 			;
 			
 			flow1.shift(0, 0);
@@ -304,6 +292,25 @@ CVWidgetEditor {
 				.font_(staticTextFont)
 				.string_(mctrl)
 				.background_(Color.white)
+				.action_({ |tf|
+					if(tf.string != mctrl, {
+						widget.wdgtControllersAndModels.midiDisplay.model.value_((
+							learn: "C",
+							src: widget.wdgtControllersAndModels.midiDisplay.model.value.src,
+							chan: widget.wdgtControllersAndModels.midiDisplay.model.value.chan,
+							ctrl: tf.string
+						)).changed(\value)
+					})
+				})
+				.mouseDownAction_({ |tf|
+					tf.stringColor_(Color.red)
+				})
+				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+					[tf, char, modifiers, unicode, keycode].postln;
+					if(unicode == 13, {
+						tf.stringColor_(Color.black);
+					})
+				}) 
 			;
 			
 			// OSC editting
