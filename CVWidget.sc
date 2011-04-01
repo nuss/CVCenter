@@ -9,7 +9,7 @@ CVWidget {
 	var <wdgtControllersAndModels;
 
 	setup {
-		^[this.midiMode, this.midiResolution, this.midiMean, this.ctrlButtonBank, this.softWithin, prCalibrate];
+		^[prMidiMode, prMidiResolution, prMidiMean, prCtrlButtonBank, prSoftWithin, prCalibrate];
 	}
 	
 	visible_ { |visible|
@@ -245,18 +245,18 @@ CVWidget {
 	}
 	
 	initControllerActions { |controllersAndModels, guiEnv, midiOscSpecsEnv, cv, key|
-		var wcm, thisGuiEls, midiOscSpecs, tmpMapping, tmpSetup, tmpCV;
+		var wcm, thisGuiEnv, midiOscSpecs, tmpMapping, tmpSetup, tmpCV, tmp;
 		var makeCCResponder, ccResponder;
 		var ctrlString, meanVal;
 		
 		if(key.notNil, {
 			wcm = controllersAndModels[key];
-			thisGuiEls = guiEnv[key];
+			thisGuiEnv = guiEnv[key];
 			midiOscSpecs = midiOscSpecsEnv[key];
 			tmpCV = cv[key];
 		}, {
 			wcm = controllersAndModels;
-			thisGuiEls = guiEnv;
+			thisGuiEnv = guiEnv;
 			midiOscSpecs = midiOscSpecsEnv;
 			tmpCV = cv;
 		});
@@ -269,33 +269,33 @@ CVWidget {
 			prCalibrate = (theChanger.value);
 			theChanger.value.switch(
 				true, { 
-					thisGuiEls.calibBut.value_(0);
-					if(thisGuiEls.editor.notNil and:{ thisGuiEls.editor.isClosed.not }, {
-						thisGuiEls.editor.calibBut.value_(0);
+					thisGuiEnv.calibBut.value_(0);
+					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
+						thisGuiEnv.editor.calibBut.value_(0);
 						wcm.mapConstrainterLo ?? { 
 							wcm.mapConstrainterLo = CV([-inf, inf].asSpec, 0.00001);
-							wcm.mapConstrainterLo.connect(thisGuiEls.editor.calibNumBoxes.lo);
+							wcm.mapConstrainterLo.connect(thisGuiEnv.editor.calibNumBoxes.lo);
 						};
 						wcm.mapConstrainterHi ?? { 
 							wcm.mapConstrainterHi = CV([-inf, inf].asSpec, 0.00001);
-							wcm.mapConstrainterHi.connect(thisGuiEls.editor.calibNumBoxes.hi);
+							wcm.mapConstrainterHi.connect(thisGuiEnv.editor.calibNumBoxes.hi);
 						};
-						[thisGuiEls.editor.calibNumBoxes.lo, thisGuiEls.editor.calibNumBoxes.hi].do({ |nb| 
+						[thisGuiEnv.editor.calibNumBoxes.lo, thisGuiEnv.editor.calibNumBoxes.hi].do({ |nb| 
 							nb.enabled_(false);
 							nb.action_(nil);
 						})
 					})
 				},
 				false, { 
-					thisGuiEls.calibBut.value_(1);
-					if(thisGuiEls.editor.notNil and:{ thisGuiEls.editor.isClosed.not }, {
-						thisGuiEls.editor.calibBut.value_(1);
+					thisGuiEnv.calibBut.value_(1);
+					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
+						thisGuiEnv.editor.calibBut.value_(1);
 						[wcm.mapConstrainterLo, wcm.mapConstrainterHi].do({ |cv| cv = nil; });
-						[thisGuiEls.editor.calibNumBoxes.lo, thisGuiEls.editor.calibNumBoxes.hi].do({ |nb| 
+						[thisGuiEnv.editor.calibNumBoxes.lo, thisGuiEnv.editor.calibNumBoxes.hi].do({ |nb| 
 							nb.enabled_(true);
 							nb.action_({ |b| 
 								this.oscInputConstraints_(
-									thisGuiEls.editor.calibNumBoxes.lo.value@thisGuiEls.editor.calibNumBoxes.hi.value;
+									thisGuiEnv.editor.calibNumBoxes.lo.value@thisGuiEnv.editor.calibNumBoxes.hi.value;
 								) 
 							})
 						})
@@ -304,7 +304,7 @@ CVWidget {
 			)
 		});
 
-		thisGuiEls.calibBut.action_({ |cb|
+		thisGuiEnv.calibBut.action_({ |cb|
 			cb.value.switch(
 				0, { wcm.calibration.model.value_(true).changed(\value) },
 				1, { wcm.calibration.model.value_(false).changed(\value) }
@@ -316,6 +316,7 @@ CVWidget {
 		};
 		
 		wcm.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
+			[theChanger.value, theChanger.value.class].postln;
 			if(theChanger.value.minval <= 0.0 or:{
 				theChanger.value.maxval <= 0.0
 			}, {
@@ -323,31 +324,47 @@ CVWidget {
 					midiOscSpecs.oscMapping === \expexp
 				}, {
 					midiOscSpecs.oscMapping = \linlin;
-					if(thisGuiEls.editor.notNil and:{
-						thisGuiEls.editor.isClosed.not
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not
 					}, {
-						thisGuiEls.editor.mappingSelect.value_(0);
+						thisGuiEnv.editor.mappingSelect.value_(0);
 					})
 				})
 			}, {
-				if(thisGuiEls.editor.notNil and:{
-					thisGuiEls.editor.isClosed.not	
+				if(thisGuiEnv.editor.notNil and:{
+					thisGuiEnv.editor.isClosed.not	
 				}, {
-					tmpMapping = thisGuiEls.editor.mappingSelect.item;
-					thisGuiEls.editor.mappingSelect.items.do({ |item, i|
+					tmpMapping = thisGuiEnv.editor.mappingSelect.item;
+					thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
 						if(item == tmpMapping, {
-							thisGuiEls.editor.mappingSelect.value_(i)
+							thisGuiEnv.editor.mappingSelect.value_(i)
 						})
-					})
+					});
 				})
 			});
+			
+			if(thisGuiEnv.editor.notNil and:{
+				thisGuiEnv.editor.isClosed.not	
+			}, {
+				thisGuiEnv.editor.specField.string_(theChanger.value.asCompileString);
+				tmp = thisGuiEnv.editor.specsListSpecs.detectIndex({ |item, i| item == theChanger.value });
+				if(tmp.notNil, {
+					thisGuiEnv.editor.specsList.value_(tmp);
+				}, {
+					thisGuiEnv.editor.specsList.items = List["custom:"+(theChanger.value.asString)]++thisGuiEnv.editor.specsList.items;
+					thisGuiEnv.editor.specsListSpecs.array_([theChanger.value]++thisGuiEnv.editor.specsListSpecs.array);
+					thisGuiEnv.editor.specsList.value_(0);
+					thisGuiEnv.editor.specsList.refresh;
+				})
+			});
+			
 			tmpCV.spec_(theChanger.value);
 			block { |break|
 				#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
 					if(tmpCV.spec == symbol.asSpec, { 
-						break.value(thisGuiEls.knob.centered_(true));
+						break.value(thisGuiEnv.knob.centered_(true));
 					}, {
-						thisGuiEls.knob.centered_(false);
+						thisGuiEnv.knob.centered_(false);
 					})			
 				})
 			}
@@ -366,42 +383,42 @@ CVWidget {
 				}, {
 					midiOscSpecs.oscMapping = \linlin;
 				});
-				if(thisGuiEls.editor.notNil and:{
-					thisGuiEls.editor.isClosed.not
+				if(thisGuiEnv.editor.notNil and:{
+					thisGuiEnv.editor.isClosed.not
 				}, {
 					{	
-						thisGuiEls.oscEditBut.states_([[
-							thisGuiEls.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscSpecs.oscMapping.asString,
-							thisGuiEls.oscEditBut.states[0][1],
-							thisGuiEls.oscEditBut.states[0][2]
+						thisGuiEnv.oscEditBut.states_([[
+							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscSpecs.oscMapping.asString,
+							thisGuiEnv.oscEditBut.states[0][1],
+							thisGuiEnv.oscEditBut.states[0][2]
 						]]);
-						thisGuiEls.oscEditBut.refresh;
-						thisGuiEls.editor.mappingSelect.items.do({ |item, i|
+						thisGuiEnv.oscEditBut.refresh;
+						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
 							if(item.asSymbol === midiOscSpecs.oscMapping, {
-								thisGuiEls.editor.mappingSelect.value_(i);
+								thisGuiEnv.editor.mappingSelect.value_(i);
 							})
 						})
 					}.defer
 				})		
 			}, {
-				if(thisGuiEls.editor.notNil and:{
-					thisGuiEls.editor.isClosed.not	
+				if(thisGuiEnv.editor.notNil and:{
+					thisGuiEnv.editor.isClosed.not	
 				}, {
 					{
-						thisGuiEls.editor.mappingSelect.items.do({ |item, i|
+						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
 							if(item.asSymbol === midiOscSpecs.oscMapping, {
-								thisGuiEls.editor.mappingSelect.value_(i)
+								thisGuiEnv.editor.mappingSelect.value_(i)
 							})
 						});
 					}.defer;
-					if(thisGuiEls.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
+					if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 						{
-							thisGuiEls.oscEditBut.states_([[
-								thisGuiEls.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscSpecs.oscMapping.asString,
-								thisGuiEls.oscEditBut.states[0][1],
-								thisGuiEls.oscEditBut.states[0][2]
+							thisGuiEnv.oscEditBut.states_([[
+								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscSpecs.oscMapping.asString,
+								thisGuiEnv.oscEditBut.states[0][1],
+								thisGuiEnv.oscEditBut.states[0][2]
 							]]);
-							thisGuiEls.oscEditBut.refresh;
+							thisGuiEnv.oscEditBut.refresh;
 						}.defer
 					})
 				})
@@ -489,55 +506,55 @@ CVWidget {
 			theChanger.value.learn.switch(
 				"X", {
 					defer {
-						thisGuiEls.midiSrc.string_(theChanger.value.src.asString)
+						thisGuiEnv.midiSrc.string_(theChanger.value.src.asString)
 							.background_(Color.red)
 							.stringColor_(Color.white)
 							.canFocus_(false)
 						;
-						thisGuiEls.midiChan.string_((theChanger.value.chan+1).asString)
+						thisGuiEnv.midiChan.string_((theChanger.value.chan+1).asString)
 							.background_(Color.red)
 							.stringColor_(Color.white)
 							.canFocus_(false)
 						;
-						thisGuiEls.midiCtrl.string_(theChanger.value.ctrl)
+						thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
 							.background_(Color.red)
 							.stringColor_(Color.white)
 							.canFocus_(false)
 						;
-						thisGuiEls.midiLearn.value_(1)
+						thisGuiEnv.midiLearn.value_(1)
 					};
-					if(thisGuiEls.editor.notNil and:{
-						thisGuiEls.editor.isClosed.not
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not
 					}, {
 						defer {
-							thisGuiEls.editor.midiSrcField.string_(theChanger.value.src.asString)
+							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
 								.background_(Color.red)
 								.stringColor_(Color.white)
 								.canFocus_(false)
 							;
-							thisGuiEls.editor.midiChanField.string_((theChanger.value.chan+1).asString)
+							thisGuiEnv.editor.midiChanField.string_((theChanger.value.chan+1).asString)
 								.background_(Color.red)
 								.stringColor_(Color.white)
 								.canFocus_(false)
 							;
-							thisGuiEls.editor.midiCtrlField.string_(theChanger.value.ctrl)
+							thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
 								.background_(Color.red)
 								.stringColor_(Color.white)
 								.canFocus_(false)
 							;
-							thisGuiEls.editor.midiLearnBut.value_(1)
+							thisGuiEnv.editor.midiLearnBut.value_(1)
 						}
 					})
 				},
 				"C", {
-					thisGuiEls.midiLearn.states_([
+					thisGuiEnv.midiLearn.states_([
 						["C", Color.white, Color(0.11468057974842, 0.38146154367376, 0.19677815686724)],
 						["X", Color.white, Color.red]
 					]).refresh;
-					if(thisGuiEls.editor.notNil and:{
-						thisGuiEls.editor.isClosed.not
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not
 					}, {
-						thisGuiEls.editor.midiLearnBut.states_([
+						thisGuiEnv.editor.midiLearnBut.states_([
 							["C", Color.white, Color(0.11468057974842, 0.38146154367376, 0.19677815686724)],
 							["X", Color.white, Color.red]
 						]).refresh;
@@ -545,47 +562,47 @@ CVWidget {
 				},
 				"L", {
 					defer {
-						thisGuiEls.midiSrc.string_(theChanger.value.src)
+						thisGuiEnv.midiSrc.string_(theChanger.value.src)
 							.background_(Color.white)
 							.stringColor_(Color.black)
 							.canFocus_(true)
 						;
-						thisGuiEls.midiChan.string_(theChanger.value.chan)
+						thisGuiEnv.midiChan.string_(theChanger.value.chan)
 							.background_(Color.white)
 							.stringColor_(Color.black)
 							.canFocus_(true)
 						;
-						thisGuiEls.midiCtrl.string_(theChanger.value.ctrl)
+						thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
 							.background_(Color.white)
 							.stringColor_(Color.black)
 							.canFocus_(true)
 						;
-						thisGuiEls.midiLearn.states_([
+						thisGuiEnv.midiLearn.states_([
 							["L", Color.white, Color.blue],
 							["X", Color.white, Color.red]
 						])
 						.value_(0).refresh;
 					};
-					if(thisGuiEls.editor.notNil and:{
-						thisGuiEls.editor.isClosed.not
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not
 					}, {
 						defer {
-							thisGuiEls.editor.midiSrcField.string_(theChanger.value.src)
+							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src)
 								.background_(Color.white)
 								.stringColor_(Color.black)
 								.canFocus_(true)
 							;
-							thisGuiEls.editor.midiChanField.string_(theChanger.value.chan)
+							thisGuiEnv.editor.midiChanField.string_(theChanger.value.chan)
 								.background_(Color.white)
 								.stringColor_(Color.black)
 								.canFocus_(true)
 							;
-							thisGuiEls.editor.midiCtrlField.string_(theChanger.value.ctrl)
+							thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
 								.background_(Color.white)
 								.stringColor_(Color.black)
 								.canFocus_(true)
 							;
-							thisGuiEls.editor.midiLearnBut.states_([
+							thisGuiEnv.editor.midiLearnBut.states_([
 								["L", Color.white, Color.blue],
 								["X", Color.white, Color.red]
 							])
@@ -601,14 +618,14 @@ CVWidget {
 		};
 		
 		wcm.midiOptions.controller.put(\value, { |theChanger, what, moreArgs|
-			if(thisGuiEls.editor.notNil and:{
-				thisGuiEls.editor.isClosed.not
+			if(thisGuiEnv.editor.notNil and:{
+				thisGuiEnv.editor.isClosed.not
 			}, {
-				thisGuiEls.editor.midiModeSelect.value_(theChanger.value.midiMode);
-				thisGuiEls.editor.midiMeanNB.value_(theChanger.value.midiMean);
-				thisGuiEls.editor.softWithinNB.value_(theChanger.value.softWithin);
-				thisGuiEls.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
-				thisGuiEls.editor.ctrlButtonBankField.value_(theChanger.value.ctrlButtonBank);
+				thisGuiEnv.editor.midiModeSelect.value_(theChanger.value.midiMode);
+				thisGuiEnv.editor.midiMeanNB.value_(theChanger.value.midiMean);
+				thisGuiEnv.editor.softWithinNB.value_(theChanger.value.softWithin);
+				thisGuiEnv.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
+				thisGuiEnv.editor.ctrlButtonBankField.value_(theChanger.value.ctrlButtonBank);
 			})
 		});
 
@@ -654,47 +671,47 @@ CVWidget {
 						)
 					)
 				}).add;
-				thisGuiEls.oscEditBut.states_([
+				thisGuiEnv.oscEditBut.states_([
 					[theChanger.value[0].asString++"["++theChanger.value[1].asString++"]"++"\n"++midiOscSpecs.oscMapping.asString, Color.white, Color.cyan(0.5)]
 				]);
-				if(thisGuiEls.editor.notNil and:{
-					thisGuiEls.editor.isClosed.not
+				if(thisGuiEnv.editor.notNil and:{
+					thisGuiEnv.editor.isClosed.not
 				}, {
-					thisGuiEls.editor.connectorBut.value_(0);
-					thisGuiEls.editor.nameField.enabled_(false).string_(theChanger.value[0].asString);
+					thisGuiEnv.editor.connectorBut.value_(0);
+					thisGuiEnv.editor.nameField.enabled_(false).string_(theChanger.value[0].asString);
 					if(prCalibrate, {
-						[thisGuiEls.editor.inputConstraintLoField, thisGuiEls.editor.inputConstraintHiField].do(_.enabled_(false));
+						[thisGuiEnv.editor.inputConstraintLoField, thisGuiEnv.editor.inputConstraintHiField].do(_.enabled_(false));
 					});
-					thisGuiEls.editor.indexField.value_(theChanger.value[1]).enabled_(false);
-					thisGuiEls.editor.connectorBut.value_(1);
+					thisGuiEnv.editor.indexField.value_(theChanger.value[1]).enabled_(false);
+					thisGuiEnv.editor.connectorBut.value_(1);
 				});
-				thisGuiEls.oscEditBut.refresh;
+				thisGuiEnv.oscEditBut.refresh;
 			});
 			if(theChanger.value == false, {
 				midiOscSpecs.oscResponder.remove;
-				thisGuiEls.oscEditBut.states_([
+				thisGuiEnv.oscEditBut.states_([
 					["edit OSC", Color.black, Color.clear]
 				]);
 				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changed(\value);
 				midiOscSpecs.calibConstraints = nil;
-				if(thisGuiEls.editor.notNil and:{
-					thisGuiEls.editor.isClosed.not
+				if(thisGuiEnv.editor.notNil and:{
+					thisGuiEnv.editor.isClosed.not
 				}, {
-					thisGuiEls.editor.connectorBut.value_(0);
-					thisGuiEls.editor.nameField.enabled_(true);
-					thisGuiEls.editor.inputConstraintLoField.value_(
+					thisGuiEnv.editor.connectorBut.value_(0);
+					thisGuiEnv.editor.nameField.enabled_(true);
+					thisGuiEnv.editor.inputConstraintLoField.value_(
 						wcm.oscInputRange.model.value[0];
 					);
-					thisGuiEls.editor.inputConstraintHiField.value_(
+					thisGuiEnv.editor.inputConstraintHiField.value_(
 						wcm.oscInputRange.model.value[1];
 					);
 					if(prCalibrate.not, {
-						[thisGuiEls.editor.inputConstraintLoField, thisGuiEls.editor.inputConstraintHiField].do(_.enabled_(true));
+						[thisGuiEnv.editor.inputConstraintLoField, thisGuiEnv.editor.inputConstraintHiField].do(_.enabled_(true));
 					});
-					thisGuiEls.editor.indexField.enabled_(true);
-					thisGuiEls.editor.connectorBut.value_(0);
+					thisGuiEnv.editor.indexField.enabled_(true);
+					thisGuiEnv.editor.connectorBut.value_(0);
 				});
-				thisGuiEls.oscEditBut.refresh;
+				thisGuiEnv.oscEditBut.refresh;
 			})
 		});
 	}

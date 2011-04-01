@@ -3,7 +3,7 @@
 CVWidgetKnob : CVWidget {
 	
 	var <widgetCV/*, <cc, <midisrc, <midichan, <midinum*/ /* keep this for now but that might change ... */;
-	var <window, <guiEls, <midiOscSpecs;
+	var <window, <guiEnv, <midiOscSpecs, <editorEnv;
 	var prSpec/*, midiOSCSpecs.oscMapping = \linlin, prCalibConstraints, oscResponder*/;
 	var returnedFromActions;
 
@@ -26,7 +26,8 @@ CVWidgetKnob : CVWidget {
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
 		
-		guiEls = ();
+		guiEnv = ();
+		editorEnv = ();
 		midiOscSpecs = ();
 		midiOscSpecs.oscMapping = \linlin;
 				
@@ -69,9 +70,9 @@ CVWidgetKnob : CVWidget {
 				
 		cvcGui ?? { 
 			window.onClose_({
-				if(guiEls.editor.notNil, {
-					if(guiEls.editor.isClosed.not, {
-						guiEls.editor.close;
+				if(guiEnv.editor.notNil, {
+					if(guiEnv.editor.isClosed.not, {
+						guiEnv.editor.close;
 					}, {
 						if(CVWidgetEditor.allEditors.notNil and:{
 							CVWidgetEditor.allEditors[thisname.asSymbol].notNil;
@@ -117,28 +118,28 @@ CVWidgetKnob : CVWidget {
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = thisXY.y+16;
 		});						
-		guiEls.knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
+		guiEnv.knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
 			.canFocus_(false)
 		;
 		block { |break|
 			#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
-				if(widgetCV.spec == symbol.asSpec, { break.value(guiEls.knob.centered_(true)) });
+				if(widgetCV.spec == symbol.asSpec, { break.value(guiEnv.knob.centered_(true)) });
 			})
 		};
 		nextY = thisXY.y+thisHeight-117;
-		guiEls.numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		guiEnv.numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(widgetCV.value)
 		;
-		nextY = nextY+guiEls.numVal.bounds.height;
-		guiEls.specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		nextY = nextY+guiEnv.numVal.bounds.height;
+		guiEnv.specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
 			.action_({ |btn|
-				if(guiEls.editor.isNil or:{ guiEls.editor.isClosed }, {
-					guiEls.editor = CVWidgetEditor(this, thisname, 0);
+				if(guiEnv.editor.isNil or:{ guiEnv.editor.isClosed }, {
+					guiEnv.editor = CVWidgetEditor(this, thisname, 0);
 				}, {
-					guiEls.editor.front(0)
+					guiEnv.editor.front(0)
 				});
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value;
@@ -148,16 +149,16 @@ CVWidgetKnob : CVWidget {
 				).changed(\value);
 			})
 		;
-		nextY = nextY+guiEls.specBut.bounds.height+1;
-		guiEls.midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
+		nextY = nextY+guiEnv.specBut.bounds.height+1;
+		guiEnv.midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
 			.action_({ |ms|
-				if(guiEls.editor.isNil or:{ guiEls.editor.isClosed }, {
-					guiEls.editor = CVWidgetEditor(this, thisname, 1);
+				if(guiEnv.editor.isNil or:{ guiEnv.editor.isClosed }, {
+					guiEnv.editor = CVWidgetEditor(this, thisname, 1);
 				}, {
-					guiEls.editor.front(1)
+					guiEnv.editor.front(1)
 				});
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value;
@@ -168,7 +169,7 @@ CVWidgetKnob : CVWidget {
 			})
 		;
 		
-		guiEls.midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
+		guiEnv.midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
@@ -179,9 +180,9 @@ CVWidgetKnob : CVWidget {
 				ml.value.switch(
 					1, {
 						margs = [
-							[guiEls.midiSrc.string, msrc], 
-							[guiEls.midiChan.string, mchan], 
-							[guiEls.midiCtrl.string, mctrl]
+							[guiEnv.midiSrc.string, msrc], 
+							[guiEnv.midiChan.string, mchan], 
+							[guiEnv.midiCtrl.string, mctrl]
 						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
 							this.midiConnect(*margs);
@@ -193,8 +194,8 @@ CVWidgetKnob : CVWidget {
 				)
 			})
 		;
-		nextY = nextY+guiEls.midiLearn.bounds.height;
-		guiEls.midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
+		nextY = nextY+guiEnv.midiLearn.bounds.height;
+		guiEnv.midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_(msrc)
@@ -219,8 +220,8 @@ CVWidgetKnob : CVWidget {
 				})
 			}) 
 		;
-		nextY = nextY+guiEls.midiSrc.bounds.height;
-		guiEls.midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
+		nextY = nextY+guiEnv.midiSrc.bounds.height;
+		guiEnv.midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_(mchan)
@@ -245,7 +246,7 @@ CVWidgetKnob : CVWidget {
 				})
 			}) 
 		;
-		guiEls.midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
+		guiEnv.midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.string_(mctrl)
@@ -271,22 +272,22 @@ CVWidgetKnob : CVWidget {
 				})
 			}) 
 		;
-		nextY = nextY+guiEls.midiCtrl.bounds.height+1;
-		guiEls.oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
+		nextY = nextY+guiEnv.midiCtrl.bounds.height+1;
+		guiEnv.oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
 				["edit OSC", Color.black, Color.clear]
 			])
 			.action_({ |oscb|
-				if(guiEls.editor.isNil or:{ guiEls.editor.isClosed }, {
-					guiEls.editor = CVWidgetEditor(this, thisname, 2);
+				if(guiEnv.editor.isNil or:{ guiEnv.editor.isClosed }, {
+					guiEnv.editor = CVWidgetEditor(this, thisname, 2);
 				}, {
-					guiEls.editor.front(2)
+					guiEnv.editor.front(2)
 				});
-				guiEls.editor.calibNumBoxes !? {
-					wdgtControllersAndModels.mapConstrainterLo.connect(guiEls.editor.calibNumBoxes.lo);
-					wdgtControllersAndModels.mapConstrainterHi.connect(guiEls.editor.calibNumBoxes.hi);
+				guiEnv.editor.calibNumBoxes !? {
+					wdgtControllersAndModels.mapConstrainterLo.connect(guiEnv.editor.calibNumBoxes.lo);
+					wdgtControllersAndModels.mapConstrainterHi.connect(guiEnv.editor.calibNumBoxes.hi);
 				};
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value;
@@ -297,8 +298,8 @@ CVWidgetKnob : CVWidget {
 
 			})
 		;
-		nextY = nextY+guiEls.oscEditBut.bounds.height;
-		guiEls.calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		nextY = nextY+guiEnv.oscEditBut.bounds.height;
+		guiEnv.calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
@@ -307,33 +308,33 @@ CVWidgetKnob : CVWidget {
 			])
 		;
 		
-		returnedFromActions = this.initControllerActions(wdgtControllersAndModels, guiEls, midiOscSpecs, widgetCV);
+		returnedFromActions = this.initControllerActions(wdgtControllersAndModels, guiEnv, midiOscSpecs, widgetCV);
 				
-		[guiEls.knob, guiEls.numVal].do({ |view| widgetCV.connect(view) });
+		[guiEnv.knob, guiEnv.numVal].do({ |view| widgetCV.connect(view) });
 		visibleGuiEls = [
-			guiEls.knob, 
-			guiEls.numVal, 
-			guiEls.specBut, 
-			guiEls.midiHead, 
-			guiEls.midiLearn, 
-			guiEls.midiSrc, 
-			guiEls.midiChan, 
-			guiEls.midiCtrl, 
-			guiEls.oscEditBut, 
-			guiEls.calibBut
+			guiEnv.knob, 
+			guiEnv.numVal, 
+			guiEnv.specBut, 
+			guiEnv.midiHead, 
+			guiEnv.midiLearn, 
+			guiEnv.midiSrc, 
+			guiEnv.midiChan, 
+			guiEnv.midiCtrl, 
+			guiEnv.oscEditBut, 
+			guiEnv.calibBut
 		];
 		allGuiEls = [
 			widgetBg, label, nameField, 
-			guiEls.knob, 
-			guiEls.numVal, 
-			guiEls.specBut, 
-			guiEls.midiHead, 
-			guiEls.midiLearn, 
-			guiEls.midiSrc, 
-			guiEls.midiChan, 
-			guiEls.midiCtrl, 
-			guiEls.oscEditBut, 
-			guiEls.calibBut
+			guiEnv.knob, 
+			guiEnv.numVal, 
+			guiEnv.specBut, 
+			guiEnv.midiHead, 
+			guiEnv.midiLearn, 
+			guiEnv.midiSrc, 
+			guiEnv.midiChan, 
+			guiEnv.midiCtrl, 
+			guiEnv.oscEditBut, 
+			guiEnv.calibBut
 		]
 	}
 	
@@ -389,7 +390,7 @@ CVWidgetKnob : CVWidget {
 		}, {
 			this.calibrate_(false);
 			midiOscSpecs.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
-			if(guiEls.editor.notNil and:{ guiEls.editor.isClosed.not }, {
+			if(guiEnv.editor.notNil and:{ guiEnv.editor.isClosed.not }, {
 				wdgtControllersAndModels.mapConstrainterLo.value_(constraintsHiLo.x);
 				wdgtControllersAndModels.mapConstrainterHi.value_(constraintsHiLo.y);
 			})
