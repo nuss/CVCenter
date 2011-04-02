@@ -129,7 +129,7 @@ CVWidgetEditor {
 				.items_(midiModes)
 				.value_(widget.midiMode)
 				.action_({ |ms|
-					widget.midiMode(ms.value);
+					widget.midiMode_(ms.value);
 				})
 			;
 			

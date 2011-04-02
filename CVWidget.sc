@@ -207,7 +207,7 @@ CVWidget {
 			wcm.oscConnection = ();
 		};
 		wcm.oscConnection.model ?? {
-			wdgtControllersAndModels.oscConnection.model = Ref(false);
+			wcm.oscConnection.model = Ref(false);
 		};
 		wcm.midiConnection ?? {
 			wcm.midiConnection = ();
@@ -236,31 +236,33 @@ CVWidget {
 			)
 		};
 		wcm.mapConstrainterLo ?? { 
-			wcm.mapConstrainterLo = CV([-inf, inf].asSpec, wdgtControllersAndModels.oscInputRange.model.value[0]);
+			wcm.mapConstrainterLo = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[0]);
 		};
 		wcm.mapConstrainterHi ?? { 
-			wcm.mapConstrainterHi = CV([-inf, inf].asSpec, wdgtControllersAndModels.oscInputRange.model.value[1]);
+			wcm.mapConstrainterHi = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[1]);
 		};
 
 	}
 	
-	initControllerActions { |controllersAndModels, guiEnv, midiOscSpecsEnv, cv, key|
-		var wcm, thisGuiEnv, midiOscSpecs, tmpMapping, tmpSetup, tmpCV, tmp;
+	/* |controllersAndModels, guiEnv, midiOscSpecsEnv, cv, key| */
+	
+	initControllerActions { |key|
+		var wcm, thisGuiEnv, midiOscSpecs, tmpMapping, tmpSetup, widgetCV, tmp;
 		var makeCCResponder, ccResponder;
 		var ctrlString, meanVal;
 		
 		if(key.notNil, {
-			wcm = controllersAndModels[key];
-			thisGuiEnv = guiEnv[key];
-			midiOscSpecs = midiOscSpecsEnv[key];
-			tmpCV = cv[key];
+			wcm = wdgtControllersAndModels[key];
+			thisGuiEnv = this.guiEnv[key];
+			midiOscSpecs = this.midiOscSpecs[key];
+			widgetCV = this.widgetCV[key];
 		}, {
-			wcm = controllersAndModels;
-			thisGuiEnv = guiEnv;
-			midiOscSpecs = midiOscSpecsEnv;
-			tmpCV = cv;
+			wcm = wdgtControllersAndModels;
+			thisGuiEnv = this.guiEnv;
+			midiOscSpecs = this.midiOscSpecs;
+			widgetCV = this.widgetCV;
 		});
-			
+					
 		wcm.calibration.controller ?? { 
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
@@ -304,7 +306,7 @@ CVWidget {
 			)
 		});
 
-		thisGuiEnv.calibBut.action_({ |cb|
+		this.calibBut.action_({ |cb|
 			cb.value.switch(
 				0, { wcm.calibration.model.value_(true).changed(\value) },
 				1, { wcm.calibration.model.value_(false).changed(\value) }
@@ -358,10 +360,10 @@ CVWidget {
 				})
 			});
 			
-			tmpCV.spec_(theChanger.value);
+			widgetCV.spec_(theChanger.value);
 			block { |break|
 				#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
-					if(tmpCV.spec == symbol.asSpec, { 
+					if(widgetCV.spec == symbol.asSpec, { 
 						break.value(thisGuiEnv.knob.centered_(true));
 					}, {
 						thisGuiEnv.knob.centered_(false);
@@ -447,15 +449,15 @@ CVWidget {
 	
 						this.midiMode.switch(
 							0, { 
-								if(val/127 < (cv.input+(prSoftWithin/2)) and: {
-									val/127 > (cv.input-(prSoftWithin/2));
+								if(val/127 < (widgetCV.input+(prSoftWithin/2)) and: {
+									val/127 > (widgetCV.input-(prSoftWithin/2));
 								}, { 
-									cv.input_(val/127);
+									widgetCV.input_(val/127);
 								})
 							},
 							1, { 
 								meanVal = this.midiMean;
-								cv.input_(cv.input+((val-meanVal)/127*this.midiResolution)) 
+								widgetCV.input_(widgetCV.input+((val-meanVal)/127*this.midiResolution)) 
 							}
 						);
 						src !? { midiOscSpecs.midisrc = src };
@@ -662,7 +664,7 @@ CVWidget {
 							midiOscSpecs.calibConstraints = (lo: wcm.oscInputRange.model.value[0], hi: wcm.oscInputRange.model.value[1]);
 						})
 					});
-					tmpCV.value_(
+					widgetCV.value_(
 						msg[theChanger.value[1]].perform(
 							midiOscSpecs.oscMapping,
 							midiOscSpecs.calibConstraints.lo, midiOscSpecs.calibConstraints.hi,
