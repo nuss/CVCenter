@@ -3,9 +3,9 @@
 CVWidgetKnob : CVWidget {
 	
 	var <widgetCV/*, <cc, <midisrc, <midichan, <midinum*/ /* keep this for now but that might change ... */;
-	var <window, <guiEnv, <midiOscSpecs, <editorEnv;
+	var <window, <guiEnv, <midiOscEnv, <editorEnv;
 	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <editor;
-	var prSpec/*, midiOSCSpecs.oscMapping = \linlin, prCalibConstraints, oscResponder*/;
+	var prSpec/*, midiOscEnv.oscMapping = \linlin, prCalibConstraints, oscResponder*/;
 	var returnedFromActions;
 
 	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
@@ -29,8 +29,9 @@ CVWidgetKnob : CVWidget {
 				
 		guiEnv = ();
 		editorEnv = ();
-		midiOscSpecs = ();
-		midiOscSpecs.oscMapping = \linlin;
+		// fixme
+		midiOscEnv ?? { midiOscEnv = () };
+		midiOscEnv.oscMapping ?? { midiOscEnv.oscMapping = \linlin };
 				
 		if(name.isNil, { thisname = "knob" }, { thisname = name });
 		
@@ -68,7 +69,7 @@ CVWidgetKnob : CVWidget {
 		}, {
 			window = parentView;
 		});
-				
+		
 		cvcGui ?? { 
 			window.onClose_({
 				if(editor.notNil, {
@@ -82,7 +83,8 @@ CVWidgetKnob : CVWidget {
 						})
 					})
 				});
-				midiOscSpecs.oscResponder !? { midiOscSpecs.oscResponder.remove };
+				midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove };
+				midiOscEnv.cc !? { midiOscEnv.cc.remove };
 				wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 			})
 		};
@@ -269,7 +271,7 @@ CVWidgetKnob : CVWidget {
 				tf.stringColor_(Color.red)
 			})
 			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
-				[tf, char, modifiers, unicode, keycode].postln;
+//				[tf, char, modifiers, unicode, keycode].postln;
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
@@ -352,7 +354,6 @@ CVWidgetKnob : CVWidget {
 			midiLearn: midiLearn
 		);
 
-//		returnedFromActions = this.initControllerActions(wdgtControllersAndModels, guiEnv, midiOscSpecs, widgetCV);
 		returnedFromActions = this.initControllerActions;
 	}
 	
@@ -388,7 +389,7 @@ CVWidgetKnob : CVWidget {
 		}, {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		}, {
-			midiOscSpecs.oscMapping = mapping.asSymbol;
+			midiOscEnv.oscMapping = mapping.asSymbol;
 			wdgtControllersAndModels.oscInputRange.model.value_(
 				wdgtControllersAndModels.oscInputRange.model.value;
 			).changed(\value);
@@ -399,7 +400,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	oscMapping {
-		^midiOscSpecs.oscMapping;
+		^midiOscEnv.oscMapping;
 	}
 	
 	oscInputConstraints_ { |constraintsHiLo|
@@ -407,7 +408,7 @@ CVWidgetKnob : CVWidget {
 			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
 		}, {
 			this.calibrate_(false);
-			midiOscSpecs.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
+			midiOscEnv.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
 			if(editor.notNil and:{ editor.isClosed.not }, {
 				wdgtControllersAndModels.mapConstrainterLo.value_(constraintsHiLo.x);
 				wdgtControllersAndModels.mapConstrainterHi.value_(constraintsHiLo.y);
@@ -416,7 +417,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	oscInputConstraints {
-		^[midiOscSpecs.calibConstraints.lo, midiOscSpecs.calibConstraints.hi];
+		^[midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi];
 	}
 	
 	oscConnect { |name, oscMsgIndex|
@@ -438,7 +439,7 @@ CVWidgetKnob : CVWidget {
 	// if all arguments are nil .learn should be triggered
 	midiConnect { |uid, chan, num|
 		var args;
-		if(midiOscSpecs.cc.isNil, {
+		if(midiOscEnv.cc.isNil, {
 			args = [uid, chan, num].select({ |param| param.notNil }).collect({ |param| param.asInt });
 			wdgtControllersAndModels.midiConnection.model.value_(
 				(src: uid, chan: chan, num: num)
@@ -449,7 +450,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	midiDisconnect { 
-		midiOscSpecs.cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
+		midiOscEnv.cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
 	}
 	
 	cvAction_ { |func|

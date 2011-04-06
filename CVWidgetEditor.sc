@@ -23,6 +23,7 @@ CVWidgetEditor {
 		var addr;
 		var midiModes;
 		var mappingSelectItems/*, mappingModes*/;
+		var tmp; // multipurpose, short-term var
 		
 		name = widgetName.asSymbol;
 		
@@ -52,7 +53,7 @@ CVWidgetEditor {
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC"], scroll: true);
 			allEditors[name].tabs = tabs;
-			allEditors[name].tabs.postln;
+//			allEditors[name].tabs.postln;
 			allEditors[name].tabs.view.resize_(5);
 			allEditors[name].tabs.stringFocusedColor_(Color.blue);
 			
@@ -105,6 +106,16 @@ CVWidgetEditor {
 						specsListSpecs.add(v);
 					})
 				})
+			});
+			
+//			[widget.spec, specsListSpecs.size, specsList.items.size].postln;
+			
+			tmp = specsListSpecs.detectIndex({ |spec, i| spec == widget.spec });
+			if(tmp.notNil, {
+				specsList.value_(tmp);
+			}, {
+				specsListSpecs.array_([widget.spec]++specsListSpecs.array);
+				specsList.items = List["custom:"+widget.spec.asString]++specsList.items;
 			});
 			
 			window.onClose_({
@@ -252,7 +263,7 @@ CVWidgetEditor {
 					tf.stringColor_(Color.red)
 				})
 				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
-					[tf, char, modifiers, unicode, keycode].postln;
+//					[tf, char, modifiers, unicode, keycode].postln;
 					if(unicode == 13, {
 						tf.stringColor_(Color.black);
 					})
@@ -279,7 +290,7 @@ CVWidgetEditor {
 					tf.stringColor_(Color.red)
 				})
 				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
-					[tf, char, modifiers, unicode, keycode].postln;
+//					[tf, char, modifiers, unicode, keycode].postln;
 					if(unicode == 13, {
 						tf.stringColor_(Color.black);
 					})
@@ -306,7 +317,7 @@ CVWidgetEditor {
 					tf.stringColor_(Color.red)
 				})
 				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
-					[tf, char, modifiers, unicode, keycode].postln;
+//					[tf, char, modifiers, unicode, keycode].postln;
 					if(unicode == 13, {
 						tf.stringColor_(Color.black);
 					})

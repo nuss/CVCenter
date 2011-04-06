@@ -1,6 +1,7 @@
 
 CVWidget {
-
+	
+//	classvar <globalMidiOscEnv;
 	var prMidiMode = 0, prMidiMean = 64, prCtrlButtonBank, prMidiResolution = 1, prSoftWithin = 0.1;
 	var prCalibrate = true; // OSC-calibration enabled/disabled - private
 	var visibleGuiEls, allGuiEls;
@@ -243,23 +244,22 @@ CVWidget {
 		};
 
 	}
-	
-	/* |controllersAndModels, guiEnv, midiOscSpecsEnv, cv, key| */
-	
+		
 	initControllerActions { |key|
-		var wcm, thisGuiEnv, midiOscSpecs, tmpMapping, tmpSetup, widgetCV, tmp;
-		var makeCCResponder, ccResponder;
+		var wcm, thisGuiEnv, midiOscEnv, tmpMapping, tmpSetup, widgetCV, tmp;
+		var oscResponderAction;
+		var makeCCResponder, ccResponderAction, ccResponder;
 		var ctrlString, meanVal;
 		
 		if(key.notNil, {
 			wcm = wdgtControllersAndModels[key];
 			thisGuiEnv = this.guiEnv[key];
-			midiOscSpecs = this.midiOscSpecs[key];
+			midiOscEnv = this.midiOscEnv[key];
 			widgetCV = this.widgetCV[key];
 		}, {
 			wcm = wdgtControllersAndModels;
 			thisGuiEnv = this.guiEnv;
-			midiOscSpecs = this.midiOscSpecs;
+			midiOscEnv = this.midiOscEnv;
 			widgetCV = this.widgetCV;
 		});
 					
@@ -318,14 +318,14 @@ CVWidget {
 		};
 		
 		wcm.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
-			[theChanger.value, theChanger.value.class].postln;
+//			[theChanger.value, theChanger.value.class].postln;
 			if(theChanger.value.minval <= 0.0 or:{
 				theChanger.value.maxval <= 0.0
 			}, {
-				if(midiOscSpecs.oscMapping === \linexp or:{
-					midiOscSpecs.oscMapping === \expexp
+				if(midiOscEnv.oscMapping === \linexp or:{
+					midiOscEnv.oscMapping === \expexp
 				}, {
-					midiOscSpecs.oscMapping = \linlin;
+					midiOscEnv.oscMapping = \linlin;
 					if(thisGuiEnv.editor.notNil and:{
 						thisGuiEnv.editor.isClosed.not
 					}, {
@@ -380,23 +380,23 @@ CVWidget {
 			if(theChanger.value[0] <= 0 or:{
 				theChanger.value[1] <= 0
 			}, {
-				if(midiOscSpecs.oscMapping === \explin or:{
-					midiOscSpecs.oscMapping === \expexp
+				if(midiOscEnv.oscMapping === \explin or:{
+					midiOscEnv.oscMapping === \expexp
 				}, {
-					midiOscSpecs.oscMapping = \linlin;
+					midiOscEnv.oscMapping = \linlin;
 				});
 				if(thisGuiEnv.editor.notNil and:{
 					thisGuiEnv.editor.isClosed.not
 				}, {
 					{	
 						thisGuiEnv.oscEditBut.states_([[
-							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscSpecs.oscMapping.asString,
+							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
 							thisGuiEnv.oscEditBut.states[0][1],
 							thisGuiEnv.oscEditBut.states[0][2]
 						]]);
 						thisGuiEnv.oscEditBut.refresh;
 						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === midiOscSpecs.oscMapping, {
+							if(item.asSymbol === midiOscEnv.oscMapping, {
 								thisGuiEnv.editor.mappingSelect.value_(i);
 							})
 						})
@@ -408,7 +408,7 @@ CVWidget {
 				}, {
 					{
 						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === midiOscSpecs.oscMapping, {
+							if(item.asSymbol === midiOscEnv.oscMapping, {
 								thisGuiEnv.editor.mappingSelect.value_(i)
 							})
 						});
@@ -416,7 +416,7 @@ CVWidget {
 					if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 						{
 							thisGuiEnv.oscEditBut.states_([[
-								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscSpecs.oscMapping.asString,
+								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
 								thisGuiEnv.oscEditBut.states[0][1],
 								thisGuiEnv.oscEditBut.states[0][2]
 							]]);
@@ -433,51 +433,61 @@ CVWidget {
 		
 		wcm.midiConnection.controller.put(\value, { |theChanger, what, moreArgs|
 			if(theChanger.value.isKindOf(Event), {
-				makeCCResponder = { |argSrc, argChan, argNum|
-					CCResponder({ |src, chan, num, val|
-						ctrlString ? ctrlString = num+1;
-						if(this.ctrlButtonBank.notNil, {
-							if(ctrlString%this.ctrlButtonBank == 0, {
-								ctrlString = this.ctrlButtonBank.asString;
-							}, {
-								ctrlString = (ctrlString%this.ctrlButtonBank).asString;
-							});
-							ctrlString = ((num+1/this.ctrlButtonBank).ceil).asString++":"++ctrlString;
+				ccResponderAction = { |src, chan, num, val|
+					ctrlString ? ctrlString = num+1;
+					if(this.ctrlButtonBank.notNil, {
+						if(ctrlString%this.ctrlButtonBank == 0, {
+							ctrlString = this.ctrlButtonBank.asString;
 						}, {
-							ctrlString = num+1;
+							ctrlString = (ctrlString%this.ctrlButtonBank).asString;
 						});
-	
-						this.midiMode.switch(
-							0, { 
-								if(val/127 < (widgetCV.input+(prSoftWithin/2)) and: {
-									val/127 > (widgetCV.input-(prSoftWithin/2));
-								}, { 
-									widgetCV.input_(val/127);
-								})
-							},
-							1, { 
-								meanVal = this.midiMean;
-								widgetCV.input_(widgetCV.input+((val-meanVal)/127*this.midiResolution)) 
-							}
-						);
-						src !? { midiOscSpecs.midisrc = src };
-						chan !? { midiOscSpecs.midichan = chan };
-						num !? { midiOscSpecs.midinum = ctrlString };
-					}, argSrc, argChan, argNum, nil);
+						ctrlString = ((num+1/this.ctrlButtonBank).ceil).asString++":"++ctrlString;
+					}, {
+						ctrlString = num+1;
+					});
+
+					this.midiMode.switch(
+						0, { 
+							if(val/127 < (widgetCV.input+(prSoftWithin/2)) and: {
+								val/127 > (widgetCV.input-(prSoftWithin/2));
+							}, { 
+								widgetCV.input_(val/127);
+							})
+						},
+						1, { 
+							meanVal = this.midiMean;
+							widgetCV.input_(widgetCV.input+((val-meanVal)/127*this.midiResolution)) 
+						}
+					);
+					src !? { midiOscEnv.midisrc = src };
+					chan !? { midiOscEnv.midichan = chan };
+					num !? { midiOscEnv.midinum = ctrlString };
+				};
+				makeCCResponder = { |argSrc, argChan, argNum|
+					if(midiOscEnv.cc.isNil, {
+						CCResponder(ccResponderAction, argSrc, argChan, argNum, nil);
+					}, {
+						midiOscEnv.cc.function_(ccResponderAction);
+					})
 				};
 				
 				fork {
 					block { |break|
 						loop {
 							0.01.wait;
-							if(midiOscSpecs.midisrc.notNil and:{
-								midiOscSpecs.midichan.notNil and:{
-									midiOscSpecs.midinum.notNil;
+							if(midiOscEnv.midisrc.notNil and:{
+								midiOscEnv.midichan.notNil and:{
+									midiOscEnv.midinum.notNil;
 								}
 							}, {
 								break.value(
 									wcm.midiDisplay.model.value_(
-										(src: midiOscSpecs.midisrc, chan: midiOscSpecs.midichan, ctrl: midiOscSpecs.midinum, learn: "X")
+										(
+											src: midiOscEnv.midisrc, 
+											chan: midiOscEnv.midichan, 
+											ctrl: midiOscEnv.midinum, 
+											learn: "X"
+										)
 									).changed(\value)
 								)
 							})
@@ -486,17 +496,18 @@ CVWidget {
 				};
 
 				if(theChanger.value.isEmpty, {
-					midiOscSpecs.cc = makeCCResponder.().learn;
+					midiOscEnv.cc = makeCCResponder.().learn;
 				}, {
-					midiOscSpecs.cc = makeCCResponder.(theChanger.value.src, theChanger.value.chan, theChanger.value.num);
-				})
+					midiOscEnv.cc = makeCCResponder.(theChanger.value.src, theChanger.value.chan, theChanger.value.num);
+				});
+				
 			}, {
-				midiOscSpecs.cc.remove;
-				midiOscSpecs.cc = nil;
+				midiOscEnv.cc.remove;
+				midiOscEnv.cc = nil;
 				wcm.midiDisplay.model.value_(
 					(src: "source", chan: "chan", ctrl: "ctrl", learn: "L")
 				).changed(\value);
-				midiOscSpecs.midisrc = nil; midiOscSpecs.midichan = nil; midiOscSpecs.midinum = nil;
+				midiOscEnv.midisrc = nil; midiOscEnv.midichan = nil; midiOscEnv.midinum = nil;
 			})
 		});
 		
@@ -636,45 +647,56 @@ CVWidget {
 		};
 
 		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
+			("at 1 midiOscEnv.oscMapping:"+midiOscEnv.oscMapping).postln;
 			if(theChanger.value.size == 2, {
-				midiOscSpecs.oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, { |t, r, msg|
+				oscResponderAction = { |t, r, msg|
 					if(prCalibrate, { 
-						if(midiOscSpecs.calibConstraints.isNil, {
-							midiOscSpecs.calibConstraints = (lo: msg[theChanger.value[1]], hi: msg[theChanger.value[1]]);
+						if(midiOscEnv.calibConstraints.isNil, {
+							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[1]], hi: msg[theChanger.value[1]]);
 						}, {
-							if(msg[theChanger.value[1]] < midiOscSpecs.calibConstraints.lo, { 
-								midiOscSpecs.calibConstraints.lo = msg[theChanger.value[1]];
+							if(msg[theChanger.value[1]] < midiOscEnv.calibConstraints.lo, { 
+								midiOscEnv.calibConstraints.lo = msg[theChanger.value[1]];
 								wcm.oscInputRange.model.value_([
 									msg[theChanger.value[1]], 
 									wcm.oscInputRange.model.value[1]
 								]).changed(\value);
 							});
-							if(msg[theChanger.value[1]] > midiOscSpecs.calibConstraints.hi, {
-								midiOscSpecs.calibConstraints.hi = msg[theChanger.value[1]];
+							if(msg[theChanger.value[1]] > midiOscEnv.calibConstraints.hi, {
+								midiOscEnv.calibConstraints.hi = msg[theChanger.value[1]];
 								wcm.oscInputRange.model.value_([
 									wcm.oscInputRange.model.value[0], 
 									msg[theChanger.value[1]]
 								]).changed(\value);
 							});
 						});
-						wcm.mapConstrainterLo.value_(midiOscSpecs.calibConstraints.lo);
-						wcm.mapConstrainterHi.value_(midiOscSpecs.calibConstraints.hi);
+						wcm.mapConstrainterLo.value_(midiOscEnv.calibConstraints.lo);
+						wcm.mapConstrainterHi.value_(midiOscEnv.calibConstraints.hi);
 					}, {
-						if(midiOscSpecs.calibConstraints.isNil, {
-							midiOscSpecs.calibConstraints = (lo: wcm.oscInputRange.model.value[0], hi: wcm.oscInputRange.model.value[1]);
+						if(midiOscEnv.calibConstraints.isNil, {
+							midiOscEnv.calibConstraints = (lo: wcm.oscInputRange.model.value[0], hi: wcm.oscInputRange.model.value[1]);
 						})
 					});
 					widgetCV.value_(
 						msg[theChanger.value[1]].perform(
-							midiOscSpecs.oscMapping,
-							midiOscSpecs.calibConstraints.lo, midiOscSpecs.calibConstraints.hi,
+							midiOscEnv.oscMapping,
+							midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi,
 							this.spec.minval, this.spec.maxval,
 							\minmax
 						)
 					)
-				}).add;
+				};
+
+				if(midiOscEnv.oscResponder.isNil, { 
+					midiOscEnv.oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, oscResponderAction).add;
+				}, {
+					("at 2 midiOscEnv.oscMapping:"+midiOscEnv.oscMapping).postln;
+//					tmp = (mapping: );
+					midiOscEnv.oscResponder.action_(oscResponderAction);
+//					this.oscMapping_(tmp.mapping);
+				});
+								
 				thisGuiEnv.oscEditBut.states_([
-					[theChanger.value[0].asString++"["++theChanger.value[1].asString++"]"++"\n"++midiOscSpecs.oscMapping.asString, Color.white, Color.cyan(0.5)]
+					[theChanger.value[0].asString++"["++theChanger.value[1].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)]
 				]);
 				if(thisGuiEnv.editor.notNil and:{
 					thisGuiEnv.editor.isClosed.not
@@ -690,12 +712,13 @@ CVWidget {
 				thisGuiEnv.oscEditBut.refresh;
 			});
 			if(theChanger.value == false, {
-				midiOscSpecs.oscResponder.remove;
+				midiOscEnv.oscResponder.remove;
+				midiOscEnv.oscResponder = nil;
 				thisGuiEnv.oscEditBut.states_([
 					["edit OSC", Color.black, Color.clear]
 				]);
 				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changed(\value);
-				midiOscSpecs.calibConstraints = nil;
+				midiOscEnv.calibConstraints = nil;
 				if(thisGuiEnv.editor.notNil and:{
 					thisGuiEnv.editor.isClosed.not
 				}, {
