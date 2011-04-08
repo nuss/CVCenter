@@ -30,7 +30,9 @@ CVWidgetKnob : CVWidget {
 		guiEnv = ();
 		editorEnv = ();
 		// fixme
-		midiOscEnv ?? { midiOscEnv = () };
+		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
+//		("midiOscEnv is"+[midiOscEnv.class, midiOscEnv]+", derived from:"+cvcGui).postln;
+//		("midiOscEnv.oscMapping, are you there?"+midiOscEnv.oscMapping).postln;
 		midiOscEnv.oscMapping ?? { midiOscEnv.oscMapping = \linlin };
 				
 		if(name.isNil, { thisname = "knob" }, { thisname = name });
@@ -432,8 +434,13 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	oscDisconnect {
-		wdgtControllersAndModels.oscConnection.model.value_(false).changed(\value);
-		wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
+		if(this.isClosed.not, {
+			wdgtControllersAndModels.oscConnection.model.value_(false).changed(\value);
+			wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
+		}, {
+			midiOscEnv.oscResponder.remove;
+		});
+		CmdPeriod.remove({ this.oscDisconnect });
 	}
 	
 	// if all arguments are nil .learn should be triggered
@@ -444,13 +451,21 @@ CVWidgetKnob : CVWidget {
 			wdgtControllersAndModels.midiConnection.model.value_(
 				(src: uid, chan: chan, num: num)
 			).changed(\value);
+			CmdPeriod.add({ this !? { this.midiDisconnect } });
 		}, {
 			"Already connected!".warn;	
 		})
 	}
 	
 	midiDisconnect { 
-		midiOscEnv.cc !? wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
+		midiOscEnv.cc.notNil !? {
+			if(this.isClosed.not, {
+				wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
+			}, {
+				midiOscEnv.cc.remove;
+			})		
+		};
+		CmdPeriod.remove({ this.midiDisconnect });
 	}
 	
 	cvAction_ { |func|
@@ -459,6 +474,10 @@ CVWidgetKnob : CVWidget {
 	
 	front {
 		window.front;
+	}
+	
+	isClosed {
+		^window.isClosed;
 	}
 	
 }

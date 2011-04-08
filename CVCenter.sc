@@ -68,7 +68,7 @@ CVCenter {
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
 		var widgetwidth, widgetheight=166, colwidth, rowheight;
 		var funcToAdd;
-		var widgetControllersAndModels;
+		var widgetControllersAndModels, cvcArgs;
 			
 		cvs !? { this.put(*cvs) };
 		
@@ -135,6 +135,7 @@ CVCenter {
 								w.wdgtControllersAndModels.oscInputRange.controller
 							].remove;
 							widgetStates[k].controllersAndModels = w.wdgtControllersAndModels;
+							("midiOscEnv:"+w.midiOscEnv).postln;
 							widgetStates[k].midiOscEnv = w.midiOscEnv;
 							
 							widgetStates[k].widgetCV = w.widgetCV;
@@ -198,16 +199,28 @@ CVCenter {
 						tabs.views[cvTabIndex], [orderedCVs[i].lo, orderedCVs[i].hi], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 122, widgetheight), this.setup
 					)
 				}, {
-					("setup:"+this.setup).postln;
+					("CVCenter.gui triggered:"+k).postln;
+					if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
+						cvcArgs = ();
+						cvcArgs.midiOscEnv = widgetStates[k].midiOscEnv;
+					}, {
+						cvcArgs = true;	
+					});
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex], 
 						orderedCVs[i], 
 						k, 
-						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight), 
+						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
 						setup: this.setup,
 						controllersAndModels: widgetStates[k] !? { widgetStates[k].controllersAndModels },
-						cvcGui: true
-					)
+						cvcGui: cvcArgs
+					);
+					widgetStates[k] !? { 
+						("CV-value at:"+k++":"+widgetStates[k].widgetCV.value).postln;
+//						cvWidgets[k].widgetCV.value_(widgetStates[k].widgetCV.value);
+						cvWidgets[k].widgetCV.spec.default_(widgetStates[k].widgetCV.value);
+						("widgetCV at"+k++" should is:"+cvWidgets[k].widgetCV.value).postln;
+					}
 				});
 
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
@@ -217,9 +230,6 @@ CVCenter {
 						if(key !== \mapConstrainterLo and:{
 							key !== \mapConstrainterHi
 						}, {
-//							("key:"+key).postln;
-//							widgetStates[k].controllersAndModels.postln;
-//							cvWidgets[k].wdgtControllersAndModels.postln;
 							widgetStates[k].controllersAndModels !? {
 								cvWidgets[k].wdgtControllersAndModels[key][\model].value_(
 									widgetStates[k].controllersAndModels[key][\model].value
@@ -233,39 +243,11 @@ CVCenter {
 							}
 						})
 					});
-//					cvWidgets[k].midiOscEnv = CVWidget.globalMidiOscEnv[k];
-
-//					cvWidgets[k].wdgtControllersAndModels.midiOptions.model.value_(
-//						widgetStates[k].controllersAndModels.midiOptions.model.value
-//					).changed(\value);
-//					cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value_(
-//						widgetStates[k].controllersAndModels.midiDisplay.model.value
-//					).changed(\value);
-//					cvWidgets[k].wdgtControllersAndModels.oscConnection.model.value_(
-//						widgetStates[k].controllersAndModels.oscConnection.model.value
-//					).changed(\value);
-//					cvWidgets[k].wdgtControllersAndModels.cvSpec.model.value_(
-//						widgetStates[k].controllersAndModels.model.value
-//					).changed(\value);
-//					cvWidgets[k].wdgtControllersAndModels.calibration.model.value_(
-//						widgetStates[k].controllersAndModels.calibration.model.value
-//					).changed(\value);
 					cvWidgets[k].nameField.string_(widgetStates[k].nameField);
 					widgetStates[k].midiEditHi !? { cvWidgets[k].midiHeadHi.enabled_(widgetStates[k].midiEditHi) };
 					widgetStates[k].midiEditLo !? { cvWidgets[k].midiHeadLo.enabled_(widgetStates[k].midiEditLo) };
-//					widgetStates[k].midiLearn !? { 
-//						cvWidgets[k].midiLearn.value_(
-//							widgetStates[k].controllersAndModels.model.value.learn;
-//						)
-//					};
 					widgetStates[k].midiLearnHi !? { cvWidgets[k].midiLearnHi.value_(widgetStates[k].midiLearnHi) };
 					widgetStates[k].midiLearnLo !? { cvWidgets[k].midiLearnLo.value_(widgetStates[k].midiLearnLo) };
-//					widgetStates[k].midiBg !? {
-//						[cvWidgets[k].guiEnv.midiSrc, cvWidgets[k].guiEnv.midiChan, cvWidgets[k].guiEnv.midiCtrl].do({ |view|
-//							view.background_(widgetStates[k].midiBg);
-//							view.stringColor_(widgetStates[k].midiStrColor);
-//						})
-//					};
 					widgetStates[k].midiBgHi !? {
 						[cvWidgets[k].midiSrcHi, cvWidgets[k].midiChanHi, cvWidgets[k].midiCtrlHi].do({ |view|
 							view.background_(widgetStates[k].midiBgHi);
@@ -278,19 +260,12 @@ CVCenter {
 							view.stringColor_(widgetStates[k].midiStrColorLo);
 						})
 					};
-//					widgetStates[k].midiSrc !? { cvWidgets[k].guiEnv.midiSrc.string_(widgetStates[k].midiSrc) };
 					widgetStates[k].midiSrcHi !? { cvWidgets[k].midiSrcHi.string_(widgetStates[k].midiSrcHi) };
 					widgetStates[k].midiSrcLo !? { cvWidgets[k].midiSrcLo.string_(widgetStates[k].midiSrcLo) };
-//					widgetStates[k].midiChan !? { cvWidgets[k].guiEnv.midiChan.string_(widgetStates[k].midiChan) };
 					widgetStates[k].midiChanHi !? { cvWidgets[k].midiChanHi.string_(widgetStates[k].midiChanHi) };
 					widgetStates[k].midiChanLo !? { cvWidgets[k].midiChanLo.string_(widgetStates[k].midiChanLo) };
-//					widgetStates[k].midiCtrl !? { cvWidgets[k].guiEnv.midiCtrl.string_(widgetStates[k].midiCtrl) };
 					widgetStates[k].midiCtrlHi !? { cvWidgets[k].midiCtrlHi.string_(widgetStates[k].midiCtrlHi) };
 					widgetStates[k].midiCtrlLo !? { cvWidgets[k].midiCtrlLo.string_(widgetStates[k].midiCtrlLo) };
-//					widgetStates[k].cc !? { 
-//						cvWidgets[k].midiOscEnv.cc_(widgetStates[k].cc);
-////						this.prAddControlButton(k);
-//					};
 					widgetStates[k].ccHi !? { 
 						cvWidgets[k].ccHi_(widgetStates[k].ccHi);
 //						this.prAddControlButton(k, \ccHi);
@@ -458,7 +433,9 @@ CVCenter {
 		all.removeAt(key.asSymbol);
 		cvWidgets[key].class.switch(
 			CVWidgetKnob, { 
-				cvWidgets[key].editor.close;
+				if(cvWidgets[key].editor.notNil and:{ cvWidgets[key].editor.isClosed.not }, {
+					cvWidgets[key].editor.close;
+				});
 				cvWidgets[key].midiOscEnv.cc !? { 
 					cvWidgets[key].midiOscEnv.cc.remove; 
 					cvWidgets[key].midiOscEnv.cc = nil;
@@ -606,7 +583,7 @@ CVCenter {
 		var cvTabIndex, tabLabels;
 		var thisNextPos;
 		var widgetwidth, widgetheight=166, colwidth, rowheight;
-		var widgetControllersAndModels;
+		var widgetControllersAndModels, cvcArgs;
 		
 		("tab passed to prAddToGui:"+[tab, this.setup]).postln;
 		
@@ -646,36 +623,34 @@ CVCenter {
 				all[k].keys.includesAny([\hi, \lo])
 			}, {
 				cvWidgets[k] = CVWidget2D(tabs.views[cvTabIndex], [all[k].lo, all[k].hi], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 122, widgetheight), this.setup);
-				// to be tested in depth ...
-//				if(cvWidgets[k].midiLearnLo.action.class != FunctionList, {
-//					cvWidgets[k].midiLearnLo.action_(
-//						cvWidgets[k].midiLearnLo.action.addFunc({ this.prAddControlButton(k, \ccLo) })
-//					)
-//				});
-//				if(cvWidgets[k].midiLearnHi.action.class != FunctionList, {
-//					cvWidgets[k].midiLearnHi.action_(
-//						cvWidgets[k].midiLearnHi.action.addFunc({ this.prAddControlButton(k, \ccHi) })
-//					)
-//				});
 				widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: (hi: false, lo: false)));
 			}, {	
 				"prAddToGui".postln;
-				
+				if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
+					cvcArgs = ();
+					cvcArgs.midiOscEnv = widgetStates[k].midiOscEnv;
+				}, {
+					cvcArgs = true;	
+				});
+				("cvcArgs:"+cvcArgs).postln;
 				cvWidgets[k] = CVWidgetKnob(
 					tabs.views[cvTabIndex], 
 					all[k], 
 					k, 
-					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight), 
+					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
 					setup: this.setup,
 					controllersAndModels: widgetStates[k] !? { widgetStates[k].controllersAndModels },
-					cvcGui: true
+					cvcGui: cvcArgs
 				);
-//				if(cvWidgets[k].guiEnv.midiLearn.action != FunctionList, {
-//					cvWidgets[k].guiEnv.midiLearn.action_(
-//						cvWidgets[k].guiEnv.midiLearn.action.addFunc({ this.prAddControlButton(k) })
-//					)
-//				});
-				widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: false));
+				if(widgetStates[k].isNil, {
+					widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: false));
+				}, {
+					widgetStates[k].tabIndex = cvTabIndex;
+					widgetStates[k].addedFunc = false;
+				});
+//				widgetStates[k].widgetCV !? { ("widgetStates["++k++"].widgetCV.value:"+widgetStates[k].widgetCV.value).postln };
+				widgetStates[k].widgetCV !? { cvWidgets[k].widgetCV.value_(widgetStates[k].widgetCV.value) };
+//				widgetStates[k].widgetCV !? { ("cvWidgets["++k++"].widgetCV.value:"+cvWidgets[k].widgetCV.value).postln };
 			});
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 			colwidth = widgetwidth+1; // add a small gap between widgets

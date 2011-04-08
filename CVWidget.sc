@@ -647,7 +647,7 @@ CVWidget {
 		};
 
 		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
-			("at 1 midiOscEnv.oscMapping:"+midiOscEnv.oscMapping).postln;
+//			("at 1 midiOscEnv.oscMapping:"+midiOscEnv.oscMapping).postln;
 			if(theChanger.value.size == 2, {
 				oscResponderAction = { |t, r, msg|
 					if(prCalibrate, { 
@@ -689,7 +689,7 @@ CVWidget {
 				if(midiOscEnv.oscResponder.isNil, { 
 					midiOscEnv.oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, oscResponderAction).add;
 				}, {
-					("at 2 midiOscEnv.oscMapping:"+midiOscEnv.oscMapping).postln;
+//					("at 2 midiOscEnv.oscMapping:"+midiOscEnv.oscMapping).postln;
 //					tmp = (mapping: );
 					midiOscEnv.oscResponder.action_(oscResponderAction);
 //					this.oscMapping_(tmp.mapping);
