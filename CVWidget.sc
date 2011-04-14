@@ -4,7 +4,7 @@ CVWidget {
 //	classvar <globalMidiOscEnv;
 	var prMidiMode = 0, prMidiMean = 64, prCtrlButtonBank, prMidiResolution = 1, prSoftWithin = 0.1;
 	var prCalibrate = true; // OSC-calibration enabled/disabled - private
-	var visibleGuiEls, allGuiEls;
+	var visibleGuiEls, allGuiEls, <isCVCWidget;
 	var <widgetBg, <label, <nameField; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps;
 	var <wdgtControllersAndModels;
@@ -169,6 +169,21 @@ CVWidget {
 	
 	midiResolution {
 		^prMidiResolution;
+	}
+	
+	front {
+		this.window.front;
+	}
+	
+	isClosed {
+		if(isCVCWidget, {
+			// we're within a CVCenter-gui or some other gui 
+			// -> a widget 'is closed' if its elements have been removed
+			if(allGuiEls.select({ |el| el.isClosed.not }).size == 0, { ^true }, { ^false });
+		}, {
+			// we just want to check for a single widget resp. its parent window
+			^this.window.isClosed;
+		})
 	}
 	
 	initControllersAndModels { |controllersAndModels, key|

@@ -29,6 +29,7 @@ CVWidgetKnob : CVWidget {
 				
 		guiEnv = ();
 		editorEnv = ();
+		cvcGui !? { isCVCWidget = true };
 		// fixme
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
 //		("midiOscEnv is"+[midiOscEnv.class, midiOscEnv]+", derived from:"+cvcGui).postln;
@@ -344,7 +345,7 @@ CVWidgetKnob : CVWidget {
 			midiCtrl, 
 			oscEditBut, 
 			calibBut
-		];
+		];		
 		guiEnv = (
 			editor: editor,
 			calibBut: calibBut,
@@ -470,14 +471,6 @@ CVWidgetKnob : CVWidget {
 	
 	cvAction_ { |func|
 		widgetCV.action_(func);
-	}
-	
-	front {
-		window.front;
-	}
-	
-	isClosed {
-		^window.isClosed;
 	}
 	
 }
