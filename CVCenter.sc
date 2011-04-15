@@ -227,6 +227,7 @@ CVCenter {
 				
 				widgetStates[k] !? {
 					cvWidgets[k].wdgtControllersAndModels.pairsDo({ |key, val|
+						widgetStates[k].postln;
 						if(key !== \mapConstrainterLo and:{
 							key !== \mapConstrainterHi
 						}, {
@@ -235,12 +236,14 @@ CVCenter {
 									widgetStates[k].controllersAndModels[key][\model].value
 								).changed(\value)
 							};
-							widgetStates[k].midiOscEnv.oscResponder !? {
-								cvWidgets[k].midiOscEnv.oscResponder = widgetStates[k].midiOscEnv.oscResponder;
-							};
-							widgetStates[k].midiOscEnv.cc !? {
-								cvWidgets[k].midiOscEnv.cc = widgetStates[k].midiOscEnv.cc;
-							}
+							if(widgetStates[k].midiOscEnv.notNil, {
+								widgetStates[k].midiOscEnv.oscResponder !? {
+									cvWidgets[k].midiOscEnv.oscResponder = widgetStates[k].midiOscEnv.oscResponder;
+								};
+								widgetStates[k].midiOscEnv.cc !? {
+									cvWidgets[k].midiOscEnv.cc = widgetStates[k].midiOscEnv.cc;
+								}
+							})
 						})
 					});
 					cvWidgets[k].nameField.string_(widgetStates[k].nameField);

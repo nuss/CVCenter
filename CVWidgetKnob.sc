@@ -425,10 +425,10 @@ CVWidgetKnob : CVWidget {
 	
 	oscConnect { |name, oscMsgIndex|
 		if("^\/".matchRegexp(name.asString).not, {
-			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as second argument to oscConnect").throw;
+			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as first argument to oscConnect").throw;
 		});
 		if(oscMsgIndex.isKindOf(Integer).not, {
-			Error("You have to supply an integer as third argument to oscConnect").throw;
+			Error("You have to supply an integer as second argument to oscConnect").throw;
 		});
 		wdgtControllersAndModels.oscConnection.model.value_([name, oscMsgIndex]).changed(\value);
 		CmdPeriod.add({ this.oscDisconnect });
