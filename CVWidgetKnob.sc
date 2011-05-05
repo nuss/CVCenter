@@ -106,13 +106,12 @@ CVWidgetKnob : CVWidget {
 				this.toggleComment(b.value);
 			})
 		;
-		nameField = TextField(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
+		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
-			.value_(thisname.asString)
-			.action_({ |nf| nf.value_(nf.value) })
+			.string_(thisname.asString)
 			.visible_(false)
+			.usesAutoInOutdent_(false)
 		;
 		knobsize = thisHeight-2-130;
 		if(knobsize >= thisWidth, {
