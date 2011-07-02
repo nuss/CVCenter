@@ -111,7 +111,7 @@ CVWidgetKnob : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.string_(thisname.asString)
 			.visible_(false)
-			.usesAutoInOutdent_(false)
+//			.usesAutoInOutdent_(false)
 		;
 		knobsize = thisHeight-2-130;
 		if(knobsize >= thisWidth, {

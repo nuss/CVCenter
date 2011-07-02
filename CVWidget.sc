@@ -551,28 +551,30 @@ CVWidget {
 						;
 						thisGuiEnv.midiLearn.value_(1)
 					};
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not
-					}, {
-						defer {
-							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
-								.background_(Color.red)
-								.stringColor_(Color.white)
-								.canFocus_(false)
-							;
-							thisGuiEnv.editor.midiChanField.string_((theChanger.value.chan+1).asString)
-								.background_(Color.red)
-								.stringColor_(Color.white)
-								.canFocus_(false)
-							;
-							thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
-								.background_(Color.red)
-								.stringColor_(Color.white)
-								.canFocus_(false)
-							;
-							thisGuiEnv.editor.midiLearnBut.value_(1)
-						}
-					})
+					defer {
+						if(thisGuiEnv.editor.notNil and:{
+							thisGuiEnv.editor.isClosed.not
+						}, {
+	//						defer {
+								thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
+									.background_(Color.red)
+									.stringColor_(Color.white)
+									.canFocus_(false)
+								;
+								thisGuiEnv.editor.midiChanField.string_((theChanger.value.chan+1).asString)
+									.background_(Color.red)
+									.stringColor_(Color.white)
+									.canFocus_(false)
+								;
+								thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
+									.background_(Color.red)
+									.stringColor_(Color.white)
+									.canFocus_(false)
+								;
+								thisGuiEnv.editor.midiLearnBut.value_(1)
+	//						}
+						})
+					}
 				},
 				"C", {
 					thisGuiEnv.midiLearn.states_([
@@ -611,32 +613,34 @@ CVWidget {
 						])
 						.value_(0).refresh;
 					};
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not
-					}, {
-						defer {
-							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src)
-								.background_(Color.white)
-								.stringColor_(Color.black)
-								.canFocus_(true)
-							;
-							thisGuiEnv.editor.midiChanField.string_(theChanger.value.chan)
-								.background_(Color.white)
-								.stringColor_(Color.black)
-								.canFocus_(true)
-							;
-							thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
-								.background_(Color.white)
-								.stringColor_(Color.black)
-								.canFocus_(true)
-							;
-							thisGuiEnv.editor.midiLearnBut.states_([
-								["L", Color.white, Color.blue],
-								["X", Color.white, Color.red]
-							])
-							.value_(0)
-						}
-					})
+					defer {
+						if(thisGuiEnv.editor.notNil and:{
+							thisGuiEnv.editor.isClosed.not
+						}, {
+	//						defer {
+								thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src)
+									.background_(Color.white)
+									.stringColor_(Color.black)
+									.canFocus_(true)
+								;
+								thisGuiEnv.editor.midiChanField.string_(theChanger.value.chan)
+									.background_(Color.white)
+									.stringColor_(Color.black)
+									.canFocus_(true)
+								;
+								thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
+									.background_(Color.white)
+									.stringColor_(Color.black)
+									.canFocus_(true)
+								;
+								thisGuiEnv.editor.midiLearnBut.states_([
+									["L", Color.white, Color.blue],
+									["X", Color.white, Color.red]
+								])
+								.value_(0)
+	//						}
+						})
+					}
 				}
 			)
 		});
@@ -713,17 +717,19 @@ CVWidget {
 				thisGuiEnv.oscEditBut.states_([
 					[theChanger.value[0].asString++"["++theChanger.value[1].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)]
 				]);
-				if(thisGuiEnv.editor.notNil and:{
-					thisGuiEnv.editor.isClosed.not
-				}, {
-					thisGuiEnv.editor.connectorBut.value_(0);
-					thisGuiEnv.editor.nameField.enabled_(false).string_(theChanger.value[0].asString);
-					if(prCalibrate, {
-						[thisGuiEnv.editor.inputConstraintLoField, thisGuiEnv.editor.inputConstraintHiField].do(_.enabled_(false));
-					});
-					thisGuiEnv.editor.indexField.value_(theChanger.value[1]).enabled_(false);
-					thisGuiEnv.editor.connectorBut.value_(1);
-				});
+				defer {
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not
+					}, {
+						thisGuiEnv.editor.connectorBut.value_(0);
+						thisGuiEnv.editor.nameField.enabled_(false).string_(theChanger.value[0].asString);
+						if(prCalibrate, {
+							[thisGuiEnv.editor.inputConstraintLoField, thisGuiEnv.editor.inputConstraintHiField].do(_.enabled_(false));
+						});
+						thisGuiEnv.editor.indexField.value_(theChanger.value[1]).enabled_(false);
+						thisGuiEnv.editor.connectorBut.value_(1);
+					})
+				};
 				thisGuiEnv.oscEditBut.refresh;
 			});
 			if(theChanger.value == false, {
