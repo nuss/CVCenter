@@ -486,7 +486,7 @@ CVWidget {
 					})
 				};
 				
-				fork {
+				{
 					block { |break|
 						loop {
 							0.01.wait;
@@ -508,7 +508,7 @@ CVWidget {
 							})
 						}
 					}
-				};
+				}.fork(AppClock);
 
 				if(theChanger.value.isEmpty, {
 					midiOscEnv.cc = makeCCResponder.().learn;

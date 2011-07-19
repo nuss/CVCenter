@@ -120,7 +120,7 @@ CVCenter {
 			switchBoard.resize_(8);
 
 			window.onClose_({
-				CVWidgetEditor.allEditors.pairsDo({ |editor, vals| vals.window.close });
+				CVWidgetEditor.allEditors.pairsDo({ |editor, val| val.window.close });
 				cvWidgets.pairsDo({ |k, w|
 					widgetStates[k].nameField = w.nameField.string;
 					w.class.switch(
