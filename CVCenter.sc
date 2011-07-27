@@ -69,6 +69,7 @@ CVCenter {
 		var widgetwidth, widgetheight=166, colwidth, rowheight;
 		var funcToAdd;
 		var widgetControllersAndModels, cvcArgs;
+		var tmp;
 			
 		cvs !? { this.put(*cvs) };
 		
@@ -121,49 +122,8 @@ CVCenter {
 
 			window.onClose_({
 				CVWidgetEditor.allEditors.pairsDo({ |editor, val| val.window.close });
-				cvWidgets.pairsDo({ |k, w|
-					widgetStates[k].nameField = w.nameField.string;
-					w.class.switch(
-						CVWidgetKnob, {
-							[
-								w.wdgtControllersAndModels.midiOptions.controller, 
-								w.wdgtControllersAndModels.midiDisplay.controller,
-								w.wdgtControllersAndModels.oscConnection.controller,
-								w.wdgtControllersAndModels.cvSpec.controller,
-								w.wdgtControllersAndModels.calibration.controller,
-								w.wdgtControllersAndModels.midiConnection.controller,
-								w.wdgtControllersAndModels.oscInputRange.controller
-							].remove;
-							widgetStates[k].controllersAndModels = w.wdgtControllersAndModels;
-							("midiOscEnv:"+w.midiOscEnv).postln;
-							widgetStates[k].midiOscEnv = w.midiOscEnv;
-							
-							widgetStates[k].widgetCV = w.widgetCV;
-//							w.cc !? { widgetStates[k].cc = w.midiOscEnvs.cc };
-						},
-						CVWidget2D, {
-							widgetStates[k].midiEditHi = w.midiHeadHi.enabled;
-							widgetStates[k].midiEditLo = w.midiHeadLo.enabled;
-							widgetStates[k].midiLearnHi = w.midiLearnHi.value;
-							widgetStates[k].midiLearnLo = w.midiLearnLo.value;
-							widgetStates[k].midiBgHi = w.midiSrcHi.background; 
-							widgetStates[k].midiStrColorHi = w.midiSrcHi.stringColor;
-							widgetStates[k].midiSrcHi = w.midiSrcHi.string;
-							widgetStates[k].midiBgLo = w.midiSrcLo.background; 
-							widgetStates[k].midiStrColorLo = w.midiSrcLo.stringColor;
-							widgetStates[k].midiSrcLo = w.midiSrcLo.string;
-							widgetStates[k].midiChanHi = w.midiChanHi.string;
-							widgetStates[k].midiChanLo = w.midiChanLo.string;
-							widgetStates[k].midiCtrlHi = w.midiCtrlHi.string;
-							widgetStates[k].midiCtrlLo = w.midiCtrlLo.string;
-							w.ccHi !? { widgetStates[k].ccHi = w.ccHi };
-							w.ccLo !? { widgetStates[k].ccLo = w.ccLo };
-						}
-					)
-				});
 				tabProperties.do(_.nextPos_(0@0));
 				controlButtons = nil;
-				cvWidgets = IdentityDictionary();
 				nextButtonPos = 0@0;
 				guiClosed = true;
 			});
@@ -173,8 +133,6 @@ CVCenter {
 			
 			order = all.order;
 			orderedCVs = all.atAll(order);
-
-//			[orderedCVs, order].postln;
 			
 			order.do({ |k, i|
 				if(widgetStates.size < 1, { cvTabIndex = 0 }, {
@@ -194,48 +152,52 @@ CVCenter {
 				if(orderedCVs[i].class === Event and:{ 
 					orderedCVs[i].keys.includesAny([\lo, \hi])
 				}, {
-//				"and now a 2D widget".postln;
+//					"and now a 2D widget".postln;
 					cvWidgets[k] = CVWidget2D(
 						tabs.views[cvTabIndex], [orderedCVs[i].lo, orderedCVs[i].hi], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 122, widgetheight), this.setup
 					)
 				}, {
 					("CVCenter.gui triggered:"+k).postln;
-					if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
+					if(cvWidgets[k].notNil and:{ cvWidgets[k].midiOscEnv.notNil }, {
 						cvcArgs = ();
-						cvcArgs.midiOscEnv = widgetStates[k].midiOscEnv;
+						cvcArgs.midiOscEnv = cvWidgets[k].midiOscEnv;
 					}, {
 						cvcArgs = true;	
 					});
+					
+					cvWidgets[k] !? { tmp = cvWidgets[k].widgetCV.value; ("tmp:"+tmp).postln };
+					
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex], 
 						orderedCVs[i], 
 						k, 
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
 						setup: this.setup,
-						controllersAndModels: widgetStates[k] !? { widgetStates[k].controllersAndModels },
+						controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 						cvcGui: cvcArgs
 					);
-					widgetStates[k] !? { 
-						("CV-value at:"+k++":"+widgetStates[k].widgetCV.value).postln;
-//						cvWidgets[k].widgetCV.value_(widgetStates[k].widgetCV.value);
-						cvWidgets[k].widgetCV.spec.default_(widgetStates[k].widgetCV.value);
-						("widgetCV at"+k++" should is:"+cvWidgets[k].widgetCV.value).postln;
-					}
+					
+					tmp !? { cvWidgets[k].widgetCV.value_(tmp) };
+					("value set to:"+cvWidgets[k].widgetCV.value).postln;
+
+//					widgetStates[k] !? { 
+//						("CV-value at:"+k++":"+widgetStates[k].widgetCV.value).postln;
+////						cvWidgets[k].widgetCV.value_(widgetStates[k].widgetCV.value);
+//						cvWidgets[k].widgetCV.spec.default_(widgetStates[k].widgetCV.value);
+//						("widgetCV at"+k++" should is:"+cvWidgets[k].widgetCV.value).postln;
+//					}
 				});
 
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 				
-				widgetStates[k] !? {
+				if(guiClosed, {
 					cvWidgets[k].wdgtControllersAndModels.pairsDo({ |key, val|
-						widgetStates[k].postln;
 						if(key !== \mapConstrainterLo and:{
 							key !== \mapConstrainterHi
 						}, {
-							widgetStates[k].controllersAndModels !? {
-								cvWidgets[k].wdgtControllersAndModels[key][\model].value_(
-									widgetStates[k].controllersAndModels[key][\model].value
-								).changed(\value)
-							};
+							cvWidgets[k].wdgtControllersAndModels[key][\model].value_(
+								cvWidgets[k].wdgtControllersAndModels[key][\model].value
+							).changed(\value);
 							if(widgetStates[k].midiOscEnv.notNil, {
 								widgetStates[k].midiOscEnv.oscResponder !? {
 									cvWidgets[k].midiOscEnv.oscResponder = widgetStates[k].midiOscEnv.oscResponder;
@@ -277,7 +239,7 @@ CVCenter {
 						cvWidgets[k].ccLo_(widgetStates[k].ccLo);
 //						this.prAddControlButton(k, \ccLo);
 					};
-				};
+				});
 				if(all[k].class === Event and:{ 
 					all[k].keys.includesAny([\lo, \hi])
 				}, {
@@ -343,50 +305,7 @@ CVCenter {
 				};
 				lastUpdateWidth = window.bounds.width;
 				lastSetUp = this.setup;
-//				lastSetUp.postln;
 				this.prAddFuncToCC;
-//				controlButtons !? {
-////					controlButtons.postln;
-//					if(lastCtrlBtnBank != ctrlButtonBank, {
-////						"should be triggered even if gui has been closed and re-oppened again".postln;
-////						if(guiClosed.not, { this.prUpdateSwitchboardSetup });
-//						guiClosed = false;
-//					});
-//					controlButtons.pairsDo({ |k, btn|
-//						if(btn.class === Event and:{
-//							btn.keys.includesAny([\ccHi, \ccLo])
-//						}, {
-//							[\ccHi, \ccLo].do({ |hilo|
-//								btn[hilo] !? {
-//									if(hilo == \ccHi, {
-//										btn[hilo].states_([[
-//											cvWidgets[k].midiCtrlHi.string, 
-//											Color.black,
-//											tabProperties[widgetStates[k].tabIndex].tabColor
-//										]])
-//									});
-//									if(hilo == \ccLo, {
-//										btn[hilo].states_([[
-//											cvWidgets[k].midiCtrlLo.string, 
-//											Color.black,
-//											tabProperties[widgetStates[k].tabIndex].tabColor
-//										]])
-//									});
-//									window.refresh;
-//								}
-//							})
-//						}, {
-////							("false func triggered:"+[k, btn]).postln;
-//							btn.states_([[
-//								cvWidgets[k].midiOscEnv.midiCtrl.string, 
-//								Color.black, 
-//								tabProperties[widgetStates[k].tabIndex].tabColor
-//							]]);
-//							window.refresh;
-//						})
-//					});
-//					lastCtrlBtnBank = ctrlButtonBank;
-//				}
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});
 	}	
@@ -642,7 +561,7 @@ CVCenter {
 					k, 
 					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
 					setup: this.setup,
-					controllersAndModels: widgetStates[k] !? { widgetStates[k].controllersAndModels },
+					controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 					cvcGui: cvcArgs
 				);
 				if(widgetStates[k].isNil, {

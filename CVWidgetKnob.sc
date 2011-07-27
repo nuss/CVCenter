@@ -3,7 +3,7 @@
 CVWidgetKnob : CVWidget {
 	
 	var <widgetCV/*, <cc, <midisrc, <midichan, <midinum*/ /* keep this for now but that might change ... */;
-	var <window, <guiEnv, <midiOscEnv, <editorEnv;
+	var <window, <guiEnv, <midiOscEnv, <editorEnv, <wdgtInfo;
 	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <editor;
 	var prSpec/*, midiOscEnv.oscMapping = \linlin, prCalibConstraints, oscResponder*/;
 	var returnedFromActions;
@@ -26,7 +26,7 @@ CVWidgetKnob : CVWidget {
 		var flow, thisname, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions, cvString;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
-				
+						
 		guiEnv = ();
 		editorEnv = ();
 		cvcGui !? { isCVCWidget = true };
@@ -37,6 +37,7 @@ CVWidgetKnob : CVWidget {
 		midiOscEnv.oscMapping ?? { midiOscEnv.oscMapping = \linlin };
 				
 		if(name.isNil, { thisname = "knob" }, { thisname = name });
+		wdgtInfo = thisname.asString;
 		
 		if(cv.isNil, {
 			widgetCV = CV.new;
@@ -72,9 +73,10 @@ CVWidgetKnob : CVWidget {
 		}, {
 			window = parentView;
 		});
-		
+						
 		cvcGui ?? { 
 			window.onClose_({
+//				{ "closing parent".postln }.defer;
 				if(editor.notNil, {
 					if(editor.isClosed.not, {
 						editor.close;
@@ -86,7 +88,7 @@ CVWidgetKnob : CVWidget {
 						})
 					})
 				});
-				midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove };
+				midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove.postln };
 				midiOscEnv.cc !? { midiOscEnv.cc.remove };
 				wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 			})
@@ -109,8 +111,9 @@ CVWidgetKnob : CVWidget {
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Helvetica", 9))
-			.string_(thisname.asString)
+			.string_(wdgtInfo)
 			.visible_(false)
+			.keyUpAction_({ wdgtInfo = nameField.string })
 //			.usesAutoInOutdent_(false)
 		;
 		knobsize = thisHeight-2-130;

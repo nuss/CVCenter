@@ -477,9 +477,13 @@ CVWidgetEditor {
 	}
 	
 	isClosed {
-		allEditors[name].window !? {
-			^allEditors[name].window.isClosed;
-		}
+		var ret;
+//		defer {
+			allEditors[name].window !? {
+				ret = defer { allEditors[name].window.isClosed };
+				^ret.value;
+			}
+//		}
 	}
 			
 }

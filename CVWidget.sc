@@ -189,7 +189,7 @@ CVWidget {
 	initControllersAndModels { |controllersAndModels, key|
 		var wcm;
 				
-		if(wdgtControllersAndModels.notNil, {
+		if(controllersAndModels.notNil, {
 			wdgtControllersAndModels = controllersAndModels;
 		}, {
 			wdgtControllersAndModels = ();
@@ -400,45 +400,44 @@ CVWidget {
 				}, {
 					midiOscEnv.oscMapping = \linlin;
 				});
-				if(thisGuiEnv.editor.notNil and:{
-					thisGuiEnv.editor.isClosed.not
-				}, {
-					{	
-						thisGuiEnv.oscEditBut.states_([[
-							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
-							thisGuiEnv.oscEditBut.states[0][1],
-							thisGuiEnv.oscEditBut.states[0][2]
-						]]);
-						thisGuiEnv.oscEditBut.refresh;
-						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === midiOscEnv.oscMapping, {
-								thisGuiEnv.editor.mappingSelect.value_(i);
-							})
-						})
-					}.defer
-				})		
-			}, {
-				if(thisGuiEnv.editor.notNil and:{
-					thisGuiEnv.editor.isClosed.not	
-				}, {
-					{
-						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === midiOscEnv.oscMapping, {
-								thisGuiEnv.editor.mappingSelect.value_(i)
-							})
-						});
-					}.defer;
-					if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
-						{
+				
+				{	
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not
+					}, {
 							thisGuiEnv.oscEditBut.states_([[
 								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
 								thisGuiEnv.oscEditBut.states[0][1],
 								thisGuiEnv.oscEditBut.states[0][2]
 							]]);
 							thisGuiEnv.oscEditBut.refresh;
-						}.defer
+							thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
+								if(item.asSymbol === midiOscEnv.oscMapping, {
+									thisGuiEnv.editor.mappingSelect.value_(i);
+								})
+							})
+					})		
+				}.defer
+			}, {
+				{
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not	
+					}, {
+							thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
+								if(item.asSymbol === midiOscEnv.oscMapping, {
+									thisGuiEnv.editor.mappingSelect.value_(i)
+								})
+							});
+							if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
+								thisGuiEnv.oscEditBut.states_([[
+									thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
+									thisGuiEnv.oscEditBut.states[0][1],
+									thisGuiEnv.oscEditBut.states[0][2]
+								]]);
+								thisGuiEnv.oscEditBut.refresh;
+							})
 					})
-				})
+				}.defer
 			})
 		});
 		
@@ -666,7 +665,6 @@ CVWidget {
 		};
 
 		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
-//			("at 1 midiOscEnv.oscMapping:"+midiOscEnv.oscMapping).postln;
 			if(theChanger.value.size == 2, {
 				oscResponderAction = { |t, r, msg|
 					if(prCalibrate, { 
@@ -692,7 +690,10 @@ CVWidget {
 						wcm.mapConstrainterHi.value_(midiOscEnv.calibConstraints.hi);
 					}, {
 						if(midiOscEnv.calibConstraints.isNil, {
-							midiOscEnv.calibConstraints = (lo: wcm.oscInputRange.model.value[0], hi: wcm.oscInputRange.model.value[1]);
+							midiOscEnv.calibConstraints = (
+								lo: wcm.oscInputRange.model.value[0], 
+								hi: wcm.oscInputRange.model.value[1]
+							)
 						})
 					});
 					widgetCV.value_(
@@ -708,10 +709,7 @@ CVWidget {
 				if(midiOscEnv.oscResponder.isNil, { 
 					midiOscEnv.oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, oscResponderAction).add;
 				}, {
-//					("at 2 midiOscEnv.oscMapping:"+midiOscEnv.oscMapping).postln;
-//					tmp = (mapping: );
 					midiOscEnv.oscResponder.action_(oscResponderAction);
-//					this.oscMapping_(tmp.mapping);
 				});
 								
 				thisGuiEnv.oscEditBut.states_([
