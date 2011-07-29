@@ -5,7 +5,7 @@ CVWidgetEditor {
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut, <calibNumBoxes;
-	var <nameField, <indexField;
+	var <ipField, <portField, <nameField, <indexField;
 	var <inputConstraintLoField, <inputConstraintHiField;
 	var <mappingSelect;
 	var <connectorBut;
@@ -46,7 +46,7 @@ CVWidgetEditor {
 		allEditors ?? { allEditors = IdentityDictionary() };
 		
 		if(allEditors[name].isNil or:{ allEditors[name].window.isClosed }, {
-			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 190));
+			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 225));
 
 			allEditors.put(name, (window: window, name: widgetName));
 
@@ -325,7 +325,30 @@ CVWidgetEditor {
 			;
 			
 			// OSC editting
-	
+			
+			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-20@15)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("device-IP/port: leave empty for listening to any IP/port")
+			;
+			
+			ipField = TextField(allEditors[name].tabs.views[2], flow2.bounds.width-60@15)
+				.font_(textFieldFont)
+				.stringColor_(textFieldFontColor)
+				.background_(textFieldBg)
+//				.string_("/my/typetag")
+			;
+			
+			flow2.shift(5, 0);
+
+			portField = TextField(allEditors[name].tabs.views[2], 36@15)
+				.font_(textFieldFont)
+				.stringColor_(textFieldFontColor)
+				.background_(textFieldBg)
+			;
+				
+			flow2.shift(0, 0);
+
 			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-20@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
@@ -435,7 +458,9 @@ CVWidgetEditor {
 					cb.value.switch(
 						1, { 
 							widget.oscConnect(
-								nameField.value, 
+								ipField.string,
+								portField.value,
+								nameField.string, 
 								indexField.value.asInt
 							);
 						},

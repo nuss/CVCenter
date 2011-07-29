@@ -164,9 +164,7 @@ CVCenter {
 					}, {
 						cvcArgs = true;	
 					});
-					
-					cvWidgets[k] !? { tmp = cvWidgets[k].widgetCV.value; ("tmp:"+tmp).postln };
-					
+										
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex], 
 						orderedCVs[i], 
@@ -177,15 +175,6 @@ CVCenter {
 						cvcGui: cvcArgs
 					);
 					
-					tmp !? { cvWidgets[k].widgetCV.value_(tmp) };
-					("value set to:"+cvWidgets[k].widgetCV.value).postln;
-
-//					widgetStates[k] !? { 
-//						("CV-value at:"+k++":"+widgetStates[k].widgetCV.value).postln;
-////						cvWidgets[k].widgetCV.value_(widgetStates[k].widgetCV.value);
-//						cvWidgets[k].widgetCV.spec.default_(widgetStates[k].widgetCV.value);
-//						("widgetCV at"+k++" should is:"+cvWidgets[k].widgetCV.value).postln;
-//					}
 				});
 
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
@@ -208,7 +197,7 @@ CVCenter {
 							})
 						})
 					});
-					cvWidgets[k].nameField.string_(widgetStates[k].nameField);
+//					cvWidgets[k].nameField.string_(widgetStates[k].nameField);
 					widgetStates[k].midiEditHi !? { cvWidgets[k].midiHeadHi.enabled_(widgetStates[k].midiEditHi) };
 					widgetStates[k].midiEditLo !? { cvWidgets[k].midiHeadLo.enabled_(widgetStates[k].midiEditLo) };
 					widgetStates[k].midiLearnHi !? { cvWidgets[k].midiLearnHi.value_(widgetStates[k].midiLearnHi) };
@@ -280,7 +269,9 @@ CVCenter {
 					});
 					if(all.size < lastUpdate, {
 						removedKeys = cvWidgets.keys.difference(all.keys);
+						("removed:"+removedKeys).postln;
 						removedKeys.do({ |k|
+							("now removing at:"+k).postln;
 							cvWidgets[k].remove;
 							cvWidgets.removeAt(k);
 							controlButtons !? {
@@ -440,12 +431,8 @@ CVCenter {
 		});
 		
 		if(window.isNil or:{ window.isClosed }, {
-//			Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size < 1
-//			("this.gui:"+this.setup).postln;
 			this.gui(tab);
 		}, {
-//			("now adding:"+tab.asString).postln;
-//			("this.prAddToGui:"+this.setup).postln;
 			this.prAddToGui(tab);
 		});
 		
@@ -595,6 +582,8 @@ CVCenter {
 	*prRegroupWidgets { |tabIndex|
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets;
 		var widgetwidth, widgetheight=166;
+		
+		"prRegroupWidgets invoked".postln;
 				
 		rowheight = widgetheight+1;
 		thisNextPos = 0@0;

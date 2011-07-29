@@ -3,7 +3,7 @@
 CVWidgetKnob : CVWidget {
 	
 	var <widgetCV/*, <cc, <midisrc, <midichan, <midinum*/ /* keep this for now but that might change ... */;
-	var <window, <guiEnv, <midiOscEnv, <editorEnv, <wdgtInfo;
+	var <window, <guiEnv, <midiOscEnv, <editorEnv;
 	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <editor;
 	var prSpec/*, midiOscEnv.oscMapping = \linlin, prCalibConstraints, oscResponder*/;
 	var returnedFromActions;
@@ -76,7 +76,6 @@ CVWidgetKnob : CVWidget {
 						
 		cvcGui ?? { 
 			window.onClose_({
-//				{ "closing parent".postln }.defer;
 				if(editor.notNil, {
 					if(editor.isClosed.not, {
 						editor.close;
@@ -425,14 +424,30 @@ CVWidgetKnob : CVWidget {
 		^[midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi];
 	}
 	
-	oscConnect { |name, oscMsgIndex|
+	oscConnect { |ip, port, name, oscMsgIndex|
+		var intPort;
+
+		if(ip.size > 0 and:{ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not }, {
+			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
+		});
+		
+		if(port.size > 0, {
+			if("^[0-9]{1,5}$".matchRegexp(port).not, {
+				Error("Please provide a valid port or leave this field empty").throw;
+			}, {
+				intPort = port.asInt;
+			})
+		});
+		 
 		if("^\/".matchRegexp(name.asString).not, {
 			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as first argument to oscConnect").throw;
 		});
+		
 		if(oscMsgIndex.isKindOf(Integer).not, {
 			Error("You have to supply an integer as second argument to oscConnect").throw;
 		});
-		wdgtControllersAndModels.oscConnection.model.value_([name, oscMsgIndex]).changed(\value);
+		
+		wdgtControllersAndModels.oscConnection.model.value_([ip, intPort, name, oscMsgIndex]).changed(\value);
 		CmdPeriod.add({ this.oscDisconnect });
 	}
 	

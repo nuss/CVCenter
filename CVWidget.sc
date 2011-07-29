@@ -3,9 +3,9 @@ CVWidget {
 	
 //	classvar <globalMidiOscEnv;
 	var prMidiMode = 0, prMidiMean = 64, prCtrlButtonBank, prMidiResolution = 1, prSoftWithin = 0.1;
-	var prCalibrate = true; // OSC-calibration enabled/disabled - private
+	var prCalibrate = true, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, allGuiEls, isCVCWidget = false;
-	var <widgetBg, <label, <nameField; // elements contained in any kind of CVWidget
+	var <widgetBg, <label, <nameField, <wdgtInfo; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps;
 	var <wdgtControllersAndModels;
 
@@ -73,7 +73,8 @@ CVWidget {
 	}
 	
 	remove {
-		allGuiEls.do(_.remove);
+//		allGuiEls.do(_.remove);
+		allGuiEls.do({ |el| el.postln; el.remove });
 	}
 	
 	midiMode_ { |mode|
@@ -665,24 +666,24 @@ CVWidget {
 		};
 
 		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
-			if(theChanger.value.size == 2, {
+			if(theChanger.value.size == 4, {
 				oscResponderAction = { |t, r, msg|
 					if(prCalibrate, { 
 						if(midiOscEnv.calibConstraints.isNil, {
-							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[1]], hi: msg[theChanger.value[1]]);
+							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
 						}, {
-							if(msg[theChanger.value[1]] < midiOscEnv.calibConstraints.lo, { 
-								midiOscEnv.calibConstraints.lo = msg[theChanger.value[1]];
+							if(msg[theChanger.value[3]] < midiOscEnv.calibConstraints.lo, { 
+								midiOscEnv.calibConstraints.lo = msg[theChanger.value[3]];
 								wcm.oscInputRange.model.value_([
-									msg[theChanger.value[1]], 
+									msg[theChanger.value[3]], 
 									wcm.oscInputRange.model.value[1]
 								]).changed(\value);
 							});
-							if(msg[theChanger.value[1]] > midiOscEnv.calibConstraints.hi, {
-								midiOscEnv.calibConstraints.hi = msg[theChanger.value[1]];
+							if(msg[theChanger.value[3]] > midiOscEnv.calibConstraints.hi, {
+								midiOscEnv.calibConstraints.hi = msg[theChanger.value[3]];
 								wcm.oscInputRange.model.value_([
-									wcm.oscInputRange.model.value[0], 
-									msg[theChanger.value[1]]
+									wcm.oscInputRange.model.value[1], 
+									msg[theChanger.value[3]]
 								]).changed(\value);
 							});
 						});
@@ -697,7 +698,7 @@ CVWidget {
 						})
 					});
 					widgetCV.value_(
-						msg[theChanger.value[1]].perform(
+						msg[theChanger.value[3]].perform(
 							midiOscEnv.oscMapping,
 							midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi,
 							this.spec.minval, this.spec.maxval,
@@ -705,26 +706,28 @@ CVWidget {
 						)
 					)
 				};
-
+								
+				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
+				
 				if(midiOscEnv.oscResponder.isNil, { 
-					midiOscEnv.oscResponder = OSCresponderNode(nil, theChanger.value[0].asSymbol, oscResponderAction).add;
+					midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;
 				}, {
 					midiOscEnv.oscResponder.action_(oscResponderAction);
 				});
 								
 				thisGuiEnv.oscEditBut.states_([
-					[theChanger.value[0].asString++"["++theChanger.value[1].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)]
+					[theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)]
 				]);
 				defer {
 					if(thisGuiEnv.editor.notNil and:{
 						thisGuiEnv.editor.isClosed.not
 					}, {
 						thisGuiEnv.editor.connectorBut.value_(0);
-						thisGuiEnv.editor.nameField.enabled_(false).string_(theChanger.value[0].asString);
+						thisGuiEnv.editor.nameField.enabled_(false).string_(theChanger.value[2].asString);
 						if(prCalibrate, {
 							[thisGuiEnv.editor.inputConstraintLoField, thisGuiEnv.editor.inputConstraintHiField].do(_.enabled_(false));
 						});
-						thisGuiEnv.editor.indexField.value_(theChanger.value[1]).enabled_(false);
+						thisGuiEnv.editor.indexField.value_(theChanger.value[3]).enabled_(false);
 						thisGuiEnv.editor.connectorBut.value_(1);
 					})
 				};
