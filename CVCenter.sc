@@ -180,7 +180,10 @@ CVCenter {
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 				
 				if(guiClosed, {
+					(k++":"+cvWidgets[k].widgetCV.value).postln;
+					tmp = cvWidgets[k].widgetCV.value;
 					cvWidgets[k].wdgtControllersAndModels.pairsDo({ |key, val|
+						[key, val].postln;
 						if(key !== \mapConstrainterLo and:{
 							key !== \mapConstrainterHi
 						}, {
@@ -197,37 +200,8 @@ CVCenter {
 							})
 						})
 					});
-//					cvWidgets[k].nameField.string_(widgetStates[k].nameField);
-					widgetStates[k].midiEditHi !? { cvWidgets[k].midiHeadHi.enabled_(widgetStates[k].midiEditHi) };
-					widgetStates[k].midiEditLo !? { cvWidgets[k].midiHeadLo.enabled_(widgetStates[k].midiEditLo) };
-					widgetStates[k].midiLearnHi !? { cvWidgets[k].midiLearnHi.value_(widgetStates[k].midiLearnHi) };
-					widgetStates[k].midiLearnLo !? { cvWidgets[k].midiLearnLo.value_(widgetStates[k].midiLearnLo) };
-					widgetStates[k].midiBgHi !? {
-						[cvWidgets[k].midiSrcHi, cvWidgets[k].midiChanHi, cvWidgets[k].midiCtrlHi].do({ |view|
-							view.background_(widgetStates[k].midiBgHi);
-							view.stringColor_(widgetStates[k].midiStrColorHi);
-						})
-					};
-					widgetStates[k].midiBgLo !? {
-						[cvWidgets[k].midiSrcLo, cvWidgets[k].midiChanLo, cvWidgets[k].midiCtrlLo].do({ |view|
-							view.background_(widgetStates[k].midiBgLo);
-							view.stringColor_(widgetStates[k].midiStrColorLo);
-						})
-					};
-					widgetStates[k].midiSrcHi !? { cvWidgets[k].midiSrcHi.string_(widgetStates[k].midiSrcHi) };
-					widgetStates[k].midiSrcLo !? { cvWidgets[k].midiSrcLo.string_(widgetStates[k].midiSrcLo) };
-					widgetStates[k].midiChanHi !? { cvWidgets[k].midiChanHi.string_(widgetStates[k].midiChanHi) };
-					widgetStates[k].midiChanLo !? { cvWidgets[k].midiChanLo.string_(widgetStates[k].midiChanLo) };
-					widgetStates[k].midiCtrlHi !? { cvWidgets[k].midiCtrlHi.string_(widgetStates[k].midiCtrlHi) };
-					widgetStates[k].midiCtrlLo !? { cvWidgets[k].midiCtrlLo.string_(widgetStates[k].midiCtrlLo) };
-					widgetStates[k].ccHi !? { 
-						cvWidgets[k].ccHi_(widgetStates[k].ccHi);
-//						this.prAddControlButton(k, \ccHi);
-					};
-					widgetStates[k].ccLo !? { 
-						cvWidgets[k].ccLo_(widgetStates[k].ccLo);
-//						this.prAddControlButton(k, \ccLo);
-					};
+					cvWidgets[k].widgetCV.value_(tmp);
+					guiClosed = false;
 				});
 				if(all[k].class === Event and:{ 
 					all[k].keys.includesAny([\lo, \hi])
@@ -557,9 +531,7 @@ CVCenter {
 					widgetStates[k].tabIndex = cvTabIndex;
 					widgetStates[k].addedFunc = false;
 				});
-//				widgetStates[k].widgetCV !? { ("widgetStates["++k++"].widgetCV.value:"+widgetStates[k].widgetCV.value).postln };
-				widgetStates[k].widgetCV !? { cvWidgets[k].widgetCV.value_(widgetStates[k].widgetCV.value) };
-//				widgetStates[k].widgetCV !? { ("cvWidgets["++k++"].widgetCV.value:"+cvWidgets[k].widgetCV.value).postln };
+				cvWidgets[k].widgetCV !? { cvWidgets[k].widgetCV.value_(cvWidgets[k].widgetCV.value) };
 			});
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 			colwidth = widgetwidth+1; // add a small gap between widgets

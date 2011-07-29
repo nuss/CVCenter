@@ -4,7 +4,7 @@ CVWidget {
 //	classvar <globalMidiOscEnv;
 	var prMidiMode = 0, prMidiMean = 64, prCtrlButtonBank, prMidiResolution = 1, prSoftWithin = 0.1;
 	var prCalibrate = true, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
-	var visibleGuiEls, allGuiEls, isCVCWidget = false;
+	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
 	var <widgetBg, <label, <nameField, <wdgtInfo; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps;
 	var <wdgtControllersAndModels;
@@ -334,7 +334,7 @@ CVWidget {
 		};
 		
 		wcm.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
-//			[theChanger.value, theChanger.value.class].postln;
+			[theChanger.value, theChanger.value.class].postln;
 			if(theChanger.value.minval <= 0.0 or:{
 				theChanger.value.maxval <= 0.0
 			}, {
