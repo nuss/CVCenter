@@ -30,10 +30,8 @@ CVWidgetKnob : CVWidget {
 		guiEnv = ();
 		editorEnv = ();
 		cvcGui !? { isCVCWidget = true };
-		// fixme
+
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
-//		("midiOscEnv is"+[midiOscEnv.class, midiOscEnv]+", derived from:"+cvcGui).postln;
-//		("midiOscEnv.oscMapping, are you there?"+midiOscEnv.oscMapping).postln;
 		midiOscEnv.oscMapping ?? { midiOscEnv.oscMapping = \linlin };
 				
 		if(name.isNil, { thisname = "knob" }, { thisname = name });
@@ -113,7 +111,6 @@ CVWidgetKnob : CVWidget {
 			.string_(wdgtInfo)
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
-//			.usesAutoInOutdent_(false)
 		;
 		knobsize = thisHeight-2-130;
 		if(knobsize >= thisWidth, {
@@ -275,7 +272,6 @@ CVWidgetKnob : CVWidget {
 				tf.stringColor_(Color.red)
 			})
 			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
-//				[tf, char, modifiers, unicode, keycode].postln;
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
@@ -426,18 +422,21 @@ CVWidgetKnob : CVWidget {
 	
 	oscConnect { |ip, port, name, oscMsgIndex|
 		var intPort;
+		[port, port.class].postln;
 
 		if(ip.size > 0 and:{ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not }, {
 			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
 		});
 		
 		if(port.size > 0, {
-			if("^[0-9]{1,5}$".matchRegexp(port).not, {
+			if("^[0-9]{1,5}$".matchRegexp(port).not and:{ port != "nil" }, {
 				Error("Please provide a valid port or leave this field empty").throw;
 			}, {
 				intPort = port.asInt;
 			})
 		});
+		
+		if(port == "nil", { intPort = nil });
 		 
 		if("^\/".matchRegexp(name.asString).not, {
 			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as first argument to oscConnect").throw;

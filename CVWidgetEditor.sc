@@ -336,7 +336,7 @@ CVWidgetEditor {
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
-//				.string_("/my/typetag")
+				.string_("")
 			;
 			
 			flow2.shift(5, 0);
@@ -345,6 +345,7 @@ CVWidgetEditor {
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
+				.string_("")
 			;
 				
 			flow2.shift(0, 0);

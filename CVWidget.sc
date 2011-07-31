@@ -226,6 +226,20 @@ CVWidget {
 		wcm.oscConnection.model ?? {
 			wcm.oscConnection.model = Ref(false);
 		};
+		wcm.oscDisplay ?? {
+			wcm.oscDisplay = ();
+		};
+		wcm.oscDisplay.model ?? {
+			wcm.oscDisplay.model = Ref((
+				but: ["edit OSC", Color.black, Color.clear],
+				ipField: "",
+				portField: "",
+				nameField: "/my/typetag",
+				index: 1, 
+				connectorButVal: 0, 
+				editEnabled: true
+			))
+		};
 		wcm.midiConnection ?? {
 			wcm.midiConnection = ();
 		};
@@ -334,7 +348,6 @@ CVWidget {
 		};
 		
 		wcm.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
-			[theChanger.value, theChanger.value.class].postln;
 			if(theChanger.value.minval <= 0.0 or:{
 				theChanger.value.maxval <= 0.0
 			}, {
@@ -511,8 +524,10 @@ CVWidget {
 				}.fork(AppClock);
 
 				if(theChanger.value.isEmpty, {
+					"now learning".postln;
 					midiOscEnv.cc = makeCCResponder.().learn;
 				}, {
+					("setting to the selected values:"+[theChanger.value.src, theChanger.value.chan, theChanger.value.num]).postln;
 					midiOscEnv.cc = makeCCResponder.(theChanger.value.src, theChanger.value.chan, theChanger.value.num);
 				});
 				
@@ -555,24 +570,22 @@ CVWidget {
 						if(thisGuiEnv.editor.notNil and:{
 							thisGuiEnv.editor.isClosed.not
 						}, {
-	//						defer {
-								thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
-									.background_(Color.red)
-									.stringColor_(Color.white)
-									.canFocus_(false)
-								;
-								thisGuiEnv.editor.midiChanField.string_((theChanger.value.chan+1).asString)
-									.background_(Color.red)
-									.stringColor_(Color.white)
-									.canFocus_(false)
-								;
-								thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
-									.background_(Color.red)
-									.stringColor_(Color.white)
-									.canFocus_(false)
-								;
-								thisGuiEnv.editor.midiLearnBut.value_(1)
-	//						}
+							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
+								.background_(Color.red)
+								.stringColor_(Color.white)
+								.canFocus_(false)
+							;
+							thisGuiEnv.editor.midiChanField.string_((theChanger.value.chan+1).asString)
+								.background_(Color.red)
+								.stringColor_(Color.white)
+								.canFocus_(false)
+							;
+							thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
+								.background_(Color.red)
+								.stringColor_(Color.white)
+								.canFocus_(false)
+							;
+							thisGuiEnv.editor.midiLearnBut.value_(1)
 						})
 					}
 				},
@@ -617,28 +630,26 @@ CVWidget {
 						if(thisGuiEnv.editor.notNil and:{
 							thisGuiEnv.editor.isClosed.not
 						}, {
-	//						defer {
-								thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src)
-									.background_(Color.white)
-									.stringColor_(Color.black)
-									.canFocus_(true)
-								;
-								thisGuiEnv.editor.midiChanField.string_(theChanger.value.chan)
-									.background_(Color.white)
-									.stringColor_(Color.black)
-									.canFocus_(true)
-								;
-								thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
-									.background_(Color.white)
-									.stringColor_(Color.black)
-									.canFocus_(true)
-								;
-								thisGuiEnv.editor.midiLearnBut.states_([
-									["L", Color.white, Color.blue],
-									["X", Color.white, Color.red]
-								])
-								.value_(0)
-	//						}
+							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src)
+								.background_(Color.white)
+								.stringColor_(Color.black)
+								.canFocus_(true)
+							;
+							thisGuiEnv.editor.midiChanField.string_(theChanger.value.chan)
+								.background_(Color.white)
+								.stringColor_(Color.black)
+								.canFocus_(true)
+							;
+							thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
+								.background_(Color.white)
+								.stringColor_(Color.black)
+								.canFocus_(true)
+							;
+							thisGuiEnv.editor.midiLearnBut.states_([
+								["L", Color.white, Color.blue],
+								["X", Color.white, Color.red]
+							])
+							.value_(0)
 						})
 					}
 				}
@@ -714,24 +725,19 @@ CVWidget {
 				}, {
 					midiOscEnv.oscResponder.action_(oscResponderAction);
 				});
-								
-				thisGuiEnv.oscEditBut.states_([
-					[theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)]
-				]);
-				defer {
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not
-					}, {
-						thisGuiEnv.editor.connectorBut.value_(0);
-						thisGuiEnv.editor.nameField.enabled_(false).string_(theChanger.value[2].asString);
-						if(prCalibrate, {
-							[thisGuiEnv.editor.inputConstraintLoField, thisGuiEnv.editor.inputConstraintHiField].do(_.enabled_(false));
-						});
-						thisGuiEnv.editor.indexField.value_(theChanger.value[3]).enabled_(false);
-						thisGuiEnv.editor.connectorBut.value_(1);
-					})
-				};
-				thisGuiEnv.oscEditBut.refresh;
+				
+				wcm.oscDisplay.model.value_(
+					(
+						but: [theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)],
+						ipField: theChanger.value[0].asString,
+						portField: theChanger.value[1].asString,
+						nameField: theChanger.value[2].asString,
+						index: theChanger.value[3],
+						connectorButVal: 1, 
+						editEnabled: false
+					)
+				).changed(\value);
+				
 			});
 			if(theChanger.value == false, {
 				midiOscEnv.oscResponder.remove;
@@ -741,25 +747,53 @@ CVWidget {
 				]);
 				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changed(\value);
 				midiOscEnv.calibConstraints = nil;
+				
+				wcm.oscDisplay.model.value_(
+					(
+						but: ["edit OSC", Color.black, Color.clear],
+						ipField: wcm.oscDisplay.model.value.ipField,
+						portField: wcm.oscDisplay.model.value.portField,
+						nameField: wcm.oscDisplay.model.value.nameField,
+						index: wcm.oscDisplay.model.value.index,
+						connectorButVal: 0, 
+						editEnabled: true
+					)
+				).changed(\value);
+
+			})
+		});
+		
+		wcm.oscDisplay.controller ?? {
+			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
+		};
+		
+		wcm.oscDisplay.controller.put(\value, { |theChanger, what, moreArgs|
+			thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
+			defer {
 				if(thisGuiEnv.editor.notNil and:{
 					thisGuiEnv.editor.isClosed.not
 				}, {
-					thisGuiEnv.editor.connectorBut.value_(0);
-					thisGuiEnv.editor.nameField.enabled_(true);
-					thisGuiEnv.editor.inputConstraintLoField.value_(
-						wcm.oscInputRange.model.value[0];
-					);
-					thisGuiEnv.editor.inputConstraintHiField.value_(
-						wcm.oscInputRange.model.value[1];
-					);
-					if(prCalibrate.not, {
-						[thisGuiEnv.editor.inputConstraintLoField, thisGuiEnv.editor.inputConstraintHiField].do(_.enabled_(true));
+					thisGuiEnv.editor.connectorBut.value_(theChanger.value.connectorButVal);
+					thisGuiEnv.editor.ipField.string_(theChanger.value.ipField);
+					thisGuiEnv.editor.portField.string_(theChanger.value.portField);
+					thisGuiEnv.editor.nameField.string_(theChanger.value.nameField);
+					if(prCalibrate, {
+						[
+							thisGuiEnv.editor.inputConstraintLoField, 
+							thisGuiEnv.editor.inputConstraintHiField
+						].do(_.enabled_(theChanger.value.editEnabled));
 					});
-					thisGuiEnv.editor.indexField.enabled_(true);
-					thisGuiEnv.editor.connectorBut.value_(0);
-				});
-				thisGuiEnv.oscEditBut.refresh;
-			})
+					thisGuiEnv.editor.indexField.value_(theChanger.value.index);
+					thisGuiEnv.editor.connectorBut.value_(theChanger.value.connectorButVal);
+					[
+						thisGuiEnv.editor.ipField,
+						thisGuiEnv.editor.portField,
+						thisGuiEnv.editor.nameField,
+						thisGuiEnv.editor.indexField
+					].do(_.enabled_(theChanger.value.editEnabled))
+				})
+			};
+			thisGuiEnv.oscEditBut.refresh;
 		});
 	}
 

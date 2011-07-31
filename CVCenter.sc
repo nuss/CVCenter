@@ -178,31 +178,13 @@ CVCenter {
 				});
 
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
-				
-				if(guiClosed, {
-					(k++":"+cvWidgets[k].widgetCV.value).postln;
-					tmp = cvWidgets[k].widgetCV.value;
-					cvWidgets[k].wdgtControllersAndModels.pairsDo({ |key, val|
-						[key, val].postln;
-						if(key !== \mapConstrainterLo and:{
-							key !== \mapConstrainterHi
-						}, {
-							cvWidgets[k].wdgtControllersAndModels[key][\model].value_(
-								cvWidgets[k].wdgtControllersAndModels[key][\model].value
-							).changed(\value);
-							if(widgetStates[k].midiOscEnv.notNil, {
-								widgetStates[k].midiOscEnv.oscResponder !? {
-									cvWidgets[k].midiOscEnv.oscResponder = widgetStates[k].midiOscEnv.oscResponder;
-								};
-								widgetStates[k].midiOscEnv.cc !? {
-									cvWidgets[k].midiOscEnv.cc = widgetStates[k].midiOscEnv.cc;
-								}
-							})
-						})
-					});
-					cvWidgets[k].widgetCV.value_(tmp);
-					guiClosed = false;
-				});
+				cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value_(
+					cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value
+				).changed(\value);
+				cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value_(
+					cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value
+				).changed(\value);
+
 				if(all[k].class === Event and:{ 
 					all[k].keys.includesAny([\lo, \hi])
 				}, {
@@ -221,6 +203,7 @@ CVCenter {
 					tabProperties[cvTabIndex].nextPos = thisNextPos.x+colwidth@(thisNextPos.y);
 				});
 			});
+//			guiClosed = false;
 			window.front;
 		});
 		window.front;
