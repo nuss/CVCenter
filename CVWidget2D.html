@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Style-Type" content="text/css">
 <title></title>
 <meta name="Generator" content="Cocoa HTML Writer">
-<meta name="CocoaVersion" content="949.54">
+<meta name="CocoaVersion" content="1038.36">
 <style type="text/css">
 p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
 p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
@@ -36,12 +36,12 @@ span.Apple-tab-span {white-space:pre}
 <body>
 <p class="p1"><span class="s1"><b>CVWidget2D </b></span><b>a widget, wrapping <i>two</i> CVs, providing a twodimensional-slider, range-slider and a number-field for mouse-/keyboard-control resp. an automated midi-learn functionality to connect to midi-sliders on external hardware</b></p>
 <p class="p2"><br></p>
-<p class="p1"><b>inherits from: </b><a href="SC://Object"><span class="s2"><b>Object</b></span></a><b> : CVWidget</b></p>
-<p class="p1"><b>dependencies: </b><a href="../../../quarks/Conductor/help/Conductor-Help/Conductor.html"><span class="s2"><b>Conductor</b></span></a><b> (</b><a href="SC://Quarks"><span class="s3"><b>Quarks</b></span></a><b>)</b></p>
+<p class="p1"><b>inherits from: </b><a href="sc://Object"><span class="s2"><b>Object</b></span></a><b> : CVWidget</b></p>
+<p class="p1"><b>dependencies: </b><a href="../../../quarks/Conductor/help/Conductor-Help/Conductor.html"><span class="s2"><b>Conductor</b></span></a><b> (</b><a href="sc://Quarks"><span class="s3"><b>Quarks</b></span></a><b>)</b></p>
 <p class="p2"><br></p>
-<p class="p1">A<b> CVWidget </b>resp. its subclasses are supposed to be convenient GUI-classes similar to <a href="SC://EZSlider"><span class="s2"><b>EZGui</b></span></a><b> </b>resp. its subclasses <a href="SC://EZSlider"><span class="s4"><b>EZSlider</b></span></a>, <a href="../../../../../../../../Applications/SuperCollider3/common/build/Help/GUI/EZ-GUI/EZKnob.html"><span class="s5"><b>EZKnob</b></span></a><span class="s5">, <a href="../../../../../../../../Applications/SuperCollider3/common/build/Help/GUI/EZ-GUI/EZRanger.html"><span class="s6"><b>EZRanger</b></span></a></span><span class="s7"> </span>etc. and it should be possible to use it any GUI. However, its primary purpose is not the use as such. Much rather it should be understood as a module for <a href="CVCenter.html"><span class="s2"><b>CVCenter</b></span></a>.</p>
+<p class="p1">A<b> CVWidget </b>resp. its subclasses are supposed to be convenient GUI-classes similar to <a href="sc://EZSlider"><span class="s2"><b>EZGui</b></span></a><b> </b>resp. its subclasses <a href="sc://EZSlider"><span class="s4"><b>EZSlider</b></span></a>, <a href="../../../../../../../../Applications/SuperCollider3/common/build/Help/GUI/EZ-GUI/EZKnob.html"><span class="s5"><b>EZKnob</b></span></a><span class="s5">, <a href="../../../../../../../../Applications/SuperCollider3/common/build/Help/GUI/EZ-GUI/EZRanger.html"><span class="s6"><b>EZRanger</b></span></a></span><span class="s7"> </span>etc. and it should be possible to use it any GUI. However, its primary purpose is not the use as such. Much rather it should be understood as a module for <a href="CVCenter.html"><span class="s2"><b>CVCenter</b></span></a>.</p>
 <p class="p2"><br></p>
-<p class="p1">A CVWidget2D is GUI-representation of two <a href="../../../quarks/Conductor/help/Conductor-Help/CV.html"><span class="s8"><b>CV</b></span></a><span class="s8"><b>s</b></span><b> </b>(requires the <a href="../../../quarks/Conductor/help/Conductor-Help/Conductor.html"><span class="s8"><b>Conductor</b></span></a>-Quark to be installed). Instantiating a CVWidget2D as an element in a GUI automatically instantiates two <a href="../../../quarks/Conductor/help/Conductor-Help/CV.html"><span class="s8"><b>CV</b></span></a><span class="s8"><b>s</b></span> that can be controlled by a twodimensional slider (a <a href="SC://Slider2D"><span class="s8"><b>Slider2D</b></span></a>),a <a href="SC://RangeSlider"><span class="s9"><b>RangeSlider</b></span></a>, two numerical inputs (<a href="SC://NumberBox"><span class="s8"><b>NumberBox</b></span></a><span class="s8"><b>es</b></span>) or a MIDI-device. CVWidget2D have a built in MIDI-learn capability (see also <a href="SC://CCResponder"><span class="s8"><b>CCResponder</b></span></a>) - a slider or fader of a connected MIDI-device will automatically be connected if the MIDi-learn button is clicked in the widget and a hardware-slider is moved.<span class="Apple-tab-span">	</span></p>
+<p class="p1">A CVWidget2D is GUI-representation of two <a href="../../../quarks/Conductor/help/Conductor-Help/CV.html"><span class="s8"><b>CV</b></span></a><span class="s8"><b>s</b></span><b> </b>(requires the <a href="../../../quarks/Conductor/help/Conductor-Help/Conductor.html"><span class="s8"><b>Conductor</b></span></a>-Quark to be installed). Instantiating a CVWidget2D as an element in a GUI automatically instantiates two <a href="../../../quarks/Conductor/help/Conductor-Help/CV.html"><span class="s8"><b>CV</b></span></a><span class="s8"><b>s</b></span> that can be controlled by a twodimensional slider (a <a href="sc://Slider2D"><span class="s8"><b>Slider2D</b></span></a>),a <a href="sc://RangeSlider"><span class="s9"><b>RangeSlider</b></span></a>, two numerical inputs (<a href="sc://NumberBox"><span class="s8"><b>NumberBox</b></span></a><span class="s8"><b>es</b></span>) or a MIDI-device. CVWidget2D have a built in MIDI-learn capability (see also <a href="sc://CCResponder"><span class="s8"><b>CCResponder</b></span></a>) - a slider or fader of a connected MIDI-device will automatically be connected if the MIDi-learn button is clicked in the widget and a hardware-slider is moved.<span class="Apple-tab-span">	</span></p>
 <p class="p3"><br></p>
 <p class="p4"><b>Creation</b></p>
 <p class="p3"><br></p>
@@ -98,7 +98,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p6"><span class="s11">var</span> win;</p>
 <p class="p6">~cv = <span class="s11">CV</span>.new(<span class="s12">\boostcut</span>.asSpec);<span class="Apple-converted-space"> </span></p>
 <p class="p6">win = <span class="s11">Window</span>(<span class="s13">"CVWidget"</span>, <span class="s11">Rect</span>(<span class="s14">50</span>, <span class="s14">50</span>, <span class="s14">72</span>, <span class="s14">140</span>));</p>
-<p class="p6">~wdgt = <span class="s11">CVWidgetKnob</span>(win, ~cv, <span class="s13">"CV test"</span>, <span class="s11">Rect</span>(<span class="s14">10</span>, <span class="s14">10</span>, <span class="s14">52</span>, <span class="s14">121</span>));</p>
+<p class="p6">~wdgt = <span class="s11">CVWidget2D</span>(win, ~cv, <span class="s13">"CV test"</span>);</p>
 <p class="p6">win.front;</p>
 <p class="p6">)</p>
 <p class="p5"><br></p>

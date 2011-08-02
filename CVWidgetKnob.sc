@@ -2,10 +2,10 @@
 
 CVWidgetKnob : CVWidget {
 	
-	var <widgetCV/*, <cc, <midisrc, <midichan, <midinum*/ /* keep this for now but that might change ... */;
+	var <widgetCV;
 	var <window, <guiEnv, <midiOscEnv, <editorEnv;
 	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <editor;
-	var prSpec/*, midiOscEnv.oscMapping = \linlin, prCalibConstraints, oscResponder*/;
+	var prSpec;
 	var returnedFromActions;
 
 	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
@@ -23,7 +23,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	init { |parentView, cv, name, bounds, action, setUpArgs, controllersAndModels, cvcGui, server|
-		var flow, thisname, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions, cvString;
+		var thisname, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
 						
@@ -368,14 +368,14 @@ CVWidgetKnob : CVWidget {
 		^prCalibrate;
 	}
 	
-	spec_ { |spec|
+	setSpec { |spec|
 		if(spec.isKindOf(ControlSpec).not, {
 			Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
 		});
 		wdgtControllersAndModels.cvSpec.model.value_(spec).changed(\value);
 	}
 	
-	spec {
+	getSpec {
 		^widgetCV.spec;
 	}
 	
@@ -422,7 +422,6 @@ CVWidgetKnob : CVWidget {
 	
 	oscConnect { |ip, port, name, oscMsgIndex|
 		var intPort;
-		[port, port.class].postln;
 
 		if(ip.size > 0 and:{ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not }, {
 			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
@@ -445,7 +444,7 @@ CVWidgetKnob : CVWidget {
 		if(oscMsgIndex.isKindOf(Integer).not, {
 			Error("You have to supply an integer as second argument to oscConnect").throw;
 		});
-		
+
 		wdgtControllersAndModels.oscConnection.model.value_([ip, intPort, name, oscMsgIndex]).changed(\value);
 		CmdPeriod.add({ this.oscDisconnect });
 	}

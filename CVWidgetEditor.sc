@@ -68,9 +68,9 @@ CVWidgetEditor {
 			;
 
 			if(hilo.notNil, {
-				cvString = widget.spec(hilo).asString.split($ );
+				cvString = widget.getSpec(hilo).asString.split($ );
 			}, {
-				cvString = widget.spec.asString.split($ );
+				cvString = widget.getSpec.asString.split($ );
 			});
 
 			cvString = cvString[1..cvString.size-1].join(" ");
@@ -79,7 +79,7 @@ CVWidgetEditor {
 				.font_(staticTextFont)
 				.string_(cvString)
 				.action_({ |tf|
-					widget.spec_(tf.string.interpret)
+					widget.setSpec(tf.string.interpret, hilo)
 				})
 			;
 			
@@ -87,7 +87,7 @@ CVWidgetEditor {
 
 			specsList = PopUpMenu(allEditors[name].tabs.views[0], flow0.bounds.width-20@20)
 				.action_({ |sl|
-					widget.spec_(specsListSpecs[sl.value]);
+					widget.setSpec(specsListSpecs[sl.value], hilo);
 				})
 			;
 			
@@ -110,12 +110,12 @@ CVWidgetEditor {
 			
 //			[widget.spec, specsListSpecs.size, specsList.items.size].postln;
 			
-			tmp = specsListSpecs.detectIndex({ |spec, i| spec == widget.spec });
+			tmp = specsListSpecs.detectIndex({ |spec, i| spec == widget.getSpec(hilo) });
 			if(tmp.notNil, {
 				specsList.value_(tmp);
 			}, {
-				specsListSpecs.array_([widget.spec]++specsListSpecs.array);
-				specsList.items = List["custom:"+widget.spec.asString]++specsList.items;
+				specsListSpecs.array_([widget.getSpec(hilo)]++specsListSpecs.array);
+				specsList.items = List["custom:"+widget.getSpec(hilo).asString]++specsList.items;
 			});
 			
 			window.onClose_({
@@ -422,7 +422,7 @@ CVWidgetEditor {
 			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.background_(Color.white)
-				.string_(" current widget-spec constraints lo / hi:"+widget.spec.minval+"/"+widget.spec.maxval)
+				.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(hilo).minval+"/"+widget.getSpec(hilo).maxval)
 			;
 	
 			flow2.shift(5, 0);

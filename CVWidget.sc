@@ -1,7 +1,6 @@
 
 CVWidget {
 	
-//	classvar <globalMidiOscEnv;
 	var prMidiMode = 0, prMidiMean = 64, prCtrlButtonBank, prMidiResolution = 1, prSoftWithin = 0.1;
 	var prCalibrate = true, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
@@ -212,7 +211,7 @@ CVWidget {
 			wcm.cvSpec = ();
 		};
 		wcm.cvSpec.model ?? { 
-			wcm.cvSpec.model = Ref(this.spec);
+			wcm.cvSpec.model = Ref(this.getSpec(key));
 		};
 		wcm.oscInputRange ?? {
 			wcm.oscInputRange = ();
@@ -280,7 +279,7 @@ CVWidget {
 		var oscResponderAction;
 		var makeCCResponder, ccResponderAction, ccResponder;
 		var ctrlString, meanVal;
-		
+				
 		if(key.notNil, {
 			wcm = wdgtControllersAndModels[key];
 			thisGuiEnv = this.guiEnv[key];
@@ -712,7 +711,7 @@ CVWidget {
 						msg[theChanger.value[3]].perform(
 							midiOscEnv.oscMapping,
 							midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi,
-							this.spec.minval, this.spec.maxval,
+							this.getSpec(key).minval, this.getSpec(key).maxval,
 							\minmax
 						)
 					)
@@ -737,7 +736,6 @@ CVWidget {
 						editEnabled: false
 					)
 				).changed(\value);
-				
 			});
 			if(theChanger.value == false, {
 				midiOscEnv.oscResponder.remove;
