@@ -187,7 +187,7 @@ CVWidget {
 	
 	initControllersAndModels { |controllersAndModels, key|
 		var wcm;
-				
+						
 		if(controllersAndModels.notNil, {
 			wdgtControllersAndModels = controllersAndModels;
 		}, {

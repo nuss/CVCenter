@@ -449,7 +449,7 @@ CVWidgetEditor {
 				mappingSelectItems.do({ |item, i|
 					if(item.asSymbol === widget.getOscMapping(hilo), {
 						mappingSelect.value_(i);
-					})
+					});
 				}, {
 					mappingSelect.value_(0);
 				})
@@ -487,7 +487,7 @@ CVWidgetEditor {
 				)
 			});
 	
-			widget.calibrate.switch(
+			widget.getCalibrate(hilo).switch(
 				true, { calibBut.value_(0) },
 				false, { calibBut.value_(1) }
 			);

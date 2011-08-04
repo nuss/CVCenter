@@ -357,14 +357,14 @@ CVWidgetKnob : CVWidget {
 		returnedFromActions = this.initControllerActions;
 	}
 	
-	calibrate_ { |bool|
+	setCalibrate { |bool|
 		if(bool.isKindOf(Boolean).not, {
 			Error("calibration can only be set to true or false!").throw;
 		});
 		wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
 	}
 	
-	calibrate {
+	getCalibrate { 
 		^prCalibrate;
 	}
 	
