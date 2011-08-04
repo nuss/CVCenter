@@ -23,7 +23,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	init { |parentView, cv, name, bounds, action, setUpArgs, controllersAndModels, cvcGui, server|
-		var thisname, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
+		var thisName, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
 						
@@ -34,8 +34,8 @@ CVWidgetKnob : CVWidget {
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
 		midiOscEnv.oscMapping ?? { midiOscEnv.oscMapping = \linlin };
 				
-		if(name.isNil, { thisname = "knob" }, { thisname = name });
-		wdgtInfo = thisname.asString;
+		if(name.isNil, { thisName = "knob" }, { thisName = name });
+		wdgtInfo = thisName.asString;
 		
 		if(cv.isNil, {
 			widgetCV = CV.new;
@@ -67,7 +67,7 @@ CVWidgetKnob : CVWidget {
 		});
 		
 		if(parentView.isNil, {
-			window = Window(thisname, Rect(50, 50, thisWidth+14, thisHeight+7), server: server);
+			window = Window(thisName, Rect(50, 50, thisWidth+14, thisHeight+7), server: server);
 		}, {
 			window = parentView;
 		});
@@ -79,9 +79,9 @@ CVWidgetKnob : CVWidget {
 						editor.close;
 					}, {
 						if(CVWidgetEditor.allEditors.notNil and:{
-							CVWidgetEditor.allEditors[thisname.asSymbol].notNil;
+							CVWidgetEditor.allEditors[thisName.asSymbol].notNil;
 						}, {
-							CVWidgetEditor.allEditors.removeAt(thisname.asSymbol)
+							CVWidgetEditor.allEditors.removeAt(thisName.asSymbol)
 						})
 					})
 				});
@@ -97,8 +97,8 @@ CVWidgetKnob : CVWidget {
 		;
 		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
 			.states_([
-				[""+thisname.asString, Color.white, Color.blue],
-				[""+thisname.asString, Color.black, Color.yellow],
+				[""+thisName.asString, Color.white, Color.blue],
+				[""+thisName.asString, Color.black, Color.yellow],
 			])
 			.font_(Font("Helvetica", 9))
 			.action_({ |b|
@@ -141,7 +141,7 @@ CVWidgetKnob : CVWidget {
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
 			.action_({ |btn|
 				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, thisname, 0);
+					editor = CVWidgetEditor(this, thisName, 0);
 					guiEnv.editor = editor;
 				}, {
 					editor.front(0)
@@ -161,7 +161,7 @@ CVWidgetKnob : CVWidget {
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
 			.action_({ |ms|
 				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, thisname, 1);
+					editor = CVWidgetEditor(this, thisName, 1);
 					guiEnv.editor = editor;
 				}, {
 					editor.front(1)
@@ -286,7 +286,7 @@ CVWidgetKnob : CVWidget {
 			])
 			.action_({ |oscb|
 				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, thisname, 2);
+					editor = CVWidgetEditor(this, thisName, 2);
 					guiEnv.editor = editor;
 				}, {
 					editor.front(2)
@@ -379,7 +379,7 @@ CVWidgetKnob : CVWidget {
 		^widgetCV.spec;
 	}
 	
-	oscMapping_ { |mapping|
+	setOscMapping { |mapping|
 		if(mapping.asSymbol !== \linlin and:{
 			mapping.asSymbol !== \linexp and:{
 				mapping.asSymbol !== \explin and:{
@@ -399,7 +399,7 @@ CVWidgetKnob : CVWidget {
 		})
 	}
 	
-	oscMapping {
+	getOscMapping {
 		^midiOscEnv.oscMapping;
 	}
 	

@@ -72,8 +72,7 @@ CVWidget {
 	}
 	
 	remove {
-//		allGuiEls.do(_.remove);
-		allGuiEls.do({ |el| el.postln; el.remove });
+		allGuiEls.do(_.remove);
 	}
 	
 	midiMode_ { |mode|
@@ -523,10 +522,8 @@ CVWidget {
 				}.fork(AppClock);
 
 				if(theChanger.value.isEmpty, {
-					"now learning".postln;
 					midiOscEnv.cc = makeCCResponder.().learn;
 				}, {
-					("setting to the selected values:"+[theChanger.value.src, theChanger.value.chan, theChanger.value.num]).postln;
 					midiOscEnv.cc = makeCCResponder.(theChanger.value.src, theChanger.value.chan, theChanger.value.num);
 				});
 				

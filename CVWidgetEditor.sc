@@ -1,6 +1,6 @@
 CVWidgetEditor {
 	classvar <allEditors;
-	var <window, <tabs;
+	var thisEditor, <window, <tabs;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
@@ -24,7 +24,7 @@ CVWidgetEditor {
 		var midiModes;
 		var mappingSelectItems/*, mappingModes*/;
 		var tmp; // multipurpose, short-term var
-		
+				
 		name = widgetName.asSymbol;
 		
 		widget ?? {
@@ -45,23 +45,31 @@ CVWidgetEditor {
 		
 		allEditors ?? { allEditors = IdentityDictionary() };
 		
-		if(allEditors[name].isNil or:{ allEditors[name].window.isClosed }, {
-			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 225));
+		
+		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
+			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 225));
 
-			allEditors.put(name, (window: window, name: widgetName));
+			if(hilo.isNil, { 
+				allEditors.put(name, (window: window, name: widgetName)) 
+			}, {
+				tmp = (); tmp.put(hilo, (window: window, name: widgetName));
+				allEditors.put(name, tmp);
+			});
+
+			if(hilo.notNil, { thisEditor = allEditors[name][hilo] }, { thisEditor = allEditors[name] });
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC"], scroll: true);
-			allEditors[name].tabs = tabs;
-//			allEditors[name].tabs.postln;
-			allEditors[name].tabs.view.resize_(5);
-			allEditors[name].tabs.stringFocusedColor_(Color.blue);
+			thisEditor.tabs = tabs;
+//			thisEditor.tabs.postln;
+			thisEditor.tabs.view.resize_(5);
+			thisEditor.tabs.stringFocusedColor_(Color.blue);
 			
-			allEditors[name].tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			allEditors[name].tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			allEditors[name].tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			thisEditor.tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			thisEditor.tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			thisEditor.tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			
-			StaticText(allEditors[name].tabs.views[0], flow0.bounds.width-20@95)
+			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@95)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq.asSpec \nor [20, 20000, \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
@@ -75,7 +83,7 @@ CVWidgetEditor {
 
 			cvString = cvString[1..cvString.size-1].join(" ");
 			
-			specField = TextField(allEditors[name].tabs.views[0], flow0.bounds.width-20@15)
+			specField = TextField(thisEditor.tabs.views[0], flow0.bounds.width-20@15)
 				.font_(staticTextFont)
 				.string_(cvString)
 				.action_({ |tf|
@@ -85,7 +93,7 @@ CVWidgetEditor {
 			
 			flow0.shift(0, 5);
 
-			specsList = PopUpMenu(allEditors[name].tabs.views[0], flow0.bounds.width-20@20)
+			specsList = PopUpMenu(thisEditor.tabs.views[0], flow0.bounds.width-20@20)
 				.action_({ |sl|
 					widget.setSpec(specsListSpecs[sl.value], hilo);
 				})
@@ -125,7 +133,7 @@ CVWidgetEditor {
 						
 			// MIDI editing
 			
-			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+40@15)
+			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+40@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-mode: 0-127 or in/decremental")
@@ -135,7 +143,7 @@ CVWidgetEditor {
 			
 			midiModes = ["0-127", "+/-"];
 			
-			midiModeSelect = PopUpMenu(allEditors[name].tabs.views[1], flow1.bounds.width/2-70@15)
+			midiModeSelect = PopUpMenu(thisEditor.tabs.views[1], flow1.bounds.width/2-70@15)
 				.font_(staticTextFont)
 				.items_(midiModes)
 				.value_(widget.midiMode)
@@ -144,7 +152,7 @@ CVWidgetEditor {
 				})
 			;
 			
-			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+60@15)
+			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-mean (in/decremental mode only)")
@@ -152,7 +160,7 @@ CVWidgetEditor {
 			
 			flow1.shift(5, 0);
 			
-			midiMeanNB = NumberBox(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
+			midiMeanNB = NumberBox(thisEditor.tabs.views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
 				.value_(widget.midiMean)
 				.action_({ |mb|
@@ -162,7 +170,7 @@ CVWidgetEditor {
 				.clipLo_(0.0)
 			;
 			
-			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+60@15)
+			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("minimum distance for the slider (0-127 only)")
@@ -170,7 +178,7 @@ CVWidgetEditor {
 			
 			flow1.shift(5, 0);
 			
-			softWithinNB = NumberBox(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
+			softWithinNB = NumberBox(thisEditor.tabs.views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
 				.value_(widget.softWithin)
 				.action_({ |mb|
@@ -181,7 +189,7 @@ CVWidgetEditor {
 				.clipHi_(0.5)
 			;
 			
-			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+60@15)
+			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-resolution (+/- only)")
@@ -189,7 +197,7 @@ CVWidgetEditor {
 			
 			flow1.shift(5, 0);
 
-			midiResolutionNB = NumberBox(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
+			midiResolutionNB = NumberBox(thisEditor.tabs.views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
 				.value_(widget.midiResolution)
 				.action_({ |mb|
@@ -200,7 +208,7 @@ CVWidgetEditor {
 				.clipHi_(10.0)
 			;
 			
-			StaticText(allEditors[name].tabs.views[1], flow1.bounds.width/2+60@15)
+			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("number of sliders per bank")
@@ -208,7 +216,7 @@ CVWidgetEditor {
 
 			flow1.shift(5, 0);
 			
-			ctrlButtonBankField = TextField(allEditors[name].tabs.views[1], flow1.bounds.width/2-90@15)
+			ctrlButtonBankField = TextField(thisEditor.tabs.views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
 				.string_(widget.ctrlButtonBank)
 				.action_({ |mb|
@@ -218,7 +226,7 @@ CVWidgetEditor {
 			
 			flow1.shift(0, 10);
 						
-			midiLearnBut = Button(allEditors[name].tabs.views[1], 15@15)
+			midiLearnBut = Button(thisEditor.tabs.views[1], 15@15)
 				.font_(staticTextFont)
 				.states_([
 					["L", Color.white, Color.blue],
@@ -245,7 +253,7 @@ CVWidgetEditor {
 			
 			flow1.shift(0, 0);
 			
-			midiSrcField = TextField(allEditors[name].tabs.views[1], flow1.bounds.width-165@15)
+			midiSrcField = TextField(thisEditor.tabs.views[1], flow1.bounds.width-165@15)
 				.font_(staticTextFont)
 				.string_(msrc)
 				.background_(Color.white)
@@ -272,7 +280,7 @@ CVWidgetEditor {
 			
 			flow1.shift(0, 0);
 			
-			midiChanField = TextField(allEditors[name].tabs.views[1], 60@15)
+			midiChanField = TextField(thisEditor.tabs.views[1], 60@15)
 				.font_(staticTextFont)
 				.string_(mchan)
 				.background_(Color.white)
@@ -299,7 +307,7 @@ CVWidgetEditor {
 			
 			flow1.shift(0, 0);
 			
-			midiCtrlField = TextField(allEditors[name].tabs.views[1], 60@15)
+			midiCtrlField = TextField(thisEditor.tabs.views[1], 60@15)
 				.font_(staticTextFont)
 				.string_(mctrl)
 				.background_(Color.white)
@@ -326,13 +334,13 @@ CVWidgetEditor {
 			
 			// OSC editting
 			
-			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-20@15)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("device-IP/port: leave empty for listening to any IP/port")
 			;
 			
-			ipField = TextField(allEditors[name].tabs.views[2], flow2.bounds.width-60@15)
+			ipField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -341,7 +349,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 
-			portField = TextField(allEditors[name].tabs.views[2], 36@15)
+			portField = TextField(thisEditor.tabs.views[2], 36@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -350,13 +358,13 @@ CVWidgetEditor {
 				
 			flow2.shift(0, 0);
 
-			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-20@15)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("OSC-typetag, e.g.: /my/typetag / OSC message index")
 			;
 	
-			nameField = TextField(allEditors[name].tabs.views[2], flow2.bounds.width-60@15)
+			nameField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -365,7 +373,7 @@ CVWidgetEditor {
 						
 			flow2.shift(5, 0);
 			
-			indexField = NumberBox(allEditors[name].tabs.views[2], 36@15)
+			indexField = NumberBox(thisEditor.tabs.views[2], 36@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.clipLo_(1)
@@ -378,13 +386,13 @@ CVWidgetEditor {
 			
 			flow2.shift(0, 0);
 	
-			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-15@15)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("lower and upper constraints of the OSC-input.")
 			;
 			
-			inputConstraintLoField = NumberBox(allEditors[name].tabs.views[2], flow2.bounds.width/2-56@15)
+			inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(widget.wdgtControllersAndModels.oscInputRange.model.value[0])
@@ -393,7 +401,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 			
-			inputConstraintHiField = NumberBox(allEditors[name].tabs.views[2], flow2.bounds.width/2-56@15)
+			inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(widget.wdgtControllersAndModels.oscInputRange.model.value[0])
@@ -402,7 +410,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 			
-			calibBut = Button(allEditors[name].tabs.views[2], 80@15)
+			calibBut = Button(thisEditor.tabs.views[2], 80@15)
 				.font_(staticTextFont)
 				.states_([
 					["calibrating", Color.white, Color.red],
@@ -412,14 +420,14 @@ CVWidgetEditor {
 	
 			flow2.shift(0, 0);
 	
-			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-15@15)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.string_("Input to Output mapping")
 			;
 			
 			flow2.shift(0, 0);
 	
-			StaticText(allEditors[name].tabs.views[2], flow2.bounds.width-15@15)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.background_(Color.white)
 				.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(hilo).minval+"/"+widget.getSpec(hilo).maxval)
@@ -429,17 +437,17 @@ CVWidgetEditor {
 			
 			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 			
-			mappingSelect = PopUpMenu(allEditors[name].tabs.views[2], flow2.bounds.width-15@20)
+			mappingSelect = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width-15@20)
 				.font_(Font("Helvetica", 14))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
-					widget.oscMapping_(ms.item);
+					widget.setOscMapping(ms.item, hilo);
 				})
 			;
 			
-			if(widget.oscMapping.notNil, {
+			if(widget.getOscMapping(hilo).notNil, {
 				mappingSelectItems.do({ |item, i|
-					if(item.asSymbol === widget.oscMapping, {
+					if(item.asSymbol === widget.getOscMapping(hilo), {
 						mappingSelect.value_(i);
 					})
 				}, {
@@ -449,7 +457,7 @@ CVWidgetEditor {
 						
 			flow2.shift(0, 0);
 	
-			connectorBut = Button(allEditors[name].tabs.views[2], flow2.bounds.width-15@25)
+			connectorBut = Button(thisEditor.tabs.views[2], flow2.bounds.width-15@25)
 				.font_(staticTextFont)
 				.states_([
 					["connect OSC-controller", Color.white, Color.blue],
@@ -487,29 +495,27 @@ CVWidgetEditor {
 		});
 		
 		tab !? { 
-			allEditors[name].tabs.focus(tab);
+			thisEditor.tabs.focus(tab);
 		};
-		allEditors[name].window.front;
+		thisEditor.window.front;
 	}
 	
 	front { |tab|
-		allEditors[name].window.front;
-		tab !? allEditors[name].tabs.focus(tab);
+		thisEditor.window.front;
+		tab !? thisEditor.tabs.focus(tab);
 	}
 	
 	close {
-		allEditors[name].window.close;
+		thisEditor.window.close;
 		allEditors.removeAt(name);
 	}
 	
 	isClosed {
 		var ret;
-//		defer {
-			allEditors[name].window !? {
-				ret = defer { allEditors[name].window.isClosed };
-				^ret.value;
-			}
-//		}
+		thisEditor.window !? {
+			ret = defer { thisEditor.window.isClosed };
+			^ret.value;
+		}
 	}
 			
 }
