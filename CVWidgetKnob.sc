@@ -50,7 +50,7 @@ CVWidgetKnob : CVWidget {
 		setUpArgs[2] !? { this.midiMean_(setUpArgs[2]) };
 		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
 		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
-		setUpArgs[6] !? { this.calibrate_(setUpArgs[6]) };
+		setUpArgs[6] !? { this.setCalibrate(setUpArgs[6]) };
 				
 		action !? { widgetCV.action_(action) };
 		
@@ -361,6 +361,7 @@ CVWidgetKnob : CVWidget {
 		if(bool.isKindOf(Boolean).not, {
 			Error("calibration can only be set to true or false!").throw;
 		});
+		prCalibrate = bool;
 		wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
 	}
 	
@@ -407,7 +408,7 @@ CVWidgetKnob : CVWidget {
 		if(constraintsHiLo.isKindOf(Point).not, {
 			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
 		}, {
-			this.calibrate_(false);
+			this.setCalibrate(false);
 			midiOscEnv.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
 			if(editor.notNil and:{ editor.isClosed.not }, {
 				wdgtControllersAndModels.mapConstrainterLo.value_(constraintsHiLo.x);

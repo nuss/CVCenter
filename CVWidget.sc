@@ -278,25 +278,29 @@ CVWidget {
 		var oscResponderAction;
 		var makeCCResponder, ccResponderAction, ccResponder;
 		var ctrlString, meanVal;
-				
+		var thisCalib;
+						
 		if(key.notNil, {
 			wcm = wdgtControllersAndModels[key];
 			thisGuiEnv = this.guiEnv[key];
 			midiOscEnv = this.midiOscEnv[key];
 			widgetCV = this.widgetCV[key];
+			thisCalib = prCalibrate[key];
 		}, {
 			wcm = wdgtControllersAndModels;
 			thisGuiEnv = this.guiEnv;
 			midiOscEnv = this.midiOscEnv;
 			widgetCV = this.widgetCV;
+			thisCalib = prCalibrate;
 		});
+		
+		("key + wcm:"+[key, wcm]).postln;
 					
 		wcm.calibration.controller ?? { 
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
 
 		wcm.calibration.controller.put(\value, { |theChanger, what, moreArgs|
-			prCalibrate = (theChanger.value);
 			theChanger.value.switch(
 				true, { 
 					thisGuiEnv.calibBut.value_(0);
@@ -673,9 +677,10 @@ CVWidget {
 		};
 
 		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
+			
 			if(theChanger.value.size == 4, {
 				oscResponderAction = { |t, r, msg|
-					if(prCalibrate, { 
+					if(thisCalib, { 
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
 						}, {
@@ -772,7 +777,7 @@ CVWidget {
 					thisGuiEnv.editor.ipField.string_(theChanger.value.ipField);
 					thisGuiEnv.editor.portField.string_(theChanger.value.portField);
 					thisGuiEnv.editor.nameField.string_(theChanger.value.nameField);
-					if(prCalibrate, {
+					if(thisCalib, {
 						[
 							thisGuiEnv.editor.inputConstraintLoField, 
 							thisGuiEnv.editor.inputConstraintHiField
