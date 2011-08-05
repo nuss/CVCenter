@@ -20,17 +20,22 @@ CVWidgetEditor {
 		var tabs, /*specsActions, editor, */cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
-		var addr;
+		var addr, wcmHiLo; 
 		var midiModes;
 		var mappingSelectItems/*, mappingModes*/;
 		var tmp; // multipurpose, short-term var
 				
 		name = widgetName.asSymbol;
-		
+
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
 		};
 
+		switch(widget.wdgtControllersAndModels.class,
+			Event, { "haha, we have an Event".postln; wcmHiLo = widget.wdgtControllersAndModels[hilo] },
+			{ wcmHiLo = widget.wdgtControllersAndModels }
+		);
+		
 		staticTextFont = Font(Font.defaultSansFace, 10);
 		staticTextColor = Color(0.2, 0.2, 0.2);
 		textFieldFont = Font(Font.defaultMonoFace, 9);
@@ -259,10 +264,10 @@ CVWidgetEditor {
 				.background_(Color.white)
 				.action_({ |tf|
 					if(tf.string != mctrl, {
-						widget.wdgtControllersAndModels.midiDisplay.model.value_((
+						wcmHiLo.midiDisplay.model.value_((
 							learn: "C",
-							src: widget.wdgtControllersAndModels.midiDisplay.model.value.src,
-							chan: widget.wdgtControllersAndModels.midiDisplay.model.value.chan,
+							src: wcmHiLo.midiDisplay.model.value.src,
+							chan: wcmHiLo.midiDisplay.model.value.chan,
 							ctrl: tf.string
 						)).changed(\value)
 					})
@@ -286,10 +291,10 @@ CVWidgetEditor {
 				.background_(Color.white)
 				.action_({ |tf|
 					if(tf.string != mctrl, {
-						widget.wdgtControllersAndModels.midiDisplay.model.value_((
+						wcmHiLo.midiDisplay.model.value_((
 							learn: "C",
-							src: widget.wdgtControllersAndModels.midiDisplay.model.value.src,
-							chan: widget.wdgtControllersAndModels.midiDisplay.model.value.chan,
+							src: wcmHiLo.midiDisplay.model.value.src,
+							chan: wcmHiLo.midiDisplay.model.value.chan,
 							ctrl: tf.string
 						)).changed(\value)
 					})
@@ -313,10 +318,10 @@ CVWidgetEditor {
 				.background_(Color.white)
 				.action_({ |tf|
 					if(tf.string != mctrl, {
-						widget.wdgtControllersAndModels.midiDisplay.model.value_((
+						wcmHiLo.midiDisplay.model.value_((
 							learn: "C",
-							src: widget.wdgtControllersAndModels.midiDisplay.model.value.src,
-							chan: widget.wdgtControllersAndModels.midiDisplay.model.value.chan,
+							src: wcmHiLo.midiDisplay.model.value.src,
+							chan: wcmHiLo.midiDisplay.model.value.chan,
 							ctrl: tf.string
 						)).changed(\value)
 					})
@@ -395,7 +400,7 @@ CVWidgetEditor {
 			inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
-				.value_(widget.wdgtControllersAndModels.oscInputRange.model.value[0])
+				.value_(wcmHiLo.oscInputRange.model.value[0])
 				.enabled_(false)
 			;
 			
@@ -404,7 +409,7 @@ CVWidgetEditor {
 			inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-56@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
-				.value_(widget.wdgtControllersAndModels.oscInputRange.model.value[0])
+				.value_(wcmHiLo.oscInputRange.model.value[0])
 				.enabled_(false)
 			;
 			
@@ -484,11 +489,11 @@ CVWidgetEditor {
 				but.value.switch(
 					0, { 
 						widget.setCalibrate(true);
-						widget.wdgtControllersAndModels.calibration.model.value_(true).changed(\value);
+						wcmHiLo.calibration.model.value_(true).changed(\value);
 					},
 					1, { 
 						widget.setCalibrate(false);
-						widget.wdgtControllersAndModels.calibration.model.value_(false).changed(\value);
+						wcmHiLo.calibration.model.value_(false).changed(\value);
 					}
 				)
 			});

@@ -178,11 +178,11 @@ CVWidget2D : CVWidget {
 				}, {
 					editor.lo.front(0)
 				});
-				wdgtControllersAndModels.oscConnection.model.value_(
-					wdgtControllersAndModels.oscConnection.model.value;
+				wdgtControllersAndModels.lo.oscConnection.model.value_(
+					wdgtControllersAndModels.lo.oscConnection.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.midiConnection.model.value_(
-					wdgtControllersAndModels.midiConnection.model.value
+				wdgtControllersAndModels.lo.midiConnection.model.value_(
+					wdgtControllersAndModels.lo.midiConnection.model.value
 				).changed(\value);
 			})
 		;
@@ -194,11 +194,11 @@ CVWidget2D : CVWidget {
 				}, {
 					editor.hi.front(0)
 				});
-				wdgtControllersAndModels.oscConnection.model.value_(
-					wdgtControllersAndModels.oscConnection.model.value;
+				wdgtControllersAndModels.hi.oscConnection.model.value_(
+					wdgtControllersAndModels.hi.oscConnection.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.midiConnection.model.value_(
-					wdgtControllersAndModels.midiConnection.model.value
+				wdgtControllersAndModels.hi.midiConnection.model.value_(
+					wdgtControllersAndModels.hi.midiConnection.model.value
 				).changed(\value);
 			})
 		;
@@ -210,11 +210,11 @@ CVWidget2D : CVWidget {
 				}, {
 					editor.lo.front(1)
 				});
-				wdgtControllersAndModels.oscConnection.model.value_(
-					wdgtControllersAndModels.oscConnection.model.value;
+				wdgtControllersAndModels.lo.oscConnection.model.value_(
+					wdgtControllersAndModels.lo.oscConnection.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.midiConnection.model.value_(
-					wdgtControllersAndModels.midiConnection.model.value
+				wdgtControllersAndModels.lo.midiConnection.model.value_(
+					wdgtControllersAndModels.lo.midiConnection.model.value
 				).changed(\value);
 			})
 		;
@@ -226,11 +226,11 @@ CVWidget2D : CVWidget {
 				}, {
 					editor.hi.front(1)
 				});
-				wdgtControllersAndModels.oscConnection.model.value_(
-					wdgtControllersAndModels.oscConnection.model.value;
+				wdgtControllersAndModels.hi.oscConnection.model.value_(
+					wdgtControllersAndModels.hi.oscConnection.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.midiConnection.model.value_(
-					wdgtControllersAndModels.midiConnection.model.value
+				wdgtControllersAndModels.hi.midiConnection.model.value_(
+					wdgtControllersAndModels.hi.midiConnection.model.value
 				).changed(\value);
 			})
 		;

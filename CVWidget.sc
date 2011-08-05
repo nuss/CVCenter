@@ -301,6 +301,8 @@ CVWidget {
 			widgetCV = this.widgetCV;
 			thisCalib = prCalibrate;
 		});
+		
+		[thisGuiEnv, this.guiEnv].postln;
 							
 		wcm.calibration.controller ?? { 
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
@@ -427,17 +429,17 @@ CVWidget {
 					if(thisGuiEnv.editor.notNil and:{
 						thisGuiEnv.editor.isClosed.not
 					}, {
-							thisGuiEnv.oscEditBut.states_([[
-								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
-								thisGuiEnv.oscEditBut.states[0][1],
-								thisGuiEnv.oscEditBut.states[0][2]
-							]]);
-							thisGuiEnv.oscEditBut.refresh;
-							thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-								if(item.asSymbol === midiOscEnv.oscMapping, {
-									thisGuiEnv.editor.mappingSelect.value_(i);
-								})
+						thisGuiEnv.oscEditBut.states_([[
+							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
+							thisGuiEnv.oscEditBut.states[0][1],
+							thisGuiEnv.oscEditBut.states[0][2]
+						]]);
+						thisGuiEnv.oscEditBut.refresh;
+						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
+							if(item.asSymbol === midiOscEnv.oscMapping, {
+								thisGuiEnv.editor.mappingSelect.value_(i);
 							})
+						})
 					})		
 				}.defer
 			}, {
@@ -730,7 +732,7 @@ CVWidget {
 				};
 								
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
-				
+								
 				if(midiOscEnv.oscResponder.isNil, { 
 					midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;
 				}, {
