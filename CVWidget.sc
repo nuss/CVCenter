@@ -2,7 +2,7 @@
 CVWidget {
 	
 	var prMidiMode = 0, prMidiMean = 64, prCtrlButtonBank, prMidiResolution = 1, prSoftWithin = 0.1;
-	var prCalibrate = true, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
+	var prCalibrate/* = true*/, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
 	var <widgetBg, <label, <nameField, <wdgtInfo; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps;
@@ -191,21 +191,29 @@ CVWidget {
 		if(controllersAndModels.notNil, {
 			wdgtControllersAndModels = controllersAndModels;
 		}, {
-			wdgtControllersAndModels = ();
+			wdgtControllersAndModels ?? { wdgtControllersAndModels = () };
 		});
 		
 		key !? {
 			wdgtControllersAndModels.put(key, ());
 		};
 		
-		wcm = wdgtControllersAndModels;
-						
+		if(key.notNil, {
+			wcm = wdgtControllersAndModels[key];
+		}, {
+			wcm = wdgtControllersAndModels;
+		});
+								
 		wcm.calibration ?? {
 			wcm.calibration = ();
 		};
 		wcm.calibration.model ?? {
-			wcm.calibration.model = Ref(prCalibrate);
-		};
+			if(key.notNil, {
+				wcm.calibration.model = Ref(prCalibrate[key]);
+			}, {
+				wcm.calibration.model = Ref(prCalibrate);
+			})
+		};		
 		wcm.cvSpec ?? {
 			wcm.cvSpec = ();
 		};
@@ -270,7 +278,7 @@ CVWidget {
 		wcm.mapConstrainterHi ?? { 
 			wcm.mapConstrainterHi = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[1]);
 		};
-
+		
 	}
 		
 	initControllerActions { |key|
@@ -293,9 +301,7 @@ CVWidget {
 			widgetCV = this.widgetCV;
 			thisCalib = prCalibrate;
 		});
-		
-		("key + wcm:"+[key, wcm]).postln;
-					
+							
 		wcm.calibration.controller ?? { 
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
@@ -338,13 +344,13 @@ CVWidget {
 			)
 		});
 
-		this.calibBut.action_({ |cb|
-			cb.value.switch(
-				0, { wcm.calibration.model.value_(true).changed(\value) },
-				1, { wcm.calibration.model.value_(false).changed(\value) }
-			)
-		});
-		
+//		this.calibBut.action_({ |cb|
+//			cb.value.switch(
+//				0, { wcm.calibration.model.value_(true).changed(\value) },
+//				1, { wcm.calibration.model.value_(false).changed(\value) }
+//			)
+//		});
+
 		wcm.cvSpec.controller ?? {
 			wcm.cvSpec.controller = SimpleController(wcm.cvSpec.model);
 		};
@@ -677,6 +683,10 @@ CVWidget {
 		};
 
 		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
+			switch(prCalibrate.class, 
+				Event, { thisCalib = prCalibrate[key] },
+				thisCalib = prCalibrate
+			);
 			
 			if(theChanger.value.size == 4, {
 				oscResponderAction = { |t, r, msg|
@@ -768,6 +778,11 @@ CVWidget {
 		};
 		
 		wcm.oscDisplay.controller.put(\value, { |theChanger, what, moreArgs|
+			switch(prCalibrate.class, 
+				Event, { thisCalib = prCalibrate[key] },
+				thisCalib = prCalibrate
+			);
+			("OSC-display calibration:"+thisCalib).postln;
 			thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
 			defer {
 				if(thisGuiEnv.editor.notNil and:{

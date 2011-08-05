@@ -26,6 +26,8 @@ CVWidgetKnob : CVWidget {
 		var thisName, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
+		
+		prCalibrate ? prCalibrate = true;
 						
 		guiEnv = ();
 		editorEnv = ();
@@ -43,18 +45,18 @@ CVWidgetKnob : CVWidget {
 			widgetCV = cv;
 		});
 				
+		this.initControllersAndModels(controllersAndModels);
+
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
 		setUpArgs[0] !? { this.midiMode_(setUpArgs[0]) };
 		setUpArgs[1] !? { this.midiResolution_(setUpArgs[1]) };
 		setUpArgs[2] !? { this.midiMean_(setUpArgs[2]) };
-		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
-		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
-		setUpArgs[6] !? { this.setCalibrate(setUpArgs[6]) };
-				
+		setUpArgs[3] !? { this.ctrlButtonBank_(setUpArgs[3]) };
+		setUpArgs[4] !? { this.softWithin_(setUpArgs[4]) };
+		setUpArgs[5] !? { this.setCalibrate(setUpArgs[5]) };
+						
 		action !? { widgetCV.action_(action) };
-		
-		this.initControllersAndModels(controllersAndModels);
 		
 		if(bounds.isNil, {		
 			thisXY = 7@0;
@@ -312,7 +314,15 @@ CVWidgetKnob : CVWidget {
 				["calibrating", Color.white, Color.red],
 				["calibrate", Color.black, Color.green]
 			])
+			.action_({ |cb|
+				("calibrate button action triggered:"+cb.value).postln;
+				switch(cb.value,
+					0, { cb.value.postln; this.setCalibrate(true) },
+					1, { cb.value.postln; this.setCalibrate(false) }
+				)
+			})
 		;
+		if(prCalibrate, { calibBut.value_(0) }, { calibBut.value_(1) });
 		
 				
 		[knob, numVal].do({ |view| widgetCV.connect(view) });
@@ -362,6 +372,7 @@ CVWidgetKnob : CVWidget {
 			Error("calibration can only be set to true or false!").throw;
 		});
 		prCalibrate = bool;
+		wdgtControllersAndModels.oscConnection.model.value_(wdgtControllersAndModels.oscConnection.model.value).changed(\value);
 		wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
 	}
 	
@@ -423,7 +434,7 @@ CVWidgetKnob : CVWidget {
 	
 	oscConnect { |ip, port, name, oscMsgIndex|
 		var intPort;
-
+		[ip, port, name, oscMsgIndex].postln;
 		if(ip.size > 0 and:{ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not }, {
 			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
 		});

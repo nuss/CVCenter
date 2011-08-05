@@ -105,7 +105,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p5"><br></p>
 <p class="p6">(</p>
 <p class="p6">~cv = <span class="s11">CV</span>.new(<span class="s13">\freq</span>.asSpec);<span class="Apple-converted-space"> </span></p>
-<p class="p6">~wdgt = <span class="s11">CVWidgetKnob</span>(<span class="s11">nil</span>, ~cv, <span class="s14">"CV test"</span>, action: { <span class="s11">|cv|</span> a.set(<span class="s13">\freq</span>, cv.value) } );</p>
+<p class="p6">~wdgt = <span class="s11">CVWidgetKnob</span>(<span class="s11">nil</span>, ~cv, <span class="s14">"CV test"</span>, action: { <span class="s11">|cv|</span> a.set(<span class="s13">\freq</span>, cv.value) }, setup:[1, nil, nil, nil, nil, false] );</p>
 <p class="p6">~wdgt.front;</p>
 <p class="p6">)</p>
 <p class="p5"><br></p>

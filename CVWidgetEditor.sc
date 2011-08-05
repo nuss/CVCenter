@@ -482,8 +482,14 @@ CVWidgetEditor {
 			
 			calibBut.action_({ |but|
 				but.value.switch(
-					0, { widget.wdgtControllersAndModels.calibration.model.value_(true).changed(\value) },
-					1, { widget.wdgtControllersAndModels.calibration.model.value_(false).changed(\value) }
+					0, { 
+						widget.setCalibrate(true);
+						widget.wdgtControllersAndModels.calibration.model.value_(true).changed(\value);
+					},
+					1, { 
+						widget.setCalibrate(false);
+						widget.wdgtControllersAndModels.calibration.model.value_(false).changed(\value);
+					}
 				)
 			});
 	

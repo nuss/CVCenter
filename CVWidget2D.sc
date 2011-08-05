@@ -25,9 +25,10 @@ CVWidget2D : CVWidget {
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, rightBarX;
 		var actionLo, actionHi;
+		
+		prCalibrate ? prCalibrate = (lo: true, hi: true);
 				
 		guiEnv = (editor: ());
-		midiOscEnv ?? { midiOscEnv = () }; 
 		editorEnv = ();
 		cvcGui !? { isCVCWidget = true };
 		
@@ -55,10 +56,12 @@ CVWidget2D : CVWidget {
 		oscEditBut = (); calibBut = ();
 		editor = ();
 		
+		[\lo, \hi].do({ |key| this.initControllersAndModels(controllersAndModels, key) });
+
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
 		setUpArgs[6] ? prCalibrate = (lo: true, hi: true);
-		
+				
 		setUpArgs[0] !? { this.midiMode_(setUpArgs[0]) };
 		setUpArgs[1] !? { this.midiResolution_(setUpArgs[1]) };
 		setUpArgs[2] !? { this.midiMean_(setUpArgs[2]) };
@@ -74,8 +77,6 @@ CVWidget2D : CVWidget {
 				actions[1] !? { widgetCV.hi.action_(actions[1]) };
 			})
 		};
-		
-		[\lo, \hi].do({ |key| this.initControllersAndModels(controllersAndModels, key) });
 
 		if(bounds.isNil, {		
 			thisXY = 7@0;
@@ -348,6 +349,7 @@ CVWidget2D : CVWidget {
 			Error("calibration can only be set to true or false!").throw;
 		});
 		prCalibrate[hilo] = bool;
+		wdgtControllersAndModels[hilo].oscConnection.model.value_(wdgtControllersAndModels.oscConnection[hilo].model.value).changed(\value);
 		wdgtControllersAndModels[hilo].calibration.model.value_(bool).changed(\value);
 	}
 	
