@@ -31,11 +31,12 @@ CVWidgetEditor {
 			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
 		};
 
-		switch(widget.wdgtControllersAndModels.class,
-			Event, { "haha, we have an Event".postln; wcmHiLo = widget.wdgtControllersAndModels[hilo] },
-			{ wcmHiLo = widget.wdgtControllersAndModels }
-		);
-		
+		if(widget.wdgtControllersAndModels[hilo].notNil, { 
+			wcmHiLo = widget.wdgtControllersAndModels[hilo];
+		}, { 
+			wcmHiLo = widget.wdgtControllersAndModels;
+		});
+				
 		staticTextFont = Font(Font.defaultSansFace, 10);
 		staticTextColor = Color(0.2, 0.2, 0.2);
 		textFieldFont = Font(Font.defaultMonoFace, 9);
@@ -230,7 +231,7 @@ CVWidgetEditor {
 			;
 			
 			flow1.shift(0, 10);
-						
+									
 			midiLearnBut = Button(thisEditor.tabs.views[1], 15@15)
 				.font_(staticTextFont)
 				.states_([
@@ -414,7 +415,7 @@ CVWidgetEditor {
 			;
 			
 			flow2.shift(5, 0);
-			
+						
 			calibBut = Button(thisEditor.tabs.views[2], 80@15)
 				.font_(staticTextFont)
 				.states_([

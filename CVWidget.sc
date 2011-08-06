@@ -301,9 +301,7 @@ CVWidget {
 			widgetCV = this.widgetCV;
 			thisCalib = prCalibrate;
 		});
-		
-		[thisGuiEnv, this.guiEnv].postln;
-							
+									
 		wcm.calibration.controller ?? { 
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};

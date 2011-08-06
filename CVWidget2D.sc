@@ -28,12 +28,15 @@ CVWidget2D : CVWidget {
 		
 		prCalibrate ? prCalibrate = (lo: true, hi: true);
 				
-		guiEnv = (editor: ());
+		guiEnv = (lo: (), hi: ());
 		editorEnv = ();
 		cvcGui !? { isCVCWidget = true };
 		
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
-		midiOscEnv.oscMapping ?? { midiOscEnv.oscMapping = (lo: \linlin, hi: \linlin) };
+		[\lo, \hi].do({ |hilo|
+			midiOscEnv[hilo] ?? { midiOscEnv.put(hilo, ()) };
+			midiOscEnv[hilo].oscMapping ?? { midiOscEnv[hilo].oscMapping = \linlin };
+		});
 						
 		if(name.isNil, { thisName = "2-dimensional" }, { thisName = name });
 		wdgtInfo = thisName.asString;
@@ -174,7 +177,7 @@ CVWidget2D : CVWidget {
 			.action_({ |btn|
 				if(editor.lo.isNil or:{ editor.lo.isClosed }, {
 					editor.lo = CVWidgetEditor(this, thisName, 0, \lo);
-					guiEnv.editor.lo = editor.lo;
+					guiEnv.lo.editor = editor.lo;
 				}, {
 					editor.lo.front(0)
 				});
@@ -190,7 +193,7 @@ CVWidget2D : CVWidget {
 			.action_({ |btn|
 				if(editor.hi.isNil or:{ editor.hi.isClosed }, {
 					editor.hi = CVWidgetEditor(this, thisName, 0, \hi);
-					guiEnv.editor.hi = editor.hi;
+					guiEnv.hi.editor = editor.hi;
 				}, {
 					editor.hi.front(0)
 				});
@@ -206,7 +209,7 @@ CVWidget2D : CVWidget {
 			.action_({ |btn|
 				if(editor.lo.isNil or:{ editor.lo.isClosed }, {
 					editor.hi = CVWidgetEditor(this, thisName, 1, \lo);
-					guiEnv.editor.lo = editor.lo;
+					guiEnv.lo.editor = editor.lo;
 				}, {
 					editor.lo.front(1)
 				});
@@ -222,7 +225,7 @@ CVWidget2D : CVWidget {
 			.action_({ |btn|
 				if(editor.hi.isNil or:{ editor.hi.isClosed }, {
 					editor.hi = CVWidgetEditor(this, thisName, 1, \hi);
-					guiEnv.editor.hi = editor.hi;
+					guiEnv.hi.editor = editor.hi;
 				}, {
 					editor.hi.front(1)
 				});
@@ -349,7 +352,7 @@ CVWidget2D : CVWidget {
 			Error("calibration can only be set to true or false!").throw;
 		});
 		prCalibrate[hilo] = bool;
-		wdgtControllersAndModels[hilo].oscConnection.model.value_(wdgtControllersAndModels.oscConnection[hilo].model.value).changed(\value);
+		wdgtControllersAndModels[hilo].oscConnection.model.value_(wdgtControllersAndModels[hilo].oscConnection.model.value).changed(\value);
 		wdgtControllersAndModels[hilo].calibration.model.value_(bool).changed(\value);
 	}
 	
@@ -386,17 +389,17 @@ CVWidget2D : CVWidget {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		}, {
 			midiOscEnv[hilo].oscMapping = mapping.asSymbol;
-			wdgtControllersAndModels.oscInputRange.model.value_(
-				wdgtControllersAndModels.oscInputRange.model.value;
+			wdgtControllersAndModels[hilo].oscInputRange.model.value_(
+				wdgtControllersAndModels[hilo].oscInputRange.model.value;
 			).changed(\value);
-			wdgtControllersAndModels.cvSpec.model.value_(
-				wdgtControllersAndModels.cvSpec.model.value;
+			wdgtControllersAndModels[hilo].cvSpec.model.value_(
+				wdgtControllersAndModels[hilo].cvSpec.model.value;
 			).changed(\value);
 		})
 	}
 	
 	getOscMapping { |hilo|
-		^midiOscEnv.oscMapping[hilo];
+		^midiOscEnv[hilo].oscMapping;
 	}
 		
 	oscConnect { |addr=nil, name, oscMsgIndex, hilo|
