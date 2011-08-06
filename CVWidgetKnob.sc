@@ -303,7 +303,6 @@ CVWidgetKnob : CVWidget {
 				wdgtControllersAndModels.midiConnection.model.value_(
 					wdgtControllersAndModels.midiConnection.model.value
 				).changed(\value);
-
 			})
 		;
 		nextY = nextY+oscEditBut.bounds.height;

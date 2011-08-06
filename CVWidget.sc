@@ -471,6 +471,7 @@ CVWidget {
 		};
 		
 		wcm.midiConnection.controller.put(\value, { |theChanger, what, moreArgs|
+			midiOscEnv.postln;
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
 					ctrlString ? ctrlString = num+1;

@@ -476,10 +476,11 @@ CVWidgetEditor {
 								ipField.string,
 								portField.value,
 								nameField.string, 
-								indexField.value.asInt
+								indexField.value.asInt,
+								hilo
 							);
 						},
-						0, { widget.oscDisconnect }
+						0, { widget.oscDisconnect(hilo) }
 					)
 				})
 			;
@@ -489,11 +490,11 @@ CVWidgetEditor {
 			calibBut.action_({ |but|
 				but.value.switch(
 					0, { 
-						widget.setCalibrate(true);
+						widget.setCalibrate(true, hilo);
 						wcmHiLo.calibration.model.value_(true).changed(\value);
 					},
 					1, { 
-						widget.setCalibrate(false);
+						widget.setCalibrate(false, hilo);
 						wcmHiLo.calibration.model.value_(false).changed(\value);
 					}
 				)

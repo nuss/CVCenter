@@ -37,6 +37,8 @@ CVWidget2D : CVWidget {
 			midiOscEnv[hilo] ?? { midiOscEnv.put(hilo, ()) };
 			midiOscEnv[hilo].oscMapping ?? { midiOscEnv[hilo].oscMapping = \linlin };
 		});
+		
+		
 						
 		if(name.isNil, { thisName = "2-dimensional" }, { thisName = name });
 		wdgtInfo = thisName.asString;
@@ -263,18 +265,34 @@ CVWidget2D : CVWidget {
 			.font_(Font("Helvetica", 7))
 			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
-			.action_({ |ms|  ms.postln })
 		});
 		
 		
-		[midiLearn.hi, nextY, midiLearn.lo, nextY+52].pairsDo({ |k, v|
-			k.bounds_(Rect(thisXY.x+rightBarX+midiHead.lo.bounds.width, v, 12, 13))
+		[midiLearn.hi, [\hi, nextY], midiLearn.lo, [\lo, nextY+52]].pairsDo({ |k, v|
+			k.bounds_(Rect(thisXY.x+rightBarX+midiHead.lo.bounds.width, v[1], 12, 13))
 			.font_(Font("Helvetica", 7))
 			.focusColor_(Color(alpha: 0))
 			.states_([
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
 			])
+			.action_({ |ml|
+				ml.value.switch(
+					1, {
+						margs = [
+							[midiSrc[v[0]].string, msrc], 
+							[midiChan[v[0]].string, mchan], 
+							[midiCtrl[v[0]].string, mctrl]
+						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
+						if(margs.select({ |i| i.notNil }).size > 0, {
+							this.midiConnect(*margs, hilo: v[0]);
+						}, {
+							this.midiConnect(hilo: v[0]);
+						})
+					},
+					0, { this.midiDisconnect(v[0]) }
+				)
+			})
 		});
 		
 		nextY = nextY+13;
@@ -320,13 +338,32 @@ CVWidget2D : CVWidget {
 		calibBut.lo = Button(window);
 		calibBut.hi = Button(window);
 		
-		[oscEditBut.lo, thisXY.x+1, oscEditBut.hi, thisXY.x+(thisWidth/2)].pairsDo({ |k, v|
-			k.bounds_(Rect(v, nextY, thisWidth/2-1, thisHeight-(label.bounds.top+label.bounds.height+slider2d.bounds.height+rangeSlider.bounds.height+numVal.lo.bounds.height+15)))
+		[oscEditBut.lo, [\lo, thisXY.x+1], oscEditBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
+			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, thisHeight-(label.bounds.top+label.bounds.height+slider2d.bounds.height+rangeSlider.bounds.height+numVal.lo.bounds.height+15)))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.states_([
 				["edit OSC", Color.black, Color.clear]
 			])
+			.action_({ |oscb|
+				("opening editor:"+thisName).postln;
+				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {
+					editor.put(v[0], CVWidgetEditor(this, thisName, 2, v[0]));
+					guiEnv[v[0]].editor = editor[v[0]];
+				}, {
+					editor[v[0]].front(2)
+				});
+				editor[v[0]].calibNumBoxes !? {
+					wdgtControllersAndModels[v[0]].mapConstrainterLo.connect(editor[v[0]].calibNumBoxes.lo);
+					wdgtControllersAndModels[v[0]].mapConstrainterHi.connect(editor[v[0]].calibNumBoxes.hi);
+				};
+				wdgtControllersAndModels[v[0]].oscConnection.model.value_(
+					wdgtControllersAndModels[v[0]].oscConnection.model.value;
+				).changed(\value);
+				wdgtControllersAndModels[v[0]].midiConnection.model.value_(
+					wdgtControllersAndModels[v[0]].midiConnection.model.value
+				).changed(\value);
+			})
 		});
 		
 		nextY = nextY+oscEditBut.lo.bounds.height;
@@ -343,7 +380,7 @@ CVWidget2D : CVWidget {
 				("calibrate button action triggered:"+cb.value).postln;
 				switch(cb.value,
 					0, { cb.value.postln; this.setCalibrate(true, v[0]) },
-					1, { cb.value.postln; this.setCalibrate(false, v[1]) }
+					1, { cb.value.postln; this.setCalibrate(false, v[0]) }
 				)
 			})
 		});
@@ -460,70 +497,70 @@ CVWidget2D : CVWidget {
 		^midiOscEnv[hilo].oscMapping;
 	}
 		
-	oscConnect { |addr=nil, name, oscMsgIndex, hilo|
-		hilo ?? { Error("Please provide the CV's key \('hi' or 'lo')!").throw };
-		if(hilo.asSymbol === \lo, {
-			this.oscResponderLo = OSCresponderNode(addr, name.asSymbol, { |t, r, msg|
-				if(prCalibrate, { 
-					if(calibConstraintsLo.isNil, {
-						calibConstraintsLo = (lo: msg[oscMsgIndex], hi: msg[oscMsgIndex]);
-					}, {
-						if(msg[oscMsgIndex] < calibConstraintsLo.lo, { calibConstraintsLo.lo = msg[oscMsgIndex] });
-						if(msg[oscMsgIndex] > calibConstraintsLo.hi, { calibConstraintsLo.hi = msg[oscMsgIndex] });
-					})
-				}, {
-					if(calibConstraintsLo.isNil, {
-						calibConstraintsLo = (lo: 0, hi: 0);
-					})	
-				});
-				widgetCV[\lo].value_(
-					msg[oscMsgIndex].perform(
-						this.prOSCMappingLo,
-						this.calibConstraintsLo.lo, this.calibConstraintsLo.hi,
-						widgetCV[hilo].spec.minval, widgetCV[hilo].spec.maxval,
-						\minmax
-					)
-				)
-			}).add
+	oscConnect { |ip, port, name, oscMsgIndex, hilo|
+		var intPort;
+		hilo ?? { Error("Please provide the CV's key \('hi' or 'lo'\)!").throw };
+		if(ip.size > 0 and:{ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not }, {
+			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
 		});
-		if(hilo.asSymbol === \hi, {
-			this.oscResponderHi = OSCresponderNode(addr, name.asSymbol, { |t, r, msg|
-				if(prCalibrate, { 
-					if(calibConstraintsHi.isNil, {
-						calibConstraintsHi = (lo: msg[oscMsgIndex], hi: msg[oscMsgIndex]);
-					}, {
-						if(msg[oscMsgIndex] < calibConstraintsHi.lo, { calibConstraintsHi.lo = msg[oscMsgIndex] });
-						if(msg[oscMsgIndex] > calibConstraintsHi.hi, { calibConstraintsHi.hi = msg[oscMsgIndex] });
-					})
-				}, {
-					if(calibConstraintsHi.isNil, {
-						calibConstraintsHi = (lo: 0, hi: 0);
-					})	
-				});
-				widgetCV[\hi].value_(
-					msg[oscMsgIndex].perform(
-						this.prOSCMappingHi,
-						this.calibConstraintsHi.lo, this.calibConstraintsHi.hi,
-						widgetCV[hilo].spec.minval, widgetCV[hilo].spec.maxval,
-						\minmax
-					)
-				)
-			}).add
-		})
+		
+		if(port.size > 0, {
+			if("^[0-9]{1,5}$".matchRegexp(port).not and:{ port != "nil" }, {
+				Error("Please provide a valid port or leave this field empty").throw;
+			}, {
+				intPort = port.asInt;
+			})
+		});
+		
+		if(port == "nil", { intPort = nil });
+		
+		if("^\/".matchRegexp(name.asString).not, {
+			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as first argument to oscConnect").throw;
+		});
+		
+		if(oscMsgIndex.isKindOf(Integer).not, {
+			Error("You have to supply an integer as second argument to oscConnect").throw;
+		});
+
+		wdgtControllersAndModels[hilo].oscConnection.model.value_([ip, intPort, name, oscMsgIndex]).changed(\value);
+		CmdPeriod.add({ this.oscDisconnect(hilo) });
 	}
 	
 	oscDisconnect { |hilo|
 		hilo ?? { Error("Please provide the CV's key \(\hi or \lo\)!").throw };
-		if(hilo.asSymbol === \hi, {
-			this.oscResponderHi.remove;
-//			this.oscInputRangeRangeModelHi_(`[0.0, 0.0]);
-			this.calibConstraintsHi_(nil);	
+		if(this.isClosed.not, {
+			wdgtControllersAndModels[hilo].oscConnection.model.value_(false).changed(\value);
+			wdgtControllersAndModels[hilo].oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
+		}, {
+			midiOscEnv[hilo].oscResponder.remove;
 		});
-		if(hilo.asSymbol === \lo, {
-			this.oscResponderLo.remove;
-//			this.oscInputRangeRangeModelLo_(`[0.0, 0.0]);
-			this.calibConstraintsLo_(nil);	
+		CmdPeriod.remove({ this.oscDisconnect(hilo) });
+	}
+	
+	// if all arguments are nil .learn should be triggered
+	midiConnect { |uid, chan, num, hilo|
+		var args;
+		("hilo:"+hilo).postln;
+		if(midiOscEnv[hilo].cc.isNil, {
+			args = [uid, chan, num].select({ |param| param.notNil }).collect({ |param| param.asInt });
+			wdgtControllersAndModels[hilo].midiConnection.model.value_(
+				(src: uid, chan: chan, num: num)
+			).changed(\value);
+			CmdPeriod.add({ this !? { this.midiDisconnect(hilo) } });
+		}, {
+			"Already connected!".warn;	
 		})
 	}
 	
+	midiDisconnect { |hilo|
+		midiOscEnv.cc.notNil !? {
+			if(this.isClosed.not, {
+				wdgtControllersAndModels[hilo].midiConnection.model.value_(nil).changed(\value);
+			}, {
+				midiOscEnv[hilo].cc.remove;
+			})		
+		};
+		CmdPeriod.remove({ this.midiDisconnect(hilo) });
+	}
+		
 }
