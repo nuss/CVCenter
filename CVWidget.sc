@@ -301,9 +301,7 @@ CVWidget {
 			widgetCV = this.widgetCV;
 			thisCalib = prCalibrate;
 		});
-		
-		thisGuiEnv.postln;
-									
+											
 		wcm.calibration.controller ?? { 
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
@@ -416,7 +414,7 @@ CVWidget {
 		};
 
 		wcm.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
-			thisGuiEnv.oscEditBut.states.postln;
+//			thisGuiEnv.oscEditBut.states.postln;
 			if(theChanger.value[0] <= 0 or:{
 				theChanger.value[1] <= 0
 			}, {
@@ -471,7 +469,7 @@ CVWidget {
 		};
 		
 		wcm.midiConnection.controller.put(\value, { |theChanger, what, moreArgs|
-			midiOscEnv.postln;
+//			midiOscEnv.postln;
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
 					ctrlString ? ctrlString = num+1;
@@ -786,7 +784,7 @@ CVWidget {
 				Event, { thisCalib = prCalibrate[key] },
 				thisCalib = prCalibrate
 			);
-			("OSC-display calibration:"+thisCalib).postln;
+//			("OSC-display calibration:"+thisCalib).postln;
 			thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
 			defer {
 				if(thisGuiEnv.editor.notNil and:{

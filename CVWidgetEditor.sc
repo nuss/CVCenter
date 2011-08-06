@@ -51,7 +51,6 @@ CVWidgetEditor {
 		
 		allEditors ?? { allEditors = IdentityDictionary() };
 		
-		
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 225));
 
@@ -59,8 +58,14 @@ CVWidgetEditor {
 				allEditors.put(name, (window: window, name: widgetName)) 
 			}, {
 				tmp = (); tmp.put(hilo, (window: window, name: widgetName));
-				allEditors.put(name, tmp);
+				if(allEditors[name].isNil, { 
+					allEditors.put(name, tmp);
+				}, { 
+					allEditors[name].put(hilo, (window: window, name: widgetName));
+				});
 			});
+			
+//			allEditors.postln;
 
 			if(hilo.notNil, { thisEditor = allEditors[name][hilo] }, { thisEditor = allEditors[name] });
 
@@ -518,12 +523,18 @@ CVWidgetEditor {
 		tab !? thisEditor.tabs.focus(tab);
 	}
 	
-	close {
+	close { |hilo|
 		thisEditor.window.close;
-		allEditors.removeAt(name);
+		switch(allEditors[name].class,
+			Event, { 
+				allEditors[name].removeAt(hilo);
+				if(allEditors[name].isEmpty, { allEditors.removeAt(name) });
+			},
+			{ allEditors.removeAt(name) };
+		)
 	}
 	
-	isClosed {
+	isClosed { 
 		var ret;
 		thisEditor.window !? {
 			ret = defer { thisEditor.window.isClosed };

@@ -38,8 +38,6 @@ CVWidget2D : CVWidget {
 			midiOscEnv[hilo].oscMapping ?? { midiOscEnv[hilo].oscMapping = \linlin };
 		});
 		
-		
-						
 		if(name.isNil, { thisName = "2-dimensional" }, { thisName = name });
 		wdgtInfo = thisName.asString;
 		
@@ -101,15 +99,18 @@ CVWidget2D : CVWidget {
 						
 		cvcGui ?? { 
 			window.onClose_({
-				[\lo, \lo].do({ |hilo|
+				[\lo, \hi].do({ |hilo|
 					if(editor[hilo].notNil, {
 						if(editor[hilo].isClosed.not, {
-							editor[hilo].close;
+							editor[hilo].close(hilo);
 						}, {
 							if(CVWidgetEditor.allEditors.notNil and:{
-								CVWidgetEditor.allEditors[thisName.asSymbol].notNil;
+								CVWidgetEditor.allEditors[thisName.asSymbol].notNil
 							}, {
-								CVWidgetEditor.allEditors.removeAt(thisName.asSymbol)
+								CVWidgetEditor.allEditors[thisName.asSymbol].removeAt(hilo);
+								if(CVWidgetEditor.allEditors[thisName.asSymbol].isEmpty, {
+									CVWidgetEditor.allEditors.removeAt(thisName.asSymbol);
+								})
 							})
 						})
 					});
@@ -553,7 +554,7 @@ CVWidget2D : CVWidget {
 	}
 	
 	midiDisconnect { |hilo|
-		midiOscEnv.cc.notNil !? {
+		midiOscEnv[hilo].cc.notNil !? {
 			if(this.isClosed.not, {
 				wdgtControllersAndModels[hilo].midiConnection.model.value_(nil).changed(\value);
 			}, {
