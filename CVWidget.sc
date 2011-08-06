@@ -301,6 +301,8 @@ CVWidget {
 			widgetCV = this.widgetCV;
 			thisCalib = prCalibrate;
 		});
+		
+		thisGuiEnv.postln;
 									
 		wcm.calibration.controller ?? { 
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
@@ -414,6 +416,7 @@ CVWidget {
 		};
 
 		wcm.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
+			thisGuiEnv.oscEditBut.states.postln;
 			if(theChanger.value[0] <= 0 or:{
 				theChanger.value[1] <= 0
 			}, {

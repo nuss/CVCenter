@@ -364,7 +364,7 @@ CVWidgetKnob : CVWidget {
 			midiLearn: midiLearn
 		);
 
-		returnedFromActions = this.initControllerActions;
+		this.initControllerActions;
 	}
 	
 	setCalibrate { |bool|

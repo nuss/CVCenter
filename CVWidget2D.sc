@@ -99,21 +99,21 @@ CVWidget2D : CVWidget {
 						
 		cvcGui ?? { 
 			window.onClose_({
-				if(editor.notNil, {
-					if(editor.isClosed.not, {
-						editor.close;
-					}, {
-						if(CVWidgetEditor.allEditors.notNil and:{
-							CVWidgetEditor.allEditors[thisName.asSymbol].notNil;
+				[\lo, \lo].do({ |hilo|
+					if(editor[hilo].notNil, {
+						if(editor[hilo].isClosed.not, {
+							editor[hilo].close;
 						}, {
-							CVWidgetEditor.allEditors.removeAt(thisName.asSymbol)
+							if(CVWidgetEditor.allEditors.notNil and:{
+								CVWidgetEditor.allEditors[thisName.asSymbol].notNil;
+							}, {
+								CVWidgetEditor.allEditors.removeAt(thisName.asSymbol)
+							})
 						})
-					})
-				});
-				[\lo, \hi].do({ |key|
-					midiOscEnv.oscResponder[key] !? { midiOscEnv.oscResponder[key].remove.postln };
-					midiOscEnv.cc[key] !? { midiOscEnv.cc[key].remove };
-					wdgtControllersAndModels[key].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
+					});
+					midiOscEnv[hilo].oscResponder !? { midiOscEnv[hilo].oscResponder.remove.postln };
+					midiOscEnv[hilo].cc !? { midiOscEnv[hilo].cc.remove };
+					wdgtControllersAndModels[hilo].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 				})
 			})
 		};
@@ -320,13 +320,32 @@ CVWidget2D : CVWidget {
 		calibBut.lo = Button(window);
 		calibBut.hi = Button(window);
 		
-		[oscEditBut.hi, thisXY.x+1, oscEditBut.lo, thisXY.x+(thisWidth/2)].pairsDo({ |k, v|
+		[oscEditBut.lo, thisXY.x+1, oscEditBut.hi, thisXY.x+(thisWidth/2)].pairsDo({ |k, v|
 			k.bounds_(Rect(v, nextY, thisWidth/2-1, thisHeight-(label.bounds.top+label.bounds.height+slider2d.bounds.height+rangeSlider.bounds.height+numVal.lo.bounds.height+15)))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.states_([
 				["edit OSC", Color.black, Color.clear]
 			])
+		});
+		
+		nextY = nextY+oscEditBut.lo.bounds.height;
+		
+		[calibBut.lo, [\lo, thisXY.x+1], calibBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
+			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
+			.font_(Font("Helvetica", 9))
+			.focusColor_(Color(alpha: 0))
+			.states_([
+				["calibrating", Color.white, Color.red],
+				["calibrate", Color.black, Color.green]
+			])
+			.action_({ |cb|
+				("calibrate button action triggered:"+cb.value).postln;
+				switch(cb.value,
+					0, { cb.value.postln; this.setCalibrate(true, v[0]) },
+					1, { cb.value.postln; this.setCalibrate(false, v[1]) }
+				)
+			})
 		});
 		
 //		prCCResponderAdd(widgetCV.hi, midiLearn.hi, midiSrc.hi, midiChan.hi, midiCtrl.hi, midiHead.hi, \hi);
@@ -336,9 +355,48 @@ CVWidget2D : CVWidget {
 		widgetCV.lo.connect(numVal.lo);
 		widgetCV.hi.connect(numVal.hi);
 
-		visibleGuiEls = [slider2d, rangeSlider, numVal.hi, numVal.lo, specBut.hi, specBut.lo, midiHead.hi, midiHead.lo, midiLearn.hi, midiLearn.lo, midiSrc.hi, midiSrc.lo, midiChan.hi, midiChan.lo, midiCtrl.hi, midiCtrl.lo];
+		visibleGuiEls = [
+			slider2d, 
+			rangeSlider, 
+			numVal.lo, numVal.hi, 
+			midiHead.lo, midiHead.hi, 
+			midiLearn.lo, midiHead.lo, 
+			midiSrc.lo, midiSrc.hi, 
+			midiChan.lo, midiHead.hi, 
+			midiCtrl.lo, midiCtrl.hi, 
+			oscEditBut.lo, oscEditBut.hi, 
+			calibBut.lo, calibBut.hi,
+		];
 
-		allGuiEls = [widgetBg, label, nameField, slider2d, rangeSlider, numVal.hi, numVal.lo, specBut.hi, specBut.lo, midiHead.hi, midiHead.lo, midiLearn.hi, midiLearn.lo, midiSrc.hi, midiSrc.lo, midiChan.hi, midiChan.lo, midiCtrl.hi, midiCtrl.lo];
+		allGuiEls = [
+			widgetBg, 
+			label, 
+			nameField, 
+			slider2d, 
+			rangeSlider, 
+			numVal.lo, numVal.hi, 
+			specBut.lo, specBut.lo, 
+			midiHead.lo, midiHead.hi, 
+			midiLearn.lo, midiLearn.hi, 
+			midiSrc.lo, midiSrc.hi, 
+			midiChan.lo, midiChan.hi, 
+			midiCtrl.lo, midiCtrl.hi, 
+			oscEditBut.lo, oscEditBut.hi, 
+			calibBut.lo, calibBut.hi,
+		];
+		
+		[\lo, \hi].do({ |hilo|
+			guiEnv[hilo] = (
+				editor: editor[hilo],
+				calibBut: calibBut[hilo],
+				slider2d: slider2d,
+				oscEditBut: oscEditBut[hilo],
+				midiSrc: midiSrc[hilo],
+				midiChan: midiChan[hilo],
+				midiCtrl: midiCtrl[hilo],
+				midiLearn: midiLearn[hilo]
+			)
+		});
 
 		this.initControllerActions(\lo);
 		this.initControllerActions(\hi);
