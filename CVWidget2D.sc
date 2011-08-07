@@ -286,7 +286,8 @@ CVWidget2D : CVWidget {
 							[midiCtrl[v[0]].string, mctrl]
 						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
-							this.midiConnect(*margs, hilo: v[0]);
+							"hilo: %\n".postf(v[0]);
+							this.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], hilo: v[0]);
 						}, {
 							this.midiConnect(hilo: v[0]);
 						})
@@ -298,38 +299,89 @@ CVWidget2D : CVWidget {
 		
 		nextY = nextY+13;
 		
-		[midiSrc.hi, nextY, midiSrc.lo, nextY+52].pairsDo({ |k, v|
-			k.bounds_(Rect(thisXY.x+rightBarX, v, 40, 13))
+		[midiSrc.hi, [\hi, nextY], midiSrc.lo, [\lo, nextY+52]].pairsDo({ |k, v|
+			k.bounds_(Rect(thisXY.x+rightBarX, v[1], 40, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("source")
-			.canFocus_(false)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
+			.action_({ |tf|
+				if(tf.string != msrc, {
+					wdgtControllersAndModels[v[0]].midiDisplay.model.value_((
+						learn: "C",
+						src: tf.string,
+						chan: wdgtControllersAndModels[v[0]].midiDisplay.model.value.chan,
+						ctrl: wdgtControllersAndModels[v[0]].midiDisplay.model.value.ctrl
+					)).changed(\value)
+				})
+			})
+			.mouseDownAction_({ |tf|
+				tf.stringColor_(Color.red)
+			})
+			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+				if(unicode == 13, {
+					tf.stringColor_(Color.black);
+				})
+			}) 
 		});
 
 		nextY = nextY+13;
 
-		[midiChan.hi, nextY, midiChan.lo, nextY+52].pairsDo({ |k, v|
-			k.bounds_(Rect(thisXY.x+rightBarX, v, 15, 13))
+		[midiChan.hi, [\hi, nextY], midiChan.lo, [\lo, nextY+52]].pairsDo({ |k, v|
+			k.bounds_(Rect(thisXY.x+rightBarX, v[1], 15, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("chan")
-			.canFocus_(false)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
+			.action_({ |tf|
+				if(tf.string != msrc, {
+					wdgtControllersAndModels[v[0]].midiDisplay.model.value_((
+						learn: "C",
+						src: wdgtControllersAndModels[v[0]].midiDisplay.model.value.src,
+						chan: tf.string,
+						ctrl: wdgtControllersAndModels[v[0]].midiDisplay.model.value.ctrl
+					)).changed(\value)
+				})
+			})
+			.mouseDownAction_({ |tf|
+				tf.stringColor_(Color.red)
+			})
+			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+				if(unicode == 13, {
+					tf.stringColor_(Color.black);
+				})
+			}) 
 		});
 
 //		nextY = nextY+12;
 
-		[midiCtrl.hi, nextY, midiCtrl.lo, nextY+52].pairsDo({ |k, v|
-			k.bounds_(Rect(thisXY.x+rightBarX+15, v, 25, 13))
+		[midiCtrl.hi, [\hi, nextY], midiCtrl.lo, [\lo, nextY+52]].pairsDo({ |k, v|
+			k.bounds_(Rect(thisXY.x+rightBarX+15, v[1], 25, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("ctrl")
-			.canFocus_(false)
 			.background_(Color(alpha: 0))
 			.stringColor_(Color.black)
+			.action_({ |tf|
+				if(tf.string != msrc, {
+					wdgtControllersAndModels[v[0]].midiDisplay.model.value_((
+						learn: "C",
+						src: wdgtControllersAndModels[v[0]].midiDisplay.model.value.src,
+						chan: wdgtControllersAndModels[v[0]].midiDisplay.model.value.chan,
+						ctrl: tf.string
+					)).changed(\value)
+				})
+			})
+			.mouseDownAction_({ |tf|
+				tf.stringColor_(Color.red)
+			})
+			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+				if(unicode == 13, {
+					tf.stringColor_(Color.black);
+				})
+			}) 
 		});
 		
 		nextY = label.bounds.top+label.bounds.height+slider2d.bounds.height+rangeSlider.bounds.height+numVal.lo.bounds.height+1;
@@ -540,6 +592,8 @@ CVWidget2D : CVWidget {
 	// if all arguments are nil .learn should be triggered
 	midiConnect { |uid, chan, num, hilo|
 		var args;
+		[uid, chan, num, hilo].postln;
+		[midiOscEnv, midiOscEnv[hilo], hilo].postln;
 		if(midiOscEnv[hilo].cc.isNil, {
 			args = [uid, chan, num].select({ |param| param.notNil }).collect({ |param| param.asInt });
 			wdgtControllersAndModels[hilo].midiConnection.model.value_(

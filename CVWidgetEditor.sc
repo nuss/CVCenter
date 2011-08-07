@@ -242,7 +242,7 @@ CVWidgetEditor {
 			StaticText(thisEditor.tabs.views[1], flow1.bounds.width-20@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("(learn | connect) / source-ID (device) / channel / controller-nr.")
+				.string_("(learn | connect) / source-ID (device) / chan / ctrl-nr.")
 			;
 
 			midiLearnBut = Button(thisEditor.tabs.views[1], 15@15)
@@ -260,7 +260,7 @@ CVWidgetEditor {
 								[thisGuiEnv.midiCtrl.string, mctrl]
 							].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 							if(margs.select({ |i| i.notNil }).size > 0, {
-								widget.midiConnect(*margs, hilo: hilo);
+								widget.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], hilo: hilo);
 							}, {
 								widget.midiConnect(hilo: hilo);
 							})
