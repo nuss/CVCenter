@@ -20,12 +20,14 @@ CVWidgetEditor {
 		var tabs, /*specsActions, editor, */cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
-		var addr, wcmHiLo; 
+		var addr, wcmHiLo, thisGuiEnv; 
 		var midiModes;
 		var mappingSelectItems/*, mappingModes*/;
 		var tmp; // multipurpose, short-term var
-				
+						
 		name = widgetName.asSymbol;
+		
+		if(hilo.isNil, { thisGuiEnv = widget.guiEnv }, { thisGuiEnv = widget.guiEnv[hilo] });
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
@@ -86,11 +88,11 @@ CVWidgetEditor {
 				.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq.asSpec \nor [20, 20000, \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
 			;
 
-			if(hilo.notNil, {
+//			if(hilo.notNil, {
 				cvString = widget.getSpec(hilo).asString.split($ );
-			}, {
-				cvString = widget.getSpec.asString.split($ );
-			});
+//			}, {
+//				cvString = widget.getSpec.asString.split($ );
+//			});
 
 			cvString = cvString[1..cvString.size-1].join(" ");
 			
@@ -236,7 +238,13 @@ CVWidgetEditor {
 			;
 			
 			flow1.shift(0, 10);
-									
+			
+			StaticText(thisEditor.tabs.views[1], flow1.bounds.width-20@15)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("(learn | connect) / source-ID (device) / channel / controller-nr.")
+			;
+
 			midiLearnBut = Button(thisEditor.tabs.views[1], 15@15)
 				.font_(staticTextFont)
 				.states_([
@@ -247,17 +255,17 @@ CVWidgetEditor {
 					ml.value.switch(
 						1, {
 							margs = [
-								[widget.guiEnv.midiSrc.string, msrc], 
-								[widget.guiEnv.midiChan.string, mchan], 
-								[widget.guiEnv.midiCtrl.string, mctrl]
+								[thisGuiEnv.midiSrc.string, msrc], 
+								[thisGuiEnv.midiChan.string, mchan], 
+								[thisGuiEnv.midiCtrl.string, mctrl]
 							].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 							if(margs.select({ |i| i.notNil }).size > 0, {
-								widget.midiConnect(*margs);
+								widget.midiConnect(*margs, hilo: hilo);
 							}, {
-								widget.midiConnect;
+								widget.midiConnect(hilo: hilo);
 							})
 						},
-						0, { widget.midiDisconnect }
+						0, { widget.midiDisconnect(hilo) }
 					)
 				})
 			;
@@ -269,12 +277,12 @@ CVWidgetEditor {
 				.string_(msrc)
 				.background_(Color.white)
 				.action_({ |tf|
-					if(tf.string != mctrl, {
+					if(tf.string != msrc, {
 						wcmHiLo.midiDisplay.model.value_((
 							learn: "C",
-							src: wcmHiLo.midiDisplay.model.value.src,
+							src: tf.string,
 							chan: wcmHiLo.midiDisplay.model.value.chan,
-							ctrl: tf.string
+							ctrl: wcmHiLo.midiDisplay.model.value.ctrl
 						)).changed(\value)
 					})
 				})
@@ -296,12 +304,12 @@ CVWidgetEditor {
 				.string_(mchan)
 				.background_(Color.white)
 				.action_({ |tf|
-					if(tf.string != mctrl, {
+					if(tf.string != mchan, {
 						wcmHiLo.midiDisplay.model.value_((
 							learn: "C",
 							src: wcmHiLo.midiDisplay.model.value.src,
-							chan: wcmHiLo.midiDisplay.model.value.chan,
-							ctrl: tf.string
+							chan: tf.string,
+							ctrl: wcmHiLo.midiDisplay.model.value.ctrl
 						)).changed(\value)
 					})
 				})

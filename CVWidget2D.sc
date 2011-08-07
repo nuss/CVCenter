@@ -378,7 +378,6 @@ CVWidget2D : CVWidget {
 				["calibrate", Color.black, Color.green]
 			])
 			.action_({ |cb|
-				("calibrate button action triggered:"+cb.value).postln;
 				switch(cb.value,
 					0, { cb.value.postln; this.setCalibrate(true, v[0]) },
 					1, { cb.value.postln; this.setCalibrate(false, v[0]) }
@@ -541,7 +540,6 @@ CVWidget2D : CVWidget {
 	// if all arguments are nil .learn should be triggered
 	midiConnect { |uid, chan, num, hilo|
 		var args;
-		("hilo:"+hilo).postln;
 		if(midiOscEnv[hilo].cc.isNil, {
 			args = [uid, chan, num].select({ |param| param.notNil }).collect({ |param| param.asInt });
 			wdgtControllersAndModels[hilo].midiConnection.model.value_(
