@@ -268,9 +268,9 @@ CVWidgetEditor {
 								[thisGuiEnv.midiCtrl.string, mctrl]
 							].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 							if(margs.select({ |i| i.notNil }).size > 0, {
-								widget.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], hilo: key);
+								widget.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], key: key)
 							}, {
-								widget.midiConnect(hilo: key);
+								widget.midiConnect(key: key)
 							})
 						},
 						0, { widget.midiDisconnect(key) }
@@ -297,14 +297,14 @@ CVWidgetEditor {
 				.mouseDownAction_({ |tf|
 					tf.stringColor_(Color.red)
 				})
-				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+				.keyUpAction_({ |tf, char, modifiers, unicode, keycode|
 //					[tf, char, modifiers, unicode, keycode].postln;
 					if(unicode == 13, {
 						tf.stringColor_(Color.black);
 					})
 				}) 
 			;
-			
+						
 			flow1.shift(0, 0);
 			
 			midiChanField = TextField(thisEditor.tabs.views[1], 60@15)
@@ -324,14 +324,11 @@ CVWidgetEditor {
 				.mouseDownAction_({ |tf|
 					tf.stringColor_(Color.red)
 				})
-				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+				.keyUpAction_({ |tf, char, modifiers, unicode, keycode|
 					if(unicode == 13, {
 						tf.stringColor_(Color.black);
 					})
 				}) 
-				.keyUpAction_({ |tf, char, modifiers, unicode, keycode|
-					[tf, char, modifiers, unicode, keycode].postln;
-				})
 			;
 			
 			flow1.shift(0, 0);
@@ -353,8 +350,7 @@ CVWidgetEditor {
 				.mouseDownAction_({ |tf|
 					tf.stringColor_(Color.red)
 				})
-				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
-//					[tf, char, modifiers, unicode, keycode].postln;
+				.keyUpAction_({ |tf, char, modifiers, unicode, keycode|
 					if(unicode == 13, {
 						tf.stringColor_(Color.black);
 					})

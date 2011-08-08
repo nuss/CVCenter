@@ -1,12 +1,13 @@
 
 CVWidget {
-	
+
+	var <widgetCV;
 	var prMidiMode/* = 0*/, prMidiMean/* = 64*/, prCtrlButtonBank, prMidiResolution/* = 1*/, prSoftWithin/* = 0.1*/;
 	var prCalibrate/* = true*/, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
 	var <widgetBg, <label, <nameField, <wdgtInfo; // elements contained in any kind of CVWidget
-	var <visible, widgetXY, widgetProps;
-	var <wdgtControllersAndModels;
+	var <visible, widgetXY, widgetProps, <editor;
+	var <wdgtControllersAndModels, <midiOscEnv;
 
 	setup {
 		^[prMidiMode, prMidiResolution, prMidiMean, prCtrlButtonBank, prSoftWithin, prCalibrate];
@@ -282,6 +283,261 @@ CVWidget {
 		)
 	}
 	
+	setCalibrate { |bool, key|
+		if(bool.isKindOf(Boolean).not, {
+			Error("calibration can only be set to true or false!").throw;
+		});
+		switch(this.class, 
+			CVWidgetKnob, {
+				prCalibrate = bool;
+				wdgtControllersAndModels.oscConnection.model.value_(
+					wdgtControllersAndModels.oscConnection.model.value
+				).changed(\value);
+				wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
+			},
+			{
+				prCalibrate[key] = bool;
+				wdgtControllersAndModels[key].oscConnection.model.value_(
+					wdgtControllersAndModels[key].oscConnection.model.value
+				).changed(\value);
+				wdgtControllersAndModels[key].calibration.model.value_(bool).changed(\value);
+			}
+		)
+	}
+	
+	getCalibrate { |key|
+		switch(this.class,
+			CVWidgetKnob, {
+				^prCalibrate;
+			},
+			{ ^prCalibrate[key] }
+		)
+	}
+	
+	setSpec { |spec, key|
+		switch(this.class,
+			CVWidgetKnob, {
+				if(spec.isKindOf(ControlSpec).not, {
+					Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
+				});
+				wdgtControllersAndModels.cvSpec.model.value_(spec).changed(\value);
+			},
+			{
+				if(spec.isKindOf(ControlSpec), {
+					wdgtControllersAndModels[key].cvSpec.model.value_(spec).changed(\value);
+				}, {
+					Error("Please provide a valid ControlSpec!").throw;
+				});
+			}
+		)
+	}
+	
+	getSpec { |key|
+		switch(this.class,
+			CVWidgetKnob, {
+				^widgetCV.spec;
+			},
+			{
+				^widgetCV[key].spec;
+			}
+		)
+	}
+	
+	setOscMapping { |mapping, key|
+		if(mapping.asSymbol !== \linlin and:{
+			mapping.asSymbol !== \linexp and:{
+				mapping.asSymbol !== \explin and:{
+					mapping.asSymbol !== \expexp
+				}
+			}
+		}, {
+			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
+		});
+		switch(this.class,
+			CVWidgetKnob, {
+				midiOscEnv.oscMapping = mapping.asSymbol;
+				wdgtControllersAndModels.oscInputRange.model.value_(
+					wdgtControllersAndModels.oscInputRange.model.value;
+				).changed(\value);
+				wdgtControllersAndModels.cvSpec.model.value_(
+					wdgtControllersAndModels.cvSpec.model.value;
+				).changed(\value);
+			},
+			{	
+				midiOscEnv[key].oscMapping = mapping.asSymbol;
+				wdgtControllersAndModels[key].oscInputRange.model.value_(
+					wdgtControllersAndModels[key].oscInputRange.model.value;
+				).changed(\value);
+				wdgtControllersAndModels[key].cvSpec.model.value_(
+					wdgtControllersAndModels[key].cvSpec.model.value;
+				).changed(\value);
+			}
+		)
+	}
+	
+	getOscMapping { |key|
+		switch(this.class, 
+			CVWidgetKnob, {
+				^midiOscEnv.oscMapping;
+			},
+			{
+				^midiOscEnv[key].oscMapping
+			}
+		)
+	}
+	
+	oscConnect { |ip, port, name, oscMsgIndex, key|
+		var intPort;
+		
+		if(ip.size > 0 and:{ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not }, {
+			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
+		});
+		
+		if(port.size > 0, {
+			if("^[0-9]{1,5}$".matchRegexp(port).not and:{ port != "nil" }, {
+				Error("Please provide a valid port or leave this field empty").throw;
+			}, {
+				intPort = port.asInt;
+			})
+		});
+		
+		if(port == "nil", { intPort = nil });
+		
+		if("^\/".matchRegexp(name.asString).not, {
+			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as first argument to oscConnect").throw;
+		});
+		
+		if(oscMsgIndex.isKindOf(Integer).not, {
+			Error("You have to supply an integer as second argument to oscConnect").throw;
+		});
+		
+		switch(this.class,
+			CVWidgetKnob, {
+				wdgtControllersAndModels.oscConnection.model.value_([ip, intPort, name, oscMsgIndex]).changed(\value);
+				CmdPeriod.add({ this.oscDisconnect });
+			},
+			{
+				wdgtControllersAndModels[key].oscConnection.model.value_([ip, intPort, name, oscMsgIndex]).changed(\value);
+				CmdPeriod.add({ this.oscDisconnect(key) });
+			}
+		)
+	}
+	
+	oscDisconnect { |key|
+		if(this.isClosed.not, {
+			switch(this.class, 
+				CVWidgetKnob, {
+					wdgtControllersAndModels.oscConnection.model.value_(false).changed(\value);
+					wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
+				},
+				{
+					wdgtControllersAndModels[key].oscConnection.model.value_(false).changed(\value);
+					wdgtControllersAndModels[key].oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
+				}
+			)
+		}, {
+			switch(this.class,
+				CVWidgetKnob, {
+					midiOscEnv.oscResponder.remove;
+				},
+				{
+					midiOscEnv[key].oscResponder.remove;
+				}
+			)
+		});
+		switch(this.class,
+			CVWidgetKnob, {
+				CmdPeriod.remove({ this.oscDisconnect });
+			}, 
+			{
+				CmdPeriod.remove({ this.oscDisconnect(key) });
+			}
+		)
+	}
+	
+	// if all arguments are nil .learn should be triggered
+	midiConnect { |uid, chan, num, key|
+		switch(this.class,
+			CVWidgetKnob, {
+				if(midiOscEnv.cc.isNil, {
+					wdgtControllersAndModels.midiConnection.model.value_(
+						(src: uid, chan: chan, num: num)
+					).changed(\value);
+					CmdPeriod.add({ this !? { this.midiDisconnect } });
+				}, {
+					"Already connected!".warn;	
+				})
+			},
+			{
+				[key, midiOscEnv[key]].postln;
+				if(midiOscEnv[key].cc.isNil, {
+					wdgtControllersAndModels[key].midiConnection.model.value_(
+						(src: uid, chan: chan, num: num)
+					).changed(\value);
+					CmdPeriod.add({ this !? { this.midiDisconnect(key) } });
+				}, {
+					"Already connected!".warn;	
+				})
+			}
+		)
+	}
+	
+	midiDisconnect { |key|
+		switch(this.class,
+			CVWidgetKnob, {
+				if(this.isClosed.not, {
+					wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
+				}, {
+					midiOscEnv.cc.remove;
+				});
+				CmdPeriod.remove({ this.midiDisconnect });
+			}, 
+			{
+				if(this.isClosed.not, {
+					wdgtControllersAndModels[key].midiConnection.model.value_(nil).changed(\value);
+				}, {
+					midiOscEnv[key].cc.remove;
+				});
+				CmdPeriod.remove({ this.midiDisconnect(key) });
+			}
+		)		
+	}
+	
+	setOscInputConstraints { |constraintsHiLo, key|
+		if(constraintsHiLo.isKindOf(Point).not, {
+			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
+		}, {
+			this.setCalibrate(false, key);
+			switch(this.class,
+				CVWidgetKnob, {
+					midiOscEnv.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
+					if(editor.notNil and:{ editor.isClosed.not }, {
+						wdgtControllersAndModels.mapConstrainterLo.value_(constraintsHiLo.x);
+						wdgtControllersAndModels.mapConstrainterHi.value_(constraintsHiLo.y);
+					})
+				},
+				{
+					midiOscEnv[key].calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
+					if(editor[key].notNil and:{ editor[key].isClosed.not }, {
+						wdgtControllersAndModels[key].mapConstrainterLo.value_(constraintsHiLo.x);
+						wdgtControllersAndModels[key].mapConstrainterHi.value_(constraintsHiLo.y);
+					})
+				}
+			)
+		})
+	}
+	
+	getOscInputConstraints { |key|
+		switch(this.class,
+			CVWidgetKnob, {
+				^[midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi];
+			},
+			{
+				^[midiOscEnv[key].calibConstraints.lo, midiOscEnv[key].calibConstraints.hi];
+			}
+	}
+		
+		
 	front {
 		this.window.front;
 	}
@@ -446,8 +702,8 @@ CVWidget {
 						[thisGuiEnv.editor.calibNumBoxes.lo, thisGuiEnv.editor.calibNumBoxes.hi].do({ |nb| 
 							nb.enabled_(true);
 							nb.action_({ |b| 
-								this.oscInputConstraints_(
-									thisGuiEnv.editor.calibNumBoxes.lo.value@thisGuiEnv.editor.calibNumBoxes.hi.value;
+								this.setOscInputConstraints(
+									thisGuiEnv.editor.calibNumBoxes.lo.value@thisGuiEnv.editor.calibNumBoxes.hi.value, key
 								) 
 							})
 						})
@@ -455,13 +711,6 @@ CVWidget {
 				}
 			)
 		});
-
-//		this.calibBut.action_({ |cb|
-//			cb.value.switch(
-//				0, { wcm.calibration.model.value_(true).changed(\value) },
-//				1, { wcm.calibration.model.value_(false).changed(\value) }
-//			)
-//		});
 
 		wcm.cvSpec.controller ?? {
 			wcm.cvSpec.controller = SimpleController(wcm.cvSpec.model);
@@ -510,15 +759,18 @@ CVWidget {
 			});
 			
 			widgetCV.spec_(theChanger.value);
-			block { |break|
-				#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
-					if(widgetCV.spec == symbol.asSpec, { 
-						break.value(thisGuiEnv.knob.centered_(true));
-					}, {
-						thisGuiEnv.knob.centered_(false);
-					})			
-				})
-			}
+			
+			if(this.class === CVWidgetKnob, {
+				block { |break|
+					#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+						if(widgetCV.spec == symbol.asSpec, { 
+							break.value(thisGuiEnv.knob.centered_(true));
+						}, {
+							thisGuiEnv.knob.centered_(false);
+						})			
+					})
+				}
+			})
 		});
 		
 		wcm.oscInputRange.controller ?? {
@@ -558,19 +810,19 @@ CVWidget {
 					if(thisGuiEnv.editor.notNil and:{
 						thisGuiEnv.editor.isClosed.not	
 					}, {
-							thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-								if(item.asSymbol === midiOscEnv.oscMapping, {
-									thisGuiEnv.editor.mappingSelect.value_(i)
-								})
-							});
-							if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
-								thisGuiEnv.oscEditBut.states_([[
-									thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
-									thisGuiEnv.oscEditBut.states[0][1],
-									thisGuiEnv.oscEditBut.states[0][2]
-								]]);
-								thisGuiEnv.oscEditBut.refresh;
+						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
+							if(item.asSymbol === midiOscEnv.oscMapping, {
+								thisGuiEnv.editor.mappingSelect.value_(i)
 							})
+						});
+						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
+							thisGuiEnv.oscEditBut.states_([[
+								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
+								thisGuiEnv.oscEditBut.states[0][1],
+								thisGuiEnv.oscEditBut.states[0][2]
+							]]);
+							thisGuiEnv.oscEditBut.refresh;
+						})
 					})
 				}.defer
 			})
@@ -585,28 +837,28 @@ CVWidget {
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
 					ctrlString ? ctrlString = num+1;
-					if(this.ctrlButtonBank.notNil, {
-						if(ctrlString%this.ctrlButtonBank == 0, {
-							ctrlString = this.ctrlButtonBank.asString;
+					if(this.getCtrlButtonBank(key).notNil, {
+						if(ctrlString%this.getCtrlButtonBank == 0, {
+							ctrlString = this.getCtrlButtonBank(key).asString;
 						}, {
-							ctrlString = (ctrlString%this.ctrlButtonBank).asString;
+							ctrlString = (ctrlString%this.getCtrlButtonBank(key)).asString;
 						});
-						ctrlString = ((num+1/this.ctrlButtonBank).ceil).asString++":"++ctrlString;
+						ctrlString = ((num+1/this.getCtrlButtonBank(key)).ceil).asString++":"++ctrlString;
 					}, {
 						ctrlString = num+1;
 					});
 
-					this.midiMode.switch(
+					this.getMidiMode(key).switch(
 						0, { 
-							if(val/127 < (widgetCV.input+(prSoftWithin/2)) and: {
-								val/127 > (widgetCV.input-(prSoftWithin/2));
+							if(val/127 < (widgetCV.input+(this.getSoftWithin(key)/2)) and: {
+								val/127 > (widgetCV.input-(this.getSoftWithin(key)/2));
 							}, { 
 								widgetCV.input_(val/127);
 							})
 						},
 						1, { 
-							meanVal = this.getMidiMean;
-							widgetCV.input_(widgetCV.input+((val-meanVal)/127*this.midiResolution)) 
+							meanVal = this.getMidiMean(key);
+							widgetCV.input_(widgetCV.input+((val-meanVal)/127*this.getMidiResolution(key))) 
 						}
 					);
 					src !? { midiOscEnv.midisrc = src };
@@ -684,9 +936,8 @@ CVWidget {
 							.stringColor_(Color.white)
 							.canFocus_(false)
 						;
-						thisGuiEnv.midiLearn.value_(1)
-					};
-					defer {
+						thisGuiEnv.midiLearn.value_(1);
+
 						if(thisGuiEnv.editor.notNil and:{
 							thisGuiEnv.editor.isClosed.not
 						}, {
@@ -745,8 +996,7 @@ CVWidget {
 							["X", Color.white, Color.red]
 						])
 						.value_(0).refresh;
-					};
-					defer {
+
 						if(thisGuiEnv.editor.notNil and:{
 							thisGuiEnv.editor.isClosed.not
 						}, {
@@ -769,7 +1019,7 @@ CVWidget {
 								["L", Color.white, Color.blue],
 								["X", Color.white, Color.red]
 							])
-							.value_(0)
+							.value_(0);
 						})
 					}
 				}
@@ -802,7 +1052,7 @@ CVWidget {
 				Event, { thisCalib = prCalibrate[key] },
 				thisCalib = prCalibrate
 			);
-			
+						
 			if(theChanger.value.size == 4, {
 				oscResponderAction = { |t, r, msg|
 					if(thisCalib, { 
@@ -884,7 +1134,6 @@ CVWidget {
 						editEnabled: true
 					)
 				).changed(\value);
-
 			})
 		});
 		
@@ -893,11 +1142,11 @@ CVWidget {
 		};
 		
 		wcm.oscDisplay.controller.put(\value, { |theChanger, what, moreArgs|
+			theChanger.value;
 			switch(prCalibrate.class, 
 				Event, { thisCalib = prCalibrate[key] },
-				thisCalib = prCalibrate
+				{ thisCalib = prCalibrate }
 			);
-//			("OSC-display calibration:"+thisCalib).postln;
 			thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
 			defer {
 				if(thisGuiEnv.editor.notNil and:{

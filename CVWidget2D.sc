@@ -1,10 +1,7 @@
 CVWidget2D : CVWidget {
-	var <widgetCV;
-	var <window, <guiEnv, <midiOscEnv, <editorEnv;
+	var <window, <guiEnv, <editorEnv;
 	var <slider2d, <rangeSlider, <numVal, <specBut;
-	var <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <editor;
-	var prSpec;
-	var calibConstraintsHi, calibConstraintsLo;
+	var <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut;
 
 	*new { |parent, cvs, name, bounds, actions, setup, controllersAndModels, cvcGui, server|
 		^super.newCopyArgs.init(
@@ -33,8 +30,6 @@ CVWidget2D : CVWidget {
 		prSoftWithin = (lo: 0.1, hi: 0.1);
 		prCtrlButtonBank = ();
 		
-		prCtrlButtonBank.postln;
-
 		guiEnv = (lo: (), hi: ());
 		editorEnv = ();
 
@@ -80,10 +75,10 @@ CVWidget2D : CVWidget {
 			setUpArgs[0] !? { setUpArgs[0][key] !? { this.setMidiMode(setUpArgs[0], key) }};
 			setUpArgs[1] !? { setUpArgs[1][key] !? { this.midiResolution_(setUpArgs[1], key) }};
 			setUpArgs[2] !? { setUpArgs[2][key] !? { this.setMidiMean(setUpArgs[2], key) }};
-			setUpArgs[4] !? { setUpArgs[4][key] !? { this.setCtrlButtonBank_(setUpArgs[4], key) }};
-			setUpArgs[5] !? { setUpArgs[5][key] !? { this.setSoftWithin(setUpArgs[5], key) }};
+			setUpArgs[3] !? { setUpArgs[3][key] !? { this.setCtrlButtonBank_(setUpArgs[3], key) }};
+			setUpArgs[4] !? { setUpArgs[5][key] !? { this.setSoftWithin(setUpArgs[4], key) }};
+			setUpArgs[5] !? { setUpArgs[5][key] !? { this.setCalibrate(setUpArgs[5], key) }};
 		});
-		setUpArgs[6] !? { prCalibrate = (lo: setUpArgs[6], hi: setUpArgs[6]) };
 		
 						
 		actions !? {
@@ -128,7 +123,7 @@ CVWidget2D : CVWidget {
 							})
 						})
 					});
-					midiOscEnv[hilo].oscResponder !? { midiOscEnv[hilo].oscResponder.remove.postln };
+					midiOscEnv[hilo].oscResponder !? { midiOscEnv[hilo].oscResponder.remove };
 					midiOscEnv[hilo].cc !? { midiOscEnv[hilo].cc.remove };
 					wdgtControllersAndModels[hilo].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 				})
@@ -300,9 +295,9 @@ CVWidget2D : CVWidget {
 							[midiCtrl[v[0]].string, mctrl]
 						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
-							this.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], hilo: v[0]);
+							this.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], key: v[0]);
 						}, {
-							this.midiConnect(hilo: v[0]);
+							this.midiConnect(key: v[0]);
 						})
 					},
 					0, { this.midiDisconnect(v[0]) }
@@ -368,8 +363,6 @@ CVWidget2D : CVWidget {
 			}) 
 		});
 
-//		nextY = nextY+12;
-
 		[midiCtrl.hi, [\hi, nextY], midiCtrl.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(thisXY.x+rightBarX+15, v[1], 25, 13))
 			.font_(Font("Helvetica", 8.5))
@@ -427,7 +420,6 @@ CVWidget2D : CVWidget {
 		calibBut.hi = Button(window);
 		
 		[oscEditBut.lo, [\lo, thisXY.x+1], oscEditBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
-//			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, thisHeight-(label.bounds.top+label.bounds.height+slider2d.bounds.height+rangeSlider.bounds.height+numVal.lo.bounds.height+15)))
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, oscEditButHeight))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
@@ -435,7 +427,6 @@ CVWidget2D : CVWidget {
 				["edit OSC", Color.black, Color.clear]
 			])
 			.action_({ |oscb|
-				("opening editor:"+thisName).postln;
 				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {
 					editor.put(v[0], CVWidgetEditor(this, thisName, 2, v[0]));
 					guiEnv[v[0]].editor = editor[v[0]];
@@ -467,15 +458,12 @@ CVWidget2D : CVWidget {
 			])
 			.action_({ |cb|
 				switch(cb.value,
-					0, { cb.value.postln; this.setCalibrate(true, v[0]) },
-					1, { cb.value.postln; this.setCalibrate(false, v[0]) }
+					0, { this.setCalibrate(true, v[0]) },
+					1, { this.setCalibrate(false, v[0]) }
 				)
 			})
 		});
-		
-//		prCCResponderAdd(widgetCV.hi, midiLearn.hi, midiSrc.hi, midiChan.hi, midiCtrl.hi, midiHead.hi, \hi);
-//		prCCResponderAdd(widgetCV.lo, midiLearn.lo, midiSrc.lo, midiChan.lo, this.midiCtrl.lo, midiHead.lo, \lo);
-		
+				
 		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
 		widgetCV.lo.connect(numVal.lo);
 		widgetCV.hi.connect(numVal.hi);
@@ -527,129 +515,4 @@ CVWidget2D : CVWidget {
 		this.initControllerActions(\hi);
 	}
 	
-	setCalibrate { |bool, hilo|
-		hilo ?? {
-			Error("CVWidget2D: no key for calibration provided!").throw;
-		};
-		if(bool.isKindOf(Boolean).not, {
-			Error("calibration can only be set to true or false!").throw;
-		});
-		prCalibrate[hilo] = bool;
-		wdgtControllersAndModels[hilo].oscConnection.model.value_(wdgtControllersAndModels[hilo].oscConnection.model.value).changed(\value);
-		wdgtControllersAndModels[hilo].calibration.model.value_(bool).changed(\value);
-	}
-	
-	getCalibrate { |hilo|
-		^prCalibrate[hilo];
-	}
-	
-	setSpec { |spec, hilo|
-		if(hilo.isNil or:{ [\hi, \lo].includes(hilo).not }, {
-			Error("In order to set the inbuilt spec you must provide either \lo or \hi, indicating which spec shall be set").throw;
-		});
-		if(spec.isKindOf(ControlSpec), {
-			widgetCV[hilo].spec_(spec);
-		}, {
-			Error("Please provide a valid ControlSpec!").throw;
-		})
-	}
-	
-	getSpec { |hilo|
-		^widgetCV[hilo].spec;
-	}
-	
-	setOscMapping { |mapping, hilo|
-		if(hilo.isNil or:{ [\hi, \lo].includes(hilo).not }, {
-			Error("In order to set the OSC=mapping you must provide either \lo or \hi, indicating which OSC-mapping shall be set").throw;
-		});
-		if(mapping.asSymbol !== \linlin and:{
-			mapping.asSymbol !== \linexp and:{
-				mapping.asSymbol !== \explin and:{
-					mapping.asSymbol !== \expexp
-				}
-			}
-		}, {
-			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
-		}, {
-			midiOscEnv[hilo].oscMapping = mapping.asSymbol;
-			wdgtControllersAndModels[hilo].oscInputRange.model.value_(
-				wdgtControllersAndModels[hilo].oscInputRange.model.value;
-			).changed(\value);
-			wdgtControllersAndModels[hilo].cvSpec.model.value_(
-				wdgtControllersAndModels[hilo].cvSpec.model.value;
-			).changed(\value);
-		})
-	}
-	
-	getOscMapping { |hilo|
-		^midiOscEnv[hilo].oscMapping;
-	}
-		
-	oscConnect { |ip, port, name, oscMsgIndex, hilo|
-		var intPort;
-		hilo ?? { Error("Please provide the CV's key \('hi' or 'lo'\)!").throw };
-		if(ip.size > 0 and:{ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not }, {
-			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
-		});
-		
-		if(port.size > 0, {
-			if("^[0-9]{1,5}$".matchRegexp(port).not and:{ port != "nil" }, {
-				Error("Please provide a valid port or leave this field empty").throw;
-			}, {
-				intPort = port.asInt;
-			})
-		});
-		
-		if(port == "nil", { intPort = nil });
-		
-		if("^\/".matchRegexp(name.asString).not, {
-			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as first argument to oscConnect").throw;
-		});
-		
-		if(oscMsgIndex.isKindOf(Integer).not, {
-			Error("You have to supply an integer as second argument to oscConnect").throw;
-		});
-
-		wdgtControllersAndModels[hilo].oscConnection.model.value_([ip, intPort, name, oscMsgIndex]).changed(\value);
-		CmdPeriod.add({ this.oscDisconnect(hilo) });
-	}
-	
-	oscDisconnect { |hilo|
-		hilo ?? { Error("Please provide the CV's key \(\hi or \lo\)!").throw };
-		if(this.isClosed.not, {
-			wdgtControllersAndModels[hilo].oscConnection.model.value_(false).changed(\value);
-			wdgtControllersAndModels[hilo].oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
-		}, {
-			midiOscEnv[hilo].oscResponder.remove;
-		});
-		CmdPeriod.remove({ this.oscDisconnect(hilo) });
-	}
-	
-	// if all arguments are nil .learn should be triggered
-	midiConnect { |uid, chan, num, hilo|
-		var args;
-		[uid, chan, num, hilo].postln;
-		[midiOscEnv, midiOscEnv[hilo], hilo].postln;
-		if(midiOscEnv[hilo].cc.isNil, {
-			args = [uid, chan, num].select({ |param| param.notNil }).collect({ |param| param.asInt });
-			wdgtControllersAndModels[hilo].midiConnection.model.value_(
-				(src: uid, chan: chan, num: num)
-			).changed(\value);
-			CmdPeriod.add({ this !? { this.midiDisconnect(hilo) } });
-		}, {
-			"Already connected!".warn;	
-		})
-	}
-	
-	midiDisconnect { |hilo|
-		midiOscEnv[hilo].cc.notNil !? {
-			if(this.isClosed.not, {
-				wdgtControllersAndModels[hilo].midiConnection.model.value_(nil).changed(\value);
-			}, {
-				midiOscEnv[hilo].cc.remove;
-			})		
-		};
-		CmdPeriod.remove({ this.midiDisconnect(hilo) });
-	}
-		
 }

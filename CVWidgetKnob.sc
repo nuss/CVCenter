@@ -2,11 +2,8 @@
 
 CVWidgetKnob : CVWidget {
 	
-	var <widgetCV;
-	var <window, <guiEnv, <midiOscEnv, <editorEnv;
-	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <editor;
-	var prSpec;
-	var returnedFromActions;
+	var <window, <guiEnv, <editorEnv;
+	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut;
 
 	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
 		^super.new.init(
@@ -91,7 +88,7 @@ CVWidgetKnob : CVWidget {
 						})
 					})
 				});
-				midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove.postln };
+				midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove };
 				midiOscEnv.cc !? { midiOscEnv.cc.remove };
 				wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 			})
@@ -318,10 +315,9 @@ CVWidgetKnob : CVWidget {
 				["calibrate", Color.black, Color.green]
 			])
 			.action_({ |cb|
-				("calibrate button action triggered:"+cb.value).postln;
 				switch(cb.value,
-					0, { cb.value.postln; this.setCalibrate(true) },
-					1, { cb.value.postln; this.setCalibrate(false) }
+					0, { this.setCalibrate(true) },
+					1, { this.setCalibrate(false) }
 				)
 			})
 		;
@@ -369,136 +365,7 @@ CVWidgetKnob : CVWidget {
 
 		this.initControllerActions;
 	}
-	
-	setCalibrate { |bool|
-		if(bool.isKindOf(Boolean).not, {
-			Error("calibration can only be set to true or false!").throw;
-		});
-		prCalibrate = bool;
-		wdgtControllersAndModels.oscConnection.model.value_(wdgtControllersAndModels.oscConnection.model.value).changed(\value);
-		wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
-	}
-	
-	getCalibrate { 
-		^prCalibrate;
-	}
-	
-	setSpec { |spec|
-		if(spec.isKindOf(ControlSpec).not, {
-			Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
-		});
-		wdgtControllersAndModels.cvSpec.model.value_(spec).changed(\value);
-	}
-	
-	getSpec {
-		^widgetCV.spec;
-	}
-	
-	setOscMapping { |mapping|
-		if(mapping.asSymbol !== \linlin and:{
-			mapping.asSymbol !== \linexp and:{
-				mapping.asSymbol !== \explin and:{
-					mapping.asSymbol !== \expexp
-				}
-			}
-		}, {
-			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
-		}, {
-			midiOscEnv.oscMapping = mapping.asSymbol;
-			wdgtControllersAndModels.oscInputRange.model.value_(
-				wdgtControllersAndModels.oscInputRange.model.value;
-			).changed(\value);
-			wdgtControllersAndModels.cvSpec.model.value_(
-				wdgtControllersAndModels.cvSpec.model.value;
-			).changed(\value);
-		})
-	}
-	
-	getOscMapping {
-		^midiOscEnv.oscMapping;
-	}
-	
-	oscInputConstraints_ { |constraintsHiLo|
-		if(constraintsHiLo.isKindOf(Point).not, {
-			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
-		}, {
-			this.setCalibrate(false);
-			midiOscEnv.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
-			if(editor.notNil and:{ editor.isClosed.not }, {
-				wdgtControllersAndModels.mapConstrainterLo.value_(constraintsHiLo.x);
-				wdgtControllersAndModels.mapConstrainterHi.value_(constraintsHiLo.y);
-			})
-		})
-	}
-	
-	oscInputConstraints {
-		^[midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi];
-	}
-	
-	oscConnect { |ip, port, name, oscMsgIndex|
-		var intPort;
-		[ip, port, name, oscMsgIndex].postln;
-		if(ip.size > 0 and:{ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not }, {
-			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
-		});
 		
-		if(port.size > 0, {
-			if("^[0-9]{1,5}$".matchRegexp(port).not and:{ port != "nil" }, {
-				Error("Please provide a valid port or leave this field empty").throw;
-			}, {
-				intPort = port.asInt;
-			})
-		});
-		
-		if(port == "nil", { intPort = nil });
-		 
-		if("^\/".matchRegexp(name.asString).not, {
-			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as first argument to oscConnect").throw;
-		});
-		
-		if(oscMsgIndex.isKindOf(Integer).not, {
-			Error("You have to supply an integer as second argument to oscConnect").throw;
-		});
-
-		wdgtControllersAndModels.oscConnection.model.value_([ip, intPort, name, oscMsgIndex]).changed(\value);
-		CmdPeriod.add({ this.oscDisconnect });
-	}
-	
-	oscDisconnect {
-		if(this.isClosed.not, {
-			wdgtControllersAndModels.oscConnection.model.value_(false).changed(\value);
-			wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
-		}, {
-			midiOscEnv.oscResponder.remove;
-		});
-		CmdPeriod.remove({ this.oscDisconnect });
-	}
-	
-	// if all arguments are nil .learn should be triggered
-	midiConnect { |uid, chan, num|
-		var args;
-		if(midiOscEnv.cc.isNil, {
-			args = [uid, chan, num].select({ |param| param.notNil }).collect({ |param| param.asInt });
-			wdgtControllersAndModels.midiConnection.model.value_(
-				(src: uid, chan: chan, num: num)
-			).changed(\value);
-			CmdPeriod.add({ this !? { this.midiDisconnect } });
-		}, {
-			"Already connected!".warn;	
-		})
-	}
-	
-	midiDisconnect { 
-		midiOscEnv.cc.notNil !? {
-			if(this.isClosed.not, {
-				wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
-			}, {
-				midiOscEnv.cc.remove;
-			})		
-		};
-		CmdPeriod.remove({ this.midiDisconnect });
-	}
-	
 	cvAction_ { |func|
 		widgetCV.action_(func);
 	}
