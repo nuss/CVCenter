@@ -27,7 +27,11 @@ CVWidgetKnob : CVWidget {
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
 		
-		prCalibrate ? prCalibrate = true;
+		prCalibrate = true;
+		prMidiMode = 0;
+		prMidiMean = 64;
+		prMidiResolution = 1;
+		prSoftWithin = 0.1;
 						
 		guiEnv = ();
 		editorEnv = ();
@@ -49,16 +53,16 @@ CVWidgetKnob : CVWidget {
 
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
-		setUpArgs[0] !? { this.midiMode_(setUpArgs[0]) };
+		setUpArgs[0] !? { this.setMidiMode(setUpArgs[0]) };
 		setUpArgs[1] !? { this.midiResolution_(setUpArgs[1]) };
-		setUpArgs[2] !? { this.midiMean_(setUpArgs[2]) };
+		setUpArgs[2] !? { this.setMidiMean(setUpArgs[2]) };
 		setUpArgs[3] !? { this.ctrlButtonBank_(setUpArgs[3]) };
 		setUpArgs[4] !? { this.softWithin_(setUpArgs[4]) };
 		setUpArgs[5] !? { this.setCalibrate(setUpArgs[5]) };
 						
 		action !? { widgetCV.action_(action) };
 		
-		if(bounds.isNil, {		
+		if(bounds.isNil, {
 			thisXY = 7@0;
 			thisWidth = 52;
 			thisHeight = 166;

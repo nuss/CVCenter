@@ -1,7 +1,7 @@
 
 CVWidget {
 	
-	var prMidiMode = 0, prMidiMean = 64, prCtrlButtonBank, prMidiResolution = 1, prSoftWithin = 0.1;
+	var prMidiMode/* = 0*/, prMidiMean/* = 64*/, prCtrlButtonBank, prMidiResolution/* = 1*/, prSoftWithin/* = 0.1*/;
 	var prCalibrate/* = true*/, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
 	var <widgetBg, <label, <nameField, <wdgtInfo; // elements contained in any kind of CVWidget
@@ -75,99 +75,211 @@ CVWidget {
 		allGuiEls.do(_.remove);
 	}
 	
-	midiMode_ { |mode|
-		prMidiMode = mode;
-		wdgtControllersAndModels !? {
-			wdgtControllersAndModels.midiOptions.model.value_(
-				(
-					midiMode: prMidiMode,
-					midiMean: prMidiMean,
-					ctrlButtonBank: prCtrlButtonBank,
-					midiResolution: prMidiResolution,
-					softWithin: prSoftWithin
-				)
-			).changed(\value);
-		}
+	setMidiMode { |mode, key|
+		switch(this.class,
+			CVWidgetKnob, {
+				wdgtControllersAndModels !? {
+					wdgtControllersAndModels.midiOptions.model.value_(
+						(
+							midiMode: prMidiMode,
+							midiMean: prMidiMean,
+							ctrlButtonBank: prCtrlButtonBank,
+							midiResolution: prMidiResolution,
+							softWithin: prSoftWithin
+						)
+					).changed(\value);
+				}
+			},
+			{
+				prMidiMode[key] = mode;
+				wdgtControllersAndModels[key] !? {
+					wdgtControllersAndModels[key].midiOptions.model.value_(
+						(
+							midiMode: prMidiMode[key],
+							midiMean: prMidiMean[key],
+							ctrlButtonBank: prCtrlButtonBank[key],
+							midiResolution: prMidiResolution[key],
+							softWithin: prSoftWithin[key]
+						)
+					).changed(\value);
+				}
+			}
+		)
 	}
 	
-	midiMode {
-		^prMidiMode;	
+	getMidiMode { |key|
+		switch(this.class,
+			CVWidgetKnob, {
+				^prMidiMode;
+			},
+			{ ^prMidiMode[key] }
+		)
 	}
 	
-	midiMean_ { |meanval|
-		prMidiMean = meanval;
-		wdgtControllersAndModels !? {
-			wdgtControllersAndModels.midiOptions.model.value_(
-				(
-					midiMode: prMidiMode,
-					midiMean: prMidiMean,
-					ctrlButtonBank: prCtrlButtonBank,
-					midiResolution: prMidiResolution,
-					softWithin: prSoftWithin
-				)
-			).changed(\value);
-		}
+	setMidiMean { |meanval, key|
+		switch(this.class, 
+			CVWidgetKnob, {
+				prMidiMean = meanval;
+				wdgtControllersAndModels !? {
+					wdgtControllersAndModels.midiOptions.model.value_(
+						(
+							midiMode: prMidiMode,
+							midiMean: prMidiMean,
+							ctrlButtonBank: prCtrlButtonBank,
+							midiResolution: prMidiResolution,
+							softWithin: prSoftWithin
+						)
+					).changed(\value);
+				}
+			},
+			prMidiMean[key] = meanval;
+			wdgtControllersAndModels[key] !? {
+				wdgtControllersAndModels[key].midiOptions.model.value_(
+					(
+						midiMode: prMidiMode[key],
+						midiMean: prMidiMean[key],
+						ctrlButtonBank: prCtrlButtonBank[key],
+						midiResolution: prMidiResolution[key],
+						softWithin: prSoftWithin[key]
+					)
+				).changed(\value);
+			}			
+		)
 	}
 	
-	midiMean	{
-		^prMidiMean;	
+	getMidiMean { |key|
+		switch(this.class,
+			CVWidgetKnob, {
+				^prMidiMean;
+			},
+			{ ^prMidiMean[key] }
+		)
 	}
 	
-	softWithin_ { |threshold|
-		prSoftWithin = threshold;
-		wdgtControllersAndModels !? {
-			wdgtControllersAndModels.midiOptions.model.value_(
-				(
-					midiMode: prMidiMode,
-					midiMean: prMidiMean,
-					ctrlButtonBank: prCtrlButtonBank,
-					midiResolution: prMidiResolution,
-					softWithin: prSoftWithin
-				)
-			).changed(\value);
-		}
+	setSoftWithin { |threshold, key|
+		switch(this.class, 
+			CVWidgetKnob, {
+				prSoftWithin = threshold;
+				wdgtControllersAndModels !? {
+					wdgtControllersAndModels.midiOptions.model.value_(
+						(
+							midiMode: prMidiMode,
+							midiMean: prMidiMean,
+							ctrlButtonBank: prCtrlButtonBank,
+							midiResolution: prMidiResolution,
+							softWithin: prSoftWithin
+						)
+					).changed(\value);
+				}
+			},
+			{
+				prSoftWithin[key] = threshold;
+				wdgtControllersAndModels[key] !? {
+					wdgtControllersAndModels[key].midiOptions.model.value_(
+						(
+							midiMode: prMidiMode[key],
+							midiMean: prMidiMean[key],
+							ctrlButtonBank: prCtrlButtonBank[key],
+							midiResolution: prMidiResolution[key],
+							softWithin: prSoftWithin[key]
+						)
+					).changed(\value);
+				}
+			}
+		)	
 	}
 	
-	softWithin {
-		^prSoftWithin;
+	getSoftWithin { |key|
+		switch(this.class,
+			CVWidgetKnob, {
+				^prSoftWithin;
+			},
+			{ ^prSoftWithin[key] }
+		)
 	}
 	
-	ctrlButtonBank_ { |numSliders|
-		prCtrlButtonBank = numSliders;
-		wdgtControllersAndModels !? {
-			wdgtControllersAndModels.midiOptions.model.value_(
-				(
-					midiMode: prMidiMode,
-					midiMean: prMidiMean,
-					ctrlButtonBank: prCtrlButtonBank,
-					midiResolution: prMidiResolution,
-					softWithin: prSoftWithin
-				)
-			).changed(\value);
-		}
+	setCtrlButtonBank { |numSliders, key|
+		switch(this.class, 
+			CVWidgetKnob, {
+				prCtrlButtonBank = numSliders;
+				wdgtControllersAndModels !? {
+					wdgtControllersAndModels.midiOptions.model.value_(
+						(
+							midiMode: prMidiMode,
+							midiMean: prMidiMean,
+							ctrlButtonBank: prCtrlButtonBank,
+							midiResolution: prMidiResolution,
+							softWithin: prSoftWithin
+						)
+					).changed(\value);
+				}
+			},
+			{
+				prCtrlButtonBank.put(key, numSliders);
+				wdgtControllersAndModels[key] !? {
+					wdgtControllersAndModels[key].midiOptions.model.value_(
+						(
+							midiMode: prMidiMode[key],
+							midiMean: prMidiMean[key],
+							ctrlButtonBank: prCtrlButtonBank[key],
+							midiResolution: prMidiResolution[key],
+							softWithin: prSoftWithin[key]
+						)
+					).changed(\value);
+				}
+			}
+		)
 	}
 	
-	ctrlButtonBank {
-		^prCtrlButtonBank;
+	getCtrlButtonBank { |key|
+		switch(this.class,
+			CVWidgetKnob, {
+				^prCtrlButtonBank;
+			},
+			{ ^prCtrlButtonBank[key] }
+		)
 	}
 	
-	midiResolution_ { |resolution|
-		prMidiResolution = resolution;
-		wdgtControllersAndModels !? {
-			wdgtControllersAndModels.midiOptions.model.value_(
-				(
-					midiMode: prMidiMode,
-					midiMean: prMidiMean,
-					ctrlButtonBank: prCtrlButtonBank,
-					midiResolution: prMidiResolution,
-					softWithin: prSoftWithin
-				)
-			).changed(\value);
-		}
+	setMidiResolution { |resolution, key|
+		switch(this.class, 
+			CVWidgetKnob, {
+				prMidiResolution = resolution;
+				wdgtControllersAndModels !? {
+					wdgtControllersAndModels.midiOptions.model.value_(
+						(
+							midiMode: prMidiMode,
+							midiMean: prMidiMean,
+							ctrlButtonBank: prCtrlButtonBank,
+							midiResolution: prMidiResolution,
+							softWithin: prSoftWithin
+						)
+					).changed(\value);
+				}
+			},
+			{
+				prMidiResolution[key] = resolution;
+				wdgtControllersAndModels[key] !? {
+					wdgtControllersAndModels[key].midiOptions.model.value_(
+						(
+							midiMode: prMidiMode[key],
+							midiMean: prMidiMean[key],
+							ctrlButtonBank: prCtrlButtonBank[key],
+							midiResolution: prMidiResolution[key],
+							softWithin: prSoftWithin[key]
+						)
+					).changed(\value);
+				}
+			}
+		)
 	}
 	
-	midiResolution {
-		^prMidiResolution;
+	getMidiResolution { |key|
+		switch(this.class,
+			CVWidgetKnob, {
+				^prMidiResolution;
+			},
+			{ ^prMidiResolution[key] }
+		)
 	}
 	
 	front {
@@ -493,7 +605,7 @@ CVWidget {
 							})
 						},
 						1, { 
-							meanVal = this.midiMean;
+							meanVal = this.getMidiMean;
 							widgetCV.input_(widgetCV.input+((val-meanVal)/127*this.midiResolution)) 
 						}
 					);
@@ -669,6 +781,7 @@ CVWidget {
 		};
 		
 		wcm.midiOptions.controller.put(\value, { |theChanger, what, moreArgs|
+			theChanger.value.postln;
 			if(thisGuiEnv.editor.notNil and:{
 				thisGuiEnv.editor.isClosed.not
 			}, {

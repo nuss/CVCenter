@@ -23,13 +23,21 @@ CVWidget2D : CVWidget {
 	init { |parentView, cvs, name, bounds, actions, setUpArgs, controllersAndModels, cvcGui, server|
 		var thisName, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
-		var nextY, rightBarX;
+		var nextY, rightBarX, oscEditButHeight, right, left;
 		var actionLo, actionHi;
 		
-		prCalibrate ? prCalibrate = (lo: true, hi: true);
-				
+		prCalibrate = (lo: true, hi: true);
+		prMidiMode = (lo: 0, hi: 0);
+		prMidiMean = (lo: 64, hi:64);
+		prMidiResolution = (lo: 1, hi: 1);
+		prSoftWithin = (lo: 0.1, hi: 0.1);
+		prCtrlButtonBank = ();
+		
+		prCtrlButtonBank.postln;
+
 		guiEnv = (lo: (), hi: ());
 		editorEnv = ();
+
 		cvcGui !? { isCVCWidget = true };
 		
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
@@ -61,16 +69,22 @@ CVWidget2D : CVWidget {
 		
 		[\lo, \hi].do({ |key| this.initControllersAndModels(controllersAndModels, key) });
 
+//		[prCalibrate, prMidiMode, prMidiMean, prMidiResolution, prSoftWithin].postln;
+		
 		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
+		setUpArgs[0] ? prMidiMode = (lo: 0, hi: 0);
 		setUpArgs[6] ? prCalibrate = (lo: true, hi: true);
-				
-		setUpArgs[0] !? { this.midiMode_(setUpArgs[0]) };
-		setUpArgs[1] !? { this.midiResolution_(setUpArgs[1]) };
-		setUpArgs[2] !? { this.midiMean_(setUpArgs[2]) };
-		setUpArgs[4] !? { this.ctrlButtonBank_(setUpArgs[4]) };
-		setUpArgs[5] !? { this.softWithin_(setUpArgs[5]) };
+		
+		[\lo, \hi].do({ |key|
+			setUpArgs[0] !? { setUpArgs[0][key] !? { this.setMidiMode(setUpArgs[0], key) }};
+			setUpArgs[1] !? { setUpArgs[1][key] !? { this.midiResolution_(setUpArgs[1], key) }};
+			setUpArgs[2] !? { setUpArgs[2][key] !? { this.setMidiMean(setUpArgs[2], key) }};
+			setUpArgs[4] !? { setUpArgs[4][key] !? { this.setCtrlButtonBank_(setUpArgs[4], key) }};
+			setUpArgs[5] !? { setUpArgs[5][key] !? { this.setSoftWithin(setUpArgs[5], key) }};
+		});
 		setUpArgs[6] !? { prCalibrate = (lo: setUpArgs[6], hi: setUpArgs[6]) };
+		
 						
 		actions !? {
 			if(actions.class !== Array, {
@@ -286,7 +300,6 @@ CVWidget2D : CVWidget {
 							[midiCtrl[v[0]].string, mctrl]
 						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
-							"hilo: %\n".postf(v[0]);
 							this.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], hilo: v[0]);
 						}, {
 							this.midiConnect(hilo: v[0]);
@@ -319,7 +332,7 @@ CVWidget2D : CVWidget {
 			.mouseDownAction_({ |tf|
 				tf.stringColor_(Color.red)
 			})
-			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+			.keyUpAction_({ |tf, char, modifiers, unicode, keycode|
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
@@ -348,7 +361,7 @@ CVWidget2D : CVWidget {
 			.mouseDownAction_({ |tf|
 				tf.stringColor_(Color.red)
 			})
-			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+			.keyUpAction_({ |tf, char, modifiers, unicode, keycode|
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
@@ -377,14 +390,36 @@ CVWidget2D : CVWidget {
 			.mouseDownAction_({ |tf|
 				tf.stringColor_(Color.red)
 			})
-			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
+			.keyUpAction_({ |tf, char, modifiers, unicode, keycode|
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
 			}) 
 		});
 		
-		nextY = label.bounds.top+label.bounds.height+slider2d.bounds.height+rangeSlider.bounds.height+numVal.lo.bounds.height+1;
+		if(
+			(left = slider2d.bounds.height
+			+rangeSlider.bounds.height
+			+numVal.lo.bounds.height)
+			>= 
+			(right = specBut.lo.bounds.height
+			+midiLearn.lo.bounds.height
+			+midiSrc.lo.bounds.height
+			+midiChan.lo.bounds.height
+			*2), 
+		{
+			nextY = 
+			label.bounds.top
+			+label.bounds.height
+			+left;
+			oscEditButHeight = thisHeight-left-32;
+		}, {
+			nextY = 
+			label.bounds.top
+			+label.bounds.height
+			+right;
+			oscEditButHeight = thisHeight-right-32;
+		});
 		
 		oscEditBut.lo = Button(window);
 		oscEditBut.hi = Button(window);
@@ -392,7 +427,8 @@ CVWidget2D : CVWidget {
 		calibBut.hi = Button(window);
 		
 		[oscEditBut.lo, [\lo, thisXY.x+1], oscEditBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
-			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, thisHeight-(label.bounds.top+label.bounds.height+slider2d.bounds.height+rangeSlider.bounds.height+numVal.lo.bounds.height+15)))
+//			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, thisHeight-(label.bounds.top+label.bounds.height+slider2d.bounds.height+rangeSlider.bounds.height+numVal.lo.bounds.height+15)))
+			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, oscEditButHeight))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.states_([
