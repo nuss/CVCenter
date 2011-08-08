@@ -535,6 +535,7 @@ CVWidget {
 			{
 				^[midiOscEnv[key].calibConstraints.lo, midiOscEnv[key].calibConstraints.hi];
 			}
+		)
 	}
 		
 		
