@@ -135,6 +135,14 @@ CVCenter {
 			orderedCVs = all.atAll(order);
 			
 			order.do({ |k, i|
+				("CVCenter.gui triggered:"+k).postln;
+				if(cvWidgets[k].notNil and:{ cvWidgets[k].midiOscEnv.notNil }, {
+					cvcArgs = ();
+					cvcArgs.midiOscEnv = cvWidgets[k].midiOscEnv;
+				}, {
+					cvcArgs = true;	
+				});
+										
 				if(widgetStates.size < 1, { cvTabIndex = 0 }, {
 					if(widgetStates[k].isNil, {
 						cvTabIndex = 0;
@@ -154,17 +162,18 @@ CVCenter {
 				}, {
 //					"and now a 2D widget".postln;
 					cvWidgets[k] = CVWidget2D(
-						tabs.views[cvTabIndex], [orderedCVs[i].lo, orderedCVs[i].hi], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 122, widgetheight), this.setup
+						tabs.views[cvTabIndex], 
+						[orderedCVs[i].lo, orderedCVs[i].hi], 
+						k, 
+						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight), 
+						setup: this.setup,
+						controllersAndModels: cvWidgets[k] !? { 
+							(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi) 
+						},
+						cvcGui: cvcArgs
 					)
 				}, {
-					("CVCenter.gui triggered:"+k).postln;
-					if(cvWidgets[k].notNil and:{ cvWidgets[k].midiOscEnv.notNil }, {
-						cvcArgs = ();
-						cvcArgs.midiOscEnv = cvWidgets[k].midiOscEnv;
-					}, {
-						cvcArgs = true;	
-					});
-										
+					"invoked a CVWidgetKnob".postln;
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex], 
 						orderedCVs[i], 
@@ -430,15 +439,28 @@ CVCenter {
 		argMean !? { this.midiMean_(argMean) };
 		argCButtonBank !? { this.ctrlButtonBank_(argCButtonBank) };
 		argSoftWithin !? { this.softWithin_(argSoftWithin) };
-		if(Window.allWindows.select({ |w| "^CVCenter".matchRegexp(w.name) == true }).size > 0, {
+		if(window.notNil and:{ window.notClosed }, {
 //			("setup-args:"+[argMode, argResolution, argMean, argCButtonBank, argSoftWithin]).postln;
 			cvWidgets.pairsDo({ |k, wdgt|
 				"does it happen here?".postln;
-				this.midiMode !? { wdgt.midiMode_(this.midiMode) };
-				this.midiResolution !? { wdgt.midiResolution_(this.midiResolution) };
-				this.midiMean !? { wdgt.midiMean_(this.midiMean) };
-				wdgt.ctrlButtonBank_(this.ctrlButtonBank);
-				this.softWithin !? { wdgt.softWithin_(this.softWithin) };
+				switch(wdgt.class,
+					CVWidgetKnob, {
+						this.midiMode !? { wdgt.setMidiMode(this.midiMode) };
+						this.midiResolution !? { wdgt.setMidiResolution(this.midiResolution) };
+						this.midiMean !? { wdgt.setMidiMean(this.midiMean) };
+						this.ctrlButtonBank !? { wdgt.setCtrlButtonBank(this.ctrlButtonBank) };
+						this.softWithin !? { wdgt.setSoftWithin(this.softWithin) };
+					},
+					CVWidget2D, {
+						[\lo, \hi].do({ |hilo|
+							this.midiMode !? { wdgt.setMidiMode(this.midiMode, hilo) };
+							this.midiResolution !? { wdgt.setMidiResolution(this.midiResolution, hilo) };
+							this.midiMean !? { wdgt.setMidiMean(this.midiMean, hilo) };
+							this.ctrlButtonBank !? { wdgt.setCtrlButtonBank(this.ctrlButtonBank, hilo) };
+							this.softWithin !? { wdgt.setSoftWithin(this.softWithin, hilo) };
+						})
+					}
+				)
 			})
 		})
 	}
@@ -485,20 +507,29 @@ CVCenter {
 		widgetKeys = cvWidgets.keys;
 		thisKeys = allCVKeys.difference(widgetKeys);
 		thisKeys.do({ |k|
+			if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
+				cvcArgs = ();
+				cvcArgs.midiOscEnv = widgetStates[k].midiOscEnv;
+			}, {
+				cvcArgs = true;	
+			});
 			if(all[k].class === Event and:{
 				all[k].keys.includesAny([\hi, \lo])
 			}, {
-				cvWidgets[k] = CVWidget2D(tabs.views[cvTabIndex], [all[k].lo, all[k].hi], k, Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 122, widgetheight), this.setup);
+				cvWidgets[k] = CVWidget2D(
+					tabs.views[cvTabIndex], 
+					[all[k].lo, all[k].hi], 
+					k, 
+					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight), 
+					setup: this.setup,
+					controllersAndModels: cvWidgets[k] !? { 
+						(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi) 
+					},
+					cvcGui: cvcArgs
+				);
 				widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: (hi: false, lo: false)));
 			}, {	
-				"prAddToGui".postln;
-				if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
-					cvcArgs = ();
-					cvcArgs.midiOscEnv = widgetStates[k].midiOscEnv;
-				}, {
-					cvcArgs = true;	
-				});
-				("cvcArgs:"+cvcArgs).postln;
+				"invoked a CVWidgetKnob at prAddToGui".postln;
 				cvWidgets[k] = CVWidgetKnob(
 					tabs.views[cvTabIndex], 
 					all[k], 
