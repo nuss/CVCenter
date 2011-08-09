@@ -30,6 +30,7 @@ CVWidget2D : CVWidget {
 		prSoftWithin = (lo: 0.1, hi: 0.1);
 		prCtrlButtonBank = ();
 		
+		
 		guiEnv = (lo: (), hi: ());
 		editorEnv = ();
 
@@ -70,8 +71,8 @@ CVWidget2D : CVWidget {
 		
 		setUpArgs[0] ? prMidiMode = (lo: 0, hi: 0);
 		setUpArgs[6] ? prCalibrate = (lo: true, hi: true);
-		
-		[\lo, \hi].do({ |key|
+				
+		[\lo, \hi].do({ |key, i|
 			setUpArgs[0] !? { setUpArgs[0][key] !? { this.setMidiMode(setUpArgs[0], key) }};
 			setUpArgs[1] !? { setUpArgs[1][key] !? { this.midiResolution_(setUpArgs[1], key) }};
 			setUpArgs[2] !? { setUpArgs[2][key] !? { this.setMidiMean(setUpArgs[2], key) }};
@@ -79,8 +80,7 @@ CVWidget2D : CVWidget {
 			setUpArgs[4] !? { setUpArgs[5][key] !? { this.setSoftWithin(setUpArgs[4], key) }};
 			setUpArgs[5] !? { setUpArgs[5][key] !? { this.setCalibrate(setUpArgs[5], key) }};
 		});
-		
-						
+			
 		actions !? {
 			if(actions.class !== Array, {
 				Error("Please provide actions in an array: [action1, action2]").throw;
@@ -95,17 +95,17 @@ CVWidget2D : CVWidget {
 			thisWidth = 122;
 			thisHeight = 166;
 		}, {
-			if(window.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
+			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
 				
-		if(window.isNil, {
+		if(parentView.isNil, {
 			window = Window(thisName, Rect(50, 50, thisWidth+14, thisHeight+7), server: server);
 		}, {
 			window = parentView;
 		});
-						
+								
 		cvcGui ?? { 
 			window.onClose_({
 				[\lo, \hi].do({ |hilo|
@@ -259,10 +259,11 @@ CVWidget2D : CVWidget {
 		midiCtrl.hi = TextField(window);
 		
 		nextY = thisXY.y+1+label.bounds.height;
-		rightBarX = slider2d.bounds.width+1;
+		rightBarX = thisXY.x+slider2d.bounds.width+1;
 
 		[specBut.hi, [nextY, \hi], specBut.lo, [nextY+52, \lo]].pairsDo({ |k, v|
-			k.bounds_(Rect(thisXY.x+rightBarX, v[0], 40, 13))
+			[thisXY.x, rightBarX].postln;
+			k.bounds_(Rect(rightBarX, v[0], 40, 13))
 			.font_(Font("Helvetica", 8))
 			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
@@ -271,7 +272,7 @@ CVWidget2D : CVWidget {
 		nextY = nextY+14;
 				
 		[midiHead.hi, nextY, midiHead.lo, nextY+52].pairsDo({ |k, v|
-			k.bounds_(Rect(thisXY.x+rightBarX, v, 28, 13))
+			k.bounds_(Rect(rightBarX, v, 28, 13))
 			.font_(Font("Helvetica", 7))
 			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, Color(alpha: 0)]])
@@ -279,7 +280,7 @@ CVWidget2D : CVWidget {
 		
 		
 		[midiLearn.hi, [\hi, nextY], midiLearn.lo, [\lo, nextY+52]].pairsDo({ |k, v|
-			k.bounds_(Rect(thisXY.x+rightBarX+midiHead.lo.bounds.width, v[1], 12, 13))
+			k.bounds_(Rect(rightBarX+midiHead.lo.bounds.width, v[1], 12, 13))
 			.font_(Font("Helvetica", 7))
 			.focusColor_(Color(alpha: 0))
 			.states_([
@@ -308,7 +309,7 @@ CVWidget2D : CVWidget {
 		nextY = nextY+13;
 		
 		[midiSrc.hi, [\hi, nextY], midiSrc.lo, [\lo, nextY+52]].pairsDo({ |k, v|
-			k.bounds_(Rect(thisXY.x+rightBarX, v[1], 40, 13))
+			k.bounds_(Rect(rightBarX, v[1], 40, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("source")
@@ -337,7 +338,7 @@ CVWidget2D : CVWidget {
 		nextY = nextY+13;
 
 		[midiChan.hi, [\hi, nextY], midiChan.lo, [\lo, nextY+52]].pairsDo({ |k, v|
-			k.bounds_(Rect(thisXY.x+rightBarX, v[1], 15, 13))
+			k.bounds_(Rect(rightBarX, v[1], 15, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("chan")
@@ -364,7 +365,7 @@ CVWidget2D : CVWidget {
 		});
 
 		[midiCtrl.hi, [\hi, nextY], midiCtrl.lo, [\lo, nextY+52]].pairsDo({ |k, v|
-			k.bounds_(Rect(thisXY.x+rightBarX+15, v[1], 25, 13))
+			k.bounds_(Rect(rightBarX+15, v[1], 25, 13))
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("ctrl")
@@ -472,6 +473,7 @@ CVWidget2D : CVWidget {
 			slider2d, 
 			rangeSlider, 
 			numVal.lo, numVal.hi, 
+			specBut.lo, specBut.hi,
 			midiHead.lo, midiHead.hi, 
 			midiLearn.lo, midiHead.lo, 
 			midiSrc.lo, midiSrc.hi, 
@@ -488,7 +490,7 @@ CVWidget2D : CVWidget {
 			slider2d, 
 			rangeSlider, 
 			numVal.lo, numVal.hi, 
-			specBut.lo, specBut.lo, 
+			specBut.lo, specBut.hi, 
 			midiHead.lo, midiHead.hi, 
 			midiLearn.lo, midiLearn.hi, 
 			midiSrc.lo, midiSrc.hi, 
@@ -503,7 +505,9 @@ CVWidget2D : CVWidget {
 				editor: editor[hilo],
 				calibBut: calibBut[hilo],
 				slider2d: slider2d,
+				specBut: specBut[hilo],
 				oscEditBut: oscEditBut[hilo],
+				calibBut: calibBut[hilo],
 				midiSrc: midiSrc[hilo],
 				midiChan: midiChan[hilo],
 				midiCtrl: midiCtrl[hilo],

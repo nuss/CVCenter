@@ -74,6 +74,8 @@ CVWidgetKnob : CVWidget {
 		}, {
 			window = parentView;
 		});
+		
+		"CVWidgetKnob: %\n".postf(window);
 						
 		cvcGui ?? { 
 			window.onClose_({

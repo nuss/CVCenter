@@ -166,7 +166,7 @@ CVCenter {
 						[orderedCVs[i].lo, orderedCVs[i].hi], 
 						k, 
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight), 
-						setup: this.setup,
+						setup: (lo: this.setup, hi: this.setup), 
 						controllersAndModels: cvWidgets[k] !? { 
 							(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi) 
 						},
@@ -185,14 +185,29 @@ CVCenter {
 					);
 					
 				});
-
+				
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
-				cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value_(
-					cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value
-				).changed(\value);
-				cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value_(
-					cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value
-				).changed(\value);
+
+				switch(cvWidgets[k].class,
+					CVWidgetKnob, {
+						cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value_(
+							cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value
+						).changed(\value);
+						cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value_(
+							cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value
+						).changed(\value);
+					},
+					CVWidget2D, {
+						[\lo, \hi].do({ |hilo|
+							cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value_(
+								cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value
+							).changed(\value);
+							cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value_(
+								cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value
+							).changed(\value);
+						})
+					}
+				);
 
 				if(all[k].class === Event and:{ 
 					all[k].keys.includesAny([\lo, \hi])
@@ -363,37 +378,29 @@ CVCenter {
 	}
 		
 	*use { |key, spec, value, tab, slot|
-		var thiskey, thisspec, thisval, thisslot;
+		var thisKey, thisSpec, thisVal, thisSlot;
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		slot !? {
-			thisslot = slot.asString.toLower.asSymbol;
-			if([\lo, \hi].detect({ |sbl| sbl === thisslot }).class !== Symbol, {
+			thisSlot = slot.asString.toLower.asSymbol;
+			if([\lo, \hi].detect({ |sbl| sbl === thisSlot }).class !== Symbol, {
 				Error("Looks like you wanted to create a multi-dimensional widget. However, the given slot-value"+slot+"is not valid!").throw;
 			});
 		};
 				
-		thiskey = key.asSymbol;
+		thisKey = key.asSymbol;
 		all ?? { this.new };
 				
-		if(all.keys.asArray.indexOfEqual(thiskey).isNil, {
-			thisspec = spec ?? { thisspec = ControlSpec.new };
-			thisval = value ?? { thisval = thisspec.default };
-			thisslot.class.switch(
-				Symbol, {
-					if(thisslot === \lo or: { thisslot === \hi }, {
-						[\lo, \hi].do({ |slot|
-							all[key.asSymbol] ?? { all.put(key.asSymbol, ()) };
-							all[key.asSymbol][slot] = CV.new(thisspec.copy, thisval.copy);
-						})
-					})
-				}, 
-				{ all.put(key.asSymbol, CV.new(thisspec, thisval)) };
-			)
+		thisSpec = spec ?? { thisSpec = ControlSpec.new };
+		thisVal = value ?? { thisVal = thisSpec.default };
+
+		if(thisSlot.notNil, {
+			/* special case: CVWidget2D needs 2 CVs */
+			if(thisSlot === \lo or: { thisSlot === \hi }, {
+				all[thisKey] ?? { all.put(thisKey, ()) };
+				all[thisKey].put(thisSlot, CV.new(thisSpec, thisVal));
+			})
 		}, {
-			if(all[key.asSymbol].isKindOf(Event) and:{ slot.notNil }, {
-				spec !? { all[key.asSymbol][thisslot].spec_(spec) };
-				value !? { all[key.asSymbol][thisslot].value_(value) };
-			}) 
+			all.put(thisKey, CV.new(thisSpec, thisVal)) 
 		});
 		
 		if(window.isNil or:{ window.isClosed }, {
@@ -403,9 +410,9 @@ CVCenter {
 		});
 		
 		if(slot.notNil, {
-			^all.at(key.asSymbol)[slot.asSymbol];
+			^all[thisKey][thisSlot];
 		}, {
-			^all.at(key.asSymbol);
+			^all[thisKey];
 		})
 	}
 	
@@ -458,7 +465,7 @@ CVCenter {
 							this.midiMean !? { wdgt.setMidiMean(this.midiMean, hilo) };
 							this.ctrlButtonBank !? { wdgt.setCtrlButtonBank(this.ctrlButtonBank, hilo) };
 							this.softWithin !? { wdgt.setSoftWithin(this.softWithin, hilo) };
-						})
+						});
 					}
 				)
 			})
@@ -521,7 +528,7 @@ CVCenter {
 					[all[k].lo, all[k].hi], 
 					k, 
 					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight), 
-					setup: this.setup,
+					setup: (lo: this.setup, hi: this.setup),
 					controllersAndModels: cvWidgets[k] !? { 
 						(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi) 
 					},
