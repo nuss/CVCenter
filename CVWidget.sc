@@ -2,8 +2,8 @@
 CVWidget {
 
 	var <widgetCV;
-	var prMidiMode/* = 0*/, prMidiMean/* = 64*/, prCtrlButtonBank, prMidiResolution/* = 1*/, prSoftWithin/* = 0.1*/;
-	var prCalibrate/* = true*/, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
+	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
+	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
 	var <widgetBg, <label, <nameField, <wdgtInfo; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps, <editor;
@@ -79,6 +79,7 @@ CVWidget {
 	setMidiMode { |mode, key|
 		switch(this.class,
 			CVWidgetKnob, {
+				prMidiMode = mode;
 				wdgtControllersAndModels !? {
 					wdgtControllersAndModels.midiOptions.model.value_(
 						(
@@ -93,6 +94,7 @@ CVWidget {
 			},
 			{
 				prMidiMode[key] = mode;
+				"prMidiMode: %\n".postf(prMidiMode);
 				wdgtControllersAndModels[key] !? {
 					wdgtControllersAndModels[key].midiOptions.model.value_(
 						(
@@ -133,17 +135,19 @@ CVWidget {
 					).changed(\value);
 				}
 			},
-			prMidiMean[key] = meanval;
-			wdgtControllersAndModels[key] !? {
-				wdgtControllersAndModels[key].midiOptions.model.value_(
-					(
-						midiMode: prMidiMode[key],
-						midiMean: prMidiMean[key],
-						ctrlButtonBank: prCtrlButtonBank[key],
-						midiResolution: prMidiResolution[key],
-						softWithin: prSoftWithin[key]
-					)
-				).changed(\value);
+			{
+				prMidiMean[key] = meanval;
+				wdgtControllersAndModels[key] !? {
+					wdgtControllersAndModels[key].midiOptions.model.value_(
+						(
+							midiMode: prMidiMode[key],
+							midiMean: prMidiMean[key],
+							ctrlButtonBank: prCtrlButtonBank[key],
+							midiResolution: prMidiResolution[key],
+							softWithin: prSoftWithin[key]
+						)
+					).changed(\value);
+				}
 			}			
 		)
 	}

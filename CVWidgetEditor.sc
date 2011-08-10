@@ -163,7 +163,7 @@ CVWidgetEditor {
 			flow1.shift(5, 0);
 			
 			midiModes = ["0-127", "+/-"];
-			
+						
 			midiModeSelect = PopUpMenu(thisEditor.tabs.views[1], flow1.bounds.width/2-70@15)
 				.font_(staticTextFont)
 				.items_(midiModes)

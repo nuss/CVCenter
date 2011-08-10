@@ -100,7 +100,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p5"><br></p>
 <p class="p6">(</p>
 <p class="p6"><span class="s12">~cv</span> = <span class="s3">CV</span>.new(<span class="s8">\freq</span>.asSpec);<span class="Apple-converted-space"> </span></p>
-<p class="p6"><span class="s12">~wdgt</span> = <span class="s3">CVWidget2D</span>(cvs: <span class="s12">~cv</span>!2, bounds: <span class="s3">Rect</span>(100, 100, 104, 166), actions: [{ <span class="s11">|cv|</span> a.set(<span class="s8">\freq1</span>, cv) }, { <span class="s11">|cv|</span> a.set(<span class="s8">\freq2</span>, cv) }] ).front;</p>
+<p class="p6"><span class="s12">~wdgt</span> = <span class="s3">CVWidget2D</span>(cvs: <span class="s12">~cv</span>!2, bounds: <span class="s3">Rect</span>(100, 100, 104, 166), setup:(lo: [ 1, 1, 64, <span class="s7">16</span>, 0.1 ], hi: [ 0, 1, 64, <span class="s7">nil</span>, 0.1 ]), actions: [{ <span class="s11">|cv|</span> a.set(<span class="s8">\freq1</span>, cv) }, { <span class="s11">|cv|</span> a.set(<span class="s8">\freq2</span>, cv) }] ).front;</p>
 <p class="p6">)</p>
 <p class="p5"><br></p>
 <p class="p11">// change the Spec of the CV</p>

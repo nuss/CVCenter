@@ -157,6 +157,8 @@ CVCenter {
 					thisNextPos = tabProperties[cvTabIndex].nextPos;
 				});
 				
+				("CVCenter setup:"+this.setup).postln;
+				
 				if(orderedCVs[i].class === Event and:{ 
 					orderedCVs[i].keys.includesAny([\lo, \hi])
 				}, {

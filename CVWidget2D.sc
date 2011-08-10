@@ -29,8 +29,7 @@ CVWidget2D : CVWidget {
 		prMidiResolution = (lo: 1, hi: 1);
 		prSoftWithin = (lo: 0.1, hi: 0.1);
 		prCtrlButtonBank = ();
-		
-		
+				
 		guiEnv = (lo: (), hi: ());
 		editorEnv = ();
 
@@ -67,19 +66,24 @@ CVWidget2D : CVWidget {
 
 //		[prCalibrate, prMidiMode, prMidiMean, prMidiResolution, prSoftWithin].postln;
 		
-		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
+//		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
 		
-		setUpArgs[0] ? prMidiMode = (lo: 0, hi: 0);
-		setUpArgs[6] ? prCalibrate = (lo: true, hi: true);
+		("CVWidget2D setUpArgs:"+setUpArgs).postln;
+//		setUpArgs[4].postln;
 				
-		[\lo, \hi].do({ |key, i|
-			setUpArgs[0] !? { setUpArgs[0][key] !? { this.setMidiMode(setUpArgs[0], key) }};
-			setUpArgs[1] !? { setUpArgs[1][key] !? { this.midiResolution_(setUpArgs[1], key) }};
-			setUpArgs[2] !? { setUpArgs[2][key] !? { this.setMidiMean(setUpArgs[2], key) }};
-			setUpArgs[3] !? { setUpArgs[3][key] !? { this.setCtrlButtonBank_(setUpArgs[3], key) }};
-			setUpArgs[4] !? { setUpArgs[5][key] !? { this.setSoftWithin(setUpArgs[4], key) }};
-			setUpArgs[5] !? { setUpArgs[5][key] !? { this.setCalibrate(setUpArgs[5], key) }};
+		[\lo, \hi].do({ |key|
+//			setUpArgs[key][0] ? prMidiMode = (lo: 0, hi: 0);
+//			setUpArgs[key][6] ? prCalibrate = (lo: true, hi: true);
+
+			setUpArgs[key] !? { setUpArgs[key][0] !? { this.setMidiMode(setUpArgs[key][0], key) }};
+			setUpArgs[key] !? { setUpArgs[key][1] !? { this.setMidiResolution(setUpArgs[key][1], key) }};
+			setUpArgs[key] !? { setUpArgs[key][2] !? { this.setMidiMean(setUpArgs[key][2], key) }};
+			setUpArgs[key] !? { setUpArgs[key][3] !? { this.setCtrlButtonBank(setUpArgs[key][3], key) }};
+			setUpArgs[key] !? { setUpArgs[key][4] !? { this.setSoftWithin(setUpArgs[key][4], key) }};
+			setUpArgs[key] !? { setUpArgs[key][5] !? { this.setCalibrate(setUpArgs[key][5], key) }};
 		});
+		
+		("CVWidget2D setup:"+this.setup).postln;
 			
 		actions !? {
 			if(actions.class !== Array, {
