@@ -847,7 +847,6 @@ CVWidget {
 						}, {
 							ctrlString = (ctrlString % this.getCtrlButtonBank(key)).asString;
 						});
-						"ctrlString: %".postf(ctrlString);
 						ctrlString = ((num+1/this.getCtrlButtonBank(key)).ceil).asString++":"++ctrlString;
 					}, {
 						ctrlString = num+1;
@@ -1043,7 +1042,7 @@ CVWidget {
 				thisGuiEnv.editor.midiMeanNB.value_(theChanger.value.midiMean);
 				thisGuiEnv.editor.softWithinNB.value_(theChanger.value.softWithin);
 				thisGuiEnv.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
-				thisGuiEnv.editor.ctrlButtonBankField.value_(theChanger.value.ctrlButtonBank);
+				thisGuiEnv.editor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
 			})
 		});
 

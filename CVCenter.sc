@@ -257,14 +257,17 @@ CVCenter {
 							("now removing at:"+k).postln;
 							cvWidgets[k].remove;
 							cvWidgets.removeAt(k);
-							controlButtons !? {
-								controlButtons[k] !? {
-									controlButtons[k].remove;
-									controlButtons.removeAt(k)
-								}
-							};
+//							controlButtons !? {
+//								controlButtons[k] !? {
+//									controlButtons[k].remove;
+//									controlButtons.removeAt(k)
+//								}
+//							};
 						});
 						this.prRegroupWidgets(tabs.activeTab);
+						tabs.views.do({ |view, i|
+							if(view.children.size == 0, { this.prRemoveTab(i) });
+						});
 //						"it happens at 1".postln;
 //						this.prUpdateSwitchboardSetup;
 					});
@@ -324,7 +327,7 @@ CVCenter {
 	}
 		
 	*removeAt { |key|
-		var lastVal;
+		var lastVal, tabIndex;
 		lastVal = all.at(key.asSymbol).value;
 		all.removeAt(key.asSymbol);
 		cvWidgets[key].class.switch(
@@ -349,19 +352,19 @@ CVCenter {
 				}
 			},
 			CVWidget2D, {
-				cvWidgets[key].ccHi !? { cvWidgets[key].ccHi.remove };
-				cvWidgets[key].ccLo !? { cvWidgets[key].ccLo.remove };
-				controlButtons !? {
-					controlButtons[key] !? {
-						controlButtons[key][\ccLo] !? {
-							controlButtons[key][\ccLo].remove;
-						};
-						controlButtons[key][\ccHi] !? {
-							controlButtons[key][\ccHi].remove;
-						};
-						controlButtons.removeAt(key);
+				[\lo, \hi].do({ |lohi|
+					if(cvWidgets[key].editor[lohi].notNil and:{ cvWidgets[key].editor.isClosed.not }, {
+						cvWidgets[key].editor[lohi].close;
+					});
+					cvWidgets[key].midiOscEnv[lohi].cc !? { 
+						cvWidgets[key].midiOscEnv[lohi].cc.remove; 
+						cvWidgets[key].midiOscEnv[lohi].cc = nil;
+					};
+					cvWidgets[key].midiOscEnv[lohi].oscResponder !? { 
+						cvWidgets[key].midiOscEnv[lohi].oscResponder.remove;
+						cvWidgets[key].midiOscEnv[lohi].oscResponder = nil;	
 					}
-				}
+				})
 			}
 		);
 		^lastVal;
@@ -783,6 +786,14 @@ CVCenter {
 				};
 			})
 		})
+	}
+	
+	*prRemoveTab { |index|
+		if(tabs.views.size > 1, {
+			tabs.removeAt(index);
+			tabProperties.removeAt(index);
+		})
+			
 	}
 	
 }
