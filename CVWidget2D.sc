@@ -23,6 +23,12 @@ CVWidget2D : CVWidget {
 		var nextY, rightBarX, oscEditButHeight, right, left;
 		var actionLo, actionHi;
 		
+		setUpArgs !? {
+			(setUpArgs.class !== Event).if{ 
+				Error( "a setup for a CVWidget2D has to be provided as an Event: (lo: [args], hi[args])!").throw;
+			}
+		};
+		
 		prCalibrate = (lo: true, hi: true);
 		prMidiMode = (lo: 0, hi: 0);
 		prMidiMean = (lo: 64, hi:64);
@@ -63,13 +69,8 @@ CVWidget2D : CVWidget {
 		editor = ();
 		
 		[\lo, \hi].do({ |key| this.initControllersAndModels(controllersAndModels, key) });
-
-//		[prCalibrate, prMidiMode, prMidiMean, prMidiResolution, prSoftWithin].postln;
 		
-//		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
-		
-		("CVWidget2D setUpArgs:"+setUpArgs).postln;
-//		setUpArgs[4].postln;
+//		("CVWidget2D setUpArgs:"+setUpArgs).postln;
 				
 		[\lo, \hi].do({ |key|
 //			setUpArgs[key][0] ? prMidiMode = (lo: 0, hi: 0);
@@ -83,7 +84,7 @@ CVWidget2D : CVWidget {
 			setUpArgs[key] !? { setUpArgs[key][5] !? { this.setCalibrate(setUpArgs[key][5], key) }};
 		});
 		
-		("CVWidget2D setup:"+this.setup).postln;
+//		("CVWidget2D setup:"+this.setup).postln;
 			
 		actions !? {
 			if(actions.class !== Array, {
@@ -266,7 +267,6 @@ CVWidget2D : CVWidget {
 		rightBarX = thisXY.x+slider2d.bounds.width+1;
 
 		[specBut.hi, [nextY, \hi], specBut.lo, [nextY+52, \lo]].pairsDo({ |k, v|
-			[thisXY.x, rightBarX].postln;
 			k.bounds_(Rect(rightBarX, v[0], 40, 13))
 			.font_(Font("Helvetica", 8))
 			.focusColor_(Color(alpha: 0))

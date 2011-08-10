@@ -94,7 +94,6 @@ CVWidget {
 			},
 			{
 				prMidiMode[key] = mode;
-				"prMidiMode: %\n".postf(prMidiMode);
 				wdgtControllersAndModels[key] !? {
 					wdgtControllersAndModels[key].midiOptions.model.value_(
 						(
@@ -473,7 +472,7 @@ CVWidget {
 				})
 			},
 			{
-				[key, midiOscEnv[key]].postln;
+//				[key, midiOscEnv[key]].postln;
 				if(midiOscEnv[key].cc.isNil, {
 					wdgtControllersAndModels[key].midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
@@ -843,11 +842,12 @@ CVWidget {
 				ccResponderAction = { |src, chan, num, val|
 					ctrlString ? ctrlString = num+1;
 					if(this.getCtrlButtonBank(key).notNil, {
-						if(ctrlString%this.getCtrlButtonBank == 0, {
+						if(ctrlString % this.getCtrlButtonBank(key) == 0, {
 							ctrlString = this.getCtrlButtonBank(key).asString;
 						}, {
-							ctrlString = (ctrlString%this.getCtrlButtonBank(key)).asString;
+							ctrlString = (ctrlString % this.getCtrlButtonBank(key)).asString;
 						});
+						"ctrlString: %".postf(ctrlString);
 						ctrlString = ((num+1/this.getCtrlButtonBank(key)).ceil).asString++":"++ctrlString;
 					}, {
 						ctrlString = num+1;
@@ -907,7 +907,6 @@ CVWidget {
 				}, {
 					midiOscEnv.cc = makeCCResponder.(theChanger.value.src, theChanger.value.chan, theChanger.value.num);
 				});
-				
 			}, {
 				midiOscEnv.cc.remove;
 				midiOscEnv.cc = nil;
@@ -1036,7 +1035,7 @@ CVWidget {
 		};
 		
 		wcm.midiOptions.controller.put(\value, { |theChanger, what, moreArgs|
-			theChanger.value.postln;
+//			theChanger.value.postln;
 			if(thisGuiEnv.editor.notNil and:{
 				thisGuiEnv.editor.isClosed.not
 			}, {
