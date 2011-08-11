@@ -268,6 +268,11 @@ CVCenter {
 						tabs.views.do({ |view, i|
 							if(view.children.size == 0, { this.prRemoveTab(i) });
 						});
+						tmp = tabs.getLabelAt(0);
+						tmp.postln;
+						if(tabs.views.size == 1 and:{ tmp != "default" }, {
+							this.renameTab(tmp, "default");
+						});
 //						"it happens at 1".postln;
 //						this.prUpdateSwitchboardSetup;
 					});
@@ -445,8 +450,9 @@ CVCenter {
 	
 	*renameTab { |oldName, newName|
 		var index;
-		index = tabs.views.detectIndex({ |view, i| tabs.getLabelAt(i) == oldName; });
-		tabs.setLabelAt(index, newName);
+		index = tabs.views.detectIndex({ |view, i| tabs.getLabelAt(i) == oldName.asString; });
+		tabs.setLabelAt(index, newName.asString);
+		tabProperties[index].tabLabel = newName.asString;
 	}
 	
 	// private Methods - not to be used directly
