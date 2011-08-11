@@ -1,21 +1,11 @@
 + TabbedView {
 	
-	labelNames {
-		^labels;
-	}
-	
-	labelNames_ { |names|
-		labels.size.do({ |i|
-			labels[i] = names[i];
-		});
-		this.updateViewSizes();
-	}
-	
-	labelAt { |index|
+	getLabelAt { |index|
 		^labels[index];
 	}
 	
-	labelAt_ { |name, index|
+	setLabelAt { |index, name|
+		this.paintTab(tabViews[index], name.asString);
 		labels[index] = name;
 		this.updateViewSizes();
 	} 

@@ -443,6 +443,12 @@ CVCenter {
 		window.bounds_(Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
 	}
 	
+	*renameTab { |oldName, newName|
+		var index;
+		index = tabs.views.detectIndex({ |view, i| tabs.getLabelAt(i) == oldName; });
+		tabs.setLabelAt(index, newName);
+	}
+	
 	// private Methods - not to be used directly
 	
 	*prSetup { |argMode, argResolution, argMean, argCButtonBank, argSoftWithin|
@@ -789,11 +795,12 @@ CVCenter {
 	}
 	
 	*prRemoveTab { |index|
+		tabs.getLabelAt(index).postln;
 		if(tabs.views.size > 1, {
 			tabs.removeAt(index);
 			tabProperties.removeAt(index);
-		})
-			
+		}, {
+			if(tabs.getLabelAt(index) != "default", { tabs.setLabelAt(index, "default") });		})
 	}
 	
 }
