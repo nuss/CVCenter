@@ -506,9 +506,14 @@ CVCenter {
 				cvTabIndex = tabLabels.indexOf(tab.asSymbol);
 //				("tab is not nil and included in the list of current tabs:"+cvTabIndex).postln;
 			}, {
-				tabs.add(tab);
-				cvTabIndex = tabLabels.size;
-				tabProperties = tabProperties.add((tabLabel: tab, tabColor: nextColor.next));
+				if(tabs.views.size == 1 and: { tabs.views[0].children.size == 0 }, {
+					cvTabIndex = 0;
+					this.renameTab(tabs.getLabelAt(0), tab.asString);
+				}, { 
+					tabs.add(tab);
+					cvTabIndex = tabLabels.size;
+					tabProperties = tabProperties.add((tabLabel: tab, tabColor: nextColor.next));
+				})
 //				("tab is not nil and not included in the list of current tabs:"+cvTabIndex).postln;
 			})
 		}, {
@@ -518,6 +523,8 @@ CVCenter {
 		
 		tabs.labelColors_(tabProperties.collect(_.tabColor));
 		tabs.unfocusedColors_(tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) }));
+		
+		"happening here? %\n".postf(tabProperties[cvTabIndex]);
 		
 		if(tabProperties[cvTabIndex].nextPos.notNil, {
 			thisNextPos = tabProperties[cvTabIndex].nextPos;
