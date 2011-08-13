@@ -229,7 +229,6 @@ CVCenter {
 					tabProperties[cvTabIndex].nextPos = thisNextPos.x+colwidth@(thisNextPos.y);
 				});
 			});
-//			guiClosed = false;
 			window.front;
 		});
 		window.front;
@@ -237,13 +236,11 @@ CVCenter {
 		skipJacks = SkipJack.all.collect({ |r| r.name == "CVCenter-Updater" });
 		if(skipJacks.includes(true).not, {
 			updateRoutine = SkipJack({
-//				this.prUpdateSwitchboardSetup;
 				lastUpdate ?? { lastUpdate = all.size };
 				lastSetUp !? {
 					if(this.setup != lastSetUp, {
 //						("now updating widget-setups:"+[this.setup, lastSetUp]).postln;
 						this.prSetup(*this.setup);
-//						this.prUpdateSwitchboard(true);
 					})
 				};	
 				if(all.size != lastUpdate, {
@@ -257,12 +254,6 @@ CVCenter {
 							("now removing at:"+k).postln;
 							cvWidgets[k].remove;
 							cvWidgets.removeAt(k);
-//							controlButtons !? {
-//								controlButtons[k] !? {
-//									controlButtons[k].remove;
-//									controlButtons.removeAt(k)
-//								}
-//							};
 						});
 						this.prRegroupWidgets(tabs.activeTab);
 						tabs.views.do({ |view, i|
@@ -273,21 +264,16 @@ CVCenter {
 						if(tabs.views.size == 1 and:{ tmp != "default" }, {
 							this.renameTab(tmp, "default");
 						});
-//						"it happens at 1".postln;
-//						this.prUpdateSwitchboardSetup;
 					});
 					lastUpdate = all.size;
 				});
 				try {
 					if(window.bounds.width != lastUpdateWidth, {
 						this.prRegroupWidgets(tabs.activeTab);
-//						this.prUpdateSwitchboard;
-//						this.prUpdateSwitchboardSetup;
 					})
 				};
 				lastUpdateWidth = window.bounds.width;
 				lastSetUp = this.setup;
-				this.prAddFuncToCC;
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});
 	}	
@@ -303,7 +289,6 @@ CVCenter {
 		});
 		this.new;
 		inputArgs.pairsDo({ |key, cv|
-//			[key, cv].postln;
 			if(cv.isKindOf(CV).not and:{ cv.isKindOf(Array).not }, {
 				Error("CVCenter expects a single CV or an array of CVs as input!").throw;			}); 
 			[cv].flat.do({ |cv|
@@ -346,15 +331,8 @@ CVCenter {
 				};
 				cvWidgets[key].midiOscEnv.oscResponder !? { 
 					cvWidgets[key].midiOscEnv.oscResponder.remove;
-					cvWidgets[key].midiOscEnv.oscResponder = nil;	
-				};
-//				controlButtons !? {
-//					controlButtons[key] !? { 
-//						controlButtons[key].postln;
-//						controlButtons[key].remove;
-//						controlButtons.removeAt(key);
-//					}
-//				}
+					cvWidgets[key].midiOscEnv.oscResponder = nil;
+				}
 			},
 			CVWidget2D, {
 				[\lo, \hi].do({ |lohi|
@@ -635,185 +613,6 @@ CVCenter {
 			})
 		}
 	}	
-	
-//	*prAddControlButton { |key, slot|
-//		var buttonWidth;
-//		
-//		if(ctrlButtonBank.notNil and:{
-//			ctrlButtonBank.isInteger and:{
-//				ctrlButtonBank > 1
-//			}
-//		}, {
-//			buttonWidth = 30
-//		}, {
-//			buttonWidth = 18
-//		});
-//
-//		controlButtons ?? { controlButtons = IdentityDictionary() };
-//		
-//		if(slot.isNil, {
-//			this.prAddCtrlBtn(key, buttonWidth);
-//		}, {
-//			this.prAdd2DCtrlBtn(key, slot, buttonWidth);
-//		});
-//		switchBoard.reflow;
-////		switchBoard.reflowAll;
-//	}
-//	
-//	*prAddCtrlBtn { |key, buttonWidth|
-//		var val;
-//		
-//		if(controlButtons[key].isNil, {
-//			val = cvWidgets[key].guiEnv.midiCtrl.string;
-//			controlButtons.put(
-//				key,
-//				Button(
-//					switchBoard,
-//					buttonWidth@15
-//				)
-//				.states_([[
-//					val, 
-//					Color.black, 
-//					tabProperties[widgetStates[key].tabIndex].tabColor
-//				]])
-//				.font_(Font("Helvetica", 9))
-//				.action_({ 
-//					tabs.focus(widgetStates[key].tabIndex);
-//					cvWidgets[key].widgetBg.focusColor_(Color.green).focus(true);
-//				})
-//			)
-//		}, {
-//			controlButtons[key].remove;
-//			controlButtons.removeAt(key);
-//		});
-//	}
-//	
-//	*prAdd2DCtrlBtn { |key, slot, buttonWidth|
-//		var val;
-//		
-//		if(controlButtons[key].isNil, {
-//			controlButtons.put(key, ());
-//		});
-//		
-//		if(controlButtons[key][slot].isNil, {
-//			if(slot == "ccHi", {
-//				val = cvWidgets[key].midiCtrlHi.string;
-//			}, {
-//				val = cvWidgets[key].midiCtrlLo.string;
-//			});			
-//			controlButtons[key].put(
-//				slot,
-//				Button(
-//					switchBoard,
-//					buttonWidth@15
-//				)
-//				.states_([[
-//					val, 
-//					Color.black, 
-//					tabProperties[widgetStates[key].tabIndex].tabColor
-//				]])
-//				.font_(Font("Helvetica", 9))
-//				.action_({ 
-//					tabs.focus(widgetStates[key].tabIndex);
-//					cvWidgets[key].widgetBg.focusColor_(Color.green).focus(true);
-//				})
-//			)
-//		}, {
-//			controlButtons[key][slot].remove;
-//			controlButtons[key].removeAt(slot);
-//			if(controlButtons[key].size == 0, { controlButtons.removeAt(key) });
-//		})
-//	}
-//	
-//	*prUpdateSwitchboard { |updateButtons=false|
-//		var buttonWidth;
-//		
-//		if(updateButtons, {
-//			if(ctrlButtonBank.notNil and:{
-//				ctrlButtonBank.isInteger and:{
-//					ctrlButtonBank > 1
-//				}
-//			}, {
-//				buttonWidth = 30
-//			}, {
-//				buttonWidth = 18
-//			});
-//			
-//			controlButtons.pairsDo({ |key, btn|
-//				if(btn.class == Event, {
-//					btn.do({ |b| b.bounds_(Rect(b.bounds.left, b.bounds.top, buttonWidth, b.bounds.height)) });
-//				}, {
-//					btn.bounds_(Rect(btn.bounds.left, btn.bounds.top, buttonWidth, btn.bounds.height));				});
-//			})
-//		});
-//		
-//		switchBoard.decorator.bounds_(switchBoard.bounds);
-//		switchBoard.reflow;
-////		switchBoard.reflowAll;
-//	}
-	
-	*prAddFuncToCC {
-		var funcToAdd;
-		cvWidgets.pairsDo({ |k, wdgt|
-//			widgetStates[k].postln;
-			funcToAdd = { 
-				{ 
-					tabs.focus(widgetStates[k].tabIndex);
-					cvWidgets[k].widgetBg.focusColor_(Color.green).focus(true);
-				}.defer
-			};
-			if(wdgt.respondsTo(\cc), {
-				wdgt.cc !? {
-					if(widgetStates[k].addedFunc == false and:{
-						wdgt.cc.function.class != FunctionList
-					}, {
-						wdgt.cc.function_(
-//							"adding another function".postln;
-							wdgt.cc.function.addFunc(funcToAdd)
-						);
-						widgetStates[k].addedFunc = true;
-					});
-				};
-				wdgt.cc ?? {
-					if(widgetStates[k].addedFunc == true, {
-						widgetStates[k].addedFunc = false
-					});
-				};
-			});
-			if(wdgt.respondsTo(\ccLo) and:{ wdgt.respondsTo(\ccHi) }, {
-				wdgt.ccLo !? {
-					if(widgetStates[k].addedFunc.lo == false and:{
-						wdgt.ccLo.function.class != FunctionList
-					}, {
-						wdgt.ccLo.function_(
-							wdgt.ccLo.function.addFunc(funcToAdd)
-						);
-						widgetStates[k].addedFunc.lo = true;
-					});
-				};
-				wdgt.ccHi !? {
-					if(widgetStates[k].addedFunc.hi == false and:{
-						wdgt.ccHi.function.class != FunctionList
-					}, {
-						wdgt.ccHi.function_(
-							wdgt.ccHi.function.addFunc(funcToAdd)
-						);
-						widgetStates[k].addedFunc.hi = true;
-					});
-				};
-				wdgt.ccLo ?? {
-					if(widgetStates[k].addedFunc.lo == true, {
-						widgetStates[k].addedFunc.lo = false
-					});
-				};
-				wdgt.ccHi ?? {
-					if(widgetStates[k].addedFunc.hi == true, {
-						widgetStates[k].addedFunc.hi = false
-					});
-				};
-			})
-		})
-	}
 	
 	*prRemoveTab { |index|
 		tabs.getLabelAt(index).postln;
