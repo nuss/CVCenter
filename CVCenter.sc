@@ -348,13 +348,13 @@ CVCenter {
 					cvWidgets[key].midiOscEnv.oscResponder.remove;
 					cvWidgets[key].midiOscEnv.oscResponder = nil;	
 				};
-				controlButtons !? {
-					controlButtons[key] !? { 
-						controlButtons[key].postln;
-						controlButtons[key].remove;
-						controlButtons.removeAt(key);
-					}
-				}
+//				controlButtons !? {
+//					controlButtons[key] !? { 
+//						controlButtons[key].postln;
+//						controlButtons[key].remove;
+//						controlButtons.removeAt(key);
+//					}
+//				}
 			},
 			CVWidget2D, {
 				[\lo, \hi].do({ |lohi|
@@ -370,7 +370,8 @@ CVCenter {
 						cvWidgets[key].midiOscEnv[lohi].oscResponder = nil;	
 					}
 				})
-			}
+			};
+			widgetStates.removeAt(key)
 		);
 		^lastVal;
 	}
@@ -453,6 +454,13 @@ CVCenter {
 		index = tabs.views.detectIndex({ |view, i| tabs.getLabelAt(i) == oldName.asString; });
 		tabs.setLabelAt(index, newName.asString);
 		tabProperties[index].tabLabel = newName.asString;
+	}
+	
+	*setActionAt { |key, action|
+		if(all[key].notNil and:{ cvWidgets[key].notNil }, {
+			all[key].action_(action);
+			widgetStates[key].put(\action, action);
+		})
 	}
 	
 	// private Methods - not to be used directly
@@ -813,7 +821,9 @@ CVCenter {
 			tabs.removeAt(index);
 			tabProperties.removeAt(index);
 		}, {
-			if(tabs.getLabelAt(index) != "default", { tabs.setLabelAt(index, "default") });		})
+			if(tabs.getLabelAt(index) != "default", { tabs.setLabelAt(index, "default") });
+			tabProperties[0] = (tabLabel: "default", tabColor: tabProperties[index].tabColor);
+		})
 	}
 	
 }

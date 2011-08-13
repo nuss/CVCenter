@@ -540,8 +540,7 @@ CVWidget {
 			}
 		)
 	}
-		
-		
+	
 	front {
 		this.window.front;
 	}
