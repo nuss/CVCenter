@@ -479,7 +479,7 @@ CVWidget2D : CVWidget {
 			numVal.lo, numVal.hi, 
 			specBut.lo, specBut.hi,
 			midiHead.lo, midiHead.hi, 
-			midiLearn.lo, midiHead.lo, 
+			midiLearn.lo, midiHead.hi, 
 			midiSrc.lo, midiSrc.hi, 
 			midiChan.lo, midiHead.hi, 
 			midiCtrl.lo, midiCtrl.hi, 

@@ -34,7 +34,6 @@ CVCenter {
 				})
 			});
 			
-//			colors.postln;
 			nextColor = Pxrand(colors, inf).asStream;
 			
 			if(cvs.isNil, {
@@ -135,7 +134,7 @@ CVCenter {
 			orderedCVs = all.atAll(order);
 			
 			order.do({ |k, i|
-				("CVCenter.gui triggered:"+k).postln;
+//				("CVCenter.gui triggered:"+k).postln;
 				if(cvWidgets[k].notNil and:{ cvWidgets[k].midiOscEnv.notNil }, {
 					cvcArgs = ();
 					cvcArgs.midiOscEnv = cvWidgets[k].midiOscEnv;
@@ -157,12 +156,11 @@ CVCenter {
 					thisNextPos = tabProperties[cvTabIndex].nextPos;
 				});
 				
-				("CVCenter setup:"+this.setup).postln;
+//				("CVCenter setup:"+this.setup).postln;
 				
 				if(orderedCVs[i].class === Event and:{ 
 					orderedCVs[i].keys.includesAny([\lo, \hi])
 				}, {
-//					"and now a 2D widget".postln;
 					cvWidgets[k] = CVWidget2D(
 						tabs.views[cvTabIndex], 
 						[orderedCVs[i].lo, orderedCVs[i].hi], 
@@ -175,7 +173,6 @@ CVCenter {
 						cvcGui: cvcArgs
 					)
 				}, {
-					"invoked a CVWidgetKnob".postln;
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex], 
 						orderedCVs[i], 
@@ -214,9 +211,9 @@ CVCenter {
 				if(all[k].class === Event and:{ 
 					all[k].keys.includesAny([\lo, \hi])
 				}, {
-					widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: (\lo: false, \hi: false)))
+					widgetStates.put(k, (tabIndex: cvTabIndex))
 				}, {
-					widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: false))
+					widgetStates.put(k, (tabIndex: cvTabIndex))
 				});
 				rowwidth = tabs.views[cvTabIndex].bounds.width-15;
 				colwidth = widgetwidth+1; // add a small gap between widgets
@@ -249,9 +246,9 @@ CVCenter {
 					});
 					if(all.size < lastUpdate, {
 						removedKeys = cvWidgets.keys.difference(all.keys);
-						("removed:"+removedKeys).postln;
+//						("removed:"+removedKeys).postln;
 						removedKeys.do({ |k|
-							("now removing at:"+k).postln;
+//							("now removing at:"+k).postln;
 							cvWidgets[k].remove;
 							cvWidgets.removeAt(k);
 						});
@@ -260,7 +257,6 @@ CVCenter {
 							if(view.children.size == 0, { this.prRemoveTab(i) });
 						});
 						tmp = tabs.getLabelAt(0);
-						tmp.postln;
 						if(tabs.views.size == 1 and:{ tmp != "default" }, {
 							this.renameTab(tmp, "default");
 						});
@@ -437,8 +433,62 @@ CVCenter {
 	*setActionAt { |key, action|
 		if(all[key].notNil and:{ cvWidgets[key].notNil }, {
 			all[key].action_(action);
-			widgetStates[key].put(\action, action);
+			widgetStates[key].put(\action, action.asCompileString);
 		})
+	}
+	
+	*saveSetup { 
+		var lib, successFunc;
+		successFunc = { |f|
+			lib = Library();
+			lib.put( \all, all );
+			lib.put( \widgetStates, widgetStates );
+			lib.put( \tabProperties, tabProperties );
+			if(GUI.current.asString == "QtGUI", {
+				lib.writeTextArchive(*f);
+			}, {
+				lib.writeTextArchive(f);
+			});
+			lib = nil;
+		};
+		if(GUI.current.asString != "QtGUI", {
+			File.saveDialog(
+				prompt: "Save your current setup to a file",
+				defaultName: "Setup",
+				successFunc: successFunc
+			)
+		}, { QDialog.savePanel(successFunc) })
+	}
+	
+	*loadSetup { |addToExisting=false, autoConnect=false, loadActions=false|
+		var lib;
+		File.openDialog(
+			prompt: "Please choose a setup",
+			successFunc: { |f|
+				lib = Library.readTextArchive(f);
+				if(all.notNil, {
+					if(addToExisting.not, { 
+						this.removeAll;
+						"all removed?".postln;
+						tabProperties = lib[\tabProperties];
+						tabProperties.do({ |p| p.nextPos = 0@0 });
+					}, {
+						lib[\tabProperties].do({ |p| 
+							if(p.tabLabel != "default", { 
+								p.nextPos = 0@0; 
+								tabProperties = tabProperties.add(p);
+								tabProperties.postln;
+							})
+						})
+					});
+				}, {
+					this.new;
+				});
+				lib[\all].pairsDo({ |k, v| all.put(k, v) });
+				lib[\widgetStates].pairsDo({ |k, v| widgetStates.put(k, v) });
+				all.pairsDo({ |k, cv| if(window.isNil, { this.gui }, { this.prAddToGui }) });
+			}
+		)
 	}
 	
 	// private Methods - not to be used directly
@@ -452,7 +502,6 @@ CVCenter {
 		if(window.notNil and:{ window.notClosed }, {
 //			("setup-args:"+[argMode, argResolution, argMean, argCButtonBank, argSoftWithin]).postln;
 			cvWidgets.pairsDo({ |k, wdgt|
-				"does it happen here?".postln;
 				switch(wdgt.class,
 					CVWidgetKnob, {
 						this.midiMode !? { wdgt.setMidiMode(this.midiMode) };
@@ -483,7 +532,7 @@ CVCenter {
 		var widgetwidth, widgetheight=166, colwidth, rowheight;
 		var widgetControllersAndModels, cvcArgs;
 		
-		("tab passed to prAddToGui:"+[tab, this.setup]).postln;
+//		("tab passed to prAddToGui:"+[tab, this.setup]).postln;
 		
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 		
@@ -509,9 +558,7 @@ CVCenter {
 		
 		tabs.labelColors_(tabProperties.collect(_.tabColor));
 		tabs.unfocusedColors_(tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) }));
-		
-		"happening here? %\n".postf(tabProperties[cvTabIndex]);
-		
+				
 		if(tabProperties[cvTabIndex].nextPos.notNil, {
 			thisNextPos = tabProperties[cvTabIndex].nextPos;
 		}, {
@@ -544,9 +591,9 @@ CVCenter {
 					},
 					cvcGui: cvcArgs
 				);
-				widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: (hi: false, lo: false)));
+				widgetStates.put(k, (tabIndex: cvTabIndex));
 			}, {	
-				"invoked a CVWidgetKnob at prAddToGui".postln;
+//				"invoked a CVWidgetKnob at prAddToGui".postln;
 				cvWidgets[k] = CVWidgetKnob(
 					tabs.views[cvTabIndex], 
 					all[k], 
@@ -557,10 +604,9 @@ CVCenter {
 					cvcGui: cvcArgs
 				);
 				if(widgetStates[k].isNil, {
-					widgetStates.put(k, (tabIndex: cvTabIndex, addedFunc: false));
+					widgetStates.put(k, (tabIndex: cvTabIndex));
 				}, {
 					widgetStates[k].tabIndex = cvTabIndex;
-					widgetStates[k].addedFunc = false;
 				});
 				cvWidgets[k].widgetCV !? { cvWidgets[k].widgetCV.value_(cvWidgets[k].widgetCV.value) };
 			});
@@ -586,7 +632,7 @@ CVCenter {
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets;
 		var widgetwidth, widgetheight=166;
 		
-		"prRegroupWidgets invoked".postln;
+//		"prRegroupWidgets invoked".postln;
 				
 		rowheight = widgetheight+1;
 		thisNextPos = 0@0;
@@ -615,7 +661,6 @@ CVCenter {
 	}	
 	
 	*prRemoveTab { |index|
-		tabs.getLabelAt(index).postln;
 		if(tabs.views.size > 1, {
 			tabs.removeAt(index);
 			tabProperties.removeAt(index);
