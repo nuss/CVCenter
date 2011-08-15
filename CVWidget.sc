@@ -533,10 +533,10 @@ CVWidget {
 	getOscInputConstraints { |key|
 		switch(this.class,
 			CVWidgetKnob, {
-				^[midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi];
+				^midiOscEnv.calibConstraints;
 			},
 			{
-				^[midiOscEnv[key].calibConstraints.lo, midiOscEnv[key].calibConstraints.hi];
+				^midiOscEnv[key].calibConstraints;
 			}
 		)
 	}
@@ -1100,6 +1100,7 @@ CVWidget {
 								
 				if(midiOscEnv.oscResponder.isNil, { 
 					midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;
+					midiOscEnv.oscMsgIndex = theChanger.value[3];
 				}, {
 					midiOscEnv.oscResponder.action_(oscResponderAction);
 				});
@@ -1119,6 +1120,7 @@ CVWidget {
 			if(theChanger.value == false, {
 				midiOscEnv.oscResponder.remove;
 				midiOscEnv.oscResponder = nil;
+				midiOscEnv.msgIndex = nil;
 				thisGuiEnv.oscEditBut.states_([
 					["edit OSC", Color.black, Color.clear]
 				]);
@@ -1144,7 +1146,7 @@ CVWidget {
 		};
 		
 		wcm.oscDisplay.controller.put(\value, { |theChanger, what, moreArgs|
-			theChanger.value;
+//			theChanger.value;
 			switch(prCalibrate.class, 
 				Event, { thisCalib = prCalibrate[key] },
 				{ thisCalib = prCalibrate }

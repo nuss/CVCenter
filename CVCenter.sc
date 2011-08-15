@@ -438,12 +438,49 @@ CVCenter {
 	}
 	
 	*saveSetup { 
-		var lib, successFunc;
+		var lib, midiOscEnvs = (), successFunc;
 		successFunc = { |f|
 			lib = Library();
 			lib.put( \all, all );
 			lib.put( \widgetStates, widgetStates );
 			lib.put( \tabProperties, tabProperties );
+			cvWidgets.pairsDo({ |k, v| 
+				midiOscEnvs.put(k, ());
+				switch(v.class,
+					CVWidget2D, {
+						midiOscEnvs[k].lo = (); midiOscEnvs[k].hi = ();
+						[\lo, \hi].do({ |lohi|
+							cvWidgets[k].midiOscEnv[lohi].oscResponder !? {
+								midiOscEnvs[k][lohi].oscRespAddr = cvWidgets[k].midiOscEnv[lohi].oscResponder.addr;
+								midiOscEnvs[k][lohi].oscRespCmdName = cvWidgets[k].midiOscEnv[lohi].oscResponder.cmdName;
+								midiOscEnvs[k][lohi].oscRespMsgIndex = cvWidgets[k].midiOscEnv[lohi].oscMsgIndex;
+								midiOscEnvs[k][lohi].calibConstraints = cvWidgets[k].getOscInputConstraints(lohi);
+								midiOscEnvs[k][lohi].oscMapping = cvWidgets[k].getOscMapping(lohi);
+							};
+							cvWidgets[k].midiOscEnv[lohi].cc !? {
+								midiOscEnvs[k][lohi].midisrc = cvWidgets[k].midiOscEnv[lohi].midisrc;
+								midiOscEnvs[k][lohi].midichan = cvWidgets[k].midiOscEnv[lohi].midichan;
+								midiOscEnvs[k][lohi].midinum = cvWidgets[k].midiOscEnv[lohi].midinum;
+							}
+						})
+					},
+					{
+						cvWidgets[k].midiOscEnv.oscResponder !? {
+							midiOscEnvs[k].oscRespAddr = cvWidgets[k].midiOscEnv.oscResponder.addr;
+							midiOscEnvs[k].oscRespCmdName = cvWidgets[k].midiOscEnv.oscResponder.cmdName;
+							midiOscEnvs[k].oscRespMsgIndex = cvWidgets[k].midiOscEnv.oscMsgIndex;
+							midiOscEnvs[k].calibConstraints = cvWidgets[k].getOscInputConstraints;
+							midiOscEnvs[k].oscMapping = cvWidgets[k].getOscMapping;
+						};
+						cvWidgets[k].midiOscEnv.cc !? {
+							midiOscEnvs[k].midisrc = cvWidgets[k].midiOscEnv.midisrc;
+							midiOscEnvs[k].midichan = cvWidgets[k].midiOscEnv.midichan;
+							midiOscEnvs[k].midinum = cvWidgets[k].midiOscEnv.midinum;
+						}
+					}
+				)
+			});
+			lib.put(\midiOscEnvs, midiOscEnvs);
 			if(GUI.current.asString == "QtGUI", {
 				lib.writeTextArchive(*f);
 			}, {
@@ -461,34 +498,49 @@ CVCenter {
 	}
 	
 	*loadSetup { |addToExisting=false, autoConnect=false, loadActions=false|
-		var lib;
-		File.openDialog(
-			prompt: "Please choose a setup",
-			successFunc: { |f|
+		var lib, midiOscEnvs, successFunc;
+
+		successFunc = { |f|
+			if(GUI.current.asString == "QtGUI", {
+				lib = Library.readTextArchive(*f);
+			}, {
 				lib = Library.readTextArchive(f);
-				if(all.notNil, {
-					if(addToExisting.not, { 
-						this.removeAll;
-						"all removed?".postln;
-						tabProperties = lib[\tabProperties];
-						tabProperties.do({ |p| p.nextPos = 0@0 });
-					}, {
-						lib[\tabProperties].do({ |p| 
-							if(p.tabLabel != "default", { 
-								p.nextPos = 0@0; 
-								tabProperties = tabProperties.add(p);
-								tabProperties.postln;
-							})
-						})
-					});
+			});
+			if(all.notNil, {
+				if(addToExisting.not, { 
+					this.removeAll;
+					"all removed?".postln;
+					tabProperties = lib[\tabProperties];
+					tabProperties.do({ |p| p.nextPos = 0@0 });
 				}, {
-					this.new;
+					lib[\tabProperties].do({ |p| 
+						if(p.tabLabel != "default", { 
+							p.nextPos = 0@0; 
+							tabProperties = tabProperties.add(p);
+							tabProperties.postln;
+						})
+					})
 				});
-				lib[\all].pairsDo({ |k, v| all.put(k, v) });
-				lib[\widgetStates].pairsDo({ |k, v| widgetStates.put(k, v) });
-				all.pairsDo({ |k, cv| if(window.isNil, { this.gui }, { this.prAddToGui }) });
-			}
-		)
+			}, {
+				this.new;
+				
+			});
+			lib[\all].pairsDo({ |k, v| all.put(k, v) });
+			lib[\widgetStates].pairsDo({ |k, v| widgetStates.put(k, v) });
+			midiOscEnvs = lib[\midiOscEnvs];
+			lib.dictionary.pairsDo({ |k, v| [k, v].postcs });
+//			[all, widgetStates, tabProperties, midiOscEnvs].postcs;
+			all.pairsDo({ |k, cv| if(window.isNil, { this.gui }, { this.prAddToGui }) });
+		};
+
+		if(GUI.current.asString == "QtGUI", {
+			QDialog.getPaths(successFunc, allowsMultiple: false);
+		}, {
+			File.openDialog(
+				prompt: "Please choose a setup",
+				successFunc: successFunc
+			)
+		})
 	}
 	
 	// private Methods - not to be used directly
