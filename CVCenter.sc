@@ -21,7 +21,6 @@ CVCenter {
 			colors = List();
 			tabProperties = [];
 			
-//			("setUpArgs:"+setUpArgs).postln;
 			if(setUpArgs.size > 0, { 
 				this.prSetup(*setUpArgs) 
 			});
@@ -147,7 +146,6 @@ CVCenter {
 			orderedCVs = all.atAll(order);
 			
 			order.do({ |k, i|
-//				("CVCenter.gui triggered:"+k).postln;
 				if(cvWidgets[k].notNil and:{ cvWidgets[k].midiOscEnv.notNil }, {
 					cvcArgs = ();
 					cvcArgs.midiOscEnv = cvWidgets[k].midiOscEnv;
@@ -168,10 +166,7 @@ CVCenter {
 				}, { 
 					thisNextPos = tabProperties[cvTabIndex].nextPos;
 				});
-				
-//				("CVCenter setup:"+this.setup).postln;
-				
-//				"now adding to tab %\n".postf(cvTabIndex);
+								
 				if(orderedCVs[i].class === Event and:{ 
 					orderedCVs[i].keys.includesAny([\lo, \hi])
 				}, {
@@ -255,8 +250,6 @@ CVCenter {
 					if(all.size < lastUpdate, {
 						removedKeys = cvWidgets.keys.difference(all.keys);
 						removedKeys.do({ |k|
-//							cvWidgets[k].remove;
-//							cvWidgets.removeAt(k);
 							this.removeAt(k);
 						});
 						this.prRegroupWidgets(tabs.activeTab);
@@ -264,9 +257,6 @@ CVCenter {
 					});
 					lastUpdate = all.size;
 				});
-//				tabs.views.do({ |view, i|
-//					if(view.children.size == 0, { this.prRemoveTab(i) });
-//				});
 				try {
 					if(window.bounds.width != lastUpdateWidth, {
 						this.prRegroupWidgets(tabs.activeTab);
@@ -514,6 +504,7 @@ CVCenter {
 					}
 				);
 				lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
+				lib[\all][k].postcs;
 			});
 
 			if(GUI.current.asString == "QtGUI", {
@@ -536,7 +527,7 @@ CVCenter {
 		});
 	}
 	
-	*loadSetup { |path, addToExisting=false, autoConnect=false, loadActions=false|
+	*loadSetup { |path, addToExisting=false, autoConnectOSC=false, autoConnectMIDI=false, loadActions=false|
 		var lib, midiOscEnvs, successFunc;
 
 		successFunc = { |f|
@@ -551,18 +542,73 @@ CVCenter {
 				});
 			});
 			lib[\all].pairsDo({ |key, v|
-//				v.postcs;
 				switch(v.wdgtClass,
 					CVWidget2D, {
-//						"I'm a CVWidget2D".postln;
 						[\lo, \hi].do({ |hilo|
-//							[key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo].postln;
 							this.use(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
+							if(loadActions, {
+								v[hilo].action !? {
+									this.setActionAt(key, v[hilo].action.interpret, hilo);
+								}
+							});
+							if(autoConnectOSC, {
+								v[hilo].osc.cmdName !? {
+									v[hilo].osc.addr.class.postln;
+									cvWidgets[key].oscConnect(
+										v[hilo].osc.addr.ip, 
+										v[hilo].osc.addr.port, 
+										v[hilo].osc.cmdName, 
+										v[hilo].osc.msgIndex, 
+										hilo
+									);
+									cvWidgets[key].setOscInputConstraints(
+										v[hilo].osc.calibConstraints.lo @ v[hilo].osc.calibConstraints.hi, hilo
+									);
+									cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo)
+								}
+							});
+							if(autoConnectMIDI, {
+								v[hilo].midi.num !? {
+									cvWidgets[key].midiConnect(
+										v[hilo].midi.src,
+										v[hilo].midi.chan,
+										v[hilo].midi.num,
+										hilo
+									)
+								}
+							})
 						})
 					},
 					CVWidgetKnob, { 
-//						"I'm a CVWidgetKnob".postln;
-						this.use(key, v.spec, v.val, v.tabLabel)
+						this.use(key, v.spec, v.val, v.tabLabel);
+						if(loadActions, {
+							v.action !? {
+								this.setActionAt(key, v.action.interpret);
+							}
+						});
+						if(autoConnectOSC, {
+							v.osc.cmdName !? {
+								cvWidgets[key].oscConnect(
+									v.osc.addr.ip, 
+									v.osc.addr.port, 
+									v.osc.cmdName, 
+									v.osc.msgIndex 
+								);
+								cvWidgets[key].setOscInputConstraints(
+									v.osc.calibConstraints.lo @ v.osc.calibConstraints.hi
+								);
+								cvWidgets[key].setOscMapping(v.osc.oscMapping)
+							}
+						});
+						if(autoConnectMIDI, {
+							v.midi.num !? {
+								cvWidgets[key].midiConnect(
+									v.midi.src,
+									v.midi.chan,
+									v.midi.num
+								)
+							}
+						})
 					}
 				)
 			});
@@ -759,7 +805,6 @@ CVCenter {
 		}, {
 			if(tabs.getLabelAt(index) != "default", { tabs.setLabelAt(index, "default") });
 			tabProperties = [(tabLabel: "default", tabColor: tabProperties[index].tabColor)];
-//			tabProperties.postln;
 		})
 	}
 	
