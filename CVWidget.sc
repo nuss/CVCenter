@@ -76,6 +76,10 @@ CVWidget {
 		allGuiEls.do(_.remove);
 	}
 	
+	close {
+		if(isCVCWidget, { this.remove }, { this.window.close });
+	}
+	
 	setMidiMode { |mode, key|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -407,11 +411,11 @@ CVWidget {
 		if(port == "nil", { intPort = nil });
 		
 		if("^\/".matchRegexp(name.asString).not, {
-			Error("You have to supply a valid OSC-typetag, beginning with an \"/\" as first argument to oscConnect").throw;
+			Error("You have to supply a valid OSC-typetag (command-name), beginning with an \"/\" as third argument to oscConnect").throw;
 		});
 		
 		if(oscMsgIndex.isKindOf(Integer).not, {
-			Error("You have to supply an integer as second argument to oscConnect").throw;
+			Error("You have to supply an integer as forth argument to oscConnect").throw;
 		});
 		
 		switch(this.class,
@@ -866,7 +870,7 @@ CVWidget {
 					);
 					src !? { midiOscEnv.midisrc = src };
 					chan !? { midiOscEnv.midichan = chan };
-					num !? { midiOscEnv.midinum = ctrlString };
+					num !? { midiOscEnv.midinum = ctrlString; midiOscEnv.midiRawNum = num };
 				};
 				makeCCResponder = { |argSrc, argChan, argNum|
 					if(midiOscEnv.cc.isNil, {
@@ -911,7 +915,7 @@ CVWidget {
 				wcm.midiDisplay.model.value_(
 					(src: "source", chan: "chan", ctrl: "ctrl", learn: "L")
 				).changed(\value);
-				midiOscEnv.midisrc = nil; midiOscEnv.midichan = nil; midiOscEnv.midinum = nil;
+				midiOscEnv.midisrc = nil; midiOscEnv.midichan = nil; midiOscEnv.midinum = nil; midiOscEnv.midiRawNum = nil;
 			})
 		});
 		

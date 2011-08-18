@@ -74,9 +74,7 @@ CVWidgetKnob : CVWidget {
 		}, {
 			window = parentView;
 		});
-		
-		"CVWidgetKnob: %\n".postf(window);
-						
+								
 		cvcGui ?? { 
 			window.onClose_({
 				if(editor.notNil, {
@@ -371,5 +369,5 @@ CVWidgetKnob : CVWidget {
 	cvAction_ { |func|
 		widgetCV.action_(func);
 	}
-	
+		
 }

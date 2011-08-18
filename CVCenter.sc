@@ -69,6 +69,8 @@ CVCenter {
 		var funcToAdd;
 		var widgetControllersAndModels, cvcArgs;
 		var tmp;
+		
+//		"should add to tab %\n".postf(tab);
 			
 		cvs !? { this.put(*cvs) };
 		
@@ -146,7 +148,7 @@ CVCenter {
 					if(widgetStates[k].isNil, {
 						cvTabIndex = 0;
 					}, {
-						cvTabIndex = widgetStates[k].tabIndex ? cvTabIndex = 0;
+						cvTabIndex = widgetStates[k].tabIndex ?? { cvTabIndex = 0 };
 					})
 				});
 				
@@ -158,6 +160,7 @@ CVCenter {
 				
 //				("CVCenter setup:"+this.setup).postln;
 				
+//				"now adding to tab %\n".postf(cvTabIndex);
 				if(orderedCVs[i].class === Event and:{ 
 					orderedCVs[i].keys.includesAny([\lo, \hi])
 				}, {
@@ -208,13 +211,7 @@ CVCenter {
 					}
 				);
 
-				if(all[k].class === Event and:{ 
-					all[k].keys.includesAny([\lo, \hi])
-				}, {
-					widgetStates.put(k, (tabIndex: cvTabIndex))
-				}, {
-					widgetStates.put(k, (tabIndex: cvTabIndex))
-				});
+				widgetStates.put(k, (tabIndex: cvTabIndex));
 				rowwidth = tabs.views[cvTabIndex].bounds.width-15;
 				colwidth = widgetwidth+1; // add a small gap between widgets
 
@@ -246,23 +243,19 @@ CVCenter {
 					});
 					if(all.size < lastUpdate, {
 						removedKeys = cvWidgets.keys.difference(all.keys);
-//						("removed:"+removedKeys).postln;
 						removedKeys.do({ |k|
-//							("now removing at:"+k).postln;
-							cvWidgets[k].remove;
-							cvWidgets.removeAt(k);
+//							cvWidgets[k].remove;
+//							cvWidgets.removeAt(k);
+							this.removeAt(k);
 						});
 						this.prRegroupWidgets(tabs.activeTab);
-						tabs.views.do({ |view, i|
-							if(view.children.size == 0, { this.prRemoveTab(i) });
-						});
 						tmp = tabs.getLabelAt(0);
-						if(tabs.views.size == 1 and:{ tmp != "default" }, {
-							this.renameTab(tmp, "default");
-						});
 					});
 					lastUpdate = all.size;
 				});
+//				tabs.views.do({ |view, i|
+//					if(view.children.size == 0, { this.prRemoveTab(i) });
+//				});
 				try {
 					if(window.bounds.width != lastUpdateWidth, {
 						this.prRegroupWidgets(tabs.activeTab);
@@ -328,25 +321,28 @@ CVCenter {
 				cvWidgets[key].midiOscEnv.oscResponder !? { 
 					cvWidgets[key].midiOscEnv.oscResponder.remove;
 					cvWidgets[key].midiOscEnv.oscResponder = nil;
-				}
+				};
 			},
 			CVWidget2D, {
-				[\lo, \hi].do({ |lohi|
-					if(cvWidgets[key].editor[lohi].notNil and:{ cvWidgets[key].editor.isClosed.not }, {
-						cvWidgets[key].editor[lohi].close;
+				[\lo, \hi].do({ |hilo|
+					if(cvWidgets[key].editor[hilo].notNil and:{ cvWidgets[key].editor.isClosed.not }, {
+						cvWidgets[key].editor[hilo].close;
 					});
-					cvWidgets[key].midiOscEnv[lohi].cc !? { 
-						cvWidgets[key].midiOscEnv[lohi].cc.remove; 
-						cvWidgets[key].midiOscEnv[lohi].cc = nil;
+					cvWidgets[key].midiOscEnv[hilo].cc !? { 
+						cvWidgets[key].midiOscEnv[hilo].cc.remove; 
+						cvWidgets[key].midiOscEnv[hilo].cc = nil;
 					};
-					cvWidgets[key].midiOscEnv[lohi].oscResponder !? { 
-						cvWidgets[key].midiOscEnv[lohi].oscResponder.remove;
-						cvWidgets[key].midiOscEnv[lohi].oscResponder = nil;	
+					cvWidgets[key].midiOscEnv[hilo].oscResponder !? { 
+						cvWidgets[key].midiOscEnv[hilo].oscResponder.remove;
+						cvWidgets[key].midiOscEnv[hilo].oscResponder = nil;	
 					}
 				})
-			};
-			widgetStates.removeAt(key)
+			}
 		);
+		cvWidgets[key].remove;
+		cvWidgets.removeAt(key);
+		widgetStates.removeAt(key);
+		tabs.views.do({ |v, i| if(v.children.size == 0, { this.prRemoveTab(i) }) });
 		^lastVal;
 	}
 	
@@ -430,10 +426,20 @@ CVCenter {
 		tabProperties[index].tabLabel = newName.asString;
 	}
 	
-	*setActionAt { |key, action|
+	*setActionAt { |key, action, slot|
 		if(all[key].notNil and:{ cvWidgets[key].notNil }, {
-			all[key].action_(action);
-			widgetStates[key].put(\action, action.asCompileString);
+			switch(cvWidgets[key].class,
+				CVWidget2D, {
+					if(slot.isNil, { Error("Please provide the key (\hi or \lo) for which the action shall be set").throw });
+					all[key][slot].action_(action);
+					widgetStates[key].action ?? { widgetStates[key].action = () };
+					widgetStates[key].action.put(slot, action.asCompileString);
+				},
+				{
+					all[key].action_(action);
+					widgetStates[key].put(\action, action.asCompileString);
+				}
+			)
 		})
 	}
 	
@@ -441,46 +447,66 @@ CVCenter {
 		var lib, midiOscEnvs = (), successFunc;
 		successFunc = { |f|
 			lib = Library();
-			lib.put( \all, all );
-			lib.put( \widgetStates, widgetStates );
-			lib.put( \tabProperties, tabProperties );
-			cvWidgets.pairsDo({ |k, v| 
-				midiOscEnvs.put(k, ());
-				switch(v.class,
+			lib.put( \all, ());
+			all.pairsDo({ |k, cv|
+				lib[\all].put(k, ());
+//				"tablabel at % is %, store in the lib as %\n".postf(k, tabProperties[widgetStates[k].tabIndex].tabLabel, lib[\all][k].tabLabel);
+				switch(cvWidgets[k].class,
 					CVWidget2D, {
-						midiOscEnvs[k].lo = (); midiOscEnvs[k].hi = ();
-						[\lo, \hi].do({ |lohi|
-							cvWidgets[k].midiOscEnv[lohi].oscResponder !? {
-								midiOscEnvs[k][lohi].oscRespAddr = cvWidgets[k].midiOscEnv[lohi].oscResponder.addr;
-								midiOscEnvs[k][lohi].oscRespCmdName = cvWidgets[k].midiOscEnv[lohi].oscResponder.cmdName;
-								midiOscEnvs[k][lohi].oscRespMsgIndex = cvWidgets[k].midiOscEnv[lohi].oscMsgIndex;
-								midiOscEnvs[k][lohi].calibConstraints = cvWidgets[k].getOscInputConstraints(lohi);
-								midiOscEnvs[k][lohi].oscMapping = cvWidgets[k].getOscMapping(lohi);
-							};
-							cvWidgets[k].midiOscEnv[lohi].cc !? {
-								midiOscEnvs[k][lohi].midisrc = cvWidgets[k].midiOscEnv[lohi].midisrc;
-								midiOscEnvs[k][lohi].midichan = cvWidgets[k].midiOscEnv[lohi].midichan;
-								midiOscEnvs[k][lohi].midinum = cvWidgets[k].midiOscEnv[lohi].midinum;
-							}
+						lib[\all][k].wdgtClass = CVWidget2D;
+						[\lo, \hi].do({ |hilo|
+							lib[\all][k][hilo] = (
+								spec: all[k][hilo].spec,
+								val: all[k][hilo].value,
+								action: widgetStates[k].action[hilo],
+								osc: (
+									addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
+										cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
+									},
+									cmdName: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
+										cvWidgets[k].midiOscEnv[hilo].oscResponder.cmdName
+									},
+									msgIndex: cvWidgets[k].midiOscEnv[hilo].oscMsgIndex,
+									calibConstraints: cvWidgets[k].getOscInputConstraints(hilo),
+									oscMapping: cvWidgets[k].getOscMapping(hilo)
+								),
+								midi: (
+									src: cvWidgets[k].midiOscEnv[hilo].midisrc,
+									chan: cvWidgets[k].midiOscEnv[hilo].midichan,
+									num: cvWidgets[k].midiOscEnv[hilo].midiRawNum
+								)
+							)
 						})
 					},
-					{
-						cvWidgets[k].midiOscEnv.oscResponder !? {
-							midiOscEnvs[k].oscRespAddr = cvWidgets[k].midiOscEnv.oscResponder.addr;
-							midiOscEnvs[k].oscRespCmdName = cvWidgets[k].midiOscEnv.oscResponder.cmdName;
-							midiOscEnvs[k].oscRespMsgIndex = cvWidgets[k].midiOscEnv.oscMsgIndex;
-							midiOscEnvs[k].calibConstraints = cvWidgets[k].getOscInputConstraints;
-							midiOscEnvs[k].oscMapping = cvWidgets[k].getOscMapping;
-						};
-						cvWidgets[k].midiOscEnv.cc !? {
-							midiOscEnvs[k].midisrc = cvWidgets[k].midiOscEnv.midisrc;
-							midiOscEnvs[k].midichan = cvWidgets[k].midiOscEnv.midichan;
-							midiOscEnvs[k].midinum = cvWidgets[k].midiOscEnv.midinum;
-						}
+					CVWidgetKnob, {
+						lib[\all][k] = (
+							spec: all[k].spec,
+							val: all[k].value,
+							action: widgetStates[k].action,
+							osc: (
+								addr: cvWidgets[k].midiOscEnv.oscResponder !? { 
+									cvWidgets[k].midiOscEnv.oscResponder.addr
+								},
+								cmdName: cvWidgets[k].midiOscEnv.oscResponder !? { 
+									cvWidgets[k].midiOscEnv.oscResponder.cmdName
+								},
+								msgIndex: cvWidgets[k].midiOscEnv.oscMsgIndex,
+								calibConstraints: cvWidgets[k].getOscInputConstraints,
+								oscMapping: cvWidgets[k].getOscMapping
+							),
+							midi: (
+								src: cvWidgets[k].midiOscEnv.midisrc,
+								chan: cvWidgets[k].midiOscEnv.midichan,
+								num: cvWidgets[k].midiOscEnv.midiRawNum
+							),
+							wdgtClass: CVWidgetKnob
+						)
 					}
-				)
+				);
+				lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
 			});
-			lib.put(\midiOscEnvs, midiOscEnvs);
+//			lib[\all].postcs;
+//			lib.put( \widgetStates, widgetStates );
 			if(GUI.current.asString == "QtGUI", {
 				lib.writeTextArchive(*f);
 			}, {
@@ -509,28 +535,24 @@ CVCenter {
 			if(all.notNil, {
 				if(addToExisting.not, { 
 					this.removeAll;
-					"all removed?".postln;
-					tabProperties = lib[\tabProperties];
-					tabProperties.do({ |p| p.nextPos = 0@0 });
-				}, {
-					lib[\tabProperties].do({ |p| 
-						if(p.tabLabel != "default", { 
-							p.nextPos = 0@0; 
-							tabProperties = tabProperties.add(p);
-							tabProperties.postln;
-						})
-					})
 				});
-			}, {
-				this.new;
-				
 			});
-			lib[\all].pairsDo({ |k, v| all.put(k, v) });
-			lib[\widgetStates].pairsDo({ |k, v| widgetStates.put(k, v) });
-			midiOscEnvs = lib[\midiOscEnvs];
-			lib.dictionary.pairsDo({ |k, v| [k, v].postcs });
-//			[all, widgetStates, tabProperties, midiOscEnvs].postcs;
-			all.pairsDo({ |k, cv| if(window.isNil, { this.gui }, { this.prAddToGui }) });
+			lib[\all].pairsDo({ |key, v|
+//				v.postcs;
+				switch(v.wdgtClass,
+					CVWidget2D, {
+//						"I'm a CVWidget2D".postln;
+						[\lo, \hi].do({ |hilo|
+//							[key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo].postln;
+							this.use(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
+						})
+					},
+					CVWidgetKnob, { 
+//						"I'm a CVWidgetKnob".postln;
+						this.use(key, v.spec, v.val, v.tabLabel)
+					}
+				)
+			});
 		};
 
 		if(GUI.current.asString == "QtGUI", {
@@ -683,7 +705,7 @@ CVCenter {
 	*prRegroupWidgets { |tabIndex|
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets;
 		var widgetwidth, widgetheight=166;
-		
+				
 //		"prRegroupWidgets invoked".postln;
 				
 		rowheight = widgetheight+1;
@@ -693,7 +715,8 @@ CVCenter {
 			order = cvWidgets.order;
 			orderedWidgets = cvWidgets.atAll(order);
 			order.do({ |k, i|
-				if(tabIndex == widgetStates[k].tabIndex, {
+//				widgetStates[k].postln;
+				if(widgetStates[k].notNil and:{ tabIndex == widgetStates[k].tabIndex }, {
 					if(thisNextPos != (0@0), { 
 						thisNextPos = tabProperties[widgetStates[k].tabIndex].nextPos;
 					});
@@ -718,7 +741,8 @@ CVCenter {
 			tabProperties.removeAt(index);
 		}, {
 			if(tabs.getLabelAt(index) != "default", { tabs.setLabelAt(index, "default") });
-			tabProperties[0] = (tabLabel: "default", tabColor: tabProperties[index].tabColor);
+			tabProperties = [(tabLabel: "default", tabColor: tabProperties[index].tabColor)];
+//			tabProperties.postln;
 		})
 	}
 	
