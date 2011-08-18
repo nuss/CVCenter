@@ -443,14 +443,13 @@ CVCenter {
 		})
 	}
 	
-	*saveSetup { 
+	*saveSetup { |path|
 		var lib, midiOscEnvs = (), successFunc;
 		successFunc = { |f|
 			lib = Library();
 			lib.put( \all, ());
 			all.pairsDo({ |k, cv|
 				lib[\all].put(k, ());
-//				"tablabel at % is %, store in the lib as %\n".postf(k, tabProperties[widgetStates[k].tabIndex].tabLabel, lib[\all][k].tabLabel);
 				switch(cvWidgets[k].class,
 					CVWidget2D, {
 						lib[\all][k].wdgtClass = CVWidget2D;
@@ -458,7 +457,7 @@ CVCenter {
 							lib[\all][k][hilo] = (
 								spec: all[k][hilo].spec,
 								val: all[k][hilo].value,
-								action: widgetStates[k].action[hilo],
+								action: widgetStates[k].action !? { widgetStates[k].action[hilo] },
 								osc: (
 									addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
 										cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
@@ -505,8 +504,7 @@ CVCenter {
 				);
 				lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
 			});
-//			lib[\all].postcs;
-//			lib.put( \widgetStates, widgetStates );
+
 			if(GUI.current.asString == "QtGUI", {
 				lib.writeTextArchive(*f);
 			}, {
@@ -514,16 +512,20 @@ CVCenter {
 			});
 			lib = nil;
 		};
-		if(GUI.current.asString != "QtGUI", {
-			File.saveDialog(
-				prompt: "Save your current setup to a file",
-				defaultName: "Setup",
-				successFunc: successFunc
-			)
-		}, { QDialog.savePanel(successFunc) })
+		if(path.isNil, {
+			if(GUI.current.asString != "QtGUI", {
+				File.saveDialog(
+					prompt: "Save your current setup to a file",
+					defaultName: "Setup",
+					successFunc: successFunc
+				)
+			}, { QDialog.savePanel(successFunc) })
+		}, {
+			successFunc.(path);
+		});
 	}
 	
-	*loadSetup { |addToExisting=false, autoConnect=false, loadActions=false|
+	*loadSetup { |path, addToExisting=false, autoConnect=false, loadActions=false|
 		var lib, midiOscEnvs, successFunc;
 
 		successFunc = { |f|
@@ -555,13 +557,17 @@ CVCenter {
 			});
 		};
 
-		if(GUI.current.asString == "QtGUI", {
-			QDialog.getPaths(successFunc, allowsMultiple: false);
+		if(path.isNil, {
+			if(GUI.current.asString == "QtGUI", {
+				QDialog.getPaths(successFunc, allowsMultiple: false);
+			}, {
+				File.openDialog(
+					prompt: "Please choose a setup",
+					successFunc: successFunc
+				)
+			})
 		}, {
-			File.openDialog(
-				prompt: "Please choose a setup",
-				successFunc: successFunc
-			)
+			successFunc.(path);
 		})
 	}
 	
