@@ -79,8 +79,6 @@ CVWidgetEditor {
 				});
 			});
 			
-//			allEditors.postln;
-
 			if(key.notNil, { thisEditor = allEditors[name][key] }, { thisEditor = allEditors[name] });
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });

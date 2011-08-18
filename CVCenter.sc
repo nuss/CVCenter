@@ -122,7 +122,18 @@ CVCenter {
 			switchBoard.resize_(8);
 
 			window.onClose_({
-				CVWidgetEditor.allEditors.pairsDo({ |editor, val| val.window.close });
+				CVWidgetEditor.allEditors.pairsDo({ |editor, val| 
+					switch(cvWidgets[editor].class, 
+						CVWidgetKnob, {
+							val.window.close;
+						},
+						CVWidget2D, {
+							[\lo, \hi].do({ |hilo|
+								val[hilo] !? { val[hilo].window.close };
+							})
+						}
+					)
+				});
 				tabProperties.do(_.nextPos_(0@0));
 				controlButtons = nil;
 				nextButtonPos = 0@0;

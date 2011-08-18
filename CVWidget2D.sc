@@ -69,13 +69,8 @@ CVWidget2D : CVWidget {
 		editor = ();
 		
 		[\lo, \hi].do({ |key| this.initControllersAndModels(controllersAndModels, key) });
-		
-//		("CVWidget2D setUpArgs:"+setUpArgs).postln;
-				
+						
 		[\lo, \hi].do({ |key|
-//			setUpArgs[key][0] ? prMidiMode = (lo: 0, hi: 0);
-//			setUpArgs[key][6] ? prCalibrate = (lo: true, hi: true);
-
 			setUpArgs[key] !? { setUpArgs[key][0] !? { this.setMidiMode(setUpArgs[key][0], key) }};
 			setUpArgs[key] !? { setUpArgs[key][1] !? { this.setMidiResolution(setUpArgs[key][1], key) }};
 			setUpArgs[key] !? { setUpArgs[key][2] !? { this.setMidiMean(setUpArgs[key][2], key) }};
@@ -83,9 +78,7 @@ CVWidget2D : CVWidget {
 			setUpArgs[key] !? { setUpArgs[key][4] !? { this.setSoftWithin(setUpArgs[key][4], key) }};
 			setUpArgs[key] !? { setUpArgs[key][5] !? { this.setCalibrate(setUpArgs[key][5], key) }};
 		});
-		
-//		("CVWidget2D setup:"+this.setup).postln;
-			
+					
 		actions !? {
 			if(actions.class !== Array, {
 				Error("Please provide actions in an array: [action1, action2]").throw;
@@ -110,7 +103,7 @@ CVWidget2D : CVWidget {
 		}, {
 			window = parentView;
 		});
-								
+										
 		cvcGui ?? { 
 			window.onClose_({
 				[\lo, \hi].do({ |hilo|

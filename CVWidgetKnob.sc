@@ -77,6 +77,7 @@ CVWidgetKnob : CVWidget {
 								
 		cvcGui ?? { 
 			window.onClose_({
+				"CVWidgetKnob: %\n".postf(editor);
 				if(editor.notNil, {
 					if(editor.isClosed.not, {
 						editor.close;
