@@ -433,6 +433,7 @@ CVCenter {
 			switch(cvWidgets[key].class,
 				CVWidget2D, {
 					if(slot.isNil, { Error("Please provide the key (\hi or \lo) for which the action shall be set").throw });
+					all[key][slot].action_(action);
 					widgetStates[key].action ?? { widgetStates[key].action = () };
 					widgetStates[key].action.put(slot, action.asCompileString);
 				},
