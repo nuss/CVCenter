@@ -1,7 +1,7 @@
 
 CVCenter {
 
-	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <switchBoard;
+	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <prefPane;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin, <numccs;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight; 
 	classvar <controlButtons, <nextButtonPos;
@@ -67,7 +67,8 @@ CVCenter {
 		var widgetwidth, widgetheight=166, colwidth, rowheight;
 		var funcToAdd;
 		var widgetControllersAndModels, cvcArgs;
-		var tmp;
+		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
+		var midiFlag, oscFlag, loadFlag, tmp;
 		
 //		"should add to tab %\n".postf(tab);
 			
@@ -100,10 +101,11 @@ CVCenter {
 			
 			tabs = TabbedView(
 				window,
-				Rect(0, 0, flow.bounds.width, flow.bounds.height-60), 
+				Rect(0, 0, flow.bounds.width, flow.bounds.height-40), 
 				labels: tabLabels, 
 				scroll: true
 			);
+			tabs.backgrounds_(Color(0.1, 0.1, 0.1)!tabs.views.size);
 			tabs.view.resize_(5);
 			tabs.labelColors_(labelColors);
 			tabs.labelPadding_(5);
@@ -116,10 +118,94 @@ CVCenter {
 			
 			flow.shift(0, 0);
 			
-			switchBoard = ScrollView(window, Rect(0, 0, flow.bounds.width, 50));
-			switchBoard.decorator = swFlow = FlowLayout(switchBoard.bounds, 0@0, 0@0);
-			switchBoard.resize_(8);
-
+			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40));
+			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, 0@0, 0@0);
+			prefPane.resize_(8).background_(Color.black);
+			
+			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
+				.font_(Font("Helvetica", 10))
+				.states_([["preferences", Color.red, Color.yellow]])
+				.action_({ |pb| })
+			;
+			
+			swFlow.shift(1, 0);
+			
+			saveBut = Button(prefPane, Rect(0, 0, 70, 20))
+				.font_(Font("Helvetica", 10))
+				.states_([["save setup", Color.white, Color(0.15, 0.15, 0.15)]])
+				.action_({ |sb| this.saveSetup })
+			;
+			
+			swFlow.shift(1, 0);
+			
+			loadBut = Button(prefPane, Rect(0, 0, 70, 20))
+				.font_(Font("Helvetica", 10))
+				.states_([["load setup", Color.white, Color(0.15, 0.15, 0.15)]])
+				.action_({ |pb|
+					if(loadActionsRadio.value == 0, { loadFlag = true }, { loadFlag = false });
+					if(autoConnectMIDIRadio.value == 0, { midiFlag = true }, { midiFlag = false });
+					if(autoConnectOSCRadio.value == 0, { oscFlag = true }, { oscFlag = false });
+					this.loadSetup(autoConnectMIDI: midiFlag, autoConnectOSC: oscFlag, loadActions: loadFlag);
+				})
+			;
+			
+			swFlow.shift(8, 0);
+			
+			StaticText(prefPane, Rect(0, 0, 55, 20))
+				.font_(Font("Helvetica", 10))
+				.stringColor_(Color.white)
+				.string_("load actions")
+				.align_(\right)
+			;
+			
+			swFlow.shift(5, 2);
+			
+			loadActionsRadio = Button(prefPane, Rect(0, 0, 15, 15))
+				.font_(Font("Helvetica", 10))
+				.states_([
+					["X", Color.red, Color.white],
+					["", Color.red, Color.white]
+				])
+			;
+			
+			swFlow.shift(5, -2);
+			
+			StaticText(prefPane, Rect(0, 0, 85, 20))
+				.font_(Font("Helvetica", 10))
+				.stringColor_(Color.white)
+				.string_("auto-connect MIDI")
+				.align_(\right)
+			;
+			
+			swFlow.shift(5, 2);
+			
+			autoConnectMIDIRadio = Button(prefPane, Rect(0, 0, 15, 15))
+				.font_(Font("Helvetica", 10))
+				.states_([
+					["X", Color.red, Color.white],
+					["", Color.red, Color.white]
+				])
+			;
+			
+			swFlow.shift(5, -2);
+						
+			StaticText(prefPane, Rect(5, 0, 85, 20))
+				.font_(Font("Helvetica", 10))
+				.stringColor_(Color.white)
+				.string_("auto-connect OSC")
+				.align_(\right)
+			;
+			
+			swFlow.shift(5, 2);
+			
+			autoConnectOSCRadio = Button(prefPane, Rect(0, 0, 15, 15))
+				.font_(Font("Helvetica", 10))
+				.states_([
+					["X", Color.red, Color.white],
+					["", Color.red, Color.white]
+				])
+			;
+						
 			window.onClose_({
 				CVWidgetEditor.allEditors.pairsDo({ |editor, val| 
 					switch(cvWidgets[editor].class, 
@@ -260,6 +346,7 @@ CVCenter {
 				try {
 					if(window.bounds.width != lastUpdateWidth, {
 						this.prRegroupWidgets(tabs.activeTab);
+						prefPane.reflowAll
 					})
 				};
 				lastUpdateWidth = window.bounds.width;
