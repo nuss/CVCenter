@@ -384,7 +384,7 @@ CVCenter {
 		}, {
 			all.put(thisKey, CV.new(thisSpec, thisVal)) 
 		});
-		
+				
 		if(window.isNil or:{ window.isClosed }, {
 			this.gui(tab);
 		}, {
@@ -429,10 +429,10 @@ CVCenter {
 	
 	*setActionAt { |key, action, slot|
 		if(all[key].notNil and:{ cvWidgets[key].notNil }, {
+			if(action.class === String, { action = action.interpret });
 			switch(cvWidgets[key].class,
 				CVWidget2D, {
 					if(slot.isNil, { Error("Please provide the key (\hi or \lo) for which the action shall be set").throw });
-					all[key][slot].action_(action);
 					widgetStates[key].action ?? { widgetStates[key].action = () };
 					widgetStates[key].action.put(slot, action.asCompileString);
 				},
@@ -504,7 +504,7 @@ CVCenter {
 					}
 				);
 				lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
-				lib[\all][k].postcs;
+//				lib[\all][k].postcs;
 			});
 
 			if(GUI.current.asString == "QtGUI", {
@@ -527,7 +527,7 @@ CVCenter {
 		});
 	}
 	
-	*loadSetup { |path, addToExisting=false, autoConnectOSC=false, autoConnectMIDI=false, loadActions=false|
+	*loadSetup { |path, addToExisting=false, autoConnectOSC=true, autoConnectMIDI=true, loadActions=true|
 		var lib, midiOscEnvs, successFunc;
 
 		successFunc = { |f|
@@ -553,7 +553,7 @@ CVCenter {
 							});
 							if(autoConnectOSC, {
 								v[hilo].osc.cmdName !? {
-									v[hilo].osc.addr.class.postln;
+									v[hilo].osc.addr.class;
 									cvWidgets[key].oscConnect(
 										v[hilo].osc.addr.ip, 
 										v[hilo].osc.addr.port, 
