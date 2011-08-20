@@ -50,7 +50,6 @@ CVCenter {
 							"Your given key-name matches the reserved names for new keys in the CVCenter. Please choose a different name.".warn;
 						})
 					});
-//					("CVs added so far:"+all).postln;
 				})
 			})
 		})
@@ -67,9 +66,7 @@ CVCenter {
 		var widgetControllersAndModels, cvcArgs;
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
 		var midiFlag, oscFlag, loadFlag, tmp;
-		
-//		"should add to tab %\n".postf(tab);
-			
+					
 		cvs !? { this.put(*cvs) };
 		
 		this.guix ?? { this.guix_(0) };
@@ -320,7 +317,6 @@ CVCenter {
 				lastUpdate ?? { lastUpdate = all.size };
 				lastSetUp !? {
 					if(this.setup != lastSetUp, {
-//						("now updating widget-setups:"+[this.setup, lastSetUp]).postln;
 						this.prSetup(*this.setup);
 					})
 				};	
@@ -587,7 +583,6 @@ CVCenter {
 					}
 				);
 				lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
-//				lib[\all][k].postcs;
 			});
 
 			if(GUI.current.asString == "QtGUI", {
@@ -720,7 +715,6 @@ CVCenter {
 		argCButtonBank !? { this.ctrlButtonBank_(argCButtonBank) };
 		argSoftWithin !? { this.softWithin_(argSoftWithin) };
 		if(window.notNil and:{ window.notClosed }, {
-//			("setup-args:"+[argMode, argResolution, argMean, argCButtonBank, argSoftWithin]).postln;
 			cvWidgets.pairsDo({ |k, wdgt|
 				switch(wdgt.class,
 					CVWidgetKnob, {
@@ -757,7 +751,6 @@ CVCenter {
 		if(tab.notNil, {
 			if(tabLabels.includes(tab.asSymbol), {
 				cvTabIndex = tabLabels.indexOf(tab.asSymbol);
-//				("tab is not nil and included in the list of current tabs:"+cvTabIndex).postln;
 			}, {
 				if(tabs.views.size == 1 and: { tabs.views[0].children.size == 0 }, {
 					cvTabIndex = 0;
@@ -767,11 +760,9 @@ CVCenter {
 					cvTabIndex = tabLabels.size;
 					tabProperties = tabProperties.add((tabLabel: tab, tabColor: nextColor.next));
 				})
-//				("tab is not nil and not included in the list of current tabs:"+cvTabIndex).postln;
 			})
 		}, {
 			cvTabIndex = tabs.activeTab;
-//			("tab is nil:"+cvTabIndex).postln;
 		});
 		
 		tabs.labelColors_(tabProperties.collect(_.tabColor));
@@ -811,7 +802,6 @@ CVCenter {
 				);
 				widgetStates.put(k, (tabIndex: cvTabIndex));
 			}, {	
-//				"invoked a CVWidgetKnob at prAddToGui".postln;
 				cvWidgets[k] = CVWidgetKnob(
 					tabs.views[cvTabIndex], 
 					all[k], 
@@ -838,7 +828,6 @@ CVCenter {
 				// add next widget to the right
 				tabProperties[cvTabIndex].nextPos = thisNextPos = thisNextPos.x+colwidth@(thisNextPos.y);
 			});
-//			[cvTabIndex, thisNextPos].postln;
 			tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
 			tabs.focus(cvTabIndex);
 		});
@@ -853,8 +842,6 @@ CVCenter {
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets;
 		var widgetwidth, widgetheight=166;
 				
-//		"prRegroupWidgets invoked".postln;
-				
 		rowheight = widgetheight+1;
 		thisNextPos = 0@0;
 		
@@ -862,7 +849,6 @@ CVCenter {
 			order = cvWidgets.order;
 			orderedWidgets = cvWidgets.atAll(order);
 			order.do({ |k, i|
-//				widgetStates[k].postln;
 				if(widgetStates[k].notNil and:{ tabIndex == widgetStates[k].tabIndex }, {
 					if(thisNextPos != (0@0), { 
 						thisNextPos = tabProperties[widgetStates[k].tabIndex].nextPos;
