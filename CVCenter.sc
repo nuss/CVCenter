@@ -446,7 +446,7 @@ CVCenter {
 	}
 		
 	*use { |key, spec, value, tab, slot|
-		var thisKey, thisSpec, thisVal, thisSlot;
+		var thisKey, thisSpec, thisVal, thisSlot, widget2DKey;
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		slot !? {
 			thisSlot = slot.asString.toLower.asSymbol;
@@ -464,6 +464,7 @@ CVCenter {
 		if(thisSlot.notNil, {
 			/* special case: CVWidget2D needs 2 CVs */
 			if(thisSlot === \lo or: { thisSlot === \hi }, {
+				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				all[thisKey] ?? { all.put(thisKey, ()) };
 				all[thisKey].put(thisSlot, CV.new(thisSpec, thisVal));
 			})
@@ -474,7 +475,7 @@ CVCenter {
 		if(window.isNil or:{ window.isClosed }, {
 			this.gui(tab);
 		}, {
-			this.prAddToGui(tab);
+			this.prAddToGui(tab, widget2DKey);
 		});
 		
 		if(slot.notNil, {
@@ -748,15 +749,13 @@ CVCenter {
 		})
 	}
 			
-	*prAddToGui { |tab|
+	*prAddToGui { |tab, widget2DKey|
 		var allCVKeys, widgetKeys, thisKeys;
 		var rowwidth, colcount;
 		var cvTabIndex, tabLabels;
 		var thisNextPos;
 		var widgetwidth, widgetheight=166, colwidth, rowheight;
 		var widgetControllersAndModels, cvcArgs;
-		
-//		("tab passed to prAddToGui:"+[tab, this.setup]).postln;
 		
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 		
@@ -801,6 +800,7 @@ CVCenter {
 			}, {
 				cvcArgs = true;	
 			});
+			all[k].postln;
 			if(all[k].class === Event and:{
 				all[k].keys.includesAny([\hi, \lo])
 			}, {
@@ -848,6 +848,9 @@ CVCenter {
 			tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
 			tabs.focus(cvTabIndex);
 		});
+		widget2DKey !? {
+			cvWidgets[widget2DKey.key].setSpec(widget2DKey.spec, widget2DKey.slot);
+		};
 		this.prRegroupWidgets(cvTabIndex);
 		window.front;
 	}
