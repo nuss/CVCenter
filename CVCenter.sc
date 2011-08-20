@@ -151,7 +151,7 @@ CVCenter {
 			
 			swFlow.shift(8, 0);
 			
-			StaticText(prefPane, Rect(0, 0, 55, 20))
+			StaticText(prefPane, Rect(0, 0, 60, 20))
 				.font_(Font("Helvetica", 10))
 				.stringColor_(Color.white)
 				.string_("load actions")
@@ -170,7 +170,7 @@ CVCenter {
 			
 			swFlow.shift(5, -2);
 			
-			StaticText(prefPane, Rect(0, 0, 85, 20))
+			StaticText(prefPane, Rect(0, 0, 90, 20))
 				.font_(Font("Helvetica", 10))
 				.stringColor_(Color.white)
 				.string_("auto-connect MIDI")
@@ -189,7 +189,7 @@ CVCenter {
 			
 			swFlow.shift(5, -2);
 						
-			StaticText(prefPane, Rect(5, 0, 85, 20))
+			StaticText(prefPane, Rect(5, 0, 90, 20))
 				.font_(Font("Helvetica", 10))
 				.stringColor_(Color.white)
 				.string_("auto-connect OSC")
@@ -346,7 +346,6 @@ CVCenter {
 				try {
 					if(window.bounds.width != lastUpdateWidth, {
 						this.prRegroupWidgets(tabs.activeTab);
-						prefPane.reflowAll
 					})
 				};
 				lastUpdateWidth = window.bounds.width;
@@ -413,7 +412,7 @@ CVCenter {
 			},
 			CVWidget2D, {
 				[\lo, \hi].do({ |hilo|
-					if(cvWidgets[key].editor[hilo].notNil and:{ cvWidgets[key].editor.isClosed.not }, {
+					if(cvWidgets[key].editor[hilo].notNil and:{ cvWidgets[key].editor[hilo].isClosed.not }, {
 						cvWidgets[key].editor[hilo].close;
 					});
 					cvWidgets[key].midiOscEnv[hilo].cc !? { 
