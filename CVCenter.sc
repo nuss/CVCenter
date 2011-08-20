@@ -2,10 +2,8 @@
 CVCenter {
 
 	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <prefPane;
-	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin, <numccs;
+	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight; 
-	classvar <controlButtons, <nextButtonPos;
-	classvar currentButtonStates, guiClosed = false/*, buttonProps*/;
 	classvar <widgetStates;
 	classvar <tabProperties, colors, nextColor;
 	classvar controllersAndModels;
@@ -220,9 +218,6 @@ CVCenter {
 					)
 				});
 				tabProperties.do(_.nextPos_(0@0));
-				controlButtons = nil;
-				nextButtonPos = 0@0;
-				guiClosed = true;
 			});
 
 			thisNextPos = 0@0;
@@ -800,7 +795,6 @@ CVCenter {
 			}, {
 				cvcArgs = true;	
 			});
-			all[k].postln;
 			if(all[k].class === Event and:{
 				all[k].keys.includesAny([\hi, \lo])
 			}, {
