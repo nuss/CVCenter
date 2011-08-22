@@ -17,14 +17,14 @@ CVWidget2D : CVWidget {
 		)
 	}
 	
-	init { |parentView, cvs, name, bounds, actions, setUpArgs, controllersAndModels, cvcGui, server|
+	init { |parentView, cvs, name, bounds, actions, setupArgs, controllersAndModels, cvcGui, server|
 		var thisName, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, rightBarX, oscEditButHeight, right, left;
 		var actionLo, actionHi;
 		
-		setUpArgs !? {
-			(setUpArgs.class !== Event).if{ 
+		setupArgs !? {
+			(setupArgs.class !== Event).if{ 
 				Error( "a setup for a CVWidget2D has to be provided as an Event: (lo: [args], hi[args])!").throw;
 			}
 		};
@@ -71,12 +71,12 @@ CVWidget2D : CVWidget {
 		[\lo, \hi].do({ |key| this.initControllersAndModels(controllersAndModels, key) });
 						
 		[\lo, \hi].do({ |key|
-			setUpArgs[key] !? { setUpArgs[key][0] !? { this.setMidiMode(setUpArgs[key][0], key) }};
-			setUpArgs[key] !? { setUpArgs[key][1] !? { this.setMidiResolution(setUpArgs[key][1], key) }};
-			setUpArgs[key] !? { setUpArgs[key][2] !? { this.setMidiMean(setUpArgs[key][2], key) }};
-			setUpArgs[key] !? { setUpArgs[key][3] !? { this.setCtrlButtonBank(setUpArgs[key][3], key) }};
-			setUpArgs[key] !? { setUpArgs[key][4] !? { this.setSoftWithin(setUpArgs[key][4], key) }};
-			setUpArgs[key] !? { setUpArgs[key][5] !? { this.setCalibrate(setUpArgs[key][5], key) }};
+			setupArgs[key] !? { setupArgs[key][\midiMode] !? { this.setMidiMode(setupArgs[key][\midiMode], key) }};
+			setupArgs[key] !? { setupArgs[key][\midiResolution] !? { this.setMidiResolution(setupArgs[key][\midiResolution], key) }};
+			setupArgs[key] !? { setupArgs[key][\midiMean] !? { this.setMidiMean(setupArgs[key][\midiMean], key) }};
+			setupArgs[key] !? { setupArgs[key][\ctrlButtonBank] !? { this.setCtrlButtonBank(setupArgs[key][\ctrlButtonBank], key) }};
+			setupArgs[key] !? { setupArgs[key][\softWithin] !? { this.setSoftWithin(setupArgs[key][\softWithin], key) }};
+			setupArgs[key] !? { setupArgs[key][\calibrate] !? { this.setCalibrate(setupArgs[key][\calibrate], key) }};
 		});
 					
 		actions !? {

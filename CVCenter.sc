@@ -20,7 +20,7 @@ CVCenter {
 			tabProperties = [];
 			
 			if(setUpArgs.size > 0, { 
-				this.prSetup(*setUpArgs) 
+				this.prSetup(setUpArgs);
 			});
 			
 			r.do({ |red|
@@ -317,7 +317,7 @@ CVCenter {
 				lastUpdate ?? { lastUpdate = all.size };
 				lastSetUp !? {
 					if(this.setup != lastSetUp, {
-						this.prSetup(*this.setup);
+						this.prSetup(this.setup);
 					})
 				};	
 				if(all.size != lastUpdate, {
@@ -477,7 +477,14 @@ CVCenter {
 	}
 	
 	*setup {
-		^[this.midiMode, this.midiResolution, this.midiMean, this.ctrlButtonBank, this.softWithin];
+//		^[this.midiMode, this.midiResolution, this.midiMean, this.ctrlButtonBank, this.softWithin];
+		^(
+			midiMode: this.midiMode,
+			midiResolution: this.midiResolution,
+			midiMean: this.midiMean,
+			ctrlButtonBank: this.ctrlButtonBank,
+			softWithin: this.softWithin
+		)
 	}
 	
 	*guiMoveTo { |point|
@@ -552,7 +559,12 @@ CVCenter {
 								midi: (
 									src: cvWidgets[k].midiOscEnv[hilo].midisrc,
 									chan: cvWidgets[k].midiOscEnv[hilo].midichan,
-									num: cvWidgets[k].midiOscEnv[hilo].midiRawNum
+									num: cvWidgets[k].midiOscEnv[hilo].midiRawNum,
+									midiMode: cvWidgets[k].getMidiMode(hilo),
+									midiMean: cvWidgets[k].getMidiMean(hilo),
+									softWithin: cvWidgets[k].getSoftWithin(hilo),
+									midiResolution: cvWidgets[k].getMidiResolution(hilo),
+									ctrlButtonBank: cvWidgets[k].getCtrlButtonBank(hilo)
 								)
 							)
 						})
@@ -576,7 +588,12 @@ CVCenter {
 							midi: (
 								src: cvWidgets[k].midiOscEnv.midisrc,
 								chan: cvWidgets[k].midiOscEnv.midichan,
-								num: cvWidgets[k].midiOscEnv.midiRawNum
+								num: cvWidgets[k].midiOscEnv.midiRawNum,
+								midiMode: cvWidgets[k].getMidiMode,
+								midiMean: cvWidgets[k].getMidiMean,
+								softWithin: cvWidgets[k].getSoftWithin,
+								midiResolution: cvWidgets[k].getMidiResolution,
+								ctrlButtonBank: cvWidgets[k].getCtrlButtonBank
 							),
 							wdgtClass: CVWidgetKnob
 						)
@@ -624,6 +641,12 @@ CVCenter {
 					CVWidget2D, {
 						[\lo, \hi].do({ |hilo|
 							this.use(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
+							cvWidgets[key].setMidiMode(v[hilo].midi.midiMode, hilo)
+								.setMidiMean(v[hilo].midi.midiMean, hilo)
+								.setSoftWithin(v[hilo].midi.softWithin, hilo)
+								.setMidiResolution(v[hilo].midi.midiResolution, hilo)
+								.setCtrlButtonBank(v[hilo].midi.ctrlButtonBank, hilo)
+							;
 							if(loadActions, {
 								v[hilo].action !? {
 									this.setActionAt(key, v[hilo].action.interpret, hilo);
@@ -659,6 +682,12 @@ CVCenter {
 					},
 					CVWidgetKnob, { 
 						this.use(key, v.spec, v.val, v.tabLabel);
+						cvWidgets[key].setMidiMode(v.midi.midiMode)
+							.setMidiMean(v.midi.midiMean)
+							.setSoftWithin(v.midi.softWithin)
+							.setMidiResolution(v.midi.midiResolution)
+							.setCtrlButtonBank(v.midi.ctrlButtonBank)
+						;
 						if(loadActions, {
 							v.action !? {
 								this.setActionAt(key, v.action.interpret);
@@ -708,12 +737,13 @@ CVCenter {
 	
 	// private Methods - not to be used directly
 	
-	*prSetup { |argMode, argResolution, argMean, argCButtonBank, argSoftWithin|
-		argMode !? { this.midiMode_(argMode) };
-		argResolution !? { this.midiResolution_(argResolution) };
-		argMean !? { this.midiMean_(argMean) };
-		argCButtonBank !? { this.ctrlButtonBank_(argCButtonBank) };
-		argSoftWithin !? { this.softWithin_(argSoftWithin) };
+	*prSetup { |setupDict|
+		setupDict[\midiMode] !? { this.midiMode_(setupDict[\midiMode]) };
+		setupDict[\midiResolution] !? { this.midiResolution_(setupDict[\midiResolution]) };
+		setupDict[\midiMean] !? { this.midiMean_(setupDict[\midiMean]) };
+		this.ctrlButtonBank_(setupDict[\ctrlButtonBank]);
+//		setupDict[\ctrlButtonBank] !? { this.ctrlButtonBank_(setupDict[\ctrlButtonBank]) };
+		setupDict[\softWithin] !? { this.softWithin_(setupDict[\softWithin]) };
 		if(window.notNil and:{ window.notClosed }, {
 			cvWidgets.pairsDo({ |k, wdgt|
 				switch(wdgt.class,
@@ -733,7 +763,7 @@ CVCenter {
 							this.softWithin !? { wdgt.setSoftWithin(this.softWithin, hilo) };
 						});
 					}
-				)
+				);
 			})
 		})
 	}

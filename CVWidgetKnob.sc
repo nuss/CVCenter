@@ -19,7 +19,7 @@ CVWidgetKnob : CVWidget {
 		)
 	}
 	
-	init { |parentView, cv, name, bounds, action, setUpArgs, controllersAndModels, cvcGui, server|
+	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, server|
 		var thisName, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
@@ -48,14 +48,14 @@ CVWidgetKnob : CVWidget {
 				
 		this.initControllersAndModels(controllersAndModels);
 
-		setUpArgs.isKindOf(Array).not.if { setUpArgs = [setUpArgs] };
+		setupArgs.isKindOf(Event).not.if { Error("a setup has to be provided as a Dictionary or an Event").throw };
 		
-		setUpArgs[0] !? { this.setMidiMode(setUpArgs[0]) };
-		setUpArgs[1] !? { this.setMidiResolution(setUpArgs[1]) };
-		setUpArgs[2] !? { this.setMidiMean(setUpArgs[2]) };
-		setUpArgs[3] !? { this.setCtrlButtonBank(setUpArgs[3]) };
-		setUpArgs[4] !? { this.setSoftWithin(setUpArgs[4]) };
-		setUpArgs[5] !? { this.setCalibrate(setUpArgs[5]) };
+		setupArgs[\midiMode] !? { this.setMidiMode(setupArgs[\midiMode]) };
+		setupArgs[\midiResolution] !? { this.setMidiResolution(setupArgs[\midiResolution]) };
+		setupArgs[\midiMean] !? { this.setMidiMean(setupArgs[\midiMean]) };
+		setupArgs[\ctrlButtonBank] !? { this.setCtrlButtonBank(setupArgs[\ctrlButtonBank]) };
+		setupArgs[\softWithin] !? { this.setSoftWithin(setupArgs[\softWithin]) };
+		setupArgs[\calibrate] !? { this.setCalibrate(setupArgs[\calibrate]) };
 						
 		action !? { widgetCV.action_(action) };
 		
@@ -77,7 +77,6 @@ CVWidgetKnob : CVWidget {
 								
 		cvcGui ?? { 
 			window.onClose_({
-				"CVWidgetKnob: %\n".postf(editor);
 				if(editor.notNil, {
 					if(editor.isClosed.not, {
 						editor.close;

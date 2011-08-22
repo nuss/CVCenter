@@ -10,7 +10,14 @@ CVWidget {
 	var <wdgtControllersAndModels, <midiOscEnv;
 
 	setup {
-		^[prMidiMode, prMidiResolution, prMidiMean, prCtrlButtonBank, prSoftWithin, prCalibrate];
+		^(
+			midiMode: prMidiMode, 
+			midiResolution: prMidiResolution, 
+			midiMean: prMidiMean, 
+			ctrlButtonBank: prCtrlButtonBank, 
+			softWithin: prSoftWithin, 
+			calibrate: prCalibrate
+		);
 	}
 	
 	visible_ { |visible|
@@ -110,7 +117,7 @@ CVWidget {
 					).changed(\value);
 				}
 			}
-		)
+		);
 	}
 	
 	getMidiMode { |key|
@@ -209,7 +216,11 @@ CVWidget {
 	setCtrlButtonBank { |numSliders, key|
 		switch(this.class, 
 			CVWidgetKnob, {
-				prCtrlButtonBank = numSliders;
+				if(numSliders.asString == "nil" or:{ numSliders.asInt === 0 }, {
+					prCtrlButtonBank = nil;
+				}, {
+					prCtrlButtonBank = numSliders.asInt;
+				});
 				wdgtControllersAndModels !? {
 					wdgtControllersAndModels.midiOptions.model.value_(
 						(
@@ -476,7 +487,6 @@ CVWidget {
 				})
 			},
 			{
-//				[key, midiOscEnv[key]].postln;
 				if(midiOscEnv[key].cc.isNil, {
 					wdgtControllersAndModels[key].midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
@@ -785,7 +795,6 @@ CVWidget {
 		};
 
 		wcm.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
-//			thisGuiEnv.oscEditBut.states.postln;
 			if(theChanger.value[0] <= 0 or:{
 				theChanger.value[1] <= 0
 			}, {
@@ -840,7 +849,6 @@ CVWidget {
 		};
 		
 		wcm.midiConnection.controller.put(\value, { |theChanger, what, moreArgs|
-//			midiOscEnv.postln;
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
 					ctrlString ? ctrlString = num+1;
@@ -1037,7 +1045,6 @@ CVWidget {
 		};
 		
 		wcm.midiOptions.controller.put(\value, { |theChanger, what, moreArgs|
-//			theChanger.value.postln;
 			if(thisGuiEnv.editor.notNil and:{
 				thisGuiEnv.editor.isClosed.not
 			}, {

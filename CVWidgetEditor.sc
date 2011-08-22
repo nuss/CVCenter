@@ -34,15 +34,19 @@ CVWidgetEditor {
 			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
 		};
 
-		if(widget.wdgtControllersAndModels[key].notNil, { 
-			wcmHiLo = widget.wdgtControllersAndModels[key];
+		if(key.notNil, {
+			if(widget.wdgtControllersAndModels[key].notNil, { 
+				wcmHiLo = widget.wdgtControllersAndModels[key];
+			});
 			thisMidiMode = widget.getMidiMode(key);
 			thisMidiMean = widget.getMidiMean(key);
 			thisMidiResolution = widget.getMidiResolution(key);
 			thisSoftWithin = widget.getSoftWithin(key);
 			thisCtrlButtonBank = widget.getCtrlButtonBank(key);
 		}, { 
-			wcmHiLo = widget.wdgtControllersAndModels;
+			if(widget.wdgtControllersAndModels.notNil, { 
+				wcmHiLo = widget.wdgtControllersAndModels;
+			});
 			thisMidiMode = widget.getMidiMode;
 			thisMidiMean = widget.getMidiMean;
 			thisMidiResolution = widget.getMidiResolution;
@@ -84,7 +88,6 @@ CVWidgetEditor {
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC"], scroll: true);
 			thisEditor.tabs = tabs;
-//			thisEditor.tabs.postln;
 			thisEditor.tabs.view.resize_(5);
 			thisEditor.tabs.stringFocusedColor_(Color.blue);
 			
@@ -134,9 +137,7 @@ CVWidgetEditor {
 					})
 				})
 			});
-			
-//			[widget.spec, specsListSpecs.size, specsList.items.size].postln;
-			
+						
 			tmp = specsListSpecs.detectIndex({ |spec, i| spec == widget.getSpec(key) });
 			if(tmp.notNil, {
 				specsList.value_(tmp);
@@ -239,7 +240,11 @@ CVWidgetEditor {
 				.font_(staticTextFont)
 				.string_(thisCtrlButtonBank)
 				.action_({ |mb|
-					widget.setCtrlButtonBank(mb.string.asInt, key);
+					if(mb.string != "nil", {
+						widget.setCtrlButtonBank(mb.string.asInt, key);
+					}, {
+						widget.setCtrlButtonBank(nil);
+					})
 				})
 			;
 			
@@ -296,7 +301,6 @@ CVWidgetEditor {
 					tf.stringColor_(Color.red)
 				})
 				.keyUpAction_({ |tf, char, modifiers, unicode, keycode|
-//					[tf, char, modifiers, unicode, keycode].postln;
 					if(unicode == 13, {
 						tf.stringColor_(Color.black);
 					})
