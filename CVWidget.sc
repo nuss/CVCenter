@@ -502,19 +502,11 @@ CVWidget {
 	midiDisconnect { |key|
 		switch(this.class,
 			CVWidgetKnob, {
-				if(this.isClosed.not, {
-					wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
-				}, {
-					midiOscEnv.cc.remove;
-				});
+				wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
 				CmdPeriod.remove({ this.midiDisconnect });
 			}, 
 			{
-				if(this.isClosed.not, {
-					wdgtControllersAndModels[key].midiConnection.model.value_(nil).changed(\value);
-				}, {
-					midiOscEnv[key].cc.remove;
-				});
+				wdgtControllersAndModels[key].midiConnection.model.value_(nil).changed(\value);
 				CmdPeriod.remove({ this.midiDisconnect(key) });
 			}
 		)		
@@ -578,9 +570,11 @@ CVWidget {
 		}, {
 			wdgtControllersAndModels ?? { wdgtControllersAndModels = () };
 		});
-		
+				
 		key !? {
-			wdgtControllersAndModels.put(key, ());
+			if(wdgtControllersAndModels[key].isNil, {
+				wdgtControllersAndModels.put(key, ());
+			})
 		};
 		
 		if(key.notNil, {
@@ -932,25 +926,28 @@ CVWidget {
 		};
 		
 		wcm.midiDisplay.controller.put(\value, { |theChanger, what, moreArgs|
+			"midiDisplay-model: %\n".postf(theChanger);
 			theChanger.value.learn.switch(
 				"X", {
 					defer {
-						thisGuiEnv.midiSrc.string_(theChanger.value.src.asString)
-							.background_(Color.red)
-							.stringColor_(Color.white)
-							.canFocus_(false)
-						;
-						thisGuiEnv.midiChan.string_((theChanger.value.chan+1).asString)
-							.background_(Color.red)
-							.stringColor_(Color.white)
-							.canFocus_(false)
-						;
-						thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
-							.background_(Color.red)
-							.stringColor_(Color.white)
-							.canFocus_(false)
-						;
-						thisGuiEnv.midiLearn.value_(1);
+						if(this.window.isClosed.not, {
+							thisGuiEnv.midiSrc.string_(theChanger.value.src.asString)
+								.background_(Color.red)
+								.stringColor_(Color.white)
+								.canFocus_(false)
+							;
+							thisGuiEnv.midiChan.string_((theChanger.value.chan+1).asString)
+								.background_(Color.red)
+								.stringColor_(Color.white)
+								.canFocus_(false)
+							;
+							thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
+								.background_(Color.red)
+								.stringColor_(Color.white)
+								.canFocus_(false)
+							;
+							thisGuiEnv.midiLearn.value_(1);
+						});
 
 						if(thisGuiEnv.editor.notNil and:{
 							thisGuiEnv.editor.isClosed.not
@@ -990,26 +987,28 @@ CVWidget {
 				},
 				"L", {
 					defer {
-						thisGuiEnv.midiSrc.string_(theChanger.value.src)
-							.background_(Color.white)
-							.stringColor_(Color.black)
-							.canFocus_(true)
-						;
-						thisGuiEnv.midiChan.string_(theChanger.value.chan)
-							.background_(Color.white)
-							.stringColor_(Color.black)
-							.canFocus_(true)
-						;
-						thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
-							.background_(Color.white)
-							.stringColor_(Color.black)
-							.canFocus_(true)
-						;
-						thisGuiEnv.midiLearn.states_([
-							["L", Color.white, Color.blue],
-							["X", Color.white, Color.red]
-						])
-						.value_(0).refresh;
+						if(this.window.isClosed.not, {
+							thisGuiEnv.midiSrc.string_(theChanger.value.src)
+								.background_(Color.white)
+								.stringColor_(Color.black)
+								.canFocus_(true)
+							;
+							thisGuiEnv.midiChan.string_(theChanger.value.chan)
+								.background_(Color.white)
+								.stringColor_(Color.black)
+								.canFocus_(true)
+							;
+							thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
+								.background_(Color.white)
+								.stringColor_(Color.black)
+								.canFocus_(true)
+							;
+							thisGuiEnv.midiLearn.states_([
+								["L", Color.white, Color.blue],
+								["X", Color.white, Color.red]
+							])
+							.value_(0).refresh;
+						});
 
 						if(thisGuiEnv.editor.notNil and:{
 							thisGuiEnv.editor.isClosed.not

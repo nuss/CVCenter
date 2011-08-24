@@ -513,6 +513,7 @@ CVCenter {
 	}
 	
 	*setActionAt { |key, action, slot|
+		key ?? { Error("You have to provide the CV's key in order to set its action!").throw };
 		if(all[key].notNil and:{ cvWidgets[key].notNil }, {
 			if(action.class === String, { action = action.interpret });
 			switch(cvWidgets[key].class,
