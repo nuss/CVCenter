@@ -24,12 +24,12 @@ p.p14 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #d21710}
 span.s1 {font: 19.0px Helvetica}
 span.s2 {text-decoration: underline}
 span.s3 {color: #464fc4}
-span.s4 {color: #142cc3}
-span.s5 {color: #008224}
-span.s6 {font: 12.0px Helvetica}
-span.s7 {color: #1c39f6}
+span.s4 {color: #000000}
+span.s5 {font: 12.0px Helvetica}
+span.s6 {color: #1c39f6}
+span.s7 {color: #142cc3}
 span.s8 {color: #ff7a29}
-span.s9 {color: #000000}
+span.s9 {color: #008224}
 span.Apple-tab-span {white-space:pre}
 </style>
 </head>
@@ -64,44 +64,51 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p1"><b>Note:</b> Setting a CVWidget to midiMode 1 will only make sense if your MIDI-device supports it. In this mode a MIDI-slider is assumed to output an in-/decremental value, not an absolute value between 0 and 127. However, the output is not assumed to be the increment/decrement only. Rather it will be the <i>mean</i> value +/- increment which makes it necessary to substract <i>mean</i> from the output (e.g. if the output equals 68 and <i>mean </i>is 64, a<i> </i>value of 64 is substracted and the result will be 4).</p>
 <p class="p9"><br></p>
-<p class="p8"><b>midiMode_</b></p>
-<p class="p8"><span class="Apple-tab-span">	</span>0 - the default mode. <span class="s4">The</span> output reflects the absolute position of the adjecant slider.<span class="Apple-converted-space"> </span></p>
-<p class="p8"><span class="Apple-tab-span">	</span>1 - in- resp. decremental output. <span class="s4">The</span> <span class="s4">Output</span> will be a mean-value (default: 64, see method <b>midiMean_</b>) +/- in- or decrement (determined be the the slider<span class="s5">'s accelaration)</span></p>
+<p class="p8"><b>setMidiMode(mode, key)</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span>0 - the default mode. The output reflects the absolute position of the adjecant slider.<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-tab-span">	</span>1 - in- resp. decremental output. The Output will be a mean-value (default: 64, see method <b>midiMean_</b>) +/- in- or decrement (determined be the the slider's accelaration)</p>
+<p class="p1"><span class="Apple-tab-span">	</span>key - a Symbol: 'lo' or 'hi'</p>
 <p class="p10"><span class="Apple-tab-span">	</span></p>
-<p class="p1"><b>midiResolution_</b></p>
+<p class="p1"><b>setMidiResolution(resolution, key)</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>default: 1</p>
 <p class="p1"><span class="Apple-tab-span">	</span>This parameter will only have an effect if midiMode is set to 1 (endless faders). It determines the resolution of each fader. Higher values will result in a lower resolution, lower values will have the opposite effect.<span class="Apple-converted-space"> </span></p>
+<p class="p8"><span class="s4"><span class="Apple-tab-span">	</span></span>key - a Symbol: 'lo' or 'hi'</p>
 <p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
-<p class="p1"><b>midiMean_</b><span class="Apple-converted-space"> </span></p>
+<p class="p8"><span class="s4"><b>setMidiMean(</b></span><b>meanval, key)</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>default: 64. Only relevant for midiMode == 1. It reflects the default output of a midislider in neutral position.</p>
+<p class="p8"><span class="Apple-tab-span">	</span>key - a Symbol: 'lo' or 'hi'</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p1"><b>ctrlButtonBank_</b></p>
+<p class="p1"><b>setCtrlButtonBank(numSliders, key)</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>As midi-devices may have a number of different banks at limited number of sliders this offers some convenience in a way that the GUI will display the bank and its sliders from 1 to the max. number of hardware sliders. E.g. on a Doepfer Pocket Dial which has 16 sliders and 4 banks a setting like</p>
 <p class="p10"><span class="Apple-tab-span">	</span></p>
-<p class="p7"><span class="s6"><span class="Apple-tab-span">	</span></span>CVCenter.setCtrlButtonBank(16)</p>
+<p class="p7"><span class="s5"><span class="Apple-tab-span">	</span></span>CVCenter.setCtrlButtonBank(16, \hi)</p>
 <p class="p11"><span class="Apple-tab-span">	</span></p>
 <p class="p1">will display the sliders in each bank like the following: 1:1..16, 2:1..16, 3:1..16, 4:1..16. Thus, slider number 36 (which is returned by the function within the corresponding CCResponder as 35) will be displayed as 3:4 (bank nr. 3, slider number 4 - corresponding to the number printed on the device and the selected bank).<span class="Apple-converted-space"> </span></p>
+<p class="p8"><span class="s4"><span class="Apple-tab-span">	</span></span>key - a Symbol: 'lo' or 'hi'</p>
 <p class="p2"><br></p>
-<p class="p1"><b>softWithin_(val)</b></p>
+<p class="p1"><b>setSoftWithin(val, key)</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>val - by default 0.1</p>
 <p class="p1"><span class="Apple-tab-span">	</span>a convenience method for the use in mode 0 (output: 0-127, non-endless). A new value (input) of a CV is set by a MIDI-slider only if the slider's value is within +/- softWithin/2 to the current value (input) of the CV, avoiding abrupt changes.</p>
+<p class="p8"><span class="s4"><span class="Apple-tab-span">	</span></span>key - a Symbol: 'lo' or 'hi'</p>
+<p class="p9"><span class="Apple-tab-span">	</span></p>
+<p class="p8">All of the above mentioned methods have coresponding methods, beginning with "get" that return the currently set values.</p>
 <p class="p9"><span class="Apple-tab-span">	</span></p>
 <p class="p1">Each of the previously mentioned setter-methods are implemented as getters as well, which allows you to retrieve its values individually. Alternatively you may use *setup to retrieve all values at once:</p>
 <p class="p9"><br></p>
 <p class="p1"><b>setup</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>A convenience-method, returning<span class="Apple-converted-space"> </span></p>
-<p class="p12"><span class="s6"><span class="Apple-tab-span">	</span></span>(midiMode, midiMean, midiResolution, ctrlButtonBank, softWithin, calibrate)</p>
+<p class="p12"><span class="s5"><span class="Apple-tab-span">	</span></span>(midiMode, midiMean, midiResolution, ctrlButtonBank, softWithin, calibrate)</p>
 <p class="p2"><br></p>
 <p class="p4"><b>Example</b></p>
 <p class="p3"><br></p>
 <p class="p7">s.boot;</p>
-<p class="p7">a = { <span class="s7">|freq1, freq2|</span> <span class="s4">SinOsc</span>.ar([freq1, freq2]) * 0.3 }.play;</p>
+<p class="p7">a = { <span class="s6">|freq1, freq2|</span> <span class="s7">SinOsc</span>.ar([freq1, freq2]) * 0.3 }.play;</p>
 <p class="p6"><br></p>
 <p class="p7">(</p>
-<p class="p7"><span class="s8">~cv</span> = <span class="s4">CV</span>.new(<span class="s5">\freq</span>.asSpec);<span class="Apple-converted-space"> </span></p>
-<p class="p13"><span class="s8">~wdgt</span><span class="s9"> = </span>CVWidget2D<span class="s9">(</span></p>
+<p class="p7"><span class="s8">~cv</span> = <span class="s7">CV</span>.new(<span class="s9">\freq</span>.asSpec);<span class="Apple-converted-space"> </span></p>
+<p class="p13"><span class="s8">~wdgt</span><span class="s4"> = </span>CVWidget2D<span class="s4">(</span></p>
 <p class="p7"><span class="Apple-tab-span">	</span>cvs: <span class="s8">~cv</span>!2,<span class="Apple-converted-space"> </span></p>
-<p class="p7"><span class="Apple-tab-span">	</span>bounds: <span class="s4">Rect</span>(100, 100, 104, 166),<span class="Apple-converted-space"> </span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>bounds: <span class="s7">Rect</span>(100, 100, 104, 166),<span class="Apple-converted-space"> </span></p>
 <p class="p7"><span class="Apple-tab-span">	</span>setup:(</p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>lo: (</p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>midiMode: 1,<span class="Apple-converted-space"> </span></p>
@@ -119,31 +126,31 @@ span.Apple-tab-span {white-space:pre}
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>clibrate: true</p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>)</p>
 <p class="p7"><span class="Apple-tab-span">	</span>), actions: [</p>
-<p class="p12"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>{ <span class="s7">|cv|</span> a.set(<span class="s5">\freq1</span>, cv) },</p>
-<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>{ <span class="s7">|cv|</span> a.set(<span class="s5">\freq2</span>, cv) }</p>
+<p class="p12"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>{ <span class="s6">|cv|</span> a.set(<span class="s9">\freq1</span>, cv) },</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>{ <span class="s6">|cv|</span> a.set(<span class="s9">\freq2</span>, cv) }</p>
 <p class="p7"><span class="Apple-tab-span">	</span>] ).front;</p>
 <p class="p7">)</p>
 <p class="p6"><br></p>
-<p class="p14"><span class="s8">~wdgt</span><span class="s9">.midiConnect(chan: 0, num: 2, key: </span><span class="s5">\lo</span><span class="s9">) </span>// connect \lo to controller nr. 3, channel 1</p>
-<p class="p14"><span class="s8">~wdgt</span><span class="s9">.midiDisconnect(</span><span class="s5">\lo</span><span class="s9">) </span>// remove the CCResponder from \lo again</p>
-<p class="p14"><span class="s8">~wdgt</span><span class="s9">.midiConnect(key: </span><span class="s5">\lo</span><span class="s9">) </span>// connect \lo to the first slider that gets moved on your hardware</p>
-<p class="p12"><span class="s8">~wdgt</span>.midiDisconnect(<span class="s5">\lo</span>)</p>
+<p class="p14"><span class="s8">~wdgt</span><span class="s4">.midiConnect(chan: 0, num: 2, key: </span><span class="s9">\lo</span><span class="s4">) </span>// connect \lo to controller nr. 3, channel 1</p>
+<p class="p14"><span class="s8">~wdgt</span><span class="s4">.midiDisconnect(</span><span class="s9">\lo</span><span class="s4">) </span>// remove the CCResponder from \lo again</p>
+<p class="p14"><span class="s8">~wdgt</span><span class="s4">.midiConnect(key: </span><span class="s9">\lo</span><span class="s4">) </span>// connect \lo to the first slider that gets moved on your hardware</p>
+<p class="p12"><span class="s8">~wdgt</span>.midiDisconnect(<span class="s9">\lo</span>)</p>
 <p class="p6"><br></p>
 <p class="p6"><br></p>
 <p class="p14">// change the Spec of the CV</p>
 <p class="p14">// change is reflected in the widget immediately</p>
 <p class="p14">// can also be done through the "edit Spec" button in the widget</p>
-<p class="p7"><span class="s8">~wdgt</span>.setSpec(<span class="s5">\freq</span>.asSpec)</p>
+<p class="p7"><span class="s8">~wdgt</span>.setSpec(<span class="s9">\freq</span>.asSpec)</p>
 <p class="p6"><br></p>
 <p class="p14">// change the MIDI-setup</p>
 <p class="p14">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
-<p class="p14"><span class="s8">~wdgt</span><span class="s9">.setMidiMode(1); </span>// in-/decremental output mode</p>
-<p class="p14"><span class="s8">~wdgt</span><span class="s9">.setMidiMean(64); </span>// only necessary if midiMode == 1</p>
-<p class="p14"><span class="s8">~wdgt</span><span class="s9">.setCtrlButtonBank(16); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
+<p class="p14"><span class="s8">~wdgt</span><span class="s4">.setMidiMode(1); </span>// in-/decremental output mode</p>
+<p class="p14"><span class="s8">~wdgt</span><span class="s4">.setMidiMean(64); </span>// only necessary if midiMode == 1</p>
+<p class="p14"><span class="s8">~wdgt</span><span class="s4">.setCtrlButtonBank(16); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
 <p class="p6"><br></p>
 <p class="p14">// set some Synth-Controls<span class="Apple-converted-space"> </span></p>
-<p class="p7">a = { <span class="s7">|freq=440|</span> <span class="s4">SinOsc</span>.ar(freq, mul: 0.4) }.play</p>
-<p class="p7"><span class="s8">~cv</span>.action_({ <span class="s7">|cv|</span> a.set(<span class="s5">\freq</span>, cv.value) })</p>
+<p class="p7">a = { <span class="s6">|freq=440|</span> <span class="s7">SinOsc</span>.ar(freq, mul: 0.4) }.play</p>
+<p class="p7"><span class="s8">~cv</span>.action_({ <span class="s6">|cv|</span> a.set(<span class="s9">\freq</span>, cv.value) })</p>
 <p class="p9"><br></p>
 <p class="p4"><b>about the GUI</b></p>
 <p class="p3"><br></p>

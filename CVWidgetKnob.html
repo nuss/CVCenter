@@ -67,29 +67,29 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p1"><b>Note:</b> Setting a CVWidget to midiMode 1 will only make sense if your MIDI-device supports it. In this mode a MIDI-slider is assumed to output an in-/decremental value, not an absolute value between 0 and 127. However, the output is not assumed to be the increment/decrement only. Rather it will be the <i>mean</i> value +/- increment which makes it necessary to substract <i>mean</i> from the output (e.g. if the output equals 68 and <i>mean </i>is 64, a<i> </i>value of 64 is substracted and the result will be 4).</p>
 <p class="p2"><br></p>
-<p class="p1"><b>midiMode_</b></p>
+<p class="p1"><b>setMidiMode(mode)</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>0 - the default mode. The output reflects the absolute position of the adjecant slider.<span class="Apple-converted-space"> </span></p>
 <p class="p1"><span class="Apple-tab-span">	</span>1 - in- resp. decremental output. The Output will be a mean-value (default: 64, see method <b>midiMean_</b>) +/- in- or decrement (determined be the the slider's accelaration)</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p1"><b>midiResolution_</b></p>
+<p class="p1"><b>setMidiResolution(resolution)</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>default: 1</p>
 <p class="p1"><span class="Apple-tab-span">	</span>This parameter will only have an effect if midiMode is set to 1 (endless faders). It determines the resolution of each fader. Higher values will result in a lower resolution, lower values will have the opposite effect.<span class="Apple-converted-space"> </span></p>
 <p class="p2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
-<p class="p1"><b>midiMean_</b><span class="Apple-converted-space"> </span></p>
+<p class="p1"><b>setMidiMean(meanval)</b><span class="Apple-converted-space"> </span></p>
 <p class="p1"><span class="Apple-tab-span">	</span>default: 64. Only relevant for midiMode == 1. It reflects the default output of a midislider in neutral position.</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p1"><b>ctrlButtonBank_</b></p>
+<p class="p1"><b>setCtrlButtonBank(numSliders)</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>As midi-devices may have a number of different banks at limited number of sliders this offers some convenience in a way that the GUI will display the bank and its sliders from 1 to the max. number of hardware sliders. E.g. on a Doepfer Pocket Dial which has 16 sliders and 4 banks a setting like</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p6"><span class="s10"><span class="Apple-tab-span">	</span></span>CVCenter.setCtrlButtonBank(16)</p>
 <p class="p5"><span class="Apple-tab-span">	</span></p>
 <p class="p1">will display the sliders in each bank like the following: 1:1..16, 2:1..16, 3:1..16, 4:1..16. Thus, e.g. slider number 36 (which is returned by the function within the corresponding CCResponder as 35) will be displayed as 3:4 (bank nr. 3, slider number 4 - corresponding to the number printed on the device and the selected bank).<span class="Apple-converted-space"> </span></p>
 <p class="p2"><br></p>
-<p class="p1"><b>softWithin_(val)</b></p>
+<p class="p1"><b>setSoftWithin(val)</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>val - by default 0.1</p>
 <p class="p1"><span class="Apple-tab-span">	</span>a convenience method for the use in mode 0 (output: 0-127, non-endless). A new value (input) of a CV is set by a MIDI-slider only if the slider's value is within +/- softWithin/2 to the current value (input) of the CV, avoiding abrupt changes.</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p1">Each of the previously mentioned setter-methods are implemented as getters as well, which allows you to retrieve its values individually. Alternatively you may use *setup to retrieve all values at once:</p>
+<p class="p1">All of the above mentioned methods have coresponding methods, beginning with "get" that return the currently set values.</p>
 <p class="p2"><br></p>
 <p class="p1"><b>setup</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>A convenience-method, returning an Event, containing</p>
