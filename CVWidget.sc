@@ -926,7 +926,6 @@ CVWidget {
 		};
 		
 		wcm.midiDisplay.controller.put(\value, { |theChanger, what, moreArgs|
-			"midiDisplay-model: %\n".postf(theChanger);
 			theChanger.value.learn.switch(
 				"X", {
 					defer {

@@ -56,7 +56,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p1"><span class="Apple-tab-span">	</span><b>setUpArgs</b> - an array reflecting the setup of the connected external MIDI-device. If the setup consits of a single value (e.g.: 0) it will internally be converted into an array.<span class="Apple-converted-space"> </span></p>
 <p class="p1"><span class="Apple-tab-span">	</span>If not given explicitely new widgets will be instantiated with the following values:</p>
 <p class="p5"><span class="Apple-tab-span">	</span></p>
-<p class="p6"><span class="Apple-tab-span">	</span>[ 0, 1, 64, "", nil, 0.1 ]</p>
+<p class="p6"><span class="Apple-tab-span">	</span>( midiMode: 0, midiResolution: 1, midiMean: 64, ctrlButtonBank: nil, softWithin: 0.1, calibrate: true )</p>
 <p class="p5"><span class="Apple-tab-span">	</span></p>
 <p class="p1"><span class="Apple-tab-span">	</span>which stands for <i>midiMode</i>: 0, <i>midiResolution</i>: 1, <i>midiMean</i>: 64, <i>midistring</i>: empty string, <i>ctrlButtonBank</i>: nil and <i>softWithin</i>: 0.1</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
@@ -78,13 +78,10 @@ span.Apple-tab-span {white-space:pre}
 <p class="p1"><b>midiMean_</b><span class="Apple-converted-space"> </span></p>
 <p class="p1"><span class="Apple-tab-span">	</span>default: 64. Only relevant for midiMode == 1. It reflects the default output of a midislider in neutral position.</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p1"><b>midistring_</b></p>
-<p class="p1"><span class="Apple-tab-span">	</span>A string, that may display details of your current midi-settings (certain details like the midi-silder's source-id, the channel, the controller-number will automatically displayed when a widget gets instantiated)</p>
-<p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p1"><b>ctrlButtonBank_</b></p>
 <p class="p1"><span class="Apple-tab-span">	</span>As midi-devices may have a number of different banks at limited number of sliders this offers some convenience in a way that the GUI will display the bank and its sliders from 1 to the max. number of hardware sliders. E.g. on a Doepfer Pocket Dial which has 16 sliders and 4 banks a setting like</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p6"><span class="s10"><span class="Apple-tab-span">	</span></span>CVCenter.ctrlButtonBank_(16)</p>
+<p class="p6"><span class="s10"><span class="Apple-tab-span">	</span></span>CVCenter.setCtrlButtonBank(16)</p>
 <p class="p5"><span class="Apple-tab-span">	</span></p>
 <p class="p1">will display the sliders in each bank like the following: 1:1..16, 2:1..16, 3:1..16, 4:1..16. Thus, e.g. slider number 36 (which is returned by the function within the corresponding CCResponder as 35) will be displayed as 3:4 (bank nr. 3, slider number 4 - corresponding to the number printed on the device and the selected bank).<span class="Apple-converted-space"> </span></p>
 <p class="p2"><br></p>
@@ -95,8 +92,8 @@ span.Apple-tab-span {white-space:pre}
 <p class="p1">Each of the previously mentioned setter-methods are implemented as getters as well, which allows you to retrieve its values individually. Alternatively you may use *setup to retrieve all values at once:</p>
 <p class="p2"><br></p>
 <p class="p1"><b>setup</b></p>
-<p class="p1"><span class="Apple-tab-span">	</span>A convenience-method, returning<span class="Apple-converted-space"> </span></p>
-<p class="p6"><span class="s10"><span class="Apple-tab-span">	</span></span>[midiMode, midiMean, midistring, ctrlButtonBank, softwithin]</p>
+<p class="p1"><span class="Apple-tab-span">	</span>A convenience-method, returning an Event, containing</p>
+<p class="p6"><span class="s10"><span class="Apple-tab-span">	</span></span>(midiMode, midiMean, midiResolution, ctrlButtonBank, softWithin, calibrate)</p>
 <p class="p2"><br></p>
 <p class="p4"><b>Example</b></p>
 <p class="p3"><br></p>
@@ -105,7 +102,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p5"><br></p>
 <p class="p6">(</p>
 <p class="p6">~cv = <span class="s11">CV</span>.new(<span class="s13">\freq</span>.asSpec);<span class="Apple-converted-space"> </span></p>
-<p class="p6">~wdgt = <span class="s11">CVWidgetKnob</span>(<span class="s11">nil</span>, ~cv, <span class="s14">"CV test"</span>, action: { <span class="s11">|cv|</span> a.set(<span class="s13">\freq</span>, cv.value) }, setup:[1, nil, nil, nil, nil, true] );</p>
+<p class="p6">~wdgt = <span class="s11">CVWidgetKnob</span>(<span class="s11">nil</span>, ~cv, <span class="s14">"CV test"</span>, action: { <span class="s11">|cv|</span> a.set(<span class="s13">\freq</span>, cv.value) }, setup:(midiMode: 1, midiMean: 64, softWithin: 0.1, midiResolution: 1, ctrlButtonBank: 16, clibrate: true) );</p>
 <p class="p6">~wdgt.front;</p>
 <p class="p6">)</p>
 <p class="p5"><br></p>
@@ -115,27 +112,19 @@ span.Apple-tab-span {white-space:pre}
 <p class="p7"><span class="s15">~wdgt.midiConnect </span>// connect to the first slider that gets moved on your hardware</p>
 <p class="p6">~wdgt.midiDisconnect</p>
 <p class="p5"><br></p>
-<p class="p6">~wdgt.midiLearn.valueAction_(1)</p>
-<p class="p5"><br></p>
-<p class="p6">~wdgt.oscInputConstraints_(4@200)</p>
-<p class="p6">~wdgt.editor</p>
-<p class="p6">~wdgt.calibrate_(false)</p>
-<p class="p6">~wdgt.wdgtControllersAndModels.oscInputRange.model.value</p>
-<p class="p5"><br></p>
 <p class="p6">a.free;</p>
 <p class="p6">~cv.action_({ <span class="s11">|cv|</span> cv.value.postln })</p>
 <p class="p5"><br></p>
 <p class="p8">// change the Spec of the CV</p>
 <p class="p8">// change is reflected in the widget immediately</p>
 <p class="p8">// can also be done through the "edit Spec" button in the widget</p>
-<p class="p6">~wdgt.spec_(<span class="s13">\freq</span>.asSpec)</p>
+<p class="p6">~wdgt.setSpec(<span class="s13">\freq</span>.asSpec)</p>
 <p class="p5"><br></p>
 <p class="p8">// change the MIDI-setup</p>
 <p class="p8">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
-<p class="p8"><span class="s15">~wdgt.midiMode_(</span><span class="s12">1</span><span class="s15">); </span>// in-/decremental output mode</p>
-<p class="p8"><span class="s15">~wdgt.midiMean_(</span><span class="s12">64</span><span class="s15">); </span>// only necessary if midiMode == 1</p>
-<p class="p8"><span class="s15">~wdgt.midistring_(</span><span class="s14">"in-/decremtal"</span><span class="s15">); </span>// an arbitrary string displaying some info about the midi-setting of the widget</p>
-<p class="p8"><span class="s15">~wdgt.ctrlButtonBank_(</span><span class="s12">16</span><span class="s15">); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
+<p class="p8"><span class="s15">~wdgt.setMidiMode(</span><span class="s12">1</span><span class="s15">); </span>// in-/decremental output mode</p>
+<p class="p8"><span class="s15">~wdgt.setMidiMean(</span><span class="s12">64</span><span class="s15">); </span>// only necessary if midiMode == 1</p>
+<p class="p8"><span class="s15">~wdgt.setCtrlButtonBank(</span><span class="s12">16</span><span class="s15">); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
 <p class="p5"><br></p>
 <p class="p8">// set some Synth-Controls<span class="Apple-converted-space"> </span></p>
 <p class="p6">a = { <span class="s11">|freq=440|</span> <span class="s11">SinOsc</span>.ar(freq, mul: <span class="s12">0.4</span>) }.play</p>
