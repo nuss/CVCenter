@@ -119,10 +119,16 @@ span.Apple-tab-span {white-space:pre}
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>clibrate: true</p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>)</p>
 <p class="p7"><span class="Apple-tab-span">	</span>), actions: [</p>
-<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>{ <span class="s7">|cv|</span> a.set(<span class="s5">\freq1</span>, cv) },<span class="Apple-converted-space"> </span></p>
+<p class="p12"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>{ <span class="s7">|cv|</span> a.set(<span class="s5">\freq1</span>, cv) },</p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>{ <span class="s7">|cv|</span> a.set(<span class="s5">\freq2</span>, cv) }</p>
 <p class="p7"><span class="Apple-tab-span">	</span>] ).front;</p>
 <p class="p7">)</p>
+<p class="p6"><br></p>
+<p class="p14"><span class="s8">~wdgt</span><span class="s9">.midiConnect(chan: 0, num: 2, key: </span><span class="s5">\lo</span><span class="s9">) </span>// connect \lo to controller nr. 3, channel 1</p>
+<p class="p14"><span class="s8">~wdgt</span><span class="s9">.midiDisconnect(</span><span class="s5">\lo</span><span class="s9">) </span>// remove the CCResponder from \lo again</p>
+<p class="p14"><span class="s8">~wdgt</span><span class="s9">.midiConnect(key: </span><span class="s5">\lo</span><span class="s9">) </span>// connect \lo to the first slider that gets moved on your hardware</p>
+<p class="p12"><span class="s8">~wdgt</span>.midiDisconnect(<span class="s5">\lo</span>)</p>
+<p class="p6"><br></p>
 <p class="p6"><br></p>
 <p class="p14">// change the Spec of the CV</p>
 <p class="p14">// change is reflected in the widget immediately</p>

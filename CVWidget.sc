@@ -487,6 +487,9 @@ CVWidget {
 				})
 			},
 			{
+				key ?? {
+					Error("Missing 'key'-argument. Maybe you forgot to explicitely provide the key: wdgt.midiConnect(key: \lo)").throw;
+				};
 				if(midiOscEnv[key].cc.isNil, {
 					wdgtControllersAndModels[key].midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
