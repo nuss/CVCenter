@@ -49,7 +49,6 @@ CVWidgetKnob : CVWidget {
 		this.initControllersAndModels(controllersAndModels);
 
 		setupArgs.isKindOf(Event).not.if { Error("a setup has to be provided as a Dictionary or an Event").throw };
-		"calibration: %\n".postf(setupArgs[\calibrate]);
 		
 		setupArgs[\midiMode] !? { this.setMidiMode(setupArgs[\midiMode]) };
 		setupArgs[\midiResolution] !? { this.setMidiResolution(setupArgs[\midiResolution]) };
