@@ -248,24 +248,35 @@ CVCenter {
 				if(orderedCVs[i].class === Event and:{ 
 					orderedCVs[i].keys.includesAny([\lo, \hi])
 				}, {
+					tmp = (
+						lo: this.setup.calibrate = cvWidgets[k] !? { 
+						cvWidgets[k].wdgtControllersAndModels.lo.calibration.model.value 
+					}, 
+					hi: this.setup.calibrate = cvWidgets[k] !? { 
+						cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value 
+					});
+//					tmp.pairsDo({ |k, v| [k, v].postln });
 					cvWidgets[k] = CVWidget2D(
 						tabs.views[cvTabIndex], 
 						[orderedCVs[i].lo, orderedCVs[i].hi], 
 						k, 
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight), 
-						setup: (lo: this.setup, hi: this.setup), 
+						setup: tmp, 
 						controllersAndModels: cvWidgets[k] !? { 
 							(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi) 
 						},
 						cvcGui: cvcArgs
 					)
 				}, {
+					tmp = this.setup.calibrate = cvWidgets[k] !? { 
+						cvWidgets[k].wdgtControllersAndModels.calibration.model.value 
+					};
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex], 
 						orderedCVs[i], 
 						k, 
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
-						setup: this.setup,
+						setup: tmp,
 						controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 						cvcGui: cvcArgs
 					);
@@ -776,6 +787,7 @@ CVCenter {
 		var thisNextPos;
 		var widgetwidth, widgetheight=166, colwidth, rowheight;
 		var widgetControllersAndModels, cvcArgs;
+		var tmp;
 		
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 		
@@ -820,12 +832,20 @@ CVCenter {
 			if(all[k].class === Event and:{
 				all[k].keys.includesAny([\hi, \lo])
 			}, {
+				tmp = (
+					lo: this.setup.calibrate = cvWidgets[k] !? { 
+					cvWidgets[k].wdgtControllersAndModels.lo.calibration.model.value 
+				}, 
+				hi: this.setup.calibrate = cvWidgets[k] !? { 
+					cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value 
+				});
+//				tmp.pairsDo({ |k, v| [k, v].postln });
 				cvWidgets[k] = CVWidget2D(
 					tabs.views[cvTabIndex], 
 					[all[k].lo, all[k].hi], 
 					k, 
 					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight), 
-					setup: (lo: this.setup, hi: this.setup),
+					setup: tmp,
 					controllersAndModels: cvWidgets[k] !? { 
 						(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi) 
 					},
@@ -833,12 +853,15 @@ CVCenter {
 				);
 				widgetStates.put(k, (tabIndex: cvTabIndex));
 			}, {	
+				tmp = this.setup.calibrate = cvWidgets[k] !? { 
+					cvWidgets[k].wdgtControllersAndModels.calibration.model.value 
+				};
 				cvWidgets[k] = CVWidgetKnob(
 					tabs.views[cvTabIndex], 
 					all[k], 
 					k, 
 					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
-					setup: this.setup,
+					setup: tmp,
 					controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 					cvcGui: cvcArgs
 				);

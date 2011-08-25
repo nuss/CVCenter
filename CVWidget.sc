@@ -442,32 +442,15 @@ CVWidget {
 	}
 	
 	oscDisconnect { |key|
-		if(this.isClosed.not, {
-			switch(this.class, 
-				CVWidgetKnob, {
-					wdgtControllersAndModels.oscConnection.model.value_(false).changed(\value);
-					wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
-				},
-				{
-					wdgtControllersAndModels[key].oscConnection.model.value_(false).changed(\value);
-					wdgtControllersAndModels[key].oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
-				}
-			)
-		}, {
-			switch(this.class,
-				CVWidgetKnob, {
-					midiOscEnv.oscResponder.remove;
-				},
-				{
-					midiOscEnv[key].oscResponder.remove;
-				}
-			)
-		});
-		switch(this.class,
+		switch(this.class, 
 			CVWidgetKnob, {
+				wdgtControllersAndModels.oscConnection.model.value_(false).changed(\value);
+				wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
 				CmdPeriod.remove({ this.oscDisconnect });
-			}, 
+			},
 			{
+				wdgtControllersAndModels[key].oscConnection.model.value_(false).changed(\value);
+				wdgtControllersAndModels[key].oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
 				CmdPeriod.remove({ this.oscDisconnect(key) });
 			}
 		)
@@ -691,7 +674,7 @@ CVWidget {
 		wcm.calibration.controller.put(\value, { |theChanger, what, moreArgs|
 			theChanger.value.switch(
 				true, { 
-					thisGuiEnv.calibBut.value_(0);
+					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
 					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
 						thisGuiEnv.editor.calibBut.value_(0);
 						wcm.mapConstrainterLo ?? { 
@@ -709,7 +692,7 @@ CVWidget {
 					})
 				},
 				false, { 
-					thisGuiEnv.calibBut.value_(1);
+					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
 					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
 						thisGuiEnv.editor.calibBut.value_(1);
 						[wcm.mapConstrainterLo, wcm.mapConstrainterHi].do({ |cv| cv = nil; });
@@ -784,60 +767,6 @@ CVWidget {
 						})			
 					})
 				}
-			})
-		});
-		
-		wcm.oscInputRange.controller ?? {
-			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
-		};
-
-		wcm.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
-			if(theChanger.value[0] <= 0 or:{
-				theChanger.value[1] <= 0
-			}, {
-				if(midiOscEnv.oscMapping === \explin or:{
-					midiOscEnv.oscMapping === \expexp
-				}, {
-					midiOscEnv.oscMapping = \linlin;
-				});
-				
-				{	
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not
-					}, {
-						thisGuiEnv.oscEditBut.states_([[
-							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
-							thisGuiEnv.oscEditBut.states[0][1],
-							thisGuiEnv.oscEditBut.states[0][2]
-						]]);
-						thisGuiEnv.oscEditBut.refresh;
-						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === midiOscEnv.oscMapping, {
-								thisGuiEnv.editor.mappingSelect.value_(i);
-							})
-						})
-					})		
-				}.defer
-			}, {
-				{
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not	
-					}, {
-						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === midiOscEnv.oscMapping, {
-								thisGuiEnv.editor.mappingSelect.value_(i)
-							})
-						});
-						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
-							thisGuiEnv.oscEditBut.states_([[
-								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
-								thisGuiEnv.oscEditBut.states[0][1],
-								thisGuiEnv.oscEditBut.states[0][2]
-							]]);
-							thisGuiEnv.oscEditBut.refresh;
-						})
-					})
-				}.defer
 			})
 		});
 		
@@ -1133,9 +1062,6 @@ CVWidget {
 				midiOscEnv.oscResponder.remove;
 				midiOscEnv.oscResponder = nil;
 				midiOscEnv.msgIndex = nil;
-				thisGuiEnv.oscEditBut.states_([
-					["edit OSC", Color.black, Color.clear]
-				]);
 				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changed(\value);
 				midiOscEnv.calibConstraints = nil;
 				
@@ -1158,12 +1084,14 @@ CVWidget {
 		};
 		
 		wcm.oscDisplay.controller.put(\value, { |theChanger, what, moreArgs|
-//			theChanger.value;
 			switch(prCalibrate.class, 
 				Event, { thisCalib = prCalibrate[key] },
 				{ thisCalib = prCalibrate }
 			);
-			thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
+			if(this.window.isClosed.not, {
+				thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
+				thisGuiEnv.oscEditBut.refresh;
+			});
 			defer {
 				if(thisGuiEnv.editor.notNil and:{
 					thisGuiEnv.editor.isClosed.not
@@ -1188,8 +1116,66 @@ CVWidget {
 					].do(_.enabled_(theChanger.value.editEnabled))
 				})
 			};
-			thisGuiEnv.oscEditBut.refresh;
 		});
+		
+		wcm.oscInputRange.controller ?? {
+			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
+		};
+
+		wcm.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
+			if(theChanger.value[0] <= 0 or:{
+				theChanger.value[1] <= 0
+			}, {
+				if(midiOscEnv.oscMapping === \explin or:{
+					midiOscEnv.oscMapping === \expexp
+				}, {
+					midiOscEnv.oscMapping = \linlin;
+				});
+				
+				{	
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not
+					}, {
+						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
+							if(item.asSymbol === midiOscEnv.oscMapping, {
+								thisGuiEnv.editor.mappingSelect.value_(i);
+							})
+						})
+					});
+					if(this.window.isClosed.not, {
+						thisGuiEnv.oscEditBut.states_([[
+							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
+							thisGuiEnv.oscEditBut.states[0][1],
+							thisGuiEnv.oscEditBut.states[0][2]
+						]]);
+						thisGuiEnv.oscEditBut.refresh;
+					})
+				}.defer
+			}, {
+				{
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not	
+					}, {
+						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
+							if(item.asSymbol === midiOscEnv.oscMapping, {
+								thisGuiEnv.editor.mappingSelect.value_(i)
+							})
+						});
+					});
+					if(this.window.isClosed.not, {
+						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
+							thisGuiEnv.oscEditBut.states_([[
+								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
+								thisGuiEnv.oscEditBut.states[0][1],
+								thisGuiEnv.oscEditBut.states[0][2]
+							]]);
+							thisGuiEnv.oscEditBut.refresh;
+						})
+					})
+				}.defer
+			})
+		});
+		
 	}
 
 }
