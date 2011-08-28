@@ -462,7 +462,7 @@ CVWidget2D : CVWidget {
 			})
 		});
 				
-		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
+		[slider2d, rangeSlider].do({ |view| /*[widgetCV.lo.spec, widgetCV.hi.spec].postln; */[widgetCV.lo, widgetCV.hi].connect(view) });
 		widgetCV.lo.connect(numVal.lo);
 		widgetCV.hi.connect(numVal.hi);
 

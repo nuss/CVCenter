@@ -464,19 +464,33 @@ CVCenter {
 		thisVal = value ?? { thisVal = thisSpec.default };
 
 		if(thisSlot.notNil, {
+			// fix me: put in a default spec for the slot that's *not* passed in
 			/* special case: CVWidget2D needs 2 CVs */
+//			all[thisKey] ?? { all.put(thisKey, ()) };
+//			[\lo, \hi].do({ |hilo|
+//				if(thisSlot === hilo, {
+//					widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
+//					all[thisKey].put(thisSlot, CV.new(thisSpec, thisVal));
+//				}, {
+//					widget2DKey = (key: thisKey, slot: hilo, spec: ControlSpec.new);
+//					all[thisKey].put(hilo, spec);
+//				})
+//			})
 			if(thisSlot === \lo or: { thisSlot === \hi }, {
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
-				all[thisKey] ?? { all.put(thisKey, ()) };
+				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
 				all[thisKey].put(thisSlot, CV.new(thisSpec, thisVal));
+//				all[thisKey].postln;
 			})
 		}, {
 			all.put(thisKey, CV.new(thisSpec, thisVal)) 
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
+//			"*gui triggered".postln;
 			this.gui(tab);
 		}, {
+//			"*prAddToGui triggered".postln;
 			this.prAddToGui(tab, widget2DKey);
 		});
 		
@@ -530,12 +544,15 @@ CVCenter {
 			switch(cvWidgets[key].class,
 				CVWidget2D, {
 					if(slot.isNil, { Error("Please provide the key (\hi or \lo) for which the action shall be set").throw });
-					all[key][slot].action_(action);
+//					"cv % at %: %\n".postf(key, slot, all[key][slot]);
+//					all[key][slot].action_(action);
+					cvWidgets[key].widgetCV[slot].action_(action);
 					widgetStates[key].action ?? { widgetStates[key].action = () };
 					widgetStates[key].action.put(slot, action.asCompileString);
 				},
 				{
-					all[key].action_(action);
+//					all[key].action_(action);
+					cvWidgets[key].widgetCV.action_(action);
 					widgetStates[key].put(\action, action.asCompileString);
 				}
 			)
@@ -839,7 +856,6 @@ CVCenter {
 				hi: this.setup.calibrate = cvWidgets[k] !? { 
 					cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value 
 				});
-//				tmp.pairsDo({ |k, v| [k, v].postln });
 				cvWidgets[k] = CVWidget2D(
 					tabs.views[cvTabIndex], 
 					[all[k].lo, all[k].hi], 
@@ -886,7 +902,10 @@ CVCenter {
 			tabs.focus(cvTabIndex);
 		});
 		widget2DKey !? {
+//			"cvWidgets[%][%].getSpec before: %\n".postf(widget2DKey.key, widget2DKey.slot, cvWidgets[widget2DKey.key].getSpec(widget2DKey.slot));
 			cvWidgets[widget2DKey.key].setSpec(widget2DKey.spec, widget2DKey.slot);
+//			all[widget2DKey.key][widget2DKey.slot] = cvWidgets[widget2DKey.key].widgetCV[widget2DKey.slot];
+//			"cvWidgets[%][%].getSpec after: %\n".postf(widget2DKey.key, widget2DKey.slot, cvWidgets[widget2DKey.key].getSpec(widget2DKey.slot));
 		};
 		this.prRegroupWidgets(cvTabIndex);
 		window.front;
