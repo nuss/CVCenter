@@ -4,7 +4,7 @@ CVWidget2D : CVWidget {
 	var <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut;
 
 	*new { |parent, cvs, name, bounds, actions, setup, controllersAndModels, cvcGui, server|
-		^super.newCopyArgs.init(
+		^super.new.init(
 			parent, 
 			cvs, 
 			name, 
