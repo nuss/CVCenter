@@ -23,6 +23,11 @@ CVWidget2D : CVWidget {
 		var nextY, rightBarX, oscEditButHeight, right, left;
 		var actionLo, actionHi;
 		
+		if(GUI.current.name == \QtGUI, { 
+			CV.viewDictionary[QSlider2D].props_([\xValue, \yValue]);
+			CV.viewDictionary[QRangeSlider].props_([\hiValue, \loValue]);
+		});
+		
 		setupArgs !? {
 			(setupArgs.class !== Event).if{ 
 				Error( "a setup for a CVWidget2D has to be provided as an Event: (lo: [args], hi[args])!").throw;
@@ -462,7 +467,7 @@ CVWidget2D : CVWidget {
 			})
 		});
 				
-		[slider2d, rangeSlider].do({ |view| /*[widgetCV.lo.spec, widgetCV.hi.spec].postln; */[widgetCV.lo, widgetCV.hi].connect(view) });
+		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
 		widgetCV.lo.connect(numVal.lo);
 		widgetCV.hi.connect(numVal.hi);
 

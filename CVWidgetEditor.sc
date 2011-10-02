@@ -11,11 +11,11 @@ CVWidgetEditor {
 	var <connectorBut;
 	var <name;
 	
-	*new { |widget, widgetName, tab, key|
-		^super.new.init(widget, widgetName, tab, key)
+	*new { |widget, widgetName, tab, slot|
+		^super.new.init(widget, widgetName, tab, slot)
 	}
 
-	init { |widget, widgetName, tab, key|
+	init { |widget, widgetName, tab, slot|
 		var flow0, flow1, flow2;
 		var tabs, /*specsActions, editor, */cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
@@ -28,21 +28,21 @@ CVWidgetEditor {
 						
 		name = widgetName.asSymbol;
 		
-		if(key.isNil, { thisGuiEnv = widget.guiEnv }, { thisGuiEnv = widget.guiEnv[key] });
+		if(slot.isNil, { thisGuiEnv = widget.guiEnv }, { thisGuiEnv = widget.guiEnv[slot] });
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
 		};
 
-		if(key.notNil, {
-			if(widget.wdgtControllersAndModels[key].notNil, { 
-				wcmHiLo = widget.wdgtControllersAndModels[key];
+		if(slot.notNil, {
+			if(widget.wdgtControllersAndModels[slot].notNil, { 
+				wcmHiLo = widget.wdgtControllersAndModels[slot];
 			});
-			thisMidiMode = widget.getMidiMode(key);
-			thisMidiMean = widget.getMidiMean(key);
-			thisMidiResolution = widget.getMidiResolution(key);
-			thisSoftWithin = widget.getSoftWithin(key);
-			thisCtrlButtonBank = widget.getCtrlButtonBank(key);
+			thisMidiMode = widget.getMidiMode(slot);
+			thisMidiMean = widget.getMidiMean(slot);
+			thisMidiResolution = widget.getMidiResolution(slot);
+			thisSoftWithin = widget.getSoftWithin(slot);
+			thisCtrlButtonBank = widget.getCtrlButtonBank(slot);
 		}, { 
 			if(widget.wdgtControllersAndModels.notNil, { 
 				wcmHiLo = widget.wdgtControllersAndModels;
@@ -61,8 +61,8 @@ CVWidgetEditor {
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 		
-		if(key.notNil, {
-			slotHiLo = "["++key.asString++"]";
+		if(slot.notNil, {
+			slotHiLo = "["++slot.asString++"]";
 		}, {
 			slotHiLo = "";
 		});
@@ -70,20 +70,23 @@ CVWidgetEditor {
 		allEditors ?? { allEditors = IdentityDictionary() };
 		
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
+			
 			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 225));
 
-			if(key.isNil, { 
+			if(slot.isNil, { 
 				allEditors.put(name, (window: window, name: widgetName)) 
 			}, {
-				tmp = (); tmp.put(key, (window: window, name: widgetName));
+				tmp = (); tmp.put(slot, (window: window, name: widgetName));
 				if(allEditors[name].isNil, { 
 					allEditors.put(name, tmp);
 				}, { 
-					allEditors[name].put(key, (window: window, name: widgetName));
+					allEditors[name].put(slot, (window: window, name: widgetName));
 				});
 			});
 			
-			if(key.notNil, { thisEditor = allEditors[name][key] }, { thisEditor = allEditors[name] });
+//			"allEditors: %\n".postf(allEditors);
+			if(slot.notNil, { thisEditor = allEditors[name][slot] }, { thisEditor = allEditors[name] });
+//			thisEditor = allEditors[name][slot];
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC"], scroll: true);
@@ -101,7 +104,7 @@ CVWidgetEditor {
 				.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq.asSpec \nor [20, 20000, \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
 			;
 
-			cvString = widget.getSpec(key).asString.split($ );
+			cvString = widget.getSpec(slot).asString.split($ );
 
 			cvString = cvString[1..cvString.size-1].join(" ");
 			
@@ -109,7 +112,7 @@ CVWidgetEditor {
 				.font_(staticTextFont)
 				.string_(cvString)
 				.action_({ |tf|
-					widget.setSpec(tf.string.interpret, key)
+					widget.setSpec(tf.string.interpret, slot)
 				})
 			;
 			
@@ -117,7 +120,7 @@ CVWidgetEditor {
 
 			specsList = PopUpMenu(thisEditor.tabs.views[0], flow0.bounds.width-20@20)
 				.action_({ |sl|
-					widget.setSpec(specsListSpecs[sl.value], key);
+					widget.setSpec(specsListSpecs[sl.value], slot);
 				})
 			;
 			
@@ -138,12 +141,12 @@ CVWidgetEditor {
 				})
 			});
 						
-			tmp = specsListSpecs.detectIndex({ |spec, i| spec == widget.getSpec(key) });
+			tmp = specsListSpecs.detectIndex({ |spec, i| spec == widget.getSpec(slot) });
 			if(tmp.notNil, {
 				specsList.value_(tmp);
 			}, {
-				specsListSpecs.array_([widget.getSpec(key)]++specsListSpecs.array);
-				specsList.items = List["custom:"+widget.getSpec(key).asString]++specsList.items;
+				specsListSpecs.array_([widget.getSpec(slot)]++specsListSpecs.array);
+				specsList.items = List["custom:"+widget.getSpec(slot).asString]++specsList.items;
 			});
 			
 			window.onClose_({
@@ -168,7 +171,7 @@ CVWidgetEditor {
 				.items_(midiModes)
 				.value_(thisMidiMode)
 				.action_({ |ms|
-					widget.setMidiMode(ms.value, key);
+					widget.setMidiMode(ms.value, slot);
 				})
 			;
 			
@@ -184,7 +187,7 @@ CVWidgetEditor {
 				.font_(staticTextFont)
 				.value_(thisMidiMean)
 				.action_({ |mb|
-					widget.setMidiMean(mb.value, key);
+					widget.setMidiMean(mb.value, slot);
 				})
 				.step_(1.0)
 				.clipLo_(0.0)
@@ -202,7 +205,7 @@ CVWidgetEditor {
 				.font_(staticTextFont)
 				.value_(thisSoftWithin)
 				.action_({ |mb|
-					widget.setSoftWithin(mb.value, key);
+					widget.setSoftWithin(mb.value, slot);
 				})
 				.step_(0.005)
 				.clipLo_(0.01)
@@ -221,7 +224,7 @@ CVWidgetEditor {
 				.font_(staticTextFont)
 				.value_(thisMidiResolution)
 				.action_({ |mb|
-					widget.setMidiResolution(mb.value, key);
+					widget.setMidiResolution(mb.value, slot);
 				})
 				.step_(0.05)
 				.clipLo_(0.001)
@@ -241,7 +244,7 @@ CVWidgetEditor {
 				.string_(thisCtrlButtonBank)
 				.action_({ |mb|
 					if(mb.string != "nil", {
-						widget.setCtrlButtonBank(mb.string.asInt, key);
+						widget.setCtrlButtonBank(mb.string.asInt, slot);
 					}, {
 						widget.setCtrlButtonBank(nil);
 					})
@@ -271,12 +274,12 @@ CVWidgetEditor {
 								[thisGuiEnv.midiCtrl.string, mctrl]
 							].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 							if(margs.select({ |i| i.notNil }).size > 0, {
-								widget.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], key: key)
+								widget.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], key: slot)
 							}, {
-								widget.midiConnect(key: key)
+								widget.midiConnect(key: slot)
 							})
 						},
-						0, { widget.midiDisconnect(key) }
+						0, { widget.midiDisconnect(slot) }
 					)
 				})
 			;
@@ -457,7 +460,7 @@ CVWidgetEditor {
 			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.background_(Color.white)
-				.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(key).minval+"/"+widget.getSpec(key).maxval)
+				.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(slot).minval+"/"+widget.getSpec(slot).maxval)
 			;
 	
 			flow2.shift(5, 0);
@@ -468,13 +471,13 @@ CVWidgetEditor {
 				.font_(Font("Helvetica", 14))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
-					widget.setOscMapping(ms.item, key);
+					widget.setOscMapping(ms.item, slot);
 				})
 			;
 			
-			if(widget.getOscMapping(key).notNil, {
+			if(widget.getOscMapping(slot).notNil, {
 				mappingSelectItems.do({ |item, i|
-					if(item.asSymbol === widget.getOscMapping(key), {
+					if(item.asSymbol === widget.getOscMapping(slot), {
 						mappingSelect.value_(i);
 					});
 				}, {
@@ -498,10 +501,10 @@ CVWidgetEditor {
 								portField.value,
 								nameField.string, 
 								indexField.value.asInt,
-								key
+								slot
 							);
 						},
-						0, { widget.oscDisconnect(key) }
+						0, { widget.oscDisconnect(slot) }
 					)
 				})
 			;
@@ -511,17 +514,17 @@ CVWidgetEditor {
 			calibBut.action_({ |but|
 				but.value.switch(
 					0, { 
-						widget.setCalibrate(true, key);
+						widget.setCalibrate(true, slot);
 						wcmHiLo.calibration.model.value_(true).changed(\value);
 					},
 					1, { 
-						widget.setCalibrate(false, key);
+						widget.setCalibrate(false, slot);
 						wcmHiLo.calibration.model.value_(false).changed(\value);
 					}
 				)
 			});
 	
-			widget.getCalibrate(key).switch(
+			widget.getCalibrate(slot).switch(
 				true, { calibBut.value_(0) },
 				false, { calibBut.value_(1) }
 			);
@@ -539,11 +542,11 @@ CVWidgetEditor {
 		tab !? thisEditor.tabs.focus(tab);
 	}
 	
-	close { |key|
+	close { |slot|
 		thisEditor.window.close;
 		switch(allEditors[name].class,
 			Event, { 
-				allEditors[name].removeAt(key);
+				allEditors[name].removeAt(slot);
 				if(allEditors[name].isEmpty, { allEditors.removeAt(name) });
 			},
 			{ allEditors.removeAt(name) };

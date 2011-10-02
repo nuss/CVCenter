@@ -544,14 +544,11 @@ CVCenter {
 			switch(cvWidgets[key].class,
 				CVWidget2D, {
 					if(slot.isNil, { Error("Please provide the key (\hi or \lo) for which the action shall be set").throw });
-//					"cv % at %: %\n".postf(key, slot, all[key][slot]);
-//					all[key][slot].action_(action);
 					cvWidgets[key].widgetCV[slot].action_(action);
 					widgetStates[key].action ?? { widgetStates[key].action = () };
 					widgetStates[key].action.put(slot, action.asCompileString);
 				},
 				{
-//					all[key].action_(action);
 					cvWidgets[key].widgetCV.action_(action);
 					widgetStates[key].put(\action, action.asCompileString);
 				}
@@ -902,10 +899,7 @@ CVCenter {
 			tabs.focus(cvTabIndex);
 		});
 		widget2DKey !? {
-//			"cvWidgets[%][%].getSpec before: %\n".postf(widget2DKey.key, widget2DKey.slot, cvWidgets[widget2DKey.key].getSpec(widget2DKey.slot));
 			cvWidgets[widget2DKey.key].setSpec(widget2DKey.spec, widget2DKey.slot);
-//			all[widget2DKey.key][widget2DKey.slot] = cvWidgets[widget2DKey.key].widgetCV[widget2DKey.slot];
-//			"cvWidgets[%][%].getSpec after: %\n".postf(widget2DKey.key, widget2DKey.slot, cvWidgets[widget2DKey.key].getSpec(widget2DKey.slot));
 		};
 		this.prRegroupWidgets(cvTabIndex);
 		window.front;
@@ -928,8 +922,8 @@ CVCenter {
 					});
 					orderedWidgets[i].widgetXY_(thisNextPos);
 					colwidth = orderedWidgets[i].widgetProps.x+1; // add a small gap to the right
-					rowwidth = tabs.views[widgetStates[k].tabIndex].bounds.width-15;
-					if(thisNextPos.x+colwidth >= (rowwidth-colwidth-15), {
+					rowwidth = tabs.views[widgetStates[k].tabIndex].bounds.width/*-15*/;
+					if(thisNextPos.x+colwidth >= (rowwidth-colwidth/*-15*/), {
 						// jump to next row
 						tabProperties[widgetStates[k].tabIndex].nextPos = thisNextPos = 0@(thisNextPos.y+rowheight);
 					}, {

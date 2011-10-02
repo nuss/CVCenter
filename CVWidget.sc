@@ -860,6 +860,7 @@ CVWidget {
 		};
 		
 		wcm.midiDisplay.controller.put(\value, { |theChanger, what, moreArgs|
+			theChanger.postln;
 			theChanger.value.learn.switch(
 				"X", {
 					defer {
@@ -885,6 +886,7 @@ CVWidget {
 						if(thisGuiEnv.editor.notNil and:{
 							thisGuiEnv.editor.isClosed.not
 						}, {
+							"triggered".postln;
 							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
 								.background_(Color.red)
 								.stringColor_(Color.white)
