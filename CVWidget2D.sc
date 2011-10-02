@@ -24,8 +24,8 @@ CVWidget2D : CVWidget {
 		var actionLo, actionHi;
 		
 		if(GUI.current.name == \QtGUI, { 
-			CV.viewDictionary[QSlider2D].props_([\xValue, \yValue]);
-			CV.viewDictionary[QRangeSlider].props_([\hiValue, \loValue]);
+			CV.viewDictionary[QSlider2D].props_(#[xValue, yValue]);
+			CV.viewDictionary[QRangeSlider].props_(#[hiValue, loValue]);
 		});
 		
 		setupArgs !? {
