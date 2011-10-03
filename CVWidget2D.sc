@@ -25,7 +25,7 @@ CVWidget2D : CVWidget {
 		
 		if(GUI.current.name == \QtGUI, { 
 			CV.viewDictionary[QSlider2D].props_(#[xValue, yValue]);
-			CV.viewDictionary[QRangeSlider].props_(#[loValue, loValue]);
+			CV.viewDictionary[QRangeSlider].props_(#[loValue, hiValue]);
 		});
 		
 		setupArgs !? {
