@@ -354,7 +354,22 @@ CVCenter {
 				lastSetUp = this.setup;
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});
-	}	
+	}
+	
+//	*guiFrom { |def...specs|
+//		var name, controls, cNames, cDict;
+//		def ?? { "You must provide a SynthDef or NodeProxy!".warn; ^nil };
+//		switch(def.class,
+//			SynthDef, {
+//				name = def.name.asSymbol;
+//				if(SynthDescLib.global[name].notNil, {
+//					controls = def.controls;
+//					cNames = SynthDescLib.global[name].controlNames;
+//					cDict = [cNames, controls].flop.flatten.as(IdentityDictionary);
+//				})
+//			}
+//		)
+//	}	
 	
 	*put { |...args|
 		var inputArgs, overwrite=false, tmp;
@@ -537,23 +552,45 @@ CVCenter {
 		tabProperties[index].tabLabel = newName.asString;
 	}
 	
-	*setActionAt { |key, action, slot|
-		key ?? { Error("You have to provide the CV's key in order to set its action!").throw };
-		if(all[key].notNil and:{ cvWidgets[key].notNil }, {
+	*addActionAt { |key, action, slot|
+		var controller;
+		key ?? { Error("You have to provide the CV's key in order to add an action!").throw };
+		if(all[key.asSymbol].notNil and:{ cvWidgets[key.asSymbol].notNil }, {
 			if(action.class === String, { action = action.interpret });
-			switch(cvWidgets[key].class,
+			switch(cvWidgets[key.asSymbol].class,
 				CVWidget2D, {
 					if(slot.isNil, { Error("Please provide the key (\hi or \lo) for which the action shall be set").throw });
-					cvWidgets[key].widgetCV[slot].action_(action);
-					widgetStates[key].action ?? { widgetStates[key].action = () };
-					widgetStates[key].action.put(slot, action.asCompileString);
+					controller = this.at(key.asSymbol)[slot].action_(action);
+					widgetStates[key.asSymbol].actions ?? { widgetStates[key.asSymbol].actions = () };
+					widgetStates[key.asSymbol].actions[slot.asSymbol] ?? { 
+						widgetStates[key.asSymbol].actions.put(slot.asSymbol, ());
+					};
+					widgetStates[key.asSymbol].actions[slot.asSymbol].put(controller, action.asCompileString);
 				},
 				{
-					cvWidgets[key].widgetCV.action_(action);
-					widgetStates[key].put(\action, action.asCompileString);
+					controller = this.at(key.asSymbol).action_(action);
+					widgetStates[key.asSymbol].actions ?? { widgetStates[key.asSymbol].put(\actions, ()) };
+					widgetStates[key.asSymbol].actions.put(controller, action.asCompileString);
 				}
 			)
+			^controller;
 		})
+	}
+	
+	*removeActionAt { |key, controller, slot|
+		var thisController;
+		key ?? { Error("You have to provide the CV's key in order to remove an action!").throw };
+		controller !? {
+			switch(cvWidgets[slot.asSymbol].class, 
+				CVWidget2D, {
+					widgetStates[key.asSymbol].actions[slot.asSymbol].removeAt(controller);
+				},
+				{
+					widgetStates[key.asSymbol].actions.removeAt(controller);
+				}
+			);
+			controller.remove;
+		}
 	}
 	
 	*saveSetup { |path|
@@ -570,7 +607,7 @@ CVCenter {
 							lib[\all][k][hilo] = (
 								spec: all[k][hilo].spec,
 								val: all[k][hilo].value,
-								action: widgetStates[k].action !? { widgetStates[k].action[hilo] },
+								actions: widgetStates[k].actions !? { widgetStates[k].actions[hilo] },
 								osc: (
 									addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
 										cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
@@ -599,7 +636,7 @@ CVCenter {
 						lib[\all][k] = (
 							spec: all[k].spec,
 							val: all[k].value,
-							action: widgetStates[k].action,
+							actions: widgetStates[k].actions,
 							osc: (
 								addr: cvWidgets[k].midiOscEnv.oscResponder !? { 
 									cvWidgets[k].midiOscEnv.oscResponder.addr
@@ -674,8 +711,10 @@ CVCenter {
 								.setCtrlButtonBank(v[hilo].midi.ctrlButtonBank, hilo)
 							;
 							if(loadActions, {
-								v[hilo].action !? {
-									this.setActionAt(key, v[hilo].action.interpret, hilo);
+								v[hilo].actions !? {
+									v[hilo].actions.pairsDo({ |ak, av|
+										this.addActionAt(key, av.interpret, hilo);
+									})
 								}
 							});
 							if(autoConnectOSC, {
@@ -715,8 +754,10 @@ CVCenter {
 							.setCtrlButtonBank(v.midi.ctrlButtonBank)
 						;
 						if(loadActions, {
-							v.action !? {
-								this.setActionAt(key, v.action.interpret);
+							v.actions !? {
+								v.actions.pairsDo({ |ak, av|
+									this.addActionAt(key, av.interpret);
+								})
 							}
 						});
 						if(autoConnectOSC, {
