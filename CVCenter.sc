@@ -612,8 +612,13 @@ CVCenter {
 		})
 	}
 	
-	*keysAtTab { |tab|
-		
+	*widgetsAtTab { |tab|
+		var index, wdgts = [];
+		index = this.tabProperties.detectIndex({ |t, i| t.tabLabel.asSymbol === tab.asSymbol });
+		all.keys.do({ |key|
+			if(widgetStates[key].tabIndex == index, { wdgts = wdgts.add(key) });
+		});
+		^wdgts;
 	}	
 	
 	*saveSetup { |path|
