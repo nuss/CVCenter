@@ -578,10 +578,9 @@ CVCenter {
 	}
 	
 	*removeActionAt { |key, controller, slot|
-		var thisController;
 		key ?? { Error("You have to provide the CV's key in order to remove an action!").throw };
 		controller !? {
-			switch(cvWidgets[slot.asSymbol].class, 
+			switch(cvWidgets[key.asSymbol].class, 
 				CVWidget2D, {
 					widgetStates[key.asSymbol].actions[slot.asSymbol].removeAt(controller);
 				},
@@ -592,6 +591,30 @@ CVCenter {
 			controller.remove;
 		}
 	}
+	
+	*removeActionsAt { |...keys|
+		keys ?? { "Can't remove actions: provide at least one key".warn };
+		keys.do({ |key|
+			switch(cvWidgets[key.asSymbol].class,
+				CVWidget2D, {
+					#[lo, hi].do({ |slot| 
+						widgetStates[key.asSymbol].actions[slot.asSymbol].pairsDo({ |ctrlr, action|
+							this.removeActionAt(key, ctrlr, slot);
+						})
+					})
+				}, 
+				{ 
+					widgetStates[key.asSymbol].actions.pairsDo({ |ctrlr, action|
+						this.removeActionAt(key, ctrlr);
+					})
+				}
+			)
+		})
+	}
+	
+	*keysAtTab { |tab|
+		
+	}	
 	
 	*saveSetup { |path|
 		var lib, midiOscEnvs = (), successFunc;
