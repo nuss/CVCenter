@@ -3,13 +3,13 @@ CVWidget2D : CVWidget {
 	var <slider2d, <rangeSlider, <numVal, <specBut;
 	var <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut;
 
-	*new { |parent, cvs, name, bounds, actions, setup, controllersAndModels, cvcGui, server|
+	*new { |parent, cvs, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server|
 		^super.new.init(
 			parent, 
 			cvs, 
 			name, 
 			bounds,
-			actions, 
+			defaultActions, 
 			setup,
 			controllersAndModels,
 			cvcGui,
@@ -85,11 +85,13 @@ CVWidget2D : CVWidget {
 		});
 					
 		actions !? {
-			if(actions.class !== Array, {
-				Error("Please provide actions in an array: [action1, action2]").throw;
+			if(actions.class !== Event, {
+				Error("Please provide actions in the following way: (lo: action1, hi: action2)").throw;
 			}, {
-				actions[0] !? { widgetCV.lo.action_(actions[0]) };
-				actions[1] !? { widgetCV.hi.action_(actions[1]) };
+				[actions, actions.lo, actions.lo.isNil].postln;
+//				actions.lo !? { widgetCV.lo.action_(actions.lo) };
+				actions[\lo] !? { actions.lo.postln; this.setDefaultAction(actions[\lo], \lo) };
+				actions[\hi] !? { actions.hi.postln; this.setDefaultAction(actions[\hi], \hi) };
 			})
 		};
 

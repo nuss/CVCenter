@@ -13,8 +13,10 @@ p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; min-height: 17.0p
 p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
 p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; min-height: 14.0px}
 p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco}
-p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #ab3b37}
-p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #8d5f5b}
+p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #194568}
+p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #666666}
+p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #ab3b37}
+p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco; color: #8d5f5b}
 span.s1 {font: 19.0px Helvetica}
 span.s2 {color: #4d5252}
 span.s3 {color: #4c5252}
@@ -28,10 +30,9 @@ span.s10 {font: 12.0px Helvetica}
 span.s11 {color: #194568}
 span.s12 {color: #716072}
 span.s13 {color: #475446}
-span.s14 {color: #666666}
-span.s15 {color: #000000}
-span.s16 {color: #874187}
-span.s17 {color: #4b5253}
+span.s14 {color: #000000}
+span.s15 {color: #874187}
+span.s16 {color: #4b5253}
 span.Apple-tab-span {white-space:pre}
 </style>
 </head>
@@ -102,37 +103,49 @@ span.Apple-tab-span {white-space:pre}
 <p class="p5"><br></p>
 <p class="p6">(</p>
 <p class="p6">~cv = <span class="s11">CV</span>.new(<span class="s13">\freq</span>.asSpec);<span class="Apple-converted-space"> </span></p>
-<p class="p6">~wdgt = <span class="s11">CVWidgetKnob</span>(<span class="s11">nil</span>, ~cv, <span class="s14">"CV test"</span>, action: { <span class="s11">|cv|</span> a.set(<span class="s13">\freq</span>, cv.value) }, setup:(midiMode: 1, midiMean: 64, softWithin: 0.1, midiResolution: 1, ctrlButtonBank: 16, clibrate: true) );</p>
+<p class="p7"><span class="s14">~wdgt = </span>CVWidgetKnob<span class="s14">(</span></p>
+<p class="p6"><span class="Apple-tab-span">	</span><span class="s11">nil</span>,<span class="Apple-converted-space"> </span></p>
+<p class="p6"><span class="Apple-tab-span">	</span>~cv,<span class="Apple-converted-space"> </span></p>
+<p class="p8"><span class="s14"><span class="Apple-tab-span">	</span></span>"CV test"<span class="s14">,<span class="Apple-converted-space"> </span></span></p>
+<p class="p6"><span class="Apple-tab-span">	</span>defaultAction: { <span class="s11">|cv|</span> "cv.value: %\n".postf(cv.value); a.set(<span class="s13">\freq</span>, cv.value) },<span class="Apple-converted-space"> </span></p>
+<p class="p6"><span class="Apple-tab-span">	</span>setup:(midiMode: 1, midiMean: 64, softWithin: 0.1, midiResolution: 1, ctrlButtonBank: 16, clibrate: true)<span class="Apple-converted-space"> </span></p>
+<p class="p6">);</p>
 <p class="p6">~wdgt.front;</p>
 <p class="p6">)</p>
 <p class="p5"><br></p>
-<p class="p7">// MIDI</p>
-<p class="p7"><span class="s15">~wdgt.midiConnect(chan: </span><span class="s16">0</span><span class="s15">, num: </span><span class="s16">2</span><span class="s15">) </span>// connect to controller nr. 3, channel 1</p>
-<p class="p7"><span class="s15">~wdgt.midiDisconnect </span>// remove the CCResponder again</p>
-<p class="p7"><span class="s15">~wdgt.midiConnect </span>// connect to the first slider that gets moved on your hardware</p>
+<p class="p6">~wdgt.removeDefaultAction;</p>
+<p class="p6">~wdgt.setDefaultAction({ |cv| a.set(\freq, cv.value) });</p>
+<p class="p5"><br></p>
+<p class="p6">~post = ~wdgt.widgetCV.action_({ |cv| "cv.value: %\n".postf(cv.value) });</p>
+<p class="p6">~post.remove;</p>
+<p class="p5"><br></p>
+<p class="p9">// MIDI</p>
+<p class="p9"><span class="s14">~wdgt.midiConnect(chan: </span><span class="s15">0</span><span class="s14">, num: </span><span class="s15">2</span><span class="s14">) </span>// connect to controller nr. 3, channel 1</p>
+<p class="p9"><span class="s14">~wdgt.midiDisconnect </span>// remove the CCResponder again</p>
+<p class="p9"><span class="s14">~wdgt.midiConnect </span>// connect to the first slider that gets moved on your hardware</p>
 <p class="p6">~wdgt.midiDisconnect</p>
 <p class="p5"><br></p>
 <p class="p6">a.free;</p>
 <p class="p6">~cv.action_({ <span class="s11">|cv|</span> cv.value.postln })</p>
 <p class="p5"><br></p>
-<p class="p8">// change the Spec of the CV</p>
-<p class="p8">// change is reflected in the widget immediately</p>
-<p class="p8">// can also be done through the "edit Spec" button in the widget</p>
+<p class="p10">// change the Spec of the CV</p>
+<p class="p10">// change is reflected in the widget immediately</p>
+<p class="p10">// can also be done through the "edit Spec" button in the widget</p>
 <p class="p6">~wdgt.setSpec(<span class="s13">\freq</span>.asSpec)</p>
 <p class="p5"><br></p>
-<p class="p8">// change the MIDI-setup</p>
-<p class="p8">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
-<p class="p8"><span class="s15">~wdgt.setMidiMode(</span><span class="s12">1</span><span class="s15">); </span>// in-/decremental output mode</p>
-<p class="p8"><span class="s15">~wdgt.setMidiMean(</span><span class="s12">64</span><span class="s15">); </span>// only necessary if midiMode == 1</p>
-<p class="p8"><span class="s15">~wdgt.setCtrlButtonBank(</span><span class="s12">16</span><span class="s15">); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
+<p class="p10">// change the MIDI-setup</p>
+<p class="p10">// change will only take effect after disconnecting and reconnecting the MIDI-device</p>
+<p class="p10"><span class="s14">~wdgt.setMidiMode(</span><span class="s12">1</span><span class="s14">); </span>// in-/decremental output mode</p>
+<p class="p10"><span class="s14">~wdgt.setMidiMean(</span><span class="s12">64</span><span class="s14">); </span>// only necessary if midiMode == 1</p>
+<p class="p10"><span class="s14">~wdgt.setCtrlButtonBank(</span><span class="s12">16</span><span class="s14">); </span>// should reflect the number of knobs/sliders on your hardware-device.</p>
 <p class="p5"><br></p>
-<p class="p8">// set some Synth-Controls<span class="Apple-converted-space"> </span></p>
+<p class="p10">// set some Synth-Controls<span class="Apple-converted-space"> </span></p>
 <p class="p6">a = { <span class="s11">|freq=440|</span> <span class="s11">SinOsc</span>.ar(freq, mul: <span class="s12">0.4</span>) }.play</p>
 <p class="p6">~cv.action_({ <span class="s11">|cv|</span> a.set(<span class="s13">\freq</span>, cv.value) })</p>
 <p class="p2"><br></p>
 <p class="p4"><b>about the GUI</b></p>
 <p class="p3"><br></p>
-<p class="p1">The Elements within the GUI should be more or less selfexplanatory. However, one might ask why there the name is reflected twice - once as a non-editable label, once as an editable textfield. The reason for this is, that within <a href="CVCenter.html"><span class="s17"><b>CVCenter</b></span></a> the label will reflect the key-name under which a CV has been added to <b>CVCenter</b>. The key may or may not reflect a key of a pattern or a control of a synth. However, a CV as part of <b>CVCenter</b> may be used in any context, so it may be useful to be able to add some addititional information, independantly from the key-name.</p>
+<p class="p1">The Elements within the GUI should be more or less selfexplanatory. However, one might ask why there the name is reflected twice - once as a non-editable label, once as an editable textfield. The reason for this is, that within <a href="CVCenter.html"><span class="s16"><b>CVCenter</b></span></a> the label will reflect the key-name under which a CV has been added to <b>CVCenter</b>. The key may or may not reflect a key of a pattern or a control of a synth. However, a CV as part of <b>CVCenter</b> may be used in any context, so it may be useful to be able to add some addititional information, independantly from the key-name.</p>
 <p class="p1">Within every CVWidget there is a blue button, labeled "L". This stands for "learn" - when clicked the button-color turns to red and the label becomes "X". In this state the first MIDI-slider that gets moved gets connected to the particular CVWidget resp. the parameters controlled by it.</p>
 <p class="p1">Last but not least you will find a (non-functional) button named "MIDI" - this should become a shortcut to the widget's MIDI-setup. As it is currently not known to the author which different setups will be useful to provide this functionality shall be implemented at a later point.</p>
 </body>

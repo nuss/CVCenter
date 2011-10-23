@@ -5,13 +5,13 @@ CVWidgetKnob : CVWidget {
 	var <window, <guiEnv, <editorEnv;
 	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut;
 
-	*new { |parent, cv, name, bounds, action, setup, controllersAndModels, cvcGui, server|
+	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, server|
 		^super.new.init(
 			parent, 
 			cv, 
 			name, 
 			bounds, 
-			action,
+			defaultAction,
 			setup,
 			controllersAndModels, 
 			cvcGui, 
@@ -57,7 +57,7 @@ CVWidgetKnob : CVWidget {
 		setupArgs[\softWithin] !? { this.setSoftWithin(setupArgs[\softWithin]) };
 		setupArgs[\calibrate] !? { this.setCalibrate(setupArgs[\calibrate]) };
 						
-		action !? { widgetCV.action_(action) };
+		action !? { this.setDefaultAction(action) };
 		
 		if(bounds.isNil, {
 			thisXY = 7@0;

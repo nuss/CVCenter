@@ -1,7 +1,7 @@
 
 CVWidget {
 
-	var <widgetCV;
+	var <widgetCV, prDefaultAction;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
@@ -389,6 +389,34 @@ CVWidget {
 				wdgtControllersAndModels[key].cvSpec.model.value_(
 					wdgtControllersAndModels[key].cvSpec.model.value;
 				).changed(\value);
+			}
+		)
+	}
+	
+	setDefaultAction { |func, slot|
+		switch(this.class,
+			CVWidget2D, {
+				slot ?? { Error("Please provide the slot for which you want to set the action: 'lo' or 'hi'").throw };
+				prDefaultAction ?? { prDefaultAction = () };
+				prDefaultAction[slot] ?? {
+					prDefaultAction.put(slot.asSymbol, this.widgetCV[slot].action_(func));
+				}
+			},
+			{
+				prDefaultAction ?? { prDefaultAction = this.widgetCV.action_(func) };
+			}
+		)
+	}
+	
+	removeDefaultAction { |slot|
+		switch(this.class,
+			CVWidget2D, {
+				prDefaultAction[slot.asSymbol].remove;
+				prDefaultAction[slot.asSymbol] = nil;
+			},
+			{
+				prDefaultAction.remove;
+				prDefaultAction = nil;
 			}
 		)
 	}
