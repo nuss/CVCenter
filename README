@@ -10,4 +10,14 @@ Installation:
 	c) wslib (optional)
 	see the Quarks-helpfile for more information on how to do this.
 2) after installing SuperCollider and the required extensions put all content of CVCenter in
-~/Library/Application Support/SuperCollider/Extensions/ (Mac)
+your user-app-support directory. Execute the following line SuperCollder to see where that is:
+
+Platform.userAppSupportDir
+
+Under OSX this will resolve to:
+~/Library/Application Support/SuperCollider/Extensions/
+
+Under Linux, using the latest Developer-Version of SuperCollider this will resolve to
+~/.local/share/SuperCollider
+
+Note: if you're on Linux you will need to have installed the developer-version of SuperCollider (3.5~dev) as CVCenter needs QtGUI to be installed.
