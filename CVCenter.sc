@@ -6,7 +6,7 @@ CVCenter {
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight; 
 	classvar <widgetStates;
 	classvar <tabProperties, colors, nextColor;
-	classvar controllersAndModels;
+//	classvar controllersAndModels;
 	
 	*new { |cvs...setUpArgs|
 		var r, g, b;
@@ -495,17 +495,14 @@ CVCenter {
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
 				all[thisKey].put(thisSlot, CV.new(thisSpec, thisVal));
-//				all[thisKey].postln;
 			})
 		}, {
 			all.put(thisKey, CV.new(thisSpec, thisVal)) 
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
-//			"*gui triggered".postln;
 			this.gui(tab);
 		}, {
-//			"*prAddToGui triggered".postln;
 			this.prAddToGui(tab, widget2DKey);
 		});
 		
@@ -517,7 +514,6 @@ CVCenter {
 	}
 	
 	*setup {
-//		^[this.midiMode, this.midiResolution, this.midiMean, this.ctrlButtonBank, this.softWithin];
 		^(
 			midiMode: this.midiMode,
 			midiResolution: this.midiResolution,
