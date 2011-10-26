@@ -15,9 +15,11 @@ your user-app-support directory. Execute the following line SuperCollder to see 
 Platform.userAppSupportDir
 
 Under OSX this will resolve to:
-~/Library/Application Support/SuperCollider/Extensions/
+~/Library/Application Support/SuperCollider
 
 Under Linux, using the latest Developer-Version of SuperCollider this will resolve to
 ~/.local/share/SuperCollider
+
+If not present yet create a directory 'Extensions' and put CVCenter in there.
 
 Note: if you're on Linux you will need to have installed the developer-version of SuperCollider (3.5~dev) as CVCenter needs QtGUI to be installed.
