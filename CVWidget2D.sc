@@ -88,10 +88,11 @@ CVWidget2D : CVWidget {
 			if(actions.class !== Event, {
 				Error("Please provide actions in the following way: (lo: action1, hi: action2)").throw;
 			}, {
-				[actions, actions.lo, actions.lo.isNil].postln;
-//				actions.lo !? { widgetCV.lo.action_(actions.lo) };
-				actions[\lo] !? { actions.lo.postln; this.setDefaultAction(actions[\lo], \lo) };
-				actions[\hi] !? { actions.hi.postln; this.setDefaultAction(actions[\hi], \hi) };
+//				[actions, actions.lo, actions.lo.isNil].postln;
+				actions[\lo] !? { this.setDefaultAction(actions[\lo], \lo) };
+				actions[\hi] !? { this.setDefaultAction(actions[\hi], \hi) };
+//				actions[\lo] !? { this.addAction(\default, actions[\lo], \lo) };
+//				actions[\hi] !? { this.addAction(\default, actions[\hi], \hi) };
 			})
 		};
 
@@ -468,10 +469,14 @@ CVWidget2D : CVWidget {
 				)
 			})
 		});
+		
+//		[widgetCV.lo, widgetCV.hi].postln;
 				
 		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
 		widgetCV.lo.connect(numVal.lo);
 		widgetCV.hi.connect(numVal.hi);
+		
+		[widgetCV.lo.value, widgetCV.hi.value].postln;
 
 		visibleGuiEls = [
 			slider2d, 

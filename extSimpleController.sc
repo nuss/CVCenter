@@ -1,11 +1,11 @@
 +SimpleController {
-	
+
 	actions {
-		^actions	
+		^actions
 	}
-	
+
 	actionAt { |key|
 		^actions[key]
 	}
-	
+
 }

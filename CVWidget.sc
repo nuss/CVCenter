@@ -1,7 +1,7 @@
 
 CVWidget {
 
-	var <widgetCV, prDefaultAction;
+	var <widgetCV, prDefaultAction/*, <actions*/;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
@@ -87,6 +87,45 @@ CVWidget {
 		if(isCVCWidget, { this.remove }, { this.window.close });
 	}
 	
+//	addAction { |name, action, slot|
+//		var act;
+//		name ?? { Error("Please provide a name for the action.").throw };
+//		actions ?? { actions = () };
+//		if(action.class === String, { act = action.interpret }, { act = action });
+//		switch(this.class,
+//			CVWidget2D, {
+//				actions[slot.asSymbol] ?? { actions.put(slot.asSymbol, ()) };
+//				actions[slot.asSymbol][name.asSymbol] ?? {
+//					actions[slot.asSymbol].put(name.asSymbol, widgetCV[slot.asSymbol].action_(act));
+//				}
+//			},
+//			{
+//				actions[name.asSymbol] ?? {
+//					actions.put(name.asSymbol, widgetCV.action_(act));
+//				}
+//			}
+//		)
+//	}
+//	
+//	removeAction { |name, slot|
+//		name ?? { Error("No name given: can't remove action.").throw };
+//		switch(this.class,
+//			CVWidget2D, {
+//				slot ?? { Error("Please provide either 'hi' or 'lo' in order to remove an action").throw };
+//				actions[slot.asSymbol][name.asSymbol] !? {
+//					actions[slot.asSymbol][name.asSymbol].remove; 
+//					actions[slot.asSymbol][name.asSymbol] = nil;
+//				}
+//			},
+//			{
+//				actions[name.asSymbol] !? {
+//					actions[name.asSymbol].remove;
+//					actions[name.asSymbol] = nil;
+//				}
+//			}
+//		)
+//	}
+
 	setMidiMode { |mode, key|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -338,11 +377,11 @@ CVWidget {
 				if(spec.isKindOf(ControlSpec).not, {
 					Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
 				});
-				wdgtControllersAndModels.cvSpec.model.value_(spec).changed(\value);
+				wdgtControllersAndModels.cvSpec.model.value_(spec.asSpec).changed(\value);
 			},
 			{
-				if(spec.isKindOf(ControlSpec), {
-					wdgtControllersAndModels[key].cvSpec.model.value_(spec).changed(\value);
+				if(spec.asSpec.isKindOf(ControlSpec), {
+					wdgtControllersAndModels[key.asSymbol].cvSpec.model.value_(spec.asSpec).changed(\value);
 				}, {
 					Error("Please provide a valid ControlSpec!").throw;
 				});
@@ -356,7 +395,7 @@ CVWidget {
 				^widgetCV.spec;
 			},
 			{
-				^widgetCV[key].spec;
+				^widgetCV[key.asSymbol].spec;
 			}
 		)
 	}
