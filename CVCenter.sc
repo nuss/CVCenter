@@ -45,7 +45,7 @@ CVCenter {
 				}, {
 					cvs.keysValuesDo({ |k, v|
 						if("^cv[0-9]".matchRegexp(k.asString).not, {
-							all.put(k.asSymbol, v);
+							all.put(k.asSymbol, v.asSpec);
 						}, {
 							"Your given key-name matches the reserved names for new keys in the CVCenter. Please choose a different name.".warn;
 						})
@@ -556,7 +556,7 @@ CVCenter {
 			switch(cvWidgets[key.asSymbol].class,
 				CVWidget2D, {
 					if(slot.isNil, { Error("Please provide the key (\hi or \lo) for which the action shall be set").throw });
-					controller = this.at(key.asSymbol)[slot].action_(action);
+					controller = cvWidgets[key.asSymbol].widgetCV[slot.asSymbol].action_(action);
 					widgetStates[key.asSymbol].actions ?? { widgetStates[key.asSymbol].actions = () };
 					widgetStates[key.asSymbol].actions[slot.asSymbol] ?? { 
 						widgetStates[key.asSymbol].actions.put(slot.asSymbol, ());
@@ -578,6 +578,7 @@ CVCenter {
 		controller !? {
 			switch(cvWidgets[key.asSymbol].class, 
 				CVWidget2D, {
+					slot ?? { Error("You have to provide either \hi or \lo in order to remove the regarding action!").throw };
 					widgetStates[key.asSymbol].actions[slot.asSymbol].removeAt(controller);
 				},
 				{
@@ -867,7 +868,7 @@ CVCenter {
 		var widgetwidth, widgetheight=166, colwidth, rowheight;
 		var widgetControllersAndModels, cvcArgs;
 		var tmp;
-		
+				
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 		
 		if(tab.notNil, {
@@ -963,6 +964,8 @@ CVCenter {
 			tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
 			tabs.focus(cvTabIndex);
 		});
+		
+		
 		widget2DKey !? {
 			cvWidgets[widget2DKey.key].setSpec(widget2DKey.spec, widget2DKey.slot);
 		};
