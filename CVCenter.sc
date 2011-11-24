@@ -594,11 +594,13 @@ CVCenter {
 		keys.do({ |key|
 			switch(cvWidgets[key.asSymbol].class,
 				CVWidget2D, {
-					#[lo, hi].do({ |slot| 
-						widgetStates[key.asSymbol].actions[slot.asSymbol].pairsDo({ |ctrlr, action|
-							this.removeActionAt(key, ctrlr, slot);
+					widgetStates[key.asSymbol].actions !? {
+						#[lo, hi].do({ |slot| 
+							widgetStates[key.asSymbol].actions[slot.asSymbol].pairsDo({ |ctrlr, action|
+								this.removeActionAt(key, ctrlr, slot);
+							})
 						})
-					})
+					}
 				}, 
 				{ 
 					widgetStates[key.asSymbol].actions.pairsDo({ |ctrlr, action|
