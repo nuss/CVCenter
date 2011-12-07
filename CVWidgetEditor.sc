@@ -9,6 +9,7 @@ CVWidgetEditor {
 	var <inputConstraintLoField, <inputConstraintHiField;
 	var <mappingSelect;
 	var <connectorBut;
+	var <enterAction, <enterActionBut, <actionDisplay;
 	var <name;
 	
 	*new { |widget, widgetName, tab, slot|
@@ -16,7 +17,7 @@ CVWidgetEditor {
 	}
 
 	init { |widget, widgetName, tab, slot|
-		var flow0, flow1, flow2;
+		var flow0, flow1, flow2, flow3;
 		var tabs, /*specsActions, editor, */cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
@@ -89,7 +90,7 @@ CVWidgetEditor {
 //			thisEditor = allEditors[name][slot];
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
-			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC"], scroll: true);
+			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC", "Actions"], scroll: true);
 			thisEditor.tabs = tabs;
 			thisEditor.tabs.view.resize_(5);
 			thisEditor.tabs.stringFocusedColor_(Color.blue);
@@ -97,6 +98,7 @@ CVWidgetEditor {
 			thisEditor.tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			thisEditor.tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			thisEditor.tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			thisEditor.tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 						
 			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@95)
 				.font_(staticTextFont)
@@ -528,7 +530,26 @@ CVWidgetEditor {
 				true, { calibBut.value_(0) },
 				false, { calibBut.value_(1) }
 			);
-	
+			
+			enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-15@50)
+				.background_(Color.white)
+				.font_(Font("Helvetica", 9))
+				.string_("{ |cv| /* do something */ }")
+				.syntaxColorize
+			;
+			
+			flow3.shift(0, 0);
+			
+			enterActionBut = Button(thisEditor.tabs.views[3], flow3.bounds.width-15@20)
+				.font_(staticTextFont)
+				.states_([
+					["add Action", Color.white, Color.blue],
+				])
+				.action_({ |ab|
+
+				})
+			;
+
 		});
 		
 		tab !? { 
