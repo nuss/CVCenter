@@ -1,5 +1,7 @@
 + TabbedView {
 	
+	getLabels { ^labels }
+	
 	getLabelAt { |index|
 		^labels[index].asString;
 	}
