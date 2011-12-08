@@ -57,8 +57,7 @@ CVWidgetKnob : CVWidget {
 		setupArgs[\softWithin] !? { this.setSoftWithin(setupArgs[\softWithin]) };
 		setupArgs[\calibrate] !? { this.setCalibrate(setupArgs[\calibrate]) };
 						
-		action !? { this.setDefaultAction(action) };
-//		action !? { this.addAction(\default, action) };
+		action !? { this.addAction(\default, action) };
 		
 		if(bounds.isNil, {
 			thisXY = 7@0;

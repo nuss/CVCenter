@@ -88,11 +88,8 @@ CVWidget2D : CVWidget {
 			if(actions.class !== Event, {
 				Error("Please provide actions in the following way: (lo: action1, hi: action2)").throw;
 			}, {
-//				[actions, actions.lo, actions.lo.isNil].postln;
-				actions[\lo] !? { this.setDefaultAction(actions[\lo], \lo) };
-				actions[\hi] !? { this.setDefaultAction(actions[\hi], \hi) };
-//				actions[\lo] !? { this.addAction(\default, actions[\lo], \lo) };
-//				actions[\hi] !? { this.addAction(\default, actions[\hi], \hi) };
+				actions[\lo] !? { this.addAction(\default, actions[\lo], \lo) };
+				actions[\hi] !? { this.addAction(\default, actions[\hi], \hi) };
 			})
 		};
 
