@@ -1,7 +1,7 @@
 
 CVWidget {
 
-	var <widgetCV, prDefaultAction/*, <actions*/;
+	var <widgetCV, prDefaultAction, <actions;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
@@ -87,44 +87,61 @@ CVWidget {
 		if(isCVCWidget, { this.remove }, { this.window.close });
 	}
 	
-//	addAction { |name, action, slot|
-//		var act;
-//		name ?? { Error("Please provide a name for the action.").throw };
-//		actions ?? { actions = () };
-//		if(action.class === String, { act = action.interpret }, { act = action });
-//		switch(this.class,
-//			CVWidget2D, {
-//				actions[slot.asSymbol] ?? { actions.put(slot.asSymbol, ()) };
-//				actions[slot.asSymbol][name.asSymbol] ?? {
-//					actions[slot.asSymbol].put(name.asSymbol, widgetCV[slot.asSymbol].action_(act));
-//				}
-//			},
-//			{
-//				actions[name.asSymbol] ?? {
-//					actions.put(name.asSymbol, widgetCV.action_(act));
-//				}
-//			}
-//		)
-//	}
-//	
-//	removeAction { |name, slot|
-//		name ?? { Error("No name given: can't remove action.").throw };
-//		switch(this.class,
-//			CVWidget2D, {
-//				slot ?? { Error("Please provide either 'hi' or 'lo' in order to remove an action").throw };
-//				actions[slot.asSymbol][name.asSymbol] !? {
-//					actions[slot.asSymbol][name.asSymbol].remove; 
-//					actions[slot.asSymbol][name.asSymbol] = nil;
-//				}
-//			},
-//			{
-//				actions[name.asSymbol] !? {
-//					actions[name.asSymbol].remove;
-//					actions[name.asSymbol] = nil;
-//				}
-//			}
-//		)
-//	}
+	addAction { |name, action, slot|
+		var act, controller;
+		name ?? { Error("Please provide a name under which the action will be added to the widget").throw };
+		action ?? { Error("Please provide an action!").throw };
+		actions ?? { actions = () };
+		if(action.class === String, { act = action.interpret }, { act = action });
+		switch(this.class,
+			CVWidget2D, {
+				slot ?? { Error("Please provide either 'lo' or 'hi' as third argument to addAction!").throw };
+				// avoid duplicates
+				actions[name.asSymbol] ?? { actions.put(name.asSymbol, ()) };
+				actions[name.asSymbol][slot.asSymbol] ?? {
+					actions[name.asSymbol].put(slot.asSymbol, ());
+					controller = widgetCV[slot.asSymbol].action_(act);
+					actions[name.asSymbol][slot.asSymbol].put(controller, act.asCompileString);
+				}
+			},
+			{
+				actions[name.asSymbol] ?? {
+					actions.put(name.asSymbol, ());
+					controller = widgetCV.action_(act);
+					actions[name.asSymbol].put(controller, act.asCompileString);
+				}
+			}
+		)
+	}
+	
+	removeAction { |name, slot|
+		var controller;
+		name ?? { Error("Please provide the action's name!").throw };
+		switch(this.class,
+			CVWidget2D, {
+				actions[name.asSymbol] !? {
+					if(slot.notNil, {
+						controller = actions[name.asSymbol][slot.asSymbol].keys.do(_.remove);
+						actions[name.asSymbol].removeAt(slot.asSymbol);
+						actions[name.asSymbol].isEmpty.if { actions.removeAt(name.asSymbol) };
+					}, {
+						#[lo, hi].do({ |sl| 
+							controller = actions[name.asSymbol][sl].keys.do(_.remove);
+							actions[name.asSymbol].removeAt(sl);
+						});
+						actions.removeAt(name.asSymbol);
+					});
+				}
+			},
+			{
+				actions[name.asSymbol] !? {
+					controller = actions[name.asSymbol].keys.do(_.remove);
+					actions.removeAt(name.asSymbol);
+				}
+			}
+		);
+		controller.do({ |c| c = nil });
+	}
 
 	setMidiMode { |mode, key|
 		switch(this.class,
