@@ -9,7 +9,7 @@ CVWidgetEditor {
 	var <inputConstraintLoField, <inputConstraintHiField;
 	var <mappingSelect;
 	var <connectorBut;
-	var <enterAction, <enterActionBut, <actionDisplay;
+	var <actionName, <enterAction, <enterActionBut, <actionsList;
 	var <name;
 	
 	*new { |widget, widgetName, tab, slot|
@@ -25,6 +25,7 @@ CVWidgetEditor {
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
 		var mappingSelectItems/*, mappingModes*/;
+		var wdgtActions;
 		var tmp; // multipurpose, short-term var
 						
 		name = widgetName.asSymbol;
@@ -531,16 +532,17 @@ CVWidgetEditor {
 				false, { calibBut.value_(1) }
 			);
 			
-			enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-15@50)
-				.background_(Color.white)
-				.font_(Font("Helvetica", 9))
-				.string_("{ |cv| /* do something */ }")
-				.syntaxColorize
+			actionName = TextField(thisEditor.tabs.views[3], flow3.bounds.width-80@20)
+				.string_("action-name")
+				.font_(staticTextFont)
+				.action_({ |tf|
+
+				})
 			;
 			
-			flow3.shift(0, 0);
+			flow3.shift(5, 0);
 			
-			enterActionBut = Button(thisEditor.tabs.views[3], flow3.bounds.width-15@20)
+			enterActionBut = Button(thisEditor.tabs.views[3], 57@20)
 				.font_(staticTextFont)
 				.states_([
 					["add Action", Color.white, Color.blue],
@@ -550,6 +552,23 @@ CVWidgetEditor {
 				})
 			;
 
+			flow3.shift(0, 0);
+
+			enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-15@50)
+				.background_(Color.white)
+				.font_(Font("Helvetica", 9))
+				.string_("{ |cv| /* do something */ }")
+				.syntaxColorize
+			;
+			
+			if(slot.notNil, {
+				wdgtActions = widget.actions[slot];
+			}, {
+				wdgtActions = widget.actions;
+			});
+			
+//			wdgt.actions		
+			
 		});
 		
 		tab !? { 

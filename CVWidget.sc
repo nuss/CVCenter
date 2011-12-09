@@ -96,13 +96,11 @@ CVWidget {
 		switch(this.class,
 			CVWidget2D, {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as third argument to addAction!").throw };
+				actions[slot.asSymbol] ?? { actions.put(slot.asSymbol, ()) };
 				// avoid duplicates
-				actions[name.asSymbol] ?? { actions.put(name.asSymbol, ()) };
-				actions[name.asSymbol][slot.asSymbol] ?? {
-					actions[name.asSymbol].put(slot.asSymbol, ());
-					controller = widgetCV[slot.asSymbol].action_(act);
-					actions[name.asSymbol][slot.asSymbol].put(controller, act.asCompileString);
-				}
+				actions[slot.asSymbol][name.asSymbol] ?? { actions[slot.asSymbol].put(name.asSymbol, ()) };
+				controller = widgetCV[slot.asSymbol].action_(act);
+				actions[slot.asSymbol][name.asSymbol].put(controller, act.asCompileString);
 			},
 			{
 				actions[name.asSymbol] ?? {
@@ -119,18 +117,11 @@ CVWidget {
 		name ?? { Error("Please provide the action's name!").throw };
 		switch(this.class,
 			CVWidget2D, {
-				actions[name.asSymbol] !? {
-					if(slot.notNil, {
-						controller = actions[name.asSymbol][slot.asSymbol].keys.do(_.remove);
-						actions[name.asSymbol].removeAt(slot.asSymbol);
-						actions[name.asSymbol].isEmpty.if { actions.removeAt(name.asSymbol) };
-					}, {
-						#[lo, hi].do({ |sl| 
-							controller = actions[name.asSymbol][sl].keys.do(_.remove);
-							actions[name.asSymbol].removeAt(sl);
-						});
-						actions.removeAt(name.asSymbol);
-					});
+				slot ?? { Error("Please provide either 'lo' or 'hi' as second argument to removeAction!").throw };
+				actions[slot.asSymbol][name.asSymbol] !? {
+					controller = actions[slot.asSymbol][name.asSymbol].keys.do(_.remove);
+					actions[slot.asSymbol].removeAt(name.asSymbol);
+					actions[slot.asSymbol].isEmpty.if { actions.removeAt(slot.asSymbol) };
 				}
 			},
 			{
