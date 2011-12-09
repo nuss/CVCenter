@@ -11,24 +11,26 @@ CVWidgetEditor {
 	var <connectorBut;
 	var <actionName, <enterAction, <enterActionBut, <actionsList;
 	var <name;
+	var flow0, flow1, flow2, flow3;
 	
 	*new { |widget, widgetName, tab, slot|
 		^super.new.init(widget, widgetName, tab, slot)
 	}
 
 	init { |widget, widgetName, tab, slot|
-		var flow0, flow1, flow2, flow3;
-		var tabs, /*specsActions, editor, */cvString, slotHiLo;
+		var tabs, cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var addr, wcmHiLo, thisGuiEnv; 
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
-		var mappingSelectItems/*, mappingModes*/;
+		var mappingSelectItems;
 		var wdgtActions;
 		var tmp; // multipurpose, short-term var
 						
 		name = widgetName.asSymbol;
+		
+		actionsList ?? { actionsList = () };
 		
 		if(slot.isNil, { thisGuiEnv = widget.guiEnv }, { thisGuiEnv = widget.guiEnv[slot] });
 
@@ -74,6 +76,7 @@ CVWidgetEditor {
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 			
 			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 225));
+			
 
 			if(slot.isNil, { 
 				allEditors.put(name, (window: window, name: widgetName)) 
@@ -532,12 +535,9 @@ CVWidgetEditor {
 				false, { calibBut.value_(1) }
 			);
 			
-			actionName = TextField(thisEditor.tabs.views[3], flow3.bounds.width-80@20)
+			actionName = TextField(thisEditor.tabs.views[3], flow3.bounds.width-100@20)
 				.string_("action-name")
 				.font_(staticTextFont)
-				.action_({ |tf|
-
-				})
 			;
 			
 			flow3.shift(5, 0);
@@ -548,13 +548,17 @@ CVWidgetEditor {
 					["add Action", Color.white, Color.blue],
 				])
 				.action_({ |ab|
-
+					if(actionName.string != "action-name" and:{
+						enterAction.string != "{ |cv| /* do something */ }"
+					}, {
+						widget.addAction(actionName.string.asSymbol, enterAction.string, slot.asSymbol);
+					})
 				})
 			;
 
 			flow3.shift(0, 0);
 
-			enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-15@50)
+			enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
 				.background_(Color.white)
 				.font_(Font("Helvetica", 9))
 				.string_("{ |cv| /* do something */ }")
@@ -567,7 +571,40 @@ CVWidgetEditor {
 				wdgtActions = widget.actions;
 			});
 			
-//			wdgt.actions		
+			wdgtActions.pairsDo({ |name, action|
+								
+				actionsList = actionsList.put(name, ());
+				
+				flow3.shift(0, 5);
+				
+				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-115@15)
+					.font_(staticTextFont)
+					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.string_(""+name.asString)
+				;
+				
+				flow3.shift(5, 0);
+				
+				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 72@15)
+					.font_(staticTextFont)
+					.states_([
+						["remove Action", Color.white, Color.red],
+					])
+					.action_({ |rb|
+						widget.removeAction(name.asSymbol, slot.asSymbol);
+					})
+				;
+				
+				flow3.shift(0, 0);
+				
+				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.font_(Font("Helvetica", 9))
+					.string_(action.asArray[0])
+					.syntaxColorize
+					.canFocus_(false)
+				;
+			})
 			
 		});
 		
@@ -599,6 +636,54 @@ CVWidgetEditor {
 			ret = defer { thisEditor.window.isClosed };
 			^ret.value;
 		}
+	}
+	
+	// private
+	
+	prAmendActionsList { |widget, addRemove, name, action, slot|
+		
+		var staticTextFont = Font(Font.defaultSansFace, 10);
+
+		switch(addRemove, 
+			\add, {
+				actionsList.put(name, ());
+				flow3.shift(0, 5);
+				
+				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-115@15)
+					.font_(staticTextFont)
+					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.string_(""+name.asString)
+				;
+				
+				flow3.shift(5, 0);
+				
+				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 72@15)
+					.font_(staticTextFont)
+					.states_([
+						["remove Action", Color.white, Color.red],
+					])
+					.action_({ |ab|
+						widget.removeAction(name.asSymbol, slot.asSymbol);
+					})
+				;
+				
+				flow3.shift(0, 0);
+				
+				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.font_(Font("Helvetica", 9))
+					.string_(action.asArray[0])
+					.syntaxColorize
+					.canFocus_(false)
+				;
+			},
+			\remove, {
+				[actionsList[name].nameField, actionsList[name].removeBut, actionsList[name].actionView].do(_.remove);
+				flow3.reFlow(thisEditor.tabs.views[3]);
+				thisEditor.tabs.views[3].refresh;
+			}		
+		)
+			
 	}
 			
 }

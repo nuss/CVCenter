@@ -88,7 +88,7 @@ CVWidget {
 	}
 	
 	addAction { |name, action, slot|
-		var act, controller;
+		var act, controller, thisGuiEnv;
 		name ?? { Error("Please provide a name under which the action will be added to the widget").throw };
 		action ?? { Error("Please provide an action!").throw };
 		actions ?? { actions = () };
@@ -99,35 +99,69 @@ CVWidget {
 				actions[slot.asSymbol] ?? { actions.put(slot.asSymbol, ()) };
 				// avoid duplicates
 				actions[slot.asSymbol][name.asSymbol] ?? { actions[slot.asSymbol].put(name.asSymbol, ()) };
-				controller = widgetCV[slot.asSymbol].action_(act);
-				actions[slot.asSymbol][name.asSymbol].put(controller, act.asCompileString);
+				if(actions[slot.asSymbol][name.asSymbol].size < 1, {
+					controller = widgetCV[slot.asSymbol].action_(act);
+					actions[slot.asSymbol][name.asSymbol].put(controller, act.asCompileString);
+					thisGuiEnv = this.guiEnv[slot.asSymbol];
+					if(thisGuiEnv.editor.notNil and: {
+						thisGuiEnv.editor.isClosed.not;
+					}, {
+						thisGuiEnv.editor.prAmendActionsList(
+							this, \add, name.asSymbol, actions[slot.asSymbol][name.asSymbol], slot.asSymbol;
+						)
+					})
+				})
 			},
 			{
 				actions[name.asSymbol] ?? {
 					actions.put(name.asSymbol, ());
 					controller = widgetCV.action_(act);
 					actions[name.asSymbol].put(controller, act.asCompileString);
-				}
+				};
+				thisGuiEnv = this.guiEnv;
+				if(thisGuiEnv.editor.notNil and: {
+					thisGuiEnv.editor.isClosed.not;
+				}, {
+					thisGuiEnv.editor.prAmendActionsList(
+						this, \add, name.asSymbol, actions[name.asSymbol];
+					)
+				})
 			}
 		)
 	}
 	
 	removeAction { |name, slot|
-		var controller;
+		var controller, thisGuiEnv;
 		name ?? { Error("Please provide the action's name!").throw };
 		switch(this.class,
 			CVWidget2D, {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as second argument to removeAction!").throw };
+				thisGuiEnv = this.guiEnv[slot.asSymbol];
 				actions[slot.asSymbol][name.asSymbol] !? {
 					controller = actions[slot.asSymbol][name.asSymbol].keys.do(_.remove);
 					actions[slot.asSymbol].removeAt(name.asSymbol);
 					actions[slot.asSymbol].isEmpty.if { actions.removeAt(slot.asSymbol) };
+					if(thisGuiEnv.editor.notNil and: {
+						thisGuiEnv.editor.isClosed.not;
+					}, {
+						thisGuiEnv.editor.prAmendActionsList(
+							this, \remove, name.asSymbol;
+						)
+					})
 				}
 			},
 			{
+				thisGuiEnv = this.guiEnv;
 				actions[name.asSymbol] !? {
 					controller = actions[name.asSymbol].keys.do(_.remove);
 					actions.removeAt(name.asSymbol);
+					if(thisGuiEnv.editor.notNil and: {
+						thisGuiEnv.editor.isClosed.not;
+					}, {
+						thisGuiEnv.editor.prAmendActionsList(
+							this, \remove, name.asSymbol;
+						)
+					})
 				}
 			}
 		);
