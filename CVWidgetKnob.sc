@@ -3,7 +3,7 @@
 CVWidgetKnob : CVWidget {
 	
 	var <window, <guiEnv, <editorEnv;
-	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut;
+	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
 
 	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, server|
 		^super.new.init(
@@ -62,7 +62,7 @@ CVWidgetKnob : CVWidget {
 		if(bounds.isNil, {
 			thisXY = 7@0;
 			thisWidth = 52;
-			thisHeight = 166;
+			thisHeight = 181;
 		}, {
 			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
 			thisWidth = bounds.width;
@@ -115,13 +115,13 @@ CVWidgetKnob : CVWidget {
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
-		knobsize = thisHeight-2-130;
+		knobsize = thisHeight-2-145;
 		if(knobsize >= thisWidth, {
 			knobsize = thisWidth;
-			knobY = thisXY.y+16+(thisHeight-128-knobsize/2);
+			knobY = thisXY.y+16+(thisHeight-143-knobsize/2);
 			knobX = thisXY.x;
 		}, {
-			knobsize = thisHeight-128;
+			knobsize = thisHeight-143;
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = thisXY.y+16;
 		});						
@@ -133,7 +133,7 @@ CVWidgetKnob : CVWidget {
 				if(widgetCV.spec == symbol.asSpec, { break.value(knob.centered_(true)) });
 			})
 		};
-		nextY = thisXY.y+thisHeight-117;
+		nextY = thisXY.y+thisHeight-132;
 		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(widgetCV.value)
 		;
@@ -321,6 +321,22 @@ CVWidgetKnob : CVWidget {
 				)
 			})
 		;
+		nextY = nextY+calibBut.bounds.height;
+		actionsBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+			.font_(Font("Helvetica", 9))
+			.focusColor_(Color(alpha: 0))
+			.states_([
+				["actions", Color.white, Color(0.31920713024337, 0.66666666666667, 0.75719983252006)],
+			])
+			.action_({ |ab|
+				if(editor.isNil or:{ editor.isClosed }, {
+					editor = CVWidgetEditor(this, thisName, 3);
+					guiEnv.editor = editor;
+				}, {
+					editor.front(3)
+				});
+			})
+		;
 		if(prCalibrate, { calibBut.value_(0) }, { calibBut.value_(1) });
 		
 				
@@ -335,7 +351,8 @@ CVWidgetKnob : CVWidget {
 			midiChan, 
 			midiCtrl, 
 			oscEditBut, 
-			calibBut
+			calibBut,
+			actionsBut
 		];
 		allGuiEls = [
 			widgetBg, 
@@ -350,11 +367,13 @@ CVWidgetKnob : CVWidget {
 			midiChan, 
 			midiCtrl, 
 			oscEditBut, 
-			calibBut
+			calibBut,
+			actionsBut
 		];		
 		guiEnv = (
 			editor: editor,
 			calibBut: calibBut,
+			actionsBut: actionsBut,
 			knob: knob,
 			oscEditBut: oscEditBut,
 			midiSrc: midiSrc,

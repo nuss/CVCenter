@@ -1,7 +1,7 @@
 CVWidget2D : CVWidget {
 	var <window, <guiEnv, <editorEnv;
 	var <slider2d, <rangeSlider, <numVal, <specBut;
-	var <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut;
+	var <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
 
 	*new { |parent, cvs, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server|
 		^super.new.init(
@@ -30,7 +30,7 @@ CVWidget2D : CVWidget {
 		
 		setupArgs !? {
 			(setupArgs.class !== Event).if{ 
-				Error( "a setup for a CVWidget2D has to be provided as an Event: (lo: [args], hi[args])!").throw;
+				Error( "a setup for a CVWidget2D has to be provided as an Event: (lo: [args], hi: [args])!").throw;
 			}
 		};
 		
@@ -70,7 +70,7 @@ CVWidget2D : CVWidget {
 				
 		numVal = (); specBut = ();
 		midiHead = (); midiLearn = (); midiSrc = (); midiChan = (); midiCtrl = ();
-		oscEditBut = (); calibBut = ();
+		oscEditBut = (); calibBut = (); actionsBut = ();
 		editor = ();
 		
 		[\lo, \hi].do({ |key| this.initControllersAndModels(controllersAndModels, key) });
@@ -96,7 +96,7 @@ CVWidget2D : CVWidget {
 		if(bounds.isNil, {		
 			thisXY = 7@0;
 			thisWidth = 122;
-			thisHeight = 166;
+			thisHeight = 196;
 		}, {
 			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
 			thisWidth = bounds.width;
@@ -401,26 +401,29 @@ CVWidget2D : CVWidget {
 			(right = specBut.lo.bounds.height
 			+midiLearn.lo.bounds.height
 			+midiSrc.lo.bounds.height
-			+midiChan.lo.bounds.height
-			*2), 
+			+midiChan.lo.bounds.height*2), 
 		{
+			thisHeight.postln;
 			nextY = 
 			label.bounds.top
 			+label.bounds.height
 			+left;
-			oscEditButHeight = thisHeight-left-32;
+			oscEditButHeight = thisHeight-left-47;
 		}, {
+			thisHeight.postln;
 			nextY = 
 			label.bounds.top
 			+label.bounds.height
 			+right;
-			oscEditButHeight = thisHeight-right-32;
+			oscEditButHeight = thisHeight-right-47;
 		});
 		
 		oscEditBut.lo = Button(window);
 		oscEditBut.hi = Button(window);
 		calibBut.lo = Button(window);
 		calibBut.hi = Button(window);
+		actionsBut.lo = Button(window);
+		actionsBut.hi = Button(window);
 		
 		[oscEditBut.lo, [\lo, thisXY.x+1], oscEditBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, oscEditButHeight))
@@ -467,6 +470,25 @@ CVWidget2D : CVWidget {
 			})
 		});
 		
+		nextY = nextY+calibBut.lo.bounds.height;
+		
+		[actionsBut.lo, [\lo, thisXY.x+1], actionsBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
+			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
+			.font_(Font("Helvetica", 9))
+			.focusColor_(Color(alpha: 0))
+			.states_([
+				["actions", Color.white, Color(0.31920713024337, 0.66666666666667, 0.75719983252006)]
+			])
+			.action_({ |ab|
+				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {
+					editor.put(v[0], CVWidgetEditor(this, thisName, 3, v[0]));
+					guiEnv[v[0]].editor = editor[v[0]];
+				}, {
+					editor[v[0]].front(3)
+				});
+			})
+		});
+
 //		[widgetCV.lo, widgetCV.hi].postln;
 				
 		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
@@ -487,6 +509,7 @@ CVWidget2D : CVWidget {
 			midiCtrl.lo, midiCtrl.hi, 
 			oscEditBut.lo, oscEditBut.hi, 
 			calibBut.lo, calibBut.hi,
+			actionsBut.lo, actionsBut.hi
 		];
 
 		allGuiEls = [
@@ -504,6 +527,7 @@ CVWidget2D : CVWidget {
 			midiCtrl.lo, midiCtrl.hi, 
 			oscEditBut.lo, oscEditBut.hi, 
 			calibBut.lo, calibBut.hi,
+			actionsBut.lo, actionsBut.hi
 		];
 		
 		[\lo, \hi].do({ |hilo|
@@ -514,6 +538,7 @@ CVWidget2D : CVWidget {
 				specBut: specBut[hilo],
 				oscEditBut: oscEditBut[hilo],
 				calibBut: calibBut[hilo],
+				actionsBut: actionsBut[hilo],
 				midiSrc: midiSrc[hilo],
 				midiChan: midiChan[hilo],
 				midiCtrl: midiCtrl[hilo],
