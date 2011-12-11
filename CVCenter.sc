@@ -6,6 +6,7 @@ CVCenter {
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight; 
 	classvar <widgetStates;
 	classvar <tabProperties, colors, nextColor;
+	classvar widgetwidth, widgetheight=181, colwidth, rowheight;
 //	classvar controllersAndModels;
 	
 	*new { |cvs...setUpArgs|
@@ -61,7 +62,7 @@ CVCenter {
 		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
 		var lastCtrlBtnsMode, swFlow;
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
-		var widgetwidth, widgetheight=166, colwidth, rowheight;
+//		var widgetwidth, widgetheight=181, colwidth, rowheight;
 		var funcToAdd;
 		var widgetControllersAndModels, cvcArgs;
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
@@ -72,7 +73,7 @@ CVCenter {
 		this.guix ?? { this.guix_(0) };
 		this.guiy ?? { this.guiy_(0) };
 		this.guiwidth ?? { this.guiwidth_(500) };
-		this.guiheight ?? { this.guiheight_(250) };
+		this.guiheight ?? { this.guiheight_(265) };
 		
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
@@ -93,7 +94,7 @@ CVCenter {
 			tabLabels = tabProperties.collect(_.tabLabel);
 			labelColors = tabProperties.collect(_.tabColor);
 			unfocusedColors = tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) });
-			
+						
 			tabs = TabbedView(
 				window,
 				Rect(0, 0, flow.bounds.width, flow.bounds.height-40), 
@@ -479,18 +480,6 @@ CVCenter {
 		thisVal = value ?? { thisVal = thisSpec.default };
 
 		if(thisSlot.notNil, {
-			// fix me: put in a default spec for the slot that's *not* passed in
-			/* special case: CVWidget2D needs 2 CVs */
-//			all[thisKey] ?? { all.put(thisKey, ()) };
-//			[\lo, \hi].do({ |hilo|
-//				if(thisSlot === hilo, {
-//					widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
-//					all[thisKey].put(thisSlot, CV.new(thisSpec, thisVal));
-//				}, {
-//					widget2DKey = (key: thisKey, slot: hilo, spec: ControlSpec.new);
-//					all[thisKey].put(hilo, spec);
-//				})
-//			})
 			if(thisSlot === \lo or: { thisSlot === \hi }, {
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
@@ -548,68 +537,37 @@ CVCenter {
 		tabProperties[index].tabLabel = newName.asString;
 	}
 	
-	*addActionAt { |key, action, slot|
-		var controller;
+	*addActionAt { |key, name, action, slot|
 		key ?? { Error("You have to provide the CV's key in order to add an action!").throw };
-		if(all[key.asSymbol].notNil and:{ cvWidgets[key.asSymbol].notNil }, {
-			if(action.class === String, { action = action.interpret });
-			switch(cvWidgets[key.asSymbol].class,
-				CVWidget2D, {
-					if(slot.isNil, { Error("Please provide the key (\hi or \lo) for which the action shall be set").throw });
-					controller = cvWidgets[key.asSymbol].widgetCV[slot.asSymbol].action_(action);
-					widgetStates[key.asSymbol].actions ?? { widgetStates[key.asSymbol].actions = () };
-					widgetStates[key.asSymbol].actions[slot.asSymbol] ?? { 
-						widgetStates[key.asSymbol].actions.put(slot.asSymbol, ());
-					};
-					widgetStates[key.asSymbol].actions[slot.asSymbol].put(controller, action.asCompileString);
-				},
-				{
-					controller = this.at(key.asSymbol).action_(action);
-					widgetStates[key.asSymbol].actions ?? { widgetStates[key.asSymbol].put(\actions, ()) };
-					widgetStates[key.asSymbol].actions.put(controller, action.asCompileString);
-				}
-			)
-			^controller;
-		})
+		cvWidgets[key.asSymbol].addAction(name, action, slot);
 	}
 	
-	*removeActionAt { |key, controller, slot|
+	*removeActionAt { |key, name, slot|
 		key ?? { Error("You have to provide the CV's key in order to remove an action!").throw };
-		controller !? {
-			switch(cvWidgets[key.asSymbol].class, 
-				CVWidget2D, {
-					slot ?? { Error("You have to provide either \hi or \lo in order to remove the regarding action!").throw };
-					widgetStates[key.asSymbol].actions[slot.asSymbol].removeAt(controller);
-				},
-				{
-					widgetStates[key.asSymbol].actions.removeAt(controller);
-				}
-			);
-			controller.remove;
-		}
+		cvWidgets[key.asSymbol].removeAction(name, slot);
 	}
 	
-	*removeActionsAt { |...keys|
-		keys ?? { "Can't remove actions: provide at least one key".warn };
-		keys.do({ |key|
-			switch(cvWidgets[key.asSymbol].class,
-				CVWidget2D, {
-					widgetStates[key.asSymbol].actions !? {
-						#[lo, hi].do({ |slot| 
-							widgetStates[key.asSymbol].actions[slot.asSymbol].pairsDo({ |ctrlr, action|
-								this.removeActionAt(key, ctrlr, slot);
-							})
-						})
-					}
-				}, 
-				{ 
-					widgetStates[key.asSymbol].actions.pairsDo({ |ctrlr, action|
-						this.removeActionAt(key, ctrlr);
-					})
-				}
-			)
-		})
-	}
+//	*removeActionsAt { |...keys|
+//		keys ?? { "Can't remove actions: provide at least one key".warn };
+//		keys.do({ |key|
+//			switch(cvWidgets[key.asSymbol].class,
+//				CVWidget2D, {
+//					widgetStates[key.asSymbol].actions !? {
+//						#[lo, hi].do({ |slot| 
+//							widgetStates[key.asSymbol].actions[slot.asSymbol].pairsDo({ |ctrlr, action|
+//								this.removeActionAt(key, ctrlr, slot);
+//							})
+//						})
+//					}
+//				}, 
+//				{ 
+//					widgetStates[key.asSymbol].actions.pairsDo({ |ctrlr, action|
+//						this.removeActionAt(key, ctrlr);
+//					})
+//				}
+//			)
+//		})
+//	}
 	
 	*widgetsAtTab { |tab|
 		var index, wdgts = [];
@@ -634,7 +592,7 @@ CVCenter {
 							lib[\all][k][hilo] = (
 								spec: all[k][hilo].spec,
 								val: all[k][hilo].value,
-								actions: widgetStates[k].actions !? { widgetStates[k].actions[hilo] },
+								actions: cvWidgets[k].actions !? { cvWidgets[k].actions[hilo] },
 								osc: (
 									addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
 										cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
@@ -663,7 +621,7 @@ CVCenter {
 						lib[\all][k] = (
 							spec: all[k].spec,
 							val: all[k].value,
-							actions: widgetStates[k].actions,
+							actions: cvWidgets[k].actions,
 							osc: (
 								addr: cvWidgets[k].midiOscEnv.oscResponder !? { 
 									cvWidgets[k].midiOscEnv.oscResponder.addr
@@ -867,7 +825,7 @@ CVCenter {
 		var rowwidth, colcount;
 		var cvTabIndex, tabLabels;
 		var thisNextPos;
-		var widgetwidth, widgetheight=166, colwidth, rowheight;
+//		var widgetwidth, widgetheight=181, colwidth, rowheight;
 		var widgetControllersAndModels, cvcArgs;
 		var tmp;
 				
@@ -977,7 +935,7 @@ CVCenter {
 	
 	*prRegroupWidgets { |tabIndex|
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets;
-		var widgetwidth, widgetheight=166;
+		var widgetwidth, widgetheight=181;
 				
 		rowheight = widgetheight+1;
 		thisNextPos = 0@0;

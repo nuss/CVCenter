@@ -89,9 +89,7 @@ CVWidgetEditor {
 				});
 			});
 			
-//			"allEditors: %\n".postf(allEditors);
 			if(slot.notNil, { thisEditor = allEditors[name][slot] }, { thisEditor = allEditors[name] });
-//			thisEditor = allEditors[name][slot];
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC", "Actions"], scroll: true);
@@ -566,9 +564,9 @@ CVWidgetEditor {
 			;
 			
 			if(slot.notNil, {
-				wdgtActions = widget.actions[slot];
+				wdgtActions = widget.wdgtActions[slot];
 			}, {
-				wdgtActions = widget.actions;
+				wdgtActions = widget.wdgtActions;
 			});
 			
 			wdgtActions.pairsDo({ |name, action|
@@ -638,9 +636,9 @@ CVWidgetEditor {
 		}
 	}
 	
-	// private
+	// not to be used directly!
 	
-	prAmendActionsList { |widget, addRemove, name, action, slot|
+	amendActionsList { |widget, addRemove, name, action, slot|
 		
 		var staticTextFont = Font(Font.defaultSansFace, 10);
 

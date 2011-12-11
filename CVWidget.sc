@@ -1,7 +1,7 @@
 
 CVWidget {
 
-	var <widgetCV, prDefaultAction, <actions;
+	var <widgetCV, prDefaultAction, <wdgtActions;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
@@ -91,39 +91,39 @@ CVWidget {
 		var act, controller, thisGuiEnv;
 		name ?? { Error("Please provide a name under which the action will be added to the widget").throw };
 		action ?? { Error("Please provide an action!").throw };
-		actions ?? { actions = () };
+		wdgtActions ?? { wdgtActions = () };
 		if(action.class === String, { act = action.interpret }, { act = action });
 		switch(this.class,
 			CVWidget2D, {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as third argument to addAction!").throw };
-				actions[slot.asSymbol] ?? { actions.put(slot.asSymbol, ()) };
+				wdgtActions[slot.asSymbol] ?? { wdgtActions.put(slot.asSymbol, ()) };
 				// avoid duplicates
-				actions[slot.asSymbol][name.asSymbol] ?? { actions[slot.asSymbol].put(name.asSymbol, ()) };
-				if(actions[slot.asSymbol][name.asSymbol].size < 1, {
+				wdgtActions[slot.asSymbol][name.asSymbol] ?? { wdgtActions[slot.asSymbol].put(name.asSymbol, ()) };
+				if(wdgtActions[slot.asSymbol][name.asSymbol].size < 1, {
 					controller = widgetCV[slot.asSymbol].action_(act);
-					actions[slot.asSymbol][name.asSymbol].put(controller, act.asCompileString);
+					wdgtActions[slot.asSymbol][name.asSymbol].put(controller, act.asCompileString);
 					thisGuiEnv = this.guiEnv[slot.asSymbol];
 					if(thisGuiEnv.editor.notNil and: {
 						thisGuiEnv.editor.isClosed.not;
 					}, {
-						thisGuiEnv.editor.prAmendActionsList(
-							this, \add, name.asSymbol, actions[slot.asSymbol][name.asSymbol], slot.asSymbol;
+						thisGuiEnv.editor.amendActionsList(
+							this, \add, name.asSymbol, wdgtActions[slot.asSymbol][name.asSymbol], slot.asSymbol;
 						)
 					})
 				})
 			},
 			{
-				actions[name.asSymbol] ?? {
-					actions.put(name.asSymbol, ());
+				wdgtActions[name.asSymbol] ?? {
+					wdgtActions.put(name.asSymbol, ());
 					controller = widgetCV.action_(act);
-					actions[name.asSymbol].put(controller, act.asCompileString);
+					wdgtActions[name.asSymbol].put(controller, act.asCompileString);
 				};
 				thisGuiEnv = this.guiEnv;
 				if(thisGuiEnv.editor.notNil and: {
 					thisGuiEnv.editor.isClosed.not;
 				}, {
-					thisGuiEnv.editor.prAmendActionsList(
-						this, \add, name.asSymbol, actions[name.asSymbol];
+					thisGuiEnv.editor.amendActionsList(
+						this, \add, name.asSymbol, wdgtActions[name.asSymbol];
 					)
 				})
 			}
@@ -137,14 +137,14 @@ CVWidget {
 			CVWidget2D, {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as second argument to removeAction!").throw };
 				thisGuiEnv = this.guiEnv[slot.asSymbol];
-				actions[slot.asSymbol][name.asSymbol] !? {
-					controller = actions[slot.asSymbol][name.asSymbol].keys.do(_.remove);
-					actions[slot.asSymbol].removeAt(name.asSymbol);
-					actions[slot.asSymbol].isEmpty.if { actions.removeAt(slot.asSymbol) };
+				wdgtActions[slot.asSymbol][name.asSymbol] !? {
+					controller = wdgtActions[slot.asSymbol][name.asSymbol].keys.do(_.remove);
+					wdgtActions[slot.asSymbol].removeAt(name.asSymbol);
+					wdgtActions[slot.asSymbol].isEmpty.if { wdgtActions.removeAt(slot.asSymbol) };
 					if(thisGuiEnv.editor.notNil and: {
 						thisGuiEnv.editor.isClosed.not;
 					}, {
-						thisGuiEnv.editor.prAmendActionsList(
+						thisGuiEnv.editor.amendActionsList(
 							this, \remove, name.asSymbol;
 						)
 					})
@@ -152,13 +152,13 @@ CVWidget {
 			},
 			{
 				thisGuiEnv = this.guiEnv;
-				actions[name.asSymbol] !? {
-					controller = actions[name.asSymbol].keys.do(_.remove);
-					actions.removeAt(name.asSymbol);
+				wdgtActions[name.asSymbol] !? {
+					controller = wdgtActions[name.asSymbol].keys.do(_.remove);
+					wdgtActions.removeAt(name.asSymbol);
 					if(thisGuiEnv.editor.notNil and: {
 						thisGuiEnv.editor.isClosed.not;
 					}, {
-						thisGuiEnv.editor.prAmendActionsList(
+						thisGuiEnv.editor.amendActionsList(
 							this, \remove, name.asSymbol;
 						)
 					})

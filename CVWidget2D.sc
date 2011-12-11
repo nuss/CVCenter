@@ -40,6 +40,8 @@ CVWidget2D : CVWidget {
 		prMidiResolution = (lo: 1, hi: 1);
 		prSoftWithin = (lo: 0.1, hi: 0.1);
 		prCtrlButtonBank = ();
+		
+		wdgtActions ?? { wdgtActions = (lo: (), hi: ()) };
 				
 		guiEnv = (lo: (), hi: ());
 		editorEnv = ();
