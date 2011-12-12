@@ -1,7 +1,7 @@
 
 CVWidget {
 
-	var <widgetCV, prDefaultAction, <wdgtActions;
+	var <widgetCV, prDefaultAction, <>wdgtActions;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
@@ -91,39 +91,39 @@ CVWidget {
 		var act, controller, thisGuiEnv;
 		name ?? { Error("Please provide a name under which the action will be added to the widget").throw };
 		action ?? { Error("Please provide an action!").throw };
-		wdgtActions ?? { wdgtActions = () };
+		this.wdgtActions ?? { this.wdgtActions = () };
 		if(action.class === String, { act = action.interpret }, { act = action });
 		switch(this.class,
 			CVWidget2D, {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as third argument to addAction!").throw };
-				wdgtActions[slot.asSymbol] ?? { wdgtActions.put(slot.asSymbol, ()) };
+				this.wdgtActions[slot.asSymbol] ?? { this.wdgtActions.put(slot.asSymbol, ()) };
 				// avoid duplicates
-				wdgtActions[slot.asSymbol][name.asSymbol] ?? { wdgtActions[slot.asSymbol].put(name.asSymbol, ()) };
-				if(wdgtActions[slot.asSymbol][name.asSymbol].size < 1, {
+				this.wdgtActions[slot.asSymbol][name.asSymbol] ?? { this.wdgtActions[slot.asSymbol].put(name.asSymbol, ()) };
+				if(this.wdgtActions[slot.asSymbol][name.asSymbol].size < 1, {
 					controller = widgetCV[slot.asSymbol].action_(act);
-					wdgtActions[slot.asSymbol][name.asSymbol].put(controller, act.asCompileString);
+					this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, act.asCompileString);
 					thisGuiEnv = this.guiEnv[slot.asSymbol];
 					if(thisGuiEnv.editor.notNil and: {
 						thisGuiEnv.editor.isClosed.not;
 					}, {
 						thisGuiEnv.editor.amendActionsList(
-							this, \add, name.asSymbol, wdgtActions[slot.asSymbol][name.asSymbol], slot.asSymbol;
+							this, \add, name.asSymbol, this.wdgtActions[slot.asSymbol][name.asSymbol], slot.asSymbol;
 						)
 					})
 				})
 			},
 			{
-				wdgtActions[name.asSymbol] ?? {
-					wdgtActions.put(name.asSymbol, ());
+				this.wdgtActions[name.asSymbol] ?? {
+					this.wdgtActions.put(name.asSymbol, ());
 					controller = widgetCV.action_(act);
-					wdgtActions[name.asSymbol].put(controller, act.asCompileString);
+					this.wdgtActions[name.asSymbol].put(controller, act.asCompileString);
 				};
 				thisGuiEnv = this.guiEnv;
 				if(thisGuiEnv.editor.notNil and: {
 					thisGuiEnv.editor.isClosed.not;
 				}, {
 					thisGuiEnv.editor.amendActionsList(
-						this, \add, name.asSymbol, wdgtActions[name.asSymbol];
+						this, \add, name.asSymbol, this.wdgtActions[name.asSymbol];
 					)
 				})
 			}
@@ -137,10 +137,10 @@ CVWidget {
 			CVWidget2D, {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as second argument to removeAction!").throw };
 				thisGuiEnv = this.guiEnv[slot.asSymbol];
-				wdgtActions[slot.asSymbol][name.asSymbol] !? {
-					controller = wdgtActions[slot.asSymbol][name.asSymbol].keys.do(_.remove);
-					wdgtActions[slot.asSymbol].removeAt(name.asSymbol);
-					wdgtActions[slot.asSymbol].isEmpty.if { wdgtActions.removeAt(slot.asSymbol) };
+				this.wdgtActions[slot.asSymbol][name.asSymbol] !? {
+					controller = this.wdgtActions[slot.asSymbol][name.asSymbol].keys.do(_.remove);
+					this.wdgtActions[slot.asSymbol].removeAt(name.asSymbol);
+					this.wdgtActions[slot.asSymbol].isEmpty.if { this.wdgtActions.removeAt(slot.asSymbol) };
 					if(thisGuiEnv.editor.notNil and: {
 						thisGuiEnv.editor.isClosed.not;
 					}, {
@@ -152,9 +152,9 @@ CVWidget {
 			},
 			{
 				thisGuiEnv = this.guiEnv;
-				wdgtActions[name.asSymbol] !? {
-					controller = wdgtActions[name.asSymbol].keys.do(_.remove);
-					wdgtActions.removeAt(name.asSymbol);
+				this.wdgtActions[name.asSymbol] !? {
+					controller = this.wdgtActions[name.asSymbol].keys.do(_.remove);
+					this.wdgtActions.removeAt(name.asSymbol);
 					if(thisGuiEnv.editor.notNil and: {
 						thisGuiEnv.editor.isClosed.not;
 					}, {

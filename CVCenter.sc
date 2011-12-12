@@ -203,6 +203,22 @@ CVCenter {
 			;
 						
 			window.onClose_({
+				cvWidgets.pairsDo({ |k, w|
+					[k, w.wdgtActions].postln;
+					switch(w.class,
+						CVWidget2D, {
+							w.wdgtActions !? {
+								#[lo, hi].do({ |hilo|
+									widgetStates[k].actions = ();
+									widgetStates[k].actions.put(hilo, w.wdgtActions[hilo]);
+								})
+							}
+						},
+						CVWidgetKnob, {
+							widgetStates[k].actions = w.wdgtActions;
+						}
+					)
+				});					
 				CVWidgetEditor.allEditors.pairsDo({ |editor, val| 
 					switch(cvWidgets[editor].class, 
 						CVWidgetKnob, {
@@ -267,7 +283,8 @@ CVCenter {
 							(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi) 
 						},
 						cvcGui: cvcArgs
-					)
+					);
+					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 				}, {
 					tmp = this.setup.calibrate = cvWidgets[k] !? { 
 						cvWidgets[k].wdgtControllersAndModels.calibration.model.value 
@@ -281,7 +298,7 @@ CVCenter {
 						controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 						cvcGui: cvcArgs
 					);
-					
+					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 				});
 				
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
@@ -891,6 +908,7 @@ CVCenter {
 					cvcGui: cvcArgs
 				);
 				widgetStates.put(k, (tabIndex: cvTabIndex));
+				widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 			}, {	
 				tmp = this.setup.calibrate = cvWidgets[k] !? { 
 					cvWidgets[k].wdgtControllersAndModels.calibration.model.value 
@@ -910,6 +928,7 @@ CVCenter {
 					widgetStates[k].tabIndex = cvTabIndex;
 				});
 				cvWidgets[k].widgetCV !? { cvWidgets[k].widgetCV.value_(cvWidgets[k].widgetCV.value) };
+				widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 			});
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 			colwidth = widgetwidth+1; // add a small gap between widgets
@@ -972,5 +991,11 @@ CVCenter {
 			tabProperties = [(tabLabel: "default", tabColor: tabProperties[index].tabColor)];
 		})
 	}
+	
+//	*prDisplayActions { |key|
+//		widgetStates[k].actions !? {
+//			
+//		}
+//	}
 	
 }

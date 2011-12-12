@@ -41,7 +41,7 @@ CVWidget2D : CVWidget {
 		prSoftWithin = (lo: 0.1, hi: 0.1);
 		prCtrlButtonBank = ();
 		
-		wdgtActions ?? { wdgtActions = (lo: (), hi: ()) };
+		this.wdgtActions ?? { this.wdgtActions = (lo: (), hi: ()) };
 				
 		guiEnv = (lo: (), hi: ());
 		editorEnv = ();
