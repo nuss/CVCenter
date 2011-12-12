@@ -592,7 +592,7 @@ CVCenter {
 							lib[\all][k][hilo] = (
 								spec: all[k][hilo].spec,
 								val: all[k][hilo].value,
-								actions: cvWidgets[k].actions !? { cvWidgets[k].actions[hilo] },
+								actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo] },
 								osc: (
 									addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
 										cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
@@ -621,7 +621,7 @@ CVCenter {
 						lib[\all][k] = (
 							spec: all[k].spec,
 							val: all[k].value,
-							actions: cvWidgets[k].actions,
+							actions: cvWidgets[k].wdgtActions,
 							osc: (
 								addr: cvWidgets[k].midiOscEnv.oscResponder !? { 
 									cvWidgets[k].midiOscEnv.oscResponder.addr
@@ -698,7 +698,7 @@ CVCenter {
 							if(loadActions, {
 								v[hilo].actions !? {
 									v[hilo].actions.pairsDo({ |ak, av|
-										this.addActionAt(key, av.interpret, hilo);
+										this.addActionAt(key, ak, av.asArray[0], hilo);
 									})
 								}
 							});
@@ -741,7 +741,7 @@ CVCenter {
 						if(loadActions, {
 							v.actions !? {
 								v.actions.pairsDo({ |ak, av|
-									this.addActionAt(key, av.interpret);
+									this.addActionAt(key, ak, av.asArray[0]);
 								})
 							}
 						});
