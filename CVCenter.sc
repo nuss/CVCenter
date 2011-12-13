@@ -7,7 +7,6 @@ CVCenter {
 	classvar <widgetStates;
 	classvar <tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=181, colwidth, rowheight;
-//	classvar controllersAndModels;
 	
 	*new { |cvs...setUpArgs|
 		var r, g, b;
@@ -204,12 +203,11 @@ CVCenter {
 						
 			window.onClose_({
 				cvWidgets.pairsDo({ |k, w|
-					[k, w.wdgtActions].postln;
 					switch(w.class,
 						CVWidget2D, {
 							w.wdgtActions !? {
 								#[lo, hi].do({ |hilo|
-									widgetStates[k].actions = ();
+									widgetStates[k].actions ?? { widgetStates[k].actions = () };
 									widgetStates[k].actions.put(hilo, w.wdgtActions[hilo]);
 								})
 							}
@@ -991,11 +989,5 @@ CVCenter {
 			tabProperties = [(tabLabel: "default", tabColor: tabProperties[index].tabColor)];
 		})
 	}
-	
-//	*prDisplayActions { |key|
-//		widgetStates[k].actions !? {
-//			
-//		}
-//	}
-	
+		
 }
