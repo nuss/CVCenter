@@ -644,6 +644,7 @@ CVWidgetEditor {
 
 		switch(addRemove, 
 			\add, {
+				
 				actionsList.put(name, ());
 				flow3.shift(0, 5);
 				
@@ -676,9 +677,8 @@ CVWidgetEditor {
 				;
 			},
 			\remove, {
-				[actionsList[name].nameField, actionsList[name].removeBut, actionsList[name].actionView].do(_.remove);
 				flow3.reFlow(thisEditor.tabs.views[3]);
-				thisEditor.tabs.views[3].refresh;
+				[actionsList[name].nameField, actionsList[name].removeBut, actionsList[name].actionView].do(_.remove);
 			}		
 		)
 			
