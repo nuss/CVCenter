@@ -202,21 +202,6 @@ CVCenter {
 			;
 						
 			window.onClose_({
-				cvWidgets.pairsDo({ |k, w|
-					switch(w.class,
-						CVWidget2D, {
-							w.wdgtActions !? {
-								#[lo, hi].do({ |hilo|
-									widgetStates[k].actions ?? { widgetStates[k].actions = () };
-									widgetStates[k].actions.put(hilo, w.wdgtActions[hilo]);
-								})
-							}
-						},
-						CVWidgetKnob, {
-							widgetStates[k].actions = w.wdgtActions;
-						}
-					)
-				});					
 				CVWidgetEditor.allEditors.pairsDo({ |editor, val| 
 					switch(cvWidgets[editor].class, 
 						CVWidgetKnob, {
@@ -265,12 +250,13 @@ CVCenter {
 				}, {
 					tmp = (
 						lo: this.setup.calibrate = cvWidgets[k] !? { 
-						cvWidgets[k].wdgtControllersAndModels.lo.calibration.model.value 
-					}, 
-					hi: this.setup.calibrate = cvWidgets[k] !? { 
-						cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value 
-					});
-//					tmp.pairsDo({ |k, v| [k, v].postln });
+							cvWidgets[k].wdgtControllersAndModels.lo.calibration.model.value 
+						}, 
+						hi: this.setup.calibrate = cvWidgets[k] !? { 
+							cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value 
+						},
+						wdgtActions: cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions }};
+					);
 					cvWidgets[k] = CVWidget2D(
 						tabs.views[cvTabIndex], 
 						[orderedCVs[i].lo, orderedCVs[i].hi], 
@@ -282,7 +268,7 @@ CVCenter {
 						},
 						cvcGui: cvcArgs
 					);
-					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
+					tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 				}, {
 					tmp = this.setup.calibrate = cvWidgets[k] !? { 
 						cvWidgets[k].wdgtControllersAndModels.calibration.model.value 
@@ -889,11 +875,13 @@ CVCenter {
 			}, {
 				tmp = (
 					lo: this.setup.calibrate = cvWidgets[k] !? { 
-					cvWidgets[k].wdgtControllersAndModels.lo.calibration.model.value 
-				}, 
-				hi: this.setup.calibrate = cvWidgets[k] !? { 
-					cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value 
-				});
+						cvWidgets[k].wdgtControllersAndModels.lo.calibration.model.value 
+					}, 
+					hi: this.setup.calibrate = cvWidgets[k] !? { 
+						cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value 
+					},
+					wdgtActions: cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions }};
+				);
 				cvWidgets[k] = CVWidget2D(
 					tabs.views[cvTabIndex], 
 					[all[k].lo, all[k].hi], 
@@ -906,7 +894,7 @@ CVCenter {
 					cvcGui: cvcArgs
 				);
 				widgetStates.put(k, (tabIndex: cvTabIndex));
-				widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
+				tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 			}, {	
 				tmp = this.setup.calibrate = cvWidgets[k] !? { 
 					cvWidgets[k].wdgtControllersAndModels.calibration.model.value 

@@ -600,7 +600,8 @@ CVWidgetEditor {
 					.font_(Font("Helvetica", 9))
 					.string_(action.asArray[0])
 					.syntaxColorize
-					.canFocus_(false)
+//					.canFocus_(false)
+					.editable_(false)
 				;
 			})
 			
@@ -673,7 +674,8 @@ CVWidgetEditor {
 					.font_(Font("Helvetica", 9))
 					.string_(action.asArray[0])
 					.syntaxColorize
-					.canFocus_(false)
+//					.canFocus_(false)
+					.editable_(false)
 				;
 			},
 			\remove, {
