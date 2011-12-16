@@ -491,8 +491,10 @@ CVCenter {
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
+//			("*gui:"+[key, window, widget2DKey]).postln;
 			this.gui(tab);
 		}, {
+//			("*prAddToGui:"+[key, window, widget2DKey]).postln;
 			this.prAddToGui(tab, widget2DKey);
 		});
 		
@@ -589,10 +591,10 @@ CVCenter {
 				switch(cvWidgets[k].class,
 					CVWidget2D, {
 						lib[\all][k].wdgtClass = CVWidget2D;
-						[\lo, \hi].do({ |hilo|
+						#[lo, hi].do({ |hilo|
 							lib[\all][k][hilo] = (
-								spec: all[k][hilo].spec,
-								val: all[k][hilo].value,
+								spec: cvWidgets[k].widgetCV[hilo].spec,
+								val: cvWidgets[k].widgetCV[hilo].value,
 								actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo] },
 								osc: (
 									addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
@@ -620,8 +622,8 @@ CVCenter {
 					},
 					CVWidgetKnob, {
 						lib[\all][k] = (
-							spec: all[k].spec,
-							val: all[k].value,
+							spec: cvWidgets[k].widgetCV.spec,
+							val: cvWidgets[k].widgetCV.value,
 							actions: cvWidgets[k].wdgtActions,
 							osc: (
 								addr: cvWidgets[k].midiOscEnv.oscResponder !? { 
@@ -699,7 +701,8 @@ CVCenter {
 							if(loadActions, {
 								v[hilo].actions !? {
 									v[hilo].actions.pairsDo({ |ak, av|
-										this.addActionAt(key, ak, av.asArray[0], hilo);
+										[ak, av, av.asArray].postln;
+										this.addActionAt(key, ak, av.asArray[0][0], hilo);
 									})
 								}
 							});
@@ -742,7 +745,8 @@ CVCenter {
 						if(loadActions, {
 							v.actions !? {
 								v.actions.pairsDo({ |ak, av|
-									this.addActionAt(key, ak, av.asArray[0]);
+									[ak, av, av.asArray].postln;
+									this.addActionAt(key, ak, av.asArray[0][0]);
 								})
 							}
 						});
@@ -829,6 +833,8 @@ CVCenter {
 //		var widgetwidth, widgetheight=181, colwidth, rowheight;
 		var widgetControllersAndModels, cvcArgs;
 		var tmp;
+		
+//		"prAddToGui called: %, %\n".postf(tab, widget2DKey);
 				
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 		

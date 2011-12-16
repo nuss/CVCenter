@@ -106,7 +106,7 @@ CVWidget {
 				this.wdgtActions[slot.asSymbol][name.asSymbol] ?? { this.wdgtActions[slot.asSymbol].put(name.asSymbol, ()) };
 				if(this.wdgtActions[slot.asSymbol][name.asSymbol].size < 1, {
 					controller = widgetCV[slot.asSymbol].action_(act);
-					this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, act.asCompileString);
+					this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, [act.asCompileString, true]);
 					thisGuiEnv = this.guiEnv[slot.asSymbol];
 					if(thisGuiEnv.editor.notNil and: {
 						thisGuiEnv.editor.isClosed.not;
@@ -121,7 +121,7 @@ CVWidget {
 				this.wdgtActions[name.asSymbol] ?? {
 					this.wdgtActions.put(name.asSymbol, ());
 					controller = widgetCV.action_(act);
-					this.wdgtActions[name.asSymbol].put(controller, act.asCompileString);
+					this.wdgtActions[name.asSymbol].put(controller, [act.asCompileStrings, true]);
 				};
 				thisGuiEnv = this.guiEnv;
 				if(thisGuiEnv.editor.notNil and: {
@@ -172,6 +172,8 @@ CVWidget {
 		);
 		controller.do({ |c| c = nil });
 	}
+	
+	
 
 	setMidiMode { |mode, key|
 		switch(this.class,

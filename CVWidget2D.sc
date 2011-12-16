@@ -405,14 +405,12 @@ CVWidget2D : CVWidget {
 			+midiSrc.lo.bounds.height
 			+midiChan.lo.bounds.height*2), 
 		{
-			thisHeight.postln;
 			nextY = 
 			label.bounds.top
 			+label.bounds.height
 			+left;
 			oscEditButHeight = thisHeight-left-47;
 		}, {
-			thisHeight.postln;
 			nextY = 
 			label.bounds.top
 			+label.bounds.height
@@ -491,14 +489,10 @@ CVWidget2D : CVWidget {
 			})
 		});
 
-//		[widgetCV.lo, widgetCV.hi].postln;
-				
 		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
 		widgetCV.lo.connect(numVal.lo);
 		widgetCV.hi.connect(numVal.hi);
 		
-		[widgetCV.lo.value, widgetCV.hi.value].postln;
-
 		visibleGuiEls = [
 			slider2d, 
 			rangeSlider, 
@@ -532,7 +526,7 @@ CVWidget2D : CVWidget {
 			actionsBut.lo, actionsBut.hi
 		];
 		
-		[\lo, \hi].do({ |hilo|
+		#[lo, hi].do({ |hilo|
 			guiEnv[hilo] = (
 				editor: editor[hilo],
 				calibBut: calibBut[hilo],
@@ -545,11 +539,9 @@ CVWidget2D : CVWidget {
 				midiChan: midiChan[hilo],
 				midiCtrl: midiCtrl[hilo],
 				midiLearn: midiLearn[hilo]
-			)
-		});
-
-		this.initControllerActions(\lo);
-		this.initControllerActions(\hi);
+			);
+			this.initControllerActions(hilo);
+		})
 	}
 	
 }

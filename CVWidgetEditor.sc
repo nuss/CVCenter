@@ -598,9 +598,8 @@ CVWidgetEditor {
 				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.font_(Font("Helvetica", 9))
-					.string_(action.asArray[0])
+					.string_(action.asArray[0][0])
 					.syntaxColorize
-//					.canFocus_(false)
 					.editable_(false)
 				;
 			})
@@ -672,9 +671,8 @@ CVWidgetEditor {
 				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.font_(Font("Helvetica", 9))
-					.string_(action.asArray[0])
+					.string_(action.asArray[0][0])
 					.syntaxColorize
-//					.canFocus_(false)
 					.editable_(false)
 				;
 			},
