@@ -125,7 +125,7 @@ CVWidget {
 				this.wdgtActions[name.asSymbol] ?? {
 					this.wdgtActions.put(name.asSymbol, ());
 					controller = widgetCV.action_(act);
-					this.wdgtActions[name.asSymbol].put(controller, [act.asCompileStrings, true]);
+					this.wdgtActions[name.asSymbol].put(controller, [act.asCompileString, true]);
 					wdgtControllersAndModels.actions.model.value_((
 						numActions: this.wdgtActions.size,
 						activeActions: this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size
