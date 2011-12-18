@@ -18,7 +18,7 @@ CVWidgetEditor {
 	}
 
 	init { |widget, widgetName, tab, slot|
-		var tabs, cvString, slotHiLo;
+		var tabs, labelColors, cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var addr, wcmHiLo, thisGuiEnv; 
@@ -75,7 +75,7 @@ CVWidgetEditor {
 		
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 			
-			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 225));
+			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 223));
 			
 
 			if(slot.isNil, { 
@@ -92,15 +92,30 @@ CVWidgetEditor {
 			if(slot.notNil, { thisEditor = allEditors[name][slot] }, { thisEditor = allEditors[name] });
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
-			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC", "Actions"], scroll: true);
+			tabs = TabbedView(window, Rect(0, 1, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC", "Actions"], scroll: true);
+			tabs.view.resize_(5);
+			tabs.tabCurve_(4);
+			tabs.labelColors_(Color.white!4);
+			labelColors = [
+				Color(241/255, 209/255, 0), //specs
+				Color.red, //midi
+				Color(0.0, 0.5, 0.5), //osc
+				Color(0.31920713024337, 0.66666666666667, 0.75719983252006), //actions
+			];
+			labelColors.postln;
+			tabs.unfocusedColors_(labelColors);
+			tabs.stringColor_(Color.white);
+//			switch(tabs.activeTab,
+//				0, { allEditors[name].lo.tabs.stringFocusedColor_(labelColors[0]) },
+//				1, { allEditors[name].lo.tabs.stringFocusedColor_(labelColors[1]) },
+//				2, { allEditors[name].lo.tabs.stringFocusedColor_(labelColors[2]) },
+//				3, { allEditors[name].lo.tabs.stringFocusedColor_(labelColors[3]) }
+//			);
+			tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			thisEditor.tabs = tabs;
-			thisEditor.tabs.view.resize_(5);
-			thisEditor.tabs.stringFocusedColor_(Color.blue);
-			
-			thisEditor.tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			thisEditor.tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			thisEditor.tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			thisEditor.tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 						
 			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@95)
 				.font_(staticTextFont)

@@ -15,7 +15,7 @@ CVCenter {
 			all = IdentityDictionary.new;
 			cvWidgets = IdentityDictionary.new;
 			widgetStates = IdentityDictionary.new;
-			r = g = b = (0.5, 0.55 .. 0.7);
+			r = g = b = (0.6, 0.65 .. 0.75);
 			colors = List();
 			tabProperties = [];
 			

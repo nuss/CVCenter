@@ -764,9 +764,9 @@ CVWidget {
 		
 	initControllerActions { |key|
 		var wcm, thisGuiEnv, midiOscEnv, tmpMapping, tmpSetup, widgetCV, tmp;
-		var oscResponderAction;
-		var makeCCResponder, ccResponderAction, ccResponder;
-		var ctrlString, meanVal;
+//		var oscResponderAction;
+//		var makeCCResponder, ccResponderAction, ccResponder;
+//		var ctrlString, meanVal;
 		var thisCalib;
 						
 		if(key.notNil, {
@@ -782,7 +782,20 @@ CVWidget {
 			widgetCV = this.widgetCV;
 			thisCalib = prCalibrate;
 		});
-											
+		
+		#[
+			prInitCalibration, 
+			prInitSpecControl, 
+			prInitMidiConnect,
+			prInitMidiDisplay,
+			prInitMidiOptions,
+			prInitOscConnect,
+			prInitOscDisplay,
+			prInitOscInputRange
+		].do({ |method| this.perform(method, wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key) });
+	}	
+		
+	prInitCalibration { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|										
 		wcm.calibration.controller ?? { 
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
@@ -823,8 +836,12 @@ CVWidget {
 					})
 				}
 			)
-		});
-
+		})
+	}
+	
+	prInitSpecControl { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
+		var tmp, tmpMapping;
+		
 		wcm.cvSpec.controller ?? {
 			wcm.cvSpec.controller = SimpleController(wcm.cvSpec.model);
 		};
@@ -886,8 +903,12 @@ CVWidget {
 					})
 				}
 			})
-		});
-		
+		})
+	}
+	
+	prInitMidiConnect { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
+		var ctrlString, meanVal, ccResponderAction, makeCCResponder;
+
 		wcm.midiConnection.controller ?? {
 			wcm.midiConnection.controller = SimpleController(wcm.midiConnection.model);
 		};
@@ -969,7 +990,10 @@ CVWidget {
 				).changed(\value);
 				midiOscEnv.midisrc = nil; midiOscEnv.midichan = nil; midiOscEnv.midinum = nil; midiOscEnv.midiRawNum = nil;
 			})
-		});
+		})
+	}
+	
+	prInitMidiDisplay { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
 		
 		wcm.midiDisplay.controller ?? {
 			wcm.midiDisplay.controller = SimpleController(wcm.midiDisplay.model);
@@ -1088,6 +1112,9 @@ CVWidget {
 				}
 			)
 		});
+	}
+	
+	prInitMidiOptions { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
 
 		wcm.midiOptions.controller ?? {
 			wcm.midiOptions.controller = SimpleController(wcm.midiOptions.model);
@@ -1103,8 +1130,12 @@ CVWidget {
 				thisGuiEnv.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
 				thisGuiEnv.editor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
 			})
-		});
-
+		})
+	}
+	
+	prInitOscConnect { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
+		var oscResponderAction;
+		
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
 		};
@@ -1196,7 +1227,10 @@ CVWidget {
 					)
 				).changed(\value);
 			})
-		});
+		})
+	}
+	
+	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
 		
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
@@ -1234,8 +1268,11 @@ CVWidget {
 						thisGuiEnv.editor.indexField
 					].do(_.enabled_(theChanger.value.editEnabled))
 				})
-			};
-		});
+			}
+		})
+	}
+	
+	prInitOscInputRange { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
 		
 		wcm.oscInputRange.controller ?? {
 			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
@@ -1293,8 +1330,7 @@ CVWidget {
 					})
 				}.defer
 			})
-		});
-		
+		})
 	}
 
 }
