@@ -701,7 +701,7 @@ CVCenter {
 							if(loadActions, {
 								v[hilo].actions !? {
 									v[hilo].actions.pairsDo({ |ak, av|
-										[ak, av, av.asArray].postln;
+//										[ak, av, av.asArray].postln;
 										this.addActionAt(key, ak, av.asArray[0][0], hilo);
 									})
 								}
@@ -745,7 +745,7 @@ CVCenter {
 						if(loadActions, {
 							v.actions !? {
 								v.actions.pairsDo({ |ak, av|
-									[ak, av, av.asArray].postln;
+//									[ak, av, av.asArray].postln;
 									this.addActionAt(key, ak, av.asArray[0][0]);
 								})
 							}

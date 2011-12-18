@@ -107,6 +107,10 @@ CVWidget {
 				if(this.wdgtActions[slot.asSymbol][name.asSymbol].size < 1, {
 					controller = widgetCV[slot.asSymbol].action_(act);
 					this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, [act.asCompileString, true]);
+					wdgtControllersAndModels[slot.asSymbol].actions.model.value_((
+						numActions: this.wdgtActions[slot.asSymbol].size,
+						activeActions: this.wdgtActions[slot.asSymbol].select({ |v| v.asArray[0][1] == true }).size
+					)).changed(\value);
 					thisGuiEnv = this.guiEnv[slot.asSymbol];
 					if(thisGuiEnv.editor.notNil and: {
 						thisGuiEnv.editor.isClosed.not;
@@ -122,6 +126,10 @@ CVWidget {
 					this.wdgtActions.put(name.asSymbol, ());
 					controller = widgetCV.action_(act);
 					this.wdgtActions[name.asSymbol].put(controller, [act.asCompileStrings, true]);
+					wdgtControllersAndModels.actions.model.value_((
+						numActions: this.wdgtActions.size,
+						activeActions: this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size
+					)).changed(\value);
 				};
 				thisGuiEnv = this.guiEnv;
 				if(thisGuiEnv.editor.notNil and: {
@@ -146,6 +154,10 @@ CVWidget {
 					controller = this.wdgtActions[slot.asSymbol][name.asSymbol].keys.do(_.remove);
 					this.wdgtActions[slot.asSymbol].removeAt(name.asSymbol);
 					this.wdgtActions[slot.asSymbol].isEmpty.if { this.wdgtActions.removeAt(slot.asSymbol) };
+					wdgtControllersAndModels[slot.asSymbol].actions.model.value_((
+						numActions: this.wdgtActions[slot.asSymbol].size,
+						activeActions: this.wdgtActions[slot.asSymbol].select({ |v| v.asArray[0][1] == true }).size
+					)).changed(\value);
 					if(thisGuiEnv.editor.notNil and: {
 						thisGuiEnv.editor.isClosed.not;
 					}, {
@@ -160,6 +172,10 @@ CVWidget {
 				this.wdgtActions[name.asSymbol] !? {
 					controller = this.wdgtActions[name.asSymbol].keys.do(_.remove);
 					this.wdgtActions.removeAt(name.asSymbol);
+					wdgtControllersAndModels.actions.model.value_((
+						numActions: this.wdgtActions.size,
+						activeActions: this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size
+					)).changed(\value);
 					if(thisGuiEnv.editor.notNil and: {
 						thisGuiEnv.editor.isClosed.not;
 					}, {
@@ -759,6 +775,12 @@ CVWidget {
 		wcm.mapConstrainterHi ?? { 
 			wcm.mapConstrainterHi = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[1]);
 		};
+		wcm.actions ?? {
+			wcm.actions = ();
+		};
+		wcm.actions.model ?? {
+			wcm.actions.model = Ref((numActions: 0, activeActions: 0))
+		};
 		
 	}
 		
@@ -791,7 +813,8 @@ CVWidget {
 			prInitMidiOptions,
 			prInitOscConnect,
 			prInitOscDisplay,
-			prInitOscInputRange
+			prInitOscInputRange,
+			prInitActionsControl
 		].do({ |method| this.perform(method, wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key) });
 	}	
 		
@@ -1329,6 +1352,23 @@ CVWidget {
 						})
 					})
 				}.defer
+			})
+		})
+	}
+	
+	prInitActionsControl { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
+		
+		wcm.actions.controller ?? {
+			wcm.actions.controller = SimpleController(wcm.actions.model);
+		};
+		
+		wcm.actions.controller.put(\value, { |theChanger, what, moreArgs|
+			if(this.window.isClosed.not, {
+				thisGuiEnv.actionsBut.states_([[
+					"actions ("++theChanger.value.numActions++"/"++theChanger.value.activeActions++")",
+					Color(1.0, 1.0, 1.0),
+					Color(0.31920713024337, 0.66666666666667, 0.75719983252006),
+				]])
 			})
 		})
 	}

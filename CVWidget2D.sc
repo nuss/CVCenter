@@ -473,11 +473,13 @@ CVWidget2D : CVWidget {
 		nextY = nextY+calibBut.lo.bounds.height;
 		
 		[actionsBut.lo, [\lo, thisXY.x+1], actionsBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
+			this.wdgtActions[v[0]].postln;
+			
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
-				["actions", Color.white, Color(0.31920713024337, 0.66666666666667, 0.75719983252006)]
+				["actions ("++this.wdgtActions[v[0]].size++"/"++this.wdgtActions[v[0]].select({ |v| v.asArray[0][1] == true }).size++")", Color.white, Color(0.31920713024337, 0.66666666666667, 0.75719983252006)]
 			])
 			.action_({ |ab|
 				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {
