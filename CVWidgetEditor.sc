@@ -1,6 +1,6 @@
 CVWidgetEditor {
 	classvar <allEditors;
-	var thisEditor, <window, <tabs;
+	var thisEditor, <window, <tabs, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
@@ -18,10 +18,10 @@ CVWidgetEditor {
 	}
 
 	init { |widget, widgetName, tab, slot|
-		var tabs, labelColors, cvString, slotHiLo;
+		var tabs, cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
-		var addr, wcmHiLo, thisGuiEnv; 
+		var addr, wcmHiLo, thisGuiEnv, labelColors; 
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
 		var mappingSelectItems;
@@ -29,7 +29,7 @@ CVWidgetEditor {
 		var tmp; // multipurpose, short-term var
 						
 		name = widgetName.asSymbol;
-		
+				
 		actionsList ?? { actionsList = () };
 		
 		if(slot.isNil, { thisGuiEnv = widget.guiEnv }, { thisGuiEnv = widget.guiEnv[slot] });
@@ -102,7 +102,8 @@ CVWidgetEditor {
 				Color(0.0, 0.5, 0.5), //osc
 				Color(0.31920713024337, 0.66666666666667, 0.75719983252006), //actions
 			];
-			labelColors.postln;
+			labelStringColors = labelColors.collect({ |c| Color(c.red * 0.8, c.green * 0.8, c.blue * 0.8) });
+//			labelColors.postln;
 			tabs.unfocusedColors_(labelColors);
 			tabs.stringColor_(Color.white);
 //			switch(tabs.activeTab,
@@ -115,6 +116,9 @@ CVWidgetEditor {
 			tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			(0..3).do({ |t| tabs.focusActions[t] = { tabs.stringFocusedColor_(labelStringColors[t]) } });
+			tabs.stringFocusedColor_(labelStringColors[tab]);
+
 			thisEditor.tabs = tabs;
 						
 			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@95)
@@ -629,6 +633,11 @@ CVWidgetEditor {
 	
 	front { |tab|
 		thisEditor.window.front;
+		thisEditor.tabs.stringFocusedColor_(labelStringColors[tab]);
+//				0, { allEditors[name].lo.tabs.stringFocusedColor_(labelColors[0]) },
+//				1, { allEditors[name].lo.tabs.stringFocusedColor_(labelColors[1]) },
+//				2, { allEditors[name].lo.tabs.stringFocusedColor_(labelColors[2]) },
+//				3, { allEditors[name].lo.tabs.stringFocusedColor_(labelColors[3]) }
 		tab !? thisEditor.tabs.focus(tab);
 	}
 	
