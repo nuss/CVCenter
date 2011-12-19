@@ -627,8 +627,8 @@ CVWidgetEditor {
 	front { |tab|
 		thisEditor.window.front;
 		tab !? { 
-			thisEditor.tabs.stringFocusedColor_(labelStringColors[tab.asSymbol]);
-			thisEditor.tabs.focus(tab.asSymbol);
+			thisEditor.tabs.stringFocusedColor_(labelStringColors[tab]);
+			thisEditor.tabs.focus(tab);
 		}
 	}
 	
