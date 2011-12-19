@@ -477,7 +477,7 @@ CVCenter {
 		thisKey = key.asSymbol;
 		all ?? { this.new };
 				
-		thisSpec = spec ?? { thisSpec = ControlSpec.new };
+		thisSpec = spec.asSpec;
 		thisVal = value ?? { thisVal = thisSpec.default };
 
 		if(thisSlot.notNil, {
