@@ -324,7 +324,7 @@ CVWidgetKnob : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
-				["actions ("++this.wdgtActions.size++"/"++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++")", Color.white, Color(0.31920713024337, 0.66666666666667, 0.75719983252006)],
+				["actions ("++this.wdgtActions.size++"/"++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++")", Color(0.077916707501562, 0.085920705606104, 0.14318447501515), Color(0.31920713024337, 0.66666666666667, 0.75719983252006)],
 			])
 			.action_({ |ab|
 				if(editor.isNil or:{ editor.isClosed }, {

@@ -1366,7 +1366,7 @@ CVWidget {
 			if(this.window.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[
 					"actions ("++theChanger.value.numActions++"/"++theChanger.value.activeActions++")",
-					Color(1.0, 1.0, 1.0),
+					Color(0.077916707501562, 0.085920705606104, 0.14318447501515),
 					Color(0.31920713024337, 0.66666666666667, 0.75719983252006),
 				]])
 			})
