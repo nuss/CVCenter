@@ -983,5 +983,19 @@ CVCenter {
 			tabProperties = [(tabLabel: "default", tabColor: tabProperties[index].tabColor)];
 		})
 	}
+	
+	/* utilities */
+	
+	*finishGui { |objClass...more|
+		[objClass, more].postln;
+		switch(objClass, 
+			Synth, {
+				thisProcess.postln;
+			},
+			Ndef, {
+				
+			}
+		)  
+	}
 		
 }

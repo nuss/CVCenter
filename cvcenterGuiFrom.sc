@@ -3,15 +3,18 @@
 
 +Synth {
 	
-	cvcGui { |environment|
-		var sDef, cNames, cVals, cDict, def;
+	cvcGui { |pairs2D, environment|
+		var sDef, def, cDict = (), thisPairs2D;
 		sDef = SynthDescLib.global[this.defName.asSymbol];
-		def = sDef.def.asCompileString;
-		cNames = sDef.controlNames;
-		cVals = sDef.def.controls;
-		cDict = [cNames, cVals].flop.flat.as(Event);
-		
-		CVWidgetSpecsEditor(this.defName.asSymbol, cDict, environment);
+		sDef.controlDict.pairsDo({ |n, c| cDict.put(n, c.defaultValue) });
+		pairs2D !? {
+			pairs2D.do({ |pair|
+				pair.do({ |c| 
+					
+				})
+			})
+		};
+		CVWidgetSpecsEditor(this.class, this.defName.asSymbol, cDict, environment);
 	}
-	
+		
 }
