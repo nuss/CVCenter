@@ -42,7 +42,7 @@ CVWidgetSpecsEditor {
 			Error("CVWidgetSpecsEditor is a utilty-class, only to be used in connection with cvcGui and the like").throw;
 		});
 		
-		lines = controls.asArray.flatten.size;
+		lines = controls.size;
 		
 		window = Window("Specs:"+name, Rect(
 			Window.screenBounds.width-650/2, 
@@ -170,11 +170,10 @@ CVWidgetSpecsEditor {
 					makeLine.(formEls[cname], cname);
 					made = made.add(cname);
 				}, {
-					// ???
-//					spec.do({ |c, i| 
-//						formEls[cname].put(i, ());
-//						makeLine.(formEls[cname][i], cname, i, controls[cname].asArray.size);
-//					})
+					formEls.put(cname, ());
+					formEls[cname].type = \wms;
+					makeLine.(formEls[cname], cname, spec.size);
+					made = made.add(cname);
 				})
 			});
 
