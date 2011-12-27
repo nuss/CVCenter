@@ -14,7 +14,7 @@ CVWidgetSpecsEditor {
 		var staticTextFont, staticTextColor, textFieldFont, selectFont, textFieldFontColor, textFieldBg;
 		var formEls, nameStr, makeLine, sendBut, cancelBut;
 		var flow, lines, allEls, allWidth;
-		var cMatrix, made;
+		var cMatrix, specName, made;
 				
 		object = obj;
 		
@@ -96,74 +96,79 @@ CVWidgetSpecsEditor {
 				
 		#formEls, cMatrix = ()!2;
 
-		makeLine = { |elem, cname, type, size|
+		makeLine = { |elem, cname, size|
 			
-			if(type.notNil, {
-				switch(type,
+			if(elem.type.notNil, {
+				"type: %\n".postf(elem.type);
+				switch(elem.type,
 					\w2d, {
 						nameStr = ""+cname+"(lo/hi)";
+						specName = cname;
 					}, 
 					\w2dcust, {
 						nameStr = ""+cname;
+						specName = cname.split($/);
+						specName = specName[0]++(specName[1].firstToUpper);
 					},
 					{
 						nameStr = ""+cname+"("++size++")";
+						specName = cname;
 					}
 				)
 			}, {
-				nameStr = ""+cname;	
+				nameStr = ""+cname;
+				specName = cname;	
 			});
 			
-//			if(slot.isNil or:{ slot == \lo }, {
-				flow.shift(0, 0);
-				StaticText(window, cNameRect)
-					.font_(staticTextFont)
-					.background_(Color(1.0, 1.0, 1.0, 0.5))
-					.string_(nameStr)
-				;
+			flow.shift(0, 0);
+			StaticText(window, cNameRect)
+				.font_(staticTextFont)
+				.background_(Color(1.0, 1.0, 1.0, 0.5))
+				.string_(nameStr)
+			;
+		
+			flow.shift(5, 0);
+			elem.cName = TextField(window, cNameEnterTextRect)
+				.font_(textFieldFont)
+				.string_(specName)
+				.background_(textFieldBg)
+			;
+		
+			flow.shift(5, 0);
+			elem.specEnterText = TextField(window, specEnterTextRect)
+				.font_(textFieldFont)
+				.background_(textFieldBg)
+			;
+		
+			flow.shift(5, 0);
+			elem.specSelect = PopUpMenu(window, specSelectRect)
+				.items_(specsList)
+				.font_(selectFont)
+			;
 			
-				flow.shift(5, 0);
-				elem.cName = TextField(window, cNameEnterTextRect)
-					.font_(textFieldFont)
-					.string_(cname)
-					.background_(textFieldBg)
-				;
-			
-				flow.shift(5, 0);
-				elem.specEnterText = TextField(window, specEnterTextRect)
-					.font_(textFieldFont)
-					.background_(textFieldBg)
-				;
-			
-				flow.shift(5, 0);
-				elem.specSelect = PopUpMenu(window, specSelectRect)
-					.items_(specsList)
-					.font_(selectFont)
-				;
-				
-				selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == cname.asSpec });
-				selectMatch !? {
-					elem.specSelect.value_(selectMatch);
-				};
-			
-				flow.shift(5, 0);
-				elem.enterTab = TextField(window, enterTabRect)
-					.font_(textFieldFont)
-					.background_(textFieldBg)
-					.string_(name)
-				;
-//			})
+			selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == cname.asSymbol.asSpec });
+			selectMatch !? {
+				elem.specSelect.value_(selectMatch);
+			};
+		
+			flow.shift(5, 0);
+			elem.enterTab = TextField(window, enterTabRect)
+				.font_(textFieldFont)
+				.background_(textFieldBg)
+				.string_(name)
+			;
 		};
+		
+		made = [];
 
 		controls.pairsDo({ |cname, spec, i|
-			
-//			"controls: %, %\n".postf(cname, spec);
 
-			formEls.put(cname, ());
 			if(spec.class === Array, {
 				if(spec.size == 2, {
+					formEls.put(cname, ());
 					formEls[cname].type = \w2d;
-					makeLine.(formEls[cname], cname, formEls[cname].type);
+					makeLine.(formEls[cname], cname);
+					made = made.add(cname);
 				}, {
 					// ???
 //					spec.do({ |c, i| 
@@ -171,19 +176,29 @@ CVWidgetSpecsEditor {
 //						makeLine.(formEls[cname][i], cname, i, controls[cname].asArray.size);
 //					})
 				})
-			}, {
-				if(pairs2D.notNil, {
-					pairs2D.do({ |pair| pair.indexOfEqual(cname) !? { 
-						if(pair[0] == cname, {
-							formEls[cname].type = \w2dcust;
-							makeLine.(formEls[cname], pair[0]++(pair[1].firstToUpper), formEls.type);
-						}, {
-							makeLine.(formEls[cname], cname);
-						})
-					}})
-				}, {
-					makeLine.(formEls[cname], cname);
-				});
+			});
+
+			pairs2D !? {
+				pairs2D.pairsDo({ |k, pair| 
+					if(pair.includes(cname) and:{ 
+						spec.class !== Array and:{ 
+							made.includes(cname).not
+						}
+					}, { 
+						formEls.put(cname, ());
+						formEls[cname].type = \w2dcust;
+						makeLine.(formEls[cname], pair[0]++"/"++pair[1]);
+						made = made.add(pair[0]);
+						made = made.add(pair[1]);
+						made.postln;
+					}) 
+				})
+			};
+
+			if(formEls[cname].isNil and:{ made.indexOfEqual(cname).isNil }, { 
+				formEls.put(cname, ()); 
+				makeLine.(formEls[cname], cname);
+				made = made.add(cname);
 			})
 			
 		});
