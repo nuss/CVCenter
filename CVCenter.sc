@@ -986,11 +986,33 @@ CVCenter {
 	
 	/* utilities */
 	
-	*finishGui { |objClass...more|
-		[objClass, more].postln;
-		switch(objClass, 
+	*finishGui { |obj, environment, type...more|
+		var interpreterVars, varNames = [], envs = [];
+//		[obj, environment, type, more].postln;
+		interpreterVars = #[a,b,c,d,e,f,g,h,i,j,k,l,m,n,p,q,r,t,u,v,w,x,z,y];
+		switch(obj.class, 
 			Synth, {
-				thisProcess.postln;
+				varNames = interpreterVars.select({ |n|
+					thisProcess.interpreter.perform(n) === obj
+				});
+				currentEnvironment.pairsDo({ |k, v|
+					if(v === obj, { varNames = varNames.add("~"++(k.asString)) });
+				});
+				environment !? { 
+					envs = interpreterVars.select({ |n|
+						thisProcess.interpreter.perform(n) === environment;
+					});
+					currentEnvironment.pairsDo({ |k, v|
+						if(v === environment, { envs = envs.add("~"++(k.asString)) });
+					});
+					environment.pairsDo({ |k, v| 
+						if(v === obj, { 
+							envs = envs.collect({ |ev| ev = ev++"[\\"++k++"]" });
+						})
+					});
+				};
+				varNames = varNames++envs;
+//				varNames.postln;
 			},
 			Ndef, {
 				

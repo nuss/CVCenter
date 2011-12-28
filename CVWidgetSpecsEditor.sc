@@ -1,11 +1,11 @@
 CVWidgetSpecsEditor {
 	var <window;
 
-	*new { |object, wdgtName, controlsDict, pairs2D, environment|
-		^super.new.init(object, wdgtName, controlsDict, pairs2D, environment)
+	*new { |object, wdgtName, controlsDict, pairs2D, metadata, environment|
+		^super.new.init(object, wdgtName, controlsDict, pairs2D, metadata, environment)
 	}
 	
-	init { |obj, name, controls, pairs2D, environment|
+	init { |obj, name, controls, pairs2D, metadata, environment|
 		var object;
 //		var cName, specEnterText, specSelect, enterTab;
 		var wdgtName;
@@ -46,9 +46,9 @@ CVWidgetSpecsEditor {
 		
 		window = Window("Specs:"+name, Rect(
 			Window.screenBounds.width-650/2, 
-			Window.screenBounds.height-(lines * 25 + 70)/2, 
+			Window.screenBounds.height-(lines * 25 + 40)/2, 
 			650, 
-			lines * 25 + 70
+			lines * 25 + 40
 		), scroll: true).userCanClose_(false);
 		
 		window.view.decorator = flow = FlowLayout(window.bounds.insetBy(5));
@@ -99,7 +99,7 @@ CVWidgetSpecsEditor {
 		makeLine = { |elem, cname, size|
 			
 			if(elem.type.notNil, {
-				"type: %\n".postf(elem.type);
+//				"type: %\n".postf(elem.type);
 				switch(elem.type,
 					\w2d, {
 						nameStr = ""+cname+"(lo/hi)";
@@ -147,6 +147,11 @@ CVWidgetSpecsEditor {
 			;
 			
 			selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == cname.asSymbol.asSpec });
+			metadata !? {
+				if(metadata.keys.includes(specName.asSymbol), {
+					selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == metadata[specName.asSymbol].asSpec });
+				})
+			};
 			selectMatch !? {
 				elem.specSelect.value_(selectMatch);
 			};
@@ -216,19 +221,23 @@ CVWidgetSpecsEditor {
 		sendBut = Button(window, Rect(0, 0, 65, 20))
 			.states_([[ "gui", Color.white, Color.red ]])
 			.action_({ |sb|
-//				formEls.postln; 
 				formEls.pairsDo({ |el, vals| 
-//					vals.postln;
+//					vals.type.postln;
 					switch(vals.type,
-						"w2d", {
-//						el.postln;
-							vals.removeAt(\type);
+						\w2d, {
+//							vals.removeAt(\type);
 							vals.do({ |v|
-								CVCenter.finishGui(obj, v);
+								CVCenter.finishGui(obj, environment, vals.type, vals);
 							})
 						},
-						{
+						\w2dcust, {
 						
+						},
+						\wms, {
+							
+						},
+						{
+							
 						}
 					)
 				});
