@@ -1,5 +1,6 @@
 
 /* automatic GUI-creation from SynthDefs, Ndefs ... */
+/* read input */
 
 +Synth {
 	

@@ -582,12 +582,12 @@ CVWidgetEditor {
 			});
 			
 			wdgtActions.pairsDo({ |name, action|
-								
+												
 				actionsList = actionsList.put(name, ());
 				
 				flow3.shift(0, 5);
 				
-				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-115@15)
+				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-173@15)
 					.font_(staticTextFont)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.string_(""+name.asString)
@@ -595,10 +595,36 @@ CVWidgetEditor {
 				
 				flow3.shift(5, 0);
 				
-				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 72@15)
+				actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
 					.font_(staticTextFont)
 					.states_([
-						["remove Action", Color.white, Color.red],
+						["activate", Color(0.1076096448114, 0.30322184313276, 0.14551632171296), Color(0.98753162717248, 0.77148428061484, 0.11016622702571)],
+						["deactivate", Color.white, Color(0.1076096448114, 0.30322184313276, 0.14551632171296)],
+					])
+					.action_({ |rb|
+						switch(rb.value, 
+							0, {},
+							1, {}
+						)
+					})
+				;
+				
+//				action.asArray[0][1].postln;
+				switch(action.asArray[0][1], 
+					true, {
+						actionsList[name].activate.value_(1);
+					},
+					false, {
+						actionsList[name].activate.value_(0);
+					}
+				);
+				
+				flow3.shift(5, 0);
+				
+				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 60@15)
+					.font_(staticTextFont)
+					.states_([
+						["remove", Color.white, Color.red],
 					])
 					.action_({ |rb|
 						widget.removeAction(name.asSymbol, slot.asSymbol);
@@ -653,7 +679,7 @@ CVWidgetEditor {
 	
 	// not to be used directly!
 	
-	amendActionsList { |widget, addRemove, name, action, slot|
+	amendActionsList { |widget, addRemove, name, action, slot, active|
 		
 		var staticTextFont = Font(Font.defaultSansFace, 10);
 
@@ -663,7 +689,7 @@ CVWidgetEditor {
 				actionsList.put(name, ());
 				flow3.shift(0, 5);
 				
-				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-115@15)
+				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-173@15)
 					.font_(staticTextFont)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.string_(""+name.asString)
@@ -671,7 +697,32 @@ CVWidgetEditor {
 				
 				flow3.shift(5, 0);
 				
-				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 72@15)
+				actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
+					.font_(staticTextFont)
+					.states_([
+						["activate", Color(0.1076096448114, 0.30322184313276, 0.14551632171296), Color(0.98753162717248, 0.77148428061484, 0.11016622702571)],
+						["deactivate", Color.white, Color(0.1076096448114, 0.30322184313276, 0.14551632171296)],
+					])
+					.action_({ |rb|
+						switch(rb.value, 
+							0, {},
+							1, {}
+						)
+					})
+				;
+				
+				switch(active, 
+					true, {
+						actionsList[name].activate.value_(1);
+					},
+					false, {
+						actionsList[name].activate.value_(0);
+					}
+				);
+				
+				flow3.shift(5, 0);
+				
+				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["remove Action", Color.white, Color.red],

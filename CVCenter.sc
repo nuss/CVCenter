@@ -540,9 +540,9 @@ CVCenter {
 		tabProperties[index].tabLabel = newName.asString;
 	}
 	
-	*addActionAt { |key, name, action, slot|
+	*addActionAt { |key, name, action, slot, active=true|
 		key ?? { Error("You have to provide the CV's key in order to add an action!").throw };
-		cvWidgets[key.asSymbol].addAction(name, action, slot);
+		cvWidgets[key.asSymbol].addAction(name, action, slot, active);
 	}
 	
 	*removeActionAt { |key, name, slot|
@@ -986,14 +986,14 @@ CVCenter {
 	
 	/* utilities */
 	
-	*finishGui { |obj, environment, type...more|
+	*finishGui { |obj, environment, more|
 		var interpreterVars, varNames = [], envs = [];
 //		[obj, environment, type, more].postln;
-		interpreterVars = #[a,b,c,d,e,f,g,h,i,j,k,l,m,n,p,q,r,t,u,v,w,x,z,y];
+		interpreterVars = #[a,b,c,d,e,f,g,h,i,j,k,l,m,n,p,q,r,s,t,u,v,w,x,z,y];
 		switch(obj.class, 
 			Synth, {
 				varNames = interpreterVars.select({ |n|
-					thisProcess.interpreter.perform(n) === obj
+					thisProcess.interpreter.perform(n) === obj;
 				});
 				currentEnvironment.pairsDo({ |k, v|
 					if(v === obj, { varNames = varNames.add("~"++(k.asString)) });
@@ -1007,12 +1007,14 @@ CVCenter {
 					});
 					environment.pairsDo({ |k, v| 
 						if(v === obj, { 
-							envs = envs.collect({ |ev| ev = ev++"[\\"++k++"]" });
+							envs = envs.collect({ |ev| ev = ev++"['"++k++"']" });
 						})
 					});
 				};
 				varNames = varNames++envs;
 //				varNames.postln;
+
+				"passid in: %\n".postf([obj, environment, more]);
 			},
 			Ndef, {
 				

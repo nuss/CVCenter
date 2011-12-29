@@ -87,7 +87,7 @@ CVWidget {
 		if(isCVCWidget, { this.remove }, { this.window.close });
 	}
 	
-	addAction { |name, action, slot|
+	addAction { |name, action, slot, active=true|
 		var act, controller, thisGuiEnv;
 		name ?? { Error("Please provide a name under which the action will be added to the widget").throw };
 		action ?? { Error("Please provide an action!").throw };
@@ -105,8 +105,13 @@ CVWidget {
 				// avoid duplicates
 				this.wdgtActions[slot.asSymbol][name.asSymbol] ?? { this.wdgtActions[slot.asSymbol].put(name.asSymbol, ()) };
 				if(this.wdgtActions[slot.asSymbol][name.asSymbol].size < 1, {
-					controller = widgetCV[slot.asSymbol].action_(act);
-					this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, [act.asCompileString, true]);
+					if(active == true, {
+						controller = widgetCV[slot.asSymbol].action_(act);
+						this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, [act.asCompileString, true]);
+					}, {
+						controller = \dummy;	
+						this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, [act.asCompileString, false]);
+					});
 					wdgtControllersAndModels[slot.asSymbol].actions.model.value_((
 						numActions: this.wdgtActions[slot.asSymbol].size,
 						activeActions: this.wdgtActions[slot.asSymbol].select({ |v| v.asArray[0][1] == true }).size
@@ -116,7 +121,7 @@ CVWidget {
 						thisGuiEnv.editor.isClosed.not;
 					}, {
 						thisGuiEnv.editor.amendActionsList(
-							this, \add, name.asSymbol, this.wdgtActions[slot.asSymbol][name.asSymbol], slot.asSymbol;
+							this, \add, name.asSymbol, this.wdgtActions[slot.asSymbol][name.asSymbol], slot.asSymbol, active;
 						)
 					})
 				})
@@ -124,8 +129,13 @@ CVWidget {
 			{
 				this.wdgtActions[name.asSymbol] ?? {
 					this.wdgtActions.put(name.asSymbol, ());
-					controller = widgetCV.action_(act);
-					this.wdgtActions[name.asSymbol].put(controller, [act.asCompileString, true]);
+					if(active == true, {
+						controller = widgetCV.action_(act);
+						this.wdgtActions[name.asSymbol].put(controller, [act.asCompileString, true]);
+					}, {
+						controller = \dummy;
+						this.wdgtActions[name.asSymbol].put(controller, [act.asCompileString, false]);
+					});
 					wdgtControllersAndModels.actions.model.value_((
 						numActions: this.wdgtActions.size,
 						activeActions: this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size
@@ -189,8 +199,62 @@ CVWidget {
 		controller.do({ |c| c = nil });
 	}
 	
-	
+	activateAction { |name, activate=true, slot|
+		var action, actions, cv, thisGuiEnv, controller, thisAction;
 
+		if(slot.notNil, {
+			cv = widgetCV[slot.asSymbol];
+			actions = this.wdgtActions[slot.asSymbol];
+			action = this.wdgtActions[slot.asSymbol][name.asSymbol];
+			thisGuiEnv = this.guiEnv[slot.asSymbol];
+		}, {
+			cv = widgetCV;
+			actions = this.wdgtActions;
+			action = this.wdgtActions[name.asSymbol];
+			thisGuiEnv = this.guiEnv;
+		});
+		
+		if(action.notNil, {
+			switch(activate, 
+				true, {
+					if(action.keys.asArray[0].class !== SimpleController, {
+						if(action.asArray[0][0].class === String, {
+							thisAction = action.asArray[0][0].interpret;
+						}, {
+							thisAction = action.asArray[0][0];
+						});
+						controller = cv.action_(thisAction);
+						action.put(controller, [thisAction, true]);
+						action.removeAt(\dummy);
+					})
+				},
+				false, {
+					if(action.keys.asArray[0].class === SimpleController, {
+						action.keys.asArray[0].remove;
+						action.dummy = [action.asArray[0][0].asCompileString, false];
+						action.removeAt(action.keys.asArray[0]);
+					})
+				}
+			);
+			wdgtControllersAndModels.actions.model.value_((
+				numActions: actions.size,
+				activeActions: actions.select({ |v| v.asArray[0][1] == true }).size
+			)).changed(\value);
+			if(thisGuiEnv.editor.notNil and: {
+				thisGuiEnv.editor.isClosed.not;
+			}, {
+				switch(activate,
+					true, { 
+						thisGuiEnv.editor.actionsList[name.asSymbol].activate.value_(1);
+					},
+					false, {
+						thisGuiEnv.editor.actionsList[name.asSymbol].activate.value_(0);
+					}
+				)
+			})
+		})
+	}
+	
 	setMidiMode { |mode, key|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -1365,7 +1429,7 @@ CVWidget {
 		wcm.actions.controller.put(\value, { |theChanger, what, moreArgs|
 			if(this.window.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[
-					"actions ("++theChanger.value.numActions++"/"++theChanger.value.activeActions++")",
+					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
 					Color(0.077916707501562, 0.085920705606104, 0.14318447501515),
 					Color(0.31920713024337, 0.66666666666667, 0.75719983252006),
 				]])

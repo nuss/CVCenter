@@ -15,6 +15,8 @@ CVWidgetSpecsEditor {
 		var formEls, nameStr, makeLine, sendBut, cancelBut;
 		var flow, lines, allEls, allWidth;
 		var cMatrix, specName, made;
+		
+//		controls.postln;
 				
 		object = obj;
 		
@@ -105,7 +107,7 @@ CVWidgetSpecsEditor {
 						nameStr = ""+cname+"(lo/hi)";
 						specName = cname;
 					}, 
-					\w2dcust, {
+					\w2dc, {
 						nameStr = ""+cname;
 						specName = cname.split($/);
 						specName = specName[0]++(specName[1].firstToUpper);
@@ -172,11 +174,13 @@ CVWidgetSpecsEditor {
 				if(spec.size == 2, {
 					formEls.put(cname, ());
 					formEls[cname].type = \w2d;
+					formEls[cname].slots = controls[cname];
 					makeLine.(formEls[cname], cname);
 					made = made.add(cname);
 				}, {
 					formEls.put(cname, ());
 					formEls[cname].type = \wms;
+					formEls[cname].slots = controls[cname];
 					makeLine.(formEls[cname], cname, spec.size);
 					made = made.add(cname);
 				})
@@ -190,11 +194,12 @@ CVWidgetSpecsEditor {
 						}
 					}, { 
 						formEls.put(cname, ());
-						formEls[cname].type = \w2dcust;
+						formEls[cname].type = \w2dc;
+						formEls[cname].slots = [controls[pair[0]], controls[pair[1]]];
 						makeLine.(formEls[cname], pair[0]++"/"++pair[1]);
 						made = made.add(pair[0]);
 						made = made.add(pair[1]);
-						made.postln;
+//						made.postln;
 					}) 
 				})
 			};
@@ -221,25 +226,25 @@ CVWidgetSpecsEditor {
 		sendBut = Button(window, Rect(0, 0, 65, 20))
 			.states_([[ "gui", Color.white, Color.red ]])
 			.action_({ |sb|
-				formEls.pairsDo({ |el, vals| 
+				
+				formEls.pairsDo({ |el, vals|
 //					vals.type.postln;
-					switch(vals.type,
-						\w2d, {
-//							vals.removeAt(\type);
-							vals.do({ |v|
-								CVCenter.finishGui(obj, environment, vals.type, vals);
-							})
-						},
-						\w2dcust, {
-						
-						},
-						\wms, {
-							
-						},
-						{
-							
-						}
-					)
+//					switch(vals.type,
+//						\w2d, {
+							vals = vals.collect(_.value);
+							vals.specSelect = specsListSpecs[vals.specSelect];
+							CVCenter.finishGui(obj, environment, vals);
+//						},
+//						\w2dc, {
+//							CVCenter.finishGui(obj, environment, vals.collect(_.value));
+//						},
+//						\wms, {
+//							CVCenter.finishGui(obj, environment, vals.collect(_.value));
+//						},
+//						{
+//							CVCenter.finishGui(obj, environment, vals.collect(_.value));
+//						}
+//					)
 				});
 //				CVCenter.finishGui();
 				window.close;

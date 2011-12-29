@@ -317,7 +317,7 @@ CVWidget2D : CVWidget {
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("source")
-			.background_(Color(alpha: 0))
+			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
 				if(tf.string != msrc, {
@@ -346,7 +346,7 @@ CVWidget2D : CVWidget {
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("chan")
-			.background_(Color(alpha: 0))
+			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
 				if(tf.string != msrc, {
@@ -373,7 +373,7 @@ CVWidget2D : CVWidget {
 			.font_(Font("Helvetica", 8.5))
 			.focusColor_(Color(alpha: 0))
 			.string_("ctrl")
-			.background_(Color(alpha: 0))
+			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
 				if(tf.string != msrc, {
@@ -473,13 +473,12 @@ CVWidget2D : CVWidget {
 		nextY = nextY+calibBut.lo.bounds.height;
 		
 		[actionsBut.lo, [\lo, thisXY.x+1], actionsBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
-			this.wdgtActions[v[0]].postln;
 			
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
-				["actions ("++this.wdgtActions[v[0]].size++"/"++this.wdgtActions[v[0]].select({ |v| v.asArray[0][1] == true }).size++")", Color(0.077916707501562, 0.085920705606104, 0.14318447501515), Color(0.31920713024337, 0.66666666666667, 0.75719983252006)]
+				["actions ("++this.wdgtActions[v[0]].select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions[v[0]].size++")", Color(0.077916707501562, 0.085920705606104, 0.14318447501515), Color(0.31920713024337, 0.66666666666667, 0.75719983252006)]
 			])
 			.action_({ |ab|
 				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {
