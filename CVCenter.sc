@@ -550,6 +550,11 @@ CVCenter {
 		cvWidgets[key.asSymbol].removeAction(name, slot);
 	}
 	
+	*activateActionAt { |key, name, activate, slot|
+		key ?? { Error("You have to provide the CV's key in order to activate or deactivate an action!").throw };
+		cvWidgets[key.asSymbol].activateAction(name, activate, slot);
+	}
+		
 //	*removeActionsAt { |...keys|
 //		keys ?? { "Can't remove actions: provide at least one key".warn };
 //		keys.do({ |key|
@@ -989,7 +994,7 @@ CVCenter {
 	*finishGui { |obj, environment, more|
 		var interpreterVars, varNames = [], envs = [];
 //		[obj, environment, type, more].postln;
-		interpreterVars = #[a,b,c,d,e,f,g,h,i,j,k,l,m,n,p,q,r,s,t,u,v,w,x,z,y];
+		interpreterVars = #[a,b,c,d,e,f,g,h,i,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z];
 		switch(obj.class, 
 			Synth, {
 				varNames = interpreterVars.select({ |n|
@@ -1009,7 +1014,7 @@ CVCenter {
 						if(v === obj, { 
 							envs = envs.collect({ |ev| ev = ev++"['"++k++"']" });
 						})
-					});
+					})
 				};
 				varNames = varNames++envs;
 //				varNames.postln;
@@ -1019,7 +1024,23 @@ CVCenter {
 			Ndef, {
 				
 			}
-		)  
+		);
+			
+		if(more.type.notNil, {
+			if(more.type === \w2d or:{ more.type === \w2dc }, {
+				#[lo, hi].do({ |slot, i|
+					this.use(more.cName, more.specSelect, more.slots[i], more.enterTab, slot);
+				})
+			}, {
+				if(more.type === \wms, {
+					more.slots.do({ |sl, i|
+						this.use(more.cName.asString++i, more.specSelect, sl, more.enterTab);
+					})
+				})		
+			})
+		}, {
+			this.use(more.cName, more.specSelect, more.slots[0], more.enterTab);
+		})
 	}
 		
 }

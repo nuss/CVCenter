@@ -169,18 +169,18 @@ CVWidgetSpecsEditor {
 		made = [];
 
 		controls.pairsDo({ |cname, spec, i|
-
+			[cname, spec].postln;
 			if(spec.class === Array, {
 				if(spec.size == 2, {
 					formEls.put(cname, ());
 					formEls[cname].type = \w2d;
-					formEls[cname].slots = controls[cname];
+					formEls[cname].slots = spec;
 					makeLine.(formEls[cname], cname);
 					made = made.add(cname);
 				}, {
 					formEls.put(cname, ());
 					formEls[cname].type = \wms;
-					formEls[cname].slots = controls[cname];
+					formEls[cname].slots = spec;
 					makeLine.(formEls[cname], cname, spec.size);
 					made = made.add(cname);
 				})
@@ -196,6 +196,7 @@ CVWidgetSpecsEditor {
 						formEls.put(cname, ());
 						formEls[cname].type = \w2dc;
 						formEls[cname].slots = [controls[pair[0]], controls[pair[1]]];
+						formEls[cname].controls = pair;
 						makeLine.(formEls[cname], pair[0]++"/"++pair[1]);
 						made = made.add(pair[0]);
 						made = made.add(pair[1]);
@@ -204,7 +205,8 @@ CVWidgetSpecsEditor {
 			};
 
 			if(formEls[cname].isNil and:{ made.indexOfEqual(cname).isNil }, { 
-				formEls.put(cname, ()); 
+				formEls.put(cname, ());
+				formEls[cname].slots = [spec];
 				makeLine.(formEls[cname], cname);
 				made = made.add(cname);
 			})
@@ -229,6 +231,9 @@ CVWidgetSpecsEditor {
 				formEls.pairsDo({ |el, vals|
 					vals = vals.collect(_.value);
 					vals.specSelect = specsListSpecs[vals.specSelect];
+					vals.postln;
+					vals = vals.collect({ |val| val.postln; if(val == "", { nil }, { val }) });
+					vals.postln;
 					CVCenter.finishGui(obj, environment, vals);
 				});
 //				CVCenter.finishGui();
