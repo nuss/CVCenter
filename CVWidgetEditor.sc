@@ -705,8 +705,8 @@ CVWidgetEditor {
 					])
 					.action_({ |rb|
 						switch(rb.value, 
-							0, {},
-							1, {}
+							0, { widget.activateAction(name, false, slot) },
+							1, { widget.activateAction(name, true, slot) }
 						)
 					})
 				;
@@ -744,7 +744,12 @@ CVWidgetEditor {
 			},
 			\remove, {
 				flow3.reFlow(thisEditor.tabs.views[3]);
-				[actionsList[name].nameField, actionsList[name].removeBut, actionsList[name].actionView].do(_.remove);
+				[
+					actionsList[name].nameField, 
+					actionsList[name].activate, 
+					actionsList[name].removeBut, 
+					actionsList[name].actionView
+				].do(_.remove);
 			}		
 		)
 			
