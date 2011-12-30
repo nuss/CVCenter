@@ -199,7 +199,6 @@ CVWidgetSpecsEditor {
 						makeLine.(formEls[cname], pair[0]++"/"++pair[1]);
 						made = made.add(pair[0]);
 						made = made.add(pair[1]);
-//						made.postln;
 					}) 
 				})
 			};
@@ -228,23 +227,9 @@ CVWidgetSpecsEditor {
 			.action_({ |sb|
 				
 				formEls.pairsDo({ |el, vals|
-//					vals.type.postln;
-//					switch(vals.type,
-//						\w2d, {
-							vals = vals.collect(_.value);
-							vals.specSelect = specsListSpecs[vals.specSelect];
-							CVCenter.finishGui(obj, environment, vals);
-//						},
-//						\w2dc, {
-//							CVCenter.finishGui(obj, environment, vals.collect(_.value));
-//						},
-//						\wms, {
-//							CVCenter.finishGui(obj, environment, vals.collect(_.value));
-//						},
-//						{
-//							CVCenter.finishGui(obj, environment, vals.collect(_.value));
-//						}
-//					)
+					vals = vals.collect(_.value);
+					vals.specSelect = specsListSpecs[vals.specSelect];
+					CVCenter.finishGui(obj, environment, vals);
 				});
 //				CVCenter.finishGui();
 				window.close;

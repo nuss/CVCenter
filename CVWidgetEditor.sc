@@ -603,8 +603,8 @@ CVWidgetEditor {
 					])
 					.action_({ |rb|
 						switch(rb.value, 
-							0, {},
-							1, {}
+							0, { widget.activateAction(name, false, slot) },
+							1, { widget.activateAction(name, true, slot) }
 						)
 					})
 				;

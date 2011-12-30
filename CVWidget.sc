@@ -200,43 +200,46 @@ CVWidget {
 	}
 	
 	activateAction { |name, activate=true, slot|
-		var action, actions, cv, thisGuiEnv, controller, thisAction;
+		var action, actions, cv, thisGuiEnv, wcm, controller, thisAction;
 
 		if(slot.notNil, {
 			cv = widgetCV[slot.asSymbol];
 			actions = this.wdgtActions[slot.asSymbol];
 			action = this.wdgtActions[slot.asSymbol][name.asSymbol];
 			thisGuiEnv = this.guiEnv[slot.asSymbol];
+			wcm = wdgtControllersAndModels[slot.asSymbol];
 		}, {
 			cv = widgetCV;
 			actions = this.wdgtActions;
 			action = this.wdgtActions[name.asSymbol];
 			thisGuiEnv = this.guiEnv;
+			wcm = wdgtControllersAndModels;
 		});
 		
 		if(action.notNil, {
 			switch(activate, 
 				true, {
-					if(action.keys.asArray[0].class !== SimpleController, {
+					if(action.keys.asArray[0].class != SimpleController, {
 						if(action.asArray[0][0].class === String, {
 							thisAction = action.asArray[0][0].interpret;
 						}, {
 							thisAction = action.asArray[0][0];
 						});
 						controller = cv.action_(thisAction);
-						action.put(controller, [thisAction, true]);
+						action.put(controller, [thisAction.asCompileString, true]);
 						action.removeAt(\dummy);
 					})
 				},
 				false, {
-					if(action.keys.asArray[0].class === SimpleController, {
-						action.keys.asArray[0].remove;
-						action.dummy = [action.asArray[0][0].asCompileString, false];
-						action.removeAt(action.keys.asArray[0]);
+					if(action.keys.asArray[0].class == SimpleController, {
+						controller = action.keys.asArray[0];
+						controller.remove;
+						action.put(\dummy, [action.asArray[0][0], false]);
+						action[controller] = nil;
 					})
 				}
 			);
-			wdgtControllersAndModels.actions.model.value_((
+			wcm.actions.model.value_((
 				numActions: actions.size,
 				activeActions: actions.select({ |v| v.asArray[0][1] == true }).size
 			)).changed(\value);
