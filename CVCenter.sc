@@ -991,18 +991,25 @@ CVCenter {
 	
 	/* utilities */
 	
-	*finishGui { |obj, environment, more|
-		var interpreterVars, varNames = [], envs = [];
-//		[obj, environment, type, more].postln;
+	*finishGui { |obj, ctrlName, environment, more|
+		var interpreterVars, varNames = [], envs = [], thisSpec;
+		var pSpaces = [], proxySpace;
+		var activate = true;
+		var actionName = "default";
+		
+//		[obj, ctrlName, environment, more].postln;
+		
 		interpreterVars = #[a,b,c,d,e,f,g,h,i,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z];
+
+		varNames = varNames ++ interpreterVars.select({ |n|
+			thisProcess.interpreter.perform(n) === obj;
+		});
+		currentEnvironment.pairsDo({ |k, v|
+			if(v === obj, { varNames = varNames.add("~"++(k.asString)) });
+		});
+		
 		switch(obj.class, 
 			Synth, {
-				varNames = interpreterVars.select({ |n|
-					thisProcess.interpreter.perform(n) === obj;
-				});
-				currentEnvironment.pairsDo({ |k, v|
-					if(v === obj, { varNames = varNames.add("~"++(k.asString)) });
-				});
 				environment !? { 
 					envs = interpreterVars.select({ |n|
 						thisProcess.interpreter.perform(n) === environment;
@@ -1017,30 +1024,82 @@ CVCenter {
 					})
 				};
 				varNames = varNames++envs;
-//				varNames.postln;
-
-				"passid in: %\n".postf([obj, environment, more]);
+			},
+			NodeProxy, {
+				// the NodeProxy passed in could be part of a ProxySpace
+				if(varNames.size < 1, {
+					pSpaces = pSpaces ++ interpreterVars.select({ |n|
+						thisProcess.interpreter.perform(n).class === ProxySpace;
+					});
+					currentEnvironment.pairsDo({ |k, v|
+						if(v.class === ProxySpace, { pSpaces = pSpaces.add("~"++k) });
+					});
+					pSpaces.do({ |p|
+						[p, p.class].postln;
+						if(p.class === Symbol, {
+							proxySpace = thisProcess.interpreter.perform(p);
+						});
+						if(p.class === String, {
+							proxySpace = p.interpret;
+						});
+						if(proxySpace.respondsTo(\envir), {
+							proxySpace.envir.pairsDo({ |k, v|
+								[k, v, obj].postln;
+								if(v === obj, {
+									varNames = varNames.add(p.asString++"['"++k++"']");
+								})
+							})
+						})
+					})
+				})
+				
 			},
 			Ndef, {
-				
+				varNames = varNames.add(obj.asString);
 			}
 		);
+		
+		if(more.specEnterText.notNil and:{
+			more.specEnterText.interpret.isKindOf(ControlSpec)
+		}, {
+			thisSpec = more.specEnterText.interpret;
+		}, {
+			thisSpec = more.specSelect;
+		});
+
+		"pSpaces: %\n".postf(pSpaces);
+		"varNames: %\n".postf(varNames);
+		"more: %\n".postf(more);
 			
 		if(more.type.notNil, {
 			if(more.type === \w2d or:{ more.type === \w2dc }, {
 				#[lo, hi].do({ |slot, i|
-					this.use(more.cName, more.specSelect, more.slots[i], more.enterTab, slot);
+					this.use(more.cName, thisSpec, more.slots[i], more.enterTab, slot);
+					varNames.do({ |v, j|
+						if(j != 0, { activate = false; actionName = actionName++j });
+						this.addActionAt(more.cName, actionName, "{ |cv|"+v++".set('"++ctrlName++"', cv.value) }", slot, activate);
+					})
 				})
 			}, {
 				if(more.type === \wms, {
 					more.slots.do({ |sl, i|
-						this.use(more.cName.asString++i, more.specSelect, sl, more.enterTab);
+						this.use(more.cName.asString++i, thisSpec, sl, more.enterTab);
+//						varNames.do({ |v, j|
+//							if(j != 0, { activate = false });
+//							this.addActionAt(more.cName, "{ |cv|"+v++".set('"++ctrlName++"', cv.value) }", slot, activate);
+//						})
 					})
 				})		
 			})
 		}, {
-			this.use(more.cName, more.specSelect, more.slots[0], more.enterTab);
-		})
+			this.use(more.cName, thisSpec, more.slots[0], more.enterTab);
+			varNames.do({ |v, j|
+				if(j != 0, { activate = false; actionName = actionName++j });
+				this.addActionAt(more.cName, actionName, "{ |cv|"+v++".set('"++ctrlName++"', cv.value) }", active: activate);
+			})
+		});
+		
+		
 	}
 		
 }

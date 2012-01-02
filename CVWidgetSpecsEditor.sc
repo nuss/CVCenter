@@ -8,7 +8,7 @@ CVWidgetSpecsEditor {
 	init { |obj, name, controls, pairs2D, metadata, environment|
 		var object;
 //		var cName, specEnterText, specSelect, enterTab;
-		var wdgtName;
+		var wdgtName, windowTitle;
 		var specsList, specsListSpecs, selectMatch;
 		var cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect, enterTabRect;
 		var staticTextFont, staticTextColor, textFieldFont, selectFont, textFieldFontColor, textFieldBg;
@@ -40,17 +40,33 @@ CVWidgetSpecsEditor {
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 		
-		if(name.isNil or:{ controls.isNil }, {
-			Error("CVWidgetSpecsEditor is a utilty-class, only to be used in connection with cvcGui and the like").throw;
+		if(object.class !== NodeProxy, {
+			if(name.isNil or:{ controls.isNil }, {
+				Error("CVWidgetSpecsEditor is a utilty-class, only to be used in connection with cvcGui and the like").throw;
+			})
+		}, {
+			if(controls.isNil, {
+				Error("CVWidgetSpecsEditor is a utilty-class, only to be used in connection with cvcGui and the like").throw;
+			})
 		});
 		
-		lines = controls.size;
+		if(pairs2D.isNil, {
+			lines = controls.size;
+		}, {
+			lines = controls.size-(pairs2D.size);
+		});
 		
-		window = Window("Specs:"+name, Rect(
+		switch(object.class,
+			Synth, { windowTitle = "Synth('"++name++"')" },
+			Ndef, { windowTitle = object.asString },
+			{ windowTitle = object.asString++", (node-ID:"+object.asNodeID++")" }
+		);
+		
+		window = Window("Specs:"+windowTitle, Rect(
 			Window.screenBounds.width-650/2, 
-			Window.screenBounds.height-(lines * 25 + 40)/2, 
+			Window.screenBounds.height-(lines * 25 + 65)/2, 
 			650, 
-			lines * 25 + 40
+			lines * 25 + 65
 		), scroll: true).userCanClose_(false);
 		
 		window.view.decorator = flow = FlowLayout(window.bounds.insetBy(5));
@@ -66,7 +82,7 @@ CVWidgetSpecsEditor {
 		flow.shift(5, 0);
 		StaticText(window, cNameEnterTextRect)
 			.font_(staticTextFont)
-			.string_(" widget/key/spec")
+			.string_(" widget-key")
 		;
 
 		flow.shift(5, 0);
@@ -169,7 +185,7 @@ CVWidgetSpecsEditor {
 		made = [];
 
 		controls.pairsDo({ |cname, spec, i|
-			[cname, spec].postln;
+//			[cname, spec].postln;
 			if(spec.class === Array, {
 				if(spec.size == 2, {
 					formEls.put(cname, ());
@@ -181,6 +197,7 @@ CVWidgetSpecsEditor {
 					formEls.put(cname, ());
 					formEls[cname].type = \wms;
 					formEls[cname].slots = spec;
+					
 					makeLine.(formEls[cname], cname, spec.size);
 					made = made.add(cname);
 				})
@@ -231,10 +248,9 @@ CVWidgetSpecsEditor {
 				formEls.pairsDo({ |el, vals|
 					vals = vals.collect(_.value);
 					vals.specSelect = specsListSpecs[vals.specSelect];
-					vals.postln;
-					vals = vals.collect({ |val| val.postln; if(val == "", { nil }, { val }) });
-					vals.postln;
-					CVCenter.finishGui(obj, environment, vals);
+					vals = vals.collect({ |val| if(val == "", { nil }, { val }) });
+//					vals.postln;
+					CVCenter.finishGui(obj, el, environment, vals);
 				});
 //				CVCenter.finishGui();
 				window.close;
