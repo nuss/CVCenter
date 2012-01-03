@@ -166,6 +166,16 @@ CVWidgetSpecsEditor {
 			metadata !? {
 				if(metadata.keys.includes(specName.asSymbol), {
 					selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == metadata[specName.asSymbol].asSpec });
+				});
+				metadata.pairsDo({ |k, spec|
+					if(spec.asSpec.isKindOf(ControlSpec), {
+						if(specsListSpecs.indexOfEqual(spec.asSpec).isNil, {
+							specsList = specsList.add("custom:"+(spec.asSpec));
+							elem.specSelect.items_(specsList);
+							specsListSpecs = specsListSpecs.add(spec.asSpec);
+							selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
+						})
+					})
 				})
 			};
 			selectMatch !? {

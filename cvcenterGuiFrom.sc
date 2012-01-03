@@ -24,7 +24,6 @@
 		}, {
 			name = nil;
 		});
-//		[this, this.group, this.objects, this.nodeMap].postln;
 		CVWidgetSpecsEditor(this, name, cDict, pairs2D);
 	}
 

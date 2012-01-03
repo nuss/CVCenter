@@ -982,9 +982,7 @@ CVWidget {
 				})
 			});
 			
-//			"before in cvSpec.controller: %\n".postf(widgetCV.spec);
 			widgetCV.spec_(theChanger.value);
-//			"after in cvSpec.controller: %\n".postf(widgetCV.spec);
 			
 			if(this.class === CVWidgetKnob, {
 				block { |break|
@@ -1119,7 +1117,6 @@ CVWidget {
 						if(thisGuiEnv.editor.notNil and:{
 							thisGuiEnv.editor.isClosed.not
 						}, {
-//							"triggered".postln;
 							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
 								.background_(Color.red)
 								.stringColor_(Color.white)
