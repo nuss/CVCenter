@@ -7,7 +7,6 @@ CVWidgetSpecsEditor {
 	
 	init { |obj, name, controls, pairs2D, metadata, environment|
 		var object;
-//		var cName, specEnterText, specSelect, enterTab;
 		var wdgtName, windowTitle;
 		var specsList, specsListSpecs, selectMatch;
 		var cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect, enterTabRect;
@@ -117,7 +116,6 @@ CVWidgetSpecsEditor {
 		makeLine = { |elem, cname, size|
 			
 			if(elem.type.notNil, {
-//				"type: %\n".postf(elem.type);
 				switch(elem.type,
 					\w2d, {
 						nameStr = ""+cname+"(lo/hi)";
@@ -185,7 +183,6 @@ CVWidgetSpecsEditor {
 		made = [];
 
 		controls.pairsDo({ |cname, spec, i|
-//			[cname, spec].postln;
 			if(spec.class === Array, {
 				if(spec.size == 2, {
 					formEls.put(cname, ());
@@ -249,10 +246,8 @@ CVWidgetSpecsEditor {
 					vals = vals.collect(_.value);
 					vals.specSelect = specsListSpecs[vals.specSelect];
 					vals = vals.collect({ |val| if(val == "", { nil }, { val }) });
-//					vals.postln;
 					CVCenter.finishGui(obj, el, environment, vals);
 				});
-//				CVCenter.finishGui();
 				window.close;
 			})
 		;

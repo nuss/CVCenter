@@ -491,10 +491,8 @@ CVCenter {
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
-//			("*gui:"+[key, window, widget2DKey]).postln;
 			this.gui(tab);
 		}, {
-//			("*prAddToGui:"+[key, window, widget2DKey]).postln;
 			this.prAddToGui(tab, widget2DKey);
 		});
 		
@@ -706,7 +704,6 @@ CVCenter {
 							if(loadActions, {
 								v[hilo].actions !? {
 									v[hilo].actions.pairsDo({ |ak, av|
-//										[ak, av, av.asArray].postln;
 										this.addActionAt(key, ak, av.asArray[0][0], hilo);
 									})
 								}
@@ -750,7 +747,6 @@ CVCenter {
 						if(loadActions, {
 							v.actions !? {
 								v.actions.pairsDo({ |ak, av|
-//									[ak, av, av.asArray].postln;
 									this.addActionAt(key, ak, av.asArray[0][0]);
 								})
 							}
@@ -1035,7 +1031,6 @@ CVCenter {
 						if(v.class === ProxySpace, { pSpaces = pSpaces.add("~"++k) });
 					});
 					pSpaces.do({ |p|
-						[p, p.class].postln;
 						if(p.class === Symbol, {
 							proxySpace = thisProcess.interpreter.perform(p);
 						});
@@ -1044,7 +1039,6 @@ CVCenter {
 						});
 						if(proxySpace.respondsTo(\envir), {
 							proxySpace.envir.pairsDo({ |k, v|
-								[k, v, obj].postln;
 								if(v === obj, {
 									varNames = varNames.add(p.asString++"['"++k++"']");
 								})
@@ -1067,16 +1061,17 @@ CVCenter {
 			thisSpec = more.specSelect;
 		});
 
-		"pSpaces: %\n".postf(pSpaces);
-		"varNames: %\n".postf(varNames);
-		"more: %\n".postf(more);
+//		"pSpaces: %\n".postf(pSpaces);
+//		"varNames: %\n".postf(varNames);
+//		"more: %\n".postf(more);
 			
 		if(more.type.notNil, {
 			if(more.type === \w2d or:{ more.type === \w2dc }, {
 				#[lo, hi].do({ |slot, i|
 					this.use(more.cName, thisSpec, more.slots[i], more.enterTab, slot);
 					varNames.do({ |v, j|
-						if(j != 0, { activate = false; actionName = actionName++j });
+						actionName = "default"++(j+1);
+						if(j == 0, { activate = true }, { activate = false });
 						this.addActionAt(more.cName, actionName, "{ |cv|"+v++".set('"++ctrlName++"', cv.value) }", slot, activate);
 					})
 				})
@@ -1085,8 +1080,8 @@ CVCenter {
 					more.slots.do({ |sl, i|
 						this.use(more.cName.asString++i, thisSpec, sl, more.enterTab);
 //						varNames.do({ |v, j|
-//							if(j != 0, { activate = false });
-//							this.addActionAt(more.cName, "{ |cv|"+v++".set('"++ctrlName++"', cv.value) }", slot, activate);
+//							if(j != 0, { activate = false; actionName = "default"++j });
+//							this.addActionAt(more.cName, actionName, "{ |cv|"+v++".set('"++ctrlName++"', cv.value) }", slot, activate);
 //						})
 					})
 				})		
@@ -1094,7 +1089,8 @@ CVCenter {
 		}, {
 			this.use(more.cName, thisSpec, more.slots[0], more.enterTab);
 			varNames.do({ |v, j|
-				if(j != 0, { activate = false; actionName = actionName++j });
+				actionName = "default"++(j+1);
+				if(j == 0, { activate = true }, { activate = false });
 				this.addActionAt(more.cName, actionName, "{ |cv|"+v++".set('"++ctrlName++"', cv.value) }", active: activate);
 			})
 		});

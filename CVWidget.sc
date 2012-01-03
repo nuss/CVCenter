@@ -161,7 +161,9 @@ CVWidget {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as second argument to removeAction!").throw };
 				thisGuiEnv = this.guiEnv[slot.asSymbol];
 				this.wdgtActions[slot.asSymbol][name.asSymbol] !? {
-					controller = this.wdgtActions[slot.asSymbol][name.asSymbol].keys.do(_.remove);
+					this.wdgtActions[slot.asSymbol][name.asSymbol].keys.do({ |c| 
+						if(c.class === SimpleController, { c.remove });
+					});
 					this.wdgtActions[slot.asSymbol].removeAt(name.asSymbol);
 					this.wdgtActions[slot.asSymbol].isEmpty.if { this.wdgtActions.removeAt(slot.asSymbol) };
 					wdgtControllersAndModels[slot.asSymbol].actions.model.value_((
@@ -180,7 +182,9 @@ CVWidget {
 			{
 				thisGuiEnv = this.guiEnv;
 				this.wdgtActions[name.asSymbol] !? {
-					controller = this.wdgtActions[name.asSymbol].keys.do(_.remove);
+					this.wdgtActions[name.asSymbol].keys.do({ |c|
+						if(c.class === SimpleController, { c.remove });
+					});
 					this.wdgtActions.removeAt(name.asSymbol);
 					wdgtControllersAndModels.actions.model.value_((
 						numActions: this.wdgtActions.size,

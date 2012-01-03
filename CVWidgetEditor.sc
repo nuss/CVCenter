@@ -26,7 +26,7 @@ CVWidgetEditor {
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
 		var mappingSelectItems;
 		var wdgtActions;
-		var tmp; // multipurpose, short-term var
+		var tmp; // multipurpose short-term var
 						
 		name = widgetName.asSymbol;
 				
@@ -547,7 +547,7 @@ CVWidgetEditor {
 			
 			actionName = TextField(thisEditor.tabs.views[3], flow3.bounds.width-100@20)
 				.string_("action-name")
-				.font_(staticTextFont)
+				.font_(textFieldFont)
 			;
 			
 			flow3.shift(5, 0);
@@ -570,7 +570,7 @@ CVWidgetEditor {
 
 			enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
 				.background_(Color.white)
-				.font_(Font("Helvetica", 9))
+				.font_(textFieldFont)
 				.string_("{ |cv| /* do something */ }")
 				.syntaxColorize
 			;
@@ -635,7 +635,7 @@ CVWidgetEditor {
 				
 				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
-					.font_(Font("Helvetica", 9))
+					.font_(textFieldFont)
 					.string_(action.asArray[0][0])
 					.syntaxColorize
 					.editable_(false)
