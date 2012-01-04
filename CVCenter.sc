@@ -1,3 +1,19 @@
+/* (c) Stefan Nussbaumer */
+/* 
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+*/
 
 CVCenter {
 
@@ -1073,7 +1089,19 @@ CVCenter {
 					varNames.do({ |v, j|
 						actionName = "default"++(j+1);
 						if(j == 0, { activate = true }, { activate = false });
-						this.addActionAt(more.cName, actionName, "{ |cv|"+v++".set('"++ctrlName++"', cv.value) }", slot, activate);
+						switch(more.type,
+							\w2d, {
+								if(slot === \lo, {
+									wms = "cv.value, CVCenter.at('"++ctrlName++"').hi.value";
+								}, {
+									wms = "CVCenter.at('"++ctrlName++"').lo.value, cv.value";
+								});
+								this.addActionAt(more.cName, actionName, "{ |cv|"+v++".setn('"++ctrlName++"', ["++wms++"]) }", slot, activate);
+							},
+							\w2dc, {
+								this.addActionAt(more.cName, actionName, "{ |cv|"+v++".set('"++more.controls[i]++"', cv.value) }", slot, activate);
+							}
+						)
 					})
 				})
 			}, {
