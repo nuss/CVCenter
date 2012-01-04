@@ -992,6 +992,7 @@ CVCenter {
 		var pSpaces = [], proxySpace;
 		var activate = true;
 		var actionName = "default";
+		var wms;
 		
 //		[obj, ctrlName, environment, more].postln;
 		
@@ -1078,12 +1079,21 @@ CVCenter {
 			}, {
 				if(more.type === \wms, {
 					more.slots.do({ |sl, i|
-						this.use(more.cName.asString++i, thisSpec, sl, more.enterTab);
-//						varNames.do({ |v, j|
-//							if(j != 0, { activate = false; actionName = "default"++j });
-//							this.addActionAt(more.cName, actionName, "{ |cv|"+v++".set('"++ctrlName++"', cv.value) }", slot, activate);
-//						})
-					})
+						this.use(more.cName.asString++(i+1), thisSpec, sl, more.enterTab);
+						wms = [];
+						more.slots.size.do({ |j|
+							if(this.at((more.cName.asString++(j+1)).asSymbol) === this.at((more.cName.asString++(i+1)).asSymbol), {
+								wms = wms.add("cv.value");
+							}, {
+								wms = wms.add("CVCenter.at('"++more.cName.asString++(j+1)++"').value")
+							})
+						});
+						varNames.do({ |v, j|
+							actionName = "default"++(j+1);
+							if(j == 0, { activate = true }, { activate = false });
+							this.addActionAt(more.cName.asString++(i+1), actionName, "{ |cv|"+v++".setn('"++ctrlName++"', ["++(wms.join(", "))++"]) }", active: activate);
+						})
+					});
 				})		
 			})
 		}, {
