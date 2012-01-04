@@ -615,13 +615,13 @@ CVWidgetEditor {
 				actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
 					.font_(staticTextFont)
 					.states_([
-						["activate", Color(0.1076096448114, 0.30322184313276, 0.14551632171296), Color(0.98753162717248, 0.77148428061484, 0.11016622702571)],
-						["deactivate", Color.white, Color(0.1076096448114, 0.30322184313276, 0.14551632171296)],
+						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+						["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
 					])
 					.action_({ |rb|
 						switch(rb.value, 
-							0, { widget.activateAction(name, false, slot) },
-							1, { widget.activateAction(name, true, slot) }
+							0, { [name, slot].postln; widget.activateAction(name, false, slot) },
+							1, { [name, slot].postln; widget.activateAction(name, true, slot) }
 						)
 					})
 				;
@@ -716,13 +716,13 @@ CVWidgetEditor {
 				actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
 					.font_(staticTextFont)
 					.states_([
-						["activate", Color(0.1076096448114, 0.30322184313276, 0.14551632171296), Color(0.98753162717248, 0.77148428061484, 0.11016622702571)],
-						["deactivate", Color.white, Color(0.1076096448114, 0.30322184313276, 0.14551632171296)],
+						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+						["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
 					])
 					.action_({ |rb|
 						switch(rb.value, 
-							0, { widget.activateAction(name, false, slot) },
-							1, { widget.activateAction(name, true, slot) }
+							0, { [name, slot].postln; widget.activateAction(name, false, slot) },
+							1, { [name, slot].postln; widget.activateAction(name, true, slot) }
 						)
 					})
 				;
