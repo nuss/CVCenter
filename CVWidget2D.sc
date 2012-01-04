@@ -287,7 +287,7 @@ CVWidget2D : CVWidget {
 			k.bounds_(Rect(rightBarX, v[0], 40, 13))
 			.font_(Font("Helvetica", 8))
 			.focusColor_(Color(alpha: 0))
-			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
+			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 		});
 		
 		nextY = nextY+14;
@@ -495,7 +495,7 @@ CVWidget2D : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
-				["actions ("++this.wdgtActions[v[0]].select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions[v[0]].size++")", Color(0.077916707501562, 0.085920705606104, 0.14318447501515), Color(0.31920713024337, 0.66666666666667, 0.75719983252006)]
+				["actions ("++this.wdgtActions[v[0]].select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions[v[0]].size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])
 			.action_({ |ab|
 				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {

@@ -156,7 +156,7 @@ CVWidgetKnob : CVWidget {
 		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
-			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
+			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 			.action_({ |btn|
 				if(editor.isNil or:{ editor.isClosed }, {
 					editor = CVWidgetEditor(this, thisName, 0);
@@ -341,7 +341,7 @@ CVWidgetKnob : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
-				["actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.077916707501562, 0.085920705606104, 0.14318447501515), Color(0.31920713024337, 0.66666666666667, 0.75719983252006)],
+				["actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)],
 			])
 			.action_({ |ab|
 				if(editor.isNil or:{ editor.isClosed }, {

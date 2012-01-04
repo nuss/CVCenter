@@ -260,7 +260,7 @@ CVWidgetSpecsEditor {
 				
 		flow.shift(20, 10);
 		cancelBut = Button(window, Rect(0, 0, 65, 20))
-			.states_([[ "cancel", Color(0.1076096448114, 0.30322184313276, 0.14551632171296), Color(0.98753162717248, 0.77148428061484, 0.11016622702571)]])
+			.states_([[ "cancel", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)]])
 			.action_({ |cb|  window.close })
 		;
 		

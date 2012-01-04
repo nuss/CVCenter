@@ -114,10 +114,10 @@ CVWidgetEditor {
 			tabs.tabCurve_(4);
 			tabs.labelColors_(Color.white!4);
 			labelColors = [
-				Color(241/255, 209/255, 0), //specs
+				Color(1.0, 0.3), //specs
 				Color.red, //midi
 				Color(0.0, 0.5, 0.5), //osc
-				Color(0.31920713024337, 0.66666666666667, 0.75719983252006), //actions
+				Color(0.32, 0.67, 0.76), //actions
 			];
 			labelStringColors = labelColors.collect({ |c| Color(c.red * 0.8, c.green * 0.8, c.blue * 0.8) });
 			tabs.unfocusedColors_(labelColors);

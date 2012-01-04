@@ -1151,14 +1151,14 @@ CVWidget {
 				},
 				"C", {
 					thisGuiEnv.midiLearn.states_([
-						["C", Color.white, Color(0.11468057974842, 0.38146154367376, 0.19677815686724)],
+						["C", Color.white, Color(0.11, 0.38, 0.2)],
 						["X", Color.white, Color.red]
 					]).refresh;
 					if(thisGuiEnv.editor.notNil and:{
 						thisGuiEnv.editor.isClosed.not
 					}, {
 						thisGuiEnv.editor.midiLearnBut.states_([
-							["C", Color.white, Color(0.11468057974842, 0.38146154367376, 0.19677815686724)],
+							["C", Color.white, Color(0.11, 0.38, 0.2)],
 							["X", Color.white, Color.red]
 						]).refresh;
 					})
@@ -1447,8 +1447,8 @@ CVWidget {
 			if(this.window.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[
 					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
-					Color(0.077916707501562, 0.085920705606104, 0.14318447501515),
-					Color(0.31920713024337, 0.66666666666667, 0.75719983252006),
+					Color(0.08, 0.09, 0.14),
+					Color(0.32, 0.67, 0.76),
 				]])
 			})
 		})
