@@ -204,7 +204,7 @@ CVWidget2D : CVWidget {
 				this.rangeSlider.bounds.width/2,
 				15
 			));
-			k.value_(v[1].value);
+			k.value_(v[1].value).font_(Font("Helvetica", 9.5));
 		});
 		
 		specBut.lo = Button(window)

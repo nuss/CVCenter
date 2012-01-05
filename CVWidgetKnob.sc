@@ -150,7 +150,7 @@ CVWidgetKnob : CVWidget {
 		};
 		nextY = thisXY.y+thisHeight-132;
 		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.value_(widgetCV.value)
+			.value_(widgetCV.value).font_(Font("Helvetica", 9.5))
 		;
 		nextY = nextY+numVal.bounds.height;
 		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
