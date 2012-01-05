@@ -193,6 +193,14 @@ CVWidgetKnob : CVWidget {
 			})
 		;
 		
+		if(GUI.current.name === \QtGUI, {
+			midiHead.mouseOverAction_({ |mb| 
+				mb.states_([["MIDI", Color.white, Color.red]])
+			}).mouseLeaveAction_({ |mb|
+				mb.states_([["MIDI", Color.black, Color(alpha: 0)]])
+			})
+		});
+		
 		midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
@@ -321,6 +329,19 @@ CVWidgetKnob : CVWidget {
 				).changed(\value);
 			})
 		;
+		
+		if(GUI.current.name === \QtGUI, {
+			oscEditBut.mouseOverAction_({ |oscb|
+				if(wdgtControllersAndModels.oscConnection.model.value === false, {
+					oscb.states_([["edit OSC", Color.white, Color.cyan(0.5)]]);
+				})
+			}).mouseLeaveAction_({ |oscb|
+				if(wdgtControllersAndModels.oscConnection.model.value === false, {
+					oscb.states_([["edit OSC", Color.black, Color(alpha: 0)]])
+				})
+			})
+		});
+		
 		nextY = nextY+oscEditBut.bounds.height;
 		calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
