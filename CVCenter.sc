@@ -726,10 +726,10 @@ CVCenter {
 							});
 							if(autoConnectOSC, {
 								v[hilo].osc.cmdName !? {
-									v[hilo].osc.addr.class;
+//									v[hilo].postln;
 									cvWidgets[key].oscConnect(
-										v[hilo].osc.addr.ip, 
-										v[hilo].osc.addr.port, 
+										v[hilo].osc.addr !? { v[hilo].osc.addr.ip }, 
+										v[hilo].osc.addr !? { v[hilo].osc.addr.port }, 
 										v[hilo].osc.cmdName, 
 										v[hilo].osc.msgIndex, 
 										hilo
@@ -769,9 +769,10 @@ CVCenter {
 						});
 						if(autoConnectOSC, {
 							v.osc.cmdName !? {
+//								v.osc.postln;
 								cvWidgets[key].oscConnect(
-									v.osc.addr.ip, 
-									v.osc.addr.port, 
+									v.osc.addr !? { v.osc.addr.ip }, 
+									v.osc.addr !? { v.osc.addr.port }, 
 									v.osc.cmdName, 
 									v.osc.msgIndex 
 								);
@@ -1096,10 +1097,10 @@ CVCenter {
 								}, {
 									wms = "CVCenter.at('"++ctrlName++"').lo.value, cv.value";
 								});
-								this.addActionAt(more.cName, actionName, "{ |cv|"+v++".setn('"++ctrlName++"', ["++wms++"]) }", slot, activate);
+								this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', ["++wms++"]) }}", slot, activate);
 							},
 							\w2dc, {
-								this.addActionAt(more.cName, actionName, "{ |cv|"+v++".set('"++more.controls[i]++"', cv.value) }", slot, activate);
+								this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".set('"++more.controls[i]++"', cv.value) }}", slot, activate);
 							}
 						)
 					})
@@ -1119,7 +1120,7 @@ CVCenter {
 						varNames.do({ |v, j|
 							actionName = "default"++(j+1);
 							if(j == 0, { activate = true }, { activate = false });
-							this.addActionAt(more.cName.asString++(i+1), actionName, "{ |cv|"+v++".setn('"++ctrlName++"', ["++(wms.join(", "))++"]) }", active: activate);
+							this.addActionAt(more.cName.asString++(i+1), actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', ["++(wms.join(", "))++"]) }}", active: activate);
 						})
 					});
 				})		
@@ -1129,7 +1130,7 @@ CVCenter {
 			varNames.do({ |v, j|
 				actionName = "default"++(j+1);
 				if(j == 0, { activate = true }, { activate = false });
-				this.addActionAt(more.cName, actionName, "{ |cv|"+v++".set('"++ctrlName++"', cv.value) }", active: activate);
+				this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".set('"++ctrlName++"', cv.value) }}", active: activate);
 			})
 		});
 		
