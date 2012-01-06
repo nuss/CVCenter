@@ -620,8 +620,8 @@ CVWidgetEditor {
 					])
 					.action_({ |rb|
 						switch(rb.value, 
-							0, { [name, slot].postln; widget.activateAction(name, false, slot) },
-							1, { [name, slot].postln; widget.activateAction(name, true, slot) }
+							0, { widget.activateAction(name, false, slot) },
+							1, { widget.activateAction(name, true, slot) }
 						)
 					})
 				;
@@ -721,8 +721,8 @@ CVWidgetEditor {
 					])
 					.action_({ |rb|
 						switch(rb.value, 
-							0, { [name, slot].postln; widget.activateAction(name, false, slot) },
-							1, { [name, slot].postln; widget.activateAction(name, true, slot) }
+							0, { widget.activateAction(name, false, slot) },
+							1, { widget.activateAction(name, true, slot) }
 						)
 					})
 				;

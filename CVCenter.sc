@@ -720,7 +720,7 @@ CVCenter {
 							if(loadActions, {
 								v[hilo].actions !? {
 									v[hilo].actions.pairsDo({ |ak, av|
-										this.addActionAt(key, ak, av.asArray[0][0], hilo);
+										this.addActionAt(key, ak, av.asArray[0][0], hilo, av.asArray[0][1]);
 									})
 								}
 							});
@@ -763,7 +763,7 @@ CVCenter {
 						if(loadActions, {
 							v.actions !? {
 								v.actions.pairsDo({ |ak, av|
-									this.addActionAt(key, ak, av.asArray[0][0]);
+									this.addActionAt(key, ak, av.asArray[0][0], active: av.asArray[0][1]);
 								})
 							}
 						});

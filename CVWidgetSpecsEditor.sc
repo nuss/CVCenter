@@ -131,7 +131,6 @@ CVWidgetSpecsEditor {
 		#formEls, cMatrix = ()!2;
 
 		makeLine = { |elem, cname, size|
-			
 			if(elem.type.notNil, {
 				switch(elem.type,
 					\w2d, {
@@ -141,7 +140,11 @@ CVWidgetSpecsEditor {
 					\w2dc, {
 						nameStr = ""+cname;
 						specName = cname.split($/);
-						specName = specName[0]++(specName[1].firstToUpper);
+//						if(pairs2D.findKeyForEqualValue(specName).notNil, {
+//							specName = pairs2D.findKeyForEqualValue(specName);
+//						}, {
+							specName = specName[0]++(specName[1].firstToUpper);
+//						})
 					},
 					{
 						nameStr = ""+cname+"("++size++")";
@@ -234,6 +237,7 @@ CVWidgetSpecsEditor {
 							made.includes(cname).not
 						}
 					}, { 
+//						cname.postln;
 						formEls.put(cname, ());
 						formEls[cname].type = \w2dc;
 						formEls[cname].slots = [controls[pair[0]], controls[pair[1]]];
