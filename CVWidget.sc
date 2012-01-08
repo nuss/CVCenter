@@ -626,7 +626,11 @@ CVWidget {
 	oscConnect { |ip, port, name, oscMsgIndex, key|
 		var intPort;
 		
-		if(ip.size > 0 and:{ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not }, {
+		if(ip.size > 0 and:{
+			"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not and:{
+				ip != "nil"
+			}
+		}, {
 			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
 		});
 		

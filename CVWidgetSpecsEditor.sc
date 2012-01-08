@@ -272,7 +272,6 @@ CVWidgetSpecsEditor {
 		sendBut = Button(window, Rect(0, 0, 65, 20))
 			.states_([[ "gui", Color.white, Color.red ]])
 			.action_({ |sb|
-				
 				formEls.pairsDo({ |el, vals|
 					vals = vals.collect(_.value);
 					vals.specSelect = specsListSpecs[vals.specSelect];
