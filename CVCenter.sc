@@ -748,8 +748,8 @@ CVCenter {
 								v[hilo].osc.cmdName !? {
 									v[hilo].osc.addr.class;
 									cvWidgets[key].oscConnect(
-										v[hilo].osc.addr.ip, 
-										v[hilo].osc.addr.port, 
+										v[hilo].osc.addr !? { v[hilo].osc.addr.ip }, 
+										v[hilo].osc.addr !? { v[hilo].osc.addr.port }, 
 										v[hilo].osc.cmdName, 
 										v[hilo].osc.msgIndex, 
 										hilo
@@ -790,8 +790,8 @@ CVCenter {
 						if(autoConnectOSC, {
 							v.osc.cmdName !? {
 								cvWidgets[key].oscConnect(
-									v.osc.addr.ip, 
-									v.osc.addr.port, 
+									v.osc.addr !? { v.osc.addr.ip },
+									v.osc.addr !? { v.osc.addr.port },
 									v.osc.cmdName, 
 									v.osc.msgIndex 
 								);
