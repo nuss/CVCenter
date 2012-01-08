@@ -208,7 +208,7 @@ CVCenter {
 							val.window.close;
 						},
 						CVWidget2D, {
-							[\lo, \hi].do({ |hilo|
+							#[lo, hi].do({ |hilo|
 								val[hilo] !? { val[hilo].window.close };
 							})
 						}
@@ -624,16 +624,16 @@ CVCenter {
 		var lib, midiOscEnvs = (), successFunc;
 		successFunc = { |f|
 			lib = Library();
-			lib.put( \all, ());
+			lib.put(\all, ());
 			all.pairsDo({ |k, cv|
 				lib[\all].put(k, ());
 				switch(cvWidgets[k].class,
 					CVWidget2D, {
 						lib[\all][k].wdgtClass = CVWidget2D;
-						[\lo, \hi].do({ |hilo|
+						#[lo, hi].do({ |hilo|
 							lib[\all][k][hilo] = (
-								spec: all[k][hilo].spec,
-								val: all[k][hilo].value,
+								spec: cvWidgets[k].widgetCV[hilo].spec,
+								val: cvWidgets[k].widgetCV[hilo].value,
 								actions: widgetStates[k].actions !? { widgetStates[k].actions[hilo] },
 								osc: (
 									addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
@@ -661,8 +661,8 @@ CVCenter {
 					},
 					CVWidgetKnob, {
 						lib[\all][k] = (
-							spec: all[k].spec,
-							val: all[k].value,
+							spec: cvWidgets[k].widgetCV.spec,
+							val: cvWidgets[k].widgetCV.value,
 							actions: widgetStates[k].actions,
 							osc: (
 								addr: cvWidgets[k].midiOscEnv.oscResponder !? { 
@@ -729,7 +729,7 @@ CVCenter {
 			lib[\all].pairsDo({ |key, v|
 				switch(v.wdgtClass,
 					CVWidget2D, {
-						[\lo, \hi].do({ |hilo|
+						#[lo, hi].do({ |hilo|
 							this.use(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
 							cvWidgets[key].setMidiMode(v[hilo].midi.midiMode, hilo)
 								.setMidiMean(v[hilo].midi.midiMean, hilo)
