@@ -1093,9 +1093,9 @@ CVCenter {
 						switch(more.type,
 							\w2d, {
 								if(slot === \lo, {
-									wms = "cv.value, CVCenter.at('"++ctrlName++"').hi.value";
+									wms = "cv.value, CVCenter.at('"++more.cName++"').hi.value";
 								}, {
-									wms = "CVCenter.at('"++ctrlName++"').lo.value, cv.value";
+									wms = "CVCenter.at('"++more.cName++"').lo.value, cv.value";
 								});
 								this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', ["++wms++"]) }}", slot, activate);
 							},
