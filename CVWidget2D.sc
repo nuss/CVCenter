@@ -299,7 +299,7 @@ CVWidget2D : CVWidget {
 			.states_([["MIDI", Color.black, Color(alpha: 0)]]);
 			
 			if(GUI.current.name === \QtGUI, {
-				k.mouseOverAction_({ |mb| 
+				k.mouseEnterAction_({ |mb| 
 					mb.states_([["MIDI", Color.white, Color.red]])
 				}).mouseLeaveAction_({ |mb|
 					mb.states_([["MIDI", Color.black, Color(alpha: 0)]])
@@ -477,7 +477,7 @@ CVWidget2D : CVWidget {
 			});
 			
 			if(GUI.current.name === \QtGUI, {
-				k.mouseOverAction_({ |oscb|
+				k.mouseEnterAction_({ |oscb|
 					if(wdgtControllersAndModels[v[0]].oscConnection.model.value === false, {
 						oscb.states_([["edit OSC", Color.white, Color.cyan(0.5)]]);
 					})
