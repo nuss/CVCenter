@@ -726,7 +726,7 @@ CVWidgetEditor {
 						)
 					})
 				;
-				
+				"active: %\n".postf(active);
 				switch(active, 
 					true, {
 						actionsList[name].activate.value_(1);
@@ -759,13 +759,14 @@ CVWidgetEditor {
 				;
 			},
 			\remove, {
-				flow3.reFlow(thisEditor.tabs.views[3]);
 				[
 					actionsList[name].nameField, 
 					actionsList[name].activate, 
 					actionsList[name].removeBut, 
 					actionsList[name].actionView
 				].do(_.remove);
+				flow3.resetTo(0@15);
+				flow3.place(thisEditor.tabs.views[3]);
 			}		
 		)
 			

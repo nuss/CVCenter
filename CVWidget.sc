@@ -162,7 +162,7 @@ CVWidget {
 					thisGuiEnv.editor.isClosed.not;
 				}, {
 					thisGuiEnv.editor.amendActionsList(
-						this, \add, name.asSymbol, this.wdgtActions[name.asSymbol];
+						this, \add, name.asSymbol, this.wdgtActions[name.asSymbol], active: active;
 					)
 				})
 			}
