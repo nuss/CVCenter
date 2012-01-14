@@ -672,7 +672,7 @@ CVCenter {
 				lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
 			});
 
-			if(GUI.current.asString == "QtGUI", {
+			if(GUI.scheme === QtGUI, {
 				lib.writeTextArchive(*f);
 			}, {
 				lib.writeTextArchive(f);
@@ -680,7 +680,7 @@ CVCenter {
 			lib = nil;
 		};
 		if(path.isNil, {
-			if(GUI.current.asString != "QtGUI", {
+			if(GUI.scheme !== QtGUI, {
 				File.saveDialog(
 					prompt: "Save your current setup to a file",
 					defaultName: "Setup",
@@ -696,7 +696,7 @@ CVCenter {
 		var lib, midiOscEnvs, successFunc;
 
 		successFunc = { |f|
-			if(GUI.current.asString == "QtGUI", {
+			if(GUI.scheme === QtGUI, {
 				lib = Library.readTextArchive(*f);
 			}, {
 				lib = Library.readTextArchive(f);
@@ -797,7 +797,7 @@ CVCenter {
 		};
 
 		if(path.isNil, {
-			if(GUI.current.asString == "QtGUI", {
+			if(GUI.scheme === QtGUI, {
 				QDialog.getPaths(successFunc, allowsMultiple: false);
 			}, {
 				File.openDialog(
@@ -1018,8 +1018,10 @@ CVCenter {
 		varNames = varNames ++ interpreterVars.select({ |n|
 			thisProcess.interpreter.perform(n) === obj;
 		});
-		currentEnvironment.pairsDo({ |k, v|
-			if(v === obj, { varNames = varNames.add("~"++(k.asString)) });
+		if(currentEnvironment.class !== ProxySpace, {
+			currentEnvironment.pairsDo({ |k, v|
+				if(v === obj, { varNames = varNames.add("~"++(k.asString)) });
+			})
 		});
 		
 		switch(obj.class, 
@@ -1045,8 +1047,10 @@ CVCenter {
 					pSpaces = pSpaces ++ interpreterVars.select({ |n|
 						thisProcess.interpreter.perform(n).class === ProxySpace;
 					});
-					currentEnvironment.pairsDo({ |k, v|
-						if(v.class === ProxySpace, { pSpaces = pSpaces.add("~"++k) });
+					if(currentEnvironment.class !== ProxySpace, {
+						currentEnvironment.pairsDo({ |k, v|
+							if(v.class === ProxySpace, { pSpaces = pSpaces.add("~"++k) });
+						})
 					});
 					pSpaces.do({ |p|
 						if(p.class === Symbol, {

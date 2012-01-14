@@ -40,7 +40,7 @@ CVWidget2D : CVWidget {
 		var nextY, rightBarX, oscEditButHeight, right, left;
 		var actionLo, actionHi;
 		
-		if(GUI.current.name === \QtGUI, { 
+		if(GUI.scheme === QtGUI, { 
 			CV.viewDictionary[QSlider2D].props_(#[xValue, yValue]);
 			CV.viewDictionary[QRangeSlider].props_(#[loValue, hiValue]);
 		});
@@ -298,7 +298,7 @@ CVWidget2D : CVWidget {
 			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, Color(alpha: 0)]]);
 			
-			if(GUI.current.name === \QtGUI, {
+			if(GUI.scheme === QtGUI, {
 				k.mouseEnterAction_({ |mb| 
 					mb.states_([["MIDI", Color.white, Color.red]])
 				}).mouseLeaveAction_({ |mb|
@@ -476,7 +476,7 @@ CVWidget2D : CVWidget {
 				).changed(\value);
 			});
 			
-			if(GUI.current.name === \QtGUI, {
+			if(GUI.scheme === QtGUI, {
 				k.mouseEnterAction_({ |oscb|
 					if(wdgtControllersAndModels[v[0]].oscConnection.model.value === false, {
 						oscb.states_([["edit OSC", Color.white, Color.cyan(0.5)]]);
