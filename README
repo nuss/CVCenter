@@ -22,4 +22,4 @@ Under Linux, using the latest Developer-Version of SuperCollider this will resol
 
 If not present yet create a directory 'Extensions' and put CVCenter in there.
 
-Note: if you're on Linux you will need to have installed the latest beta-version of SuperCollider (3.5 beta) as CVCenter needs QtGUI to be installed.
+Note: if you're on Linux you will need to have installed the developer-version of SuperCollider (3.5~dev) as CVCenter needs QtGUI to be installed.
