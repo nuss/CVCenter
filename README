@@ -3,7 +3,7 @@ CVCenter s supposed to be a graphical control-interface that lets you connect sy
 For more info check out CVCenter.html resp. CVWidget.html.
 
 Installation: 
-1) get SuperCollider from http://supercollider.sourceforge.net/downloads/
+1) get SuperCollider from http://sourceforge.net/projects/supercollider/files/
 2) install the required extensions via the Quarks-mechanism:
 	a) Conductor
 	b) TabbedView
