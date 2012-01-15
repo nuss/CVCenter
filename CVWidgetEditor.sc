@@ -726,7 +726,7 @@ CVWidgetEditor {
 						)
 					})
 				;
-				"active: %\n".postf(active);
+
 				switch(active, 
 					true, {
 						actionsList[name].activate.value_(1);
