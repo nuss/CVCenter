@@ -31,13 +31,9 @@ CVWidgetSpecsEditor {
 		var formEls, nameStr, makeLine, sendBut, cancelBut;
 		var flow, lines, allEls, allWidth;
 		var cMatrix, specName, made;
-		
-//		controls.postln;
 				
 		object = obj;
 		
-//		#cName, specEnterText, specSelect, enterTab = ()!4;
-
 		#cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect, enterTabRect = Rect.new!5;
 		[cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect, enterTabRect].do({ |e|
 			e.height_(20).left_(0).top_(0);
@@ -71,7 +67,7 @@ CVWidgetSpecsEditor {
 		}, {
 			lines = controls.size-(pairs2D.size);
 		});
-		
+				
 		switch(object.class,
 			Synth, { windowTitle = "Synth('"++name++"')" },
 			Ndef, { windowTitle = object.asString },
@@ -79,8 +75,8 @@ CVWidgetSpecsEditor {
 		);
 		
 		window = Window("Specs:"+windowTitle, Rect(
-			Window.screenBounds.width-650/2, 
-			Window.screenBounds.height-(lines * 25 + 65)/2, 
+			(Window.screenBounds.width-650).div(2), 
+			(Window.screenBounds.height-(lines * 25 + 65)).div(2), 
 			650, 
 			lines * 25 + 65
 		), scroll: true).userCanClose_(false);
@@ -258,7 +254,7 @@ CVWidgetSpecsEditor {
 			
 		});
 		
-//		cMatrix.postln;
+		cMatrix.postln;
 		
 		allWidth = allEls.collect({ |e| e.width }).sum + (allEls.size-1*5);
 				
