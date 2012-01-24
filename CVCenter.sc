@@ -1076,9 +1076,9 @@ CVCenter {
 		);
 		
 		if(more.specEnterText.notNil and:{
-			more.specEnterText.interpret.isKindOf(ControlSpec)
+			more.specEnterText.interpret.asSpec.isKindOf(ControlSpec)
 		}, {
-			thisSpec = more.specEnterText.interpret;
+			thisSpec = more.specEnterText.interpret.asSpec;
 		}, {
 			thisSpec = more.specSelect;
 		});

@@ -88,7 +88,7 @@ CVWidgetSpecsEditor {
 		flow.shift(0, 0);
 		StaticText(window, cNameRect)
 			.font_(staticTextFont)
-			.string_(" argname")
+			.string_(" argname(s)")
 		;
 
 		flow.shift(5, 0);
@@ -126,7 +126,8 @@ CVWidgetSpecsEditor {
 				
 		#formEls, cMatrix = ()!2;
 
-		makeLine = { |elem, cname, size|
+		makeLine = { |elem, cname, size, pairs2D|
+//			("input:"+[elem.type, cname, size]).postln;
 			if(elem.type.notNil, {
 				switch(elem.type,
 					\w2d, {
@@ -136,11 +137,9 @@ CVWidgetSpecsEditor {
 					\w2dc, {
 						nameStr = ""+cname;
 						specName = cname.split($/);
-//						if(pairs2D.findKeyForEqualValue(specName).notNil, {
-//							specName = pairs2D.findKeyForEqualValue(specName);
-//						}, {
-							specName = specName[0]++(specName[1].firstToUpper);
-//						})
+						specName = pairs2D.select({ |v, k| 
+							v == [specName[0].asSymbol, specName[1].asSymbol] 
+						}).keys.asArray[0];
 					},
 					{
 						nameStr = ""+cname+"("++size++")";
@@ -179,23 +178,45 @@ CVWidgetSpecsEditor {
 			;
 			
 			selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == cname.asSymbol.asSpec });
+			elem.specSelect.value_(selectMatch);
+			
 			metadata !? {
 				if(metadata.keys.includes(specName.asSymbol), {
 					selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == metadata[specName.asSymbol].asSpec });
 				});
-				metadata.pairsDo({ |k, spec|
-					if(spec.asSpec.isKindOf(ControlSpec), {
-						if(specsListSpecs.indexOfEqual(spec.asSpec).isNil, {
-							specsList = specsList.add("custom:"+(spec.asSpec));
-							elem.specSelect.items_(specsList);
-							specsListSpecs = specsListSpecs.add(spec.asSpec);
-							selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
+				block { |break|
+					metadata.pairsDo({ |k, spec|
+						if(spec.asSpec.isKindOf(ControlSpec), {
+							if(specsListSpecs.indexOfEqual(spec.asSpec).isNil, {
+								if(pairs2D.notNil, {
+									if(pairs2D.keys.includes(specName) and:{ 
+										pairs2D[specName].includes(k)
+									}, {
+										specsList = specsList.add(specName.asString++":"+(spec.asSpec));
+										elem.specSelect.items_(specsList);
+										specsListSpecs = specsListSpecs.add(spec.asSpec);
+										Spec.add(k, spec); // make spec available for all subsequent selections
+										selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
+										break.value(elem.specSelect.value_(selectMatch));
+									});
+								}, {
+									specsList = specsList.add(k.asString++":"+(spec.asSpec));
+									elem.specSelect.items_(specsList);
+									specsListSpecs = specsListSpecs.add(spec.asSpec);
+									Spec.add(k, spec); // make spec available for all subsequent selections
+									selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
+									elem.specSelect.value_(selectMatch);
+									break.value(elem.specSelect.value_(selectMatch));
+								});
+							}, {
+								if(k == cname, {
+									selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
+									break.value(elem.specSelect.value_(selectMatch));
+								})
+							})
 						})
 					})
-				})
-			};
-			selectMatch !? {
-				elem.specSelect.value_(selectMatch);
+				}
 			};
 		
 			flow.shift(5, 0);
@@ -208,20 +229,19 @@ CVWidgetSpecsEditor {
 		
 		made = [];
 
-		controls.pairsDo({ |cname, spec, i|
-			if(spec.class === Array, {
-				if(spec.size == 2, {
+		controls.pairsDo({ |cname, val, i|
+			if(val.class === Array, {
+				if(val.size == 2, {
 					formEls.put(cname, ());
 					formEls[cname].type = \w2d;
-					formEls[cname].slots = spec;
+					formEls[cname].slots = val;
 					makeLine.(formEls[cname], cname);
 					made = made.add(cname);
 				}, {
 					formEls.put(cname, ());
 					formEls[cname].type = \wms;
-					formEls[cname].slots = spec;
-					
-					makeLine.(formEls[cname], cname, spec.size);
+					formEls[cname].slots = val;
+					makeLine.(formEls[cname], cname, val.size);
 					made = made.add(cname);
 				})
 			});
@@ -229,16 +249,15 @@ CVWidgetSpecsEditor {
 			pairs2D !? {
 				pairs2D.pairsDo({ |k, pair| 
 					if(pair.includes(cname) and:{ 
-						spec.class !== Array and:{ 
+						val.class !== Array and:{ 
 							made.includes(cname).not
 						}
 					}, { 
-//						cname.postln;
 						formEls.put(cname, ());
 						formEls[cname].type = \w2dc;
 						formEls[cname].slots = [controls[pair[0]], controls[pair[1]]];
 						formEls[cname].controls = pair;
-						makeLine.(formEls[cname], pair[0]++"/"++pair[1]);
+						makeLine.(formEls[cname], pair[0]++"/"++pair[1], pairs2D: pairs2D);
 						made = made.add(pair[0]);
 						made = made.add(pair[1]);
 					}) 
@@ -247,14 +266,14 @@ CVWidgetSpecsEditor {
 
 			if(formEls[cname].isNil and:{ made.indexOfEqual(cname).isNil }, { 
 				formEls.put(cname, ());
-				formEls[cname].slots = [spec];
+				formEls[cname].slots = [val];
 				makeLine.(formEls[cname], cname);
 				made = made.add(cname);
 			})
 			
 		});
 		
-		cMatrix.postln;
+//		cMatrix.postln;
 		
 		allWidth = allEls.collect({ |e| e.width }).sum + (allEls.size-1*5);
 				
