@@ -9,8 +9,7 @@ Installation:
 	b) TabbedView
 	c) wslib (optional)
 	see the Quarks-helpfile for more information on how to do this.
-2) after installing SuperCollider and the required extensions put all content of CVCenter in
-your user-app-support directory. Execute the following line SuperCollder to see where that is:
+2) after installing SuperCollider and the required extensions put all content of CVCenter in your user-app-support directory. Execute the following line SuperCollder to see where that is:
 
 Platform.userAppSupportDir
 
