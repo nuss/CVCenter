@@ -18,11 +18,11 @@
 CVWidgetSpecsEditor {
 	var <window;
 
-	*new { |object, wdgtName, controlsDict, pairs2D, metadata, environment|
-		^super.new.init(object, wdgtName, controlsDict, pairs2D, metadata, environment)
+	*new { |displayDialog, object, wdgtName, controlsDict, pairs2D, metadata, environment|
+		^super.new.init(displayDialog, object, wdgtName, controlsDict, pairs2D, metadata, environment)
 	}
 	
-	init { |obj, name, controls, pairs2D, metadata, environment|
+	init { |displayDialog, obj, name, controls, pairs2D, metadata, environment|
 		var object;
 		var wdgtName, windowTitle;
 		var specsList, specsListSpecs, selectMatch;
