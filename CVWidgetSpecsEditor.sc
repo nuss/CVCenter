@@ -192,20 +192,32 @@ CVWidgetSpecsEditor {
 									if(pairs2D.keys.includes(specName) and:{ 
 										pairs2D[specName].includes(k)
 									}, {
-										specsList = specsList.add(specName.asString++":"+(spec.asSpec));
-									});
+										specsList.includes(specName.asString++":"+(spec.asSpec)).not.if{
+											specsList = specsList.add(specName.asString++":"+(spec.asSpec));
+											// make spec available for all subsequent selections
+											Spec.add(specName, spec); 										}
+									})
 								}, {
 									specsList = specsList.add(k.asString++":"+(spec.asSpec));
-								});
+									// make spec available for all subsequent selections
+									Spec.add(k, spec); 								});
 								elem.specSelect.items_(specsList);
-								specsListSpecs = specsListSpecs.add(spec.asSpec);
-								Spec.add(k, spec); // make spec available for all subsequent selections
+								specsListSpecs.includes(spec.asSpec).not.if{
+									specsListSpecs = specsListSpecs.add(spec.asSpec);
+								};
+								
 								selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
 								break.value(elem.specSelect.value_(selectMatch));
 							}, {
 								if(k == cname, {
 									selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
 									break.value(elem.specSelect.value_(selectMatch));
+								});
+								if(pairs2D.notNil and:{ pairs2D[specName].notNil }, {
+									if(pairs2D[specName].includes(k), {
+										selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
+										break.value(elem.specSelect.value_(selectMatch));
+									})
 								})
 							})
 						})
