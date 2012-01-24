@@ -229,8 +229,18 @@ CVWidgetSpecsEditor {
 			elem.enterTab = TextField(window, enterTabRect)
 				.font_(textFieldFont)
 				.background_(textFieldBg)
-				.string_(name)
 			;
+			
+			if(object.class == NodeProxy, {
+				if(object.isPlaying, {
+					elem.enterTab.string_("NodeProxy ("++object.asNodeID++")");
+				}, {
+					elem.enterTab.string_("NodeProxy");
+				})
+			}, {
+				elem.enterTab.string_(name);
+			});
+				
 		};
 		
 		made = [];
