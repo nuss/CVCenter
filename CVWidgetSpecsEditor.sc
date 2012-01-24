@@ -193,21 +193,15 @@ CVWidgetSpecsEditor {
 										pairs2D[specName].includes(k)
 									}, {
 										specsList = specsList.add(specName.asString++":"+(spec.asSpec));
-										elem.specSelect.items_(specsList);
-										specsListSpecs = specsListSpecs.add(spec.asSpec);
-										Spec.add(k, spec); // make spec available for all subsequent selections
-										selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
-										break.value(elem.specSelect.value_(selectMatch));
 									});
 								}, {
 									specsList = specsList.add(k.asString++":"+(spec.asSpec));
-									elem.specSelect.items_(specsList);
-									specsListSpecs = specsListSpecs.add(spec.asSpec);
-									Spec.add(k, spec); // make spec available for all subsequent selections
-									selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
-									elem.specSelect.value_(selectMatch);
-									break.value(elem.specSelect.value_(selectMatch));
 								});
+								elem.specSelect.items_(specsList);
+								specsListSpecs = specsListSpecs.add(spec.asSpec);
+								Spec.add(k, spec); // make spec available for all subsequent selections
+								selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
+								break.value(elem.specSelect.value_(selectMatch));
 							}, {
 								if(k == cname, {
 									selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
