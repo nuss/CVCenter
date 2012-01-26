@@ -374,21 +374,6 @@ CVCenter {
 		});
 	}
 	
-//	*guiFrom { |def...specs|
-//		var name, controls, cNames, cDict;
-//		def ?? { "You must provide a SynthDef or NodeProxy!".warn; ^nil };
-//		switch(def.class,
-//			SynthDef, {
-//				name = def.name.asSymbol;
-//				if(SynthDescLib.global[name].notNil, {
-//					controls = def.controls;
-//					cNames = SynthDescLib.global[name].controlNames;
-//					cDict = [cNames, controls].flop.flatten.as(IdentityDictionary);
-//				})
-//			}
-//		)
-//	}	
-	
 	*put { |...args|
 		var inputArgs, overwrite=false, tmp;
 		inputArgs = args;
