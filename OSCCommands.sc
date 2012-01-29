@@ -221,6 +221,7 @@ OSCCommands {
 		cmdsPath = this.filenameSymbol.asString.split($/).drop(-1).join($/)+/+"OSCCommands";
 		cmds = Object.readArchive(cmdsPath);
 		cmds.removeAt(deviceName.asSymbol);
+		cmds.writeArchive(cmdsPath);
 	}
 	
 	*storedDevices {

@@ -828,7 +828,7 @@ CVWidget {
 				but: ["edit OSC", Color.black, Color.clear],
 				ipField: "",
 				portField: "",
-				nameField: "/my/typetag",
+				nameField: "/my/cmd/name",
 				index: 1, 
 				connectorButVal: 0, 
 				editEnabled: true
