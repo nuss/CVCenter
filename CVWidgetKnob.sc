@@ -308,7 +308,7 @@ CVWidgetKnob : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.focusColor_(Color(alpha: 0))
 			.states_([
-				["edit OSC", Color.black, Color.clear]
+				["edit OSC", Color.black, Color.white]
 			])
 			.action_({ |oscb|
 				if(editor.isNil or:{ editor.isClosed }, {
@@ -337,7 +337,7 @@ CVWidgetKnob : CVWidget {
 				})
 			}).mouseLeaveAction_({ |oscb|
 				if(wdgtControllersAndModels.oscConnection.model.value === false, {
-					oscb.states_([["edit OSC", Color.black, Color(alpha: 0)]])
+					oscb.states_([["edit OSC", Color.black, Color.white]])
 				})
 			})
 		});
