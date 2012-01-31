@@ -40,6 +40,8 @@ CVWidget2D : CVWidget {
 		var nextY, rightBarX, oscEditButHeight, right, left;
 		var actionLo, actionHi;
 		
+		this.bgColor ?? { this.bgColor_(Color.white) };
+		
 		if(GUI.scheme === QtGUI, { 
 			CV.viewDictionary[QSlider2D].props_(#[xValue, yValue]);
 			CV.viewDictionary[QRangeSlider].props_(#[loValue, hiValue]);
@@ -153,7 +155,7 @@ CVWidget2D : CVWidget {
 		};
 						
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
-			.focusColor_(Color(alpha: 1.0))
+//			.focusColor_(Color(alpha: 1.0))
 			.background_(Color.white)
 		;
 		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
@@ -286,7 +288,7 @@ CVWidget2D : CVWidget {
 		[specBut.hi, [nextY, \hi], specBut.lo, [nextY+52, \lo]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX, v[0], 40, 13))
 			.font_(Font("Helvetica", 8))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 		});
 		
@@ -295,14 +297,14 @@ CVWidget2D : CVWidget {
 		[midiHead.hi, nextY, midiHead.lo, nextY+52].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX, v, 28, 13))
 			.font_(Font("Helvetica", 7))
-			.focusColor_(Color(alpha: 0))
-			.states_([["MIDI", Color.black, Color(alpha: 0)]]);
+//			.focusColor_(Color(alpha: 0))
+			.states_([["MIDI", Color.black, this.bgColor]]);
 			
 			if(GUI.scheme === QtGUI, {
 				k.mouseEnterAction_({ |mb| 
 					mb.states_([["MIDI", Color.white, Color.red]])
 				}).mouseLeaveAction_({ |mb|
-					mb.states_([["MIDI", Color.black, Color(alpha: 0)]])
+					mb.states_([["MIDI", Color.black, this.bgColor]])
 				})
 			})
 		});
@@ -311,7 +313,7 @@ CVWidget2D : CVWidget {
 		[midiLearn.hi, [\hi, nextY], midiLearn.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX+midiHead.lo.bounds.width, v[1], 12, 13))
 			.font_(Font("Helvetica", 7))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.states_([
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
@@ -340,7 +342,7 @@ CVWidget2D : CVWidget {
 		[midiSrc.hi, [\hi, nextY], midiSrc.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX, v[1], 40, 13))
 			.font_(Font("Helvetica", 8.5))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.string_("source")
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -369,7 +371,7 @@ CVWidget2D : CVWidget {
 		[midiChan.hi, [\hi, nextY], midiChan.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX, v[1], 15, 13))
 			.font_(Font("Helvetica", 8.5))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.string_("chan")
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -396,7 +398,7 @@ CVWidget2D : CVWidget {
 		[midiCtrl.hi, [\hi, nextY], midiCtrl.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX+15, v[1], 25, 13))
 			.font_(Font("Helvetica", 8.5))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.string_("ctrl")
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -453,9 +455,9 @@ CVWidget2D : CVWidget {
 		[oscEditBut.lo, [\lo, thisXY.x+1], oscEditBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, oscEditButHeight))
 			.font_(Font("Helvetica", 8.5))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.states_([
-				["edit OSC", Color.black, Color.clear]
+				["edit OSC", Color.black, this.bgColor]
 			])
 			.action_({ |oscb|
 				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {
@@ -483,7 +485,7 @@ CVWidget2D : CVWidget {
 					})
 				}).mouseLeaveAction_({ |oscb|
 					if(wdgtControllersAndModels[v[0]].oscConnection.model.value === false, {
-						oscb.states_([["edit OSC", Color.black, Color(alpha: 0)]])
+						oscb.states_([["edit OSC", Color.black, this.bgColor]])
 					})
 				})
 			})
@@ -494,7 +496,7 @@ CVWidget2D : CVWidget {
 		[calibBut.lo, [\lo, thisXY.x+1], calibBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.states_([
 				["calibrating", Color.white, Color.red],
 				["calibrate", Color.black, Color.green]
@@ -513,7 +515,7 @@ CVWidget2D : CVWidget {
 			
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.states_([
 				["actions ("++this.wdgtActions[v[0]].select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions[v[0]].size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])

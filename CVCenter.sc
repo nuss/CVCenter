@@ -284,6 +284,14 @@ CVCenter {
 						},
 						cvcGui: cvcArgs
 					);
+					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+					#[lo, hi].do({ |sl|
+						[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b| 
+							{ b.states_([
+								[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
+							]) }.defer(0.1);
+						})
+					});
 					tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 				}, {
 					tmp = this.setup.calibrate = cvWidgets[k] !? { 
@@ -299,6 +307,12 @@ CVCenter {
 						cvcGui: cvcArgs
 					);
 					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
+					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+					[cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b| 
+						{ b.states_([
+							[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
+						]) }.defer(0.1);
+					})
 				});
 				
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
@@ -494,10 +508,10 @@ CVCenter {
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
-			"passing to *gui, thisSlot: %\n".postf(thisSlot);
+			"passing to *gui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
 			this.gui(tab);
 		}, {
-			"passing to *prAddToGui, thisSlot: %\n".postf(thisSlot);
+			"passing to *prAddToGui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
 			this.prAddToGui(tab, widget2DKey);
 		});
 		
@@ -907,6 +921,14 @@ CVCenter {
 					cvcGui: cvcArgs
 				);
 				widgetStates.put(k, (tabIndex: cvTabIndex));
+				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+				#[lo, hi].do({ |sl|
+					[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b| 
+						{ b.states_([
+							[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
+						]) }.defer(0.1);
+					})
+				});
 				tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 			}, {	
 				tmp = this.setup.calibrate = cvWidgets[k] !? { 
@@ -928,6 +950,12 @@ CVCenter {
 				});
 				cvWidgets[k].widgetCV !? { cvWidgets[k].widgetCV.value_(cvWidgets[k].widgetCV.value) };
 				widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
+				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+				[cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b| 
+					{ b.states_([
+						[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
+					]) }.defer(0.1);
+				})
 			});
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 			colwidth = widgetwidth+1; // add a small gap between widgets
