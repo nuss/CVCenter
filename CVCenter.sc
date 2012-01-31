@@ -497,18 +497,18 @@ CVCenter {
 
 		if(thisSlot.notNil, {
 			if(thisSlot === \lo or: { thisSlot === \hi }, {
-				"slot not nil: %\n".postf(thisSlot);
+//				"slot not nil: %\n".postf(thisSlot);
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
 				all[thisKey].put(thisSlot, CV.new(thisSpec, thisVal));
 			})
 		}, {
-			"slot is nil: %\n".postf(thisSlot);
+//			"slot is nil: %\n".postf(thisSlot);
 			all.put(thisKey, CV.new(thisSpec, thisVal)) 
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
-			"passing to *gui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
+//			"passing to *gui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
 			this.gui(tab);
 		}, {
 			"passing to *prAddToGui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);

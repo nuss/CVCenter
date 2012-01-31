@@ -49,6 +49,7 @@ CVWidgetEditor {
 		name = widgetName.asSymbol;
 		
 		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
+		thisCmdNames ?? { thisCmdNames = [nil] };
 				
 		actionsList ?? { actionsList = () };
 		
@@ -400,10 +401,10 @@ CVWidgetEditor {
 			
 			// OSC editting
 			
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@30)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@12)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("device-IP/port: Either choose from a list of command-names (as set by the selected device) or add your custom one")
+				.string_("device-IP/port")
 			;
 						
 			ipField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
@@ -424,10 +425,10 @@ CVWidgetEditor {
 				
 			flow2.shift(0, 0);
 
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@20)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@40)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("OSC command-name, e.g.: /my/cmd/name / OSC message slot")
+				.string_("OSC command-name, e.g.: /my/cmd/name / OSC message slot: Either choose from a list of command-names (as set by the selected device) or add your custom one ")
 			;
 	
 			flow2.shift(0, 0);
@@ -439,8 +440,16 @@ CVWidgetEditor {
 					cmdListMenu.items_(["command-names..."]);
 					if(m.value != 0, {
 						cmdNames[m.items[m.value].asSymbol].pairsDo({ |name, slts|
-							cmdListMenu.items = cmdListMenu.items.add(name.asString+"("++slts++")");
+							cmdListMenu.items_(cmdListMenu.items.add(name.asString+"("++slts++")"));
+							thisCmdNames = thisCmdNames.add(name.asString);
 						})
+					})
+				})
+				.mouseDownAction_({ |m|
+					cmdNames = OSCCommands.deviceCmds;
+					deviceListMenu.items_(["select device..."]);
+					cmdNames.pairsDo({ |dev, cmds|
+						deviceListMenu.items_(deviceListMenu.items ++ dev);
 					})
 				})
 			;
@@ -450,6 +459,11 @@ CVWidgetEditor {
 			cmdListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-11@15)
 				.items_(["command-names..."])
 				.font_(Font("Helvetica", 10))
+				.action_({ |m|
+					if(nameField.enabled, {
+						nameField.string_(thisCmdNames[m.value]);
+					})
+				})
 			;
 			
 			cmdNames.pairsDo({ |dev, cmds|
@@ -463,6 +477,7 @@ CVWidgetEditor {
 					["new", Color.white, Color(0.15, 0.5, 0.15)]
 				])
 				.font_(staticTextFont)
+				.action_({ OSCCommands.gui })
 			;
 
 			nameField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
