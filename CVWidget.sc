@@ -17,7 +17,7 @@
 
 CVWidget {
 
-	var <widgetCV, prDefaultAction, <>wdgtActions;
+	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
@@ -828,7 +828,7 @@ CVWidget {
 				but: ["edit OSC", Color.black, Color.clear],
 				ipField: "",
 				portField: "",
-				nameField: "/my/typetag",
+				nameField: "/my/cmd/name",
 				index: 1, 
 				connectorButVal: 0, 
 				editEnabled: true

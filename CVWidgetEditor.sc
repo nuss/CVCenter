@@ -16,12 +16,13 @@
 */
 
 CVWidgetEditor {
-	classvar <allEditors;
+	classvar <allEditors, cmdNames;
 	var thisEditor, <window, <tabs, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut, <calibNumBoxes;
+	var <deviceListMenu, <cmdListMenu, <addDeviceBut, thisCmdNames;
 	var <ipField, <portField, <nameField, <indexField;
 	var <inputConstraintLoField, <inputConstraintHiField;
 	var <mappingSelect;
@@ -46,6 +47,9 @@ CVWidgetEditor {
 		var tmp; // multipurpose short-term var
 						
 		name = widgetName.asSymbol;
+		
+		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
+		thisCmdNames ?? { thisCmdNames = [nil] };
 				
 		actionsList ?? { actionsList = () };
 		
@@ -92,7 +96,7 @@ CVWidgetEditor {
 		
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 			
-			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 223));
+			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 265));
 			
 
 			if(slot.isNil, { 
@@ -397,12 +401,12 @@ CVWidgetEditor {
 			
 			// OSC editting
 			
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@15)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@12)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("device-IP/port: leave empty for listening to any IP/port")
+				.string_("device-IP/port")
 			;
-			
+						
 			ipField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
@@ -421,17 +425,66 @@ CVWidgetEditor {
 				
 			flow2.shift(0, 0);
 
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@15)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@40)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("OSC-typetag, e.g.: /my/typetag / OSC message index")
+				.string_("OSC command-name, e.g.: /my/cmd/name / OSC message slot: Either choose from a list of command-names (as set by the selected device) or add your custom one ")
 			;
 	
+			flow2.shift(0, 0);
+			
+			deviceListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-40@15)
+				.items_(["select device..."])
+				.font_(Font("Helvetica", 10))
+				.action_({ |m|
+					cmdListMenu.items_(["command-names..."]);
+					if(m.value != 0, {
+						cmdNames[m.items[m.value].asSymbol].pairsDo({ |name, slts|
+							cmdListMenu.items_(cmdListMenu.items.add(name.asString+"("++slts++")"));
+							thisCmdNames = thisCmdNames.add(name.asString);
+						})
+					})
+				})
+				.mouseDownAction_({ |m|
+					cmdNames = OSCCommands.deviceCmds;
+					deviceListMenu.items_(["select device..."]);
+					cmdNames.pairsDo({ |dev, cmds|
+						deviceListMenu.items_(deviceListMenu.items ++ dev);
+					})
+				})
+			;
+			
+			flow2.shift(0, 0);
+			
+			cmdListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-11@15)
+				.items_(["command-names..."])
+				.font_(Font("Helvetica", 10))
+				.action_({ |m|
+					if(nameField.enabled, {
+						nameField.string_(thisCmdNames[m.value]);
+					})
+				})
+			;
+			
+			cmdNames.pairsDo({ |dev, cmds|
+				deviceListMenu.items = deviceListMenu.items ++ dev;
+			});
+			
+			flow2.shift(0, 0);
+			
+			addDeviceBut = Button(thisEditor.tabs.views[2], 29@15)
+				.states_([
+					["new", Color.white, Color(0.15, 0.5, 0.15)]
+				])
+				.font_(staticTextFont)
+				.action_({ OSCCommands.gui })
+			;
+
 			nameField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
-				.string_("/my/typetag")
+				.string_("/my/cmd/name")
 			;
 						
 			flow2.shift(5, 0);
@@ -501,7 +554,7 @@ CVWidgetEditor {
 			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 			
 			mappingSelect = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width-15@20)
-				.font_(Font("Helvetica", 14))
+				.font_(Font("Helvetica", 12))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
 					widget.setOscMapping(ms.item, slot);

@@ -224,7 +224,7 @@ CVCenter {
 							val.window.close;
 						},
 						CVWidget2D, {
-							[\lo, \hi].do({ |hilo|
+							#[lo, hi].do({ |hilo|
 								val[hilo] !? { val[hilo].window.close };
 							})
 						}
@@ -262,7 +262,7 @@ CVCenter {
 				});
 								
 				if(orderedCVs[i].class === Event and:{ 
-					orderedCVs[i].keys.includesAny([\lo, \hi])
+					orderedCVs[i].keys.includesAny(#[lo, hi])
 				}, {
 					tmp = (
 						lo: this.setup.calibrate = cvWidgets[k] !? { 
@@ -284,6 +284,15 @@ CVCenter {
 						},
 						cvcGui: cvcArgs
 					);
+					
+					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+					#[lo, hi].do({ |sl|
+						[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b| 
+							{ b.states_([
+								[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
+							]) }.defer(0.1);
+						})
+					});
 					tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 				}, {
 					tmp = this.setup.calibrate = cvWidgets[k] !? { 
@@ -299,6 +308,12 @@ CVCenter {
 						cvcGui: cvcArgs
 					);
 					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
+					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+					[cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b| 
+						{ b.states_([
+							[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
+						]) }.defer(0.1);
+					})
 				});
 				
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
@@ -313,7 +328,7 @@ CVCenter {
 						).changed(\value);
 					},
 					CVWidget2D, {
-						[\lo, \hi].do({ |hilo|
+						#[lo, hi].do({ |hilo|
 							cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value_(
 								cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value
 							).changed(\value);
@@ -394,7 +409,7 @@ CVCenter {
 			});
 			if(cv.isKindOf(Array) and:{ cv.size == 2 }, {
 				tmp = cv.copy;
-				[\lo, \hi].do({ |key, i|
+				#[lo, hi].do({ |key, i|
 					cv.isKindOf(Event).not.if { cv = () };
 					cv.put(key, tmp[i]);
 				})
@@ -431,7 +446,7 @@ CVCenter {
 				};
 			},
 			CVWidget2D, {
-				[\lo, \hi].do({ |hilo|
+				#[lo, hi].do({ |hilo|
 					if(cvWidgets[key].editor[hilo].notNil and:{ cvWidgets[key].editor[hilo].isClosed.not }, {
 						cvWidgets[key].editor[hilo].close;
 					});
@@ -470,8 +485,8 @@ CVCenter {
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		slot !? {
 			thisSlot = slot.asString.toLower.asSymbol;
-			if([\lo, \hi].detect({ |sbl| sbl === thisSlot }).class !== Symbol, {
-				Error("Looks like you wanted to create a multi-dimensional widget. However, the given slot-value"+slot+"is not valid!").throw;
+			if(#[lo, hi].detect({ |sbl| sbl === thisSlot }).class !== Symbol, {
+				Error("Looks like you wanted to create a multi-dimensional widget. However, the given slot-value % is not valid!".postf(slot)).throw;
 			});
 		};
 				
@@ -483,17 +498,21 @@ CVCenter {
 
 		if(thisSlot.notNil, {
 			if(thisSlot === \lo or: { thisSlot === \hi }, {
+//				"slot not nil: %\n".postf(thisSlot);
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
 				all[thisKey].put(thisSlot, CV.new(thisSpec, thisVal));
 			})
 		}, {
+//			"slot is nil: %\n".postf(thisSlot);
 			all.put(thisKey, CV.new(thisSpec, thisVal)) 
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
+//			"passing to *gui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
 			this.gui(tab);
 		}, {
+			"passing to *prAddToGui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
 			this.prAddToGui(tab, widget2DKey);
 		});
 		
@@ -694,7 +713,7 @@ CVCenter {
 			lib[\all].pairsDo({ |key, v|
 				switch(v.wdgtClass,
 					CVWidget2D, {
-						[\lo, \hi].do({ |hilo|
+						#[lo, hi].do({ |hilo|
 							this.use(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
 							cvWidgets[key].setMidiMode(v[hilo].midi.midiMode, hilo)
 								.setMidiMean(v[hilo].midi.midiMean, hilo)
@@ -815,7 +834,7 @@ CVCenter {
 						this.softWithin !? { wdgt.setSoftWithin(this.softWithin) };
 					},
 					CVWidget2D, {
-						[\lo, \hi].do({ |hilo|
+						#[lo, hi].do({ |hilo|
 							this.midiMode !? { wdgt.setMidiMode(this.midiMode, hilo) };
 							this.midiResolution !? { wdgt.setMidiResolution(this.midiResolution, hilo) };
 							this.midiMean !? { wdgt.setMidiMean(this.midiMean, hilo) };
@@ -903,6 +922,14 @@ CVCenter {
 					cvcGui: cvcArgs
 				);
 				widgetStates.put(k, (tabIndex: cvTabIndex));
+				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+				#[lo, hi].do({ |sl|
+					[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b| 
+						{ b.states_([
+							[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
+						]) }.defer(0.1);
+					})
+				});
 				tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 			}, {	
 				tmp = this.setup.calibrate = cvWidgets[k] !? { 
@@ -924,6 +951,12 @@ CVCenter {
 				});
 				cvWidgets[k].widgetCV !? { cvWidgets[k].widgetCV.value_(cvWidgets[k].widgetCV.value) };
 				widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
+				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+				[cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b| 
+					{ b.states_([
+						[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
+					]) }.defer(0.1);
+				})
 			});
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 			colwidth = widgetwidth+1; // add a small gap between widgets
