@@ -284,6 +284,7 @@ CVCenter {
 						},
 						cvcGui: cvcArgs
 					);
+					
 					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 					#[lo, hi].do({ |sl|
 						[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b| 
