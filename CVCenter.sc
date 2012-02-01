@@ -17,7 +17,7 @@
 
 CVCenter {
 
-	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <prefPane;
+	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <prefPane, <removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight; 
 	classvar <widgetStates;
@@ -31,6 +31,7 @@ CVCenter {
 			all = IdentityDictionary.new;
 			cvWidgets = IdentityDictionary.new;
 			widgetStates = IdentityDictionary.new;
+			removeButs = IdentityDictionary.new;
 			r = g = b = (0.6, 0.65 .. 0.75);
 			colors = List();
 			tabProperties = [];
@@ -234,7 +235,7 @@ CVCenter {
 			});
 
 			thisNextPos = 0@0;
-			rowheight = widgetheight+1; // add a small gap between rows
+			rowheight = widgetheight+1+15; // add a small gap between rows
 			
 			order = all.order;
 			orderedCVs = all.atAll(order);
@@ -261,6 +262,7 @@ CVCenter {
 					thisNextPos = tabProperties[cvTabIndex].nextPos;
 				});
 								
+				"next x: %\n".postf(thisNextPos.x);
 				if(orderedCVs[i].class === Event and:{ 
 					orderedCVs[i].keys.includesAny(#[lo, hi])
 				}, {
@@ -284,7 +286,13 @@ CVCenter {
 						},
 						cvcGui: cvcArgs
 					);
-					
+					removeButs[k] ?? { removeButs.put(k, 
+						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+							.states_([["remove", Color.white, Color(0.1, 0.1, 0.1)]])
+							.action_({ |b| this.removeAt(k) })
+							.font_(Font("Helvetica", 10, true))
+						;
+					)};
 					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 					#[lo, hi].do({ |sl|
 						[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b| 
@@ -307,6 +315,13 @@ CVCenter {
 						controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 						cvcGui: cvcArgs
 					);
+					removeButs[k] ?? { removeButs.put(k, 
+						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+							.states_([["remove", Color.white, Color(0.1, 0.1, 0.1)]])
+							.action_({ |b| this.removeAt(k) })
+							.font_(Font("Helvetica", 10, true))
+						;
+					)};
 					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 					[cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b| 
@@ -456,13 +471,15 @@ CVCenter {
 					};
 					cvWidgets[key].midiOscEnv[hilo].oscResponder !? { 
 						cvWidgets[key].midiOscEnv[hilo].oscResponder.remove;
-						cvWidgets[key].midiOscEnv[hilo].oscResponder = nil;	
+						cvWidgets[key].midiOscEnv[hilo].oscResponder = nil;
 					}
 				})
 			}
 		);
 		cvWidgets[key].remove;
 		cvWidgets.removeAt(key);
+		removeButs[key].remove;
+		removeButs.removeAt(key);
 		widgetStates.removeAt(key);
 		tabs.views.do({ |v, i| if(v.children.size == 0, { this.prRemoveTab(i) }) });
 		^lastVal;
@@ -512,7 +529,7 @@ CVCenter {
 //			"passing to *gui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
 			this.gui(tab);
 		}, {
-			"passing to *prAddToGui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
+//			"passing to *prAddToGui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
 			this.prAddToGui(tab, widget2DKey);
 		});
 		
@@ -886,7 +903,7 @@ CVCenter {
 			thisNextPos = 0@0;
 		});
 		
-		rowheight = widgetheight+1; // add a small gap between rows
+		rowheight = widgetheight+1+15; // add a small gap between rows
 		
 		allCVKeys = all.keys;
 		widgetKeys = cvWidgets.keys;
@@ -898,6 +915,7 @@ CVCenter {
 			}, {
 				cvcArgs = true;	
 			});
+			"next x: %\n".postf(thisNextPos.x);
 			if(all[k].class === Event and:{
 				all[k].keys.includesAny([\hi, \lo])
 			}, {
@@ -921,6 +939,13 @@ CVCenter {
 					},
 					cvcGui: cvcArgs
 				);
+				removeButs[k] ?? { removeButs.put(k, 
+					Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+						.states_([["remove", Color.white, Color(0.1, 0.1, 0.1)]])
+						.action_({ |b| this.removeAt(k) })
+						.font_(Font("Helvetica", 10, true))
+					;
+				)};
 				widgetStates.put(k, (tabIndex: cvTabIndex));
 				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 				#[lo, hi].do({ |sl|
@@ -944,6 +969,13 @@ CVCenter {
 					controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 					cvcGui: cvcArgs
 				);
+				removeButs[k] ?? { removeButs.put(k, 
+					Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+						.states_([["remove", Color.white, Color(0.1, 0.1, 0.1)]])
+						.action_({ |b| this.removeAt(k) })
+						.font_(Font("Helvetica", 10, true))
+					;
+				)};
 				if(widgetStates[k].isNil, {
 					widgetStates.put(k, (tabIndex: cvTabIndex));
 				}, {
@@ -984,7 +1016,7 @@ CVCenter {
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets;
 		var widgetwidth, widgetheight=181;
 				
-		rowheight = widgetheight+1;
+		rowheight = widgetheight+1+15;
 		thisNextPos = 0@0;
 		
 		tabIndex !? {	
