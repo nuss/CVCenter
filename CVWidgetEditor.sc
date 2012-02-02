@@ -16,7 +16,7 @@
 */
 
 CVWidgetEditor {
-	classvar <allEditors, cmdNames;
+	classvar <allEditors;
 	var thisEditor, <window, <tabs, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
@@ -44,6 +44,7 @@ CVWidgetEditor {
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
 		var mappingSelectItems;
 		var wdgtActions;
+		var cmdNames, orderedCmds, orderedCmdSlots;
 		var tmp; // multipurpose short-term var
 						
 		name = widgetName.asSymbol;
@@ -439,9 +440,11 @@ CVWidgetEditor {
 				.action_({ |m|
 					cmdListMenu.items_(["command-names..."]);
 					if(m.value != 0, {
-						cmdNames[m.items[m.value].asSymbol].pairsDo({ |name, slts|
-							cmdListMenu.items_(cmdListMenu.items.add(name.asString+"("++slts++")"));
-							thisCmdNames = thisCmdNames.add(name.asString);
+						orderedCmds = cmdNames[m.items[m.value].asSymbol].order;
+						orderedCmdSlots = cmdNames[m.items[m.value].asSymbol].atAll(orderedCmds);
+						orderedCmds.do({ |cmd, i|
+							cmdListMenu.items_(cmdListMenu.items.add(cmd.asString+"("++orderedCmdSlots[i]++")"));
+							thisCmdNames = thisCmdNames.add(cmd.asString);
 						})
 					})
 				})
