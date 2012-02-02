@@ -96,9 +96,6 @@ OSCCommands {
 							["remove", Color.white, Color.blue],
 							["add", Color.white, Color.red],
 						])
-//						.action_({ |but|
-//
-//						})
 					;						
 				})
 			})
