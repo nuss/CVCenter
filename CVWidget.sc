@@ -1003,7 +1003,7 @@ CVWidget {
 			
 			if(this.class === CVWidgetKnob, {
 				block { |break|
-					#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+					#[pan, boostcut, bipolar, detune].do({ |symbol| 
 						if(widgetCV.spec == symbol.asSpec, { 
 							break.value(thisGuiEnv.knob.centered_(true));
 						}, {

@@ -146,7 +146,7 @@ CVWidgetKnob : CVWidget {
 			.canFocus_(false)
 		;
 		block { |break|
-			#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+			#[pan, boostcut, bipolar, detune].do({ |symbol| 
 				if(widgetCV.spec == symbol.asSpec, { break.value(knob.centered_(true)) });
 			})
 		};

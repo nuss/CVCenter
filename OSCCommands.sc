@@ -164,13 +164,13 @@ OSCCommands {
 			})
 		}, AppClock);
 					
-		StaticText(window, Rect(0, 0, 250, 40)).string_("Note: collecting command-names will stop as soon as you hit 'remove' on any of the already collected names or save the device's commands.").font_(staticTextFont);
+		StaticText(window, Rect(0, 0, 230, 40)).string_("Collecting command-names will stop as soon as you close this window or save the device's commands. You can only save the command-names after setting a device-name.").font_(staticTextFont);
 		
-		flow.shift(0, 0);
+		flow.shift(20, 0);
 		
 		deviceNameField = TextField(window, Rect(0, 0, 144, 40))
 			.font_(Font(Font.defaultMonoFace, 15))
-			.string_("device-name")
+			.string_("< device-name >")
 		;
 		
 		flow.shift(0, 0);

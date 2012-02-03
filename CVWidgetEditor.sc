@@ -439,6 +439,7 @@ CVWidgetEditor {
 				.font_(Font("Helvetica", 10))
 				.action_({ |m|
 					cmdListMenu.items_(["command-names..."]);
+					thisCmdNames = [nil];
 					if(m.value != 0, {
 						orderedCmds = cmdNames[m.items[m.value].asSymbol].order;
 						orderedCmdSlots = cmdNames[m.items[m.value].asSymbol].atAll(orderedCmds);
