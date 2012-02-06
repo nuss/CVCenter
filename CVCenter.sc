@@ -285,13 +285,13 @@ CVCenter {
 						},
 						cvcGui: cvcArgs
 					);
-					removeButs[k] ?? { removeButs.put(k, 
+					removeButs.put(k, 
 						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0, 0.15)]])
 							.action_({ |b| this.removeAt(k) })
 							.font_(Font("Helvetica", 9))
 						;
-					)};
+					);
 					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 					#[lo, hi].do({ |sl|
 						[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b| 
@@ -314,13 +314,13 @@ CVCenter {
 						controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 						cvcGui: cvcArgs
 					);
-					removeButs[k] ?? { removeButs.put(k, 
+					removeButs.put(k, 
 						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0.0, 0.15)]])
 							.action_({ |b| this.removeAt(k) })
 							.font_(Font("Helvetica", 9))
 						;
-					)};
+					);
 					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 					[cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b| 
@@ -369,7 +369,7 @@ CVCenter {
 		});
 		window.front;
 
-		skipJacks = SkipJack.all.collect({ |r| r.name == "CVCenter-Updater" });
+		skipJacks = SkipJack.all.collect({ |r| r === updateRoutine });
 		if(skipJacks.includes(true).not, {
 			updateRoutine = SkipJack({
 				lastUpdate ?? { lastUpdate = all.size };
@@ -937,13 +937,13 @@ CVCenter {
 					},
 					cvcGui: cvcArgs
 				);
-				removeButs[k] ?? { removeButs.put(k, 
+				removeButs.put(k, 
 					Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 						.states_([["remove", Color.white, Color(0.0, 0.15)]])
 						.action_({ |b| this.removeAt(k) })
 						.font_(Font("Helvetica", 9))
 					;
-				)};
+				);
 				widgetStates.put(k, (tabIndex: cvTabIndex));
 				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 				#[lo, hi].do({ |sl|
@@ -967,13 +967,13 @@ CVCenter {
 					controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 					cvcGui: cvcArgs
 				);
-				removeButs[k] ?? { removeButs.put(k, 
+				removeButs.put(k, 
 					Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 						.states_([["remove", Color.white, Color(0.0, 0.15)]])
 						.action_({ |b| this.removeAt(k) })
 						.font_(Font("Helvetica", 9))
 					;
-				)};
+				);
 				if(widgetStates[k].isNil, {
 					widgetStates.put(k, (tabIndex: cvTabIndex));
 				}, {
