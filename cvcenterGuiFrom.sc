@@ -20,19 +20,19 @@
 
 +Synth {
 	
-	cvcGui { |displayDialog=true, pairs2D, environment|
+	cvcGui { |displayDialog=true, prefix, pairs2D, environment|
 		var sDef, def, cDict = (), metadata;
 		sDef = SynthDescLib.global[this.defName.asSymbol];
 		sDef.metadata !? { sDef.metadata.specs !? { metadata = sDef.metadata.specs }};
 		sDef.controlDict.pairsDo({ |n, c| cDict.put(n, c.defaultValue) });
-		CVWidgetSpecsEditor(displayDialog, this, this.defName.asSymbol, cDict, pairs2D, metadata, environment);
+		CVWidgetSpecsEditor(displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, metadata, environment);
 	}
 		
 }
 
 +NodeProxy {
 	
-	cvcGui { |displayDialog=true, pairs2D|
+	cvcGui { |displayDialog=true, prefix, pairs2D|
 		var cDict = (), name;
 		this.getKeysValues.do({ |pair| cDict.put(pair[0], pair[1]) });
 		if(this.class === Ndef, {
@@ -40,7 +40,7 @@
 		}, {
 			name = nil;
 		});
-		CVWidgetSpecsEditor(displayDialog, this, name, cDict, pairs2D);
+		CVWidgetSpecsEditor(displayDialog, this, name, cDict, prefix, pairs2D);
 	}
 
 }

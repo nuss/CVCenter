@@ -822,8 +822,6 @@ CVWidgetEditor {
 					actionsList[name].removeBut, 
 					actionsList[name].actionView
 				].do(_.remove);
-//				flow3.resetTo(0@15);
-//				flow3.place(thisEditor.tabs.views[3]);
 				flow3.reFlow(thisEditor.tabs.views[3]);
 			}		
 		)

@@ -18,11 +18,11 @@
 CVWidgetSpecsEditor {
 	var <window;
 
-	*new { |displayDialog, object, wdgtName, controlsDict, pairs2D, metadata, environment|
-		^super.new.init(displayDialog, object, wdgtName, controlsDict, pairs2D, metadata, environment)
+	*new { |displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment|
+		^super.new.init(displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment)
 	}
 	
-	init { |displayDialog, obj, name, controls, pairs2D, metadata, environment|
+	init { |displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment|
 		var object;
 		var wdgtName, windowTitle;
 		var specsList, specsListSpecs, selectMatch;
@@ -126,7 +126,7 @@ CVWidgetSpecsEditor {
 				
 		#formEls, cMatrix = ()!2;
 
-		makeLine = { |elem, cname, size, pairs2D|
+		makeLine = { |elem, cname, size, pairs2D, prefix|
 //			("input:"+[elem.type, cname, size]).postln;
 			if(elem.type.notNil, {
 				switch(elem.type,
@@ -150,6 +150,13 @@ CVWidgetSpecsEditor {
 				nameStr = ""+cname;
 				specName = cname;	
 			});
+			
+			"specName.class, prefix before: %, %\n".postf(specName.class, prefix);
+
+			prefix !? {
+				specName = prefix.asString ++ (specName.asString[0]).toUpper ++ specName.asString[1..];
+			};
+			"specName, prefix after: %, %\n".postf(specName, prefix);
 			
 			flow.shift(0, 0);
 			StaticText(window, cNameRect)
@@ -251,13 +258,13 @@ CVWidgetSpecsEditor {
 					formEls.put(cname, ());
 					formEls[cname].type = \w2d;
 					formEls[cname].slots = val;
-					makeLine.(formEls[cname], cname);
+					makeLine.(formEls[cname], cname, prefix: prefix);
 					made = made.add(cname);
 				}, {
 					formEls.put(cname, ());
 					formEls[cname].type = \wms;
 					formEls[cname].slots = val;
-					makeLine.(formEls[cname], cname, val.size);
+					makeLine.(formEls[cname], cname, val.size, prefix: prefix);
 					made = made.add(cname);
 				})
 			});
@@ -273,7 +280,7 @@ CVWidgetSpecsEditor {
 						formEls[cname].type = \w2dc;
 						formEls[cname].slots = [controls[pair[0]], controls[pair[1]]];
 						formEls[cname].controls = pair;
-						makeLine.(formEls[cname], pair[0]++"/"++pair[1], pairs2D: pairs2D);
+						makeLine.(formEls[cname], pair[0]++"/"++pair[1], pairs2D: pairs2D, prefix: prefix);
 						made = made.add(pair[0]);
 						made = made.add(pair[1]);
 					}) 
@@ -283,7 +290,7 @@ CVWidgetSpecsEditor {
 			if(formEls[cname].isNil and:{ made.indexOfEqual(cname).isNil }, { 
 				formEls.put(cname, ());
 				formEls[cname].slots = [val];
-				makeLine.(formEls[cname], cname);
+				makeLine.(formEls[cname], cname, prefix: prefix);
 				made = made.add(cname);
 			})
 			
