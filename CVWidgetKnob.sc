@@ -306,6 +306,7 @@ CVWidgetKnob : CVWidget {
 			}) 
 		;
 		nextY = nextY+midiCtrl.bounds.height+1;
+				
 		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.font_(Font("Helvetica", 9))
 //			.focusColor_(Color(alpha: 0))

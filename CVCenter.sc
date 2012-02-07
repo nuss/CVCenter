@@ -80,7 +80,7 @@ CVCenter {
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
 //		var widgetwidth, widgetheight=181, colwidth, rowheight;
 		var funcToAdd;
-		var widgetControllersAndModels, cvcArgs;
+		var cvcArgs, btnColor;
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
 		var midiFlag, oscFlag, loadFlag, tmp;
 					
@@ -294,10 +294,21 @@ CVCenter {
 					);
 					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 					#[lo, hi].do({ |sl|
-						[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b| 
-							{ b.states_([
-								[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
-							]) }.defer(0.1);
+						[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b|
+							{ 
+								if(cvWidgets[k].wdgtControllersAndModels[sl].notNil and:{ 
+									cvWidgets[k].wdgtControllersAndModels[sl].oscConnection.model.value !== false and:{
+										b === cvWidgets[k].oscEditBut[sl]
+									}
+								}, {
+									btnColor = Color.cyan(0.5);
+								}, {
+									btnColor = tabProperties[cvTabIndex].tabColor;
+								});
+								b.states_([
+									[b.states[0][0], b.states[0][1], btnColor]
+								]) 
+							}.defer(0.1);
 						})
 					});
 					tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
@@ -324,9 +335,18 @@ CVCenter {
 					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 					[cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b| 
-						{ b.states_([
-							[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
-						]) }.defer(0.1);
+						{ 
+							if(cvWidgets[k].wdgtControllersAndModels.oscConnection.model.value !== false and:{
+								b === cvWidgets[k].oscEditBut;
+							}, {
+								btnColor = Color.cyan(0.5);
+							}, {
+								btnColor = tabProperties[cvTabIndex].tabColor;
+							});
+							b.states_([
+								[b.states[0][0], b.states[0][1], btnColor]
+							]) 
+						}.defer(0.1);
 					})
 				});
 				
@@ -502,7 +522,7 @@ CVCenter {
 		slot !? {
 			thisSlot = slot.asString.toLower.asSymbol;
 			if(#[lo, hi].detect({ |sbl| sbl === thisSlot }).class !== Symbol, {
-				Error("Looks like you wanted to create a multi-dimensional widget. However, the given slot-value % is not valid!".postf(slot)).throw;
+				Error("Looks like you wanted to create a multi-dimensional widget. However, the given slot-value % is not valid!".format(slot)).throw;
 			});
 		};
 				
@@ -746,7 +766,6 @@ CVCenter {
 							});
 							if(autoConnectOSC, {
 								v[hilo].osc.cmdName !? {
-//									v[hilo].postln;
 									cvWidgets[key].oscConnect(
 										v[hilo].osc.addr !? { v[hilo].osc.addr.ip }, 
 										v[hilo].osc.addr !? { v[hilo].osc.addr.port }, 
@@ -869,7 +888,7 @@ CVCenter {
 		var cvTabIndex, tabLabels;
 		var thisNextPos;
 //		var widgetwidth, widgetheight=181, colwidth, rowheight;
-		var widgetControllersAndModels, cvcArgs;
+		var cvcArgs, btnColor;
 		var tmp;
 		
 //		"prAddToGui called: %, %\n".postf(tab, widget2DKey);
@@ -915,7 +934,7 @@ CVCenter {
 				cvcArgs = true;	
 			});
 			if(all[k].class === Event and:{
-				all[k].keys.includesAny([\hi, \lo])
+				all[k].keys.includesAny(#[hi, lo])
 			}, {
 				tmp = (
 					lo: this.setup.calibrate = cvWidgets[k] !? { 
@@ -947,10 +966,21 @@ CVCenter {
 				widgetStates.put(k, (tabIndex: cvTabIndex));
 				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 				#[lo, hi].do({ |sl|
-					[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b| 
-						{ b.states_([
-							[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
-						]) }.defer(0.1);
+					[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b|
+						{ 
+							if(cvWidgets[k].wdgtControllersAndModels[sl].notNil and:{ 
+								cvWidgets[k].wdgtControllersAndModels[sl].oscConnection.model.value !== false and:{
+									b === cvWidgets[k].oscEditBut[sl]
+								}
+							}, {
+								btnColor = Color.cyan(0.5);
+							}, {
+								btnColor = tabProperties[cvTabIndex].tabColor;
+							});
+							b.states_([
+								[b.states[0][0], b.states[0][1], btnColor]
+							]) 
+						}.defer(0.1);
 					})
 				});
 				tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
@@ -983,9 +1013,18 @@ CVCenter {
 				widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 				[cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b| 
-					{ b.states_([
-						[b.states[0][0], b.states[0][1], tabProperties[cvTabIndex].tabColor]
-					]) }.defer(0.1);
+					{
+						if(cvWidgets[k].wdgtControllersAndModels.oscConnection.model.value !== false and:{
+							b === cvWidgets[k].oscEditBut;
+						}, {
+							btnColor = Color.cyan(0.5);
+						}, {
+							btnColor = tabProperties[cvTabIndex].tabColor;
+						});
+						b.states_([
+							[b.states[0][0], b.states[0][1], btnColor]
+						]) 
+					}.defer(0.1);
 				})
 			});
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
