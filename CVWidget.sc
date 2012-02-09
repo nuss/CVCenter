@@ -1260,7 +1260,7 @@ CVWidget {
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
 						}, {
-							if(msg[theChanger.value[3]].isNegative and:{
+							if(msg[theChanger.value[3]] <= 0 and:{
 								msg[theChanger.value[3]].abs > alwaysPositive;
 							}, { alwaysPositive = msg[theChanger.value[3]].abs+0.1 });
 							if(msg[theChanger.value[3]] < midiOscEnv.calibConstraints.lo, { 
