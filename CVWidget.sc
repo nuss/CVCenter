@@ -1,7 +1,23 @@
+/* (c) Stefan Nussbaumer */
+/* 
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+*/
 
 CVWidget {
 
-	var <widgetCV, prDefaultAction/*, <actions*/;
+	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
@@ -87,45 +103,181 @@ CVWidget {
 		if(isCVCWidget, { this.remove }, { this.window.close });
 	}
 	
-//	addAction { |name, action, slot|
-//		var act;
-//		name ?? { Error("Please provide a name for the action.").throw };
-//		actions ?? { actions = () };
-//		if(action.class === String, { act = action.interpret }, { act = action });
-//		switch(this.class,
-//			CVWidget2D, {
-//				actions[slot.asSymbol] ?? { actions.put(slot.asSymbol, ()) };
-//				actions[slot.asSymbol][name.asSymbol] ?? {
-//					actions[slot.asSymbol].put(name.asSymbol, widgetCV[slot.asSymbol].action_(act));
-//				}
-//			},
-//			{
-//				actions[name.asSymbol] ?? {
-//					actions.put(name.asSymbol, widgetCV.action_(act));
-//				}
-//			}
-//		)
-//	}
-//	
-//	removeAction { |name, slot|
-//		name ?? { Error("No name given: can't remove action.").throw };
-//		switch(this.class,
-//			CVWidget2D, {
-//				slot ?? { Error("Please provide either 'hi' or 'lo' in order to remove an action").throw };
-//				actions[slot.asSymbol][name.asSymbol] !? {
-//					actions[slot.asSymbol][name.asSymbol].remove; 
-//					actions[slot.asSymbol][name.asSymbol] = nil;
-//				}
-//			},
-//			{
-//				actions[name.asSymbol] !? {
-//					actions[name.asSymbol].remove;
-//					actions[name.asSymbol] = nil;
-//				}
-//			}
-//		)
-//	}
+	addAction { |name, action, slot, active=true|
+		var act, controller, thisGuiEnv;
+		name ?? { Error("Please provide a name under which the action will be added to the widget").throw };
+		action ?? { Error("Please provide an action!").throw };
+		if(action.isFunction.not and:{
+			action.interpret.isFunction.not
+		}, {
+			Error("'action' must be a function or a string that compiles to one").throw;
+		});
+		this.wdgtActions ?? { this.wdgtActions = () };
+		if(action.class === String, { act = action.interpret }, { act = action });
+		switch(this.class,
+			CVWidget2D, {
+				slot ?? { Error("Please provide either 'lo' or 'hi' as third argument to addAction!").throw };
+				this.wdgtActions[slot.asSymbol] ?? { this.wdgtActions.put(slot.asSymbol, ()) };
+				// avoid duplicates
+				this.wdgtActions[slot.asSymbol][name.asSymbol] ?? { this.wdgtActions[slot.asSymbol].put(name.asSymbol, ()) };
+				if(this.wdgtActions[slot.asSymbol][name.asSymbol].size < 1, {
+					if(active == true, {
+						controller = widgetCV[slot.asSymbol].action_(act);
+						this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, [act.asCompileString, true]);
+					}, {
+						controller = \dummy;	
+						this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, [act.asCompileString, false]);
+					});
+					wdgtControllersAndModels[slot.asSymbol].actions.model.value_((
+						numActions: this.wdgtActions[slot.asSymbol].size,
+						activeActions: this.wdgtActions[slot.asSymbol].select({ |v| v.asArray[0][1] == true }).size
+					)).changed(\value);
+					thisGuiEnv = this.guiEnv[slot.asSymbol];
+					if(thisGuiEnv.editor.notNil and: {
+						thisGuiEnv.editor.isClosed.not;
+					}, {
+						thisGuiEnv.editor.amendActionsList(
+							this, \add, name.asSymbol, this.wdgtActions[slot.asSymbol][name.asSymbol], slot.asSymbol, active;
+						)
+					})
+				})
+			},
+			{
+				this.wdgtActions[name.asSymbol] ?? {
+					this.wdgtActions.put(name.asSymbol, ());
+					if(active == true, {
+						controller = widgetCV.action_(act);
+						this.wdgtActions[name.asSymbol].put(controller, [act.asCompileString, true]);
+					}, {
+						controller = \dummy;
+						this.wdgtActions[name.asSymbol].put(controller, [act.asCompileString, false]);
+					});
+					wdgtControllersAndModels.actions.model.value_((
+						numActions: this.wdgtActions.size,
+						activeActions: this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size
+					)).changed(\value);
+				};
+				thisGuiEnv = this.guiEnv;
+				if(thisGuiEnv.editor.notNil and: {
+					thisGuiEnv.editor.isClosed.not;
+				}, {
+					thisGuiEnv.editor.amendActionsList(
+						this, \add, name.asSymbol, this.wdgtActions[name.asSymbol], active: active;
+					)
+				})
+			}
+		)
+	}
+	
+	removeAction { |name, slot|
+		var controller, thisGuiEnv;
+		name ?? { Error("Please provide the action's name!").throw };
+		switch(this.class,
+			CVWidget2D, {
+				slot ?? { Error("Please provide either 'lo' or 'hi' as second argument to removeAction!").throw };
+				thisGuiEnv = this.guiEnv[slot.asSymbol];
+				this.wdgtActions[slot.asSymbol][name.asSymbol] !? {
+					this.wdgtActions[slot.asSymbol][name.asSymbol].keys.do({ |c| 
+						if(c.class === SimpleController, { c.remove });
+					});
+					this.wdgtActions[slot.asSymbol].removeAt(name.asSymbol);
+					this.wdgtActions[slot.asSymbol].isEmpty.if { this.wdgtActions.removeAt(slot.asSymbol) };
+					wdgtControllersAndModels[slot.asSymbol].actions.model.value_((
+						numActions: this.wdgtActions[slot.asSymbol].size,
+						activeActions: this.wdgtActions[slot.asSymbol].select({ |v| v.asArray[0][1] == true }).size
+					)).changed(\value);
+					if(thisGuiEnv.editor.notNil and: {
+						thisGuiEnv.editor.isClosed.not;
+					}, {
+						thisGuiEnv.editor.amendActionsList(
+							this, \remove, name.asSymbol;
+						)
+					})
+				}
+			},
+			{
+				thisGuiEnv = this.guiEnv;
+				this.wdgtActions[name.asSymbol] !? {
+					this.wdgtActions[name.asSymbol].keys.do({ |c|
+						if(c.class === SimpleController, { c.remove });
+					});
+					this.wdgtActions.removeAt(name.asSymbol);
+					wdgtControllersAndModels.actions.model.value_((
+						numActions: this.wdgtActions.size,
+						activeActions: this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size
+					)).changed(\value);
+					if(thisGuiEnv.editor.notNil and: {
+						thisGuiEnv.editor.isClosed.not;
+					}, {
+						thisGuiEnv.editor.amendActionsList(
+							this, \remove, name.asSymbol;
+						)
+					})
+				}
+			}
+		);
+		controller.do({ |c| c = nil });
+	}
+	
+	activateAction { |name, activate=true, slot|
+		var action, actions, cv, thisGuiEnv, wcm, controller, thisAction;
 
+		if(slot.notNil, {
+			cv = widgetCV[slot.asSymbol];
+			actions = this.wdgtActions[slot.asSymbol];
+			action = this.wdgtActions[slot.asSymbol][name.asSymbol];
+			thisGuiEnv = this.guiEnv[slot.asSymbol];
+			wcm = wdgtControllersAndModels[slot.asSymbol];
+		}, {
+			cv = widgetCV;
+			actions = this.wdgtActions;
+			action = this.wdgtActions[name.asSymbol];
+			thisGuiEnv = this.guiEnv;
+			wcm = wdgtControllersAndModels;
+		});
+		
+		if(action.notNil, {
+			switch(activate, 
+				true, {
+					if(action.keys.asArray[0].class != SimpleController, {
+						if(action.asArray[0][0].class === String, {
+							thisAction = action.asArray[0][0].interpret;
+						}, {
+							thisAction = action.asArray[0][0];
+						});
+						controller = cv.action_(thisAction);
+						action.put(controller, [thisAction.asCompileString, true]);
+						action.removeAt(\dummy);
+					})
+				},
+				false, {
+					if(action.keys.asArray[0].class == SimpleController, {
+						controller = action.keys.asArray[0];
+						controller.remove;
+						action.put(\dummy, [action.asArray[0][0], false]);
+						action[controller] = nil;
+					})
+				}
+			);
+			wcm.actions.model.value_((
+				numActions: actions.size,
+				activeActions: actions.select({ |v| v.asArray[0][1] == true }).size
+			)).changed(\value);
+			if(thisGuiEnv.editor.notNil and: {
+				thisGuiEnv.editor.isClosed.not;
+			}, {
+				switch(activate,
+					true, { 
+						thisGuiEnv.editor.actionsList[name.asSymbol].activate.value_(1);
+					},
+					false, {
+						thisGuiEnv.editor.actionsList[name.asSymbol].activate.value_(0);
+					}
+				)
+			})
+		})
+	}
+	
 	setMidiMode { |mode, key|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -474,7 +626,11 @@ CVWidget {
 	oscConnect { |ip, port, name, oscMsgIndex, key|
 		var intPort;
 		
-		if(ip.size > 0 and:{ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not }, {
+		if(ip.size > 0 and:{
+			"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not and:{
+				ip != "nil"
+			}
+		}, {
 			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
 		});
 		
@@ -672,7 +828,7 @@ CVWidget {
 				but: ["edit OSC", Color.black, Color.clear],
 				ipField: "",
 				portField: "",
-				nameField: "/my/typetag",
+				nameField: "/my/cmd/name",
 				index: 1, 
 				connectorButVal: 0, 
 				editEnabled: true
@@ -710,14 +866,17 @@ CVWidget {
 		wcm.mapConstrainterHi ?? { 
 			wcm.mapConstrainterHi = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[1]);
 		};
+		wcm.actions ?? {
+			wcm.actions = ();
+		};
+		wcm.actions.model ?? {
+			wcm.actions.model = Ref((numActions: 0, activeActions: 0))
+		};
 		
 	}
 		
 	initControllerActions { |key|
 		var wcm, thisGuiEnv, midiOscEnv, tmpMapping, tmpSetup, widgetCV, tmp;
-		var oscResponderAction;
-		var makeCCResponder, ccResponderAction, ccResponder;
-		var ctrlString, meanVal;
 		var thisCalib;
 						
 		if(key.notNil, {
@@ -733,7 +892,21 @@ CVWidget {
 			widgetCV = this.widgetCV;
 			thisCalib = prCalibrate;
 		});
-											
+		
+		#[
+			prInitCalibration, 
+			prInitSpecControl, 
+			prInitMidiConnect,
+			prInitMidiDisplay,
+			prInitMidiOptions,
+			prInitOscConnect,
+			prInitOscDisplay,
+			prInitOscInputRange,
+			prInitActionsControl
+		].do({ |method| this.perform(method, wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key) });
+	}	
+		
+	prInitCalibration { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|										
 		wcm.calibration.controller ?? { 
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
@@ -774,8 +947,12 @@ CVWidget {
 					})
 				}
 			)
-		});
-
+		})
+	}
+	
+	prInitSpecControl { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
+		var tmp, tmpMapping;
+		
 		wcm.cvSpec.controller ?? {
 			wcm.cvSpec.controller = SimpleController(wcm.cvSpec.model);
 		};
@@ -822,13 +999,11 @@ CVWidget {
 				})
 			});
 			
-//			"before in cvSpec.controller: %\n".postf(widgetCV.spec);
 			widgetCV.spec_(theChanger.value);
-//			"after in cvSpec.controller: %\n".postf(widgetCV.spec);
 			
 			if(this.class === CVWidgetKnob, {
 				block { |break|
-					#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+					#[pan, boostcut, bipolar, detune].do({ |symbol| 
 						if(widgetCV.spec == symbol.asSpec, { 
 							break.value(thisGuiEnv.knob.centered_(true));
 						}, {
@@ -837,8 +1012,12 @@ CVWidget {
 					})
 				}
 			})
-		});
-		
+		})
+	}
+	
+	prInitMidiConnect { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
+		var ctrlString, meanVal, ccResponderAction, makeCCResponder;
+
 		wcm.midiConnection.controller ?? {
 			wcm.midiConnection.controller = SimpleController(wcm.midiConnection.model);
 		};
@@ -920,7 +1099,10 @@ CVWidget {
 				).changed(\value);
 				midiOscEnv.midisrc = nil; midiOscEnv.midichan = nil; midiOscEnv.midinum = nil; midiOscEnv.midiRawNum = nil;
 			})
-		});
+		})
+	}
+	
+	prInitMidiDisplay { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
 		
 		wcm.midiDisplay.controller ?? {
 			wcm.midiDisplay.controller = SimpleController(wcm.midiDisplay.model);
@@ -952,7 +1134,6 @@ CVWidget {
 						if(thisGuiEnv.editor.notNil and:{
 							thisGuiEnv.editor.isClosed.not
 						}, {
-//							"triggered".postln;
 							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
 								.background_(Color.red)
 								.stringColor_(Color.white)
@@ -974,14 +1155,14 @@ CVWidget {
 				},
 				"C", {
 					thisGuiEnv.midiLearn.states_([
-						["C", Color.white, Color(0.11468057974842, 0.38146154367376, 0.19677815686724)],
+						["C", Color.white, Color(0.11, 0.38, 0.2)],
 						["X", Color.white, Color.red]
 					]).refresh;
 					if(thisGuiEnv.editor.notNil and:{
 						thisGuiEnv.editor.isClosed.not
 					}, {
 						thisGuiEnv.editor.midiLearnBut.states_([
-							["C", Color.white, Color(0.11468057974842, 0.38146154367376, 0.19677815686724)],
+							["C", Color.white, Color(0.11, 0.38, 0.2)],
 							["X", Color.white, Color.red]
 						]).refresh;
 					})
@@ -1039,6 +1220,9 @@ CVWidget {
 				}
 			)
 		});
+	}
+	
+	prInitMidiOptions { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
 
 		wcm.midiOptions.controller ?? {
 			wcm.midiOptions.controller = SimpleController(wcm.midiOptions.model);
@@ -1054,8 +1238,12 @@ CVWidget {
 				thisGuiEnv.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
 				thisGuiEnv.editor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
 			})
-		});
-
+		})
+	}
+	
+	prInitOscConnect { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
+		var oscResponderAction;
+		
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
 		};
@@ -1072,6 +1260,9 @@ CVWidget {
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
 						}, {
+							if(msg[theChanger.value[3]].isNegative and:{
+								msg[theChanger.value[3]].abs > alwaysPositive;
+							}, { alwaysPositive = msg[theChanger.value[3]].abs+0.1 });
 							if(msg[theChanger.value[3]] < midiOscEnv.calibConstraints.lo, { 
 								midiOscEnv.calibConstraints.lo = msg[theChanger.value[3]];
 								wcm.oscInputRange.model.value_([
@@ -1098,9 +1289,10 @@ CVWidget {
 						})
 					});
 					widgetCV.value_(
-						msg[theChanger.value[3]].perform(
+						(msg[theChanger.value[3]]+alwaysPositive).perform(
 							midiOscEnv.oscMapping,
-							midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi,
+							midiOscEnv.calibConstraints.lo+alwaysPositive, 
+							midiOscEnv.calibConstraints.hi+alwaysPositive,
 							this.getSpec(key).minval, this.getSpec(key).maxval,
 							\minmax
 						)
@@ -1147,7 +1339,10 @@ CVWidget {
 					)
 				).changed(\value);
 			})
-		});
+		})
+	}
+	
+	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
 		
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
@@ -1159,6 +1354,7 @@ CVWidget {
 				{ thisCalib = prCalibrate }
 			);
 			if(this.window.isClosed.not, {
+//				"set color: %\n".postf(theChanger.value.but);
 				thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
 				thisGuiEnv.oscEditBut.refresh;
 			});
@@ -1185,34 +1381,30 @@ CVWidget {
 						thisGuiEnv.editor.indexField
 					].do(_.enabled_(theChanger.value.editEnabled))
 				})
-			};
-		});
+			}
+		})
+	}
+	
+	prInitOscInputRange { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
 		
 		wcm.oscInputRange.controller ?? {
 			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
 		};
 
 		wcm.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
-			if(theChanger.value[0] <= 0 or:{
-				theChanger.value[1] <= 0
-			}, {
-				if(midiOscEnv.oscMapping === \explin or:{
-					midiOscEnv.oscMapping === \expexp
+			{
+				if(thisGuiEnv.editor.notNil and:{
+					thisGuiEnv.editor.isClosed.not
 				}, {
-					midiOscEnv.oscMapping = \linlin;
-				});
-				
-				{	
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not
-					}, {
-						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === midiOscEnv.oscMapping, {
-								thisGuiEnv.editor.mappingSelect.value_(i);
-							})
+					thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
+						if(item.asSymbol === midiOscEnv.oscMapping, {
+							thisGuiEnv.editor.mappingSelect.value_(i)
 						})
 					});
-					if(this.window.isClosed.not, {
+					thisGuiEnv.editor.alwaysPosField.string_(" +"++(alwaysPositive.trunc(0.1)));
+				});
+				if(this.window.isClosed.not, {
+					if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 						thisGuiEnv.oscEditBut.states_([[
 							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
 							thisGuiEnv.oscEditBut.states[0][1],
@@ -1220,32 +1412,26 @@ CVWidget {
 						]]);
 						thisGuiEnv.oscEditBut.refresh;
 					})
-				}.defer
-			}, {
-				{
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not	
-					}, {
-						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === midiOscEnv.oscMapping, {
-								thisGuiEnv.editor.mappingSelect.value_(i)
-							})
-						});
-					});
-					if(this.window.isClosed.not, {
-						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
-							thisGuiEnv.oscEditBut.states_([[
-								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
-								thisGuiEnv.oscEditBut.states[0][1],
-								thisGuiEnv.oscEditBut.states[0][2]
-							]]);
-							thisGuiEnv.oscEditBut.refresh;
-						})
-					})
-				}.defer
-			})
-		});
+				})
+			}.defer
+		})
+	}
+	
+	prInitActionsControl { |wcm, thisGuiEnv, midiOscEnv, widgetCV, thisCalib, key|
 		
+		wcm.actions.controller ?? {
+			wcm.actions.controller = SimpleController(wcm.actions.model);
+		};
+		
+		wcm.actions.controller.put(\value, { |theChanger, what, moreArgs|
+			if(this.window.isClosed.not, {
+				thisGuiEnv.actionsBut.states_([[
+					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
+					Color(0.08, 0.09, 0.14),
+					Color(0.32, 0.67, 0.76),
+				]])
+			})
+		})
 	}
 
 }

@@ -1,32 +1,58 @@
+/* (c) Stefan Nussbaumer */
+/* 
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+*/
+
 CVWidgetEditor {
 	classvar <allEditors;
-	var thisEditor, <window, <tabs;
+	var thisEditor, <window, <tabs, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut, <calibNumBoxes;
+	var <deviceListMenu, <cmdListMenu, <addDeviceBut, thisCmdNames;
 	var <ipField, <portField, <nameField, <indexField;
-	var <inputConstraintLoField, <inputConstraintHiField;
+	var <inputConstraintLoField, <inputConstraintHiField, <alwaysPosField;
 	var <mappingSelect;
 	var <connectorBut;
+	var <actionName, <enterAction, <enterActionBut, <actionsList;
 	var <name;
+	var flow0, flow1, flow2, flow3;
 	
 	*new { |widget, widgetName, tab, slot|
 		^super.new.init(widget, widgetName, tab, slot)
 	}
 
 	init { |widget, widgetName, tab, slot|
-		var flow0, flow1, flow2;
-		var tabs, /*specsActions, editor, */cvString, slotHiLo;
+		var tabs, cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
-		var addr, wcmHiLo, thisGuiEnv; 
+		var addr, wcmHiLo, thisGuiEnv, labelColors; 
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
-		var mappingSelectItems/*, mappingModes*/;
-		var tmp; // multipurpose, short-term var
+		var mappingSelectItems;
+		var wdgtActions;
+		var cmdNames, orderedCmds, orderedCmdSlots;
+		var tmp; // multipurpose short-term var
 						
 		name = widgetName.asSymbol;
+		
+		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
+		thisCmdNames ?? { thisCmdNames = [nil] };
+				
+		actionsList ?? { actionsList = () };
 		
 		if(slot.isNil, { thisGuiEnv = widget.guiEnv }, { thisGuiEnv = widget.guiEnv[slot] });
 
@@ -71,7 +97,8 @@ CVWidgetEditor {
 		
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 			
-			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 225));
+			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 265));
+			
 
 			if(slot.isNil, { 
 				allEditors.put(name, (window: window, name: widgetName)) 
@@ -84,19 +111,30 @@ CVWidgetEditor {
 				});
 			});
 			
-//			"allEditors: %\n".postf(allEditors);
 			if(slot.notNil, { thisEditor = allEditors[name][slot] }, { thisEditor = allEditors[name] });
-//			thisEditor = allEditors[name][slot];
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
-			tabs = TabbedView(window, Rect(0, 0, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC"], scroll: true);
+			tabs = TabbedView(window, Rect(0, 1, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC", "Actions"], scroll: true);
+			tabs.view.resize_(5);
+			tabs.tabCurve_(4);
+			tabs.labelColors_(Color.white!4);
+			labelColors = [
+				Color(1.0, 0.3), //specs
+				Color.red, //midi
+				Color(0.0, 0.5, 0.5), //osc
+				Color(0.32, 0.67, 0.76), //actions
+			];
+			labelStringColors = labelColors.collect({ |c| Color(c.red * 0.8, c.green * 0.8, c.blue * 0.8) });
+			tabs.unfocusedColors_(labelColors);
+			tabs.stringColor_(Color.white);
+			tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			(0..3).do({ |t| tabs.focusActions[t] = { tabs.stringFocusedColor_(labelStringColors[t]) } });
+			tabs.stringFocusedColor_(labelStringColors[tab]);
+
 			thisEditor.tabs = tabs;
-			thisEditor.tabs.view.resize_(5);
-			thisEditor.tabs.stringFocusedColor_(Color.blue);
-			
-			thisEditor.tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			thisEditor.tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			thisEditor.tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 						
 			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@95)
 				.font_(staticTextFont)
@@ -364,12 +402,12 @@ CVWidgetEditor {
 			
 			// OSC editting
 			
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@15)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@12)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("device-IP/port: leave empty for listening to any IP/port")
+				.string_("device-IP/port")
 			;
-			
+						
 			ipField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
@@ -388,17 +426,69 @@ CVWidgetEditor {
 				
 			flow2.shift(0, 0);
 
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@15)
+			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@40)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("OSC-typetag, e.g.: /my/typetag / OSC message index")
+				.string_("OSC command-name, e.g.: /my/cmd/name / OSC message slot: Either choose from a list of command-names (as set by the selected device) or add your custom one ")
 			;
 	
+			flow2.shift(0, 0);
+			
+			deviceListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-40@15)
+				.items_(["select device..."])
+				.font_(Font("Helvetica", 10))
+				.action_({ |m|
+					cmdListMenu.items_(["command-names..."]);
+					thisCmdNames = [nil];
+					if(m.value != 0, {
+						orderedCmds = cmdNames[m.items[m.value].asSymbol].order;
+						orderedCmdSlots = cmdNames[m.items[m.value].asSymbol].atAll(orderedCmds);
+						orderedCmds.do({ |cmd, i|
+							cmdListMenu.items_(cmdListMenu.items.add(cmd.asString+"("++orderedCmdSlots[i]++")"));
+							thisCmdNames = thisCmdNames.add(cmd.asString);
+						})
+					})
+				})
+				.mouseDownAction_({ |m|
+					cmdNames = OSCCommands.deviceCmds;
+					deviceListMenu.items_(["select device..."]);
+					cmdNames.pairsDo({ |dev, cmds|
+						deviceListMenu.items_(deviceListMenu.items ++ dev);
+					})
+				})
+			;
+			
+			flow2.shift(0, 0);
+			
+			cmdListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-11@15)
+				.items_(["command-names..."])
+				.font_(Font("Helvetica", 10))
+				.action_({ |m|
+					if(nameField.enabled, {
+						nameField.string_(thisCmdNames[m.value]);
+					})
+				})
+			;
+			
+			cmdNames.pairsDo({ |dev, cmds|
+				deviceListMenu.items = deviceListMenu.items ++ dev;
+			});
+			
+			flow2.shift(0, 0);
+			
+			addDeviceBut = Button(thisEditor.tabs.views[2], 29@15)
+				.states_([
+					["new", Color.white, Color(0.15, 0.5, 0.15)]
+				])
+				.font_(staticTextFont)
+				.action_({ OSCCommands.gui })
+			;
+
 			nameField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
-				.string_("/my/typetag")
+				.string_("/my/cmd/name")
 			;
 						
 			flow2.shift(5, 0);
@@ -419,10 +509,10 @@ CVWidgetEditor {
 			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("lower and upper constraints of the OSC-input.")
+				.string_("OSC-input constraints + compensation")
 			;
 			
-			inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-56@15)
+			inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(wcmHiLo.oscInputRange.model.value[0])
@@ -431,7 +521,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 			
-			inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-56@15)
+			inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(wcmHiLo.oscInputRange.model.value[0])
@@ -439,8 +529,17 @@ CVWidgetEditor {
 			;
 			
 			flow2.shift(5, 0);
+			
+			alwaysPosField = StaticText(thisEditor.tabs.views[2], 32@15)
+				.font_(staticTextFont)
+				.string_(" +"++widget.alwaysPositive)
+				.stringColor_(Color(0.5))
+				.background_(Color(0.95, 0.95, 0.95))
+			;
 						
-			calibBut = Button(thisEditor.tabs.views[2], 80@15)
+			flow2.shift(5, 0);
+
+			calibBut = Button(thisEditor.tabs.views[2], 60@15)
 				.font_(staticTextFont)
 				.states_([
 					["calibrating", Color.white, Color.red],
@@ -468,7 +567,7 @@ CVWidgetEditor {
 			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 			
 			mappingSelect = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width-15@20)
-				.font_(Font("Helvetica", 14))
+				.font_(Font("Helvetica", 12))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
 					widget.setOscMapping(ms.item, slot);
@@ -528,7 +627,103 @@ CVWidgetEditor {
 				true, { calibBut.value_(0) },
 				false, { calibBut.value_(1) }
 			);
-	
+			
+			actionName = TextField(thisEditor.tabs.views[3], flow3.bounds.width-100@20)
+				.string_("action-name")
+				.font_(textFieldFont)
+			;
+			
+			flow3.shift(5, 0);
+			
+			enterActionBut = Button(thisEditor.tabs.views[3], 57@20)
+				.font_(staticTextFont)
+				.states_([
+					["add Action", Color.white, Color.blue],
+				])
+				.action_({ |ab|
+					if(actionName.string != "action-name" and:{
+						enterAction.string != "{ |cv| /* do something */ }"
+					}, {
+						widget.addAction(actionName.string.asSymbol, enterAction.string, slot.asSymbol);
+					})
+				})
+			;
+
+			flow3.shift(0, 0);
+
+			enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+				.background_(Color.white)
+				.font_(textFieldFont)
+				.string_("{ |cv| /* do something */ }")
+				.syntaxColorize
+			;
+			
+			if(slot.notNil, {
+				wdgtActions = widget.wdgtActions[slot];
+			}, {
+				wdgtActions = widget.wdgtActions;
+			});
+			
+			wdgtActions.pairsDo({ |name, action|
+												
+				actionsList = actionsList.put(name, ());
+				
+				flow3.shift(0, 5);
+				
+				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-173@15)
+					.font_(staticTextFont)
+					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.string_(""+name.asString)
+				;
+				
+				flow3.shift(5, 0);
+				
+				actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
+					.font_(staticTextFont)
+					.states_([
+						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+						["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
+					])
+					.action_({ |rb|
+						switch(rb.value, 
+							0, { widget.activateAction(name, false, slot) },
+							1, { widget.activateAction(name, true, slot) }
+						)
+					})
+				;
+				
+				switch(action.asArray[0][1], 
+					true, {
+						actionsList[name].activate.value_(1);
+					},
+					false, {
+						actionsList[name].activate.value_(0);
+					}
+				);
+				
+				flow3.shift(5, 0);
+				
+				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 60@15)
+					.font_(staticTextFont)
+					.states_([
+						["remove", Color.white, Color.red],
+					])
+					.action_({ |rb|
+						widget.removeAction(name.asSymbol, slot.asSymbol);
+					})
+				;
+				
+				flow3.shift(0, 0);
+				
+				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.font_(textFieldFont)
+					.string_(action.asArray[0][0])
+					.syntaxColorize
+					.editable_(false)
+				;
+			})
+			
 		});
 		
 		tab !? { 
@@ -539,7 +734,10 @@ CVWidgetEditor {
 	
 	front { |tab|
 		thisEditor.window.front;
-		tab !? thisEditor.tabs.focus(tab);
+		tab !? { 
+			thisEditor.tabs.stringFocusedColor_(labelStringColors[tab]);
+			thisEditor.tabs.focus(tab);
+		}
 	}
 	
 	close { |slot|
@@ -559,6 +757,84 @@ CVWidgetEditor {
 			ret = defer { thisEditor.window.isClosed };
 			^ret.value;
 		}
+	}
+	
+	// not to be used directly!
+	
+	amendActionsList { |widget, addRemove, name, action, slot, active|
+		
+		var staticTextFont = Font(Font.defaultSansFace, 10);
+
+		switch(addRemove, 
+			\add, {
+				
+				actionsList.put(name, ());
+				flow3.shift(0, 5);
+				
+				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-173@15)
+					.font_(staticTextFont)
+					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.string_(""+name.asString)
+				;
+				
+				flow3.shift(5, 0);
+				
+				actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
+					.font_(staticTextFont)
+					.states_([
+						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+						["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
+					])
+					.action_({ |rb|
+						switch(rb.value, 
+							0, { widget.activateAction(name, false, slot) },
+							1, { widget.activateAction(name, true, slot) }
+						)
+					})
+				;
+
+				switch(active, 
+					true, {
+						actionsList[name].activate.value_(1);
+					},
+					false, {
+						actionsList[name].activate.value_(0);
+					}
+				);
+				
+				flow3.shift(5, 0);
+				
+				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 60@15)
+					.font_(staticTextFont)
+					.states_([
+						["remove", Color.white, Color.red],
+					])
+					.action_({ |ab|
+						widget.removeAction(name.asSymbol, slot.asSymbol);
+					})
+				;
+				
+				flow3.shift(0, 0);
+				
+				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.font_(Font("Helvetica", 9))
+					.string_(action.asArray[0][0])
+					.syntaxColorize
+					.editable_(false)
+				;
+			},
+			\remove, {
+				[
+					actionsList[name].nameField, 
+					actionsList[name].activate, 
+					actionsList[name].removeBut, 
+					actionsList[name].actionView
+				].do(_.remove);
+				flow3.reFlow(thisEditor.tabs.views[3]);
+			}		
+		)
+			
 	}
 			
 }

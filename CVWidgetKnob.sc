@@ -1,9 +1,24 @@
-/* new branch: 'midi_refactoring' - midi-connections should be handled analoguesly to OSC-handling - within a MVC-logic. Moreover, there shouldn't be a new CCResponder created for each new connection, rather this should be handled within the CCResponder's function (to be investigated in depth. */
+/* (c) Stefan Nussbaumer */
+/* 
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+*/
 
 CVWidgetKnob : CVWidget {
 	
 	var <window, <guiEnv, <editorEnv;
-	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut;
+	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
 
 	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, server|
 		^super.new.init(
@@ -23,6 +38,8 @@ CVWidgetKnob : CVWidget {
 		var thisName, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
+		
+		this.bgColor ?? { this.bgColor = Color.white };
 		
 		prCalibrate = true;
 		prMidiMode = 0;
@@ -57,13 +74,12 @@ CVWidgetKnob : CVWidget {
 		setupArgs[\softWithin] !? { this.setSoftWithin(setupArgs[\softWithin]) };
 		setupArgs[\calibrate] !? { this.setCalibrate(setupArgs[\calibrate]) };
 						
-		action !? { this.setDefaultAction(action) };
-//		action !? { this.addAction(\default, action) };
+		action !? { this.addAction(\default, action) };
 		
 		if(bounds.isNil, {
 			thisXY = 7@0;
 			thisWidth = 52;
-			thisHeight = 166;
+			thisHeight = 181;
 		}, {
 			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
 			thisWidth = bounds.width;
@@ -96,8 +112,8 @@ CVWidgetKnob : CVWidget {
 		};
 						
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
-			.focusColor_(Color(alpha: 1.0))
-			.background_(Color.white)
+//			.focusColor_(Color(alpha: 1.0))
+			.background_(this.bgColor)
 		;
 		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
 			.states_([
@@ -116,13 +132,13 @@ CVWidgetKnob : CVWidget {
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
-		knobsize = thisHeight-2-130;
+		knobsize = thisHeight-2-145;
 		if(knobsize >= thisWidth, {
 			knobsize = thisWidth;
-			knobY = thisXY.y+16+(thisHeight-128-knobsize/2);
+			knobY = thisXY.y+16+(thisHeight-143-knobsize/2);
 			knobX = thisXY.x;
 		}, {
-			knobsize = thisHeight-128;
+			knobsize = thisHeight-143;
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = thisXY.y+16;
 		});						
@@ -130,19 +146,19 @@ CVWidgetKnob : CVWidget {
 			.canFocus_(false)
 		;
 		block { |break|
-			#[\pan, \boostcut, \bipolar, \detune].do({ |symbol| 
+			#[pan, boostcut, bipolar, detune].do({ |symbol| 
 				if(widgetCV.spec == symbol.asSpec, { break.value(knob.centered_(true)) });
 			})
 		};
-		nextY = thisXY.y+thisHeight-117;
+		nextY = thisXY.y+thisHeight-132;
 		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.value_(widgetCV.value)
+			.value_(widgetCV.value).font_(Font("Helvetica", 9.5))
 		;
 		nextY = nextY+numVal.bounds.height;
 		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
-			.states_([["edit Spec", Color.black, Color(241/255, 209/255, 0)]])
+//			.focusColor_(Color(alpha: 0))
+			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 			.action_({ |btn|
 				if(editor.isNil or:{ editor.isClosed }, {
 					editor = CVWidgetEditor(this, thisName, 0);
@@ -161,8 +177,8 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+specBut.bounds.height+1;
 		midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
-			.states_([["MIDI", Color.black, Color(alpha: 0)]])
+//			.focusColor_(Color(alpha: 0))
+			.states_([["MIDI", Color.black, this.bgColor]])
 			.action_({ |ms|
 				if(editor.isNil or:{ editor.isClosed }, {
 					editor = CVWidgetEditor(this, thisName, 1);
@@ -179,9 +195,17 @@ CVWidgetKnob : CVWidget {
 			})
 		;
 		
+		if(GUI.current.name === \QtGUI, {
+			midiHead.mouseEnterAction_({ |mb|
+				mb.states_([["MIDI", Color.white, Color.red]])
+			}).mouseLeaveAction_({ |mb|
+				mb.states_([["MIDI", Color.black, this.bgColor]])
+			})
+		});
+		
 		midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.states_([
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
@@ -207,7 +231,7 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+midiLearn.bounds.height;
 		midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.string_(msrc)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -233,7 +257,7 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+midiSrc.bounds.height;
 		midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.string_(mchan)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -258,7 +282,7 @@ CVWidgetKnob : CVWidget {
 		;
 		midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.string_(mctrl)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -282,11 +306,12 @@ CVWidgetKnob : CVWidget {
 			}) 
 		;
 		nextY = nextY+midiCtrl.bounds.height+1;
+				
 		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.states_([
-				["edit OSC", Color.black, Color.clear]
+				["edit OSC", Color.black, this.bgColor]
 			])
 			.action_({ |oscb|
 				if(editor.isNil or:{ editor.isClosed }, {
@@ -307,10 +332,23 @@ CVWidgetKnob : CVWidget {
 				).changed(\value);
 			})
 		;
+		
+		if(GUI.current.name === \QtGUI, {
+			oscEditBut.mouseEnterAction_({ |oscb|
+				if(wdgtControllersAndModels.oscConnection.model.value === false, {
+					oscb.states_([["edit OSC", Color.white, Color.cyan(0.5)]]);
+				})
+			}).mouseLeaveAction_({ |oscb|
+				if(wdgtControllersAndModels.oscConnection.model.value === false, {
+					oscb.states_([["edit OSC", Color.black, this.bgColor]])
+				})
+			})
+		});
+		
 		nextY = nextY+oscEditBut.bounds.height;
 		calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
-			.focusColor_(Color(alpha: 0))
+//			.focusColor_(Color(alpha: 0))
 			.states_([
 				["calibrating", Color.white, Color.red],
 				["calibrate", Color.black, Color.green]
@@ -320,6 +358,22 @@ CVWidgetKnob : CVWidget {
 					0, { this.setCalibrate(true) },
 					1, { this.setCalibrate(false) }
 				)
+			})
+		;
+		nextY = nextY+calibBut.bounds.height;
+		actionsBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+			.font_(Font("Helvetica", 9))
+//			.focusColor_(Color(alpha: 0))
+			.states_([
+				["actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)],
+			])
+			.action_({ |ab|
+				if(editor.isNil or:{ editor.isClosed }, {
+					editor = CVWidgetEditor(this, thisName, 3);
+					guiEnv.editor = editor;
+				}, {
+					editor.front(3)
+				});
 			})
 		;
 		if(prCalibrate, { calibBut.value_(0) }, { calibBut.value_(1) });
@@ -336,7 +390,8 @@ CVWidgetKnob : CVWidget {
 			midiChan, 
 			midiCtrl, 
 			oscEditBut, 
-			calibBut
+			calibBut,
+			actionsBut
 		];
 		allGuiEls = [
 			widgetBg, 
@@ -351,11 +406,13 @@ CVWidgetKnob : CVWidget {
 			midiChan, 
 			midiCtrl, 
 			oscEditBut, 
-			calibBut
+			calibBut,
+			actionsBut
 		];		
 		guiEnv = (
 			editor: editor,
 			calibBut: calibBut,
+			actionsBut: actionsBut,
 			knob: knob,
 			oscEditBut: oscEditBut,
 			midiSrc: midiSrc,

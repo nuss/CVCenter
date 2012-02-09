@@ -1,4 +1,4 @@
-/* (c) Stefan Nussbumer */
+/* (c) Stefan Nussbaumer */
 /* 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -15,18 +15,13 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-+ TabbedView {
-	
-	getLabels { ^labels }
-	
-	getLabelAt { |index|
-		^labels[index].asString;
++ FlowLayout {
+
+	resetTo { |point|
+		bounds.postln;
+		maxRight = left = bounds.left + point.x;
+		top = bounds.top + point.y;
+		maxHeight  = 0;
 	}
-	
-	setLabelAt { |index, name|
-		this.paintTab(tabViews[index], name.asString);
-		labels[index] = name.asString;
-		this.updateViewSizes();
-	} 
 	
 }
