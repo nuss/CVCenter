@@ -24,7 +24,7 @@ CVWidgetEditor {
 	var <calibBut, <calibNumBoxes;
 	var <deviceListMenu, <cmdListMenu, <addDeviceBut, thisCmdNames;
 	var <ipField, <portField, <nameField, <indexField;
-	var <inputConstraintLoField, <inputConstraintHiField;
+	var <inputConstraintLoField, <inputConstraintHiField, <alwaysPosField;
 	var <mappingSelect;
 	var <connectorBut;
 	var <actionName, <enterAction, <enterActionBut, <actionsList;
@@ -509,10 +509,10 @@ CVWidgetEditor {
 			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("lower and upper constraints of the OSC-input.")
+				.string_("OSC-input constraints + compensation")
 			;
 			
-			inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-56@15)
+			inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(wcmHiLo.oscInputRange.model.value[0])
@@ -521,7 +521,7 @@ CVWidgetEditor {
 			
 			flow2.shift(5, 0);
 			
-			inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-56@15)
+			inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(wcmHiLo.oscInputRange.model.value[0])
@@ -529,8 +529,17 @@ CVWidgetEditor {
 			;
 			
 			flow2.shift(5, 0);
+			
+			alwaysPosField = StaticText(thisEditor.tabs.views[2], 32@15)
+				.font_(staticTextFont)
+				.string_(" +"++widget.alwaysPositive)
+				.stringColor_(Color(0.5))
+				.background_(Color(0.95, 0.95, 0.95))
+			;
 						
-			calibBut = Button(thisEditor.tabs.views[2], 80@15)
+			flow2.shift(5, 0);
+
+			calibBut = Button(thisEditor.tabs.views[2], 60@15)
 				.font_(staticTextFont)
 				.states_([
 					["calibrating", Color.white, Color.red],

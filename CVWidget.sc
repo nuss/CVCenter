@@ -17,7 +17,7 @@
 
 CVWidget {
 
-	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor;
+	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
@@ -1260,6 +1260,9 @@ CVWidget {
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
 						}, {
+							if(msg[theChanger.value[3]].isNegative and:{
+								msg[theChanger.value[3]].abs > alwaysPositive;
+							}, { alwaysPositive = msg[theChanger.value[3]].abs+0.1 });
 							if(msg[theChanger.value[3]] < midiOscEnv.calibConstraints.lo, { 
 								midiOscEnv.calibConstraints.lo = msg[theChanger.value[3]];
 								wcm.oscInputRange.model.value_([
@@ -1286,9 +1289,10 @@ CVWidget {
 						})
 					});
 					widgetCV.value_(
-						msg[theChanger.value[3]].perform(
+						(msg[theChanger.value[3]]+alwaysPositive).perform(
 							midiOscEnv.oscMapping,
-							midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi,
+							midiOscEnv.calibConstraints.lo+alwaysPositive, 
+							midiOscEnv.calibConstraints.hi+alwaysPositive,
 							this.getSpec(key).minval, this.getSpec(key).maxval,
 							\minmax
 						)
@@ -1388,26 +1392,18 @@ CVWidget {
 		};
 
 		wcm.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
-			if(theChanger.value[0] <= 0 or:{
-				theChanger.value[1] <= 0
-			}, {
-				if(midiOscEnv.oscMapping === \explin or:{
-					midiOscEnv.oscMapping === \expexp
+			{
+				if(thisGuiEnv.editor.notNil and:{
+					thisGuiEnv.editor.isClosed.not
 				}, {
-					midiOscEnv.oscMapping = \linlin;
-				});
-				
-				{	
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not
-					}, {
-						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === midiOscEnv.oscMapping, {
-								thisGuiEnv.editor.mappingSelect.value_(i);
-							})
+					thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
+						if(item.asSymbol === midiOscEnv.oscMapping, {
+							thisGuiEnv.editor.mappingSelect.value_(i)
 						})
 					});
-					if(this.window.isClosed.not, {
+					thisGuiEnv.editor.alwaysPosField.string_(" +"++(alwaysPositive.trunc(0.1)));					});
+				if(this.window.isClosed.not, {
+					if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 						thisGuiEnv.oscEditBut.states_([[
 							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
 							thisGuiEnv.oscEditBut.states[0][1],
@@ -1415,30 +1411,8 @@ CVWidget {
 						]]);
 						thisGuiEnv.oscEditBut.refresh;
 					})
-				}.defer
-			}, {
-				{
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not	
-					}, {
-						thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
-							if(item.asSymbol === midiOscEnv.oscMapping, {
-								thisGuiEnv.editor.mappingSelect.value_(i)
-							})
-						});
-					});
-					if(this.window.isClosed.not, {
-						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
-							thisGuiEnv.oscEditBut.states_([[
-								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
-								thisGuiEnv.oscEditBut.states[0][1],
-								thisGuiEnv.oscEditBut.states[0][2]
-							]]);
-							thisGuiEnv.oscEditBut.refresh;
-						})
-					})
-				}.defer
-			})
+				})
+			}.defer
 		})
 	}
 	
