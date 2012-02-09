@@ -151,12 +151,9 @@ CVWidgetSpecsEditor {
 				specName = cname;	
 			});
 			
-			"specName.class, prefix before: %, %\n".postf(specName.class, prefix);
-
 			prefix !? {
 				specName = prefix.asString ++ (specName.asString[0]).toUpper ++ specName.asString[1..];
 			};
-			"specName, prefix after: %, %\n".postf(specName, prefix);
 			
 			flow.shift(0, 0);
 			StaticText(window, cNameRect)

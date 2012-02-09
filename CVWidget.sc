@@ -1354,7 +1354,6 @@ CVWidget {
 				{ thisCalib = prCalibrate }
 			);
 			if(this.window.isClosed.not, {
-//				"set color: %\n".postf(theChanger.value.but);
 				thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
 				thisGuiEnv.oscEditBut.refresh;
 			});

@@ -808,7 +808,6 @@ CVCenter {
 						});
 						if(autoConnectOSC, {
 							v.osc.cmdName !? {
-//								v.osc.postln;
 								cvWidgets[key].oscConnect(
 									v.osc.addr !? { v.osc.addr.ip }, 
 									v.osc.addr !? { v.osc.addr.port }, 
