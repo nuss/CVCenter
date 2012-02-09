@@ -1401,7 +1401,7 @@ CVWidget {
 							thisGuiEnv.editor.mappingSelect.value_(i)
 						})
 					});
-					thisGuiEnv.editor.alwaysPosField.string_(" +"++(alwaysPositive.trunc(0.1)));					});
+					thisGuiEnv.editor.alwaysPosField.string_(" +"++(alwaysPositive.trunc(0.1)));				});
 				if(this.window.isClosed.not, {
 					if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 						thisGuiEnv.oscEditBut.states_([[
