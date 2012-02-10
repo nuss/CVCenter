@@ -30,7 +30,7 @@ CVWidgetSpecsEditor {
 		var staticTextFont, staticTextColor, textFieldFont, selectFont, textFieldFontColor, textFieldBg;
 		var formEls, nameStr, makeLine, sendBut, cancelBut;
 		var flow, lines, allEls, allWidth;
-		var cMatrix, specName, made;
+		var cMatrix, specName, prefSpecName, made;
 				
 		object = obj;
 		
@@ -152,7 +152,7 @@ CVWidgetSpecsEditor {
 			});
 			
 			prefix !? {
-				specName = prefix.asString ++ (specName.asString[0]).toUpper ++ specName.asString[1..];
+				prefSpecName = prefix.asString ++ (specName.asString[0]).toUpper ++ specName.asString[1..];
 			};
 			
 			flow.shift(0, 0);
@@ -165,7 +165,7 @@ CVWidgetSpecsEditor {
 			flow.shift(5, 0);
 			elem.cName = TextField(window, cNameEnterTextRect)
 				.font_(textFieldFont)
-				.string_(specName)
+				.string_(prefSpecName ? specName)
 				.background_(textFieldBg)
 			;
 		
