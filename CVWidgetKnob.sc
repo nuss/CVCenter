@@ -424,8 +424,4 @@ CVWidgetKnob : CVWidget {
 		this.initControllerActions;
 	}
 		
-	cvAction_ { |func|
-		widgetCV.action_(func);
-	}
-		
 }
