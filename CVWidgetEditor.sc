@@ -466,6 +466,7 @@ CVWidgetEditor {
 				.action_({ |m|
 					if(nameField.enabled, {
 						nameField.string_(thisCmdNames[m.value]);
+						indexField.clipHi_(orderedCmdSlots[m.value-1]);
 					})
 				})
 			;

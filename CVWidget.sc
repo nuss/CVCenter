@@ -623,7 +623,7 @@ CVWidget {
 		)
 	}
 	
-	oscConnect { |ip, port, name, oscMsgIndex, key|
+	oscConnect { |ip, port, name, oscMsgIndex=1, key|
 		var intPort;
 		
 		if(ip.size > 0 and:{
