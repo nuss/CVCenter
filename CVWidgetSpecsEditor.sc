@@ -127,7 +127,6 @@ CVWidgetSpecsEditor {
 		#formEls, cMatrix = ()!2;
 
 		makeLine = { |elem, cname, size, pairs2D, prefix|
-//			("input:"+[elem.type, cname, size]).postln;
 			if(elem.type.notNil, {
 				switch(elem.type,
 					\w2d, {

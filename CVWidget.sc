@@ -654,11 +654,11 @@ CVWidget {
 		
 		switch(this.class,
 			CVWidgetKnob, {
-				wdgtControllersAndModels.oscConnection.model.value_([ip, intPort, name, oscMsgIndex]).changed(\value);
+				wdgtControllersAndModels.oscConnection.model.value_([ip, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
 				CmdPeriod.add({ this.oscDisconnect });
 			},
 			{
-				wdgtControllersAndModels[key].oscConnection.model.value_([ip, intPort, name, oscMsgIndex]).changed(\value);
+				wdgtControllersAndModels[key].oscConnection.model.value_([ip, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
 				CmdPeriod.add({ this.oscDisconnect(key) });
 			}
 		)
