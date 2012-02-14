@@ -47,7 +47,7 @@ OSCCommands {
 		var thisDeviceName, allDevices, cmdsPath;
 		
 		deviceName ?? {
-			Error("Please provide the device- or application-name whose commandnames you want to save.").throw;
+			Error("Please provide the device- or application-name whose command-names you want to save.").throw;
 		};
 		
 		this.collect(false);
@@ -85,7 +85,7 @@ OSCCommands {
 					fields[nf].cmdName = StaticText(window, Rect(0, 0, 400, 20))
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 					;
-					if(cmds[nf] < 2, {
+					if(cmds[nf] == 1, {
 						fields[nf].cmdName.string_(nf.asString+"("++cmds[nf]+"slot)");
 					}, {
 						fields[nf].cmdName.string_(nf.asString+"("++cmds[nf]+"slots)");
@@ -178,8 +178,8 @@ OSCCommands {
 		saveBut = Button(window, Rect(0, 0, 70, 40))
 			.states_([["save", Color.white, Color(0.15, 0.5, 0.15)]])
 			.font_(Font(Font.defaultSansFace, 15, true))
-			.action_({ |but|
-				if(deviceNameField.string != "device-name" and:{ deviceNameField.string.size > 0 }, {
+			.action_({ |b|
+				if(deviceNameField.string != "< device-name >" and:{ deviceNameField.string.size > 0 }, {
 					this.collect(false);
 					[progressRoutine, collectRoutine].do(_.stop);
 					fields.pairsDo({ |k, v|

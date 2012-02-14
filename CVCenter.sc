@@ -741,12 +741,13 @@ CVCenter {
 			}, {
 				lib = Library.readTextArchive(f);
 			});
-			if(all.notNil, {
-				if(addToExisting.not, { 
+			all !? {
+				if(addToExisting == true, { 
 					this.removeAll;
 				});
-			});
+			};
 			lib[\all].pairsDo({ |key, v|
+//				"%: %\n".postf(key, v);
 				switch(v.wdgtClass,
 					CVWidget2D, {
 						#[lo, hi].do({ |hilo|
@@ -765,7 +766,7 @@ CVCenter {
 								}
 							});
 							if(autoConnectOSC, {
-								v[hilo].osc.cmdName !? {
+								if(v[hilo].osc.notNil and:{ v[hilo].osc.cmdName.notNil }, {
 									cvWidgets[key].oscConnect(
 										v[hilo].osc.addr !? { v[hilo].osc.addr.ip }, 
 										v[hilo].osc.addr !? { v[hilo].osc.addr.port }, 
@@ -777,17 +778,17 @@ CVCenter {
 										v[hilo].osc.calibConstraints.lo @ v[hilo].osc.calibConstraints.hi, hilo
 									);
 									cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo)
-								}
+								})
 							});
 							if(autoConnectMIDI, {
-								v[hilo].midi.num !? {
+								if(v[hilo].midi.notNil and:{ v[hilo].midi.num.notNil }, {
 									cvWidgets[key].midiConnect(
 										v[hilo].midi.src,
 										v[hilo].midi.chan,
 										v[hilo].midi.num,
 										hilo
 									)
-								}
+								})
 							})
 						})
 					},
