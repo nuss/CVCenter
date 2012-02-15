@@ -53,9 +53,9 @@ OSCCommands {
 		this.collect(false);
 		
 		thisDeviceName = deviceName.asSymbol;
-		cmdsPath = this.filenameSymbol.asString.split($/).drop(-1).join($/);
+		cmdsPath = this.filenameSymbol.asString.dirname;
 		if(File.exists(cmdsPath+/+"OSCCommands"), {
-			allDevices = Object.readArchive(cmdsPath+/+"OSCCommands");
+			allDevices = Object.readArchive(cmdsPath +/+ "OSCCommands");
 		}, {
 			allDevices = ();	
 		});
@@ -207,7 +207,7 @@ OSCCommands {
 		var thisDeviceName, thisCmds, cmdsPath;
 		
 		deviceName !? { thisDeviceName = deviceName.asSymbol };
-		cmdsPath = this.filenameSymbol.asString.split($/).drop(-1).join($/)+/+"OSCCommands";
+		cmdsPath = this.filenameSymbol.asString.dirname +/+ "OSCCommands";
 		thisCmds = Object.readArchive(cmdsPath);
 		
 		if(deviceName.notNil, { ^thisCmds[thisDeviceName] }, { ^thisCmds });
@@ -215,7 +215,7 @@ OSCCommands {
 	
 	*clearCmdsAt { |deviceName|
 		var cmdsPath, cmds;
-		cmdsPath = this.filenameSymbol.asString.split($/).drop(-1).join($/)+/+"OSCCommands";
+		cmdsPath = this.filenameSymbol.asString.dirname +/+ "OSCCommands";
 		cmds = Object.readArchive(cmdsPath);
 		cmds.removeAt(deviceName.asSymbol);
 		cmds.writeArchive(cmdsPath);
@@ -223,7 +223,7 @@ OSCCommands {
 	
 	*storedDevices {
 		var cmdsPath, cmds;
-		cmdsPath = this.filenameSymbol.asString.split($/).drop(-1).join($/)+/+"OSCCommands";
+		cmdsPath = this.filenameSymbol.asString.dirname +/+ "OSCCommands";
 		cmds = Object.readArchive(cmdsPath);
 		^cmds.keys;
 	}
