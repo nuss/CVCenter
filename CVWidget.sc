@@ -624,7 +624,7 @@ CVWidget {
 	}
 	
 	oscConnect { |ip, port, name, oscMsgIndex=1, key|
-		var intPort;
+		var thisIP, intPort;
 		
 		if(ip.size > 0 and:{
 			"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not and:{
@@ -642,6 +642,7 @@ CVWidget {
 			})
 		});
 		
+		if(ip == "nil", { thisIP = "" }, { thisIP = ip });
 		if(port == "nil", { intPort = nil });
 		
 		if("^\/".matchRegexp(name.asString).not, {
@@ -654,11 +655,11 @@ CVWidget {
 		
 		switch(this.class,
 			CVWidgetKnob, {
-				wdgtControllersAndModels.oscConnection.model.value_([ip, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
+				wdgtControllersAndModels.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
 				CmdPeriod.add({ this.oscDisconnect });
 			},
 			{
-				wdgtControllersAndModels[key].oscConnection.model.value_([ip, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
+				wdgtControllersAndModels[key].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
 				CmdPeriod.add({ this.oscDisconnect(key) });
 			}
 		)
