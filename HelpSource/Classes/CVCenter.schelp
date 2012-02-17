@@ -1,0 +1,348 @@
+CLASS:: CVCenter
+summary:: CVCenter is a collection of CVs and provides a GUI for easy use in connection with external hard- and software like MIDI- and OSC-controllers.
+categories:: GUI, CV, MIDI, OSC
+related:: CV, CCResponder, OSCresponderNode
+
+DESCRIPTION::
+CVCenter lets you collect an arbitrary number of CVs (you need to have the Conductor-quark installed) and use them to easily create control-widgets for Synths, Ndefs or Pattern-keys. Or even more basically: any value that can be set at runtime. For each CV a widget will be created within the main CVCenter-GUI that combines an arbitrary number of TabbedViews, filled with your widgets.
+
+CLASSMETHODS::
+
+METHOD:: all
+
+returns:: an IdentityDictionary of all CVs added to CVCenter
+
+METHOD:: cvWidgets
+all widgets (currently either CVWidgetKnobs or CVWidget2Ds) displayed within the main GUI of CVCenter
+
+returns:: an IdentityDictionary, containing all CVWidgets
+
+METHOD:: window
+The main window of CVCenter
+
+returns:: an instance of Window
+
+METHOD:: tabs
+A TabbedView, containing the widgets
+
+returns:: a TabbedView
+
+METHOD:: prefPane
+The preferences-panel at the bottom of the CVCenter-GUI
+
+returns:: a ScrollView
+
+METHOD:: removeButs
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiMode
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiResolution
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: ctrlButtonBank
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiMean
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: softWithin
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: guix
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: guiy
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: guiwidth
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: guiheight
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: widgetStates
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: tabProperties
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: new
+(describe method here)
+
+argument:: cvs
+(describe argument here)
+
+argument::  ... setUpArgs
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: gui
+(describe method here)
+
+argument:: tab
+(describe argument here)
+
+argument::  ... cvs
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: put
+(describe method here)
+
+argument::  ... args
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: removeAt
+(describe method here)
+
+argument:: key
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: removeAll
+(describe method here)
+
+argument::  ... keys
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: at
+(describe method here)
+
+argument:: key
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: use
+(describe method here)
+
+argument:: key
+(describe argument here)
+
+argument:: spec
+(describe argument here)
+
+argument:: value
+(describe argument here)
+
+argument:: tab
+(describe argument here)
+
+argument:: slot
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: setup
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: guiMoveTo
+(describe method here)
+
+argument:: point
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: guiChangeDimensions
+(describe method here)
+
+argument:: point
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: renameTab
+(describe method here)
+
+argument:: oldName
+(describe argument here)
+
+argument:: newName
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: addActionAt
+(describe method here)
+
+argument:: key
+(describe argument here)
+
+argument:: name
+(describe argument here)
+
+argument:: action
+(describe argument here)
+
+argument:: slot
+(describe argument here)
+
+argument:: active
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: removeActionAt
+(describe method here)
+
+argument:: key
+(describe argument here)
+
+argument:: name
+(describe argument here)
+
+argument:: slot
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: activateActionAt
+(describe method here)
+
+argument:: key
+(describe argument here)
+
+argument:: name
+(describe argument here)
+
+argument:: activate
+(describe argument here)
+
+argument:: slot
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: widgetsAtTab
+(describe method here)
+
+argument:: tab
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: saveSetup
+(describe method here)
+
+argument:: path
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: loadSetup
+(describe method here)
+
+argument:: path
+(describe argument here)
+
+argument:: addToExisting
+(describe argument here)
+
+argument:: autoConnectOSC
+(describe argument here)
+
+argument:: autoConnectMIDI
+(describe argument here)
+
+argument:: loadActions
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prSetup
+(describe method here)
+
+argument:: setupDict
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prAddToGui
+(describe method here)
+
+argument:: tab
+(describe argument here)
+
+argument:: widget2DKey
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prRegroupWidgets
+(describe method here)
+
+argument:: tabIndex
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prRemoveTab
+(describe method here)
+
+argument:: index
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: finishGui
+(describe method here)
+
+argument:: obj
+(describe argument here)
+
+argument:: ctrlName
+(describe argument here)
+
+argument:: environment
+(describe argument here)
+
+argument:: more
+(describe argument here)
+
+returns:: (returnvalue)
+
+
+INSTANCEMETHODS::
+
+
+EXAMPLES::
+
+code::
+(some example code)
+::

@@ -17,7 +17,7 @@
 
 CVCenter {
 
-	classvar <all, <nextCVKey, <cvWidgets, <window, <tabs, <prefPane, <removeButs;
+	classvar <all, nextCVKey, <cvWidgets, <window, <tabs, <prefPane, <removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight; 
 	classvar <widgetStates;
@@ -93,7 +93,7 @@ CVCenter {
 		
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
-			if(Quarks.isInstalled("wslib"), { window.background_(Color.black) });
+			if(Quarks.isInstalled("wslib") and:{ GUI.scheme !== SwingGUI }, { window.background_(Color.black) });
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
 			window.view.decorator = flow;
@@ -119,6 +119,14 @@ CVCenter {
 			);
 			tabs.backgrounds_(Color(0.1, 0.1, 0.1)!tabs.views.size);
 			tabs.view.resize_(5);
+			tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
+//				[view, char, modifiers, unicode, keycode].postcs;
+				switch(keycode, 
+					16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+					16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
+				);
+				if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }})
+			});
 			tabs.labelColors_(labelColors);
 			tabs.labelPadding_(5);
 			tabs.unfocusedColors_(unfocusedColors);
