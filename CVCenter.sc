@@ -125,6 +125,11 @@ CVCenter {
 					16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
 					16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
 				);
+				switch(unicode,
+					111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
+					109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
+					120, { CVCenterControllersMonitor.window.close } // key "x" -> close window
+				);
 				if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }})
 			});
 			tabs.labelColors_(labelColors);

@@ -98,7 +98,6 @@ CVWidgetEditor {
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 			
 			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 265));
-			
 
 			if(slot.isNil, { 
 				allEditors.put(name, (window: window, name: widgetName)) 
@@ -135,6 +134,18 @@ CVWidgetEditor {
 			tabs.stringFocusedColor_(labelStringColors[tab]);
 
 			thisEditor.tabs = tabs;
+			
+			thisEditor.tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
+				switch(unicode,
+					111, { thisEditor.tabs.focus(2) }, // osc
+					109, { thisEditor.tabs.focus(1) }, // midi
+					97, { thisEditor.tabs.focus(3) }, // actions
+					115, { thisEditor.tabs.focus(0) }, // specs
+					79, { CVCenterControllersMonitor(1) }, // osc-controllers monitor
+					77, { CVCenterControllersMonitor(0) }, // midi-controllers monitor
+					120, { this.close(slot) } // close editor
+				)
+			});
 						
 			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@95)
 				.font_(staticTextFont)
