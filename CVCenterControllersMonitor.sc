@@ -79,15 +79,16 @@ CVCenterControllersMonitor {
 			midiOrder.do({ |mc, i|
 				flow0.shift(0, 0);
 				StaticText(tabs.views[0], Rect(0, 0, flow0.bounds.width-30, 20))
-					.string_(""+mc+"(used:"+ctrlrs.midiCtrlrs[mc]++"x)")
+					.string_(""+mc+"(used:"+ctrlrs.midiCtrlrs[mc][0]++"x)"+ctrlrs.midiCtrlrs[mc][1])
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.font_(staticTextFont)
 				;
 			});
 			oscOrder.do({ |oc, i|
+				ctrlrs.oscCtrlrs[oc].postln;
 				flow0.shift(0, 0);
 				StaticText(tabs.views[1], Rect(0, 0, flow0.bounds.width-30, 20))
-					.string_(""+oc+"(used:"+ctrlrs.oscCtrlrs[oc]++"x)")
+					.string_(""+oc+"(used:"+ctrlrs.oscCtrlrs[oc][0]++"x)"+ctrlrs.oscCtrlrs[oc][1])
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.font_(staticTextFont)
 				;
@@ -103,12 +104,17 @@ CVCenterControllersMonitor {
 		midiCtrlrs ? midiCtrlrs = ();
 		oscCtrlrs ? oscCtrlrs = ();
 		
-		CVCenter.cvWidgets.do({ |w|
+		CVCenter.cvWidgets.pairsDo({ |k, w|
 			switch(w.class,
 				CVWidgetKnob, {
 					if(w.wdgtControllersAndModels.oscConnection.model.value !== false, { 
 						tmp = (w.wdgtControllersAndModels.oscConnection.model.value[2].asString+"(slot"+w.wdgtControllersAndModels.oscConnection.model.value[3]++")").asSymbol;
-						if(oscCtrlrs[tmp].isNil, { oscCtrlrs.put(tmp, 1) }, { oscCtrlrs[tmp] = oscCtrlrs[tmp]+1 });
+						if(oscCtrlrs[tmp.asSymbol].isNil, {
+							oscCtrlrs.put(tmp.asSymbol, [1, [k.asString]]);
+						}, { 
+							oscCtrlrs[tmp.asSymbol][0] = oscCtrlrs[tmp.asSymbol][0]+1;
+							oscCtrlrs[tmp.asSymbol][1] = oscCtrlrs[tmp.asSymbol][1].add(k.asString);
+						});
 					});
 					w.wdgtControllersAndModels.midiConnection.model.value !? {
 						tmp = w.wdgtControllersAndModels.midiConnection.model.value.num;
@@ -120,8 +126,11 @@ CVCenterControllersMonitor {
 						}, {
 							tmp = tmp+1;
 						});
-						if(midiCtrlrs[tmp.asSymbol].isNil, { midiCtrlrs.put(tmp.asSymbol, 1) }, {
-							midiCtrlrs[tmp.asSymbol] = midiCtrlrs[tmp.asSymbol]+1;
+						if(midiCtrlrs[tmp.asSymbol].isNil, {
+							midiCtrlrs.put(tmp.asSymbol, [1, [k.asString]]);
+						}, {
+							midiCtrlrs[tmp.asSymbol][0] = midiCtrlrs[tmp.asSymbol][0]+1;
+							midiCtrlrs[tmp.asSymbol][1] = midiCtrlrs[tmp.asSymbol][1].add(k.asString);
 						});
 					};
 				},
@@ -130,7 +139,12 @@ CVCenterControllersMonitor {
 						if(w.wdgtControllersAndModels[hilo].oscConnection.model.value !== false, { 
 							tmp = (w.wdgtControllersAndModels[hilo].oscConnection.model.value[2].asString
 							+"(slot"+w.wdgtControllersAndModels[hilo].oscConnection.model.value[3]++")").asSymbol;
-							if(oscCtrlrs[tmp].isNil, { oscCtrlrs.put(tmp, 1) }, { oscCtrlrs[tmp] = oscCtrlrs[tmp]+1 });
+							if(oscCtrlrs[tmp].isNil, {
+								oscCtrlrs.put(tmp.asSymbol, [1, [k.asString++"["++hilo++"]"]])
+							}, {
+								oscCtrlrs[tmp.asSymbol][0] = oscCtrlrs[tmp.asSymbol][0]+1;
+								oscCtrlrs[tmp.asSymbol][1] = oscCtrlrs[tmp.asSymbol][1].add(k.asString++"["++hilo++"]")
+							});
 						});
 						w.wdgtControllersAndModels[hilo].midiConnection.model.value !? {
 							tmp = w.wdgtControllersAndModels.midiConnection.model.value.num;
@@ -142,8 +156,11 @@ CVCenterControllersMonitor {
 							}, {
 								tmp = tmp+1;
 							});
-							if(midiCtrlrs[tmp.asSymbol].isNil, { midiCtrlrs.put(tmp.asSymbol, 1) }, { 
-								midiCtrlrs[tmp.asSymbol] = midiCtrlrs[tmp.asSymbol]+1;
+							if(midiCtrlrs[tmp.asSymbol].isNil, {
+								midiCtrlrs.put(tmp.asSymbol, [1, [k.asString++"["++hilo++"]"]]);
+							}, { 
+								midiCtrlrs[tmp.asSymbol][0] = midiCtrlrs[tmp.asSymbol][0]+1;
+								midiCtrlrs[tmp.asSymbol][1] = midiCtrlrs[tmp.asSymbol][1].add(k.asString++"["++hilo++"]");
 							});
 						}
 					})
