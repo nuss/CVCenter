@@ -119,18 +119,21 @@ CVCenter {
 			);
 			tabs.backgrounds_(Color(0.1, 0.1, 0.1)!tabs.views.size);
 			tabs.view.resize_(5);
-			tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
+			
+			[tabs.view, tabs.views].flat.do({ |v|
+				v.keyDownAction_({ |view, char, modifiers, unicode, keycode|
 //				[view, char, modifiers, unicode, keycode].postcs;
-				switch(keycode, 
-					16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-					16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
-				);
-				switch(unicode,
-					111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
-					109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
-					120, { CVCenterControllersMonitor.window.close } // key "x" -> close window
-				);
-				if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }})
+					switch(keycode, 
+						16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
+					);
+					switch(unicode,
+						111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
+						109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
+						120, { CVCenterControllersMonitor.window.close } // key "x" -> close window
+					);
+					if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }})
+				})
 			});
 			tabs.labelColors_(labelColors);
 			tabs.labelPadding_(5);
@@ -916,7 +919,19 @@ CVCenter {
 					cvTabIndex = 0;
 					this.renameTab(tabs.getLabelAt(0), tab.asString);
 				}, { 
-					tabs.add(tab);
+					tabs.add(tab).keyDownAction_({ |view, char, modifiers, unicode, keycode|
+		//				[view, char, modifiers, unicode, keycode].postcs;
+						switch(keycode, 
+							16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+							16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
+						);
+						switch(unicode,
+							111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
+							109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
+							120, { CVCenterControllersMonitor.window.close } // key "x" -> close window
+						);
+						if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }})
+					});
 					cvTabIndex = tabLabels.size;
 					tabProperties = tabProperties.add((tabLabel: tab, tabColor: nextColor.next));
 				})
