@@ -30,7 +30,7 @@ CVCenter {
 		if(all.isNil, {
 			all = IdentityDictionary.new;
 			cvWidgets = IdentityDictionary.new;
-			widgetStates = IdentityDictionary.new;
+			widgetStates ?? { widgetStates = IdentityDictionary.new };
 			removeButs = IdentityDictionary.new;
 			r = g = b = (0.6, 0.65 .. 0.75);
 			colors = List();
@@ -78,7 +78,6 @@ CVCenter {
 		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
 		var lastCtrlBtnsMode, swFlow;
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
-//		var widgetwidth, widgetheight=181, colwidth, rowheight;
 		var funcToAdd;
 		var cvcArgs, btnColor;
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
@@ -542,29 +541,31 @@ CVCenter {
 			});
 		};
 				
-		thisKey = key.asSymbol;
-		all ?? { this.new };
+		all ? this.new;
 				
+		thisKey = key.asSymbol;
+		thisSlot !? {
+			widgetStates[thisKey] ?? { widgetStates.put(thisKey, ()) };
+			widgetStates[thisKey][thisSlot] ?? { widgetStates[thisKey].put(thisSlot, ()) };
+		};
+		
 		thisSpec = spec.asSpec;
 		thisVal = value ?? { thisVal = thisSpec.default };
 
-		if(thisSlot.notNil, {
+		if(thisSlot.notNil and:{ widgetStates[thisKey][thisSlot][\made] !== true }, {
+			widgetStates[thisKey][thisSlot].made = true;
 			if(thisSlot === \lo or: { thisSlot === \hi }, {
-//				"slot not nil: %\n".postf(thisSlot);
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
 				all[thisKey].put(thisSlot, CV.new(thisSpec, thisVal));
 			})
 		}, {
-//			"slot is nil: %\n".postf(thisSlot);
-			all.put(thisKey, CV.new(thisSpec, thisVal)) 
+			all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) }; 
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
-//			"passing to *gui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
 			this.gui(tab);
 		}, {
-//			"passing to *prAddToGui, thisKey: %, thisSlot: %\n".postf(thisKey, thisSlot);
 			this.prAddToGui(tab, widget2DKey);
 		});
 		
@@ -763,7 +764,6 @@ CVCenter {
 				});
 			};
 			lib[\all].pairsDo({ |key, v|
-//				"%: %\n".postf(key, v);
 				switch(v.wdgtClass,
 					CVWidget2D, {
 						#[lo, hi].do({ |hilo|
@@ -903,11 +903,8 @@ CVCenter {
 		var rowwidth, colcount;
 		var cvTabIndex, tabLabels;
 		var thisNextPos;
-//		var widgetwidth, widgetheight=181, colwidth, rowheight;
 		var cvcArgs, btnColor;
 		var tmp;
-		
-//		"prAddToGui called: %, %\n".postf(tab, widget2DKey);
 				
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 		
