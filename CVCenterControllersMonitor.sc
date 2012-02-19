@@ -85,7 +85,6 @@ CVCenterControllersMonitor {
 				;
 			});
 			oscOrder.do({ |oc, i|
-				ctrlrs.oscCtrlrs[oc].postln;
 				flow0.shift(0, 0);
 				StaticText(tabs.views[1], Rect(0, 0, flow0.bounds.width-30, 20))
 					.string_(""+oc+"(used:"+ctrlrs.oscCtrlrs[oc][0]++"x)"+ctrlrs.oscCtrlrs[oc][1])
