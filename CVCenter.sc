@@ -119,21 +119,6 @@ CVCenter {
 			tabs.backgrounds_(Color(0.1, 0.1, 0.1)!tabs.views.size);
 			tabs.view.resize_(5);
 			
-			[tabs.view, tabs.views].flat.do({ |v|
-				v.keyDownAction_({ |view, char, modifiers, unicode, keycode|
-//				[view, char, modifiers, unicode, keycode].postcs;
-					switch(keycode, 
-						16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
-					);
-					switch(unicode,
-						111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
-						109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
-						120, { CVCenterControllersMonitor.window.close } // key "x" -> close window
-					);
-					if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }})
-				})
-			});
 			tabs.labelColors_(labelColors);
 			tabs.labelPadding_(5);
 			tabs.unfocusedColors_(unfocusedColors);
@@ -148,6 +133,35 @@ CVCenter {
 			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40));
 			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, 0@0, 0@0);
 			prefPane.resize_(8).background_(Color.black);
+			
+			[tabs.view, tabs.views, prefPane].flat.do({ |v|
+				v.keyDownAction_({ |view, char, modifiers, unicode, keycode|
+//				[view, char, modifiers, unicode, keycode].postcs;
+					switch(keycode, 
+						16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
+					);
+					switch(unicode,
+						111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
+						109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
+						120, { CVCenterControllersMonitor.window.close }, // key "x" -> close window
+						104, { 
+							if(History.started === false, { 
+								History.start;
+								History.makeWin(Window.screenBounds.width-300 @ Window.screenBounds.height);
+							})
+						},
+						110, { NdefMixer(Server.default) },
+						112, { PdefAllGui() },
+						116, { TdefAllGui() },
+						97, { if(Quarks.isInstalled("AllGui"), { AllGui() }) }
+					);
+					if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }});
+					if(modifiers == 131072 and:{ unicode == 72 and:{ History.started }}, {
+						History.end; History.document;
+					})
+				})
+			});
 			
 			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
 				.font_(Font("Helvetica", 10))
