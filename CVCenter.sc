@@ -81,7 +81,7 @@ CVCenter {
 		var funcToAdd;
 		var cvcArgs, btnColor;
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
-		var midiFlag, oscFlag, loadFlag, tmp;
+		var midiFlag, oscFlag, loadFlag, tmp, wdgtActions;
 					
 		cvs !? { this.put(*cvs) };
 		
@@ -300,9 +300,9 @@ CVCenter {
 						}, 
 						hi: this.setup.calibrate = cvWidgets[k] !? { 
 							cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value 
-						},
-						wdgtActions: cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions }};
+						}
 					);
+					cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
 					cvWidgets[k] = CVWidget2D(
 						tabs.views[cvTabIndex], 
 						[orderedCVs[i].lo, orderedCVs[i].hi], 
@@ -340,11 +340,12 @@ CVCenter {
 							}.defer(0.1);
 						})
 					});
-					tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
+					wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
 				}, {
 					tmp = this.setup.calibrate = cvWidgets[k] !? { 
-						cvWidgets[k].wdgtControllersAndModels.calibration.model.value 
+						cvWidgets[k].wdgtControllersAndModels.calibration.model.value;
 					};
+					cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex], 
 						orderedCVs[i], 
@@ -376,7 +377,8 @@ CVCenter {
 								[b.states[0][0], b.states[0][1], btnColor]
 							]) 
 						}.defer(0.1);
-					})
+					});
+					wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
 				});
 				
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
@@ -389,6 +391,11 @@ CVCenter {
 						cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value_(
 							cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value
 						).changed(\value);
+//						"widget '%' actions model: %. wdgtActions: %\n".postf(k, cvWidgets[k].wdgtControllersAndModels.actions.model.value, cvWidgets[k].wdgtActions);
+						cvWidgets[k].wdgtControllersAndModels.actions.model.value_((
+							numActions: cvWidgets[k].wdgtActions.size,
+							activeActions: cvWidgets[k].wdgtActions.select({ |v| v.asArray[0][1] == true }).size
+						)).changed(\value);
 					},
 					CVWidget2D, {
 						#[lo, hi].do({ |hilo|
@@ -398,6 +405,11 @@ CVCenter {
 							cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value_(
 								cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value
 							).changed(\value);
+//							"widget '%[%]' actions model: %. wdgtActions: \n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].actions.model.value, cvWidgets[k].wdgtActions[hilo]);
+							cvWidgets[k].wdgtControllersAndModels[hilo].actions.model.value_((
+								numActions: cvWidgets[k].wdgtActions[hilo].size,
+								activeActions: cvWidgets[k].wdgtActions[hilo].select({ |v| v.asArray[0][1] == true }).size
+							)).changed(\value);
 						})
 					}
 				);
