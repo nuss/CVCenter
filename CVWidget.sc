@@ -278,7 +278,7 @@ CVWidget {
 		})
 	}
 	
-	setMidiMode { |mode, key|
+	setMidiMode { |mode, slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				prMidiMode = mode;
@@ -295,15 +295,15 @@ CVWidget {
 				}
 			},
 			{
-				prMidiMode[key] = mode;
-				wdgtControllersAndModels[key] !? {
-					wdgtControllersAndModels[key].midiOptions.model.value_(
+				prMidiMode[slot.asSymbol] = mode;
+				wdgtControllersAndModels[slot.asSymbol] !? {
+					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
 						(
-							midiMode: prMidiMode[key],
-							midiMean: prMidiMean[key],
-							ctrlButtonBank: prCtrlButtonBank[key],
-							midiResolution: prMidiResolution[key],
-							softWithin: prSoftWithin[key]
+							midiMode: prMidiMode[slot.asSymbol],
+							midiMean: prMidiMean[slot.asSymbol],
+							ctrlButtonBank: prCtrlButtonBank[slot.asSymbol],
+							midiResolution: prMidiResolution[slot.asSymbol],
+							softWithin: prSoftWithin[slot.asSymbol]
 						)
 					).changed(\value);
 				}
@@ -311,16 +311,16 @@ CVWidget {
 		);
 	}
 	
-	getMidiMode { |key|
+	getMidiMode { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				^prMidiMode;
 			},
-			{ ^prMidiMode[key] }
+			{ ^prMidiMode[slot.asSymbol] }
 		)
 	}
 	
-	setMidiMean { |meanval, key|
+	setMidiMean { |meanval, slot|
 		switch(this.class, 
 			CVWidgetKnob, {
 				prMidiMean = meanval;
@@ -337,15 +337,15 @@ CVWidget {
 				}
 			},
 			{
-				prMidiMean[key] = meanval;
-				wdgtControllersAndModels[key] !? {
-					wdgtControllersAndModels[key].midiOptions.model.value_(
+				prMidiMean[slot.asSymbol] = meanval;
+				wdgtControllersAndModels[slot.asSymbol] !? {
+					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
 						(
-							midiMode: prMidiMode[key],
-							midiMean: prMidiMean[key],
-							ctrlButtonBank: prCtrlButtonBank[key],
-							midiResolution: prMidiResolution[key],
-							softWithin: prSoftWithin[key]
+							midiMode: prMidiMode[slot.asSymbol],
+							midiMean: prMidiMean[slot.asSymbol],
+							ctrlButtonBank: prCtrlButtonBank[slot.asSymbol],
+							midiResolution: prMidiResolution[slot.asSymbol],
+							softWithin: prSoftWithin[slot.asSymbol]
 						)
 					).changed(\value);
 				}
@@ -353,16 +353,16 @@ CVWidget {
 		)
 	}
 	
-	getMidiMean { |key|
+	getMidiMean { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				^prMidiMean;
 			},
-			{ ^prMidiMean[key] }
+			{ ^prMidiMean[slot.asSymbol] }
 		)
 	}
 	
-	setSoftWithin { |threshold, key|
+	setSoftWithin { |threshold, slot|
 		switch(this.class, 
 			CVWidgetKnob, {
 				prSoftWithin = threshold;
@@ -379,15 +379,15 @@ CVWidget {
 				}
 			},
 			{
-				prSoftWithin[key] = threshold;
-				wdgtControllersAndModels[key] !? {
-					wdgtControllersAndModels[key].midiOptions.model.value_(
+				prSoftWithin[slot] = threshold;
+				wdgtControllersAndModels[slot.asSymbol] !? {
+					wdgtControllersAndModels[slot].midiOptions.model.value_(
 						(
-							midiMode: prMidiMode[key],
-							midiMean: prMidiMean[key],
-							ctrlButtonBank: prCtrlButtonBank[key],
-							midiResolution: prMidiResolution[key],
-							softWithin: prSoftWithin[key]
+							midiMode: prMidiMode[slot.asSymbol],
+							midiMean: prMidiMean[slot.asSymbol],
+							ctrlButtonBank: prCtrlButtonBank[slot.asSymbol],
+							midiResolution: prMidiResolution[slot.asSymbol],
+							softWithin: prSoftWithin[slot.asSymbol]
 						)
 					).changed(\value);
 				}
@@ -395,16 +395,16 @@ CVWidget {
 		)	
 	}
 	
-	getSoftWithin { |key|
+	getSoftWithin { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				^prSoftWithin;
 			},
-			{ ^prSoftWithin[key] }
+			{ ^prSoftWithin[slot.asSymbol] }
 		)
 	}
 	
-	setCtrlButtonBank { |numSliders, key|
+	setCtrlButtonBank { |numSliders, slot|
 		switch(this.class, 
 			CVWidgetKnob, {
 				if(numSliders.asString == "nil" or:{ numSliders.asInt === 0 }, {
@@ -425,15 +425,15 @@ CVWidget {
 				}
 			},
 			{
-				prCtrlButtonBank.put(key, numSliders);
-				wdgtControllersAndModels[key] !? {
-					wdgtControllersAndModels[key].midiOptions.model.value_(
+				prCtrlButtonBank.put(slot.asSymbol, numSliders);
+				wdgtControllersAndModels[slot.asSymbol] !? {
+					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
 						(
-							midiMode: prMidiMode[key],
-							midiMean: prMidiMean[key],
-							ctrlButtonBank: prCtrlButtonBank[key],
-							midiResolution: prMidiResolution[key],
-							softWithin: prSoftWithin[key]
+							midiMode: prMidiMode[slot.asSymbol],
+							midiMean: prMidiMean[slot.asSymbol],
+							ctrlButtonBank: prCtrlButtonBank[slot.asSymbol],
+							midiResolution: prMidiResolution[slot.asSymbol],
+							softWithin: prSoftWithin[slot.asSymbol]
 						)
 					).changed(\value);
 				}
@@ -441,16 +441,16 @@ CVWidget {
 		)
 	}
 	
-	getCtrlButtonBank { |key|
+	getCtrlButtonBank { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				^prCtrlButtonBank;
 			},
-			{ ^prCtrlButtonBank[key] }
+			{ ^prCtrlButtonBank[slot.asSymbol] }
 		)
 	}
 	
-	setMidiResolution { |resolution, key|
+	setMidiResolution { |resolution, slot|
 		switch(this.class, 
 			CVWidgetKnob, {
 				prMidiResolution = resolution;
@@ -467,15 +467,15 @@ CVWidget {
 				}
 			},
 			{
-				prMidiResolution[key] = resolution;
-				wdgtControllersAndModels[key] !? {
-					wdgtControllersAndModels[key].midiOptions.model.value_(
+				prMidiResolution[slot.asSymbol] = resolution;
+				wdgtControllersAndModels[slot.asSymbol] !? {
+					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
 						(
-							midiMode: prMidiMode[key],
-							midiMean: prMidiMean[key],
-							ctrlButtonBank: prCtrlButtonBank[key],
-							midiResolution: prMidiResolution[key],
-							softWithin: prSoftWithin[key]
+							midiMode: prMidiMode[slot.asSymbol],
+							midiMean: prMidiMean[slot.asSymbol],
+							ctrlButtonBank: prCtrlButtonBank[slot.asSymbol],
+							midiResolution: prMidiResolution[slot.asSymbol],
+							softWithin: prSoftWithin[slot.asSymbol]
 						)
 					).changed(\value);
 				}
@@ -483,16 +483,16 @@ CVWidget {
 		)
 	}
 	
-	getMidiResolution { |key|
+	getMidiResolution { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				^prMidiResolution;
 			},
-			{ ^prMidiResolution[key] }
+			{ ^prMidiResolution[slot.asSymbol] }
 		)
 	}
 	
-	setCalibrate { |bool, key|
+	setCalibrate { |bool, slot|
 		if(bool.isKindOf(Boolean).not, {
 			Error("calibration can only be set to true or false!").throw;
 		});
@@ -505,25 +505,25 @@ CVWidget {
 				wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
 			},
 			{
-				prCalibrate[key] = bool;
-				wdgtControllersAndModels[key].oscConnection.model.value_(
-					wdgtControllersAndModels[key].oscConnection.model.value
+				prCalibrate[slot.asSymbol] = bool;
+				wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_(
+					wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value
 				).changed(\value);
-				wdgtControllersAndModels[key].calibration.model.value_(bool).changed(\value);
+				wdgtControllersAndModels[slot.asSymbol].calibration.model.value_(bool).changed(\value);
 			}
 		)
 	}
 	
-	getCalibrate { |key|
+	getCalibrate { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				^prCalibrate;
 			},
-			{ ^prCalibrate[key] }
+			{ ^prCalibrate[slot.asSymbol] }
 		)
 	}
 	
-	setSpec { |spec, key|
+	setSpec { |spec, slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				if(spec.isKindOf(ControlSpec).not, {
@@ -533,7 +533,7 @@ CVWidget {
 			},
 			{
 				if(spec.asSpec.isKindOf(ControlSpec), {
-					wdgtControllersAndModels[key.asSymbol].cvSpec.model.value_(spec.asSpec).changed(\value);
+					wdgtControllersAndModels[slot.asSymbol].cvSpec.model.value_(spec.asSpec).changed(\value);
 				}, {
 					Error("Please provide a valid ControlSpec!").throw;
 				});
@@ -541,18 +541,18 @@ CVWidget {
 		)
 	}
 	
-	getSpec { |key|
+	getSpec { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				^widgetCV.spec;
 			},
 			{
-				^widgetCV[key.asSymbol].spec;
+				^widgetCV[slot.asSymbol].spec;
 			}
 		)
 	}
 	
-	setOscMapping { |mapping, key|
+	setOscMapping { |mapping, slot|
 		if(mapping.asSymbol !== \linlin and:{
 			mapping.asSymbol !== \linexp and:{
 				mapping.asSymbol !== \explin and:{
@@ -573,57 +573,29 @@ CVWidget {
 				).changed(\value);
 			},
 			{	
-				midiOscEnv[key].oscMapping = mapping.asSymbol;
-				wdgtControllersAndModels[key].oscInputRange.model.value_(
-					wdgtControllersAndModels[key].oscInputRange.model.value;
+				midiOscEnv[slot.asSymbol].oscMapping = mapping.asSymbol;
+				wdgtControllersAndModels[slot.asSymbol].oscInputRange.model.value_(
+					wdgtControllersAndModels[slot.asSymbol].oscInputRange.model.value;
 				).changed(\value);
-				wdgtControllersAndModels[key].cvSpec.model.value_(
-					wdgtControllersAndModels[key].cvSpec.model.value;
+				wdgtControllersAndModels[slot.asSymbol].cvSpec.model.value_(
+					wdgtControllersAndModels[slot.asSymbol].cvSpec.model.value;
 				).changed(\value);
 			}
 		)
 	}
-	
-	setDefaultAction { |func, slot|
-		switch(this.class,
-			CVWidget2D, {
-				slot ?? { Error("Please provide the slot for which you want to set the action: 'lo' or 'hi'").throw };
-				prDefaultAction ?? { prDefaultAction = () };
-				prDefaultAction[slot] ?? {
-					prDefaultAction.put(slot.asSymbol, this.widgetCV[slot].action_(func));
-				}
-			},
-			{
-				prDefaultAction ?? { prDefaultAction = this.widgetCV.action_(func) };
-			}
-		)
-	}
-	
-	removeDefaultAction { |slot|
-		switch(this.class,
-			CVWidget2D, {
-				prDefaultAction[slot.asSymbol].remove;
-				prDefaultAction[slot.asSymbol] = nil;
-			},
-			{
-				prDefaultAction.remove;
-				prDefaultAction = nil;
-			}
-		)
-	}
-	
-	getOscMapping { |key|
+		
+	getOscMapping { |slot|
 		switch(this.class, 
 			CVWidgetKnob, {
 				^midiOscEnv.oscMapping;
 			},
 			{
-				^midiOscEnv[key].oscMapping
+				^midiOscEnv[slot.asSymbol].oscMapping
 			}
 		)
 	}
 	
-	oscConnect { |ip, port, name, oscMsgIndex=1, key|
+	oscConnect { |ip, port, name, oscMsgIndex=1, slot|
 		var thisIP, intPort;
 		
 		if(ip.size > 0 and:{
@@ -659,13 +631,13 @@ CVWidget {
 				CmdPeriod.add({ this.oscDisconnect });
 			},
 			{
-				wdgtControllersAndModels[key].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
-				CmdPeriod.add({ this.oscDisconnect(key) });
+				wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
+				CmdPeriod.add({ this.oscDisconnect(slot.asSymbol) });
 			}
 		)
 	}
 	
-	oscDisconnect { |key|
+	oscDisconnect { |slot|
 		switch(this.class, 
 			CVWidgetKnob, {
 				wdgtControllersAndModels.oscConnection.model.value_(false).changed(\value);
@@ -673,15 +645,15 @@ CVWidget {
 				CmdPeriod.remove({ this.oscDisconnect });
 			},
 			{
-				wdgtControllersAndModels[key].oscConnection.model.value_(false).changed(\value);
-				wdgtControllersAndModels[key].oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
-				CmdPeriod.remove({ this.oscDisconnect(key) });
+				wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_(false).changed(\value);
+				wdgtControllersAndModels[slot.asSymbol].oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
+				CmdPeriod.remove({ this.oscDisconnect(slot) });
 			}
 		)
 	}
 	
 	// if all arguments are nil .learn should be triggered
-	midiConnect { |uid, chan, num, key|
+	midiConnect { |uid, chan, num, slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				if(midiOscEnv.cc.isNil, {
@@ -694,14 +666,14 @@ CVWidget {
 				})
 			},
 			{
-				key ?? {
-					Error("Missing 'key'-argument. Maybe you forgot to explicitely provide the key: wdgt.midiConnect(key: \lo)").throw;
+				slot ?? {
+					Error("Missing 'slot'-argument. Maybe you forgot to explicitely provide the slot: wdgt.midiConnect(slot: \lo)").throw;
 				};
-				if(midiOscEnv[key].cc.isNil, {
-					wdgtControllersAndModels[key].midiConnection.model.value_(
+				if(midiOscEnv[slot].cc.isNil, {
+					wdgtControllersAndModels[slot.asSymbol].midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
 					).changed(\value);
-					CmdPeriod.add({ this !? { this.midiDisconnect(key) } });
+					CmdPeriod.add({ this !? { this.midiDisconnect(slot) } });
 				}, {
 					"Already connected!".warn;	
 				})
@@ -709,24 +681,24 @@ CVWidget {
 		)
 	}
 	
-	midiDisconnect { |key|
+	midiDisconnect { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				wdgtControllersAndModels.midiConnection.model.value_(nil).changed(\value);
 				CmdPeriod.remove({ this.midiDisconnect });
 			}, 
 			{
-				wdgtControllersAndModels[key].midiConnection.model.value_(nil).changed(\value);
-				CmdPeriod.remove({ this.midiDisconnect(key) });
+				wdgtControllersAndModels[slot.asSymbol].midiConnection.model.value_(nil).changed(\value);
+				CmdPeriod.remove({ this.midiDisconnect(slot) });
 			}
 		)		
 	}
 	
-	setOscInputConstraints { |constraintsHiLo, key|
+	setOscInputConstraints { |constraintsHiLo, slot|
 		if(constraintsHiLo.isKindOf(Point).not, {
 			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
 		}, {
-			this.setCalibrate(false, key);
+			this.setCalibrate(false, slot);
 			switch(this.class,
 				CVWidgetKnob, {
 					midiOscEnv.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
@@ -736,23 +708,23 @@ CVWidget {
 					})
 				},
 				{
-					midiOscEnv[key].calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
-					if(editor[key].notNil and:{ editor[key].isClosed.not }, {
-						wdgtControllersAndModels[key].mapConstrainterLo.value_(constraintsHiLo.x);
-						wdgtControllersAndModels[key].mapConstrainterHi.value_(constraintsHiLo.y);
+					midiOscEnv[slot.asSymbol].calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
+					if(editor[slot.asSymbol].notNil and:{ editor[slot.asSymbol].isClosed.not }, {
+						wdgtControllersAndModels[slot.asSymbol].mapConstrainterLo.value_(constraintsHiLo.x);
+						wdgtControllersAndModels[slot.asSymbol].mapConstrainterHi.value_(constraintsHiLo.y);
 					})
 				}
 			)
 		})
 	}
 	
-	getOscInputConstraints { |key|
+	getOscInputConstraints { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				^midiOscEnv.calibConstraints;
 			},
 			{
-				^midiOscEnv[key].calibConstraints;
+				^midiOscEnv[slot.asSymbol].calibConstraints;
 			}
 		)
 	}
@@ -1256,6 +1228,9 @@ CVWidget {
 			);
 						
 			if(theChanger.value.size == 4, {
+
+//				theChanger.value.postln;
+
 				oscResponderAction = { |t, r, msg|
 					if(thisCalib, { 
 						if(midiOscEnv.calibConstraints.isNil, {
@@ -1301,6 +1276,8 @@ CVWidget {
 				};
 								
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
+				
+//				[midiOscEnv.oscResponder, oscResponderAction].postcs;
 								
 				if(midiOscEnv.oscResponder.isNil, { 
 					midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;

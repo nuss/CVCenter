@@ -1,10 +1,15 @@
 CLASS:: CVCenter
 summary:: CVCenter is a collection of CVs and provides a GUI for easy use in connection with external hard- and software like MIDI- and OSC-controllers.
 categories:: GUI, CV, MIDI, OSC
-related:: CV, CCResponder, OSCresponderNode
+related:: Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
 
 DESCRIPTION::
-CVCenter lets you collect an arbitrary number of CVs (you need to have the Conductor-quark installed) and use them to easily create control-widgets for Synths, Ndefs or Pattern-keys. Or even more basically: any value that can be set at runtime. For each CV a widget will be created within the main CVCenter-GUI that combines an arbitrary number of TabbedViews, filled with your widgets.
+CVCenter lets you collect an arbitrary number of link::Classes/CV::s (you need to have the Conductor-quark installed) and use them to easily create control-widgets for Synths, Ndefs or Pattern-keys. Or even more basically: any value that can be set at runtime. For each CV a widget will be created within the main CVCenter-GUI that combines an arbitrary number of TabbedViews, filled with your widgets.
+
+What's a CV?
+
+A CV models a value constrained by a ControlSpec. The value can be a single Float or an array of Floats. Whenever the CV's value changes, it sends a changed message labeled 'synch'.  This way dependants (such as GUI objects or server value) can be updated with SimpleControllers. 
+A CV's value can be read with the 'value' message. 
 
 CLASSMETHODS::
 

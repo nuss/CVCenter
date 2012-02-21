@@ -144,7 +144,13 @@ CVCenter {
 					switch(unicode,
 						111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
 						109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
-						120, { CVCenterControllersMonitor.window.close }, // key "x" -> close window
+						120, { 
+							if(CVCenterControllersMonitor.window.notNil and:{
+								CVCenterControllersMonitor.window.isClosed.not;
+							}, {
+								CVCenterControllersMonitor.window.close; // key "x" -> close window
+							})
+						},
 						104, { 
 							if(History.started === false, { 
 								History.start;
@@ -391,7 +397,6 @@ CVCenter {
 						cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value_(
 							cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value
 						).changed(\value);
-//						"widget '%' actions model: %. wdgtActions: %\n".postf(k, cvWidgets[k].wdgtControllersAndModels.actions.model.value, cvWidgets[k].wdgtActions);
 						cvWidgets[k].wdgtControllersAndModels.actions.model.value_((
 							numActions: cvWidgets[k].wdgtActions.size,
 							activeActions: cvWidgets[k].wdgtActions.select({ |v| v.asArray[0][1] == true }).size
@@ -402,10 +407,10 @@ CVCenter {
 							cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value_(
 								cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value
 							).changed(\value);
+							"osc-connections at '%[%]': %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].oscConnection.model.value);
 							cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value_(
 								cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value
 							).changed(\value);
-//							"widget '%[%]' actions model: %. wdgtActions: \n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].actions.model.value, cvWidgets[k].wdgtActions[hilo]);
 							cvWidgets[k].wdgtControllersAndModels[hilo].actions.model.value_((
 								numActions: cvWidgets[k].wdgtActions[hilo].size,
 								activeActions: cvWidgets[k].wdgtActions[hilo].select({ |v| v.asArray[0][1] == true }).size

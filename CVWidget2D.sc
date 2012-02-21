@@ -68,7 +68,7 @@ CVWidget2D : CVWidget {
 		cvcGui !? { isCVCWidget = true };
 		
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
-		[\lo, \hi].do({ |hilo|
+		#[lo, hi].do({ |hilo|
 			midiOscEnv[hilo] ?? { midiOscEnv.put(hilo, ()) };
 			midiOscEnv[hilo].oscMapping ?? { midiOscEnv[hilo].oscMapping = \linlin };
 		});
@@ -82,7 +82,7 @@ CVWidget2D : CVWidget {
 			widgetCV.lo = CV.new; widgetCV.hi = CV.new;
 		}, {
 			if(cvs.class !== Array, {
-				Error("Please provide CVs in an array: [cv1, cv2]").throw;
+				Error("Please provide CVs as array: [cv1, cv2]").throw;
 			}, {
 				if(cvs[0].isNil, { widgetCV.lo = CV.new }, { widgetCV.lo = cvs[0] });
 				if(cvs[1].isNil, { widgetCV.hi = CV.new }, { widgetCV.hi = cvs[1] });
@@ -94,9 +94,9 @@ CVWidget2D : CVWidget {
 		oscEditBut = (); calibBut = (); actionsBut = ();
 		editor = ();
 		
-		[\lo, \hi].do({ |key| this.initControllersAndModels(controllersAndModels, key) });
+		#[lo, hi].do({ |key| this.initControllersAndModels(controllersAndModels, key) });
 						
-		[\lo, \hi].do({ |key|
+		#[lo, hi].do({ |key|
 			setupArgs[key] !? { setupArgs[key][\midiMode] !? { this.setMidiMode(setupArgs[key][\midiMode], key) }};
 			setupArgs[key] !? { setupArgs[key][\midiResolution] !? { this.setMidiResolution(setupArgs[key][\midiResolution], key) }};
 			setupArgs[key] !? { setupArgs[key][\midiMean] !? { this.setMidiMean(setupArgs[key][\midiMean], key) }};
@@ -132,7 +132,7 @@ CVWidget2D : CVWidget {
 										
 		cvcGui ?? { 
 			window.onClose_({
-				[\lo, \hi].do({ |hilo|
+				#[lo, hi].do({ |hilo|
 					if(editor[hilo].notNil, {
 						if(editor[hilo].isClosed.not, {
 							editor[hilo].close(hilo);
@@ -155,7 +155,7 @@ CVWidget2D : CVWidget {
 		};
 						
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
-//			.focusColor_(Color(alpha: 1.0))
+//			.focusColor_(Color.green)
 			.background_(Color.white)
 		;
 		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
@@ -528,7 +528,7 @@ CVWidget2D : CVWidget {
 				});
 			})
 		});
-
+		
 		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
 		widgetCV.lo.connect(numVal.lo);
 		widgetCV.hi.connect(numVal.hi);
