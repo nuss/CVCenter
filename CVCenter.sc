@@ -136,7 +136,7 @@ CVCenter {
 			
 			[tabs.view, tabs.views, prefPane].flat.do({ |v|
 				v.keyDownAction_({ |view, char, modifiers, unicode, keycode|
-//				[view, char, modifiers, unicode, keycode].postcs;
+//					[view, char, modifiers, unicode, keycode].postcs;
 					switch(keycode, 
 						16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
 						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
@@ -144,26 +144,27 @@ CVCenter {
 					switch(unicode,
 						111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
 						109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
-						120, { 
+						120, { // key "x" -> close window
 							if(CVCenterControllersMonitor.window.notNil and:{
 								CVCenterControllersMonitor.window.isClosed.not;
 							}, {
-								CVCenterControllersMonitor.window.close; // key "x" -> close window
+								CVCenterControllersMonitor.window.close;
 							})
 						},
-						104, { 
+						104, { // key "h" -> start History and open History window
 							if(History.started === false, { 
 								History.start;
 								History.makeWin(Window.screenBounds.width-300 @ Window.screenBounds.height);
 							})
 						},
-						110, { NdefMixer(Server.default) },
-						112, { PdefAllGui() },
-						116, { TdefAllGui() },
-						97, { if(Quarks.isInstalled("AllGui"), { AllGui() }) }
+						110, { NdefMixer(Server.default) }, // key "n" -> the NdefMixer for the default server
+						112, { PdefAllGui() }, // key "p"
+						116, { TdefAllGui() }, // key "t"
+						97, { if(Quarks.isInstalled("AllGui"), { AllGui() }) } // key "a"
 					);
 					if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }});
-					if(modifiers == 131072 and:{ unicode == 72 and:{ History.started }}, {
+					if(modifiers == 131072 and:{ unicode == 72 and:{ History.started }}, { 
+						// keys <shift> + "h" -> end History and open History in a new document
 						History.end; History.document;
 					})
 				})
@@ -564,6 +565,7 @@ CVCenter {
 		
 	*use { |key, spec, value, tab, slot|
 		var thisKey, thisSpec, thisVal, thisSlot, widget2DKey;
+		[key, spec, value, tab, slot].postln;
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		slot !? {
 			thisSlot = slot.asString.toLower.asSymbol;
@@ -982,6 +984,9 @@ CVCenter {
 		allCVKeys = all.keys;
 		widgetKeys = cvWidgets.keys;
 		thisKeys = allCVKeys.difference(widgetKeys);
+		
+		[allCVKeys, widgetKeys, thisKeys].postln;
+		
 		thisKeys.do({ |k|
 			if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
 				cvcArgs = ();

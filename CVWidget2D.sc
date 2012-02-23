@@ -39,7 +39,7 @@ CVWidget2D : CVWidget {
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, rightBarX, oscEditButHeight, right, left;
 		var actionLo, actionHi;
-		
+				
 		this.bgColor ?? { this.bgColor_(Color.white) };
 		
 		if(GUI.scheme === QtGUI, { 
@@ -93,16 +93,15 @@ CVWidget2D : CVWidget {
 		midiHead = (); midiLearn = (); midiSrc = (); midiChan = (); midiCtrl = ();
 		oscEditBut = (); calibBut = (); actionsBut = ();
 		editor = ();
-		
-		#[lo, hi].do({ |key| this.initControllersAndModels(controllersAndModels, key) });
-						
-		#[lo, hi].do({ |key|
-			setupArgs[key] !? { setupArgs[key][\midiMode] !? { this.setMidiMode(setupArgs[key][\midiMode], key) }};
-			setupArgs[key] !? { setupArgs[key][\midiResolution] !? { this.setMidiResolution(setupArgs[key][\midiResolution], key) }};
-			setupArgs[key] !? { setupArgs[key][\midiMean] !? { this.setMidiMean(setupArgs[key][\midiMean], key) }};
-			setupArgs[key] !? { setupArgs[key][\ctrlButtonBank] !? { this.setCtrlButtonBank(setupArgs[key][\ctrlButtonBank], key) }};
-			setupArgs[key] !? { setupArgs[key][\softWithin] !? { this.setSoftWithin(setupArgs[key][\softWithin], key) }};
-			setupArgs[key] !? { setupArgs[key][\calibrate] !? { this.setCalibrate(setupArgs[key][\calibrate], key) }};
+								
+		#[lo, hi].do({ |slot|
+			this.initControllersAndModels(controllersAndModels, slot);
+			setupArgs[slot] !? { setupArgs[slot][\midiMode] !? { this.setMidiMode(setupArgs[slot][\midiMode], slot) }};
+			setupArgs[slot] !? { setupArgs[slot][\midiResolution] !? { this.setMidiResolution(setupArgs[slot][\midiResolution], slot) }};
+			setupArgs[slot] !? { setupArgs[slot][\midiMean] !? { this.setMidiMean(setupArgs[slot][\midiMean], slot) }};
+			setupArgs[slot] !? { setupArgs[slot][\ctrlButtonBank] !? { this.setCtrlButtonBank(setupArgs[slot][\ctrlButtonBank], slot) }};
+			setupArgs[slot] !? { setupArgs[slot][\softWithin] !? { this.setSoftWithin(setupArgs[slot][\softWithin], slot) }};
+			setupArgs[slot] !? { setupArgs[slot][\calibrate] !? { this.setCalibrate(setupArgs[slot][\calibrate], slot) }};
 		});
 					
 		actions !? {
@@ -327,9 +326,9 @@ CVWidget2D : CVWidget {
 							[midiCtrl[v[0]].string, mctrl]
 						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
-							this.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], key: v[0]);
+							this.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], slot: v[0]);
 						}, {
-							this.midiConnect(key: v[0]);
+							this.midiConnect(slot: v[0]);
 						})
 					},
 					0, { this.midiDisconnect(v[0]) }
@@ -529,6 +528,7 @@ CVWidget2D : CVWidget {
 			})
 		});
 		
+		// widgetCV
 		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
 		widgetCV.lo.connect(numVal.lo);
 		widgetCV.hi.connect(numVal.hi);
@@ -566,21 +566,21 @@ CVWidget2D : CVWidget {
 			actionsBut.lo, actionsBut.hi
 		];
 		
-		#[lo, hi].do({ |hilo|
-			guiEnv[hilo] = (
-				editor: editor[hilo],
-				calibBut: calibBut[hilo],
+		#[lo, hi].do({ |slot|
+			guiEnv[slot] = (
+				editor: editor[slot],
+				calibBut: calibBut[slot],
 				slider2d: slider2d,
-				specBut: specBut[hilo],
-				oscEditBut: oscEditBut[hilo],
-				calibBut: calibBut[hilo],
-				actionsBut: actionsBut[hilo],
-				midiSrc: midiSrc[hilo],
-				midiChan: midiChan[hilo],
-				midiCtrl: midiCtrl[hilo],
-				midiLearn: midiLearn[hilo]
+				specBut: specBut[slot],
+				oscEditBut: oscEditBut[slot],
+				calibBut: calibBut[slot],
+				actionsBut: actionsBut[slot],
+				midiSrc: midiSrc[slot],
+				midiChan: midiChan[slot],
+				midiCtrl: midiCtrl[slot],
+				midiLearn: midiLearn[slot]
 			);
-			this.initControllerActions(hilo);
+			this.initControllerActions(slot);
 		})
 	}
 	

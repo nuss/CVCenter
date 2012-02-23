@@ -61,18 +61,18 @@ CVWidgetEditor {
 		};
 
 		if(slot.notNil, {
-			if(widget.wdgtControllersAndModels[slot].notNil, { 
+			widget.wdgtControllersAndModels[slot] !? { 
 				wcmHiLo = widget.wdgtControllersAndModels[slot];
-			});
+			};
 			thisMidiMode = widget.getMidiMode(slot);
 			thisMidiMean = widget.getMidiMean(slot);
 			thisMidiResolution = widget.getMidiResolution(slot);
 			thisSoftWithin = widget.getSoftWithin(slot);
 			thisCtrlButtonBank = widget.getCtrlButtonBank(slot);
 		}, { 
-			if(widget.wdgtControllersAndModels.notNil, { 
+			widget.wdgtControllersAndModels !? { 
 				wcmHiLo = widget.wdgtControllersAndModels;
-			});
+			};
 			thisMidiMode = widget.getMidiMode;
 			thisMidiMean = widget.getMidiMean;
 			thisMidiResolution = widget.getMidiResolution;
