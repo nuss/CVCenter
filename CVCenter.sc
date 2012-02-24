@@ -593,10 +593,8 @@ CVCenter {
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
-			"*gui called for %\n".postf(slot);
 			this.gui(tab);
 		}, {
-			"*prAddToGui called for %\n".postf(slot);
 			this.prAddToGui(tab, widget2DKey);
 		});
 		

@@ -862,7 +862,7 @@ CVWidget {
 			wcm = wdgtControllersAndModels;
 			thisGuiEnv = this.guiEnv;
 			midiOscEnv = this.midiOscEnv;
-			widgetCV = this.widgetCV;
+			thisWidgetCV = this.widgetCV;
 			thisCalib = prCalibrate;
 		});
 		
