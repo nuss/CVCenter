@@ -571,6 +571,7 @@ CVWidget2D : CVWidget {
 				editor: editor[slot],
 				calibBut: calibBut[slot],
 				slider2d: slider2d,
+				rangeSlider: rangeSlider,
 				specBut: specBut[slot],
 				oscEditBut: oscEditBut[slot],
 				calibBut: calibBut[slot],

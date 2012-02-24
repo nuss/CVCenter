@@ -408,7 +408,6 @@ CVCenter {
 							cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value_(
 								cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value
 							).changed(\value);
-							"osc-connections at '%[%]': %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].oscConnection.model.value);
 							cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value_(
 								cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value
 							).changed(\value);
@@ -510,7 +509,6 @@ CVCenter {
 		
 	*removeAt { |key|
 		var lastVal, tabIndex;
-//		lastVal = all.at(key.asSymbol).value;
 		all.removeAt(key.asSymbol);
 		cvWidgets[key].class.switch(
 			CVWidgetKnob, { 
@@ -548,7 +546,6 @@ CVCenter {
 		removeButs.removeAt(key);
 		widgetStates.removeAt(key);
 		tabs.views.do({ |v, i| if(v.children.size == 0, { this.prRemoveTab(i) }) });
-//		^lastVal;
 	}
 	
 	*removeAll { |...keys|
@@ -565,7 +562,6 @@ CVCenter {
 		
 	*use { |key, spec, value, tab, slot|
 		var thisKey, thisSpec, thisVal, thisSlot, widget2DKey;
-		[key, spec, value, tab, slot].postln;
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		slot !? {
 			thisSlot = slot.asString.toLower.asSymbol;
@@ -588,17 +584,19 @@ CVCenter {
 		if(thisSlot.notNil and:{ widgetStates[thisKey][thisSlot][\made] !== true }, {
 			widgetStates[thisKey][thisSlot].made = true;
 			if(thisSlot === \lo or: { thisSlot === \hi }, {
-				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
-				all[thisKey].put(thisSlot, CV.new(thisSpec, thisVal));
+				all[thisKey][thisSlot].spec_(thisSpec, thisVal);
+				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 			})
 		}, {
 			all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) }; 
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
+			"*gui called for %\n".postf(slot);
 			this.gui(tab);
 		}, {
+			"*prAddToGui called for %\n".postf(slot);
 			this.prAddToGui(tab, widget2DKey);
 		});
 		
@@ -984,9 +982,7 @@ CVCenter {
 		allCVKeys = all.keys;
 		widgetKeys = cvWidgets.keys;
 		thisKeys = allCVKeys.difference(widgetKeys);
-		
-		[allCVKeys, widgetKeys, thisKeys].postln;
-		
+				
 		thisKeys.do({ |k|
 			if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
 				cvcArgs = ();
@@ -1101,7 +1097,6 @@ CVCenter {
 			tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
 			tabs.focus(cvTabIndex);
 		});
-		
 		
 		widget2DKey !? {
 			cvWidgets[widget2DKey.key].setSpec(widget2DKey.spec, widget2DKey.slot);
