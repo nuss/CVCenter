@@ -15,7 +15,7 @@ CLASSMETHODS::
 
 METHOD:: all
 
-returns:: an IdentityDictionary of all CVs added to CVCenter
+returns:: an IdentityDictionary, containing all CVs added to CVCenter
 
 METHOD:: cvWidgets
 all widgets (currently either CVWidgetKnobs or CVWidget2Ds) displayed within the main GUI of CVCenter
@@ -31,16 +31,6 @@ METHOD:: tabs
 A TabbedView, containing the widgets
 
 returns:: a TabbedView
-
-METHOD:: prefPane
-The preferences-panel at the bottom of the CVCenter-GUI
-
-returns:: a ScrollView
-
-METHOD:: removeButs
-(describe method here)
-
-returns:: (returnvalue)
 
 METHOD:: midiMode
 (describe method here)
@@ -345,6 +335,36 @@ returns:: (returnvalue)
 
 INSTANCEMETHODS::
 
+copymethod:: Synth, -cvcGui
+(describe method here)
+
+argument:: displayDialog
+(describe argument here)
+
+argument:: prefix
+(describe argument here)
+
+argument:: pairs2D
+(describe argument here)
+
+argument:: environment
+(describe argument here)
+
+returns:: (returnvalue)
+
+copymethod:: NodeProxy, -cvcGui
+(describe method here)
+
+argument:: displayDialog
+(describe argument here)
+
+argument:: prefix
+(describe argument here)
+
+argument:: pairs2D
+(describe argument here)
+
+returns:: (returnvalue)
 
 EXAMPLES::
 

@@ -173,11 +173,16 @@ CVWidgetSpecsEditor {
 				.font_(textFieldFont)
 				.background_(textFieldBg)
 			;
-		
+			
+			cname.asSymbol.asSpec !? { elem.specEnterText.string_(cname.asSymbol.asSpec.asCompileString) };
+			
 			flow.shift(5, 0);
 			elem.specSelect = PopUpMenu(window, specSelectRect)
 				.items_(specsList)
 				.font_(selectFont)
+				.action_({ |m|
+					elem.specEnterText.string_(specsListSpecs[m.value].asCompileString)
+				})
 			;
 			
 			selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == cname.asSymbol.asSpec });
@@ -210,16 +215,25 @@ CVWidgetSpecsEditor {
 								};
 								
 								selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
-								break.value(elem.specSelect.value_(selectMatch));
+								break.value(
+									elem.specSelect.value_(selectMatch);
+									elem.specEnterText.string_(spec.asSpec.asCompileString);
+								);
 							}, {
 								if(k == cname, {
 									selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
-									break.value(elem.specSelect.value_(selectMatch));
+									break.value(
+										elem.specSelect.value_(selectMatch);
+										elem.specEnterText.string_(spec.asSpec.asCompileString);
+									);
 								});
 								if(pairs2D.notNil and:{ pairs2D[specName].notNil }, {
 									if(pairs2D[specName].includes(k), {
 										selectMatch = specsListSpecs.indexOfEqual(spec.asSpec);
-										break.value(elem.specSelect.value_(selectMatch));
+										break.value(
+											elem.specSelect.value_(selectMatch);
+											elem.specEnterText.string_(spec.asSpec.asCompileString);
+										);
 									})
 								})
 							})
