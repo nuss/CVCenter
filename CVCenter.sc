@@ -142,6 +142,7 @@ CVCenter {
 						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
 					);
 					switch(unicode,
+						99, { OSCCommands.gui }, // "c" -> collect OSC-commands resp. open the collector's GUI
 						111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
 						109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
 						120, { // key "x" -> close window
@@ -283,7 +284,7 @@ CVCenter {
 				}, {
 					cvcArgs = true;	
 				});
-										
+				
 				if(widgetStates.size < 1, { cvTabIndex = 0 }, {
 					if(widgetStates[k].isNil, {
 						cvTabIndex = 0;
@@ -419,7 +420,11 @@ CVCenter {
 					}
 				);
 
-				widgetStates.put(k, (tabIndex: cvTabIndex));
+				if(widgetStates[k].isNil, {
+					widgetStates.put(k, (tabIndex: cvTabIndex));
+				}, {
+					widgetStates[k].tabIndex = cvTabIndex;
+				});
 				rowwidth = tabs.views[cvTabIndex].bounds.width-15;
 				colwidth = widgetwidth+1; // add a small gap between widgets
 
@@ -561,18 +566,48 @@ CVCenter {
 	}
 		
 	*use { |key, spec, value, tab, slot|
-		var thisKey, thisSpec, thisVal, thisSlot, widget2DKey;
+		var thisKey, thisSpec, thisVal, thisSlot, thisTab, widget2DKey;
+
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
-		slot !? {
+		thisKey = key.asSymbol;
+
+		// if a 2D-widget under the given key exists force the given slot to become 
+		// the other slot of the already existing widget
+		// also prevents misbehaviour in case of bogus slots
+		if(cvWidgets.notNil and:{
+			cvWidgets[thisKey].notNil and:{
+				cvWidgets[thisKey].class == CVWidget2D
+			}
+		}, {
+			block { |break|
+				#[lo, hi].do({ |hilo|
+					if(widgetStates[thisKey].notNil and:{
+						widgetStates[thisKey][hilo].isNil
+					}, { break.value(thisSlot = hilo) })
+				})
+			}
+		});
+				
+		// above test didn't apply. so we can assume no widget exists under the given key
+		if(slot.notNil and:{ thisSlot.isNil }, {
 			thisSlot = slot.asString.toLower.asSymbol;
-			if(#[lo, hi].detect({ |sbl| sbl === thisSlot }).class !== Symbol, {
-				Error("Looks like you wanted to create a multi-dimensional widget. However, the given slot-value % is not valid!".format(slot)).throw;
-			});
+		});
+		
+		tab !? {
+			if(widgetStates.notNil and:{ 
+				widgetStates[thisKey].notNil and:{ 
+					tabs.getLabelAt(widgetStates[thisKey].tabIndex) != tab.asString
+				}
+			}, {
+				// force widget2D-slot to be created under the same tab as the already existing slot
+				thisTab = tabs.getLabelAt(widgetStates[thisKey].tabIndex);
+			}, {
+				thisTab = tab;
+			})
 		};
 				
 		all ? this.new;
-				
-		thisKey = key.asSymbol;
+		
 		thisSlot !? {
 			widgetStates[thisKey] ?? { widgetStates.put(thisKey, ()) };
 			widgetStates[thisKey][thisSlot] ?? { widgetStates[thisKey].put(thisSlot, ()) };
@@ -595,7 +630,7 @@ CVCenter {
 		if(window.isNil or:{ window.isClosed }, {
 			this.gui(tab);
 		}, {
-			this.prAddToGui(tab, widget2DKey);
+			this.prAddToGui(thisTab, widget2DKey);
 		});
 		
 		if(slot.notNil, {
@@ -822,6 +857,9 @@ CVCenter {
 									cvWidgets[key].setOscInputConstraints(
 										v[hilo].osc.calibConstraints.lo @ v[hilo].osc.calibConstraints.hi, hilo
 									);
+									cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
+										[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
+									).changed(\value);
 									cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo)
 								})
 							});
@@ -863,6 +901,9 @@ CVCenter {
 								cvWidgets[key].setOscInputConstraints(
 									v.osc.calibConstraints.lo @ v.osc.calibConstraints.hi
 								);
+								cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
+									[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
+								).changed(\value);
 								cvWidgets[key].setOscMapping(v.osc.oscMapping)
 							}
 						});
@@ -934,7 +975,7 @@ CVCenter {
 		var thisNextPos;
 		var cvcArgs, btnColor;
 		var tmp;
-				
+						
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 		
 		if(tab.notNil, {
@@ -1018,7 +1059,11 @@ CVCenter {
 						.font_(Font("Helvetica", 9))
 					;
 				);
-				widgetStates.put(k, (tabIndex: cvTabIndex));
+				if(widgetStates[k].isNil, {
+					widgetStates.put(k, (tabIndex: cvTabIndex));
+				}, {
+					widgetStates[k].tabIndex = cvTabIndex;
+				});
 				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
 				#[lo, hi].do({ |sl|
 					[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b|

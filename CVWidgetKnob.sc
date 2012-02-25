@@ -322,7 +322,9 @@ CVWidgetKnob : CVWidget {
 				});
 				editor.calibNumBoxes !? {
 					wdgtControllersAndModels.mapConstrainterLo.connect(editor.calibNumBoxes.lo);
+					editor.calibNumBoxes.lo.value_(wdgtControllersAndModels.oscInputRange.model.value[0]);
 					wdgtControllersAndModels.mapConstrainterHi.connect(editor.calibNumBoxes.hi);
+					editor.calibNumBoxes.hi.value_(wdgtControllersAndModels.oscInputRange.model.value[1]);
 				};
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value;

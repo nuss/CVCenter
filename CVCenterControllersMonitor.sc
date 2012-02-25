@@ -121,7 +121,7 @@ CVCenterControllersMonitor {
 							CVCenter.ctrlButtonBank.isInteger;
 						}, {
 							tmp = (tmp+1/CVCenter.ctrlButtonBank).ceil.asString++":"
-							++(tmp % CVCenter.ctrlButtonBank);
+							++((tmp % CVCenter.ctrlButtonBank)+1);
 						}, {
 							tmp = tmp+1;
 						});
@@ -151,7 +151,7 @@ CVCenterControllersMonitor {
 								CVCenter.ctrlButtonBank.isInteger;
 							}, {
 								tmp = (tmp+1/CVCenter.ctrlButtonBank).ceil.asString++":"
-								++(tmp % CVCenter.ctrlButtonBank);
+								++((tmp % CVCenter.ctrlButtonBank)+1);
 							}, {
 								tmp = tmp+1;
 							});

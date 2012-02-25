@@ -136,14 +136,16 @@ CVWidgetEditor {
 			thisEditor.tabs = tabs;
 			
 			thisEditor.tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
+//				[view, char, modifiers, unicode, keycode].postln;
 				switch(unicode,
-					111, { thisEditor.tabs.focus(2) }, // osc
-					109, { thisEditor.tabs.focus(1) }, // midi
-					97, { thisEditor.tabs.focus(3) }, // actions
-					115, { thisEditor.tabs.focus(0) }, // specs
-					79, { CVCenterControllersMonitor(1) }, // osc-controllers monitor
-					77, { CVCenterControllersMonitor(0) }, // midi-controllers monitor
-					120, { this.close(slot) } // close editor
+					111, { thisEditor.tabs.focus(2) }, // "o" -> osc
+					109, { thisEditor.tabs.focus(1) }, // "m" -> midi
+					97, { thisEditor.tabs.focus(3) }, // "a" -> actions
+					115, { thisEditor.tabs.focus(0) }, // "s" -> specs
+					79, { CVCenterControllersMonitor(1) }, // <shift> + "o" -> osc-controllers monitor
+					77, { CVCenterControllersMonitor(0) }, // <shift> + "m" -> midi-controllers monitor
+					120, { this.close(slot) }, // "x" -> close editor
+					99, { OSCCommands.gui } // "c" -> collect OSC-commands resp. open the collector's GUI
 				)
 			});
 						
@@ -523,7 +525,7 @@ CVWidgetEditor {
 				.stringColor_(staticTextColor)
 				.string_("OSC-input constraints + compensation")
 			;
-			
+						
 			inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
@@ -536,10 +538,10 @@ CVWidgetEditor {
 			inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
-				.value_(wcmHiLo.oscInputRange.model.value[0])
+				.value_(wcmHiLo.oscInputRange.model.value[1])
 				.enabled_(false)
 			;
-			
+						
 			flow2.shift(5, 0);
 			
 			alwaysPosField = StaticText(thisEditor.tabs.views[2], 32@15)

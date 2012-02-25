@@ -467,7 +467,9 @@ CVWidget2D : CVWidget {
 				});
 				editor[v[0]].calibNumBoxes !? {
 					wdgtControllersAndModels[v[0]].mapConstrainterLo.connect(editor[v[0]].calibNumBoxes.lo);
+					editor[v[0]].calibNumBoxes.lo.value_(wdgtControllersAndModels[v[0]].oscInputRange.model.value[0]);
 					wdgtControllersAndModels[v[0]].mapConstrainterHi.connect(editor[v[0]].calibNumBoxes.hi);
+					editor[v[0]].calibNumBoxes.hi.value_(wdgtControllersAndModels[v[0]].oscInputRange.model.value[1]);
 				};
 				wdgtControllersAndModels[v[0]].oscConnection.model.value_(
 					wdgtControllersAndModels[v[0]].oscConnection.model.value;
