@@ -591,6 +591,9 @@ CVCenter {
 		// above test didn't apply. so we can assume no widget exists under the given key
 		if(slot.notNil and:{ thisSlot.isNil }, {
 			thisSlot = slot.asString.toLower.asSymbol;
+			if(#[lo, hi].detect({ |sbl| sbl === thisSlot }).class !== Symbol, {
+				Error("Looks like you wanted to create a multi-dimensional widget. However, the given slot-value '%' is not valid!".format(slot)).throw;
+			})
 		});
 		
 		tab !? {
