@@ -1,4 +1,4 @@
-CVCenter s supposed to be a graphical control-interface that lets you connect synth-controls or controls within patterns to hardware midi-sliders or OSC-controllers. CVCenter itself is more or less a container of CVs, each represented by CVWidgets (currently CVWidgetKnob and CVWidget2D). Each of them can be connected to an unlimited number GUI-elements or/and control parameters in running Synths or set values in Patterns. As CV inherits from Stream any instance can be used as any other Pattern (Pseq, Prand, Pwhite etcetc.).
+CVCenter is supposed to be a graphical control-interface that lets you connect synth-controls or controls within patterns to hardware midi-sliders or OSC-controllers. CVCenter itself is more or less a container of CVs (a collection of CVs + GUI), each represented by CVWidgets (currently CVWidgetKnob and CVWidget2D). Each of them can be connected to an unlimited number GUI-elements or/and control parameters in running Synths or set values in Patterns. As CV inherits from Stream any instance can be used as any other Pattern (Pseq, Prand, Pwhite etcetc.).
 
 For more info check out CVCenter.html resp. CVWidget.html.
 
@@ -21,4 +21,4 @@ Under Linux, using the latest Developer-Version of SuperCollider this will resol
 
 If not present yet create a directory 'Extensions' and put CVCenter in there.
 
-Note: if you're on Linux you will need to have installed the latest beta-version of SuperCollider (3.5 beta) as CVCenter needs QtGUI to be installed.
+Note: if you're on Linux you will need to have installed SuperCollider >= 3.5 as CVCenter needs QtGUI to be installed. Under MacOSX CVCenter *should* be compatible with SC >= 3.4 resp. QtGUI as well as Cocoa.
