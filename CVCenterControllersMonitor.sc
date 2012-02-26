@@ -106,7 +106,7 @@ CVCenterControllersMonitor {
 		CVCenter.cvWidgets.pairsDo({ |k, w|
 			switch(w.class,
 				CVWidgetKnob, {
-					if(w.wdgtControllersAndModels.oscConnection.model.value !== false, { 
+					if(w.wdgtControllersAndModels.oscConnection.model.value != false, { 
 						tmp = (w.wdgtControllersAndModels.oscConnection.model.value[2].asString+"(slot"+w.wdgtControllersAndModels.oscConnection.model.value[3]++")").asSymbol;
 						if(oscCtrlrs[tmp.asSymbol].isNil, {
 							oscCtrlrs.put(tmp.asSymbol, [1, [k.asString]]);
