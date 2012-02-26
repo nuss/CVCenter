@@ -550,7 +550,7 @@ CVCenter {
 		removeButs[key].remove;
 		removeButs.removeAt(key);
 		widgetStates.removeAt(key);
-		tabs.views.do({ |v, i| if(v.children.size == 0, { this.prRemoveTab(i) }) });
+		{ tabs.views.do({ |v, i| v.refresh; if(v.children.size == 0, { this.prRemoveTab(i) }) }) }.defer(0.1);
 	}
 	
 	*removeAll { |...keys|
