@@ -21,7 +21,7 @@ CVWidget {
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
-	var <widgetBg, <label, <nameField, <wdgtInfo; // elements contained in any kind of CVWidget
+	var <widgetBg, <label, <nameField; // elements contained in any kind of CVWidget
 	var <visible, widgetXY, widgetProps, <editor;
 	var <wdgtControllersAndModels, <midiOscEnv;
 

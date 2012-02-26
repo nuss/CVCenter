@@ -4,12 +4,12 @@ categories:: GUI, CV, MIDI, OSC
 related:: Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
 
 DESCRIPTION::
-CVCenter lets you collect an arbitrary number of link::Classes/CV::s (you need to have the Conductor-quark installed) and use them to easily create control-widgets for Synths, Ndefs or Pattern-keys. Or even more basically: any value that can be set at runtime. For each CV a widget will be created within the main CVCenter-GUI that combines an arbitrary number of TabbedViews, filled with your widgets.
+CVCenter lets you collect an arbitrary number of link::Classes/CV::s (you need to have the Conductor-quark installed) and use them to easily create control-widgets for link::Classes/Synth::s, link::Classes/Ndef::s or link::Classes/Pattern::-keys. Or even more basically: any value that can be set at runtime. For each link::Classes/CV:: a widget will be created within the main CVCenter-GUI that combines an arbitrary number of link::Classes/TabbedView::s, filled with your widgets.
 
-What's a CV?
+strong:: What's a CV? ::
 
-A CV models a value constrained by a ControlSpec. The value can be a single Float or an array of Floats. Whenever the CV's value changes, it sends a changed message labeled 'synch'.  This way dependants (such as GUI objects or server value) can be updated with SimpleControllers. 
-A CV's value can be read with the 'value' message. 
+A link::Classes/CV:: models a value constrained by a link::Classes/ControlSpec::. The value can be a single link::Classes/Float:: or an array of Floats. Whenever the link::Classes/CV::'s value changes, it sends a changed message labeled 'synch'.  This way dependants (such as GUI objects or server value) can be updated with link::Classes/SimpleController::s. 
+A link::Classes/CV::'s value can be read with the 'value' message. 
 
 CLASSMETHODS::
 
@@ -33,54 +33,89 @@ A TabbedView, containing the widgets
 returns:: a TabbedView
 
 METHOD:: midiMode
-(describe method here)
+Different MIDI-devices may have different output modes: either values from 0-127 or an in-/decremental value (e.g. -1 or +1). These modes may be taken in account as follows:
 
-returns:: (returnvalue)
+0: the device outputs a values 0-127
+1: the device outputs in-/decremental values
+
+code::midiMode:: can be set at runtime and will be reflected in all widgets, i.e. all currently connectected devices will be switched to the new mode immediately.
+
+default: code::0::
+
+returns:: this
 
 METHOD:: midiResolution
-(describe method here)
+When code::midiMode:: has been set to 1, this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
 
-returns:: (returnvalue)
+standard-value: 1
+lower values -> higher resolution (lower stepzise)
+higher values -> lower resolution (bigger stepzise)
+
+default: code::1::
+
+returns:: this
 
 METHOD:: ctrlButtonBank
-(describe method here)
+Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI. 
+code::ctrlButtonBank:: translates the hardware-layout in a way that makes it easy to see the slider's bank and number: slider 17 becomes 2:1 (bank 2,  nr. 1).
 
-returns:: (returnvalue)
+default: code::nil::
+
+returns:: this
 
 METHOD:: midiMean
-(describe method here)
+Devices which output a in-/decremtal may output a standard value + in-/decrement. code::midiMean:: gets automatically subtracted from this value, so in-/decrement remains.
 
-returns:: (returnvalue)
+default: code::64::
+
+returns:: this
 
 METHOD:: softWithin
-(describe method here)
+If code::midiMode:: has been set to 0 moving a widget-slider will set the CV to a new value. However, if a MIDI-slider is connected to that widget, moving the MIDI-slider will set the CV's value immediatly to the value that is stored in the MIDI-slider i.e. a "jump" will happen. code::softWithin:: will ease this behavior by setting the CV's value only if the slider gets within code::softWithin/2::
 
-returns:: (returnvalue)
+default: code::0.1::
+
+returns:: this
 
 METHOD:: guix
-(describe method here)
+The x-position at which the GUI will be created - can only be set ahead from GUI-creation.
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: guiy
-(describe method here)
+The y-position at which the GUI will be created - can only be set ahead from GUI-creation.
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: guiwidth
-(describe method here)
+The GUI-width - can only be set ahead from GUI-creation.
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: guiheight
-(describe method here)
+The GUI-height - can only be set ahead from GUI-creation.
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: widgetStates
-(describe method here)
+an IdentityDictionary, displaying information on GUI's widgets (keys are built from the widgets' names):
 
-returns:: (returnvalue)
+list::
+link::CVWidgetKnob::s:
+
+code::tabIndex::: the numerical index of the tab under which the widget has been added::
+::
+list::
+link::CVWidget2D::s:
+
+code::tabIndex::: the numerical index of the tab under which the widget has been added
+
+code::lo:: reps. code::hi::: 
+
+code::made::: indicating wether the regarding slot has been created explicitly by CVCenter-*use (when creating one slot of a CVWidget2D the second slot gets created automatically. However the user may still set the second slot as long code::widgetStates[key][slot][made]:: isn't code::true::)
+::
+
+returns:: an IdentityDictinary
 
 METHOD:: tabProperties
 (describe method here)
@@ -334,37 +369,6 @@ returns:: (returnvalue)
 
 
 INSTANCEMETHODS::
-
-copymethod:: Synth, -cvcGui
-(describe method here)
-
-argument:: displayDialog
-(describe argument here)
-
-argument:: prefix
-(describe argument here)
-
-argument:: pairs2D
-(describe argument here)
-
-argument:: environment
-(describe argument here)
-
-returns:: (returnvalue)
-
-copymethod:: NodeProxy, -cvcGui
-(describe method here)
-
-argument:: displayDialog
-(describe argument here)
-
-argument:: prefix
-(describe argument here)
-
-argument:: pairs2D
-(describe argument here)
-
-returns:: (returnvalue)
 
 EXAMPLES::
 
