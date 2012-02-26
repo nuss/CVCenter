@@ -115,23 +115,17 @@ CVCenterControllersMonitor {
 							oscCtrlrs[tmp.asSymbol][1] = oscCtrlrs[tmp.asSymbol][1].add(k.asString);
 						});
 					});
-					w.wdgtControllersAndModels.midiConnection.model.value !? {
-						tmp = w.wdgtControllersAndModels.midiConnection.model.value.num;
-						if(CVCenter.ctrlButtonBank.notNil and:{
-							CVCenter.ctrlButtonBank.isInteger;
-						}, {
-							tmp = (tmp+1/CVCenter.ctrlButtonBank).ceil.asString++":"
-							++((tmp % CVCenter.ctrlButtonBank)+1);
-						}, {
-							tmp = tmp+1;
-						});
-						if(midiCtrlrs[tmp.asSymbol].isNil, {
-							midiCtrlrs.put(tmp.asSymbol, [1, [k.asString]]);
-						}, {
-							midiCtrlrs[tmp.asSymbol][0] = midiCtrlrs[tmp.asSymbol][0]+1;
-							midiCtrlrs[tmp.asSymbol][1] = midiCtrlrs[tmp.asSymbol][1].add(k.asString);
-						});
-					};
+					w.midiOscEnv.midinum !? {
+						tmp = w.midiOscEnv.midinum.asSymbol;
+						tmp !? {
+							if(midiCtrlrs[tmp].isNil, {
+								midiCtrlrs.put(tmp, [1, [k.asString]]);
+							}, { 
+								midiCtrlrs[tmp][0] = midiCtrlrs[tmp][0]+1;
+								midiCtrlrs[tmp][1] = midiCtrlrs[tmp][1].add(k.asString);
+							})
+						}
+					}
 				},
 				CVWidget2D, {
 					#[lo, hi].do({ |hilo|
@@ -145,22 +139,16 @@ CVCenterControllersMonitor {
 								oscCtrlrs[tmp.asSymbol][1] = oscCtrlrs[tmp.asSymbol][1].add(k.asString++"["++hilo++"]")
 							});
 						});
-						w.wdgtControllersAndModels[hilo].midiConnection.model.value !? {
-							tmp = w.wdgtControllersAndModels.midiConnection.model.value.num;
-							if(CVCenter.ctrlButtonBank.notNil and:{
-								CVCenter.ctrlButtonBank.isInteger;
-							}, {
-								tmp = (tmp+1/CVCenter.ctrlButtonBank).ceil.asString++":"
-								++((tmp % CVCenter.ctrlButtonBank)+1);
-							}, {
-								tmp = tmp+1;
-							});
-							if(midiCtrlrs[tmp.asSymbol].isNil, {
-								midiCtrlrs.put(tmp.asSymbol, [1, [k.asString++"["++hilo++"]"]]);
-							}, { 
-								midiCtrlrs[tmp.asSymbol][0] = midiCtrlrs[tmp.asSymbol][0]+1;
-								midiCtrlrs[tmp.asSymbol][1] = midiCtrlrs[tmp.asSymbol][1].add(k.asString++"["++hilo++"]");
-							});
+						w.midiOscEnv[hilo].midinum !? {
+							tmp = w.midiOscEnv[hilo].midinum.asSymbol;
+							tmp !? {
+								if(midiCtrlrs[tmp].isNil, {
+									midiCtrlrs.put(tmp, [1, [k.asString++"["++hilo++"]"]]);
+								}, { 
+									midiCtrlrs[tmp][0] = midiCtrlrs[tmp][0]+1;
+									midiCtrlrs[tmp][1] = midiCtrlrs[tmp][1].add(k.asString++"["++hilo++"]");
+								})
+							}
 						}
 					})
 				}
