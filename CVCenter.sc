@@ -561,6 +561,12 @@ CVCenter {
 		});
 	}
 	
+	*removeAtTab { |label|
+		var wdgts;
+		wdgts = this.widgetsAtTab(label);
+		this.removeAll(*wdgts);		
+	}
+	
 	*at { |key|
 		^all.at(key.asSymbol);
 	}
@@ -671,6 +677,18 @@ CVCenter {
 		window.bounds_(Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
 	}
 	
+	*bounds {
+		^window.bounds;
+	}
+	
+	*bounds_ { |rect|
+		this.guix_(rect.left);
+		this.guiy_(rect.top);
+		this.guiwidth_(rect.width);
+		this.guiheight_(rect.height);
+		window.bounds_(rect);
+	}
+	
 	*renameTab { |oldName, newName|
 		var index;
 		index = tabs.views.detectIndex({ |view, i| tabs.getLabelAt(i) == oldName.asString; });
@@ -715,9 +733,9 @@ CVCenter {
 //		})
 //	}
 	
-	*widgetsAtTab { |tab|
+	*widgetsAtTab { |label|
 		var index, wdgts = [];
-		index = this.tabProperties.detectIndex({ |t, i| t.tabLabel.asSymbol === tab.asSymbol });
+		index = this.tabProperties.detectIndex({ |t, i| t.tabLabel.asSymbol === label.asSymbol });
 		all.keys.do({ |key|
 			if(widgetStates[key].tabIndex == index, { wdgts = wdgts.add(key) });
 		});
@@ -1003,7 +1021,7 @@ CVCenter {
 						if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }})
 					});
 					cvTabIndex = tabLabels.size;
-					tabProperties = tabProperties.add((tabLabel: tab, tabColor: nextColor.next));
+					tabProperties = tabProperties.add((tabLabel: tab.asString, tabColor: nextColor.next));
 				})
 			})
 		}, {
