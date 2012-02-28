@@ -139,7 +139,10 @@ CVCenter {
 //					[view, char, modifiers, unicode, keycode].postcs;
 					switch(keycode, 
 						16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
+						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
+						// when and why have the keycodes been changed??
+						124, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+						123, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
 					);
 					switch(unicode,
 						99, { OSCCommands.gui }, // "c" -> collect OSC-commands resp. open the collector's GUI
@@ -1024,10 +1027,13 @@ CVCenter {
 					this.renameTab(tabs.getLabelAt(0), tab.asString);
 				}, { 
 					tabs.add(tab).keyDownAction_({ |view, char, modifiers, unicode, keycode|
-		//				[view, char, modifiers, unicode, keycode].postcs;
+//						[view, char, modifiers, unicode, keycode].postcs;
 						switch(keycode, 
 							16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-							16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
+							16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
+							// when and why have the keycodes been changed??
+							124, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+							123, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
 						);
 						switch(unicode,
 							111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
