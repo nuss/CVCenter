@@ -513,44 +513,60 @@ CVCenter {
 	}
 		
 	*removeAt { |key|
-		var lastVal, tabIndex;
-		all.removeAt(key.asSymbol);
-		cvWidgets[key].class.switch(
+		var lastVal, thisKey, tabIndex;
+		thisKey = key.asSymbol;
+		all.removeAt(thisKey);
+		cvWidgets[thisKey].class.switch(
 			CVWidgetKnob, { 
-				if(cvWidgets[key].editor.notNil and:{ cvWidgets[key].editor.isClosed.not }, {
-					cvWidgets[key].editor.close;
+				if(cvWidgets[thisKey].editor.notNil and:{ cvWidgets[thisKey].editor.isClosed.not }, {
+					cvWidgets[thisKey].editor.close;
 				});
-				cvWidgets[key].midiOscEnv.cc !? { 
-					cvWidgets[key].midiOscEnv.cc.remove; 
-					cvWidgets[key].midiOscEnv.cc = nil;
+				cvWidgets[thisKey].midiOscEnv.cc !? { 
+					cvWidgets[thisKey].midiOscEnv.cc.remove; 
+					cvWidgets[thisKey].midiOscEnv.cc = nil;
 				};
-				cvWidgets[key].midiOscEnv.oscResponder !? { 
-					cvWidgets[key].midiOscEnv.oscResponder.remove;
-					cvWidgets[key].midiOscEnv.oscResponder = nil;
+				cvWidgets[thisKey].midiOscEnv.oscResponder !? { 
+					cvWidgets[thisKey].midiOscEnv.oscResponder.remove;
+					cvWidgets[thisKey].midiOscEnv.oscResponder = nil;
 				};
 			},
 			CVWidget2D, {
 				#[lo, hi].do({ |hilo|
-					if(cvWidgets[key].editor[hilo].notNil and:{ cvWidgets[key].editor[hilo].isClosed.not }, {
-						cvWidgets[key].editor[hilo].close;
+					if(cvWidgets[thisKey].editor[hilo].notNil and:{ cvWidgets[thisKey].editor[hilo].isClosed.not }, {
+						cvWidgets[thisKey].editor[hilo].close;
 					});
-					cvWidgets[key].midiOscEnv[hilo].cc !? { 
-						cvWidgets[key].midiOscEnv[hilo].cc.remove; 
-						cvWidgets[key].midiOscEnv[hilo].cc = nil;
+					cvWidgets[thisKey].midiOscEnv[hilo].cc !? { 
+						cvWidgets[thisKey].midiOscEnv[hilo].cc.remove; 
+						cvWidgets[thisKey].midiOscEnv[hilo].cc = nil;
 					};
-					cvWidgets[key].midiOscEnv[hilo].oscResponder !? { 
-						cvWidgets[key].midiOscEnv[hilo].oscResponder.remove;
-						cvWidgets[key].midiOscEnv[hilo].oscResponder = nil;
+					cvWidgets[thisKey].midiOscEnv[hilo].oscResponder !? { 
+						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder.remove;
+						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder = nil;
 					}
 				})
 			}
 		);
-		cvWidgets[key].remove;
+		cvWidgets[thisKey].remove;
 		cvWidgets.removeAt(key);
-		removeButs[key].remove;
-		removeButs.removeAt(key);
-		widgetStates.removeAt(key);
-		{ tabs.views.do({ |v, i| v.refresh; if(v.children.size == 0, { this.prRemoveTab(i) }) }) }.defer(0.1);
+		removeButs[thisKey].remove;
+		removeButs.removeAt(thisKey);
+		if(window.notNil, { 
+			if(window.isClosed.not, {
+				{ tabs.views.do({ |v, i| v.refresh; if(v.children.size == 0, { this.prRemoveTab(i) }) }) }.defer(0.1);
+			}, {
+				if(this.widgetsAtTab(tabs.getLabelAt(widgetStates[key].tabIndex)).size == 0, {
+					if(tabProperties.size == 1, {
+						tabProperties = [(tabLabel: "default", tabColor: tabProperties[0].tabColor)];
+					}, {	
+						tabProperties.removeAt(widgetStates[key].tabIndex);
+						widgetStates.do({ |w| 
+							if(w.tabIndex > widgetStates[key].tabIndex, { w.tabIndex = w.tabIndex-1 });
+						})
+					})
+				})
+			})
+		});
+		widgetStates.removeAt(thisKey);
 	}
 	
 	*removeAll { |...keys|
@@ -1210,6 +1226,7 @@ CVCenter {
 		if(tabs.views.size > 1, {
 			if(window.isClosed.not, { tabs.removeAt(index) });
 			tabProperties.removeAt(index);
+			widgetStates.do({ |w| if(w.tabIndex > index, { w.tabIndex = w.tabIndex-1 }) });
 		}, {
 			if(window.isClosed.not and:{ tabs.getLabelAt(index) != "default" }, { tabs.setLabelAt(index, "default") });
 			tabProperties = [(tabLabel: "default", tabColor: tabProperties[index].tabColor)];
