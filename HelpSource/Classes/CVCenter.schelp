@@ -97,36 +97,17 @@ The GUI-height - can only be set ahead from GUI-creation.
 
 returns:: this
 
-METHOD:: widgetStates
-an IdentityDictionary, displaying information on GUI's widgets (keys are built from the widgets' names):
+METHOD:: 
+Initializes CVCenter by creating its classvars code::all::, code::cvWidgets:: and more private ones.
 
-list::
-link::CVWidgetKnob::s:
-
-code::tabIndex::: the numerical index of the tab under which the widget has been added::
-::
-list::
-link::CVWidget2D::s:
-
-code::tabIndex::: the numerical index of the tab under which the widget has been added
-
-code::lo:: reps. code::hi::: 
-
-code::made::: indicating wether the regarding slot has been created explicitly by CVCenter-*use (when creating one slot of a CVWidget2D the second slot gets created automatically. However the user may still set the second slot as long code::widgetStates[key][slot][made]:: isn't code::true::)
-::
-
-returns:: an IdentityDictinary
-
-METHOD:: tabProperties
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: new
-(describe method here)
+note::It is recommended to always initialize CVCenter resp. add widgets by utilizing strong::*use::
 
 argument:: cvs
-(describe argument here)
+an Array, a Dictionary or an Event, containg the widget name(s) and its/their internal CV(s):
+
+list::
+Array: code:: [\widget1, CV.new, \widget2, (lo: CV.new, hi: CV.new), … \widgetN, CV.new]::
+::
 
 argument::  ... setUpArgs
 (describe argument here)

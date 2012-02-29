@@ -20,8 +20,8 @@ CVCenter {
 	classvar <all, nextCVKey, <cvWidgets, <window, <tabs, prefPane, removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight; 
-	classvar <widgetStates;
-	classvar <tabProperties, colors, nextColor;
+	classvar widgetStates;
+	classvar tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=181, colwidth, rowheight;
 	
 	*new { |cvs...setUpArgs|
@@ -644,7 +644,7 @@ CVCenter {
 		thisSpec = spec.asSpec;
 		thisVal = value ?? { thisVal = thisSpec.default };
 
-		if(thisSlot.notNil and:{ widgetStates[thisKey][thisSlot][\made] !== true }, {
+		if(thisSlot.notNil and:{ widgetStates[thisKey][thisSlot][\made] != true }, {
 			widgetStates[thisKey][thisSlot].made = true;
 			if(thisSlot === \lo or: { thisSlot === \hi }, {
 				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
@@ -730,31 +730,9 @@ CVCenter {
 		cvWidgets[key.asSymbol].activateAction(name, activate, slot);
 	}
 		
-//	*removeActionsAt { |...keys|
-//		keys ?? { "Can't remove actions: provide at least one key".warn };
-//		keys.do({ |key|
-//			switch(cvWidgets[key.asSymbol].class,
-//				CVWidget2D, {
-//					widgetStates[key.asSymbol].actions !? {
-//						#[lo, hi].do({ |slot| 
-//							widgetStates[key.asSymbol].actions[slot.asSymbol].pairsDo({ |ctrlr, action|
-//								this.removeActionAt(key, ctrlr, slot);
-//							})
-//						})
-//					}
-//				}, 
-//				{ 
-//					widgetStates[key.asSymbol].actions.pairsDo({ |ctrlr, action|
-//						this.removeActionAt(key, ctrlr);
-//					})
-//				}
-//			)
-//		})
-//	}
-	
 	*widgetsAtTab { |label|
 		var index, wdgts = [];
-		index = this.tabProperties.detectIndex({ |t, i| t.tabLabel.asSymbol === label.asSymbol });
+		index = tabProperties.detectIndex({ |t, i| t.tabLabel.asSymbol === label.asSymbol });
 		all.keys.do({ |key|
 			if(widgetStates[key].tabIndex == index, { wdgts = wdgts.add(key) });
 		});
