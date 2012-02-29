@@ -35,8 +35,10 @@ returns:: a TabbedView
 METHOD:: midiMode
 Different MIDI-devices may have different output modes: either values from 0-127 or an in-/decremental value (e.g. -1 or +1). These modes may be taken in account as follows:
 
-0: the device outputs a values 0-127
-1: the device outputs in-/decremental values
+table::
+## code::0:: || the device outputs a values 0-127
+## code::1:: || the device outputs in-/decremental values
+::
 
 code::midiMode:: can be set at runtime and will be reflected in all widgets, i.e. all currently connectected devices will be switched to the new mode immediately.
 
@@ -48,8 +50,8 @@ METHOD:: midiResolution
 When code::midiMode:: has been set to 1, this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
 
 standard-value: 1
-lower values -> higher resolution (lower stepzise)
-higher values -> lower resolution (bigger stepzise)
+lower values -> higher resolution (lower stepsize)
+higher values -> lower resolution (bigger stepsize)
 
 default: code::1::
 
@@ -71,59 +73,71 @@ default: code::64::
 returns:: this
 
 METHOD:: softWithin
-If code::midiMode:: has been set to 0 moving a widget-slider will set the CV to a new value. However, if a MIDI-slider is connected to that widget, moving the MIDI-slider will set the CV's value immediatly to the value that is stored in the MIDI-slider i.e. a "jump" will happen. code::softWithin:: will ease this behavior by setting the CV's value only if the slider gets within code::softWithin/2::
+If code::midiMode:: has been set to code::0:: moving a widget-slider will set the CV to a new value. However, if a MIDI-slider is connected to that widget, moving the MIDI-slider will set the CV's value immediatly to the value that is stored in the MIDI-slider i.e. a "jump" will happen. code::softWithin:: will ease this behavior by setting the CV's value only if the slider gets within code::softWithin/2::
 
 default: code::0.1::
 
 returns:: this
 
 METHOD:: guix
-The x-position at which the GUI will be created - can only be set ahead from GUI-creation.
+The x-position at which the GUI will be created - has no direct effect besides when being set ahead from initializing CVCenter.
 
 returns:: this
 
 METHOD:: guiy
-The y-position at which the GUI will be created - can only be set ahead from GUI-creation.
+The y-position at which the GUI will be created - has no direct effect besides when being set ahead from initializing CVCenter.
 
 returns:: this
 
 METHOD:: guiwidth
-The GUI-width - can only be set ahead from GUI-creation.
+The GUI-width - has no direct effect besides when being set ahead from initializing CVCenter.
 
 returns:: this
 
 METHOD:: guiheight
-The GUI-height - can only be set ahead from GUI-creation.
+The GUI-height - has no direct effect besides when being set ahead from initializing CVCenter.
 
 returns:: this
 
-METHOD:: 
+METHOD:: new
 Initializes CVCenter by creating its classvars code::all::, code::cvWidgets:: and more private ones.
 
-note::It is recommended to always initialize CVCenter resp. add widgets by utilizing strong::*use::
+note::It shouldn't be necessary to initialize CVCenter with an explicit call to strong::*new::. Rather use strong::*use:: whenever possible as (will call strong::*new:: internally) ::
 
 argument:: cvs
-an Array, a Dictionary or an Event, containg the widget name(s) and its/their internal CV(s):
+an Array, a Dictionary or an Event, containing the widget name(s) and its/their internal CV(s):
 
+argument:: … setUpArgs
+An arbitrary number of key/value pairs. The following keys are currently supported:
+definitionList::
 list::
-Array: code:: [\widget1, CV.new, \widget2, (lo: CV.new, hi: CV.new), … \widgetN, CV.new]::
+## strong::midiMode::
+table::
+## code::0:: || MIDI-controllers that yield values from 0-127
+## code::1:: || MIDI-controller that yield de-/incremental values
+::
+## strong::midiResolution:: || - only applies when midiMode is set to code::1:: - default: 1
+## strong::midiMean:: || - only applies when midiMode is set to code::1:: - default: 64
+## strong::softwithin:: || - only applies when midiMode is set to code::0:: - default: 0.1
+## strong::ctrlButtonBank:: || - default: nil
+::
+::
 ::
 
-argument::  ... setUpArgs
-(describe argument here)
+For a detailed description of the above listet arguments see the descriptions of the according classvar-methods. 
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: gui
-(describe method here)
+Creates and fronts the CVCenter GUI if it's closed or nil. Sends the GUI to front if it's in the background. If CVs are passed in as key/value pairs it adds them as widgets to the GUI under the given tab if given or the one that's currently in front.
 
 argument:: tab
-(describe argument here)
+a String or a Symbol, indicating the label of a tab. If none is provided the widgets will be added to "default" or any other tab that's currently in front. If an event containing the keys code::\hi:: and code::\hi:: gets passed in the widget will be a CVWidget2D.
 
 argument::  ... cvs
-(describe argument here)
+key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), … \wdgtNameN, a CV::
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: put
 (describe method here)

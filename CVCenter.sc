@@ -43,7 +43,7 @@ CVCenter {
 			r.do({ |red|
 				g.do({ |green|
 					b.do({ |blue|
-						colors.add(Color(red, green, blue, 1.0));
+						colors.add(Color(red, green, blue));
 					})
 				})
 			});
@@ -122,7 +122,7 @@ CVCenter {
 			tabs.labelColors_(labelColors);
 			tabs.labelPadding_(5);
 			tabs.unfocusedColors_(unfocusedColors);
-			tabs.font_(GUI.font.new("Helvetica", 10));
+			tabs.font_(GUI.font.new("Helvetica", 10, true));
 			tabs.tabCurve_(3);
 			tabs.stringColor_(Color.black);
 			tabs.stringFocusedColor_(Color(0.0, 0.0, 0.5, 1.0));
