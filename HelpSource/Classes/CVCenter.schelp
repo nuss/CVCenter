@@ -140,88 +140,99 @@ key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), … \
 returns:: this
 
 METHOD:: put
-(describe method here)
+Put new CVs into CVCenter.all
 
 argument::  ... args
-(describe argument here)
+key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), … \wdgtNameN, a CV::
+If the number of arguments is odd and the last one is a code::Boolean:: this will indicate wether already contained values will be overwritten (default: code::false::)
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: removeAt
-(describe method here)
+Remove a given widget including its CV(s).
 
 argument:: key
-(describe argument here)
+a code::Symbol:: or code::String::
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: removeAll
-(describe method here)
+Remove given widgets including their CVs or all.
 
 argument::  ... keys
-(describe argument here)
+widget-keys, given as code::String::s or code::Symbol::s. If no keys are given strong::all:: widgets will be removed. 
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: at
-(describe method here)
+Return the CV at the given key
 
 argument:: key
-(describe argument here)
+a code::Symbol:: or a code::String::
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: use
-(describe method here)
+Use an arbitrary name for creating a new CVWidget (a CVWidgetKnob or a CVWidget2D, depending on the argument code::slot::).
+
+note::This is the recommended way for creating new widgets.::
+
+This method should be convenient in most situations. It simply creates a new code::CVWidget:: and returns the code::CV::. As code::CV:: inherits from code::Stream:: this method may directly be used in code::Pattern::s. Any reevaluation will leave a once created code::CV:: untouched.
 
 argument:: key
-(describe argument here)
+a code::Symbol:: or a code::String:: - the resulting code::CV:: will be put into code::CVCenter.all:: under this name and the widget will be labeled the same.
 
 argument:: spec
-(describe argument here)
+a code::ControlSpec:: - default: code::ControlSpec.new::
 
 argument:: value
-(describe argument here)
+a default value for the code::CV:: - default: the code::ControlSpec::'s default value
 
 argument:: tab
-(describe argument here)
+a code::String:: or a code::Symbol:: - the tab under which the widget will appear. If not provided the widget will be added under the tab that's currently in front.
 
 argument:: slot
-(describe argument here)
+only needed if a code::CVWidget2D:: shall be created. Either code::\lo:: or code::\hi::
 
-returns:: (returnvalue)
+returns:: a CV
 
 METHOD:: setup
-(describe method here)
+returns the current setup:
+list::
+## code::midiMode::
+## code::midiResolution::
+## code::midiMean::
+## code::ctrlButtonBank::
+## code::softWithin::
 
-returns:: (returnvalue)
+returns:: an code::Event::
 
 METHOD:: guiMoveTo
-(describe method here)
+Moves the GUI to a given potion on screen.
 
 argument:: point
-(describe argument here)
+a code::Point::
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: guiChangeDimensions
-(describe method here)
+Sets the GUI's dimension to the given value.
 
 argument:: point
-(describe argument here)
+a code::Point::
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: renameTab
-(describe method here)
+Set a tab-name from code::oldName:: to code::newName::
 
 argument:: oldName
-(describe argument here)
+a code::String:: or a code::Symbol::
 
 argument:: newName
-(describe argument here)
+a code::String:: or a code::Symbol::
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: addActionAt
 (describe method here)
