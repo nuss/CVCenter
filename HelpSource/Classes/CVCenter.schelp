@@ -208,7 +208,7 @@ list::
 returns:: an code::Event::
 
 METHOD:: guiMoveTo
-Moves the GUI to a given potion on screen.
+Moves the GUI to a given position on screen.
 
 argument:: point
 a code::Point::
@@ -235,24 +235,24 @@ a code::String:: or a code::Symbol::
 returns:: this
 
 METHOD:: addActionAt
-(describe method here)
+Add an action to a widget's CV given in code::key:: under the name code::name:: 
 
 argument:: key
-(describe argument here)
+a code::Symbol:: or code::String:: - representing a CVWidget resp. its CVs
 
 argument:: name
-(describe argument here)
+a code::Symbol:: or a code::String:: - the name under which the action will be added. The action may be removed or deactivated again by referring to this name.
 
 argument:: action
-(describe argument here)
+a code::Function:: or a code::String:: - if one or more arguments are added, the first will automatically be a representation of the CV. The function can also be provided as a string that compiles to a function when you call code::interpret:: on it.
 
 argument:: slot
-(describe argument here)
+a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D:::
 
 argument:: active
-(describe argument here)
+a code::Boolean:: - activate or deactivate the action. default: code::true::
 
-returns:: (returnvalue)
+returns:: this
 
 METHOD:: removeActionAt
 (describe method here)
