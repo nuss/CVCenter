@@ -21,23 +21,39 @@ OSCCommands {
 	
 	*initClass {
 		cmdList = ();
-		collectFunc = { |msg, time, addr, recvPort|
-			if(msg[0] != '/status.reply', {
-				cmdList.put(msg[0], msg[1..].size);
-			})
-		}
+		if(Main.verisonAtLeast(3, 5), {
+			collectFunc = { |msg, time, addr, recvPort|
+				if(msg[0] != '/status.reply', {
+					cmdList.put(msg[0], msg[1..].size);
+				})
+			}
+		}, {
+			collectFunc = { |time, addr, msg|
+				if(msg[0] != '/status.reply', {
+					cmdList.put(msg[0], msg[1..].size);
+				})
+			}
+		})
 	}
 	
 	*collect { |play=true|
 		var displayList, cmdList = ();
 		if(play, {
 			if(running == false, {
-				thisProcess.addOSCRecvFunc(collectFunc);
+				if(Main.versionAtLeast(3, 5), {
+					thisProcess.addOSCRecvFunc(collectFunc);
+				}, {
+					thisProcess.recvOSCfunc = collectFunc;
+				});
 				CmdPeriod.add({ this.collect(false) });
 				running = true;
 			})
 		}, {
-			thisProcess.removeOSCRecvFunc(collectFunc);
+			if(Main.versionAtLeast(3, 5), {
+				thisProcess.removeOSCRecvFunc(collectFunc);
+			}, {
+				thisProcess.recvOSCfunc = nil;
+			});
 			CmdPeriod.remove({ this.collect(false) });
 			running = false;
 		});
