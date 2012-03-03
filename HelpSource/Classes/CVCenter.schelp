@@ -174,11 +174,11 @@ returns:: this
 
 METHOD:: use
 Use an arbitrary name for creating a new CVWidget (a CVWidgetKnob or a CVWidget2D, depending on the argument code::slot::).
-note::You may omit the argument code::slot:: and code::tab:: when creating a code::CVWidget2D:: and its first slot (code::\hi:: or code::\lo::) has already been created. However, if the widget is used within patterns you always strong::must:: provide the slot as execution of the pattern depends on the right CV to be returned (if omitted the widget would return an event, composed of the \lo and \hi key).
+note:: strong::This is the recommended way for creating new widgets!:: This method should be convenient in most situations. It simply creates a new code::CVWidget:: and returns the code::CV::. As code::CV:: inherits from code::Stream:: this method may directly be used in code::Pattern::s. Any reevaluation will leave a once created code::CV:: untouched.
 
-note::This is the recommended way for creating new widgets.::
+You may omit the arguments code::slot:: and code::tab:: when creating a code::CVWidget2D:: and its first slot has already been created. However, if the widget is used within patterns you always strong::must:: provide the slot as execution of the pattern depends on the right CV to be returned (if omitted the widget would return an event, composed of the \lo and \hi key).
+::
 
-This method should be convenient in most situations. It simply creates a new code::CVWidget:: and returns the code::CV::. As code::CV:: inherits from code::Stream:: this method may directly be used in code::Pattern::s. Any reevaluation will leave a once created code::CV:: untouched.
 
 argument:: key
 a code::Symbol:: or a code::String:: - the resulting code::CV:: will be put into code::CVCenter.all:: under this name and the widget will be labeled the same.
@@ -270,7 +270,7 @@ a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only nee
 returns:: this
 
 METHOD:: activateActionAt
-activates or deactivates an action at code::key:: (representing the widget) and code::name:: (the name under which the action is stored)
+Activates or deactivates an action at code::key:: (representing the widget) and code::name:: (the name under which the action is stored)
 
 argument:: key
 a code::Symbol:: or code::String:: - representing a CVWidget resp. its CVs
@@ -291,7 +291,7 @@ a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only nee
 returns:: this
 
 METHOD:: widgetsAtTab
-get an code::Array:: containing all widgets (names) under the give tab.
+Get an code::Array:: containing all widgets (names) under the give tab.
 
 argument:: tab
 a code::String:: or a code::Symbol::
@@ -299,7 +299,7 @@ a code::String:: or a code::Symbol::
 returns:: an code::Array::
 
 METHOD:: saveSetup
-save all widgets and tabs resp. their actions, connected MIDI- and OSC-responders into a setup-file on disk. A once stored setup can be loaded again with code::loadSetup:: and all its responders can get reinitialized automatically.
+Save all widgets and tabs resp. their actions, connected MIDI- and OSC-responders into a setup-file on disk. A once stored setup can be loaded again with code::loadSetup:: and all its responders can get reinitialized automatically.
 
 argument:: path
 optional - expects the full path to the location where the setup shall be stored disk. If given no file-save dialog will be displayed.
@@ -307,26 +307,22 @@ optional - expects the full path to the location where the setup shall be stored
 returns:: this
 
 METHOD:: loadSetup
-loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup. 
+Loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup. 
 
 argument:: path
 optional - expects the full path to the location where the setup shall be stored disk. If given no file-open dialog will be displayed.
 
 argument:: addToExisting
-if CVCenter GUI has already been initialized and contains some widgets and code::addToExisting:: is set to code::true:: the setup will rather add widgets to the already existing ones.
-strong::default::: code::false::
+If CVCenter GUI has already been initialized and contains some widgets and code::addToExisting:: is set to code::true:: the setup will rather add widgets to the already existing ones. strong::default::: code::false::
 
 argument:: autoConnectOSC
-if set to code::true:: OSC-responders will be initialized automatically
-strong::default::: code::true::
+If set to code::true:: OSC-responders will be initialized automatically. strong::default::: code::true::
 
 argument:: autoConnectMIDI
-if set to code::true:: MIDI-responders will be initialized automatically
-strong::default::: code::true::
+If set to code::true:: MIDI-responders will be initialized automatically. strong::default::: code::true::
 
 argument:: loadActions
-if set to code::true:: actions will be initialized automatically
-strong::default::: code::true::
+If set to code::true:: actions will be initialized automatically. strong::default::: code::true::
 
 returns:: this
 
