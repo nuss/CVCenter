@@ -21,7 +21,7 @@ OSCCommands {
 	
 	*initClass {
 		cmdList = ();
-		if(Main.verisonAtLeast(3, 5), {
+		if(Main.versionAtLeast(3, 5), {
 			collectFunc = { |msg, time, addr, recvPort|
 				if(msg[0] != '/status.reply', {
 					cmdList.put(msg[0], msg[1..].size);
