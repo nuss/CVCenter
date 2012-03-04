@@ -526,7 +526,7 @@ CVWidget {
 	setSpec { |spec, slot|
 		switch(this.class,
 			CVWidgetKnob, {
-				if(spec.isKindOf(ControlSpec).not, {
+				if(spec.asSpe.isKindOf(ControlSpec).not, {
 					Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
 				});
 				wdgtControllersAndModels.cvSpec.model.value_(spec.asSpec).changed(\value);

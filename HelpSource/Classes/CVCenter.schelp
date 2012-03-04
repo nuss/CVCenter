@@ -375,6 +375,9 @@ PRIVATE:: prRemoveTab
 
 PRIVATE:: finishGui
 
+
+INSTANCEMETHODS::
+
 SECTION:: Shortcuts
 If CVCenter GUI is sent to front a number of shortcuts apply:
 definitionList::
@@ -393,11 +396,46 @@ definitionList::
 ## "a" || If the code::Quark:: code::AllGui:: is installed open a new code::AllGui::.
 ::
 
-
-INSTANCEMETHODS::
-
 EXAMPLES::
 
 code::
-(some example code)
+// create a couple of CVWidgets under the tab "test"
+// and add an action
+CVCenter.use(\knobTest, tab: \test);
+CVCenter.addActionAt(\knobTest, \testFunc, { |cv| "knobTest: %\n".postf(cv.value) }, active: false);
+CVCenter.use(\test2D, tab: \test, slot: \lo);
+CVCenter.use(\test2D, tab: \test, slot: \hi);
+CVCenter.addActionAt(\test2D, \testFunc, { |cv| "test2D lo: %\n".postf(cv.value) }, \lo);
+CVCenter.addActionAt(\test2D, \testFunc, { |cv| "test2D hi: %\n".postf(cv.value) }, \hi);
+
+// action activation and deactivation 
+// watch the "actions"-button at the bottom of the widget
+// turn the knob to see the effect
+CVCenter.cvWidgets[\knobTest].activateAction(\testFunc, true);
+CVCenter.cvWidgets[\knobTest].activateAction(\testFunc, false);
+
+// some sound
+s.waitForBoot{ a = { |freq1, freq2, amp| SinOsc.ar([freq1, freq2]) * amp }.play };
+
+// set the specs suitable to synth's controls
+CVCenter.cvWidgets[\knobTest].setSpec(\amp);
+#[lo, hi].do({ |slot| CVCenter.cvWidgets[\test2D].setSpec(\freq, slot) });
+
+// add actions that set the controls in a
+CVCenter.addActionAt(\knobTest, \setAmp, { |cv| a !? { a.set(\amp, cv.value) }});
+CVCenter.addActionAt(\test2D, \setFreq1, { |cv| a !? { a.set(\freq1, cv.value) }}, \lo);
+CVCenter.addActionAt(\test2D, \setFreq2, { |cv| a !? { a.set(\freq2, cv.value) }}, \hi);
+
+// CVCenter will not open another guy if one is already present
+// if the GUI is in the background it will be sent to front
+CVCenter.gui;
+
+// close the GUI and open it again
+// all widgets should just work as before
+CVCenter.window.close;
+CVCenter.gui;
+
+// free the synth and remove all widgets
+a.free;
+CVCenter.removeAll;
 ::
