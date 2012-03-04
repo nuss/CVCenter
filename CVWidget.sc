@@ -524,16 +524,18 @@ CVWidget {
 	}
 	
 	setSpec { |spec, slot|
+		var thisSpec;
+		if(spec.class == String, { thisSpec = spec.asSymbol }, { thisSpec = spec });
 		switch(this.class,
 			CVWidgetKnob, {
-				if(spec.asSpe.isKindOf(ControlSpec).not, {
+				if(thisSpec.asSpec.isKindOf(ControlSpec).not, {
 					Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
 				});
-				wdgtControllersAndModels.cvSpec.model.value_(spec.asSpec).changed(\value);
+				wdgtControllersAndModels.cvSpec.model.value_(thisSpec.asSpec).changed(\value);
 			},
 			{
-				if(spec.asSpec.isKindOf(ControlSpec), {
-					wdgtControllersAndModels[slot.asSymbol].cvSpec.model.value_(spec.asSpec).changed(\value);
+				if(thisSpec.asSpec.isKindOf(ControlSpec), {
+					wdgtControllersAndModels[slot.asSymbol].cvSpec.model.value_(thisSpec.asSpec).changed(\value);
 				}, {
 					Error("Please provide a valid ControlSpec!").throw;
 				});
