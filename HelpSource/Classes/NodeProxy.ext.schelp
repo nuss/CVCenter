@@ -1,0 +1,19 @@
+instancemethods::
+
+subsection:: Extensions by CVCenter
+
+method:: cvcGui
+Creates code::CVWidget::s for the controls of a code::NodeProxy::, an code::Ndef:: or a key in a code::ProxySpace::.
+
+argument:: displayDialog
+If set to code::false:: widgets will be created immediately without allowing to edit specs ahead from creation.
+
+argument:: prefix
+As code::CVCenter.all:: cannot contain a name twice you may add a custom prefix to avoid CVCenter from trying to overwrite existing keys.
+
+argument:: pairs2D
+An code::Event:: that creates a code::CVWidget2D:: rather than a code::CVWidgetKnob:: for the given control-names and the given widget-name:
+
+code::(widgetName1: #[controlName1_lo, controlName1_hi], widgetName2: #[controlName2_lo, controlName2_hi, … widgetNameN: #[controlNameN_lo, controlNameN_hi])::
+
+returns:: this (a code::NodeProxy::)

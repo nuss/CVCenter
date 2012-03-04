@@ -13,6 +13,262 @@ A link::Classes/CV::'s value can be read with the 'value' message.
 
 CLASSMETHODS::
 
+METHOD:: new
+Initializes CVCenter by creating its classvars code::all::, code::cvWidgets:: and more private ones.
+
+note::It shouldn't be necessary to initialize CVCenter with an explicit call to strong::*new::. Rather use strong::*use:: whenever possible as (will call strong::*new:: internally) ::
+
+argument:: cvs
+an Array, a Dictionary or an Event, containing the widget name(s) and its/their internal CV(s):
+
+argument:: … setUpArgs
+An arbitrary number of key/value pairs. The following keys are currently supported:
+definitionList::
+list::
+## strong::midiMode::
+table::
+## code::0:: || MIDI-controllers that yield values from 0-127
+## code::1:: || MIDI-controller that yield de-/incremental values
+::
+## strong::midiResolution:: || - only applies when midiMode is set to code::1:: - default: 1
+## strong::midiMean:: || - only applies when midiMode is set to code::1:: - default: 64
+## strong::softwithin:: || - only applies when midiMode is set to code::0:: - default: 0.1
+## strong::ctrlButtonBank:: || - default: nil
+::
+::
+::
+
+For a detailed description of the above listet arguments see the descriptions of the according classvar-methods. 
+
+returns:: this
+
+
+METHOD:: gui
+Creates and fronts the CVCenter GUI if it's closed or nil. Sends the GUI to front if it's in the background. If CVs are passed in as key/value pairs it adds them as widgets to the GUI under the given tab if given or the one that's currently in front.
+
+argument:: tab
+a String or a Symbol, indicating the label of a tab. If none is provided the widgets will be added to "default" or any other tab that's currently in front. If an event containing the keys code::\hi:: and code::\hi:: gets passed in the widget will be a CVWidget2D.
+
+argument::  ... cvs
+key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), … \wdgtNameN, a CV::
+
+returns:: this
+
+
+METHOD:: use
+Use an arbitrary name for creating a new code::CVWidget:: (a code::CVWidgetKnob:: or a code::CVWidget2D::, depending on the argument code::slot::).
+note:: strong::This is the recommended way for creating new widgets.:: This method should be convenient in most situations. It simply creates a new code::CVWidget:: and returns the code::CV::. As code::CV:: inherits from code::Stream:: this method may directly be used in code::Pattern::s. Any reevaluation will leave a once created code::CV:: untouched.
+
+You may omit the arguments code::slot:: and code::tab:: when creating a code::CVWidget2D:: and its first slot has already been created. However, if the widget is used within patterns you always strong::must:: provide the slot as execution of the pattern depends on the right CV to be returned (if omitted the widget would return an event, composed of the \lo and \hi key).
+::
+
+argument:: key
+a code::Symbol:: or a code::String:: - the resulting code::CV:: will be put into code::CVCenter.all:: under this name and the widget will be labeled the same.
+
+argument:: spec
+a code::ControlSpec:: - default: code::ControlSpec.new::
+
+argument:: value
+a default value for the code::CV:: - default: the code::ControlSpec::'s default value
+
+argument:: tab
+a code::String:: or a code::Symbol:: - the tab under which the widget will appear. If not provided the widget will be added under the tab that's currently in front.
+
+argument:: slot
+only needed if a code::CVWidget2D:: shall be created. Either code::\lo:: or code::\hi::
+
+returns:: a code::CV::
+
+METHOD:: at
+Return the code::CV:: at the given key. If the key belongs to a code::CVWidget2D:: an code::Event:: will rather be returned, containing 2 CVs: code::\lo:: and code::\hi::. If your code relies on a CV being returned by this method, make sure you call the right slot (e.G.: code:: CVCenter.at(\myKey).lo::).
+
+argument:: key
+a code::Symbol:: or a code::String::
+
+returns:: a code::CV:: resp. an code::Event::
+
+
+METHOD:: removeAt
+Remove a given widget including its code::CV::(s). . Existing OSC- or MIDI-connections will be resolved automatically.
+
+argument:: key
+a code::Symbol:: or code::String::
+
+returns:: this
+
+
+METHOD:: removeAll
+Remove given code::CVWidget::s including their code::CV::s or all. Existing OSC- or MIDI-connections will be resolved automatically.
+
+argument::  ... keys
+widget-keys, given as code::String::s or code::Symbol::s. If no keys are given strong::all:: widgets will be removed. 
+
+returns:: this
+
+METHOD:: removeAtTab
+Remove code::CVWidget::s under a given tab and remove the tab (if there's currently more than one tab) or rename it to "default" (if the given tab is the only tab in the CVCenter GUI).
+
+argument:: label
+The name of the tab as code::String:: or code::Symbol::
+
+returns:: this
+
+
+METHOD:: addActionAt
+Add an action given in code::action:: to a widget's CV given in code::key:: under the name code::name::
+
+argument:: key
+a code::Symbol:: or code::String:: - representing a code::CVWidget:: resp. its code::CV::
+
+argument:: name
+a code::Symbol:: or a code::String:: - the name under which the action will be added. The action may be removed or deactivated again by referring to this name.
+
+argument:: action
+a code::Function:: or a code::String:: - if one or more arguments are added, the first will automatically be a representation of the CV. The function can also be provided as a string that compiles to a function when you call code::interpret:: on it.
+
+argument:: slot
+a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D::
+
+argument:: active
+a code::Boolean:: - activate or deactivate the action. default: code::true::
+
+returns:: this
+
+
+METHOD:: removeActionAt
+Remove an action from a widget's CV given in code::key:: under the name code::name::
+
+argument:: key
+a code::Symbol:: or code::String:: - representing a code::CVWidget:: resp. its code::CV::s
+
+argument:: name
+a code::Symbol:: or a code::String:: - the name under which the action is stored.
+
+argument:: slot
+a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D::
+
+returns:: this
+
+
+METHOD:: activateActionAt
+Activates or deactivates an action at code::key:: (representing the widget) and code::name:: (the name under which the action is stored)
+
+argument:: key
+a code::Symbol:: or code::String:: - representing a code::CVWidget:: resp. its code::CV::s
+
+argument:: name
+a code::Symbol:: or a code::String:: - the name under which the action is stored.
+
+argument:: activate
+a code::Boolean::
+definitionList::
+## true || - activate the action
+## false || - deactivate the action
+::
+
+argument:: slot
+a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D::
+
+returns:: this
+
+
+METHOD:: bounds
+Get or set the current bounds of the CVCenter GUI.
+
+argument:: rect
+A code::Rect::.
+
+returns:: this
+
+
+METHOD:: guiMoveTo
+Moves the GUI to a given position on screen.
+
+argument:: point
+a code::Point::
+
+returns:: this
+
+
+METHOD:: guiMoveTo
+Moves the GUI to a given position on screen.
+
+argument:: point
+a code::Point::
+
+returns:: this
+
+
+METHOD:: guiChangeDimensions
+Set the GUI's dimension to the given value.
+
+argument:: point
+a code::Point::
+
+returns:: this
+
+
+METHOD:: renameTab
+Set a tab-name from code::oldName:: to code::newName::
+
+argument:: oldName
+a code::String:: or a code::Symbol::
+
+argument:: newName
+a code::String:: or a code::Symbol::
+
+returns:: this
+
+METHOD:: widgetsAtTab
+Get an code::Array:: containing all widgets (names) under the give tab.
+
+argument:: tab
+a code::String:: or a code::Symbol::
+
+returns:: an code::Array::
+
+METHOD:: saveSetup
+Save all widgets and tabs resp. their actions, connected MIDI- and OSC-responders into a setup-file on disk. A once stored setup can be loaded again with code::loadSetup:: and all its responders can get reinitialized automatically.
+
+argument:: path
+optional - expects the full path to the location where the setup shall be stored disk. If given no file-save dialog will be displayed.
+
+returns:: this
+
+
+METHOD:: loadSetup
+Loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup. 
+
+argument:: path
+optional - expects the full path to the location where the setup shall be stored disk. If given no file-open dialog will be displayed.
+
+argument:: addToExisting
+If CVCenter GUI has already been initialized and contains some widgets and code::addToExisting:: is set to code::true:: the setup will rather add widgets to the already existing ones. strong::default::: code::false::
+
+argument:: autoConnectOSC
+If set to code::true:: OSC-responders will be initialized automatically. strong::default::: code::true::
+
+argument:: autoConnectMIDI
+If set to code::true:: MIDI-responders will be initialized automatically. strong::default::: code::true::
+
+argument:: loadActions
+If set to code::true:: actions will be initialized automatically. strong::default::: code::true::
+
+returns:: this
+
+
+METHOD:: setup
+returns the current setup:
+list::
+## code::midiMode::
+## code::midiResolution::
+## code::midiMean::
+## code::ctrlButtonBank::
+## code::softWithin::
+
+returns:: an code::Event::
+
+
 METHOD:: all
 
 returns:: an IdentityDictionary, containing all CVs added to CVCenter
@@ -99,46 +355,6 @@ The GUI-height - has no direct effect besides when being set ahead from initiali
 
 returns:: this
 
-METHOD:: new
-Initializes CVCenter by creating its classvars code::all::, code::cvWidgets:: and more private ones.
-
-note::It shouldn't be necessary to initialize CVCenter with an explicit call to strong::*new::. Rather use strong::*use:: whenever possible as (will call strong::*new:: internally) ::
-
-argument:: cvs
-an Array, a Dictionary or an Event, containing the widget name(s) and its/their internal CV(s):
-
-argument:: … setUpArgs
-An arbitrary number of key/value pairs. The following keys are currently supported:
-definitionList::
-list::
-## strong::midiMode::
-table::
-## code::0:: || MIDI-controllers that yield values from 0-127
-## code::1:: || MIDI-controller that yield de-/incremental values
-::
-## strong::midiResolution:: || - only applies when midiMode is set to code::1:: - default: 1
-## strong::midiMean:: || - only applies when midiMode is set to code::1:: - default: 64
-## strong::softwithin:: || - only applies when midiMode is set to code::0:: - default: 0.1
-## strong::ctrlButtonBank:: || - default: nil
-::
-::
-::
-
-For a detailed description of the above listet arguments see the descriptions of the according classvar-methods. 
-
-returns:: this
-
-METHOD:: gui
-Creates and fronts the CVCenter GUI if it's closed or nil. Sends the GUI to front if it's in the background. If CVs are passed in as key/value pairs it adds them as widgets to the GUI under the given tab if given or the one that's currently in front.
-
-argument:: tab
-a String or a Symbol, indicating the label of a tab. If none is provided the widgets will be added to "default" or any other tab that's currently in front. If an event containing the keys code::\hi:: and code::\hi:: gets passed in the widget will be a CVWidget2D.
-
-argument::  ... cvs
-key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), … \wdgtNameN, a CV::
-
-returns:: this
-
 METHOD:: put
 Put new CVs into CVCenter.all
 
@@ -148,235 +364,34 @@ If the number of arguments is odd and the last one is a code::Boolean:: this wil
 
 returns:: this
 
-METHOD:: removeAt
-Remove a given widget including its CV(s).
 
-argument:: key
-a code::Symbol:: or code::String::
+PRIVATE:: prSetup
 
-returns:: this
+PRIVATE:: prAddToGui
 
-METHOD:: removeAll
-Remove given widgets including their CVs or all.
+PRIVATE:: prRegroupWidgets
 
-argument::  ... keys
-widget-keys, given as code::String::s or code::Symbol::s. If no keys are given strong::all:: widgets will be removed. 
+PRIVATE:: prRemoveTab
 
-returns:: this
+PRIVATE:: finishGui
 
-METHOD:: at
-Return the CV at the given key
-
-argument:: key
-a code::Symbol:: or a code::String::
-
-returns:: this
-
-METHOD:: use
-Use an arbitrary name for creating a new CVWidget (a CVWidgetKnob or a CVWidget2D, depending on the argument code::slot::).
-note:: strong::This is the recommended way for creating new widgets!:: This method should be convenient in most situations. It simply creates a new code::CVWidget:: and returns the code::CV::. As code::CV:: inherits from code::Stream:: this method may directly be used in code::Pattern::s. Any reevaluation will leave a once created code::CV:: untouched.
-
-You may omit the arguments code::slot:: and code::tab:: when creating a code::CVWidget2D:: and its first slot has already been created. However, if the widget is used within patterns you always strong::must:: provide the slot as execution of the pattern depends on the right CV to be returned (if omitted the widget would return an event, composed of the \lo and \hi key).
-::
-
-
-argument:: key
-a code::Symbol:: or a code::String:: - the resulting code::CV:: will be put into code::CVCenter.all:: under this name and the widget will be labeled the same.
-
-argument:: spec
-a code::ControlSpec:: - default: code::ControlSpec.new::
-
-argument:: value
-a default value for the code::CV:: - default: the code::ControlSpec::'s default value
-
-argument:: tab
-a code::String:: or a code::Symbol:: - the tab under which the widget will appear. If not provided the widget will be added under the tab that's currently in front.
-
-argument:: slot
-only needed if a code::CVWidget2D:: shall be created. Either code::\lo:: or code::\hi::
-
-returns:: a CV
-
-METHOD:: setup
-returns the current setup:
-list::
-## code::midiMode::
-## code::midiResolution::
-## code::midiMean::
-## code::ctrlButtonBank::
-## code::softWithin::
-
-returns:: an code::Event::
-
-METHOD:: guiMoveTo
-Moves the GUI to a given position on screen.
-
-argument:: point
-a code::Point::
-
-returns:: this
-
-METHOD:: guiChangeDimensions
-Sets the GUI's dimension to the given value.
-
-argument:: point
-a code::Point::
-
-returns:: this
-
-METHOD:: renameTab
-Set a tab-name from code::oldName:: to code::newName::
-
-argument:: oldName
-a code::String:: or a code::Symbol::
-
-argument:: newName
-a code::String:: or a code::Symbol::
-
-returns:: this
-
-METHOD:: addActionAt
-Add an action given in code::action:: to a widget's CV given in code::key:: under the name code::name::
-
-argument:: key
-a code::Symbol:: or code::String:: - representing a CVWidget resp. its CVs
-
-argument:: name
-a code::Symbol:: or a code::String:: - the name under which the action will be added. The action may be removed or deactivated again by referring to this name.
-
-argument:: action
-a code::Function:: or a code::String:: - if one or more arguments are added, the first will automatically be a representation of the CV. The function can also be provided as a string that compiles to a function when you call code::interpret:: on it.
-
-argument:: slot
-a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D:::
-
-argument:: active
-a code::Boolean:: - activate or deactivate the action. default: code::true::
-
-returns:: this
-
-METHOD:: removeActionAt
-Remove an action from a widget's CV given in code::key:: under the name code::name::
-
-argument:: key
-a code::Symbol:: or code::String:: - representing a CVWidget resp. its CVs
-
-argument:: name
-a code::Symbol:: or a code::String:: - the name under which the action is stored.
-
-argument:: slot
-a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D:::
-
-returns:: this
-
-METHOD:: activateActionAt
-Activates or deactivates an action at code::key:: (representing the widget) and code::name:: (the name under which the action is stored)
-
-argument:: key
-a code::Symbol:: or code::String:: - representing a CVWidget resp. its CVs
-
-argument:: name
-a code::Symbol:: or a code::String:: - the name under which the action is stored.
-
-argument:: activate
-a code::Boolean::
+SECTION:: Shortcuts
+If CVCenter GUI is sent to front a number of shortcuts apply:
 definitionList::
-## true || - activate the action
-## false || - deactivate the action
+## right arrow-key || navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
+## left arrow-key || navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
+## 0-9 || Select tabs and focus them. The numbers represent the order of the tabs.
+## "c" || Open the code::OSCCommands:: GUI. This will also trigger code::OSCCommands.collect::
+## "o" || See a list of already connected OSC-controllers (see also: code::CVCenterControllersMonitor::).
+## "m" || See a list of already connected MIDI-controllers (see also: code::CVCenterControllersMonitor::).
+## "x" || If the code::CVCenterControllersMonitor:: GUI is open, close it.
+## "h" || Start the code::History:: and open its GUI.
+## <shift> + "h" || End the code::History::, close its GUI a and open a new code::Document:: containing the recorded code::History::.
+## "n" || Open an code::NdefMixer:: for the default code::Server::
+## "p" || Open a new code::PdefAllGui::.
+## "t" || Open a new code::TdefAllGui::.
+## "a" || If the code::Quark:: code::AllGui:: is installed open a new code::AllGui::.
 ::
-
-argument:: slot
-a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D:::
-
-returns:: this
-
-METHOD:: widgetsAtTab
-Get an code::Array:: containing all widgets (names) under the give tab.
-
-argument:: tab
-a code::String:: or a code::Symbol::
-
-returns:: an code::Array::
-
-METHOD:: saveSetup
-Save all widgets and tabs resp. their actions, connected MIDI- and OSC-responders into a setup-file on disk. A once stored setup can be loaded again with code::loadSetup:: and all its responders can get reinitialized automatically.
-
-argument:: path
-optional - expects the full path to the location where the setup shall be stored disk. If given no file-save dialog will be displayed.
-
-returns:: this
-
-METHOD:: loadSetup
-Loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup. 
-
-argument:: path
-optional - expects the full path to the location where the setup shall be stored disk. If given no file-open dialog will be displayed.
-
-argument:: addToExisting
-If CVCenter GUI has already been initialized and contains some widgets and code::addToExisting:: is set to code::true:: the setup will rather add widgets to the already existing ones. strong::default::: code::false::
-
-argument:: autoConnectOSC
-If set to code::true:: OSC-responders will be initialized automatically. strong::default::: code::true::
-
-argument:: autoConnectMIDI
-If set to code::true:: MIDI-responders will be initialized automatically. strong::default::: code::true::
-
-argument:: loadActions
-If set to code::true:: actions will be initialized automatically. strong::default::: code::true::
-
-returns:: this
-
-METHOD:: prSetup
-(describe method here)
-
-argument:: setupDict
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prAddToGui
-(describe method here)
-
-argument:: tab
-(describe argument here)
-
-argument:: widget2DKey
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prRegroupWidgets
-(describe method here)
-
-argument:: tabIndex
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prRemoveTab
-(describe method here)
-
-argument:: index
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: finishGui
-(describe method here)
-
-argument:: obj
-(describe argument here)
-
-argument:: ctrlName
-(describe argument here)
-
-argument:: environment
-(describe argument here)
-
-argument:: more
-(describe argument here)
-
-returns:: (returnvalue)
 
 
 INSTANCEMETHODS::
