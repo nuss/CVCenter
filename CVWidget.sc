@@ -654,7 +654,7 @@ CVWidget {
 		)
 	}
 	
-	// if all arguments are nil .learn should be triggered
+	// if all arguments besides 'slot' are nil .learn should be triggered
 	midiConnect { |uid, chan, num, slot|
 		switch(this.class,
 			CVWidgetKnob, {

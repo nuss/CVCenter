@@ -79,6 +79,53 @@ only needed if a code::CVWidget2D:: shall be created. Either code::\lo:: or code
 
 returns:: a code::CV::
 
+METHOD:: midiMode
+Different MIDI-devices may have different output modes: either values from 0-127 or an in-/decremental value (e.g. -1 or +1). These modes may be taken in account as follows:
+
+table::
+## code::0:: || the device outputs a values 0-127
+## code::1:: || the device outputs in-/decremental values
+::
+
+code::midiMode:: can be set at runtime and will be reflected in all widgets, i.e. all currently connectected devices will be switched to the new mode immediately.
+
+default: code::0::
+
+returns:: this
+
+METHOD:: midiResolution
+When code::midiMode:: has been set to 1, this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
+
+standard-value: 1
+lower values -> higher resolution (lower stepsize)
+higher values -> lower resolution (bigger stepsize)
+
+default: code::1::
+
+returns:: this
+
+METHOD:: ctrlButtonBank
+Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI. 
+code::ctrlButtonBank:: translates the hardware-layout in a way that makes it easy to see the slider's bank and number: slider 17 becomes 2:1 (bank 2,  nr. 1).
+
+default: code::nil::
+
+returns:: this
+
+METHOD:: midiMean
+Devices which output a in-/decremtal may output a standard value + in-/decrement. code::midiMean:: gets automatically subtracted from this value, so in-/decrement remains.
+
+default: code::64::
+
+returns:: this
+
+METHOD:: softWithin
+If code::midiMode:: has been set to code::0:: moving a widget-slider will set the CV to a new value. However, if a MIDI-slider is connected to that widget, moving the MIDI-slider will set the CV's value immediatly to the value that is stored in the MIDI-slider i.e. a "jump" will happen. code::softWithin:: will ease this behavior by setting the CV's value only if the slider gets within code::softWithin/2::
+
+default: code::0.1::
+
+returns:: this
+
 METHOD:: at
 Return the code::CV:: at the given key. If the key belongs to a code::CVWidget2D:: an code::Event:: will rather be returned, containing 2 CVs: code::\lo:: and code::\hi::. If your code relies on a CV being returned by this method, make sure you call the right slot (e.G.: code:: CVCenter.at(\myKey).lo::).
 
@@ -288,53 +335,6 @@ A TabbedView, containing the widgets
 
 returns:: a TabbedView
 
-METHOD:: midiMode
-Different MIDI-devices may have different output modes: either values from 0-127 or an in-/decremental value (e.g. -1 or +1). These modes may be taken in account as follows:
-
-table::
-## code::0:: || the device outputs a values 0-127
-## code::1:: || the device outputs in-/decremental values
-::
-
-code::midiMode:: can be set at runtime and will be reflected in all widgets, i.e. all currently connectected devices will be switched to the new mode immediately.
-
-default: code::0::
-
-returns:: this
-
-METHOD:: midiResolution
-When code::midiMode:: has been set to 1, this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
-
-standard-value: 1
-lower values -> higher resolution (lower stepsize)
-higher values -> lower resolution (bigger stepsize)
-
-default: code::1::
-
-returns:: this
-
-METHOD:: ctrlButtonBank
-Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI. 
-code::ctrlButtonBank:: translates the hardware-layout in a way that makes it easy to see the slider's bank and number: slider 17 becomes 2:1 (bank 2,  nr. 1).
-
-default: code::nil::
-
-returns:: this
-
-METHOD:: midiMean
-Devices which output a in-/decremtal may output a standard value + in-/decrement. code::midiMean:: gets automatically subtracted from this value, so in-/decrement remains.
-
-default: code::64::
-
-returns:: this
-
-METHOD:: softWithin
-If code::midiMode:: has been set to code::0:: moving a widget-slider will set the CV to a new value. However, if a MIDI-slider is connected to that widget, moving the MIDI-slider will set the CV's value immediatly to the value that is stored in the MIDI-slider i.e. a "jump" will happen. code::softWithin:: will ease this behavior by setting the CV's value only if the slider gets within code::softWithin/2::
-
-default: code::0.1::
-
-returns:: this
-
 METHOD:: guix
 The x-position at which the GUI will be created - has no direct effect besides when being set ahead from initializing CVCenter.
 
@@ -379,7 +379,7 @@ PRIVATE:: finishGui
 INSTANCEMETHODS::
 
 SECTION:: Shortcuts
-If CVCenter GUI is sent to front a number of shortcuts apply:
+When CVCenter GUI is sent to front a number of shortcuts apply:
 definitionList::
 ## right arrow-key || navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
 ## left arrow-key || navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
@@ -404,20 +404,24 @@ code::
 CVCenter.use(\knobTest, tab: \test);
 CVCenter.addActionAt(\knobTest, \testFunc, { |cv| "knobTest: %\n".postf(cv.value) }, active: false);
 CVCenter.use(\test2D, tab: \test, slot: \lo);
-CVCenter.use(\test2D, tab: \test, slot: \hi);
+// arguments 'tab' and 'slot' may be omitted when creating the 'hi' slot as the widget knows under which
+// tab it's living and which slot has already been created. Also the operation doesn't depend 
+// on a CV being returned
+CVCenter.use(\test2D);
 CVCenter.addActionAt(\test2D, \testFunc, { |cv| "test2D lo: %\n".postf(cv.value) }, \lo);
 CVCenter.addActionAt(\test2D, \testFunc, { |cv| "test2D hi: %\n".postf(cv.value) }, \hi);
 
 // action activation and deactivation 
 // watch the "actions"-button at the bottom of the widget
 // turn the knob to see the effect
-CVCenter.cvWidgets[\knobTest].activateAction(\testFunc, true);
-CVCenter.cvWidgets[\knobTest].activateAction(\testFunc, false);
+CVCenter.activateActionAt(\knobTest, \testFunc, true);
+CVCenter.activateActionAt(\knobTest, \testFunc, false);
+CVCenter.activateActionAt(\knobTest, \testFunc, true);
 
 // some sound
 s.waitForBoot{ a = { |freq1, freq2, amp| SinOsc.ar([freq1, freq2]) * amp }.play };
 
-// set the specs suitable to synth's controls
+// set suitable specs for synth's controls
 CVCenter.cvWidgets[\knobTest].setSpec(\amp);
 #[lo, hi].do({ |slot| CVCenter.cvWidgets[\test2D].setSpec(\freq, slot) });
 
@@ -426,7 +430,7 @@ CVCenter.addActionAt(\knobTest, \setAmp, { |cv| a !? { a.set(\amp, cv.value) }})
 CVCenter.addActionAt(\test2D, \setFreq1, { |cv| a !? { a.set(\freq1, cv.value) }}, \lo);
 CVCenter.addActionAt(\test2D, \setFreq2, { |cv| a !? { a.set(\freq2, cv.value) }}, \hi);
 
-// CVCenter will not open another guy if one is already present
+// CVCenter will not open another gui if one is already present
 // if the GUI is in the background it will be sent to front
 CVCenter.gui;
 
@@ -438,4 +442,143 @@ CVCenter.gui;
 // free the synth and remove all widgets
 a.free;
 CVCenter.removeAll;
+::
+
+subsection:: Creating CVWidgets within CVCenter GUI from running Synths, NodeProxies, Ndefs and ProxySpaces
+
+code::
+// a SynthDef, including some arrayed controls 
+(
+SynthDef('dynKlank', { |impFreq1, impFreq2, freqs1=#[800, 1071, 1153, 1723], freqs2=#[789, 1067, 1150, 1720], ringtimes1=#[1, 1, 1, 1], ringtimes2=#[1, 1, 1, 1]|
+	var signal1, signal2;
+	signal1 = DynKlank.ar(`[freqs1, nil, ringtimes1 ], Impulse.ar(impFreq1, 0, 0.1));
+	signal2 = DynKlank.ar(`[freqs2, nil, ringtimes2 ], Impulse.ar(impFreq2, 0, 0.1));
+	Out.ar(0, [signal1, signal2]);
+}, 
+// specs, defined within the SynthDef's metadata will be considered when auto-creating the GUI
+metadata: (
+	specs: (
+		freqs1: \freq, 
+		freqs2: \freq, 
+		impFreq1: [0.1, 5], 
+		impFreq2: [0.1, 5], 
+		ringtimes1: [1, 20], 
+		ringtimes2: [1, 20]
+	)
+)).add; // must be 'added' if the GUI shall be auto-created
+)
+
+s.waitForBoot { a = Synth(\dynKlank) };
+
+// GUI creation - note that actions within widgets representing arrayed controls will
+// rather use setn to set the regarding controls 
+a.cvcGui(pairs2D: (impFreqs: #[impFreq1, impFreq2]));
+
+
+
+/////////////////////////////////// CVCenter and Ndefs /////////////////////////////////////////////////
+
+Ndef(\sawTest, { |damping| SinOsc.ar(damping * VarSaw.ar(\sawFreq.kr([100, 101]))).tanh * \amp.kr(0.5) });
+
+// Ndefs don't have metadata but you may add some specs ahead from creation
+Spec.add(\sawFreq, \freq);
+Spec.add(\damping, #[200, 20000, \exp, 0.0, 1000, " Hz"]);
+
+// create the GUI
+Ndef(\sawTest).cvcGui;
+
+// play the Ndef (turn the knobs if you don't hear anything immediately)
+s.waitForBoot{ Ndef(\sawTest).play };
+
+// clean up
+CVCenter.removeAll;
+Ndef(\sawTest).clear(10);
+
+
+/////////////////////////////////// the same thing in NodeProxy-style /////////////////////////////////
+
+a = NodeProxy.new.play; // play to hardware output.
+// set the source
+a.source = { |damping| SinOsc.ar(damping * VarSaw.ar(\sawFreq.kr([100, 101]))).tanh * \amp.kr(0.5) };
+
+// specs should already be declared within the above example
+a.cvcGui
+
+a.clear(10)
+
+CVCenter.removeAll
+
+
+/////////////////////////////////// as ProxySpace, pushed //////////////////////////////////////////////
+
+p = ProxySpace.push(s);
+~sawTest = { |damping| SinOsc.ar(damping * VarSaw.ar(\sawFreq.kr([100, 101]))).tanh * \amp.kr(0.5) };
+
+s.waitForBoot{ ~sawTest.play };
+
+// specs should already be there
+~sawTest.cvcGui;
+
+~sawTest.clear(10);
+p.clean;
+p.pop;
+CVCenter.removeAll;
+
+
+/////////////////////////////////// as ProxySpace, not pushed //////////////////////////////////////////
+
+p = ProxySpace.new;
+
+p[\sawTest] = { |damping| SinOsc.ar(damping * VarSaw.ar(\sawFreq.kr([100, 101]))).tanh * \amp.kr(0.5) };
+
+s.waitForBoot{ p[\sawTest].play };
+
+p[\sawTest].cvcGui;
+
+p[\sawTest].clear(10);
+p.clean;
+p.pop;
+CVCenter.removeAll;
+::
+
+subsection:: CVCenter and Patterns
+code::
+// declare some SynthDef first
+(
+SynthDef(\hihat, { |out=0, atk=0.01, rel=0.1, curve=(-4.0), amp=0.5, freq=300, rq=0.5, pan=0|
+    var env, son;
+    env = Env.perc(atk, rel, curve:curve);
+    son = BPF.ar(WhiteNoise.ar, freq, rq);
+    Out.ar(out, Pan2.ar(son * EnvGen.ar(env, doneAction: 2) * amp, pos:pan));
+}).add;
+)
+
+// something to change the tempo
+t = TempoClock.default;
+t.tempo_(2);
+CVCenter.use(\tempo, #[1.0, 3.0], t.tempo, tab: \hihat);
+CVCenter.addActionAt(\tempo, \setTempo, { |cv| t.tempo_(cv.value) });
+
+// the pattern
+// no .action_ needed here - CVs can be embedded in patterns just like any other pattern
+// you can at any time change the Pdef, add new widgets to CVCenter by calling CVCenter.use(\someKey)
+// NOTE: If you're adding 2D-widgets (CVWidget2D) you *must* explicitly declare their slots ('hi' or 'lo')
+// as the output depends on what is returned by CVCenter:use
+(
+Pdef(\hiHat,
+    Pbind(*[
+        instrument: \hihat,
+        dur: Pwrand([1/4, Pwrand([Pn(1/4, 4), Pn(1/8, 2)], [2, 5].normalizeSum, 1)], [16, 9].normalizeSum, inf),
+        freq: 20000,
+        atk: 0.0001,
+        rel: Pgauss(0.04, Pwhite(0.02, CVCenter.use(\rel, value: 0.2, tab: \hihat))).abs,
+        curve: Pgauss(-4.0, 1.0),
+        amp: CVCenter.use(\amp, \amp, tab: \hihat),
+        rq: Pwhite(0.1, 1.0),
+        pan: Pgauss(0.0, 1.0),
+    ])
+)
+)
+
+Pdef(\hiHat).play(t);
 ::
