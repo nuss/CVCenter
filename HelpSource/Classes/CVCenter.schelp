@@ -471,7 +471,8 @@ metadata: (
 s.waitForBoot { a = Synth(\dynKlank) };
 
 // GUI creation - note that actions within widgets representing arrayed controls will
-// rather use setn to set the regarding controls 
+// rather use setn to set the regarding controls
+// have a look at the Synth helpfile to see all possible arguments for cvcGui
 a.cvcGui(pairs2D: (impFreqs: #[impFreq1, impFreq2]));
 
 
@@ -485,6 +486,7 @@ Spec.add(\sawFreq, \freq);
 Spec.add(\damping, #[200, 20000, \exp, 0.0, 1000, " Hz"]);
 
 // create the GUI
+// have a look at the NodeProxy helpfile to see all possible arguments for cvcGui
 Ndef(\sawTest).cvcGui;
 
 // play the Ndef (turn the knobs if you don't hear anything immediately)
