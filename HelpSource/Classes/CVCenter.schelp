@@ -40,7 +40,7 @@ table::
 
 For a detailed description of the above listet arguments see the descriptions of the according classvar-methods. 
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: gui
@@ -52,7 +52,7 @@ a String or a Symbol, indicating the label of a tab. If none is provided the wid
 argument::  ... cvs
 key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), … \wdgtNameN, a CV::
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: use
@@ -91,7 +91,7 @@ code::midiMode:: can be set at runtime and will be reflected in all widgets, i.e
 
 default: code::0::
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: midiResolution
 When code::midiMode:: has been set to 1, this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
@@ -102,7 +102,7 @@ higher values -> lower resolution (bigger stepsize)
 
 default: code::1::
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: ctrlButtonBank
 Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI. 
@@ -110,21 +110,21 @@ code::ctrlButtonBank:: translates the hardware-layout in a way that makes it eas
 
 default: code::nil::
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: midiMean
-Devices which output a in-/decremtal may output a standard value + in-/decrement. code::midiMean:: gets automatically subtracted from this value, so in-/decrement remains.
+Devices which output a in-/decremtal may output a standard value + in-/decrement. code::midiMean:: gets automatically subtracted from this value, so in-/decrement remains. Applies only if midiMode is set to code::1::.
 
 default: code::64::
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: softWithin
-If code::midiMode:: has been set to code::0:: moving a widget-slider will set the CV to a new value. However, if a MIDI-slider is connected to that widget, moving the MIDI-slider will set the CV's value immediatly to the value that is stored in the MIDI-slider i.e. a "jump" will happen. code::softWithin:: will ease this behavior by setting the CV's value only if the slider gets within code::softWithin/2::
+If code::midiMode:: has been set to code::0:: moving a widget-slider will set the CV to a new value. However, if a MIDI-slider is connected to that widget, moving the MIDI-slider will set the CV's value immediatly to the value that is stored in the MIDI-slider i.e. a "jump" will happen. code::softWithin:: will ease this behavior by setting the CV's value only if the slider gets within code::softWithin/2::. Applies only if midiMode is set to code::0::.
 
 default: code::0.1::
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: at
 Return the code::CV:: at the given key. If the key belongs to a code::CVWidget2D:: an code::Event:: will rather be returned, containing 2 CVs: code::\lo:: and code::\hi::. If your code relies on a CV being returned by this method, make sure you call the right slot (e.G.: code:: CVCenter.at(\myKey).lo::).
@@ -141,7 +141,7 @@ Remove a given widget including its code::CV::(s). . Existing OSC- or MIDI-conne
 argument:: key
 a code::Symbol:: or code::String::
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: removeAll
@@ -150,7 +150,7 @@ Remove given code::CVWidget::s including their code::CV::s or all. Existing OSC-
 argument::  ... keys
 widget-keys, given as code::String::s or code::Symbol::s. If no keys are given strong::all:: widgets will be removed. 
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: removeAtTab
 Remove code::CVWidget::s under a given tab and remove the tab (if there's currently more than one tab) or rename it to "default" (if the given tab is the only tab in the CVCenter GUI).
@@ -158,7 +158,7 @@ Remove code::CVWidget::s under a given tab and remove the tab (if there's curren
 argument:: label
 The name of the tab as code::String:: or code::Symbol::
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: addActionAt
@@ -179,7 +179,7 @@ a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only nee
 argument:: active
 a code::Boolean:: - activate or deactivate the action. default: code::true::
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: removeActionAt
@@ -194,7 +194,7 @@ a code::Symbol:: or a code::String:: - the name under which the action is stored
 argument:: slot
 a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D::
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: activateActionAt
@@ -216,7 +216,7 @@ definitionList::
 argument:: slot
 a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D::
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: bounds
@@ -225,7 +225,7 @@ Get or set the current bounds of the CVCenter GUI.
 argument:: rect
 A code::Rect::.
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: guiMoveTo
@@ -234,7 +234,7 @@ Moves the GUI to a given position on screen.
 argument:: point
 a code::Point::
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: guiMoveTo
@@ -243,7 +243,7 @@ Moves the GUI to a given position on screen.
 argument:: point
 a code::Point::
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: guiChangeDimensions
@@ -252,7 +252,7 @@ Set the GUI's dimension to the given value.
 argument:: point
 a code::Point::
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: renameTab
@@ -264,7 +264,7 @@ a code::String:: or a code::Symbol::
 argument:: newName
 a code::String:: or a code::Symbol::
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: widgetsAtTab
 Get an code::Array:: containing all widgets (names) under the give tab.
@@ -280,7 +280,7 @@ Save all widgets and tabs resp. their actions, connected MIDI- and OSC-responder
 argument:: path
 optional - expects the full path to the location where the setup shall be stored disk. If given no file-save dialog will be displayed.
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: loadSetup
@@ -301,7 +301,7 @@ If set to code::true:: MIDI-responders will be initialized automatically. strong
 argument:: loadActions
 If set to code::true:: actions will be initialized automatically. strong::default::: code::true::
 
-returns:: this
+returns:: this (CVCenter)
 
 
 METHOD:: setup
@@ -338,22 +338,22 @@ returns:: a TabbedView
 METHOD:: guix
 The x-position at which the GUI will be created - has no direct effect besides when being set ahead from initializing CVCenter.
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: guiy
 The y-position at which the GUI will be created - has no direct effect besides when being set ahead from initializing CVCenter.
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: guiwidth
 The GUI-width - has no direct effect besides when being set ahead from initializing CVCenter.
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: guiheight
 The GUI-height - has no direct effect besides when being set ahead from initializing CVCenter.
 
-returns:: this
+returns:: this (CVCenter)
 
 METHOD:: put
 Put new CVs into CVCenter.all
@@ -362,7 +362,7 @@ argument::  ... args
 key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), … \wdgtNameN, a CV::
 If the number of arguments is odd and the last one is a code::Boolean:: this will indicate wether already contained values will be overwritten (default: code::false::)
 
-returns:: this
+returns:: this (CVCenter)
 
 
 PRIVATE:: prSetup
