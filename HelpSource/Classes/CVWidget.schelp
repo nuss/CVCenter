@@ -26,7 +26,7 @@ an code::Integer::
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: getMidiMode
 Get the current midiMode (0 or 1).
@@ -45,7 +45,7 @@ an code::Integer::. default: code::64::
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns::  the receiver
 
 METHOD:: getMidiMean
 Get the current midiMean value.
@@ -64,7 +64,7 @@ a code::Float:: - default: code::0.1::.
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns::  the receiver
 
 METHOD:: getSoftWithin
 Get the current softWithin value.
@@ -84,7 +84,7 @@ an code::Integer::, representing the number of sliders in one bank.
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: code::nil:: or an code::Integer::
+returns:: the receiver
 
 METHOD:: getCtrlButtonBank
 Get the current ctrlButtonBank value
@@ -107,7 +107,7 @@ default: code::1::
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: getMidiResolution
 Get the current value midiResolution value.
@@ -115,7 +115,7 @@ Get the current value midiResolution value.
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns::  a code::float::
+returns::  a code::Float::
 
 METHOD:: setCalibrate
 Unlike MIDI the range of incoming values isn't 0-127 - it is unknown at the time of initialization of the OSC-responder. All CVWidgets have an inbuilt calibration mechanism that determines the range automatically. At initialization the range is set to [0.0001, 0.0001]. If the mechanism detects a value that is lower or higher than the values set at initialization it will set the constraints accordingly. This method allows to stop or start the calibration-process.
@@ -126,7 +126,7 @@ a code::Boolean::, indicating wether the calibration-process shall be started or
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: getCalibrate
 Get the current calibration-status
@@ -148,7 +148,7 @@ can either be:
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: getSpec
 Get the current spec of the widget's code::CV::.
@@ -171,7 +171,7 @@ a code::Symbol:: - can be:
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: getOscMapping
 Get the current oscMapping-mode
@@ -191,7 +191,7 @@ argument:: port
 optional - if set the code::OSCresponder:: will only listen to messages coming from that port.
 
 argument:: name
-a code::String:: or a code::Symbol::: The OSC-command-name to which the OSCresponder will listen. E.g. code::'/touch/x':: or code::'/accelerometer/x'::. Every widget has an inbuilt mechanism that allows the user to scan connected devices for possible command-names. This mechanism is implemented the class code::OSCCommands:: which cannot only be used in connection with CVWidgets. code::OSCCommands:: stores a list of devices and commands to disk so the user does not have to rescan every time (s)he restarts SC.
+a code::String:: or a code::Symbol::: The OSC-command-name to which the OSCresponder will listen. E.g. code::'/touch/x':: or code::'/accelerometer/x'::. Every widget has an inbuilt mechanism that allows the user to scan connected devices for possible command-names. This mechanism is implemented in the class code::OSCCommands:: which may not only be used in connection with CVWidgets. code::OSCCommands:: stores a list of devices and commands to disk so the user does not have to rescan every time (s)he restarts SC.
 
 argument:: oscMsgIndex
 messages you receive from an OSC-device/-program usually consist of the commend-name and one or more slots, containing numerical values. An orientation-sensor might e.g. send a message like the following:
@@ -203,7 +203,7 @@ the first slot is the command-name and the subsequent slots are code::x::, code:
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: oscDisconnect
 Disconnects the OSC-device/-application reps. removes the code::OSCresponder::
@@ -211,7 +211,7 @@ Disconnects the OSC-device/-application reps. removes the code::OSCresponder::
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: midiConnect
 Connect a widget to a MIDI-device utilizing a code::CCResponder::.
@@ -228,7 +228,7 @@ optional - the controller-number to which the program will listen
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: midiDisconnect
 Terminate a MIDi-connection reps. remove the code::CCResponder::.
@@ -236,7 +236,7 @@ Terminate a MIDi-connection reps. remove the code::CCResponder::.
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: setOscInputConstraints
 Any widget has a mechanism built in that supposed to detect the constraints of the values coming in via OSC. However, you my set these constraints manually as well with this method.
@@ -247,7 +247,7 @@ a code::Point:: - e.g. code::Point(-20, 20):: or code::0@360::
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: getOscInputConstraints
 Get the current oscInputConstraints. This will return code::nil:: as the widget is not connected and the calibration-mechanism hasn't set any values.
@@ -273,7 +273,7 @@ only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::
 argument:: active
 a code::Boolean::, indicating wether the action shall become active immediatly
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: removeAction
 Remove an action given by its name
@@ -284,7 +284,7 @@ a code::Symbol:: or a code::String::, representing the action's name
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
 
 METHOD:: activateAction
 Activate or deactivate a stored action
@@ -298,7 +298,61 @@ a code::Boolean::, indicating wether the action shall be activated or deactivate
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: this (a CVWidget)
+returns:: the receiver
+
+subsection:: Models and Controllers, internal bookkeeping
+
+METHOD:: wdgtControllersAndModels
+CVWidgets are based on a MVC-paradigm (MVC = "model - view - controller"). Any time a new CVWidget gets instantiated the models get initialized. Any time the model is changed the function in the regarding controller gets invoked. 
+note::Do not try to change the models directly, e.g. by doing something like 
+
+code::myWidget.wdgtControllersAndModels.someModel = someValue:: 
+
+Models are designed for internal bookkeeping and all methods within code::CVWidget:: are supposed to do the right thing with them.:: 
+All models and controllers are stored within the wdgtControllersAndModels instance-var. If the widget is a code::CVWidget2D:: wdgtControllersAndModels will be split up in a code::\lo:: and a code::\hi:: slot, each containing the following models (code::CVWidgetKnob:: keeps simply them under wdgtControllersAndModels):
+
+definitionList::
+## calibrate || the current calibration-state as set with code::setCalibrate:: - either code::Ref(true):: (default at initialization) or code::Ref(false)::
+## cvSpec || the code::CV::'s current spec as set at initialization or with code::setSpec:: - a code::Ref:: to a code::ControlSpec::
+## oscInputRange || the current input-range, set by the widget's input mechanism with code::setInputRange:: - default at initialization: Ref([0.0001, 0.0001])
+## oscConnection || the current OSC-connection (if present): code::Ref([<IP-address>, <port>, <command-name>, <message-index>])::. If no connection is present it will be code::Ref(false)::
+## oscDisplayModel || stores all OSC-related visual properties of a widget and its editor. A code::Ref:: to an code::Event::, containing the following slots:
+list::
+## strong::but::: the state of the OSC-button ("edit OSC")
+## strong::ipField::: the IP-field under the OSC-tab of the editor (see code::CVWidgetEditor::)
+## strong::portField::: the port-field under the OSC-tab of the editor (see code::CVWidgetEditor::)
+## strong::nameField::: the field for the OSC-command-name under the OSC-tab of the editor (see code::CVWidgetEditor::)
+## strong::index::: the field for the message-index under the OSC-tab of the editor (see code::CVWidgetEditor::)
+## strong::connectorButVal::: the value of the connect-button under the OSC-tab of the editor connectorButVal (see code::CVWidgetEditor::)
+## strong::editEnabled::: if a connection is established editor-fields will be made uneditable and this slot is set to code::false::
+::
+## midiConnection || the currentMIDI-connection (if present): code::Ref((src: <val>, chan: <val>, num: <val>))::. If no connection is present this will be: code::Ref(nil)::.
+## midiDisplay || stores all MIDI-related visual properties of a widget and its editor. A code::Ref:: to an code::Event::, containing the following slots:
+list::
+## strong::learn::: the current state of the 'learn'-button of the widget and the 'learn'-button under the MIDI-tab of the editor
+## strong::src::: the current string of the 'src'-field of the widget and the 'src'-field under the MIDI-tab of the editor (the ID under which the device gets registered in SC)
+## strong::src::: the current string of the 'chan'-field of the widget and the 'chan'-field under the MIDI-tab of the editor (the MIDI-channel)
+## strong::src::: the current string of the 'ctrl'-field of the widget and the 'ctrl'-field under the MIDI-tab of the editor (the controller-number of the device)
+::
+## midiOptions || the current MIDI-setup, analogue to code::CVWidget:setup:::
+list::
+## strong::midiMode:: the current code::midiMode:: - see also link::#-setMidiMode::
+## strong::midiMean:: the current code::midiMean:: - see also link::#-setMidiMean::
+## strong::ctrlButtonBank:: the current value for code::ctrlButtonBank:: - see also link::#-setCtrlButtonBank::
+## strong::midiResolution:: the current code::midiResolution:: - see also link::#-setMidiResolution::
+## strong::softWithin:: the current value for code::softWithin:: - see also link::#-setSoftWithin::
+::
+## mapConstrainterLo || a code::CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[0]:: as value
+## mapConstrainterLo || a code::CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[1]:: as value
+## actions || a code::Ref:: to an code::Event::: code::Ref((numActions: <val>, activeActions: <val>))::. This model reflects the number of actions reps. active actions as displayed in the 'actions'-button of the widget.
+::
+
+returns:: an code::Event::
+
+METHOD:: midiOscEnv
+(describe method here)
+
+returns:: (returnvalue)
 
 METHOD:: widgetCV
 (describe method here)
@@ -314,163 +368,6 @@ METHOD:: alwaysPositive
 (describe method here)
 
 returns:: (returnvalue)
-
-subsection:: GUI properties and methods
-
-METHOD:: front
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: allGuiEls
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: bgColor
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: widgetBg
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: label
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: nameField
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: wdgtInfo
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: visible
-(describe method here)
-
-argument:: visible
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: editor
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: wdgtControllersAndModels
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: midiOscEnv
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: setup
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: toggleComment
-(describe method here)
-
-argument:: visible
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: widgetXY
-(describe method here)
-
-argument:: point
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: widgetProps
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: bounds
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: remove
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: close
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: isClosed
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: initControllersAndModels
-(describe method here)
-
-argument:: controllersAndModels
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: initControllerActions
-(describe method here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prInitCalibration
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
-
-argument:: midiOscEnv
-(describe argument here)
-
-argument:: argWidgetCV
-(describe argument here)
-
-argument:: thisCalib
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prInitSpecControl
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
 
 argument:: midiOscEnv
 (describe argument here)
@@ -646,6 +543,158 @@ argument:: slot
 (describe argument here)
 
 returns:: (returnvalue)
+
+subsection:: GUI properties and methods
+
+METHOD:: front
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: allGuiEls
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: bgColor
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: widgetBg
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: label
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: nameField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: visible
+(describe method here)
+
+argument:: visible
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: editor
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: wdgtControllersAndModels
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiOscEnv
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: setup
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: toggleComment
+(describe method here)
+
+argument:: visible
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: widgetXY
+(describe method here)
+
+argument:: point
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: widgetProps
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: bounds
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: remove
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: close
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: isClosed
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: initControllersAndModels
+(describe method here)
+
+argument:: controllersAndModels
+(describe argument here)
+
+argument:: slot
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: initControllerActions
+(describe method here)
+
+argument:: slot
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prInitCalibration
+(describe method here)
+
+argument:: wcm
+(describe argument here)
+
+argument:: thisGuiEnv
+(describe argument here)
+
+argument:: midiOscEnv
+(describe argument here)
+
+argument:: argWidgetCV
+(describe argument here)
+
+argument:: thisCalib
+(describe argument here)
+
+argument:: slot
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prInitSpecControl
+(describe method here)
+
+argument:: wcm
+(describe argument here)
+
+argument:: thisGuiEnv
+(describe argument here)
 
 
 EXAMPLES::
