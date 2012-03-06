@@ -206,7 +206,7 @@ only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::
 returns:: this (a CVWidget)
 
 METHOD:: oscDisconnect
-Disconnects reps. removes the code::OSCresponder::
+Disconnects the OSC-device/-application reps. removes the code::OSCresponder::
 
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
@@ -214,53 +214,91 @@ only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::
 returns:: this (a CVWidget)
 
 METHOD:: midiConnect
-(describe method here)
+Connect a widget to a MIDI-device utilizing a code::CCResponder::.
 
 argument:: uid
-(describe argument here)
+optional - the ID under which the device gets registered in SuperCollider
 
 argument:: chan
-(describe argument here)
+optional - the MIDI-channel to which the program will listen
 
 argument:: num
-(describe argument here)
+optional - the controller-number to which the program will listen
 
 argument:: slot
-(describe argument here)
+only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: (returnvalue)
+returns:: this (a CVWidget)
 
 METHOD:: midiDisconnect
-(describe method here)
+Terminate a MIDi-connection reps. remove the code::CCResponder::.
 
 argument:: slot
-(describe argument here)
+only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: (returnvalue)
+returns:: this (a CVWidget)
 
 METHOD:: setOscInputConstraints
-(describe method here)
+Any widget has a mechanism built in that supposed to detect the constraints of the values coming in via OSC. However, you my set these constraints manually as well with this method.
 
 argument:: constraintsHiLo
-(describe argument here)
+a code::Point:: - e.g. code::Point(-20, 20):: or code::0@360::
 
 argument:: slot
-(describe argument here)
+only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: (returnvalue)
+returns:: this (a CVWidget)
 
 METHOD:: getOscInputConstraints
-(describe method here)
+Get the current oscInputConstraints. This will return code::nil:: as the widget is not connected and the calibration-mechanism hasn't set any values.
 
 argument:: slot
-(describe argument here)
+only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: (returnvalue)
+returns:: code::nil:: or an code::Event:: containing the constraints in the keys code::\lo:: and code::\hi:: (not related to the \lo and \hi keys in a code::CVWidget2D::)
 
-METHOD:: front
-(describe method here)
+METHOD:: addAction
+Add an action to the widget's code::CV::. 
 
-returns:: (returnvalue)
+argument:: name
+a code::Symbol:: or a code::String::, representing the name under which the action will be stored
+
+argument:: action
+a code::Function:: or a code::String:: that compiles to one if code::interpret:: is called on it. If the function contains an argument the code::CV:: will be provided in this argument:
+code::{ |cv| "the CV's current value is %\n".postf(cv.value) }::
+
+argument:: slot
+only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+
+argument:: active
+a code::Boolean::, indicating wether the action shall become active immediatly
+
+returns:: this (a CVWidget)
+
+METHOD:: removeAction
+Remove an action given by its name
+
+argument:: name
+a code::Symbol:: or a code::String::, representing the action's name
+
+argument:: slot
+only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+
+returns:: this (a CVWidget)
+
+METHOD:: activateAction
+Activate or deactivate a stored action
+
+argument:: name
+a code::Symbol:: or a code::String::, representing the action's name
+
+argument:: activate
+a code::Boolean::, indicating wether the action shall be activated or deactivated
+
+argument:: slot
+only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+
+returns:: this (a CVWidget)
 
 METHOD:: widgetCV
 (describe method here)
@@ -272,17 +310,24 @@ METHOD:: wdgtActions
 
 returns:: (returnvalue)
 
-METHOD:: bgColor
-(describe method here)
-
-returns:: (returnvalue)
-
 METHOD:: alwaysPositive
 (describe method here)
 
 returns:: (returnvalue)
 
+subsection:: GUI properties and methods
+
+METHOD:: front
+(describe method here)
+
+returns:: (returnvalue)
+
 METHOD:: allGuiEls
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: bgColor
 (describe method here)
 
 returns:: (returnvalue)
@@ -368,48 +413,6 @@ returns:: (returnvalue)
 
 METHOD:: close
 (describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: addAction
-(describe method here)
-
-argument:: name
-(describe argument here)
-
-argument:: action
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-argument:: active
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: removeAction
-(describe method here)
-
-argument:: name
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: activateAction
-(describe method here)
-
-argument:: name
-(describe argument here)
-
-argument:: activate
-(describe argument here)
-
-argument:: slot
-(describe argument here)
 
 returns:: (returnvalue)
 

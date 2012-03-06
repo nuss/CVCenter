@@ -13,6 +13,8 @@ A link::Classes/CV::'s value can be read with the 'value' message.
 
 CLASSMETHODS::
 
+subsection:: Basic usage
+
 METHOD:: new
 Initializes CVCenter by creating its classvars code::all::, code::cvWidgets:: and more private ones.
 
@@ -79,6 +81,19 @@ only needed if a code::CVWidget2D:: shall be created. Either code::\lo:: or code
 
 returns:: a code::CV::
 
+
+METHOD:: put
+Put new code::CV::s into CVCenter
+note::It shouldn't be necessary to initialize CVCenter with an explicit call to strong::*new::. Rather use strong::*use:: whenever possible as (strong::*use:: uses strong::*put:: internally)::
+argument::  ... args
+key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), … \wdgtNameN, a CV::
+If the number of arguments is odd and the last one is a code::Boolean:: this will indicate wether already contained values will be overwritten (default: code::false::)
+
+returns:: this (CVCenter)
+
+
+subsection:: Setup options (classvar getters and setters)
+
 METHOD:: midiMode
 Different MIDI-devices may have different output modes: either values from 0-127 or an in-/decremental value (e.g. -1 or +1). These modes may be taken in account as follows:
 
@@ -125,6 +140,8 @@ If code::midiMode:: has been set to code::0:: moving a widget-slider will set th
 default: code::0.1::
 
 returns:: this (CVCenter)
+
+subsection:: Convenience methods
 
 METHOD:: at
 Return the code::CV:: at the given key. If the key belongs to a code::CVWidget2D:: an code::Event:: will rather be returned, containing 2 CVs: code::\lo:: and code::\hi::. If your code relies on a CV being returned by this method, make sure you call the right slot (e.G.: code:: CVCenter.at(\myKey).lo::).
@@ -219,6 +236,8 @@ a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only nee
 returns:: this (CVCenter)
 
 
+subsection:: Setting GUI-properties
+
 METHOD:: bounds
 Get or set the current bounds of the CVCenter GUI.
 
@@ -274,6 +293,8 @@ a code::String:: or a code::Symbol::
 
 returns:: an code::Array::
 
+subsection:: Saving and loading setups
+
 METHOD:: saveSetup
 Save all widgets and tabs resp. their actions, connected MIDI- and OSC-responders into a setup-file on disk. A once stored setup can be loaded again with code::loadSetup:: and all its responders can get reinitialized automatically.
 
@@ -303,6 +324,7 @@ If set to code::true:: actions will be initialized automatically. strong::defaul
 
 returns:: this (CVCenter)
 
+subsection:: More classvars and internal values
 
 METHOD:: setup
 returns the current setup:
@@ -352,15 +374,6 @@ returns:: this (CVCenter)
 
 METHOD:: guiheight
 The GUI-height - has no direct effect besides when being set ahead from initializing CVCenter.
-
-returns:: this (CVCenter)
-
-METHOD:: put
-Put new CVs into CVCenter.all
-
-argument::  ... args
-key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), … \wdgtNameN, a CV::
-If the number of arguments is odd and the last one is a code::Boolean:: this will indicate wether already contained values will be overwritten (default: code::false::)
 
 returns:: this (CVCenter)
 
