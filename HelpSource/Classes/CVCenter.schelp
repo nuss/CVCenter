@@ -384,7 +384,7 @@ definitionList::
 ## right arrow-key || navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
 ## left arrow-key || navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
 ## 0-9 || Select tabs and focus them. The numbers represent the order of the tabs.
-## "c" || Open the code::OSCCommands:: GUI. This will also trigger code::OSCCommands.collect::
+## "c" || Open the code::OSCCommands:: GUI. This will also trigger code::OSCCommands:collect::
 ## "o" || See a list of already connected OSC-controllers (see also: code::CVCenterControllersMonitor::).
 ## "m" || See a list of already connected MIDI-controllers (see also: code::CVCenterControllersMonitor::).
 ## "x" || If the code::CVCenterControllersMonitor:: GUI is open, close it.

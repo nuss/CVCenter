@@ -1,0 +1,67 @@
+CLASS:: OSCCommands
+summary:: (put short description here)
+categories:: Undocumented classes
+related:: Classes/SomeRelatedClass, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+(put long description here)
+
+
+CLASSMETHODS::
+
+METHOD:: initClass
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: collect
+(describe method here)
+
+argument:: play
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: saveCmdSet
+(describe method here)
+
+argument:: deviceName
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: gui
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: deviceCmds
+(describe method here)
+
+argument:: deviceName
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: clearCmdsAt
+(describe method here)
+
+argument:: deviceName
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: storedDevices
+(describe method here)
+
+returns:: (returnvalue)
+
+
+INSTANCEMETHODS::
+
+
+EXAMPLES::
+
+code::
+(some example code)
+::

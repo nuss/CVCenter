@@ -17,7 +17,7 @@
 
 OSCCommands {
 
-	classvar collectFunc, running=false, <cmdList;
+	classvar collectFunc, running=false, cmdList;
 	
 	*initClass {
 		cmdList = ();
@@ -37,7 +37,7 @@ OSCCommands {
 	}
 	
 	*collect { |play=true|
-		var displayList, cmdList = ();
+		var displayList;
 		if(play, {
 			if(running == false, {
 				if(Main.versionAtLeast(3, 5), {

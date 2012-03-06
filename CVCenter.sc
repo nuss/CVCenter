@@ -174,13 +174,13 @@ CVCenter {
 				})
 			});
 			
-			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
-				.font_(Font("Helvetica", 10))
-				.states_([["preferences", Color.red, Color.yellow]])
-				.action_({ |pb| })
-			;
-			
-			swFlow.shift(1, 0);
+//			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
+//				.font_(Font("Helvetica", 10))
+//				.states_([["preferences", Color.red, Color.yellow]])
+//				.action_({ |pb| })
+//			;
+//			
+//			swFlow.shift(1, 0);
 			
 			saveBut = Button(prefPane, Rect(0, 0, 70, 20))
 				.font_(Font("Helvetica", 10))
