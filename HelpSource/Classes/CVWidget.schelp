@@ -344,15 +344,22 @@ list::
 ::
 ## mapConstrainterLo || a code::CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[0]:: as value
 ## mapConstrainterLo || a code::CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[1]:: as value
-## actions || a code::Ref:: to an code::Event::: code::Ref((numActions: <val>, activeActions: <val>))::. This model reflects the number of actions reps. active actions as displayed in the 'actions'-button of the widget.
+## actions || a code::Ref:: to an code::Event::: code::Ref((numActions: <val>, activeActions: <val>))::. This model reflects the number of actions resp. active actions as displayed in the 'actions'-button of the widget.
 ::
 
 returns:: an code::Event::
 
 METHOD:: midiOscEnv
-(describe method here)
+Get the current MIDI-/OSC-environment of the widget. If the widget is a code::CVWidget2D:: calling this method will return an code::Event:: containing the environments in 2 slots: code::\lo:: and code::\hi::, else the environment will be returned:
+definitionList::
+## oscMapping || input- to output-mapping of the values coming from the code::OSCresponder::: either code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp:: (see also: link::#-setOscMapping::). By default the entry will be code::\linlin::.
+## oscMsgIndex || if an code::OSCresponder:: is present this will reflect the index of the message at which the values are received (see also: link::#-oscConnect::).
+## calibConstraints || if an code::OSCresponder:: is present this will reflect the current constraints for values coming in via OSC. Usually the constraints are set automatically by the widget's internal calibration-mechanism. However, you may set them manually by link::#-setOscInputConstraints:: or deactivate the calibration-mechanism by link:: #-setCalibrate::.
+## oscResponder || if an if an code::OSCresponder:: is present it will be stored under this slot.
+## midiResponder || if a code::CCResponder:: is present it will stored under this slot.
+::
 
-returns:: (returnvalue)
+returns:: an code::Event::
 
 METHOD:: widgetCV
 (describe method here)
