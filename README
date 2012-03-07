@@ -1,4 +1,4 @@
-CVCenter is supposed to be a graphical control-interface that lets you connect synth-controls or controls within patterns to hardware midi-sliders or OSC-controllers. CVCenter itself is more or less a container of CVs (a collection of CVs + GUI), each represented by CVWidgets (currently CVWidgetKnob and CVWidget2D). Each of them can be connected to an unlimited number GUI-elements or/and control parameters in running Synths or set values in Patterns. As CV inherits from Stream any instance can be used as any other Pattern (Pseq, Prand, Pwhite etcetc.).
+CVCenter provides a graphical control-interface that lets you connect synth-controls or controls within patterns to hardware midi-sliders or OSC-controllers as well as it is a container of CVs (a collection of CVs + GUI), each represented by CVWidgets (currently CVWidgetKnob and CVWidget2D). Each of them can be connected to an unlimited number GUI-elements or/and control parameters in running Synths or set values in Patterns. As CV inherits from Stream any instance can be used as any other Pattern (Pseq, Prand, Pwhite etcetc.).
 
 For more info check out CVCenter.html resp. CVWidget.html.
 
@@ -9,7 +9,7 @@ Installation:
 	b) TabbedView
 	c) wslib (optional)
 	see the Quarks-helpfile for more information on how to do this.
-2) after installing SuperCollider and the required extensions put all content of CVCenter in your user-app-support directory. Execute the following line SuperCollder to see where that is:
+2) after installing SuperCollider and the required extensions put all content of CVCenter in your user-app-support directory. Execute the following line SuperCollider to see where that is:
 
 Platform.userAppSupportDir
 
