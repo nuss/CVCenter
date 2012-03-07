@@ -65,15 +65,16 @@ CVWidgetKnob : CVWidget {
 				
 		this.initControllersAndModels(controllersAndModels);
 
-		setupArgs.isKindOf(Event).not.if { Error("a setup has to be provided as a Dictionary or an Event").throw };
-		
-		setupArgs[\midiMode] !? { this.setMidiMode(setupArgs[\midiMode]) };
-		setupArgs[\midiResolution] !? { this.setMidiResolution(setupArgs[\midiResolution]) };
-		setupArgs[\midiMean] !? { this.setMidiMean(setupArgs[\midiMean]) };
-		setupArgs[\ctrlButtonBank] !? { this.setCtrlButtonBank(setupArgs[\ctrlButtonBank]) };
-		setupArgs[\softWithin] !? { this.setSoftWithin(setupArgs[\softWithin]) };
-		setupArgs[\calibrate] !? { this.setCalibrate(setupArgs[\calibrate]) };
-						
+		setupArgs !? {
+			setupArgs.isKindOf(Event).not.if { Error("a setup has to be provided as a Dictionary or an Event").throw };
+			setupArgs[\midiMode] !? { this.setMidiMode(setupArgs[\midiMode]) };
+			setupArgs[\midiResolution] !? { this.setMidiResolution(setupArgs[\midiResolution]) };
+			setupArgs[\midiMean] !? { this.setMidiMean(setupArgs[\midiMean]) };
+			setupArgs[\ctrlButtonBank] !? { this.setCtrlButtonBank(setupArgs[\ctrlButtonBank]) };
+			setupArgs[\softWithin] !? { this.setSoftWithin(setupArgs[\softWithin]) };
+			setupArgs[\calibrate] !? { this.setCalibrate(setupArgs[\calibrate]) };
+		};
+								
 		action !? { this.addAction(\default, action) };
 		
 		if(bounds.isNil, {

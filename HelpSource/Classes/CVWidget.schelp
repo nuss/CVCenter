@@ -12,6 +12,19 @@ CLASSMETHODS::
 
 INSTANCEMETHODS::
 
+METHOD:: setup
+The current widget-setup, returned as an code::Event::. If the widget is a code::CVWidget2D:: each key of the returned Event will be split in a code::\lo:: and a code::\hi:: value:
+definitionList::
+## midiMode || as set by link::#-setMidiMode::. default: code::0::
+## calibrate || indicates wether OSC-calibration is active or not, set by link::#-setCalibrate::. default: code::true::
+## ctrlButtonBank || indicates wether the code::ctrlButtonBank:: parameter, reflecting a MIDI-device's bank-layout is set. This can be set with link::#-setCtrlButtonBank::. default: code::nil::
+## midiMean || if a MIDI-device is set to in-/decremental mode reps. code::midiMode:: is set to code::1:: this will be the mean output-value. Can be set with link::#-setMidiMean::. default: code::64::
+## midiResolution || if code::midiMode:: is set to code::1:: the step-size of each slider is determined by this parameter. Can be set with link::#-setMidiResolution::. default: code::1::
+## softWithin || if code::midiMode:: is set to code::0:: this determines the tolerance at which a MIDI-slider will respond when moved. For a more detailed explanation see link::#-setSoftWithin::. default: code::0.1::
+::
+
+returns:: an code::Event::
+
 METHOD:: setMidiMode
 Different MIDI-devices may have different output modes: either values from 0-127 or an in-/decremental value (e.g. -1 or +1). These modes may be taken in account as follows:
 
@@ -95,11 +108,13 @@ only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::
 returns:: an code::Integer::, representing the number of sliders in one bank.
 
 METHOD:: setMidiResolution
-If code::midiMode:: has been set to 1 (by calling setMidiMode), this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
+If code::midiMode:: has been set to 1 (by calling link::#-setMidiMode::), this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
 
 argument:: resolution
 a code::Float::, representing the stepsize:
+
 lower values -> higher resolution 
+
 higher values -> lower resolution
 
 default: code::1::
@@ -362,20 +377,23 @@ definitionList::
 returns:: an code::Event::
 
 METHOD:: widgetCV
-(describe method here)
+The widget's code::CV::. If the widget is a code::CVWidget2D:: an code::Event::, containing to slots code::\lo:: and code::\hi:: is returned.
 
-returns:: (returnvalue)
+returns:: either a code::CV:: ( code::CVWidgetKnob::) or an code::Event:: ( code::CVWidget2D::)
 
 METHOD:: wdgtActions
-(describe method here)
+All actions (active and inactive) specified for the given widget.
+note:: Though this has to be a setter/getter for some reason strong::do not attempt to set an action like:: code::myWidget.wdgtActions_(…)::. Rather use link::#-addAction::, link::#-removeAction:: resp. link::#-activateAction::
 
-returns:: (returnvalue)
+returns:: an code::Event:: containing active and inactive actions of a widget.
 
 METHOD:: alwaysPositive
-(describe method here)
+If code::\explin:: or code::\expexp:: has been chosen for input to output mapping with link::#-setOscMapping:: both constraints of the input-range have to be same-signed - otherwise the operation would produce code::NaN::s. code::alwaysPositive:: will be calculated automatically, so the user shouldn't have to worry about it.
 
-returns:: (returnvalue)
+returns:: the receiver
 
+PRIVATE:: initControllersAndModels
+private:: initControllerActions
 private:: prInitSpecControl
 private:: prInitMidiConnect
 private:: prInitMidiDisplay
@@ -389,17 +407,17 @@ private:: prInitActionsControl
 subsection:: GUI properties and methods
 
 METHOD:: front
-(describe method here)
+Sends the widget's window to front.
 
-returns:: (returnvalue)
+returns:: the receiver
 
 METHOD:: allGuiEls
-(describe method here)
+All GUI-elements: buttons, sliders, textfields...
 
-returns:: (returnvalue)
+returns:: an code::Array::
 
 METHOD:: bgColor
-(describe method here)
+Set/Get the widget's background-color
 
 returns:: (returnvalue)
 
@@ -427,21 +445,6 @@ argument:: visible
 returns:: (returnvalue)
 
 METHOD:: editor
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: wdgtControllersAndModels
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: midiOscEnv
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: setup
 (describe method here)
 
 returns:: (returnvalue)
@@ -484,25 +487,6 @@ returns:: (returnvalue)
 
 METHOD:: isClosed
 (describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: initControllersAndModels
-(describe method here)
-
-argument:: controllersAndModels
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: initControllerActions
-(describe method here)
-
-argument:: slot
-(describe argument here)
 
 returns:: (returnvalue)
 
