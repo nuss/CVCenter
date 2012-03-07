@@ -376,180 +376,15 @@ METHOD:: alwaysPositive
 
 returns:: (returnvalue)
 
-argument:: midiOscEnv
-(describe argument here)
-
-argument:: argWidgetCV
-(describe argument here)
-
-argument:: thisCalib
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prInitMidiConnect
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
-
-argument:: midiOscEnv
-(describe argument here)
-
-argument:: argWidgetCV
-(describe argument here)
-
-argument:: thisCalib
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prInitMidiDisplay
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
-
-argument:: midiOscEnv
-(describe argument here)
-
-argument:: argWidgetCV
-(describe argument here)
-
-argument:: thisCalib
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prInitMidiOptions
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
-
-argument:: midiOscEnv
-(describe argument here)
-
-argument:: argWidgetCV
-(describe argument here)
-
-argument:: thisCalib
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prInitOscConnect
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
-
-argument:: midiOscEnv
-(describe argument here)
-
-argument:: argWidgetCV
-(describe argument here)
-
-argument:: thisCalib
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prInitOscDisplay
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
-
-argument:: midiOscEnv
-(describe argument here)
-
-argument:: argWidgetCV
-(describe argument here)
-
-argument:: thisCalib
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prInitOscInputRange
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
-
-argument:: midiOscEnv
-(describe argument here)
-
-argument:: argWidgetCV
-(describe argument here)
-
-argument:: thisCalib
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prInitActionsControl
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
-
-argument:: midiOscEnv
-(describe argument here)
-
-argument:: argWidgetCV
-(describe argument here)
-
-argument:: thisCalib
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
+private:: prInitSpecControl
+private:: prInitMidiConnect
+private:: prInitMidiDisplay
+private:: prInitMidiOptions
+private:: prInitCalibration
+private:: prInitOscConnect
+private:: prInitOscDisplay
+private:: prInitOscInputRange
+private:: prInitActionsControl
 
 subsection:: GUI properties and methods
 
@@ -670,39 +505,6 @@ argument:: slot
 (describe argument here)
 
 returns:: (returnvalue)
-
-METHOD:: prInitCalibration
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
-
-argument:: midiOscEnv
-(describe argument here)
-
-argument:: argWidgetCV
-(describe argument here)
-
-argument:: thisCalib
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: prInitSpecControl
-(describe method here)
-
-argument:: wcm
-(describe argument here)
-
-argument:: thisGuiEnv
-(describe argument here)
-
 
 EXAMPLES::
 
