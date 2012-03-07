@@ -22,7 +22,7 @@ CVWidget {
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
 	var <widgetBg, <label, <nameField, wdgtInfo; // elements contained in any kind of CVWidget
-	var <visible, widgetXY, widgetProps, <editor;
+	var widgetXY, widgetProps, <editor;
 	var <wdgtControllersAndModels, <midiOscEnv;
 
 	setup {
@@ -34,24 +34,6 @@ CVWidget {
 			softWithin: prSoftWithin, 
 			calibrate: prCalibrate
 		);
-	}
-	
-	visible_ { |visible|
-		if(visible.isKindOf(Boolean).not, {
-			^nil;
-		}, {
-			if(visible, {
-				allGuiEls.do({ |el| 
-					if(el === nameField, {
-						el.visible_(false);
-					}, {
-						el.visible_(true);
-					})
-				});
-			}, {
-				allGuiEls.do(_.visible_(false));
-			})
-		})
 	}
 	
 	toggleComment { |visible|

@@ -405,6 +405,7 @@ private:: prInitOscInputRange
 private:: prInitActionsControl
 
 subsection:: GUI properties and methods
+CVWidget implements a few GUI-elements that are common to code::CVWidgetKnob:: as well as code::CVWidget2D::. Descriptions of the rest of the elements can be found in the documentation for the regarding classes.
 
 METHOD:: front
 Sends the widget's window to front.
@@ -416,38 +417,27 @@ All GUI-elements: buttons, sliders, textfields...
 
 returns:: an code::Array::
 
-METHOD:: bgColor
-Set/Get the widget's background-color
+METHOD:: editor
+Every widget has one or more editors that will open in a new window (code::CVWidgetKnob:: 1 editor, code::CVWidget2D:: 2 editors - code::\lo:: and code::\hi::). This method returns a reference to them. 
 
-returns:: (returnvalue)
+returns:: a code::CVWidgetEditor:: or an code::Event::, containing a reference two 2 or more code::CVWidgetEditor::s
+
+private:: bgColor
 
 METHOD:: widgetBg
-(describe method here)
+A code::UserView:: upon which all other elements of the GUI will be placed
 
-returns:: (returnvalue)
+returns:: a code::UserView::
 
 METHOD:: label
-(describe method here)
+A button, containing the name of the widget. When clicked the widget will switch to a code::TextView:: that can be used to write down notices.
 
-returns:: (returnvalue)
+returns:: a code::Button::
 
 METHOD:: nameField
-(describe method here)
+A code::TextView:: that can be used to write down notices.
 
-returns:: (returnvalue)
-
-METHOD:: visible
-(describe method here)
-
-argument:: visible
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: editor
-(describe method here)
-
-returns:: (returnvalue)
+returns:: a code::TextView::
 
 METHOD:: toggleComment
 (describe method here)
