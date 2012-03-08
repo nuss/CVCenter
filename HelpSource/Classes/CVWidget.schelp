@@ -412,13 +412,8 @@ Sends the widget's window to front.
 
 returns:: the receiver
 
-METHOD:: allGuiEls
-All GUI-elements: buttons, sliders, textfields...
-
-returns:: an code::Array::
-
 METHOD:: editor
-Every widget has one or more editors that will open in a new window (code::CVWidgetKnob:: 1 editor, code::CVWidget2D:: 2 editors - code::\lo:: and code::\hi::). This method returns a reference to them. 
+Every widget has one or more editors that will open in a new window ( code::CVWidgetKnob:: 1 editor, code::CVWidget2D:: 2 editors - code::\lo:: and code::\hi::). This method returns a reference to them. 
 
 returns:: a code::CVWidgetEditor:: or an code::Event::, containing a reference two 2 or more code::CVWidgetEditor::s
 
@@ -440,48 +435,89 @@ A code::TextView:: that can be used to write down notices.
 returns:: a code::TextView::
 
 METHOD:: toggleComment
-(describe method here)
+Toggles between code::nameField:: and the regular widget-appearance.
 
 argument:: visible
-(describe argument here)
+a code::Boolean::
 
-returns:: (returnvalue)
+returns:: the receiver
 
 METHOD:: widgetXY
-(describe method here)
+Sets/gets the XY-position of a widget within its parent window.
 
 argument:: point
-(describe argument here)
+a code::Point::
 
-returns:: (returnvalue)
+returns:: a code::Point::
 
 METHOD:: widgetProps
-(describe method here)
+Returns the width/height of a widget as code::Point::. 
 
-returns:: (returnvalue)
+returns:: a code::Point::
 
 METHOD:: bounds
-(describe method here)
+Returns the bounds of a widget as code::Rect::.
 
-returns:: (returnvalue)
+returns:: a code::Rect::
 
 METHOD:: remove
-(describe method here)
+Removes all GUI-elements (buttons, text-fields, sliders etc.) from a widget.
 
-returns:: (returnvalue)
+returns:: the receiver
 
 METHOD:: close
-(describe method here)
+If the widget is part of the CVCenter-GUI all its elements will be removed, otherwise close the widget.
 
-returns:: (returnvalue)
+returns:: the receiver
 
 METHOD:: isClosed
-(describe method here)
 
-returns:: (returnvalue)
+returns:: code::true:: if the widget has been closed, otherwise code::false::
 
 EXAMPLES::
 
 code::
-(some example code)
+// create some simple CVWidget
+~twoDee = CVWidget2D.new.front;
+
+// define an action to be executed when the knob is turned
+~twoDee.addAction(\post, { |cv| "current value[lo]: %\n".postf(cv.value) }, \lo);
+~twoDee.addAction(\post, { |cv| "current value[hi]: %\n".postf(cv.value) }, \hi);
+
+// some noise
+(
+Server.default.waitForBoot{ 
+	~noise = { |trigFreq=10, freqMod=0|
+		var trig, seq, freq;
+		trig = Impulse.kr(trigFreq);
+		seq = Drand([Dseq((1..5).mirror1, 1), Drand((4..10), 8)], 2000);
+		freq = Demand.kr(trig, 0, seq * 100);
+		SinOsc.ar(freq + [0,0.7]).cubed.cubed.scaleneg(freqMod) * 0.1;
+	}.play 
+}
+)
+
+// add another action to set trigFreq in ~noise 
+~twoDee.addAction(\trigFreq, { |cv| ~noise.set(\trigFreq, cv.value) }, \lo);
+
+// change the widget's spec to something nore suitable
+// a linear ControlSpec, reaching from 10 to 30
+~twoDee.setSpec(#[10, 30], \lo);
+
+// add another action to set freqMod in ~noise 
+~twoDee.addAction(\trigFreq, { |cv| ~noise.set(\freqMod, cv.value) }, \hi);
+
+// change the widget's spec to something nore suitable
+// a spec can be set as the spec's name which automatically gets converted
+// to a ControlSpec if a spec under that name exists - see the ControlSpec helpfile
+~twoDee.setSpec(\pan, \hi);
+
+// deactivate posting values to the post-window
+// the action can be reactivated at any time with the same 
+// method-call, providing true as its parameter
+~twoDee.activateAction(\post, false, \lo);
+~twoDee.activateAction(\post, false, \hi);
+
+~noise.free;
+~twoDee.close;
 ::

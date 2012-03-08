@@ -123,7 +123,7 @@ CVWidgetKnob : CVWidget {
 			])
 			.font_(Font("Helvetica", 9))
 			.action_({ |b|
-				this.toggleComment(b.value);
+				this.toggleComment(b.value.asBoolean);
 			})
 		;
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))

@@ -73,7 +73,7 @@ CVWidget2D : CVWidget {
 			midiOscEnv[hilo].oscMapping ?? { midiOscEnv[hilo].oscMapping = \linlin };
 		});
 		
-		if(name.isNil, { thisName = "2-dimensional" }, { thisName = name });
+		if(name.isNil, { thisName = "2D" }, { thisName = name });
 		wdgtInfo = thisName.asString;
 		
 		widgetCV = ();
@@ -168,7 +168,7 @@ CVWidget2D : CVWidget {
 			])
 			.font_(Font("Helvetica", 9))
 			.action_({ |b|
-				this.toggleComment(b.value);
+				this.toggleComment(b.value.asBoolean);
 			})
 		;
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))

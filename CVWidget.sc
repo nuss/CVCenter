@@ -20,7 +20,7 @@ CVWidget {
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
-	var visibleGuiEls, <allGuiEls, isCVCWidget = false;
+	var visibleGuiEls, allGuiEls, isCVCWidget = false;
 	var <widgetBg, <label, <nameField, wdgtInfo; // elements contained in any kind of CVWidget
 	var widgetXY, widgetProps, <editor;
 	var <wdgtControllersAndModels, <midiOscEnv;
@@ -38,13 +38,13 @@ CVWidget {
 	
 	toggleComment { |visible|
 		visible.switch(
-			0, { 
+			false, { 
 				visibleGuiEls.do({ |el| 
 					el.visible_(true);
 					nameField.visible_(false);
 				})
 			},
-			1, {
+			true, {
 				visibleGuiEls.do({ |el|
 					el.visible_(false);
 					nameField.visible_(true);
