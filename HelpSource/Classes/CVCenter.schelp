@@ -432,7 +432,7 @@ CVCenter.activateActionAt(\knobTest, \testFunc, false);
 CVCenter.activateActionAt(\knobTest, \testFunc, true);
 
 // some sound
-s.waitForBoot{ a = { |freq1, freq2, amp| SinOsc.ar([freq1, freq2]) * amp }.play };
+Server.default.waitForBoot{ a = { |freq1, freq2, amp| SinOsc.ar([freq1, freq2]) * amp }.play };
 
 // set suitable specs for synth's controls
 CVCenter.cvWidgets[\knobTest].setSpec(\amp);
@@ -481,7 +481,7 @@ metadata: (
 )).add; // must be 'added' if the GUI shall be auto-created
 )
 
-s.waitForBoot { a = Synth(\dynKlank) };
+Server.default.waitForBoot { a = Synth(\dynKlank) };
 
 // GUI creation - note that actions within widgets representing arrayed controls will
 // rather use setn to set the regarding controls
@@ -503,7 +503,7 @@ Spec.add(\damping, #[200, 20000, \exp, 0.0, 1000, " Hz"]);
 Ndef(\sawTest).cvcGui;
 
 // play the Ndef (turn the knobs if you don't hear anything immediately)
-s.waitForBoot{ Ndef(\sawTest).play };
+Server.default.waitForBoot{ Ndef(\sawTest).play };
 
 // clean up
 CVCenter.removeAll;
@@ -529,7 +529,7 @@ CVCenter.removeAll
 p = ProxySpace.push(s);
 ~sawTest = { |damping| SinOsc.ar(damping * VarSaw.ar(\sawFreq.kr([100, 101]))).tanh * \amp.kr(0.5) };
 
-s.waitForBoot{ ~sawTest.play };
+Server.default.waitForBoot{ ~sawTest.play };
 
 // specs should already be there
 ~sawTest.cvcGui;
@@ -546,7 +546,7 @@ p = ProxySpace.new;
 
 p[\sawTest] = { |damping| SinOsc.ar(damping * VarSaw.ar(\sawFreq.kr([100, 101]))).tanh * \amp.kr(0.5) };
 
-s.waitForBoot{ p[\sawTest].play };
+Server.default.waitForBoot{ p[\sawTest].play };
 
 p[\sawTest].cvcGui;
 
