@@ -99,11 +99,22 @@ CVCenter {
 			flow.margin_(4@0);
 			flow.gap_(0@4);
 			flow.shift(0, 0);
-			
+						
 			if(tabProperties.size < 1, {
 				tabProperties = tabProperties.add(());
 				if(tab.isNil, { tabProperties[0].tabLabel = "default" }, { tabProperties[0].tabLabel = tab.asString });
 				tabProperties[0].tabColor = nextColor.next;
+			}, {
+				if(tabProperties.size == 1 and:{
+					tabProperties[0].tabLabel == "default" and:{
+						tabProperties[0].nextPos == (0@0)
+					}
+				}, {
+					tab !? { 
+						tabProperties[0].tabLabel = tab.asString;
+						tabProperties[0].tabColor = nextColor.next;
+					};
+				})
 			});
 			
 			tabLabels = tabProperties.collect(_.tabLabel);
