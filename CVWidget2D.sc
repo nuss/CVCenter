@@ -154,8 +154,17 @@ CVWidget2D : CVWidget {
 					midiOscEnv[hilo].cc !? { midiOscEnv[hilo].cc.remove };
 					wdgtControllersAndModels[hilo].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 				})
-			})
+			});
 		};
+//		cvcGui ?? {
+//			window.onClose.addFunc({
+//				#[lo, hi].do({ |hilo|
+//					midiOscEnv[hilo].oscResponder !? { midiOscEnv[hilo].oscResponder.remove };
+//					midiOscEnv[hilo].cc !? { midiOscEnv[hilo].cc.remove };
+//					wdgtControllersAndModels[hilo].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
+//				})
+//			})
+//		};
 						
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color.green)
@@ -252,11 +261,11 @@ CVWidget2D : CVWidget {
 				}, {
 					editor.lo.front(1)
 				});
-				wdgtControllersAndModels.lo.oscConnection.model.value_(
-					wdgtControllersAndModels.lo.oscConnection.model.value;
+				wdgtControllersAndModels.lo.oscDisplay.model.value_(
+					wdgtControllersAndModels.lo.oscDisplay.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.lo.midiConnection.model.value_(
-					wdgtControllersAndModels.lo.midiConnection.model.value
+				wdgtControllersAndModels.lo.midiDisplay.model.value_(
+					wdgtControllersAndModels.lo.midiDisplay.model.value
 				).changed(\value);
 			})
 		;
@@ -268,11 +277,11 @@ CVWidget2D : CVWidget {
 				}, {
 					editor.hi.front(1)
 				});
-				wdgtControllersAndModels.hi.oscConnection.model.value_(
-					wdgtControllersAndModels.hi.oscConnection.model.value;
+				wdgtControllersAndModels.hi.oscDisplay.model.value_(
+					wdgtControllersAndModels.hi.oscDisplay.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.hi.midiConnection.model.value_(
-					wdgtControllersAndModels.hi.midiConnection.model.value
+				wdgtControllersAndModels.hi.midiDisplay.model.value_(
+					wdgtControllersAndModels.hi.midiDisplay.model.value
 				).changed(\value);
 			})
 		;
@@ -475,11 +484,11 @@ CVWidget2D : CVWidget {
 					wdgtControllersAndModels[v[0]].mapConstrainterHi.connect(editor[v[0]].calibNumBoxes.hi);
 					editor[v[0]].calibNumBoxes.hi.value_(wdgtControllersAndModels[v[0]].oscInputRange.model.value[1]);
 				};
-				wdgtControllersAndModels[v[0]].oscConnection.model.value_(
-					wdgtControllersAndModels[v[0]].oscConnection.model.value;
+				wdgtControllersAndModels[v[0]].oscDisplay.model.value_(
+					wdgtControllersAndModels[v[0]].oscDisplay.model.value;
 				).changed(\value);
-				wdgtControllersAndModels[v[0]].midiConnection.model.value_(
-					wdgtControllersAndModels[v[0]].midiConnection.model.value
+				wdgtControllersAndModels[v[0]].midiDisplay.model.value_(
+					wdgtControllersAndModels[v[0]].midiDisplay.model.value
 				).changed(\value);
 			});
 			

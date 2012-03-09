@@ -325,9 +325,9 @@ CVWidgetEditor {
 								[thisGuiEnv.midiCtrl.string, mctrl]
 							].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 							if(margs.select({ |i| i.notNil }).size > 0, {
-								widget.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], key: slot)
+								widget.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], slot: slot)
 							}, {
-								widget.midiConnect(key: slot)
+								widget.midiConnect(slot: slot)
 							})
 						},
 						0, { widget.midiDisconnect(slot) }

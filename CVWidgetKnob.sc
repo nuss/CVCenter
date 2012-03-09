@@ -92,9 +92,10 @@ CVWidgetKnob : CVWidget {
 		}, {
 			window = parentView;
 		});
-								
+				
 		cvcGui ?? { 
 			window.onClose_({
+				[window, thisName, editor].postln;
 				if(editor.notNil, {
 					if(editor.isClosed.not, {
 						editor.close;
@@ -109,8 +110,15 @@ CVWidgetKnob : CVWidget {
 				midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove };
 				midiOscEnv.cc !? { midiOscEnv.cc.remove };
 				wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
-			})
+			});
 		};
+//		cvcGui ?? {
+//			window.onClose.addFunc({
+//				midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove };
+//				midiOscEnv.cc !? { midiOscEnv.cc.remove };
+//				wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
+//			})
+//		};
 						
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color(alpha: 1.0))
@@ -187,11 +195,11 @@ CVWidgetKnob : CVWidget {
 				}, {
 					editor.front(1)
 				});
-				wdgtControllersAndModels.oscConnection.model.value_(
-					wdgtControllersAndModels.oscConnection.model.value;
+				wdgtControllersAndModels.oscDisplay.model.value_(
+					wdgtControllersAndModels.oscDisplay.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.midiConnection.model.value_(
-					wdgtControllersAndModels.midiConnection.model.value
+				wdgtControllersAndModels.midiDisplay.model.value_(
+					wdgtControllersAndModels.midiDisplay.model.value
 				).changed(\value);
 			})
 		;
@@ -327,11 +335,11 @@ CVWidgetKnob : CVWidget {
 					wdgtControllersAndModels.mapConstrainterHi.connect(editor.calibNumBoxes.hi);
 					editor.calibNumBoxes.hi.value_(wdgtControllersAndModels.oscInputRange.model.value[1]);
 				};
-				wdgtControllersAndModels.oscConnection.model.value_(
-					wdgtControllersAndModels.oscConnection.model.value;
+				wdgtControllersAndModels.oscDisplay.model.value_(
+					wdgtControllersAndModels.oscDisplay.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.midiConnection.model.value_(
-					wdgtControllersAndModels.midiConnection.model.value
+				wdgtControllersAndModels.midiDisplay.model.value_(
+					wdgtControllersAndModels.midiDisplay.model.value
 				).changed(\value);
 			})
 		;
