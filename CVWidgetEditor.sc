@@ -17,18 +17,18 @@
 
 CVWidgetEditor {
 	classvar <allEditors;
-	var thisEditor, <window, <tabs, labelStringColors;
+	var thisEditor, <window, <tabs, editorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut, <calibNumBoxes;
-	var <deviceListMenu, <cmdListMenu, <addDeviceBut, thisCmdNames;
+	var <deviceListMenu, <cmdListMenu, addDeviceBut, thisCmdNames;
 	var <ipField, <portField, <nameField, <indexField;
 	var <inputConstraintLoField, <inputConstraintHiField, <alwaysPosField;
 	var <mappingSelect;
 	var <connectorBut;
 	var <actionName, <enterAction, <enterActionBut, <actionsList;
-	var <name;
+	var name;
 	var flow0, flow1, flow2, flow3;
 	
 	*new { |widget, widgetName, tab, slot|
@@ -48,6 +48,8 @@ CVWidgetEditor {
 		var tmp; // multipurpose short-term var
 						
 		name = widgetName.asSymbol;
+		
+		editorEnv = ();
 		
 		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
 		thisCmdNames ?? { thisCmdNames = [nil] };
@@ -175,14 +177,14 @@ CVWidgetEditor {
 				})
 			;
 			
-			if(widget.editorEnv.specsListSpecs.isNil, { 
+			if(editorEnv.specsListSpecs.isNil, { 
 				specsListSpecs = List() 
 			}, {
-				specsListSpecs = widget.editorEnv.specsListSpecs;
+				specsListSpecs = editorEnv.specsListSpecs;
 			});
 			
-			if(widget.editorEnv.specsListItems.notNil, {
-				specsList.items_(widget.editorEnv.specsListItems);
+			if(editorEnv.specsListItems.notNil, {
+				specsList.items_(editorEnv.specsListItems);
 			}, {
 				Spec.specs.pairsDo({ |k, v|
 					if(v.isKindOf(ControlSpec), {
@@ -201,8 +203,8 @@ CVWidgetEditor {
 			});
 			
 			window.onClose_({
-				widget.editorEnv.specsListSpecs = specsListSpecs;
-				widget.editorEnv.specsListItems = specsList.items;
+				editorEnv.specsListSpecs = specsListSpecs;
+				editorEnv.specsListItems = specsList.items;
 			});
 						
 			// MIDI editing

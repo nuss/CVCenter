@@ -16,7 +16,7 @@
 */
 
 CVWidget2D : CVWidget {
-	var <window, <guiEnv, <editorEnv;
+
 	var <slider2d, <rangeSlider, <numVal, <specBut;
 	var <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
 
@@ -63,7 +63,6 @@ CVWidget2D : CVWidget {
 		this.wdgtActions ?? { this.wdgtActions = (lo: (), hi: ()) };
 				
 		guiEnv = (lo: (), hi: ());
-		editorEnv = ();
 
 		cvcGui !? { isCVCWidget = true };
 		

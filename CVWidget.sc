@@ -17,6 +17,7 @@
 
 CVWidget {
 
+	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation

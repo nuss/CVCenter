@@ -407,6 +407,16 @@ private:: prInitActionsControl
 subsection:: GUI properties and methods
 CVWidget implements a few GUI-elements that are common to code::CVWidgetKnob:: as well as code::CVWidget2D::. Descriptions of the rest of the elements can be found in the documentation for the regarding classes.
 
+METHOD:: window
+The window containing the widget
+
+returns:: a code::Window::
+
+METHOD:: guiEnv
+An code::Event:: containing certain elements of the GUI.
+
+returns:: an code::Event::
+
 METHOD:: front
 Sends the widget's window to front.
 

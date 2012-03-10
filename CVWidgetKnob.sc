@@ -17,7 +17,6 @@
 
 CVWidgetKnob : CVWidget {
 	
-	var <window, <guiEnv, <editorEnv;
 	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
 
 	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, server|
@@ -48,7 +47,6 @@ CVWidgetKnob : CVWidget {
 		prSoftWithin = 0.1;
 						
 		guiEnv = ();
-		editorEnv = ();
 		cvcGui !? { isCVCWidget = true };
 
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
