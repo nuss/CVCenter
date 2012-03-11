@@ -218,7 +218,7 @@ CVWidgetEditor {
 			flow1.shift(5, 0);
 			
 			midiModes = ["0-127", "+/-"];
-						
+			
 			midiModeSelect = PopUpMenu(thisEditor.tabs.views[1], flow1.bounds.width/2-70@15)
 				.font_(staticTextFont)
 				.items_(midiModes)
@@ -527,7 +527,7 @@ CVWidgetEditor {
 				.stringColor_(staticTextColor)
 				.string_("OSC-input constraints + compensation")
 			;
-						
+									
 			inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)

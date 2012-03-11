@@ -18,6 +18,8 @@
 CVWidgetKnob : CVWidget {
 	
 	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
+	// permanent widget
+	var pWidget; 
 
 	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, server|
 		^super.new.init(
@@ -431,6 +433,68 @@ CVWidgetKnob : CVWidget {
 		);
 
 		this.initControllerActions;
+	}
+	
+	*newP { |permanentID, parent, cv, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server|
+		^super.new.initP(permanentID, parent, cv, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server);
+	}
+	
+	initP { |permanentID, parent, cv, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server|
+		var pCv, pWCM, pMidiOscEnv, pWdgtActions;
+		
+		permanentID ?? { Error("Please provide a permanentID.").throw };
+		pEnv !? {
+			if(pEnv.keys.select({ |i| i === permanentID.asSymbol }).size > 0 and:{
+				pEnv[permanentID.asSymbol].isNil	
+			}, {
+				Error("The given permanentID is already in use. Please choose a different one.").throw;
+			})
+		};
+		pEnv ?? { pEnv = IdentityDictionary.new };
+		pEnv[permanentID.asSymbol] ?? { pEnv.put(permanentID.asSymbol, ()) };
+
+		pWidget = this.class.new(
+			parent, 
+			pEnv[permanentID.asSymbol].cv ?? { pCv = cv ? CV.new }, 
+			name, 
+			bounds, 
+			defaultActions, 
+			setup, 
+			pEnv[permanentID.asSymbol].wcm ? controllersAndModels, 
+			if(pEnv[permanentID.asSymbol].midiOscEnv.isNil, { true }, { (midiOscEnv: pEnv[permanentID.asSymbol].midiOscEnv) }), 
+			server
+		);
+
+		pEnv[permanentID.asSymbol].wdgtActions !? { pWidget.wdgtActions_(pEnv[permanentID.asSymbol].wdgtActions) };
+		pWidget.wdgtControllersAndModels.oscDisplay.model.value_(
+			pWidget.wdgtControllersAndModels.oscDisplay.model.value
+		).changed(\value);
+		pWidget.wdgtControllersAndModels.midiOptions.model.value_(
+			pWidget.wdgtControllersAndModels.midiOptions.model.value
+		).changed(\value);
+		pWidget.wdgtControllersAndModels.midiDisplay.model.value_(
+			pWidget.wdgtControllersAndModels.midiDisplay.model.value
+		).changed(\value);
+		pWidget.wdgtControllersAndModels.actions.model.value_(
+			pWidget.wdgtControllersAndModels.actions.model.value
+		).changed(\value);
+		pWidget.wdgtControllersAndModels.calibration.model.value_(
+			pWidget.wdgtControllersAndModels.calibration.model.value
+		).changed(\value);
+
+		pWidget.window.onClose_({
+			pWCM = pWidget.wdgtControllersAndModels;
+			pMidiOscEnv = pWidget.midiOscEnv;
+			pWdgtActions = pWidget.wdgtActions;
+			if(pWidget.editor.notNil and:{
+				pWidget.editor.isClosed.not
+			}, { pWidget.editor.close });
+			pEnv[permanentID.asSymbol].cv ?? { pEnv[permanentID.asSymbol].cv_(pCv) };
+			pEnv[permanentID.asSymbol].wcm ?? { pEnv[permanentID.asSymbol].wcm_(pWCM) };
+			pEnv[permanentID.asSymbol].midiOscEnv ?? { pEnv[permanentID.asSymbol].midiOscEnv_(pMidiOscEnv) };
+			pEnv[permanentID.asSymbol].wdgtActions ?? { pEnv[permanentID.asSymbol].wdgtActions_(pWdgtActions) };
+		})
+		^pWidget;
 	}
 		
 }
