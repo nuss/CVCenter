@@ -265,7 +265,7 @@ CVWidget {
 	setMidiMode { |mode, slot|
 		switch(this.class,
 			CVWidgetKnob, {
-//				prMidiMode = mode;
+				prMidiMode = mode;
 				wdgtControllersAndModels !? {
 					wdgtControllersAndModels.midiOptions.model.value_(
 						(
@@ -279,7 +279,7 @@ CVWidget {
 				}
 			},
 			{
-//				prMidiMode[slot.asSymbol] = mode;
+				prMidiMode[slot.asSymbol] = mode;
 				wdgtControllersAndModels[slot.asSymbol] !? {
 					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
 						(
@@ -307,7 +307,7 @@ CVWidget {
 	setMidiMean { |meanval, slot|
 		switch(this.class, 
 			CVWidgetKnob, {
-//				prMidiMean = meanval;
+				prMidiMean = meanval;
 				wdgtControllersAndModels !? {
 					wdgtControllersAndModels.midiOptions.model.value_(
 						(
@@ -321,7 +321,7 @@ CVWidget {
 				}
 			},
 			{
-//				prMidiMean[slot.asSymbol] = meanval;
+				prMidiMean[slot.asSymbol] = meanval;
 				wdgtControllersAndModels[slot.asSymbol] !? {
 					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
 						(
@@ -349,7 +349,7 @@ CVWidget {
 	setSoftWithin { |threshold, slot|
 		switch(this.class, 
 			CVWidgetKnob, {
-//				prSoftWithin = threshold;
+				prSoftWithin = threshold;
 				wdgtControllersAndModels !? {
 					wdgtControllersAndModels.midiOptions.model.value_(
 						(
@@ -363,7 +363,7 @@ CVWidget {
 				}
 			},
 			{
-//				prSoftWithin[slot] = threshold;
+				prSoftWithin[slot] = threshold;
 				wdgtControllersAndModels[slot.asSymbol] !? {
 					wdgtControllersAndModels[slot].midiOptions.model.value_(
 						(
@@ -391,11 +391,11 @@ CVWidget {
 	setCtrlButtonBank { |numSliders, slot|
 		switch(this.class, 
 			CVWidgetKnob, {
-//				if(numSliders.asString == "nil" or:{ numSliders.asInt === 0 }, {
-//					prCtrlButtonBank = nil;
-//				}, {
-//					prCtrlButtonBank = numSliders.asInt;
-//				});
+				if(numSliders.asString == "nil" or:{ numSliders.asInt === 0 }, {
+					prCtrlButtonBank = nil;
+				}, {
+					prCtrlButtonBank = numSliders.asInt;
+				});
 				wdgtControllersAndModels !? {
 					wdgtControllersAndModels.midiOptions.model.value_(
 						(
@@ -409,6 +409,11 @@ CVWidget {
 				}
 			},
 			{
+				if(numSliders.asString == "nil" or:{ numSliders.asInt === 0 }, {
+					prCtrlButtonBank.put(slot, nil);
+				}, {
+					prCtrlButtonBank.put(slot.asSymbol, numSliders.asInt);
+				});
 //				prCtrlButtonBank.put(slot.asSymbol, numSliders);
 				wdgtControllersAndModels[slot.asSymbol] !? {
 					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
@@ -437,7 +442,7 @@ CVWidget {
 	setMidiResolution { |resolution, slot|
 		switch(this.class, 
 			CVWidgetKnob, {
-//				prMidiResolution = resolution;
+				prMidiResolution = resolution;
 				wdgtControllersAndModels !? {
 					wdgtControllersAndModels.midiOptions.model.value_(
 						(
@@ -451,7 +456,7 @@ CVWidget {
 				}
 			},
 			{
-//				prMidiResolution[slot.asSymbol] = resolution;
+				prMidiResolution[slot.asSymbol] = resolution;
 				wdgtControllersAndModels[slot.asSymbol] !? {
 					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
 						(
