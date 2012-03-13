@@ -484,6 +484,9 @@ CVWidget {
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value
 				).changed(\value);
+//				wdgtControllersAndModels.oscDisplay.model.value_(
+//					wdgtControllersAndModels.oscDisplay.model.value
+//				).changed(\value);
 				wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
 			},
 			{
@@ -491,6 +494,9 @@ CVWidget {
 				wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_(
 					wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value
 				).changed(\value);
+//				wdgtControllersAndModels[slot.asSymbol].oscDisplay.model.value_(
+//					wdgtControllersAndModels[slot.asSymbol].oscDisplay.model.value
+//				).changed(\value);
 				wdgtControllersAndModels[slot.asSymbol].calibration.model.value_(bool).changed(\value);
 			}
 		)
@@ -1015,10 +1021,9 @@ CVWidget {
 				makeCCResponder = { |argSrc, argChan, argNum|
 					if(midiOscEnv.cc.isNil, {
 						CCResponder(ccResponderAction, argSrc, argChan, argNum, nil);
-					}/*, {
-						ccResponderAction.def.postcs;
+					}, {
 						midiOscEnv.cc.function_(ccResponderAction);
-					}*/)
+					})
 				};
 				
 				{
@@ -1210,7 +1215,7 @@ CVWidget {
 		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
 			switch(prCalibrate.class, 
 				Event, { thisCalib = prCalibrate[slot] },
-				thisCalib = prCalibrate
+				{ thisCalib = prCalibrate }
 			);
 						
 			if(theChanger.value.size == 4, {
@@ -1234,7 +1239,7 @@ CVWidget {
 							if(msg[theChanger.value[3]] > midiOscEnv.calibConstraints.hi, {
 								midiOscEnv.calibConstraints.hi = msg[theChanger.value[3]];
 								wcm.oscInputRange.model.value_([
-									wcm.oscInputRange.model.value[1], 
+									wcm.oscInputRange.model.value[0], 
 									msg[theChanger.value[3]]
 								]).changed(\value);
 							});
@@ -1266,10 +1271,9 @@ CVWidget {
 					midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;
 //					midiOscEnv.oscResponder = OSCFunc(oscResponderAction, theChanger.value[2].asSymbol, netAddr);
 					midiOscEnv.oscMsgIndex = theChanger.value[3];
-				}/*, {
-					oscResponderAction.def.postcs;
+				}, {
 					midiOscEnv.oscResponder.action_(oscResponderAction);
-				}*/);
+				});
 				
 				wcm.oscDisplay.model.value_(
 					(

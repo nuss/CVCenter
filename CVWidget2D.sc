@@ -38,7 +38,7 @@ CVWidget2D : CVWidget {
 	}
 	
 	init { |parentView, cvs, name, bounds, actions, setupArgs, controllersAndModels, cvcGui, persistent, server|
-		var thisName, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
+		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, rightBarX, oscEditButHeight, right, left;
 		var actionLo, actionHi;
@@ -125,12 +125,17 @@ CVWidget2D : CVWidget {
 			thisHeight = 196;
 		}, {
 			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
+			if(bounds.isNil, {
+				thisX = 50; thisY = 50;
+			}, {
+				thisX = bounds.left; thisY = bounds.top;
+			});
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
 				
 		if(parentView.isNil, {
-			window = Window(thisName, Rect(50, 50, thisWidth+14, thisHeight+7), server: server);
+			window = Window(thisName, Rect(thisX, thisY, thisWidth+14, thisHeight+7), server: server);
 		}, {
 			window = parentView;
 		});
@@ -156,17 +161,21 @@ CVWidget2D : CVWidget {
 			})
 		};
 
-		if(persistent == false or:{ persistent.isNil }, {
-			window.onClose_(window.onClose.addFunc({
-				#[lo, hi].do({ |hilo|
-					midiOscEnv[hilo].oscResponder !? { midiOscEnv[hilo].oscResponder.remove };
-					midiOscEnv[hilo].cc !? { midiOscEnv[hilo].cc.remove };
-					wdgtControllersAndModels[hilo].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
-				})
-			}))
-		}, {
-			isPersistent = true;
-		});
+		cvcGui ?? {
+			if(persistent == false or:{ persistent.isNil }, {
+				window.onClose_(window.onClose.addFunc({
+					#[lo, hi].do({ |hilo|
+						midiOscEnv[hilo].oscResponder !? { midiOscEnv[hilo].oscResponder.remove };
+						midiOscEnv[hilo].cc !? { midiOscEnv[hilo].cc.remove };
+						wdgtControllersAndModels[hilo].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
+					})
+				}))
+			}, {
+				isPersistent = true;
+			})
+		};
+
+		if(persistent, { isPersistent = true });
 		
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color.green)
@@ -628,7 +637,6 @@ CVWidget2D : CVWidget {
 				thisWdgt.wdgtControllersAndModels[hilo].oscDisplay.model.value_(
 					wdgtControllersAndModels[hilo].oscDisplay.model.value
 				).changed(\value);
-				wdgtControllersAndModels[hilo].midiOptions.model.postln;
 				thisWdgt.wdgtControllersAndModels[hilo].midiOptions.model.value_(
 					wdgtControllersAndModels[hilo].midiOptions.model.value
 				).changed(\value);

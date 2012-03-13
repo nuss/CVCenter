@@ -38,7 +38,7 @@ CVWidgetKnob : CVWidget {
 	}
 	
 	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, server|
-		var thisName, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
+		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
 		
@@ -86,12 +86,17 @@ CVWidgetKnob : CVWidget {
 			thisHeight = 181;
 		}, {
 			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
+			if(bounds.isNil, {
+				thisX = 50; thisY = 50;
+			}, {
+				thisX = bounds.left; thisY = bounds.top;
+			});
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
 		
 		if(parentView.isNil, {
-			window = Window(thisName, Rect(50, 50, thisWidth+14, thisHeight+7), server: server);
+			window = Window(thisName, Rect(thisX, thisY, thisWidth+14, thisHeight+7), server: server);
 		}, {
 			window = parentView;
 		});
@@ -112,15 +117,19 @@ CVWidgetKnob : CVWidget {
 			})
 		};
 		
-		if(persistent == false or:{ persistent.isNil }, {
-			window.onClose_(window.onClose.addFunc({
-				midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove };
-				midiOscEnv.cc !? { midiOscEnv.cc.remove };
-				wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
-			}))
-		}, {
-			isPersistent = true;
-		});
+		cvcGui ?? {
+			if(persistent == false or:{ persistent.isNil }, {
+				window.onClose_(window.onClose.addFunc({
+					midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove };
+					midiOscEnv.cc !? { midiOscEnv.cc.remove };
+					wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
+				}))
+			}, {
+				isPersistent = true;
+			})
+		};
+		
+		if(persistent, { isPersistent = true });
 						
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color(alpha: 1.0))
@@ -441,7 +450,7 @@ CVWidgetKnob : CVWidget {
 		
 	reopen { |parent, wdgtBounds|
 		var thisWdgt, thisBounds;
-						
+								
 		if(parent.isNil, {
 			thisBounds = Rect(oldBounds.left, oldBounds.top, oldBounds.width-14, oldBounds.height-7);
 		}, {
@@ -462,7 +471,6 @@ CVWidgetKnob : CVWidget {
 			thisWdgt.wdgtControllersAndModels.oscDisplay.model.value_(
 				wdgtControllersAndModels.oscDisplay.model.value
 			).changed(\value);
-			wdgtControllersAndModels.midiOptions.model.postln;
 			thisWdgt.wdgtControllersAndModels.midiOptions.model.value_(
 				wdgtControllersAndModels.midiOptions.model.value
 			).changed(\value);
