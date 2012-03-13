@@ -16,13 +16,13 @@
 */
 
 CVWidget2D : CVWidget {
-
+	var <window, <guiEnv, <editorEnv;
 	var <slider2d, <rangeSlider, <numVal, <specBut;
 	var <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
-	// permanent widgets
-	var pWidget;
-	
-	*new { |parent, cvs, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server|
+	// persistent widgets
+	var isPersistent, oldBounds, oldName;
+
+	*new { |parent, cvs, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, persistent, server|
 		^super.new.init(
 			parent, 
 			cvs, 
@@ -32,16 +32,17 @@ CVWidget2D : CVWidget {
 			setup,
 			controllersAndModels,
 			cvcGui,
+			persistent, 
 			server
 		)
 	}
 	
-	init { |parentView, cvs, name, bounds, actions, setupArgs, controllersAndModels, cvcGui, server|
+	init { |parentView, cvs, name, bounds, actions, setupArgs, controllersAndModels, cvcGui, persistent, server|
 		var thisName, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, rightBarX, oscEditButHeight, right, left;
 		var actionLo, actionHi;
-								
+				
 		this.bgColor ?? { this.bgColor_(Color.white) };
 		
 		if(GUI.scheme === QtGUI, { 
@@ -63,8 +64,9 @@ CVWidget2D : CVWidget {
 		prCtrlButtonBank = ();
 		
 		this.wdgtActions ?? { this.wdgtActions = (lo: (), hi: ()) };
-						
+				
 		guiEnv = (lo: (), hi: ());
+		editorEnv = ();
 
 		cvcGui !? { isCVCWidget = true };
 		
@@ -99,18 +101,11 @@ CVWidget2D : CVWidget {
 		
 		setupArgs !? {
 			#[lo, hi].do({ |slot|
-				this.initControllersAndModels(controllersAndModels, slot);
 				setupArgs[slot] !? { setupArgs[slot][\midiMode] !? { this.setMidiMode(setupArgs[slot][\midiMode], slot) }};
-				setupArgs[slot] !? {
-					setupArgs[slot][\midiResolution] !? { this.setMidiResolution(setupArgs[slot][\midiResolution], slot) }
-				};
+				setupArgs[slot] !? { setupArgs[slot][\midiResolution] !? { this.setMidiResolution(setupArgs[slot][\midiResolution], slot) }};
 				setupArgs[slot] !? { setupArgs[slot][\midiMean] !? { this.setMidiMean(setupArgs[slot][\midiMean], slot) }};
-				setupArgs[slot] !? { setupArgs[slot][\ctrlButtonBank] !? {
-					this.setCtrlButtonBank(setupArgs[slot][\ctrlButtonBank], slot) }
-				};
-				setupArgs[slot] !? { setupArgs[slot][\softWithin] !? {
-					this.setSoftWithin(setupArgs[slot][\softWithin], slot) }
-				};
+				setupArgs[slot] !? { setupArgs[slot][\ctrlButtonBank] !? { this.setCtrlButtonBank(setupArgs[slot][\ctrlButtonBank], slot) }};
+				setupArgs[slot] !? { setupArgs[slot][\softWithin] !? { this.setSoftWithin(setupArgs[slot][\softWithin], slot) }};
 				setupArgs[slot] !? { setupArgs[slot][\calibrate] !? { this.setCalibrate(setupArgs[slot][\calibrate], slot) }};
 			})
 		};
@@ -139,7 +134,7 @@ CVWidget2D : CVWidget {
 		}, {
 			window = parentView;
 		});
-												
+										
 		cvcGui ?? { 
 			window.onClose_({
 				#[lo, hi].do({ |hilo|
@@ -156,23 +151,23 @@ CVWidget2D : CVWidget {
 								})
 							})
 						})
-					});
+					})
+				})
+			})
+		};
+
+		if(persistent == false or:{ persistent.isNil }, {
+			window.onClose_(window.onClose.addFunc({
+				#[lo, hi].do({ |hilo|
 					midiOscEnv[hilo].oscResponder !? { midiOscEnv[hilo].oscResponder.remove };
 					midiOscEnv[hilo].cc !? { midiOscEnv[hilo].cc.remove };
 					wdgtControllersAndModels[hilo].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 				})
-			});
-		};
-//		cvcGui ?? {
-//			window.onClose.addFunc({
-//				#[lo, hi].do({ |hilo|
-//					midiOscEnv[hilo].oscResponder !? { midiOscEnv[hilo].oscResponder.remove };
-//					midiOscEnv[hilo].cc !? { midiOscEnv[hilo].cc.remove };
-//					wdgtControllersAndModels[hilo].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
-//				})
-//			})
-//		};
-						
+			}))
+		}, {
+			isPersistent = true;
+		});
+		
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color.green)
 			.background_(Color.white)
@@ -252,11 +247,11 @@ CVWidget2D : CVWidget {
 				}, {
 					editor.hi.front(0)
 				});
-				wdgtControllersAndModels.hi.oscConnection.model.value_(
-					wdgtControllersAndModels.hi.oscConnection.model.value;
+				wdgtControllersAndModels.hi.oscDisplay.model.value_(
+					wdgtControllersAndModels.hi.oscDisplay.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.hi.midiConnection.model.value_(
-					wdgtControllersAndModels.hi.midiConnection.model.value
+				wdgtControllersAndModels.hi.midiDisplay.model.value_(
+					wdgtControllersAndModels.hi.midiDisplay.model.value
 				).changed(\value);
 			})
 		;
@@ -284,11 +279,11 @@ CVWidget2D : CVWidget {
 				}, {
 					editor.hi.front(1)
 				});
-				wdgtControllersAndModels.hi.oscDisplay.model.value_(
-					wdgtControllersAndModels.hi.oscDisplay.model.value;
+				wdgtControllersAndModels.hi.oscConnection.model.value_(
+					wdgtControllersAndModels.hi.oscConnection.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.hi.midiDisplay.model.value_(
-					wdgtControllersAndModels.hi.midiDisplay.model.value
+				wdgtControllersAndModels.hi.midiConnection.model.value_(
+					wdgtControllersAndModels.hi.midiConnection.model.value
 				).changed(\value);
 			})
 		;
@@ -604,73 +599,60 @@ CVWidget2D : CVWidget {
 				midiLearn: midiLearn[slot]
 			);
 			this.initControllerActions(slot);
+			oldBounds = window.bounds;
+			oldName = window.name;
 		})
 	}
-	
-	*newP { |permanentID, parent, cvs, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server|
-		^super.new.initP(permanentID, parent, cvs, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server);
-	}
-	
-	initP { |permanentID, parent, cvs, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server|
-		var pCvs, pWCM, pMidiOscEnv, pWdgtActions;
-		
-		permanentID ?? { Error("Please provide a permanentID.").throw };
-		pEnv !? {
-			if(pEnv.keys.select({ |i| i === permanentID.asSymbol }).size > 0 and:{
-				pEnv[permanentID.asSymbol].isNil	
-			}, {
-				Error("The given permanentID is already in use. Please choose a different one.").throw;
-			})
-		};
-		pEnv ?? { pEnv = IdentityDictionary.new };
-		pEnv[permanentID.asSymbol] ?? { pEnv.put(permanentID.asSymbol, ()) };
 
-		pWidget = this.class.new(
-			parent, 
-			pEnv[permanentID.asSymbol].cvs ?? { pCvs = cvs ? CV.new!2 }, 
-			name, 
-			bounds, 
-			defaultActions, 
-			setup, 
-			pEnv[permanentID.asSymbol].wcm ? controllersAndModels, 
-			if(pEnv[permanentID.asSymbol].midiOscEnv.isNil, { true }, { (midiOscEnv: pEnv[permanentID.asSymbol].midiOscEnv) }), 
-			server
-		);
-
-		pEnv[permanentID.asSymbol].wdgtActions !? { pWidget.wdgtActions_(pEnv[permanentID.asSymbol].wdgtActions) };
-		#[lo, hi].do({ |hilo|
-			pWidget.wdgtControllersAndModels[hilo].oscDisplay.model.value_(
-				pWidget.wdgtControllersAndModels[hilo].oscDisplay.model.value
-			).changed(\value);
-			pWidget.wdgtControllersAndModels[hilo].midiOptions.model.value_(
-				pWidget.wdgtControllersAndModels[hilo].midiOptions.model.value
-			).changed(\value);
-			pWidget.wdgtControllersAndModels[hilo].midiDisplay.model.value_(
-				pWidget.wdgtControllersAndModels[hilo].midiDisplay.model.value
-			).changed(\value);
-			pWidget.wdgtControllersAndModels[hilo].actions.model.value_(
-				pWidget.wdgtControllersAndModels[hilo].actions.model.value
-			).changed(\value);
-			pWidget.wdgtControllersAndModels[hilo].calibration.model.value_(
-				pWidget.wdgtControllersAndModels[hilo].calibration.model.value
-			).changed(\value);
+	reopen { |parent, wdgtBounds|
+		var thisWdgt, thisBounds;
+						
+		if(parent.isNil, {
+			thisBounds = Rect(oldBounds.left, oldBounds.top, oldBounds.width-14, oldBounds.height-7);
+		}, {
+			if(wdgtBounds.isNil, { thisBounds = oldBounds });
 		});
-
-		pWidget.window.onClose_({
-			pWCM = pWidget.wdgtControllersAndModels;
-			pMidiOscEnv = pWidget.midiOscEnv;
-			pWdgtActions = pWidget.wdgtActions;
+				
+		if(this.notNil and:{ this.isClosed and:{ isPersistent }}, {
+			thisWdgt = this.class.new(
+				parent: parent,
+				cvs: [widgetCV.lo, widgetCV.hi], 
+				name: oldName, 
+				bounds: thisBounds, 
+				setup: this.setup, 
+				controllersAndModels: wdgtControllersAndModels, 
+				cvcGui: (midiOscEnv: midiOscEnv),
+				persistent: true
+			).front;
 			#[lo, hi].do({ |hilo|
-				if(pWidget.editor[hilo].notNil and:{
-					pWidget.editor[hilo].isClosed.not
-				}, { pWidget.editor[hilo].close })
+				thisWdgt.wdgtControllersAndModels[hilo].oscDisplay.model.value_(
+					wdgtControllersAndModels[hilo].oscDisplay.model.value
+				).changed(\value);
+				wdgtControllersAndModels[hilo].midiOptions.model.postln;
+				thisWdgt.wdgtControllersAndModels[hilo].midiOptions.model.value_(
+					wdgtControllersAndModels[hilo].midiOptions.model.value
+				).changed(\value);
+				thisWdgt.wdgtControllersAndModels[hilo].midiDisplay.model.value_(
+					wdgtControllersAndModels[hilo].midiDisplay.model.value
+				).changed(\value);
+				thisWdgt.wdgtControllersAndModels[hilo].actions.model.value_(
+					wdgtControllersAndModels[hilo].actions.model.value
+				).changed(\value);
+				thisWdgt.wdgtControllersAndModels[hilo].calibration.model.value_(
+					wdgtControllersAndModels[hilo].calibration.model.value
+				).changed(\value);
 			});
-			pEnv[permanentID.asSymbol].cvs ?? { pEnv[permanentID.asSymbol].cvs_(pCvs) };
-			pEnv[permanentID.asSymbol].wcm ?? { pEnv[permanentID.asSymbol].wcm_(pWCM) };
-			pEnv[permanentID.asSymbol].midiOscEnv ?? { pEnv[permanentID.asSymbol].midiOscEnv_(pMidiOscEnv) };
-			pEnv[permanentID.asSymbol].wdgtActions ?? { pEnv[permanentID.asSymbol].wdgtActions_(pWdgtActions) };
+			thisWdgt.window.onClose_(thisWdgt.window.onClose.addFunc({
+				#[lo, hi].do({ |hilo|
+					if(thisWdgt.editor[hilo].notNil and:{
+						thisWdgt.editor[hilo].isClosed.not
+					}, { thisWdgt.editor[hilo].close });
+				})
+			}));
+			^thisWdgt;
+		}, {
+			"Either the widget you're trying to reopen hasn't been closed yet or it doesn't even exist.".warn;
 		})
-		^pWidget;
 	}
 	
 }

@@ -17,11 +17,12 @@
 
 CVWidgetKnob : CVWidget {
 	
+	var <window, <guiEnv, <editorEnv;
 	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
-	// permanent widget
-	var pWidget; 
+	// persistent widgets
+	var isPersistent, oldBounds, oldName;
 
-	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, server|
+	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, server|
 		^super.new.init(
 			parent, 
 			cv, 
@@ -31,11 +32,12 @@ CVWidgetKnob : CVWidget {
 			setup,
 			controllersAndModels, 
 			cvcGui, 
+			persistent, 
 			server // swing compatibility. well, ...
 		)
 	}
 	
-	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, server|
+	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, server|
 		var thisName, thisXY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
@@ -49,6 +51,7 @@ CVWidgetKnob : CVWidget {
 		prSoftWithin = 0.1;
 						
 		guiEnv = ();
+		editorEnv = ();
 		cvcGui !? { isCVCWidget = true };
 
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
@@ -92,10 +95,9 @@ CVWidgetKnob : CVWidget {
 		}, {
 			window = parentView;
 		});
-				
+								
 		cvcGui ?? { 
 			window.onClose_({
-				[window, thisName, editor].postln;
 				if(editor.notNil, {
 					if(editor.isClosed.not, {
 						editor.close;
@@ -106,19 +108,19 @@ CVWidgetKnob : CVWidget {
 							CVWidgetEditor.allEditors.removeAt(thisName.asSymbol)
 						})
 					})
-				});
+				})
+			})
+		};
+		
+		if(persistent == false or:{ persistent.isNil }, {
+			window.onClose_(window.onClose.addFunc({
 				midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove };
 				midiOscEnv.cc !? { midiOscEnv.cc.remove };
 				wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
-			});
-		};
-//		cvcGui ?? {
-//			window.onClose.addFunc({
-//				midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove };
-//				midiOscEnv.cc !? { midiOscEnv.cc.remove };
-//				wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
-//			})
-//		};
+			}))
+		}, {
+			isPersistent = true;
+		});
 						
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color(alpha: 1.0))
@@ -175,11 +177,11 @@ CVWidgetKnob : CVWidget {
 				}, {
 					editor.front(0)
 				});
-				wdgtControllersAndModels.oscConnection.model.value_(
-					wdgtControllersAndModels.oscConnection.model.value;
+				wdgtControllersAndModels.oscDisplay.model.value_(
+					wdgtControllersAndModels.oscDisplay.model.value;
 				).changed(\value);
-				wdgtControllersAndModels.midiConnection.model.value_(
-					wdgtControllersAndModels.midiConnection.model.value
+				wdgtControllersAndModels.midiDisplay.model.value_(
+					wdgtControllersAndModels.midiDisplay.model.value
 				).changed(\value);
 			})
 		;
@@ -433,68 +435,55 @@ CVWidgetKnob : CVWidget {
 		);
 
 		this.initControllerActions;
+		oldBounds = window.bounds;
+		oldName = window.name;
 	}
-	
-	*newP { |permanentID, parent, cv, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server|
-		^super.new.initP(permanentID, parent, cv, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server);
-	}
-	
-	initP { |permanentID, parent, cv, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, server|
-		var pCv, pWCM, pMidiOscEnv, pWdgtActions;
 		
-		permanentID ?? { Error("Please provide a permanentID.").throw };
-		pEnv !? {
-			if(pEnv.keys.select({ |i| i === permanentID.asSymbol }).size > 0 and:{
-				pEnv[permanentID.asSymbol].isNil	
-			}, {
-				Error("The given permanentID is already in use. Please choose a different one.").throw;
-			})
-		};
-		pEnv ?? { pEnv = IdentityDictionary.new };
-		pEnv[permanentID.asSymbol] ?? { pEnv.put(permanentID.asSymbol, ()) };
-
-		pWidget = this.class.new(
-			parent, 
-			pEnv[permanentID.asSymbol].cv ?? { pCv = cv ? CV.new }, 
-			name, 
-			bounds, 
-			defaultActions, 
-			setup, 
-			pEnv[permanentID.asSymbol].wcm ? controllersAndModels, 
-			if(pEnv[permanentID.asSymbol].midiOscEnv.isNil, { true }, { (midiOscEnv: pEnv[permanentID.asSymbol].midiOscEnv) }), 
-			server
-		);
-
-		pEnv[permanentID.asSymbol].wdgtActions !? { pWidget.wdgtActions_(pEnv[permanentID.asSymbol].wdgtActions) };
-		pWidget.wdgtControllersAndModels.oscDisplay.model.value_(
-			pWidget.wdgtControllersAndModels.oscDisplay.model.value
-		).changed(\value);
-		pWidget.wdgtControllersAndModels.midiOptions.model.value_(
-			pWidget.wdgtControllersAndModels.midiOptions.model.value
-		).changed(\value);
-		pWidget.wdgtControllersAndModels.midiDisplay.model.value_(
-			pWidget.wdgtControllersAndModels.midiDisplay.model.value
-		).changed(\value);
-		pWidget.wdgtControllersAndModels.actions.model.value_(
-			pWidget.wdgtControllersAndModels.actions.model.value
-		).changed(\value);
-		pWidget.wdgtControllersAndModels.calibration.model.value_(
-			pWidget.wdgtControllersAndModels.calibration.model.value
-		).changed(\value);
-
-		pWidget.window.onClose_({
-			pWCM = pWidget.wdgtControllersAndModels;
-			pMidiOscEnv = pWidget.midiOscEnv;
-			pWdgtActions = pWidget.wdgtActions;
-			if(pWidget.editor.notNil and:{
-				pWidget.editor.isClosed.not
-			}, { pWidget.editor.close });
-			pEnv[permanentID.asSymbol].cv ?? { pEnv[permanentID.asSymbol].cv_(pCv) };
-			pEnv[permanentID.asSymbol].wcm ?? { pEnv[permanentID.asSymbol].wcm_(pWCM) };
-			pEnv[permanentID.asSymbol].midiOscEnv ?? { pEnv[permanentID.asSymbol].midiOscEnv_(pMidiOscEnv) };
-			pEnv[permanentID.asSymbol].wdgtActions ?? { pEnv[permanentID.asSymbol].wdgtActions_(pWdgtActions) };
+	reopen { |parent, wdgtBounds|
+		var thisWdgt, thisBounds;
+						
+		if(parent.isNil, {
+			thisBounds = Rect(oldBounds.left, oldBounds.top, oldBounds.width-14, oldBounds.height-7);
+		}, {
+			if(wdgtBounds.isNil, { thisBounds = oldBounds });
+		});
+				
+		if(this.notNil and:{ this.isClosed and:{ isPersistent }}, {
+			thisWdgt = this.class.new(
+				parent: parent,
+				cv: widgetCV, 
+				name: oldName, 
+				bounds: thisBounds, 
+				setup: this.setup, 
+				controllersAndModels: wdgtControllersAndModels, 
+				cvcGui: (midiOscEnv: midiOscEnv),
+				persistent: true
+			).front;
+			thisWdgt.wdgtControllersAndModels.oscDisplay.model.value_(
+				wdgtControllersAndModels.oscDisplay.model.value
+			).changed(\value);
+			wdgtControllersAndModels.midiOptions.model.postln;
+			thisWdgt.wdgtControllersAndModels.midiOptions.model.value_(
+				wdgtControllersAndModels.midiOptions.model.value
+			).changed(\value);
+			thisWdgt.wdgtControllersAndModels.midiDisplay.model.value_(
+				wdgtControllersAndModels.midiDisplay.model.value
+			).changed(\value);
+			thisWdgt.wdgtControllersAndModels.actions.model.value_(
+				wdgtControllersAndModels.actions.model.value
+			).changed(\value);
+			thisWdgt.wdgtControllersAndModels.calibration.model.value_(
+				wdgtControllersAndModels.calibration.model.value
+			).changed(\value);
+			thisWdgt.window.onClose_(thisWdgt.window.onClose.addFunc({
+				if(thisWdgt.editor.notNil and:{
+					thisWdgt.editor.isClosed.not
+				}, { thisWdgt.editor.close });
+			}));
+			^thisWdgt;
+		}, {
+			"Either the widget you're trying to reopen hasn't been closed yet or it doesn't even exist.".warn;
 		})
-		^pWidget;
 	}
-		
+	
 }

@@ -17,8 +17,6 @@
 
 CVWidget {
 
-	classvar <pEnv;
-	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
@@ -269,7 +267,7 @@ CVWidget {
 				wdgtControllersAndModels !? {
 					wdgtControllersAndModels.midiOptions.model.value_(
 						(
-							midiMode: mode,
+							midiMode: prMidiMode,
 							midiMean: prMidiMean,
 							ctrlButtonBank: prCtrlButtonBank,
 							midiResolution: prMidiResolution,
@@ -283,7 +281,7 @@ CVWidget {
 				wdgtControllersAndModels[slot.asSymbol] !? {
 					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
 						(
-							midiMode: mode,
+							midiMode: prMidiMode[slot.asSymbol],
 							midiMean: prMidiMean[slot.asSymbol],
 							ctrlButtonBank: prCtrlButtonBank[slot.asSymbol],
 							midiResolution: prMidiResolution[slot.asSymbol],
@@ -292,7 +290,7 @@ CVWidget {
 					).changed(\value);
 				}
 			}
-		)
+		);
 	}
 	
 	getMidiMode { |slot|
@@ -312,7 +310,7 @@ CVWidget {
 					wdgtControllersAndModels.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode,
-							midiMean: meanval,
+							midiMean: prMidiMean,
 							ctrlButtonBank: prCtrlButtonBank,
 							midiResolution: prMidiResolution,
 							softWithin: prSoftWithin
@@ -326,7 +324,7 @@ CVWidget {
 					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
 						(
 							midiMode: prMidiMode[slot.asSymbol],
-							midiMean: meanval,
+							midiMean: prMidiMean[slot.asSymbol],
 							ctrlButtonBank: prCtrlButtonBank[slot.asSymbol],
 							midiResolution: prMidiResolution[slot.asSymbol],
 							softWithin: prSoftWithin[slot.asSymbol]
@@ -357,7 +355,7 @@ CVWidget {
 							midiMean: prMidiMean,
 							ctrlButtonBank: prCtrlButtonBank,
 							midiResolution: prMidiResolution,
-							softWithin: threshold
+							softWithin: prSoftWithin
 						)
 					).changed(\value);
 				}
@@ -371,7 +369,7 @@ CVWidget {
 							midiMean: prMidiMean[slot.asSymbol],
 							ctrlButtonBank: prCtrlButtonBank[slot.asSymbol],
 							midiResolution: prMidiResolution[slot.asSymbol],
-							softWithin: threshold
+							softWithin: prSoftWithin[slot.asSymbol]
 						)
 					).changed(\value);
 				}
@@ -401,7 +399,7 @@ CVWidget {
 						(
 							midiMode: prMidiMode,
 							midiMean: prMidiMean,
-							ctrlButtonBank: numSliders.asString,
+							ctrlButtonBank: prCtrlButtonBank,
 							midiResolution: prMidiResolution,
 							softWithin: prSoftWithin
 						)
@@ -409,18 +407,13 @@ CVWidget {
 				}
 			},
 			{
-				if(numSliders.asString == "nil" or:{ numSliders.asInt === 0 }, {
-					prCtrlButtonBank.put(slot, nil);
-				}, {
-					prCtrlButtonBank.put(slot.asSymbol, numSliders.asInt);
-				});
-//				prCtrlButtonBank.put(slot.asSymbol, numSliders);
+				prCtrlButtonBank.put(slot.asSymbol, numSliders);
 				wdgtControllersAndModels[slot.asSymbol] !? {
 					wdgtControllersAndModels[slot.asSymbol].midiOptions.model.value_(
 						(
 							midiMode: prMidiMode[slot.asSymbol],
 							midiMean: prMidiMean[slot.asSymbol],
-							ctrlButtonBank: numSliders.asString,
+							ctrlButtonBank: prCtrlButtonBank[slot.asSymbol],
 							midiResolution: prMidiResolution[slot.asSymbol],
 							softWithin: prSoftWithin[slot.asSymbol]
 						)
@@ -449,7 +442,7 @@ CVWidget {
 							midiMode: prMidiMode,
 							midiMean: prMidiMean,
 							ctrlButtonBank: prCtrlButtonBank,
-							midiResolution: resolution,
+							midiResolution: prMidiResolution,
 							softWithin: prSoftWithin
 						)
 					).changed(\value);
@@ -463,7 +456,7 @@ CVWidget {
 							midiMode: prMidiMode[slot.asSymbol],
 							midiMean: prMidiMean[slot.asSymbol],
 							ctrlButtonBank: prCtrlButtonBank[slot.asSymbol],
-							midiResolution: resolution,
+							midiResolution: prMidiResolution[slot.asSymbol],
 							softWithin: prSoftWithin[slot.asSymbol]
 						)
 					).changed(\value);
@@ -487,16 +480,18 @@ CVWidget {
 		});
 		switch(this.class, 
 			CVWidgetKnob, {
-				wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
+				prCalibrate = bool;
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value
 				).changed(\value);
+				wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
 			},
 			{
-				wdgtControllersAndModels[slot.asSymbol].calibration.model.value_(bool).changed(\value);
+				prCalibrate[slot.asSymbol] = bool;
 				wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_(
 					wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value
 				).changed(\value);
+				wdgtControllersAndModels[slot.asSymbol].calibration.model.value_(bool).changed(\value);
 			}
 		)
 	}
@@ -812,27 +807,15 @@ CVWidget {
 			wcm.midiOptions = ();
 		};
 		wcm.midiOptions.model ?? {
-			if(slot.isNil, {
-				wcm.midiOptions.model = Ref(
-					(
-						midiMode: prMidiMode, 
-						midiMean: prMidiMean, 
-						ctrlButtonBank: prCtrlButtonBank, 
-						midiResolution: prMidiResolution, 
-						softWithin: prSoftWithin
-					)
+			wcm.midiOptions.model = Ref(
+				(
+					midiMode: prMidiMode, 
+					midiMean: prMidiMean, 
+					ctrlButtonBank: prCtrlButtonBank, 
+					midiResolution: prMidiResolution, 
+					softWithin: prSoftWithin
 				)
-			}, {
-				wcm.midiOptions.model = Ref(
-					(
-						midiMode: prMidiMode[slot], 
-						midiMean: prMidiMean[slot], 
-						ctrlButtonBank: prCtrlButtonBank[slot], 
-						midiResolution: prMidiResolution[slot], 
-						softWithin: prSoftWithin[slot]
-					)
-				)
-			})
+			)
 		};
 		wcm.mapConstrainterLo ?? { 
 			wcm.mapConstrainterLo = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[0]);
@@ -887,7 +870,6 @@ CVWidget {
 		};
 
 		wcm.calibration.controller.put(\value, { |theChanger, what, moreArgs|
-			if(slot.notNil, { prCalibrate[slot] = theChanger.value }, { prCalibrate = theChanger.value });
 			theChanger.value.switch(
 				true, { 
 					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
@@ -1033,10 +1015,10 @@ CVWidget {
 				makeCCResponder = { |argSrc, argChan, argNum|
 					if(midiOscEnv.cc.isNil, {
 						CCResponder(ccResponderAction, argSrc, argChan, argNum, nil);
-					}, {
+					}/*, {
 						ccResponderAction.def.postcs;
 						midiOscEnv.cc.function_(ccResponderAction);
-					})
+					}*/)
 				};
 				
 				{
@@ -1200,50 +1182,20 @@ CVWidget {
 	}
 	
 	prInitMidiOptions { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		var thisMidiMode, thisMidiMean, thisSoftWithin, thisCtrlButtonBank, thisMidiResolution;
 
 		wcm.midiOptions.controller ?? {
 			wcm.midiOptions.controller = SimpleController(wcm.midiOptions.model);
 		};
 		
 		wcm.midiOptions.controller.put(\value, { |theChanger, what, moreArgs|
-			if(slot.notNil, {
-				thisMidiMode = prMidiMode[slot] = theChanger.value.midiMode;
-				thisMidiMean = prMidiMean[slot] = theChanger.value.midiMean;
-				thisSoftWithin = prSoftWithin[slot] = theChanger.value.softWithin;
-				thisMidiResolution = prMidiResolution[slot] = theChanger.value.midiResolution;
-				if(theChanger.value.ctrlButtonBank.isNil or:{ 
-					theChanger.value.ctrlButtonBank == "nil" or:{ 
-						theChanger.value.ctrlButtonBank.asInt == 0
-					}
-				}, {
-					thisCtrlButtonBank = prCtrlButtonBank[slot] = nil;
-				}, {
-					thisCtrlButtonBank = prCtrlButtonBank[slot] = theChanger.value.ctrlButtonBank.asInt;
-				});
-			}, {
-				thisMidiMode = prMidiMode = theChanger.value.midiMode;
-				thisMidiMean = prMidiMean = theChanger.value.midiMean;
-				thisSoftWithin = prSoftWithin = theChanger.value.softWithin;
-				thisMidiResolution = prMidiResolution = theChanger.value.midiResolution;
-				if(theChanger.value.ctrlButtonBank.isNil or:{ 
-					theChanger.value.ctrlButtonBank == "nil" or:{ 
-						theChanger.value.ctrlButtonBank.asInt == 0
-					}
-				}, {
-					thisCtrlButtonBank = prCtrlButtonBank = nil;
-				}, {
-					thisCtrlButtonBank = prCtrlButtonBank = theChanger.value.ctrlButtonBank.asInt;
-				});
-			});
 			if(thisGuiEnv.editor.notNil and:{
 				thisGuiEnv.editor.isClosed.not
 			}, {
-				thisGuiEnv.editor.midiModeSelect.value_(thisMidiMode);
-				thisGuiEnv.editor.midiMeanNB.value_(thisMidiMean);
-				thisGuiEnv.editor.softWithinNB.value_(thisSoftWithin);
-				thisGuiEnv.editor.midiResolutionNB.value_(thisMidiResolution);
-				thisGuiEnv.editor.ctrlButtonBankField.string_(thisCtrlButtonBank);
+				thisGuiEnv.editor.midiModeSelect.value_(theChanger.value.midiMode);
+				thisGuiEnv.editor.midiMeanNB.value_(theChanger.value.midiMean);
+				thisGuiEnv.editor.softWithinNB.value_(theChanger.value.softWithin);
+				thisGuiEnv.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
+				thisGuiEnv.editor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
 			})
 		})
 	}
@@ -1256,18 +1208,16 @@ CVWidget {
 		};
 
 		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
+			switch(prCalibrate.class, 
+				Event, { thisCalib = prCalibrate[slot] },
+				thisCalib = prCalibrate
+			);
 						
 			if(theChanger.value.size == 4, {
 // 				OSCresponderNode: t, r, msg
 // 				OSCfunc: msg, time, addr // for the future
 				oscResponderAction = { |t, r, msg|
-
-					switch(prCalibrate.class, 
-						Event, { thisCalib = prCalibrate[slot] },
-						{ thisCalib = prCalibrate }
-					);
-			
-					if(thisCalib, {
+					if(thisCalib, { 
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
 						}, {
@@ -1284,7 +1234,7 @@ CVWidget {
 							if(msg[theChanger.value[3]] > midiOscEnv.calibConstraints.hi, {
 								midiOscEnv.calibConstraints.hi = msg[theChanger.value[3]];
 								wcm.oscInputRange.model.value_([
-									wcm.oscInputRange.model.value[0], 
+									wcm.oscInputRange.model.value[1], 
 									msg[theChanger.value[3]]
 								]).changed(\value);
 							});
@@ -1316,10 +1266,10 @@ CVWidget {
 					midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;
 //					midiOscEnv.oscResponder = OSCFunc(oscResponderAction, theChanger.value[2].asSymbol, netAddr);
 					midiOscEnv.oscMsgIndex = theChanger.value[3];
-				}, {
-//					oscResponderAction.def.postcs;
+				}/*, {
+					oscResponderAction.def.postcs;
 					midiOscEnv.oscResponder.action_(oscResponderAction);
-				});
+				}*/);
 				
 				wcm.oscDisplay.model.value_(
 					(
