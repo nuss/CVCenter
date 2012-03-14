@@ -95,12 +95,12 @@ A code::TextField:: displaying the channel for an existing code::CCResponder:: o
 returns:: a code::TextField::
 METHOD:: midiCtrl
 A code::TextField:: displaying the controller-number of an existing code::CCResponder:: or, if none is present, one may use this field to set the controller-number for which the code::CCResponder:: shall be created.
-note:: SuperCollider numbers controller-numbers internally beginning with code::0:: - if code::0:: gets entered here the controller will be displayed as code::1:: as most devices will probably number their knobs and sliders beginning with code::1::. Also, the way controller numbers are displayed is related to the code::ctrlButtonBank:: setting which can be set with link::Classes/CVWidget#-setCtrlButtonBank::
+note:: SuperCollider numbers hardware-controllers internally beginning with code::0:: - if code::0:: gets entered here the controller will be displayed as code::1:: as most devices will probably number their knobs and sliders beginning with code::1::. Also, the way controller-numbers are displayed is related to the code::ctrlButtonBank:: setting which can be set with link::Classes/CVWidget#-setCtrlButtonBank::
 :: 
 
 returns:: a code::TextField::
 METHOD:: oscEditBut
-A code::Button:: that links to the widget's OSC-tab within the code::CVWidgetEditor::. If an code::OSCresponder:: is present, the button-label will display the commandname, the message-slot and the current link::Classes/CVWidget#-setOscMapping#OSC-mapping:: (if the button is big enough to display all this information - mapping can be code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp::).
+A code::Button:: that links to the widget's OSC-tab within the code::CVWidgetEditor::. If an code::OSCresponder:: is present, the button-label will display the command-name, the message-slot and the current link::Classes/CVWidget#-setOscMapping#OSC-mapping:: (if the button is big enough to display all this information - mapping can be code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp::).
 
 returns:: a code::Button::
 METHOD:: calibBut

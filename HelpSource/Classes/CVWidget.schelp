@@ -50,7 +50,7 @@ only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::
 returns:: an code::Integer::
 
 METHOD:: setMidiMean
-Devices which output a in-/decremtal may output a standard value + in-/decrement. code::midiMean:: gets automatically subtracted from this value, so in-/decrement remains. Applies only if midiMode is set to code::1::.
+Devices which output a in-/decremental may output a standard value + in-/decrement. code::midiMean:: gets automatically subtracted from this value, so in-/decrement remains. Applies only if midiMode is set to code::1::.
 
 argument:: meanval
 an code::Integer::. default: code::64::
@@ -133,7 +133,7 @@ only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::
 returns::  a code::Float::
 
 METHOD:: setCalibrate
-Unlike MIDI the range of incoming values isn't 0-127 - it is unknown at the time of initialization of the OSC-responder. All CVWidgets have an inbuilt calibration mechanism that determines the range automatically. At initialization the range is set to [0.0001, 0.0001]. If the mechanism detects a value that is lower or higher than the values set at initialization it will set the constraints accordingly. This method allows to stop or start the calibration-process.
+Unlike MIDI the range of incoming OSC-values isn't 0-127 - it is unknown at the time of initialization of the OSC-responder. All CVWidgets have an inbuilt calibration mechanism that determines the range automatically. At initialization the range is set to [0.0001, 0.0001]. If the mechanism detects a value that is lower or higher than the values set at initialization it will set the constraints accordingly. This method allows to stop or start the calibration-process.
 
 argument:: bool
 a code::Boolean::, indicating wether the calibration-process shall be started or stopped.
@@ -318,7 +318,7 @@ returns:: the receiver
 subsection:: Models and Controllers, internal bookkeeping
 
 METHOD:: wdgtControllersAndModels
-CVWidgets are based on a MVC-paradigm (MVC = "model - view - controller"). Any time a new CVWidget gets instantiated the models get initialized. Any time the model is changed the function in the regarding controller gets invoked. 
+CVWidgets are designed in an MVC-architecture (MVC = "model - view - controller"). Any time a new CVWidget gets instantiated the models get initialized. Any time the model is changed the function in the regarding controller gets invoked. 
 note::Do not try to change the models directly, e.g. by doing something like 
 
 code::myWidget.wdgtControllersAndModels.someModel = someValue:: 
@@ -383,7 +383,7 @@ returns:: either a code::CV:: ( code::CVWidgetKnob::) or an code::Event:: ( code
 
 METHOD:: wdgtActions
 All actions (active and inactive) specified for the given widget.
-note:: Though this has to be a setter/getter for some reason strong::do not attempt to set an action like:: code::myWidget.wdgtActions_(…)::. Rather use link::#-addAction::, link::#-removeAction:: resp. link::#-activateAction::
+note:: Though this has to be a setter/getter for some reason. strong::Do not attempt to set an action like:: code::myWidget.wdgtActions_(…)::. Rather use link::#-addAction::, link::#-removeAction:: resp. link::#-activateAction::
 
 returns:: an code::Event:: containing active and inactive actions of a widget.
 
