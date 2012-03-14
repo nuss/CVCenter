@@ -1,0 +1,123 @@
+CLASS:: CVWidget2D
+summary:: a control-widget that can either be embedded in other views or opened as a standalone-widget, offering easy connections with external MIDI-/OSC-hard- and software.
+categories:: GUI, CV, MIDI, OSC
+related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
+DESCRIPTION::
+A CVWidget2D is widget that can be used to set e.g. controls in running code::Synth::s, code::Ndef::s, code::ProxySpace:: slots, code::NodeProxy::s and other other values that can be set at runtime. Also it may be used in connection with code::Pattern::s. Contrary to code::CVWidgetKnob:: it holds two code::CV::s.
+CLASSMETHODS::
+METHOD:: new
+Create a new CVWidget2D. To display the widget on screen you must call code::front:: on the resulting object.
+
+argument:: parent
+an instance of code::Window:: - optional. If none is given the it will be created internally.
+
+argument:: cvs
+an code::Array:: of code::CV::s - optional. If none is given it will be created internally. The array may hold code::2:: code::CV::s.
+
+argument:: name
+a code::String:: or a code::Symbol:: - optional. If none is given the widget will be named "knob".
+
+argument:: bounds
+a code::Rect:: - optional. If none is given the widget will be created with a default size.
+
+argument:: defaultActions
+an code::Event:: holding code::2:: code::Function::s - optional. By default the code::Event:: has to look like code::(lo: lofunction, hi: hifunction)::. The functions may be given as a code::Function:: or a code::String:: that compiles to one when link::Classes/String#-interpret#interpret:: is called on it. If an argument is added to the functions it will provide the widget's code::CV::. E.g.: code::{ arg cv; cv.value.postln }::
+
+argument:: setup
+optional - an code::Event:: containing the following optional keys in two separate code::Events:: -> code::(lo:(<setup-lo>), hi:(<setup-hi)):::
+
+definitionList::
+## midiMode || see link::Classes/CVWidget#-setMidiMode::. default: code::0::
+## midiMean || see link::Classes/CVWidget#-setMidiMean::. default: code::64::
+## midiResolution || see link::Classes/CVWidget#-setMidiResolution::. default: code::1::
+## softWithin || see link::Classes/CVWidget#-setSoftWithin::. default: code::0.1::
+## ctrlButtonBank || see link::Classes/CVWidget#-setCtrlButtonBank::. default: code::nil::
+## calibrate || see link::Classes/CVWidget#-setCalibrate::. default: code::true::
+::
+
+argument:: controllersAndModels
+if a widget wraps a code::CV:: that has been created within some the CVWidget the models and controllers of that other widget can be added here. CVWidget2D expects the parameters to be passed in in an code::Event:: containing the keys code::\lo:: and code::\hi::: code::(lo: wdgtControllersAndModels-lo, hi: wdgtControlersAndModels-hi)::. However, it is emphasis::not:: recommended to do so as there are specific methods that allow you to recreate widgets that have already been closed. See also link::Classes/CVWidget#-wdgtControllersAndModels::. 
+
+argument:: cvcGui
+a multi-purpose argument: usually you will not set anything here. It is used with the link::#-open:: method resp. CVCenter. Within these it is used to pass in OSC-/MIDI-responders resp. the widgets MIDI-/OSC-environment. See also link::Classes/CVWidget#-midiOscEnv::
+
+argument:: persistent
+if set to code::true:: the widget's OSC-/MIDI-responders will not be removed when the widget gets closed - default: code::nil::
+
+argument:: server
+only used for code::SwingOSC:: compatability (untested)
+
+returns:: this (a CVWidget2D)
+INSTANCEMETHODS::
+METHOD:: open
+If a widget has been created with the argument code::persistent:: set to true the user may reopen the widget with this method. This is basically a workaround due to the fact that GUIs in SuperCollider usually can't be opened again once they have been closed (even though executing the variable storing the the regarding object still returns the object). However, rather than reopening the old widget this method will create a new one, holding all properties, the CV and MIDI-/OSC-responders. In order to make this work as desired one should apply the following syntax where code::x:::
+
+code::x = x.open // the old widget was stored in x which will afterwards hold the new widget::
+
+See example in link::Classes/CVWidget#reusable_widgets::
+
+argument:: parent
+a code::Window:: or nil - if none is provided the window will be created internally
+
+argument:: wdgtBounds
+a code::Rect:: or nil - if none is provided the bounds of the old widget will be used.
+
+returns:: a code::CVCWidgetKnob::
+subsection:: GUI-elements
+note::Opposite to code::CVWidgetKnob:: many elements of the GUI are returned as code::Event::s containing a code::\lo:: and a code::\hi:: element. Basically all of the following elements are strong::getters:: but not strong::setters::. However, it is possible to change the value returned in code::\lo:: or code::\hi:: as they are simply values within an code::Event:: - strong::do not attempt to do so or unexpected things will happen!::
+::
+
+METHOD:: slider2d
+The code::Slider2D:: on the top of the left side of the widget. It allows the user to set two values at once. The horizontal axis of the slider represents the value of link::Classes/CVWidget#-widgetCV#widgetCV.lo::, the vertical axis the value of link::Classes/CVWidget#-widgetCV#widgetCV.hi::.
+
+returns:: a code::Slider2D::
+
+METHOD:: rangeSlider
+The code::RangeSlider:: on the bottom of the code::Slider2D::. It allows the user to set two values at once. The left end of the bar represents the the value of link::Classes/CVWidget#-widgetCV#widgetCV.lo::, the right end the value of link::Classes/CVWidget#-widgetCV#widgetCV.hi::.
+
+returns:: a code::RangeSlider::
+METHOD:: numVal
+An code::Event:: containing two code::NumberBox::es, displaying or setting the current value of the widget's code::CV::s.
+
+returns:: an code::Event::
+METHOD:: specBut
+An code::Event:: containing two code::Button::s, linking to the regarding spec-tab within the widget's editor ( code::\lo:: or code::\hi::) (see also: code::CVWidgetEditor::)
+
+returns:: an code::Event::
+METHOD:: midiHead
+An code::Event:: containing two code::Button::s linking to the regarding MIDI-tab within the widget's editor ( code::\lo:: or code::\hi::) (see also: code::CVWidgetEditor::)
+
+returns:: an code::Event::
+METHOD:: midiLearn
+An code::Event:: containing two code::Button::s ( code::\lo:: or code::\hi::) that, if clicked, either triggers the MIDI-learn functionality (button-label: "L") or creates a code::CCResponder:: for the values entered in link::#-midiSrc::, link::#-midiChan:: or/and link::#-midiCtrl:: (button-label: "C"). If a code::CCResponder:: is present the button-label gets changed to "X" - upon clicking the responder gets removed again.
+
+returns:: an code::Event::
+METHOD:: midiSrc
+An code::Event:: containing two code::TextField::s ( code::\lo:: and code::\hi::), each displaying the ID of a connected MIDI-device. If no code::CCResponder:: is present one may enter the ID of a device (if known) and when clicking the link::#-midiLearn:: button the widget will create a code::CCResponder:: listening to that device.
+
+returns:: an code::Event::
+METHOD:: midiChan
+An code::Event:: containing two code::TextField::s ( code::\lo:: and code::\hi::), each displaying the channel for an existing code::CCResponder:: or, if none is present, one may use this field to set the channel for which the code::CCResponder:: shall be created.
+
+returns:: an code::Event::
+METHOD:: midiCtrl
+An code::Event:: containing two code::TextField::s ( code::\lo:: and code::\hi::), each displaying the controller-number of an existing code::CCResponder:: or, if none is present, one may use this field to set the controller-number for which the code::CCResponder:: shall be created.
+note:: SuperCollider numbers hardware-controllers internally beginning with code::0:: - if code::0:: gets entered here the controller will be displayed as code::1:: as most devices will probably number their knobs and sliders beginning with code::1::. Also, the way controller-numbers are displayed is related to the code::ctrlButtonBank:: setting which can be set with link::Classes/CVWidget#-setCtrlButtonBank::
+:: 
+
+returns:: an code::Event::
+METHOD:: oscEditBut
+An code::Event:: containing two code::Button::s ( code::\lo:: and code::\hi::) that link to the widget's OSC-tabs within the regarding code::CVWidgetEditor::. If an code::OSCresponder:: is present, the button-label will display the command-name, the message-slot and the current link::Classes/CVWidget#-setOscMapping#OSC-mapping:: (if the button is big enough to display all this information - mapping can be code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp::).
+
+returns:: an code::Event::
+METHOD:: calibBut
+An code::Event:: containing two code::Button::s that link to the OSC-tabs within the regarding code::CVWidgetEditor::, displaying the current link::CLasses/CVWidget#-setCalibrate#calibration::-status.
+
+returns:: an code::Event::
+METHOD:: actionsBut
+An code::Event:: containing two code::Button::s, each linking to the actions-tab within the widget's regarding code::CVWidgetEditor::s. The button displays the number of active actions resp. existing actions in total.
+returns:: an code::Event::
+private:: init
+
+EXAMPLES::
+See examples in link::Classes/CVWidget#examples::

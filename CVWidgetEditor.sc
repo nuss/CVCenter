@@ -23,12 +23,12 @@ CVWidgetEditor {
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut, <calibNumBoxes;
-	var <deviceListMenu, <cmdListMenu, addDeviceBut, thisCmdNames;
+	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 	var <ipField, <portField, <nameField, <indexField;
 	var <inputConstraintLoField, <inputConstraintHiField, <alwaysPosField;
 	var <mappingSelect;
 	var <connectorBut;
-	var <actionName, <enterAction, <enterActionBut, <actionsList;
+	var actionName, enterAction, enterActionBut, <actionsList;
 	var name;
 	var flow0, flow1, flow2, flow3;
 	

@@ -1,0 +1,185 @@
+
+CLASS:: CVWidgetEditor
+summary:: a GUI for editing widgets and their parameters: specs, MIDI, OSC, actions...
+categories:: GUI, CV, MIDI, OSC
+related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/SimpleController, Classes/ControlSpec
+
+DESCRIPTION::
+The interface defined within code::CVWidget:: reps. its subclasses code::CVWidgetKnob:: and code::CVWidget2D:: defines a number of methods that can also be triggered via their GUI. However these GUIs don't offer enough space to display all options a widget incorporates. Therefore each widget has an inbuilt editor which is defined within CVWidgetEditor.
+note::CVWidgetEditor is not supposed to be used directly. Rather editors should always be instantiated from within the widget it belongs to.::
+
+
+CLASSMETHODS::
+
+private:: allEditors
+METHOD:: new
+Opens a new editor for the widget specified by code::widgetName::
+
+
+argument:: widget
+the widget-object: either a code::CVWidgetKnob:: or a code::CVWidget2D::
+
+argument:: widgetName
+a code::Symbol::, reflecting the widget's name
+
+argument:: tab
+an code::Integer:: specifying which tab of the editor shall be focused when the editor opens. Each editor contains 4 tabs ( see also code::TabbedView::): "Specs", "MIDI", "OSC" and "Action", each addressed by an integer value from code::0:: to code::3::
+
+argument:: slot
+if the widget is a code::CVWidget2D:: this parameter is necessary to reflect the widget's slot for which the editor will be created.
+
+returns:: a code::CVWidgetEditor::
+
+
+INSTANCEMETHODS::
+subsection:: Common GUI properties
+METHOD:: window
+The editor's window
+
+returns:: a code::Window::
+
+METHOD:: tabs
+The editor's tabs, defined by a code::TabbedView:: 
+
+returns:: a code::TabbedView::
+
+subsection:: The "Specs"-tab
+
+METHOD:: specField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: specsList
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: specsListSpecs
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiModeSelect
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiMeanNB
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: softWithinNB
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: ctrlButtonBankField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiResolutionNB
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiLearnBut
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiSrcField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiChanField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: midiCtrlField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: calibBut
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: calibNumBoxes
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: ipField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: portField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: nameField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: indexField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: inputConstraintLoField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: inputConstraintHiField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: alwaysPosField
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: mappingSelect
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: connectorBut
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: actionsList
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: init
+(describe method here)
+
+argument:: widget
+(describe argument here)
+
+argument:: widgetName
+(describe argument here)
+
+argument:: tab
+(describe argument here)
+
+argument:: slot
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: front(describe method here)argument:: tab(describe argument here)returns:: (returnvalue)METHOD:: close(describe method here)argument:: slot(describe argument here)returns:: (returnvalue)METHOD:: isClosed(describe method here)returns:: (returnvalue)METHOD:: amendActionsList(describe method here)argument:: widget(describe argument here)argument:: addRemove(describe argument here)argument:: name(describe argument here)argument:: action(describe argument here)argument:: slot(describe argument here)argument:: active(describe argument here)returns:: (returnvalue)EXAMPLES::code::(some example code)::

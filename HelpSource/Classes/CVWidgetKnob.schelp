@@ -21,7 +21,7 @@ argument:: bounds
 a code::Rect:: - optional. If none is given the widget will be created with a default size.
 
 argument:: defaultAction
-a code::Function:: or a code::String:: that compiles to one - optional. If an argument is added to the function it will provide the widgt's code::CV::
+optional - a code::Function:: or a code::String:: that compiles to one when link::Classes/String#-interpret#interpret:: is called on it. If an argument is added to the function it will provide the widget's code::CV::. E.g.: code::{ arg cv; cv.value.postln }:: 
 
 argument:: setup
 optional - an code::Event:: containing the following optional keys:
