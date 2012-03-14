@@ -16,6 +16,7 @@
 */
 
 CVWidgetEditor {
+
 	classvar <allEditors;
 	var thisEditor, <window, <tabs, editorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;

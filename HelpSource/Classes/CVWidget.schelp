@@ -485,7 +485,8 @@ METHOD:: isClosed
 returns:: code::true:: if the widget has been closed, otherwise code::false::
 
 EXAMPLES::
-
+subsection:: basic usage
+Like code::*new:: the method code::reopen:: is implemented within CVWidgetKnob
 code::
 // create some simple CVWidget
 ~twoDee = CVWidget2D.new.front;
@@ -530,4 +531,32 @@ Server.default.waitForBoot{
 
 ~noise.free;
 ~twoDee.close;
+::
+::
+
+subsection:: reusable widgets
+By default windows created in SC lack the ability to be opened again once they're closed (even evaluating the variable under which the window has been created will still return the window). The following section describes a workaround in CVWidget (resp. code::CVWidgetKnob:: and code::CVWidget2D::) that enables the user to keep a widget's responders and open and close it as many times as the user needs to (strong::open:: is implemented in link::Classes/CVWidgetKnob#-open#CVWidgetKnob:: and link::Classes/CVWidget2D#-open#CVWidget2D::).
+code::
+// create some widgets
+// if a widget is made 'persistent' its OSC-/MID-responders 
+// will not be removed when the widget gets closed
+~knob = CVWidgetKnob(bounds: Rect(490, 0, 80, 210), persistent: true).front;
+~twoDee = CVWidget2D(bounds: Rect(330, 0, 140, 210), persistent: true).front;
+
+// make some noise
+Server.default.waitForBoot{ ~noise = { SinOsc.ar(\freq.kr([0, 0]), mul: \amp.kr) }.play };
+
+// set various properties of the widgets
+~knob.setMidiMode(1).setCtrlButtonBank(16).addAction(\setAmp, { |cv| ~noise.set(\amp, cv.value) });
+#[lo, hi].do({ |hilo| ~twoDee.setSpec(#[20, 220, \exp], hilo).setOscMapping(\linexp, hilo).setMidiMode(1, hilo).setCtrlButtonBank(16, hilo) });
+~twoDee.addAction(\setFreq, { |cv| ~noise.setn(\freq, [cv.value, ~twoDee.widgetCV.hi.value]) }, \lo);
+~twoDee.addAction(\setFreq, { |cv| ~noise.setn(\freq, [~twoDee.widgetCV.lo.value, cv.value]) }, \hi);
+
+// close the widgets and open them again
+// note: rather than simply opening them you should re-assign while opening them
+// as the open-method always returns a new widget but it will keep properties, 
+// actions, responders etc. of the old one
+~knob = ~knob.open;
+~twoDee = ~twoDee.open;
+::
 ::

@@ -17,7 +17,6 @@
 
 CVWidgetKnob : CVWidget {
 	
-	var <window, <guiEnv, <editorEnv;
 	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
@@ -51,7 +50,6 @@ CVWidgetKnob : CVWidget {
 		prSoftWithin = 0.1;
 						
 		guiEnv = ();
-		editorEnv = ();
 		cvcGui !? { isCVCWidget = true };
 
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
@@ -82,15 +80,12 @@ CVWidgetKnob : CVWidget {
 		
 		if(bounds.isNil, {
 			thisXY = 7@0;
+			thisX = 50; thisY = 50;
 			thisWidth = 52;
 			thisHeight = 181;
 		}, {
 			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
-			if(bounds.isNil, {
-				thisX = 50; thisY = 50;
-			}, {
-				thisX = bounds.left; thisY = bounds.top;
-			});
+			thisX = bounds.left; thisY = bounds.top;
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
@@ -129,7 +124,7 @@ CVWidgetKnob : CVWidget {
 			})
 		};
 		
-		if(persistent, { isPersistent = true });
+		persistent !? { if(persistent, { isPersistent = true }) };
 						
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color(alpha: 1.0))
@@ -448,7 +443,7 @@ CVWidgetKnob : CVWidget {
 		oldName = window.name;
 	}
 		
-	reopen { |parent, wdgtBounds|
+	open { |parent, wdgtBounds|
 		var thisWdgt, thisBounds;
 								
 		if(parent.isNil, {

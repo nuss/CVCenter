@@ -17,6 +17,7 @@
 
 CVWidget {
 
+	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
@@ -24,6 +25,8 @@ CVWidget {
 	var <widgetBg, <label, <nameField, wdgtInfo; // elements contained in any kind of CVWidget
 	var widgetXY, widgetProps, <editor;
 	var <wdgtControllersAndModels, <midiOscEnv;
+	// persistent widgets
+	var isPersistent, oldBounds, oldName;
 
 	setup {
 		^(
@@ -82,7 +85,7 @@ CVWidget {
 	}
 	
 	close {
-		if(isCVCWidget, { this.remove }, { this.window.close });
+		if(isCVCWidget and:{ isPersistent == false or:{ isPersistent == nil }}, { this.remove }, { this.window.close });
 	}
 	
 	addAction { |name, action, slot, active=true|

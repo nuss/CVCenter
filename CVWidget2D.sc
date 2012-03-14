@@ -16,11 +16,9 @@
 */
 
 CVWidget2D : CVWidget {
-	var <window, <guiEnv, <editorEnv;
+
 	var <slider2d, <rangeSlider, <numVal, <specBut;
 	var <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
-	// persistent widgets
-	var isPersistent, oldBounds, oldName;
 
 	*new { |parent, cvs, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, persistent, server|
 		^super.new.init(
@@ -49,10 +47,10 @@ CVWidget2D : CVWidget {
 			CV.viewDictionary[QSlider2D].props_(#[xValue, yValue]);
 			CV.viewDictionary[QRangeSlider].props_(#[loValue, hiValue]);
 		});
-		
+
 		setupArgs !? {
 			(setupArgs.class !== Event).if{ 
-				Error( "a setup for a CVWidget2D has to be provided as an Event: (lo: [args], hi: [args])!").throw;
+				Error( "a setup for a CVWidget2D has to be provided as an Event: (lo: (argname: arg), hi: (argname: arg))!").throw;
 			}
 		};
 		
@@ -66,7 +64,6 @@ CVWidget2D : CVWidget {
 		this.wdgtActions ?? { this.wdgtActions = (lo: (), hi: ()) };
 				
 		guiEnv = (lo: (), hi: ());
-		editorEnv = ();
 
 		cvcGui !? { isCVCWidget = true };
 		
@@ -121,15 +118,12 @@ CVWidget2D : CVWidget {
 
 		if(bounds.isNil, {		
 			thisXY = 7@0;
+			thisX = 50; thisY = 50;
 			thisWidth = 122;
 			thisHeight = 196;
 		}, {
 			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
-			if(bounds.isNil, {
-				thisX = 50; thisY = 50;
-			}, {
-				thisX = bounds.left; thisY = bounds.top;
-			});
+			thisX = bounds.left; thisY = bounds.top;
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
@@ -139,7 +133,7 @@ CVWidget2D : CVWidget {
 		}, {
 			window = parentView;
 		});
-										
+												
 		cvcGui ?? { 
 			window.onClose_({
 				#[lo, hi].do({ |hilo|
@@ -175,7 +169,7 @@ CVWidget2D : CVWidget {
 			})
 		};
 
-		if(persistent, { isPersistent = true });
+		persistent !? { if(persistent, { isPersistent = true }) };
 		
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color.green)
@@ -612,8 +606,8 @@ CVWidget2D : CVWidget {
 			oldName = window.name;
 		})
 	}
-
-	reopen { |parent, wdgtBounds|
+	
+	open { |parent, wdgtBounds|
 		var thisWdgt, thisBounds;
 						
 		if(parent.isNil, {
