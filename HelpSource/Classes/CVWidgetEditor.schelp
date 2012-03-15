@@ -1,11 +1,10 @@
-
 CLASS:: CVWidgetEditor
 summary:: a GUI for editing widgets and their parameters: specs, MIDI, OSC, actions...
-categories:: GUI, CV, MIDI, OSC
+categories:: GUI, CV, External Control>MIDI, External Control>OSC
 related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/SimpleController, Classes/ControlSpec
 
 DESCRIPTION::
-The interface defined within code::CVWidget:: reps. its subclasses code::CVWidgetKnob:: and code::CVWidget2D:: defines a number of methods that can also be triggered via their GUI. However these GUIs don't offer enough space to display all options a widget incorporates. Therefore each widget has an inbuilt editor which is defined within CVWidgetEditor.
+The interface defined within code::CVWidget:: resp. its subclasses code::CVWidgetKnob:: and code::CVWidget2D:: defines a number of methods that can also be triggered via their GUI. However these GUIs don't offer enough space to display all options a widget incorporates. Therefore each widget has an inbuilt editor which is defined within CVWidgetEditor.
 note::CVWidgetEditor is not supposed to be used directly. Rather editors should always be instantiated from within the widget it belongs to.::
 
 
@@ -46,9 +45,14 @@ returns:: a code::TabbedView::
 subsection:: The "Specs"-tab
 
 METHOD:: specField
-(describe method here)
+A code::TextField:: for manually entering a code::ControlSpec::. Values can be:
+definitionList::
+## a code::Symbol:: || identifying an existing code::ControlSpec:: - e.g. code::\freq:: will become code::ControlSpec(20, 20000, 'exp', 0, 440, " Hz")::
+## an code::Array:: || values can be literals if no calculations have to be processed on them - e.g.: code::#[1, 10]:: will become code::ControlSpec(1, 10, 'linear', 0.0, 1, "")::. If calculations are happening within the string - e.g.: code::[5*3, 30]:: the array strong::must not:: be prefixed with code::#::.
+## a valid code::ControlSpec:: || e.g. code::ControlSpec(-1, 1, 'linear', 0.0, 0, "")::
+::
 
-returns:: (returnvalue)
+returns:: a code::TextField::
 
 METHOD:: specsList
 (describe method here)
@@ -182,4 +186,54 @@ argument:: slot
 
 returns:: (returnvalue)
 
-METHOD:: front(describe method here)argument:: tab(describe argument here)returns:: (returnvalue)METHOD:: close(describe method here)argument:: slot(describe argument here)returns:: (returnvalue)METHOD:: isClosed(describe method here)returns:: (returnvalue)METHOD:: amendActionsList(describe method here)argument:: widget(describe argument here)argument:: addRemove(describe argument here)argument:: name(describe argument here)argument:: action(describe argument here)argument:: slot(describe argument here)argument:: active(describe argument here)returns:: (returnvalue)EXAMPLES::code::(some example code)::
+METHOD:: front
+(describe method here)
+
+argument:: tab
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: close
+(describe method here)
+
+argument:: slot
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: isClosed
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: amendActionsList
+(describe method here)
+
+argument:: widget
+(describe argument here)
+
+argument:: addRemove
+(describe argument here)
+
+argument:: name
+(describe argument here)
+
+argument:: action
+(describe argument here)
+
+argument:: slot
+(describe argument here)
+
+argument:: active
+(describe argument here)
+
+returns:: (returnvalue)
+
+
+EXAMPLES::
+
+code::
+(some example code)
+::
+
