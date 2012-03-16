@@ -1,10 +1,10 @@
 CLASS:: CVWidget
 summary:: The abstract superclass for all CVWidgets
-categories:: GUI, CV, MIDI, OSC
+categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVCenter, Classes/CV, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
 
 DESCRIPTION::
-CVWidget is the superclass for all CVWidgets (currently: code::CVWidgetKnob:: and code::CVWidget2D::). However, it implements a couple of useful methods that are common to all its subclasses.
+CVWidget is the abstract superclass of all CVWidgets (currently: code::CVWidgetKnob:: and code::CVWidget2D::). However, it implements a couple of useful methods that are common to all its subclasses.
 
 
 CLASSMETHODS::

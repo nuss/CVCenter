@@ -1,6 +1,6 @@
 CLASS:: CVCenter
 summary:: CVCenter is a collection of CVs and provides a GUI for easy use in connection with external hard- and software like MIDI- and OSC-controllers.
-categories:: GUI, CV, MIDI, OSC
+categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
 
 DESCRIPTION::
@@ -32,10 +32,11 @@ table::
 ## code::0:: || MIDI-controllers that yield values from 0-127
 ## code::1:: || MIDI-controller that yield de-/incremental values
 ::
-## strong::midiResolution:: || - only applies when midiMode is set to code::1:: - default: 1
-## strong::midiMean:: || - only applies when midiMode is set to code::1:: - default: 64
-## strong::softwithin:: || - only applies when midiMode is set to code::0:: - default: 0.1
-## strong::ctrlButtonBank:: || - default: nil
+(for a detailed explanation see: link::#-midiMode::)
+## strong::midiResolution:: || - only applies when midiMode is set to code::1:: - default: 1 (for a detailed explanation see: link::#-midiResolution::)
+## strong::midiMean:: || - only applies when midiMode is set to code::1:: - default: 64 (for a detailed explanation see: link::#-midiMean::)
+## strong::softwithin:: || - only applies when midiMode is set to code::0:: - default: 0.1 (for a detailed explanation see: link::#-softWithin::)
+## strong::ctrlButtonBank:: || - default: nil (for a detailed explanation see: link::#-ctrlButtonBank::)
 ::
 ::
 ::
@@ -120,7 +121,7 @@ default: code::1::
 returns:: this (CVCenter)
 
 METHOD:: ctrlButtonBank
-Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI. 
+Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 hardware-sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI. 
 code::ctrlButtonBank:: translates the hardware-layout in a way that makes it easy to see the slider's bank and number: slider 17 becomes 2:1 (bank 2,  nr. 1).
 
 default: code::nil::

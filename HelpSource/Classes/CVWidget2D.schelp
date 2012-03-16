@@ -1,6 +1,6 @@
 CLASS:: CVWidget2D
 summary:: a control-widget that can either be embedded in other views or opened as a standalone-widget, offering easy connections with external MIDI-/OSC-hard- and software.
-categories:: GUI, CV, MIDI, OSC
+categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
 
 DESCRIPTION::
@@ -63,15 +63,15 @@ code::x = x.open // the old widget was stored in x which will afterwards hold th
 See example in link::Classes/CVWidget#reusable_widgets::
 
 argument:: parent
-a code::Window:: or nil - if none is provided the window will be created internally
+a code::Window:: or code::nil:: - if none is provided the window will be created internally
 
 argument:: wdgtBounds
-a code::Rect:: or nil - if none is provided the bounds of the old widget will be used.
+a code::Rect:: or code::nil:: - if none is provided the bounds of the old widget will be used.
 
-returns:: a code::CVCWidgetKnob::
+returns:: a code::CVWidgetKnob::
 
 subsection:: GUI-elements
-note::Opposite to code::CVWidgetKnob:: many elements of the GUI are returned as code::Event::s containing a code::\lo:: and a code::\hi:: element. Basically all of the following elements are strong::getters:: but not strong::setters::. However, it is possible to change the value returned in code::\lo:: or code::\hi:: as they are simply values within an code::Event:: - strong::do not attempt to do so or unexpected things will happen!::
+warning::Opposite to code::CVWidgetKnob:: many elements of the GUI are returned as code::Event::s containing a code::\lo:: and a code::\hi:: element. Basically all of the following elements are strong::getters:: but not strong::setters::. However, it is possible to change the value returned in code::\lo:: or code::\hi:: as they are simply values within an code::Event:: - strong::do not attempt to do so or unexpected things will happen!::
 ::
 
 METHOD:: slider2d

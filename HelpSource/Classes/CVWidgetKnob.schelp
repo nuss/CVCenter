@@ -1,6 +1,6 @@
 CLASS:: CVWidgetKnob
 summary:: a control-widget that can either be embedded in other views or opened as a standalone-widget, offering easy connections with external MIDI-/OSC-hard- and software.
-categories:: GUI, CV, MIDI, OSC
+categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
 
 DESCRIPTION::

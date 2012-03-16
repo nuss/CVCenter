@@ -1,6 +1,6 @@
 CLASS:: CVWidgetEditor
 summary:: a GUI for editing widgets and their parameters: specs, MIDI, OSC, actions...
-categories:: GUI, CV, External Control>MIDI, External Control>OSC
+categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/SimpleController, Classes/ControlSpec
 
 DESCRIPTION::
@@ -55,59 +55,63 @@ definitionList::
 returns:: a code::TextField::
 
 METHOD:: specsList
-(describe method here)
+A code::PopUpMenu:: displaying the list of predefined code::ControlSpec::s. 
 
-returns:: (returnvalue)
+returns:: a code::PopUpMenu::
 
 METHOD:: specsListSpecs
-(describe method here)
+The internal list of code::ControlSpec::s from which the user may choose in link::#-specsList::. This is strong::not:: identical with the list that is displayed as code::specsList.items:: contains the spec-names as well.
 
-returns:: (returnvalue)
+returns:: a code::List::
+
+subsection:: The "MIDI"-tab
 
 METHOD:: midiModeSelect
-(describe method here)
+A code::PopUpMenu:: allowing the user to selct the link::Classes/CVWidget#-setMidiMode#midiMode:: - either code::0-127:: (default, midiMode: code::0::) or code::+/-:: (in-/decremental, midiMode: code::1::).
 
-returns:: (returnvalue)
+returns:: a code::PopUpMenu::
 
 METHOD:: midiMeanNB
-(describe method here)
+A code::NumberBox:: allowing the user to set the value for link::Classes/CVCenter#-setMidiMean#midiMean::
 
-returns:: (returnvalue)
+returns:: a code::NumberBox::
 
 METHOD:: softWithinNB
-(describe method here)
+A code::NumberBox:: allowing the user to set the value for link::Classes/CVCenter#-setSoftWithin#softWithin::
 
-returns:: (returnvalue)
+returns:: a code::NumberBox::
 
 METHOD:: ctrlButtonBankField
-(describe method here)
+A code::TextField:: allowing the user to set the value for link::Classes/CVCenter#-setCtrlButtonBank#ctrlButtonBank::
 
-returns:: (returnvalue)
+returns:: a code::TextField::
 
 METHOD:: midiResolutionNB
-(describe method here)
+A code::NumberBox:: allowing the user to set the value for link::Classes/CVCenter#-setMidiResolution#midiResolution::
 
-returns:: (returnvalue)
+returns:: a code::NumberBox::
 
 METHOD:: midiLearnBut
-(describe method here)
+A code::Button:: allowing the user to either trigger the link::Classes/CCResponder#-learn#MIDI-learn:: functionality ("L") or, if a value has been set in link::#-midiSrcField:: and/or link::#-midiChanField:: and/or link::#-midiCtrlField:: set up a code::CCResponder:: with the specified values ("C").
 
-returns:: (returnvalue)
+returns:: a code::TextField::
 
 METHOD:: midiSrcField
-(describe method here)
+A code::TextField:: for setting resp. displaying the ID under which the MIDI-device has been registered in SuperCollider.
 
-returns:: (returnvalue)
+returns:: a code::TextField::
 
 METHOD:: midiChanField
-(describe method here)
+A code::TextField:: for setting resp. displaying a MIDI-channel.
 
-returns:: (returnvalue)
+returns:: a code::TextField::
 
 METHOD:: midiCtrlField
-(describe method here)
+A code::TextField:: for setting resp. displaying a controller-number.
 
-returns:: (returnvalue)
+returns:: a code::TextField::
+
+subsection:: The "OSC"-tab
 
 METHOD:: calibBut
 (describe method here)
