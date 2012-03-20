@@ -145,8 +145,6 @@ CVWidgetEditor {
 					109, { thisEditor.tabs.focus(1) }, // "m" -> midi
 					97, { thisEditor.tabs.focus(3) }, // "a" -> actions
 					115, { thisEditor.tabs.focus(0) }, // "s" -> specs
-					79, { CVCenterControllersMonitor(1) }, // <shift> + "o" -> osc-controllers monitor
-					77, { CVCenterControllersMonitor(0) }, // <shift> + "m" -> midi-controllers monitor
 					120, { this.close(slot) }, // "x" -> close editor
 					99, { OSCCommands.gui } // "c" -> collect OSC-commands resp. open the collector's GUI
 				)

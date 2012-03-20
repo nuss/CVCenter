@@ -19,7 +19,7 @@ CVCenterControllersMonitor {
 	classvar <window, <tabs;
 	
 	*new { |focus|
-		var ctrlrs, skipJack;
+		var ctrlrs;
 		var midiOrder, orderedMidiCtrlrs;
 		var oscOrder, orderedOscCtrlrs;
 		var labelColors, labelStringColors, flow0, flow1;
