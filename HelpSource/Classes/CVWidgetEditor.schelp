@@ -193,6 +193,19 @@ returns:: an code::Event::
 private:: init
 private:: amendActionsList
 
+SECTION:: Shortcuts
+When a CVWidgetEditor is present (resp. its GUI) a number of shortcuts apply:
+definitionList::
+## "s" || bring the "Specs"- tab to front
+## "m" || bring the "MIDI"-tab to front
+## "o" || bring the "OSC"-tab to front
+## "a" || bring the "Actions"-tab to front
+## "c" || open the code::OSCCommands:: GUI (starts collecting immediatly)
+## "x" || close the editor
+## <shift> + "o" || open the code::CVCenterControllersMonitor::, focusing its "OSC"-tab 
+## <shift> + "m" || open the code::CVCenterControllersMonitor::, focusing its "MIDI"-tab.
+::
+
 EXAMPLES::
 
 CVWidgetEditor is not to be used on its own as it's just meant as an extended editor to an existent code::CVWidget:: ( code::CVWidgetKnob:: or code::CVWidget2D::). strong::To test things out please refer to the example-section of:: link::Classes/CVWidget#examples#CVWidget::.

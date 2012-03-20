@@ -1,21 +1,17 @@
 CLASS:: OSCCommands
-summary:: (put short description here)
-categories:: Undocumented classes
-related:: Classes/SomeRelatedClass, Reference/SomeRelatedStuff, etc.
+summary:: A utility-class that let's you collect OSC command-names form emphasis::incoming:: OSC
+categories:: External Control>OSC
+related:: Classes/OSCresponder, Classes/OSCresponderNot, Classes/OSCFunc, Classes/OSCDef, Classes/CVWidgetEditor
 
 DESCRIPTION::
-(put long description here)
-
+OSCCommands implements a couple of methods that let the user collect OSC command-names (including their path/namespace - e.g. '/my, super/long/and/winding/pth/to/cmdname' - resp. the number of addressable msg-slots. E.g. from an orientation-sensor: code::[ '/cmdname', <x-value>, <y-value>, <z-value> ]:: (one command-name, 3 slots). Collected command-names can be stored to disk under a name set by the user. 
+For convenience OSCCommands has its own GUI which shows the user which names have already been collected resp. allowing her/him to remove unwanted names from the list.
 
 CLASSMETHODS::
 
-METHOD:: initClass
-(describe method here)
-
-returns:: (returnvalue)
-
+private:: initClass
 METHOD:: collect
-(describe method here)
+Starts the collection-process when set to code::true::. Stops the process
 
 argument:: play
 (describe argument here)
