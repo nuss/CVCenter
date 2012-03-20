@@ -93,22 +93,22 @@ A code::PopUpMenu:: allowing the user to selct the link::Classes/CVWidget#-setMi
 returns:: a code::PopUpMenu::
 
 METHOD:: midiMeanNB
-A code::NumberBox:: allowing the user to set the value for link::Classes/CVCenter#-setMidiMean#midiMean::
+A code::NumberBox:: allowing the user to set the value for link::Classes/CVWidget#-setMidiMean#midiMean::
 
 returns:: a code::NumberBox::
 
 METHOD:: softWithinNB
-A code::NumberBox:: allowing the user to set the value for link::Classes/CVCenter#-setSoftWithin#softWithin::
+A code::NumberBox:: allowing the user to set the value for link::Classes/CVWidget#-setSoftWithin#softWithin::
 
 returns:: a code::NumberBox::
 
 METHOD:: ctrlButtonBankField
-A code::TextField:: allowing the user to set the value for link::Classes/CVCenter#-setCtrlButtonBank#ctrlButtonBank::
+A code::TextField:: allowing the user to set the value for link::Classes/CVWidget#-setCtrlButtonBank#ctrlButtonBank::
 
 returns:: a code::TextField::
 
 METHOD:: midiResolutionNB
-A code::NumberBox:: allowing the user to set the value for link::Classes/CVCenter#-setMidiResolution#midiResolution::
+A code::NumberBox:: allowing the user to set the value for link::Classes/CVWidget#-setMidiResolution#midiResolution::
 
 returns:: a code::NumberBox::
 
