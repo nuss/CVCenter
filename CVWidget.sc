@@ -1337,8 +1337,10 @@ CVWidget {
 					thisGuiEnv.editor.nameField.string_(theChanger.value.nameField);
 					if(thisCalib, {
 						[
-							thisGuiEnv.editor.inputConstraintLoField, 
-							thisGuiEnv.editor.inputConstraintHiField
+//							thisGuiEnv.editor.inputConstraintLoField, 
+//							thisGuiEnv.editor.inputConstraintHiField
+							thisGuiEnv.editor.calibNumBoxes.lo, 
+							thisGuiEnv.editor.calibNumBoxes.hi
 						].do(_.enabled_(theChanger.value.editEnabled));
 					});
 					thisGuiEnv.editor.indexField.value_(theChanger.value.index);

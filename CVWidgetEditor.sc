@@ -25,7 +25,7 @@ CVWidgetEditor {
 	var <calibBut, <calibNumBoxes;
 	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 	var <ipField, <portField, <nameField, <indexField;
-	var <inputConstraintLoField, <inputConstraintHiField, <alwaysPosField;
+	var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
 	var <mappingSelect;
 	var <connectorBut;
 	var actionName, enterAction, enterActionBut, <actionsList;

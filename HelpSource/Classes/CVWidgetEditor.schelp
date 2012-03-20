@@ -1,7 +1,7 @@
 CLASS:: CVWidgetEditor
 summary:: a GUI for editing widgets and their parameters: specs, MIDI, OSC, actions...
 categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
-related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/SimpleController, Classes/ControlSpec
+related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/SimpleController, Classes/ControlSpec, Classes/OSCCommands
 
 DESCRIPTION::
 The interface defined within code::CVWidget:: resp. its subclasses code::CVWidgetKnob:: and code::CVWidget2D:: defines a number of methods that can also be triggered via their GUI. However these GUIs don't offer enough space to display all options a widget incorporates. Therefore each widget has an inbuilt editor which is defined within CVWidgetEditor.
@@ -31,7 +31,7 @@ returns:: a code::CVWidgetEditor::
 
 
 INSTANCEMETHODS::
-subsection:: Common GUI properties
+subsection:: Common GUI properties and methods
 METHOD:: window
 The editor's window
 
@@ -41,6 +41,27 @@ METHOD:: tabs
 The editor's tabs, defined by a code::TabbedView:: 
 
 returns:: a code::TabbedView::
+
+METHOD:: front
+Open resp.bring the an editor-window to front, focusing the tab given by code::tab::
+
+argument:: tab
+an code::Integer:: providing the tab-index code::0-3::
+
+returns:: a code::CVWidgetEditor::
+
+METHOD:: close
+Close the editor resp. its code::Winow::
+
+argument:: slot
+a code::Symbol:: - either code::\lo:: or code::\hi::
+
+returns:: a code::CVWidgetEditor::
+
+METHOD:: isClosed
+returns code::true:: if the editor is not code::nil:: yet it's been closed closed.
+
+returns:: a code::Boolean::
 
 subsection:: The "Specs"-tab
 
@@ -114,130 +135,65 @@ returns:: a code::TextField::
 subsection:: The "OSC"-tab
 
 METHOD:: calibBut
-(describe method here)
+A code::Button:: displaying resp. setting the widget's OSC-calibration-status - see also: link::Classes/CVWidget#-setCalibrate::.
 
-returns:: (returnvalue)
+returns:: a code::Button::
 
 METHOD:: calibNumBoxes
-(describe method here)
+An code::Event:: containing 2 code::NumberBox::es, one displaying or setting the low limit of the OSC-input, the other displaying or setting the high limit - see also: link::Classes/CVWidget#-setOscInputConstraints::
 
-returns:: (returnvalue)
+returns:: an code::Event::
 
 METHOD:: ipField
-(describe method here)
+A code::TextField:: allowing the user to restrict incoming OSC-messages to the specified IP-address only. The IP-address will be part of a code::NetAddr:: that will persist as long as the OSCresponder is active. Leaving the link::#-portField:: empty will create a code::NetAddr:: valid for all messages coming from that address, regardless of the the port from which they have been sent.
 
-returns:: (returnvalue)
+returns:: a code::TextField::
 
 METHOD:: portField
-(describe method here)
+A code::TextField:: allowing the user to restrict incoming OSC-messages to the specified port only. The port will be part of a code::NetAddr:: that will persist as long as the code::OSCresponder:: is active. Leaving the link::#-ipField:: empty will create a code::NetAddr:: valid for all messages coming from the specified port, regardless of the IP-address from which they have been sent.
 
-returns:: (returnvalue)
+returns:: a code::TextField::
 
 METHOD:: nameField
-(describe method here)
+A code::TextField:: allowing the user to set the OSC-command-path/-name. OSC-commands are organized in namespaces. I.e. a valid command could be code::/commandname:: or code::/some/path/to/commandname:: (The '/' at the beginning is mandatory!). This depends on how the device/program the messages are beeing sent from implement commands. For convenience users may collect valid commend-names for specific devices via a utility-class called code::OSCCommands::. Within a CVWidgetEditor the classes' inbuilt GUI can be triggered by clicking the green 'new' button to the left of code::nameField::. After having collected and saved OSC-command-names the device-name under which they have been saved will appear in the left code::PopUpMenu:: above code::nameField::. Select the device and its possible command-names are added to the list of the right code::PopUpMenu:: above code::nameField::
 
-returns:: (returnvalue)
+returns:: a code::textField::
 
 METHOD:: indexField
-(describe method here)
+A code::NumberBox:: allowing to set the required index within the incoming OSC-message: OSC-messages coming e.g. from an OSC-controller installed on a mobile-phone will usually be received as an code::Array:: where slot code::0:: contains the command-name, subsequent slots will hold the values being sent from the device/program. E.g. an orientation-sensor might send a message like the following:
 
-returns:: (returnvalue)
+code::[ '/orientation', <x-value>, <y-value>, <z-value> ]::
 
-METHOD:: inputConstraintLoField
-(describe method here)
+So, if the user wants the y-value to be captured (s)he has to enter code::2:: in code::indexField::
 
-returns:: (returnvalue)
-
-METHOD:: inputConstraintHiField
-(describe method here)
-
-returns:: (returnvalue)
+returns:: a code::NumberBox::
 
 METHOD:: alwaysPosField
-(describe method here)
+A code::StaticText:: displaying the auto-correction value for incoming OSC-values - see link::Classes/CVWidget#-alwaysPositive:: for an explanation.
 
-returns:: (returnvalue)
+returns:: a code::StaticText::
 
 METHOD:: mappingSelect
-(describe method here)
+A code::PopUpMenu:: allowing the user to set the mapping of incoming OSC-values to the Output-spec. For an explanation see link::Classes/CVWidget#-setOscMapping::
 
-returns:: (returnvalue)
+returns:: a code::PopUpmenu::
 
 METHOD:: connectorBut
-(describe method here)
+A code::Button:: allowing the user to connect an code::OSCresponderNode::, defined within the previously explained inputs.
 
-returns:: (returnvalue)
+returns:: code::Button::
+
+subsection:: The "Actions"-tab
 
 METHOD:: actionsList
-(describe method here)
+An code::Event:: containing all GUI-elements displaying the current actions of a widget. Actions can be added in the topmost code::TextView:: resp. a code::TextField:: (for the action's name). Behind the scenes this is handled by link::Classes/CVWidget#-addAction::, link::Classes/CVWidget#-removeAction:: resp. link::Classes/CVWidget#-activateAction::
 
-returns:: (returnvalue)
+returns:: an code::Event::
 
-METHOD:: init
-(describe method here)
-
-argument:: widget
-(describe argument here)
-
-argument:: widgetName
-(describe argument here)
-
-argument:: tab
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: front
-(describe method here)
-
-argument:: tab
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: close
-(describe method here)
-
-argument:: slot
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: isClosed
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: amendActionsList
-(describe method here)
-
-argument:: widget
-(describe argument here)
-
-argument:: addRemove
-(describe argument here)
-
-argument:: name
-(describe argument here)
-
-argument:: action
-(describe argument here)
-
-argument:: slot
-(describe argument here)
-
-argument:: active
-(describe argument here)
-
-returns:: (returnvalue)
-
+private:: init
+private:: amendActionsList
 
 EXAMPLES::
 
-code::
-(some example code)
-::
+CVWidgetEditor is not to be used on its own as it's just meant as an extended editor to an existent code::CVWidget:: ( code::CVWidgetKnob:: or code::CVWidget2D::). strong::To test things out please refer to the example-section of:: link::Classes/CVWidget#examples#CVWidget::.
 
