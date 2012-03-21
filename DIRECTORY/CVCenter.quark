@@ -1,25 +1,16 @@
 (
 // required:
-Ê Ê \name: Ê Ê Ê Ê Ê "CVCenter",
-Ê Ê \path: Ê Ê Ê Ê Ê "CVCenter", // almost always the same as the quark name
-Ê Ê \summary: Ê Ê Ê Ê"Human readable summary",
-Ê Ê \author: Ê Ê Ê Ê "Stefan Nussbaumer",
+	\name:		"CVCenter",
+	\path:		"CVCenter", // almost always the same as the quark name
+	\summary:	"Human readable summary",
+	\author:		"Stefan Nussbaumer",
 
 // optional:
-Ê Ê \version: Ê Ê Ê Ê0.85, // must be a float
-Ê Ê \organization: Ê "My Organization",
-Ê Ê \country: Ê Ê Ê Ê"My Country",
-Ê Ê \since: Ê Ê Ê Ê Ê"2004",
-Ê Ê \schelp: Ê Ê Ê Ê "Classes/MyClass",
-Ê Ê \ext_dependancy: "Information on additional software needed to run this quark properly",
-Ê Ê \url: Ê Ê Ê Ê Ê Ê"http://www.strangeQuark.de",
+	\version:		0.85, // must be a float
+	\since:		"2010",
+	\schelp:		"Overviews/CVCenter",
+	\url:			"http://pustota.5tefan.us/coding/CVCenter",
 
-// If the quark depends on other quarks, you can specify it as a list containing:
-// (1) strings (just the quark name)
-Ê Ê \dependencies: Ê "nameOfDependantQuark"
-// (2) key->value pairs (name->version)
-// Ê\dependencies: Ê [("nameOfDependantQuark" -> 1.0)]
 // or (3) arrays with info in this order: [name, version, repositoryBaseUrl]
-// Ê\dependencies: Ê [["nameOfDependantQuark", 1.0, "https://svn.weirdserver.be/trunk/weirdquarks"]]
-
+	\dependencies:	[["Conductor"], ["TabbedView"]]
 )

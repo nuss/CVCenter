@@ -1,0 +1,51 @@
+TITLE:: CVCenter
+SUMMARY:: a library aiming at the easy use of eternal hard- and software controllers within SuperCollider
+CATEGORIES:: Conductor, External Control>MIDI, External Control>OSC
+
+CVCenter is builds upon on the concept of code::CV::s from Ron Kuivila. Its name-giving class CVCenter holds a collection of CVs and allows the user to easily created widgets for them that let her/him easily connect their external MIDI- or OSC-controllers. Widgets can be created from Synth-, Ndef-, NodeProxy-controls resp. it can also be used in connection with slots of a ProxySpace. 
+As CVs enherit from Stream they may be used in Patterns as well (just like you would embed a regular Pattern in another).
+
+SECTION:: Classes
+
+LIST::
+## link::Classes/CVCenter::
+
+subsection:: Widgets
+## link::Classes/CVWidget:: - the abstract superclass of all CVWidgets. Implements some useful methods for all CVWidgets
+## link::Classes/CVWidgetKnob::
+## link::Classes/CVWidget2D::
+
+subsection:: Utilities
+## link::Classes/OSCCommands::
+## link::Classes/CVCenterControllersMonitor::
+
+subsection:: Helpers
+## link::Classes/CVWidgetEditor::
+## link::Classes/CVWidgetSpecsEditor::
+
+subsection:: Extensions to other Classes
+## link::Classes/Synth#-cvcGui::
+## link::Classes/NodeProxy#-cvcGui::
+
+EXAMPLES::
+Ndef(\sawTest, { |damping| SinOsc.ar(damping * VarSaw.ar(\sawFreq.kr([100, 101]))).tanh * \amp.kr(0.5) });
+
+// Ndefs don't have metadata but you may add some specs ahead from creation
+Spec.add(\sawFreq, \freq);
+Spec.add(\damping, #[200, 20000, \exp, 0.0, 1000, " Hz"]);
+
+// create the GUI
+// have a look at the NodeProxy helpfile to see all possible arguments for cvcGui
+Ndef(\sawTest).cvcGui;
+
+// play the Ndef (turn the knobs if you don't hear anything immediately)
+Server.default.waitForBoot{ Ndef(\sawTest).play };
+
+// maybe play around with specs a bit...
+#[lo, hi].do(CVCenter.cvWidgets[\sawFreq].setSpec(#[20, 220, \exp], _);
+CVCenter.cvWidgets[\sawFreq].setSpec(#[17, 170, \exp], \lo);
+
+// clean up
+CVCenter.removeAll;
+Ndef(\sawTest).clear(10);
+
