@@ -72,7 +72,7 @@ CVCenter {
 		})
 	}
 		
-	*gui { |tab...cvs|
+	*makeWindow { |tab...cvs|
 		var flow, rowwidth, colcount;
 		var cvTabIndex, order, orderedCVs;
 		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
@@ -667,7 +667,7 @@ CVCenter {
 		});
 				
 		if(window.isNil or:{ window.isClosed }, {
-			this.gui(tab);
+			this.makeWindow(tab);
 		}, {
 			this.prAddToGui(thisTab, widget2DKey);
 		});

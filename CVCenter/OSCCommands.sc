@@ -80,7 +80,7 @@ OSCCommands {
 		cmdList.clear;
 	}
 	
-	*gui {
+	*makeWindow {
 		var window, flow, fields = (), deviceNameField, saveBut;
 		var progress, progressStates, progressRoutine, collectRoutine, stopFunc;
 		var makeField, nextFields;

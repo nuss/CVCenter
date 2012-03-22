@@ -146,7 +146,7 @@ CVWidgetEditor {
 					97, { thisEditor.tabs.focus(3) }, // "a" -> actions
 					115, { thisEditor.tabs.focus(0) }, // "s" -> specs
 					120, { this.close(slot) }, // "x" -> close editor
-					99, { OSCCommands.gui } // "c" -> collect OSC-commands resp. open the collector's GUI
+					99, { OSCCommands.makeWindow } // "c" -> collect OSC-commands resp. open the collector's GUI
 				)
 			});
 						
@@ -496,7 +496,7 @@ CVWidgetEditor {
 					["new", Color.white, Color(0.15, 0.5, 0.15)]
 				])
 				.font_(staticTextFont)
-				.action_({ OSCCommands.gui })
+				.action_({ OSCCommands.makeWindow })
 			;
 
 			nameField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)

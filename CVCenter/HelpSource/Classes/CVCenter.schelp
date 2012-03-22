@@ -23,7 +23,7 @@ note::It shouldn't be necessary to initialize CVCenter with an explicit call to 
 argument:: cvs
 an Array, a Dictionary or an Event, containing the widget name(s) and its/their internal CV(s):
 
-argument:: â€¦ setUpArgs
+argument:: É setUpArgs
 An arbitrary number of key/value pairs. The following keys are currently supported:
 definitionList::
 list::
@@ -46,14 +46,14 @@ For a detailed description of the above listet arguments see the descriptions of
 returns:: this (CVCenter)
 
 
-METHOD:: gui
+METHOD:: makeWindow
 Creates and fronts the CVCenter GUI if it's closed or nil. Sends the GUI to front if it's in the background. If CVs are passed in as key/value pairs it adds them as widgets to the GUI under the given tab if given or the one that's currently in front.
 
 argument:: tab
 a String or a Symbol, indicating the label of a tab. If none is provided the widgets will be added to "default" or any other tab that's currently in front. If an event containing the keys code::\hi:: and code::\hi:: gets passed in the widget will be a CVWidget2D.
 
 argument::  ... cvs
-key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), â€¦ \wdgtNameN, a CV::
+key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), É \wdgtNameN, a CV::
 
 returns:: this (CVCenter)
 
@@ -87,7 +87,7 @@ METHOD:: put
 Put new code::CV::s into CVCenter
 note::It shouldn't be necessary to initialize CVCenter with an explicit call to strong::*new::. Rather use strong::*use:: whenever possible as (strong::*use:: uses strong::*put:: internally)::
 argument::  ... args
-key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), â€¦ \wdgtNameN, a CV::
+key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), É \wdgtNameN, a CV::
 If the number of arguments is odd and the last one is a code::Boolean:: this will indicate wether already contained values will be overwritten (default: code::false::)
 
 returns:: this (CVCenter)
@@ -446,12 +446,12 @@ CVCenter.addActionAt(\test2D, \setFreq2, { |cv| a !? { a.set(\freq2, cv.value) }
 
 // CVCenter will not open another gui if one is already present
 // if the GUI is in the background it will be sent to front
-CVCenter.gui;
+CVCenter.makeWindow;
 
 // close the GUI and open it again
 // all widgets should just work as before
 CVCenter.window.close;
-CVCenter.gui;
+CVCenter.makeWindow;
 
 // free the synth and remove all widgets
 a.free;

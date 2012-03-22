@@ -27,7 +27,7 @@ a code::String:: or a code::Symbol:: representing the name of the current collec
 
 returns:: this (OSCCommands)
 
-METHOD:: gui
+METHOD:: makeWindow
 Open the interactive GUI that shows the user all currently collected command-names resp. remove unwanted names.
 
 returns:: this (OSCCommands)
@@ -62,7 +62,7 @@ For the following example you will have to have installed an application capable
 
 code::
 // most easy
-OSCCommands.gui;
+OSCCommands.makeWindow;
 
 // start the collecting-process
 // the application sending OSC-commands should be up and running
