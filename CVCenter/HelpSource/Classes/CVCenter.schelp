@@ -23,7 +23,7 @@ note::It shouldn't be necessary to initialize CVCenter with an explicit call to 
 argument:: cvs
 an Array, a Dictionary or an Event, containing the widget name(s) and its/their internal CV(s):
 
-argument:: É setUpArgs
+argument::  setUpArgs
 An arbitrary number of key/value pairs. The following keys are currently supported:
 definitionList::
 list::
@@ -53,7 +53,7 @@ argument:: tab
 a String or a Symbol, indicating the label of a tab. If none is provided the widgets will be added to "default" or any other tab that's currently in front. If an event containing the keys code::\hi:: and code::\hi:: gets passed in the widget will be a CVWidget2D.
 
 argument::  ... cvs
-key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), É \wdgtNameN, a CV::
+key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV),  \wdgtNameN, a CV::
 
 returns:: this (CVCenter)
 
@@ -87,7 +87,7 @@ METHOD:: put
 Put new code::CV::s into CVCenter
 note::It shouldn't be necessary to initialize CVCenter with an explicit call to strong::*new::. Rather use strong::*use:: whenever possible as (strong::*use:: uses strong::*put:: internally)::
 argument::  ... args
-key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV), É \wdgtNameN, a CV::
+key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV),  \wdgtNameN, a CV::
 If the number of arguments is odd and the last one is a code::Boolean:: this will indicate wether already contained values will be overwritten (default: code::false::)
 
 returns:: this (CVCenter)
