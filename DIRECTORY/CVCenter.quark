@@ -2,7 +2,7 @@
 // required:
 	\name:		"CVCenter",
 	\path:		"CVCenter", // almost always the same as the quark name
-	\summary:	"Human readable summary",
+	\summary:	"CVCenter is a collection of CVs and provides a GUI for easy use in connection with external hard- and software like MIDI- and OSC-controllers.",
 	\author:		"Stefan Nussbaumer",
 
 // optional:

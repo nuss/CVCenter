@@ -28,6 +28,7 @@ subsection:: Extensions to other Classes
 ## link::Classes/NodeProxy#-cvcGui::
 
 EXAMPLES::
+code::
 Ndef(\sawTest, { |damping| SinOsc.ar(damping * VarSaw.ar(\sawFreq.kr([100, 101]))).tanh * \amp.kr(0.5) });
 
 // Ndefs don't have metadata but you may add some specs ahead from creation
@@ -48,4 +49,5 @@ CVCenter.cvWidgets[\sawFreq].setSpec(#[17, 170, \exp], \lo);
 // clean up
 CVCenter.removeAll;
 Ndef(\sawTest).clear(10);
+::
 
