@@ -2,7 +2,7 @@
 // required:
 	\name:		"CVCenter",
 	\path:		"CVCenter", // almost always the same as the quark name
-	\summary:	"CVCenter is a collection of CVs and provides a GUI for easy use in connection with external hard- and software like MIDI- and OSC-controllers.",
+	\summary:	"CVCenter is a collection of CVs and provides a GUI for easy use in connection with external hard- and software like MIDI- and OSC-controllers. A note to all SC<3.5 users: the helpfiles for CVCenter are available at http://pustota.5tefan.us/_/sc-help/Help/Overviews/CVCenter.html",
 	\author:		"Stefan Nussbaumer",
 
 // optional:
