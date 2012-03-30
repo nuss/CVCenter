@@ -603,7 +603,7 @@ CVWidget2D : CVWidget {
 			);
 			this.initControllerActions(slot);
 			oldBounds = window.bounds;
-			oldName = window.name;
+			if(window.respondsTo(\name), { oldName = window.name });
 		})
 	}
 	

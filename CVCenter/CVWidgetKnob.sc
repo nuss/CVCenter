@@ -54,7 +54,7 @@ CVWidgetKnob : CVWidget {
 
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
 		midiOscEnv.oscMapping ?? { midiOscEnv.oscMapping = \linlin };
-				
+						
 		if(name.isNil, { thisName = "knob" }, { thisName = name });
 		wdgtInfo = thisName.asString;
 		
@@ -95,7 +95,7 @@ CVWidgetKnob : CVWidget {
 		}, {
 			window = parentView;
 		});
-								
+										
 		cvcGui ?? { 
 			window.onClose_({
 				if(editor.notNil, {
@@ -440,7 +440,7 @@ CVWidgetKnob : CVWidget {
 
 		this.initControllerActions;
 		oldBounds = window.bounds;
-		oldName = window.name;
+		if(window.respondsTo(\name), { oldName = window.name });
 	}
 		
 	open { |parent, wdgtBounds|
