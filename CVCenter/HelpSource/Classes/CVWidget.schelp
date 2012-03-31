@@ -535,7 +535,7 @@ Server.default.waitForBoot{
 ::
 
 subsection:: reusable widgets
-By default windows created in SC lack the ability to be opened again once they're closed (even evaluating the variable under which the window has been created will still return the window). The following section describes a workaround in CVWidget (resp. code::CVWidgetKnob:: and code::CVWidget2D::) that enables the user to keep a widget's responders and open and close it as many times as the user needs to (strong::open:: is implemented in link::Classes/CVWidgetKnob#-open#CVWidgetKnob:: and link::Classes/CVWidget2D#-open#CVWidget2D::).
+By default windows created in SC lack the ability to be opened again once they're closed (even evaluating the variable under which the window has been created will still return the window). The following section describes a workaround in CVWidget (resp. code::CVWidgetKnob:: and code::CVWidget2D::) that enables the user to keep a widget's responders and open and close it as many times as the user needs to ( strong::open:: is implemented in link::Classes/CVWidgetKnob#-open#CVWidgetKnob:: and link::Classes/CVWidget2D#-open#CVWidget2D::).
 code::
 // create some widgets
 // if a widget is made 'persistent' its OSC-/MID-responders 

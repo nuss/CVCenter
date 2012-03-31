@@ -56,7 +56,7 @@ returns:: this (a CVWidgetKnob)
 INSTANCEMETHODS::
 
 METHOD:: open
-If a widget has been created with the argument code::persistent:: set to true the user may reopen the widget with this method. This is basically a workaround due to the fact that GUIs in SuperCollider usually can't be opened again once they have been closed (even though executing the variable storing the the regarding object still returns the object). However, rather than reopening the old widget this method will create a new one, holding all properties, the CV and MIDI-/OSC-responders. In order to make this work as desired one should apply the following syntax where code::x:::
+If a widget has been created with the argument code::persistent:: set to true the user may reopen the widget with this method. This is basically a workaround due to the fact that GUIs in SuperCollider usually can't be opened again once they have been closed (even though executing the variable storing the the regarding object still returns the object). However, rather than reopening the old widget this method will create a new one, holding all properties, the CV and MIDI-/OSC-responders. In order to make this work as desired one should apply the following syntax where code::x:: holds the instance of the initially created widget:
 
 code::x = x.open // the old widget was stored in x which will afterwards hold the new widget::
 
