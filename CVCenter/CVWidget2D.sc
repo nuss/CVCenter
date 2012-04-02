@@ -547,6 +547,8 @@ CVWidget2D : CVWidget {
 				});
 			})
 		});
+
+		#[lo, hi].do({ |slot| if(prCalibrate[slot], { calibBut[slot].value_(0) }, { calibBut[slot].value_(1) }) });
 		
 		// widgetCV
 		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
