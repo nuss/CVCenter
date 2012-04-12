@@ -346,8 +346,8 @@ list::
 list::
 ## strong::learn::: the current state of the 'learn'-button of the widget and the 'learn'-button under the MIDI-tab of the editor
 ## strong::src::: the current string of the 'src'-field of the widget and the 'src'-field under the MIDI-tab of the editor (the ID under which the device gets registered in SC)
-## strong::src::: the current string of the 'chan'-field of the widget and the 'chan'-field under the MIDI-tab of the editor (the MIDI-channel)
-## strong::src::: the current string of the 'ctrl'-field of the widget and the 'ctrl'-field under the MIDI-tab of the editor (the controller-number of the device)
+## strong::chan::: the current string of the 'chan'-field of the widget and the 'chan'-field under the MIDI-tab of the editor (the MIDI-channel)
+## strong::ctrl::: the current string of the 'ctrl'-field of the widget and the 'ctrl'-field under the MIDI-tab of the editor (the controller-number of the device)
 ::
 ## midiOptions || the current MIDI-setup, analogue to code::CVWidget:setup:::
 list::
