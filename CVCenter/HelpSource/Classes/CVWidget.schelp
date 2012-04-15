@@ -374,11 +374,11 @@ returns:: an code::Event::
 METHOD:: midiOscEnv
 Get the current MIDI-/OSC-environment of the widget. If the widget is a code::CVWidget2D:: calling this method will return an code::Event:: containing the environments in 2 slots: code::\lo:: and code::\hi::, else the environment will be returned:
 definitionList::
-## oscMapping || input- to output-mapping of the values coming from the code::OSCresponder::\: either code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp:: (see also: link::#-setOscMapping::). By default the entry will be code::\linlin::.
-## oscMsgIndex || if an code::OSCresponder:: is present this will reflect the index of the message at which the values are received (see also: link::#-oscConnect::).
-## calibConstraints || if an code::OSCresponder:: is present this will reflect the current constraints for values coming in via OSC. Usually the constraints are set automatically by the widget's internal calibration-mechanism. However, you may set them manually by link::#-setOscInputConstraints:: or deactivate the calibration-mechanism by link:: #-setCalibrate::.
-## oscResponder || if an if an code::OSCresponder:: is present it will be stored under this slot.
-## midiResponder || if a code::CCResponder:: is present it will stored under this slot.
+	## oscMapping || input- to output-mapping of the values coming from the code::OSCresponder::\: either code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp:: (see also: link::#-setOscMapping::). By default the entry will be code::\linlin::.
+	## oscMsgIndex || if an code::OSCresponder:: is present this will reflect the index of the message at which the values are received (see also: link::#-oscConnect::).
+	## calibConstraints || if an code::OSCresponder:: is present this will reflect the current constraints for values coming in via OSC. Usually the constraints are set automatically by the widget's internal calibration-mechanism. However, you may set them manually by link::#-setOscInputConstraints:: or deactivate the calibration-mechanism by link:: #-setCalibrate::.
+	## oscResponder || if an if an code::OSCresponder:: is present it will be stored under this slot.
+	## midiResponder || if a code::CCResponder:: is present it will stored under this slot.
 ::
 
 returns:: an code::Event::
@@ -391,8 +391,9 @@ returns:: either a code::CV:: ( code::CVWidgetKnob::) or an code::Event:: ( code
 METHOD:: wdgtActions
 All actions (active and inactive) specified for the given widget.
 note:: Though this has to be a setter/getter for some reason. strong::Do not attempt to set an action like:: code::myWidget.wdgtActions_(some action)::. Rather use link::#-addAction::, link::#-removeAction:: resp. link::#-activateAction::
+::
 
-returns:: an code::Event:: containing active and inactive actions of a widget.
+returns:: an code::Event::, containing active and inactive actions of a widget.
 
 METHOD:: alwaysPositive
 If code::\explin:: or code::\expexp:: has been chosen for input to output mapping with link::#-setOscMapping:: both constraints of the input-range have to be same-signed - otherwise the operation would produce code::NaN::s. code::alwaysPositive:: will be calculated automatically, so the user shouldn't have to worry about it.
@@ -539,7 +540,6 @@ Server.default.waitForBoot{
 ~noise.free;
 ~twoDee.close;
 ::
-::
 
 subsection:: reusable widgets
 By default windows created in SC lack the ability to be opened again once they're closed (even evaluating the variable under which the window has been created will still return the window). The following section describes a workaround in CVWidget (resp. code::CVWidgetKnob:: and code::CVWidget2D::) that enables the user to keep a widget's responders and open and close it as many times as the user needs to ( strong::open:: is implemented in link::Classes/CVWidgetKnob#-open#CVWidgetKnob:: and link::Classes/CVWidget2D#-open#CVWidget2D::).
@@ -565,5 +565,4 @@ Server.default.waitForBoot{ ~noise = { SinOsc.ar(\freq.kr([0, 0]), mul: \amp.kr)
 // actions, responders etc. of the old one
 ~knob = ~knob.open;
 ~twoDee = ~twoDee.open;
-::
 ::
