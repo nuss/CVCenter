@@ -5,7 +5,6 @@ related:: Classes/CVCenter, Classes/ControlSpec, Classes/Synth, Classes/NodeProx
 
 DESCRIPTION::
 A dialog only being used when creating widgets in code::CVCenter:: from code::Synth::s, code::Ndef::s, code::NodeProxy::s or slots in a code::ProxySpace::.
-::
 
 CLASSMETHODS::
 

@@ -1,7 +1,7 @@
 CLASS:: OSCCommands
 summary:: A utility-class that let's you collect OSC command-names form incoming OSC
 categories:: External Control>OSC
-related:: Classes/OSCresponder, Classes/OSCresponderNot, Classes/OSCFunc, Classes/OSCDef, Classes/CVWidgetEditor, Guides/OSC_communication
+related:: Classes/OSCresponder, Classes/OSCresponderNode, Classes/OSCFunc, Classes/OSCDef, Classes/CVWidgetEditor, Guides/OSC_communication
 
 DESCRIPTION::
 OSCCommands implements a couple of methods that let the user collect OSC command-names (including their path/namespace - e.g. '/my, super/long/and/winding/pth/to/cmdname' - resp. the number of addressable msg-slots. E.g. from an orientation-sensor: code::[ '/cmdname', <x-value>, <y-value>, <z-value> ]:: (one command-name, 3 slots). Collected command-names can be stored to disk under a name set by the user. 

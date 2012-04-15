@@ -1,7 +1,7 @@
 CLASS:: CVWidget
 summary:: The abstract superclass for all CVWidgets
 categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
-related:: Classes/CVCenter, Classes/CV, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/ControlSpec, Classes/SimpleController/
+related:: Classes/CVCenter, Classes/CV, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/ControlSpec, Classes/SimpleController
 
 DESCRIPTION::
 CVWidget is the abstract superclass of all CVWidgets (currently: code::CVWidgetKnob:: and code::CVWidget2D::). However, it implements a couple of useful methods that are common to all its subclasses.
@@ -15,12 +15,12 @@ INSTANCEMETHODS::
 METHOD:: setup
 The current widget-setup, returned as an code::Event::. If the widget is a code::CVWidget2D:: each key of the returned Event will be split in a code::\lo:: and a code::\hi:: value:
 definitionList::
-## midiMode || as set by link::#-setMidiMode::. default: code::0::
-## calibrate || indicates wether OSC-calibration is active or not, set by link::#-setCalibrate::. default: code::true::
-## ctrlButtonBank || indicates wether the code::ctrlButtonBank:: parameter, reflecting a MIDI-device's bank-layout is set. This can be set with link::#-setCtrlButtonBank::. default: code::nil::
-## midiMean || if a MIDI-device is set to in-/decremental mode reps. code::midiMode:: is set to code::1:: this will be the mean output-value. Can be set with link::#-setMidiMean::. default: code::64::
-## midiResolution || if code::midiMode:: is set to code::1:: the step-size of each slider is determined by this parameter. Can be set with link::#-setMidiResolution::. default: code::1::
-## softWithin || if code::midiMode:: is set to code::0:: this determines the tolerance at which a MIDI-slider will respond when moved. For a more detailed explanation see link::#-setSoftWithin::. default: code::0.1::
+	## midiMode || as set by link::#-setMidiMode::. default: code::0::
+	## calibrate || indicates wether OSC-calibration is active or not, set by link::#-setCalibrate::. default: code::true::
+	## ctrlButtonBank || indicates wether the code::ctrlButtonBank:: parameter, reflecting a MIDI-device's bank-layout is set. This can be set with link::#-setCtrlButtonBank::. default: code::nil::
+	## midiMean || if a MIDI-device is set to in-/decremental mode reps. code::midiMode:: is set to code::1:: this will be the mean output-value. Can be set with link::#-setMidiMean::. default: code::64::
+	## midiResolution || if code::midiMode:: is set to code::1:: the step-size of each slider is determined by this parameter. Can be set with link::#-setMidiResolution::. default: code::1::
+	## softWithin || if code::midiMode:: is set to code::0:: this determines the tolerance at which a MIDI-slider will respond when moved. For a more detailed explanation see link::#-setSoftWithin::. default: code::0.1::
 ::
 
 returns:: an code::Event::
@@ -29,8 +29,8 @@ METHOD:: setMidiMode
 Different MIDI-devices may have different output modes: either values from 0-127 or an in-/decremental value (e.g. -1 or +1). These modes may be taken in account as follows:
 
 table::
-## code::0:: || the device outputs a values 0-127
-## code::1:: || the device outputs in-/decremental values
+	## code::0:: || the device outputs a values 0-127
+	## code::1:: || the device outputs in-/decremental values
 ::
 
 argument:: mode
@@ -156,9 +156,11 @@ Every CVWidget wraps one or more code::CV::s whose internal spec can be set with
 
 argument:: spec
 can either be:
-- a code::ControlSpec::
-- an code::Array:: that can be converted to a valid ControlSpec by calling code::asSpec:: on it
-- a code::Symbol:: representing the name of a valid ControlSpec (e.g. code::\freq::)
+list::
+	## a code::ControlSpec::
+	## an code::Array:: that can be converted to a valid ControlSpec by calling code::asSpec:: on it
+	## a code::Symbol:: representing the name of a valid ControlSpec (e.g. code::\freq::)
+::
 
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
@@ -178,10 +180,12 @@ Within an code::OSCresponder::'s function values coming in are being mapped to t
 
 argument:: mapping
 a code::Symbol:: - can be:
-- code::\linlin:: - linear to linear mapping
-- code::\linexp:: - linear to exponential mapping
-- code::\explin:: - exponential to linear mapping
-- code::\expexp:: - exponential to exponential mapping
+list::
+	## code::\linlin:: - linear to linear mapping
+	## code::\linexp:: - linear to exponential mapping
+	## code::\explin:: - exponential to linear mapping
+	## code::\expexp:: - exponential to exponential mapping
+::
 
 argument:: slot
 only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
@@ -206,12 +210,12 @@ argument:: port
 optional - if set the code::OSCresponder:: will only listen to messages coming from that port.
 
 argument:: name
-a code::String:: or a code::Symbol::: The OSC-command-name to which the OSCresponder will listen. E.g. code::'/touch/x':: or code::'/accelerometer/x'::. Every widget has an inbuilt mechanism that allows the user to scan connected devices for possible command-names. This mechanism is implemented in the class code::OSCCommands:: which may not only be used in connection with CVWidgets. code::OSCCommands:: stores a list of devices and commands to disk so the user does not have to rescan every time (s)he restarts SC.
+a code::String:: or a code::Symbol::\: The OSC-command-name to which the OSCresponder will listen. E.g. code::'/touch/x':: or code::'/accelerometer/x'::. Every widget has an inbuilt mechanism that allows the user to scan connected devices for possible command-names. This mechanism is implemented in the class code::OSCCommands:: which may not only be used in connection with CVWidgets. code::OSCCommands:: stores a list of devices and commands to disk so the user does not have to rescan every time (s)he restarts SC.
 
 argument:: oscMsgIndex
 messages you receive from an OSC-device/-program usually consist of the commend-name and one or more slots, containing numerical values. An orientation-sensor might e.g. send a message like the following:
 
-code:: '/orientation', 178, 67, 78::
+code:: [ '/orientation', 178, 67, 78 ]::
 
 the first slot is the command-name and the subsequent slots are code::x::, code::y:: and code::z::. code::oscMsgIndex:: allows you to select which of those three values you want to use in your widget.
 
@@ -319,47 +323,50 @@ subsection:: Models and Controllers, internal bookkeeping
 
 METHOD:: wdgtControllersAndModels
 CVWidgets are designed in an MVC-architecture (MVC = "model - view - controller"). Any time a new CVWidget gets instantiated the models get initialized. Any time the model is changed the function in the regarding controller gets invoked. 
-note::Do not try to change the models directly, e.g. by doing something like 
+
+warning:: Do not try to change the models directly, e.g. by doing something like 
 
 code::myWidget.wdgtControllersAndModels.someModel = someValue:: 
 
-Models are designed for internal bookkeeping and all methods within code::CVWidget:: are supposed to do the right thing with them.:: 
-All models and controllers are stored within the wdgtControllersAndModels instance-var. If the widget is a code::CVWidget2D:: wdgtControllersAndModels will be split up in a code::\lo:: and a code::\hi:: slot, each containing the following models (code::CVWidgetKnob:: keeps simply them under wdgtControllersAndModels):
+Models are designed for internal bookkeeping and all methods within CVWidget are supposed to do the right thing with them.
+::
+
+All models and controllers are stored within the wdgtControllersAndModels instance-var. If the widget is a code::CVWidget2D:: wdgtControllersAndModels will be split up in a code::\lo:: and a code::\hi:: slot, each containing the following models ( code::CVWidgetKnob:: simply keeps  them under wdgtControllersAndModels):
 
 definitionList::
-## calibrate || the current calibration-state as set with code::setCalibrate:: - either code::Ref(true):: (default at initialization) or code::Ref(false)::
-## cvSpec || the code::CV::'s current spec as set at initialization or with code::setSpec:: - a code::Ref:: to a code::ControlSpec::
-## oscInputRange || the current input-range, set by the widget's input mechanism with code::setInputRange:: - default at initialization: Ref([0.0001, 0.0001])
-## oscConnection || the current OSC-connection (if present): code::Ref([<IP-address>, <port>, <command-name>, <message-index>])::. If no connection is present it will be code::Ref(false)::
-## oscDisplayModel || stores all OSC-related visual properties of a widget and its editor. A code::Ref:: to an code::Event::, containing the following slots:
-list::
-## strong::but::: the state of the OSC-button ("edit OSC")
-## strong::ipField::: the IP-field under the OSC-tab of the editor (see code::CVWidgetEditor::)
-## strong::portField::: the port-field under the OSC-tab of the editor (see code::CVWidgetEditor::)
-## strong::nameField::: the field for the OSC-command-name under the OSC-tab of the editor (see code::CVWidgetEditor::)
-## strong::index::: the field for the message-index under the OSC-tab of the editor (see code::CVWidgetEditor::)
-## strong::connectorButVal::: the value of the connect-button under the OSC-tab of the editor connectorButVal (see code::CVWidgetEditor::)
-## strong::editEnabled::: if a connection is established editor-fields will be made uneditable and this slot is set to code::false::
-::
-## midiConnection || the currentMIDI-connection (if present): code::Ref((src: <val>, chan: <val>, num: <val>))::. If no connection is present this will be: code::Ref(nil)::.
-## midiDisplay || stores all MIDI-related visual properties of a widget and its editor. A code::Ref:: to an code::Event::, containing the following slots:
-list::
-## strong::learn::: the current state of the 'learn'-button of the widget and the 'learn'-button under the MIDI-tab of the editor
-## strong::src::: the current string of the 'src'-field of the widget and the 'src'-field under the MIDI-tab of the editor (the ID under which the device gets registered in SC)
-## strong::chan::: the current string of the 'chan'-field of the widget and the 'chan'-field under the MIDI-tab of the editor (the MIDI-channel)
-## strong::ctrl::: the current string of the 'ctrl'-field of the widget and the 'ctrl'-field under the MIDI-tab of the editor (the controller-number of the device)
-::
-## midiOptions || the current MIDI-setup, analogue to code::CVWidget:setup:::
-list::
-## strong::midiMode:: the current code::midiMode:: - see also link::#-setMidiMode::
-## strong::midiMean:: the current code::midiMean:: - see also link::#-setMidiMean::
-## strong::ctrlButtonBank:: the current value for code::ctrlButtonBank:: - see also link::#-setCtrlButtonBank::
-## strong::midiResolution:: the current code::midiResolution:: - see also link::#-setMidiResolution::
-## strong::softWithin:: the current value for code::softWithin:: - see also link::#-setSoftWithin::
-::
-## mapConstrainterLo || a code::CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[0]:: as value
-## mapConstrainterLo || a code::CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[1]:: as value
-## actions || a code::Ref:: to an code::Event::: code::Ref((numActions: <val>, activeActions: <val>))::. This model reflects the number of actions resp. active actions as displayed in the 'actions'-button of the widget.
+	## calibrate || the current calibration-state as set with link::#-setCalibrate:: - either code::Ref(true):: (default at initialization) or code::Ref(false)::.
+	## cvSpec || the code::CV::'s current spec as set at initialization or with code::setSpec:: - a code::Ref:: to a code::ControlSpec::.
+	## oscInputRange || the current input-range, set by the widget's input mechanism with code::setInputRange:: - default at initialization: code::Ref([0.0001, 0.0001])::.
+	## oscConnection || the current OSC-connection (if present): code::Ref([<IP-address>, <port>, <command-name>, <message-index>])::. If no connection is present it will be code::Ref(false)::.
+	## oscDisplayModel || stores all OSC-related visual properties of a widget and its editor. A code::Ref:: to an code::Event::, containing the following slots:
+	list::
+		## strong::but::: the state of the OSC-button ("edit OSC")
+		## strong::ipField::: the IP-field under the OSC-tab of the editor (see code::CVWidgetEditor::)
+		## strong::portField::: the port-field under the OSC-tab of the editor (see code::CVWidgetEditor::)
+		## strong::nameField::: the field for the OSC-command-name under the OSC-tab of the editor (see code::CVWidgetEditor::)
+		## strong::index::: the field for the message-index under the OSC-tab of the editor (see code::CVWidgetEditor::)
+		## strong::connectorButVal::: the value of the connect-button under the OSC-tab of the editor connectorButVal (see code::CVWidgetEditor::)
+		## strong::editEnabled::: if a connection is established editor-fields will be made uneditable and this slot is set to code::false:: 
+	::
+	## midiConnection || the currentMIDI-connection (if present): code::Ref((src\: <val>, chan\: <val>, num\: <val>))::. If no connection is present this will be: code::Ref(nil)::.
+	## midiDisplay || stores all MIDI-related visual properties of a widget and its editor. A code::Ref:: to an code::Event::, containing the following slots:
+	list::
+		## strong::learn::: the current state of the 'learn'-button of the widget and the 'learn'-button under the MIDI-tab of the editor
+		## strong::src::: the current string of the 'src'-field of the widget and the 'src'-field under the MIDI-tab of the editor (the ID under which the device gets registered in SC)
+		## strong::chan::: the current string of the 'chan'-field of the widget and the 'chan'-field under the MIDI-tab of the editor (the MIDI-channel)
+		## strong::ctrl::: the current string of the 'ctrl'-field of the widget and the 'ctrl'-field under the MIDI-tab of the editor (the controller-number of the device)
+	::
+	## midiOptions || the current MIDI-setup, analogue to link::#-setup:::
+	list::
+		## strong::midiMode::: the current code::midiMode:: - see also link::#-setMidiMode:: 
+		## strong::midiMean::: the current code::midiMean:: - see also link::#-setMidiMean:: 
+		## strong::ctrlButtonBank::: the current value for code::ctrlButtonBank:: - see also link::#-setCtrlButtonBank:: 
+		## strong::midiResolution::: the current code::midiResolution:: - see also link::#-setMidiResolution:: 
+		## strong::softWithin::: the current value for code::softWithin:: - see also link::#-setSoftWithin:: 
+	::
+	## mapConstrainterLo || a code::CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[0]:: as value
+	## mapConstrainterLo || a code::CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[1]:: as value
+	## actions || a code::Ref:: to an code::Event::: code::Ref((numActions\: <val>, activeActions\: <val>))::. This model reflects the number of actions resp. active actions as displayed in the 'actions'-button of the widget.
 ::
 
 returns:: an code::Event::
@@ -367,7 +374,7 @@ returns:: an code::Event::
 METHOD:: midiOscEnv
 Get the current MIDI-/OSC-environment of the widget. If the widget is a code::CVWidget2D:: calling this method will return an code::Event:: containing the environments in 2 slots: code::\lo:: and code::\hi::, else the environment will be returned:
 definitionList::
-## oscMapping || input- to output-mapping of the values coming from the code::OSCresponder::: either code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp:: (see also: link::#-setOscMapping::). By default the entry will be code::\linlin::.
+## oscMapping || input- to output-mapping of the values coming from the code::OSCresponder::\: either code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp:: (see also: link::#-setOscMapping::). By default the entry will be code::\linlin::.
 ## oscMsgIndex || if an code::OSCresponder:: is present this will reflect the index of the message at which the values are received (see also: link::#-oscConnect::).
 ## calibConstraints || if an code::OSCresponder:: is present this will reflect the current constraints for values coming in via OSC. Usually the constraints are set automatically by the widget's internal calibration-mechanism. However, you may set them manually by link::#-setOscInputConstraints:: or deactivate the calibration-mechanism by link:: #-setCalibrate::.
 ## oscResponder || if an if an code::OSCresponder:: is present it will be stored under this slot.
@@ -383,7 +390,7 @@ returns:: either a code::CV:: ( code::CVWidgetKnob::) or an code::Event:: ( code
 
 METHOD:: wdgtActions
 All actions (active and inactive) specified for the given widget.
-note:: Though this has to be a setter/getter for some reason. strong::Do not attempt to set an action like:: code::myWidget.wdgtActions_(…)::. Rather use link::#-addAction::, link::#-removeAction:: resp. link::#-activateAction::
+note:: Though this has to be a setter/getter for some reason. strong::Do not attempt to set an action like:: code::myWidget.wdgtActions_(some action)::. Rather use link::#-addAction::, link::#-removeAction:: resp. link::#-activateAction::
 
 returns:: an code::Event:: containing active and inactive actions of a widget.
 

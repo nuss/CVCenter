@@ -18,27 +18,25 @@ subsection:: Basic usage
 METHOD:: new
 Initializes CVCenter by creating its classvars code::all::, code::cvWidgets:: and more private ones.
 
-note::It shouldn't be necessary to initialize CVCenter with an explicit call to strong::*new::. Rather use strong::*use:: whenever possible as (will call strong::*new:: internally) ::
+note::It shouldn't be necessary to initialize CVCenter with an explicit call to strong::*new::. Rather use strong::*use:: whenever possible as (will call strong::*new:: internally)
+::
 
 argument:: cvs
 an Array, a Dictionary or an Event, containing the widget name(s) and its/their internal CV(s):
 
-argument::  setUpArgs
+argument::  ... setUpArgs
 An arbitrary number of key/value pairs. The following keys are currently supported:
-definitionList::
-list::
-## strong::midiMode::
-table::
-## code::0:: || MIDI-controllers that yield values from 0-127
-## code::1:: || MIDI-controller that yield de-/incremental values
-::
-(for a detailed explanation see: link::#-midiMode::)
-## strong::midiResolution:: || - only applies when midiMode is set to code::1:: - default: 1 (for a detailed explanation see: link::#-midiResolution::)
-## strong::midiMean:: || - only applies when midiMode is set to code::1:: - default: 64 (for a detailed explanation see: link::#-midiMean::)
-## strong::softwithin:: || - only applies when midiMode is set to code::0:: - default: 0.1 (for a detailed explanation see: link::#-softWithin::)
-## strong::ctrlButtonBank:: || - default: nil (for a detailed explanation see: link::#-ctrlButtonBank::)
-::
-::
+definitionlist::
+	## strong::midiMode:: ||
+		table::
+			## code::0:: || MIDI-controllers that yield values from 0-127
+			## code::1:: || MIDI-controller that yield de-/incremental values
+		::
+		(for a detailed explanation see: link::#-midiMode::)
+	## strong::midiResolution:: || - only applies when midiMode is set to code::1:: - default: 1 (for a detailed explanation see: link::#-midiResolution::)
+	## strong::midiMean:: || - only applies when midiMode is set to code::1:: - default: 64 (for a detailed explanation see: link::#-midiMean::)
+	## strong::softwithin:: || - only applies when midiMode is set to code::0:: - default: 0.1 (for a detailed explanation see: link::#-softWithin::)
+	## strong::ctrlButtonBank:: || - default: nil (for a detailed explanation see: link::#-ctrlButtonBank::)
 ::
 
 For a detailed description of the above listet arguments see the descriptions of the according classvar-methods. 
@@ -289,8 +287,8 @@ returns:: this (CVCenter)
 METHOD:: widgetsAtTab
 Get an code::Array:: containing all widgets (names) under the give tab.
 
-argument:: tab
-a code::String:: or a code::Symbol::
+argument:: label
+a code::String:: or a code::Symbol:: representing the name of the selected tab
 
 returns:: an code::Array::
 
@@ -309,7 +307,7 @@ METHOD:: loadSetup
 Loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup. 
 
 argument:: path
-optional - expects the full path to the location where the setup shall be stored disk. If given no file-open dialog will be displayed.
+optional - expects the full path to the location where the setup shall be stored to disk. If given no file-open dialog will be displayed.
 
 argument:: addToExisting
 If CVCenter GUI has already been initialized and contains some widgets and code::addToExisting:: is set to code::true:: the setup will rather add widgets to the already existing ones. strong::default::: code::false::
@@ -335,6 +333,7 @@ list::
 ## code::midiMean::
 ## code::ctrlButtonBank::
 ## code::softWithin::
+::
 
 returns:: an code::Event::
 

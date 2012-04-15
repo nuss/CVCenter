@@ -9,23 +9,32 @@ SECTION:: Classes
 
 LIST::
 ## link::Classes/CVCenter::
+::
 
 subsection:: Widgets
+LIST::
 ## link::Classes/CVWidget:: - the abstract superclass of all CVWidgets. Implements some useful methods for all CVWidgets
 ## link::Classes/CVWidgetKnob::
 ## link::Classes/CVWidget2D::
+::
 
 subsection:: Utilities
+LIST::
 ## link::Classes/OSCCommands::
 ## link::Classes/CVCenterControllersMonitor::
+::
 
 subsection:: Helpers
+LIST::
 ## link::Classes/CVWidgetEditor::
 ## link::Classes/CVWidgetSpecsEditor::
+::
 
 subsection:: Extensions to other Classes
+LIST::
 ## link::Classes/Synth#-cvcGui::
 ## link::Classes/NodeProxy#-cvcGui::
+::
 
 EXAMPLES::
 code::
