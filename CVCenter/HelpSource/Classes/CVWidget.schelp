@@ -258,7 +258,7 @@ only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::
 returns:: the receiver
 
 METHOD:: setOscInputConstraints
-Any widget has a mechanism built in that supposed to detect the constraints of the values coming in via OSC. However, you my set these constraints manually as well with this method.
+Any widget has a mechanism built in that is supposed to detect the constraints of the values coming in via OSC. However, you my set these constraints manually as well with this method.
 
 argument:: constraintsHiLo
 a code::Point:: - e.g. code::Point(-20, 20):: or code::0@360::
@@ -390,7 +390,7 @@ returns:: either a code::CV:: ( code::CVWidgetKnob::) or an code::Event:: ( code
 
 METHOD:: wdgtActions
 All actions (active and inactive) specified for the given widget.
-note:: Though this has to be a setter/getter for some reason. strong::Do not attempt to set an action like:: code::myWidget.wdgtActions_(some action)::. Rather use link::#-addAction::, link::#-removeAction:: resp. link::#-activateAction::
+warning:: Though this has to be a setter/getter for some reason. strong::Do not attempt to set an action like:: code::myWidget.wdgtActions_(some action)::. Rather use link::#-addAction::, link::#-removeAction:: resp. link::#-activateAction::
 ::
 
 returns:: an code::Event::, containing active and inactive actions of a widget.

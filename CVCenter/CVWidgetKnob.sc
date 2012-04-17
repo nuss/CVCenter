@@ -40,7 +40,7 @@ CVWidgetKnob : CVWidget {
 		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
-		
+				
 		this.bgColor ?? { this.bgColor = Color.white };
 		
 		prCalibrate = true;
