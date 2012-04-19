@@ -32,11 +32,11 @@ definitionlist::
 			## code::0:: || MIDI-controllers that yield values from 0-127
 			## code::1:: || MIDI-controller that yield de-/incremental values
 		::
-		(for a detailed explanation see: link::#-midiMode::)
-	## strong::midiResolution:: || - only applies when midiMode is set to code::1:: - default: 1 (for a detailed explanation see: link::#-midiResolution::)
-	## strong::midiMean:: || - only applies when midiMode is set to code::1:: - default: 64 (for a detailed explanation see: link::#-midiMean::)
-	## strong::softwithin:: || - only applies when midiMode is set to code::0:: - default: 0.1 (for a detailed explanation see: link::#-softWithin::)
-	## strong::ctrlButtonBank:: || - default: nil (for a detailed explanation see: link::#-ctrlButtonBank::)
+		(for a detailed explanation see: link::#*midiMode::)
+	## strong::midiResolution:: || - only applies when midiMode is set to code::1:: - default: 1 (for a detailed explanation see: link::#*midiResolution::)
+	## strong::midiMean:: || - only applies when midiMode is set to code::1:: - default: 64 (for a detailed explanation see: link::#*midiMean::)
+	## strong::softwithin:: || - only applies when midiMode is set to code::0:: - default: 0.1 (for a detailed explanation see: link::#*softWithin::)
+	## strong::ctrlButtonBank:: || - default: nil (for a detailed explanation see: link::#*ctrlButtonBank::)
 ::
 
 For a detailed description of the above listet arguments see the descriptions of the according classvar-methods. 
