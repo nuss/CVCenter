@@ -167,15 +167,19 @@ CVWidgetSpecsEditor {
 				.string_(prefSpecName ? specName)
 				.background_(textFieldBg)
 			;
-		
+					
 			flow.shift(5, 0);
 			elem.specEnterText = TextField(window, specEnterTextRect)
 				.font_(textFieldFont)
 				.background_(textFieldBg)
 			;
 			
-			cname.asSymbol.asSpec !? { elem.specEnterText.string_(cname.asSymbol.asSpec.asCompileString) };
-			
+			if(cname.asSymbol.asSpec.notNil and:{
+				cname.asSymbol.asSpec.isKindOf(ControlSpec)
+			}, { 
+				elem.specEnterText.string_(cname.asSymbol.asSpec.asCompileString)
+			});
+						
 			flow.shift(5, 0);
 			elem.specSelect = PopUpMenu(window, specSelectRect)
 				.items_(specsList)
@@ -186,7 +190,7 @@ CVWidgetSpecsEditor {
 			;
 			
 			selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == cname.asSymbol.asSpec });
-			elem.specSelect.value_(selectMatch);
+			selectMatch !? { elem.specSelect.value_(selectMatch) };
 			
 			metadata !? {
 				if(metadata.keys.includes(specName.asSymbol), {
