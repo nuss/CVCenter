@@ -22,10 +22,72 @@
 	
 	cvcGui { |displayDialog=true, prefix, pairs2D, environment|
 		var sDef, def, cDict = (), metadata;
+		var thisType, thisControls, thisSpec, thisSlots, thisName;
 		sDef = SynthDescLib.global[this.defName.asSymbol];
 		sDef.metadata !? { sDef.metadata.specs !? { metadata = sDef.metadata.specs }};
 		sDef.controlDict.pairsDo({ |n, c| cDict.put(n, c.defaultValue) });
-		CVWidgetSpecsEditor(displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, metadata, environment);
+		if(displayDialog, {
+			CVWidgetSpecsEditor(displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, metadata, environment);
+		}, {
+			cDict.pairsDo({ |cName, vals|
+				block { |break|
+					pairs2D.pairsDo({ |wdgtName, cNames|
+						if(cNames.includes(cName), {
+							break.value(
+								thisName = wdgtName;
+								thisType = \w2dc;
+								thisControls = cNames;
+								if(metadata.notNil, {
+									metadata[cNames[0]] !? { thisSpec = metadata[cNames[0]].asSpec };
+								}, {
+									thisSpec = cName.asSpec;
+								})
+							)
+						})
+					})
+				};
+				if(cDict[cName].size == 0, { thisType = nil; thisName = cName });
+				if(cDict[cName].size == 2, { thisType = \w2d; thisName = cName });
+				if(cDict[cName].size > 2, { thisType = \wms; thisName = cName });
+				
+				switch(thisType, 
+					\w2dc, {
+						thisSlots = [cDict[thisControls[0]], cDict[thisControls[1]]];
+					},
+					\w2d, {
+						thisSlots = cDict[cName];
+						if(metadata.notNil, {
+							metadata[cName] !? { thisSpec = metadata[cName].asSpec };
+						}, {
+							thisSpec = cName.asSpec;
+						})
+					},
+					\wms, {
+						thisSlots = cDict[cName];
+						if(metadata.notNil, {
+							metadata[cName] !? { thisSpec = metadata[cName].asSpec };
+						}, {
+							thisSpec = cName.asSpec;
+						})
+					},
+					thisSlots = [cDict[cName]];
+					if(metadata.notNil, {
+						metadata[cName] !? { thisSpec = metadata[cName].asSpec };
+					}, {
+						thisSpec = cName.asSpec;
+					})
+				);
+				
+				CVCenter.finishGui(this, cName, nil, (
+					cName: thisName, 
+					type: thisType, 
+					enterTab: this.defName.asSymbol, 
+					controls: thisControls,
+					slots: thisSlots,
+					specSelect: thisSpec
+				))
+			})
+		})
 	}
 		
 }
@@ -34,13 +96,59 @@
 	
 	cvcGui { |displayDialog=true, prefix, pairs2D|
 		var cDict = (), name;
+		var thisType, thisControls, thisSpec, thisSlots, thisName;
 		this.getKeysValues.do({ |pair| cDict.put(pair[0], pair[1]) });
 		if(this.class === Ndef, {
 			name = this.key;
 		}, {
 			name = nil;
 		});
-		CVWidgetSpecsEditor(displayDialog, this, name, cDict, prefix, pairs2D);
+		if(displayDialog, {
+			CVWidgetSpecsEditor(displayDialog, this, name, cDict, prefix, pairs2D);
+		}, {
+			cDict.pairsDo({ |cName, vals|
+				block { |break|
+					pairs2D.pairsDo({ |wdgtName, cNames|
+						if(cNames.includes(cName), {
+							break.value(
+								thisName = wdgtName;
+								thisType = \w2dc;
+								thisControls = cNames;
+								thisSpec = cName.asSpec;
+							)
+						})
+					})
+				};
+				if(cDict[cName].size == 0, { thisType = nil; thisName = cName });
+				if(cDict[cName].size == 2, { thisType = \w2d; thisName = cName });
+				if(cDict[cName].size > 2, { thisType = \wms; thisName = cName });
+				
+				switch(thisType, 
+					\w2dc, {
+						thisSlots = [cDict[thisControls[0]], cDict[thisControls[1]]];
+					},
+					\w2d, {
+						thisSlots = cDict[cName];
+						thisSpec = cName.asSpec;
+					},
+					\wms, {
+						thisSlots = cDict[cName];
+						thisSpec = cName.asSpec;
+					},
+					thisSlots = [cDict[cName]];
+					thisSpec = cName.asSpec;
+				);
+				
+				CVCenter.finishGui(this, cName, nil, (
+					cName: thisName, 
+					type: thisType, 
+					enterTab: name, 
+					controls: thisControls,
+					slots: thisSlots,
+					specSelect: thisSpec
+				))
+			})
+		})
 	}
 
 }
