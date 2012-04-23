@@ -22,7 +22,7 @@
 	
 	cvcGui { |displayDialog=true, prefix, pairs2D, environment|
 		var sDef, def, cDict = (), metadata;
-		var thisType, thisControls, thisSpec, thisSlots, thisName;
+		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
 		sDef = SynthDescLib.global[this.defName.asSymbol];
 		sDef.metadata !? { sDef.metadata.specs !? { metadata = sDef.metadata.specs }};
 		sDef.controlDict.pairsDo({ |n, c| cDict.put(n, c.defaultValue) });
@@ -41,12 +41,13 @@
 									metadata[cNames[0]] !? { thisSpec = metadata[cNames[0]].asSpec };
 								}, {
 									thisSpec = cName.asSpec;
-								})
+								});
+								done = done.add(cNames).flat;
 							)
 						})
 					})
 				};
-				if(cDict[cName].size == 0, { thisType = nil; thisName = cName });
+				if(cDict[cName].size == 0 and:{ done.includes(cName).not }, { thisType = nil; thisName = cName });
 				if(cDict[cName].size == 2, { thisType = \w2d; thisName = cName });
 				if(cDict[cName].size > 2, { thisType = \wms; thisName = cName });
 				
@@ -78,6 +79,8 @@
 					})
 				);
 				
+				prefix !? { thisName = prefix.asString++(thisName.asString[0]).toUpper ++ thisName.asString[1..] };
+				
 				CVCenter.finishGui(this, cName, nil, (
 					cName: thisName, 
 					type: thisType, 
@@ -96,7 +99,7 @@
 	
 	cvcGui { |displayDialog=true, prefix, pairs2D|
 		var cDict = (), name;
-		var thisType, thisControls, thisSpec, thisSlots, thisName;
+		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
 		this.getKeysValues.do({ |pair| cDict.put(pair[0], pair[1]) });
 		if(this.class === Ndef, {
 			name = this.key;
@@ -115,11 +118,12 @@
 								thisType = \w2dc;
 								thisControls = cNames;
 								thisSpec = cName.asSpec;
+								done = done.add(cNames).flat;
 							)
 						})
 					})
 				};
-				if(cDict[cName].size == 0, { thisType = nil; thisName = cName });
+				if(cDict[cName].size == 0 and:{ done.includes(cName).not }, { thisType = nil; thisName = cName });
 				if(cDict[cName].size == 2, { thisType = \w2d; thisName = cName });
 				if(cDict[cName].size > 2, { thisType = \wms; thisName = cName });
 				
@@ -138,6 +142,8 @@
 					thisSlots = [cDict[cName]];
 					thisSpec = cName.asSpec;
 				);
+
+				prefix !? { thisName = prefix.asString++(thisName.asString[0]).toUpper ++ thisName.asString[1..] };
 				
 				CVCenter.finishGui(this, cName, nil, (
 					cName: thisName, 
