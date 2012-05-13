@@ -659,7 +659,7 @@ CVWidgetEditor {
 					if(actionName.string != "action-name" and:{
 						enterAction.string != "{ |cv| /* do something */ }"
 					}, {
-						widget.addAction(actionName.string.asSymbol, enterAction.string, slot.asSymbol);
+						widget.addAction(actionName.string.asSymbol, enterAction.string.replace("\t", "    "), slot.asSymbol);
 					})
 				})
 			;
@@ -671,6 +671,7 @@ CVWidgetEditor {
 				.font_(textFieldFont)
 				.string_("{ |cv| /* do something */ }")
 				.syntaxColorize
+//				.keyDownAction_({ |v| v.string_(v.string.copy.replace("\t", "    ")) })
 			;
 			
 			if(slot.notNil, {
@@ -733,7 +734,7 @@ CVWidgetEditor {
 				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.font_(textFieldFont)
-					.string_(action.asArray[0][0])
+					.string_(action.asArray[0][0].replace("\t", "    "))
 					.syntaxColorize
 					.editable_(false)
 				;
