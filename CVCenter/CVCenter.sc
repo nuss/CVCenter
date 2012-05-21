@@ -844,7 +844,7 @@ CVCenter {
 	
 	*loadSetup { |path, addToExisting=false, autoConnectOSC=true, autoConnectMIDI=true, loadActions=true|
 		var lib, midiOscEnvs, successFunc;
-
+		
 		successFunc = { |f|
 			if(GUI.scheme === QtGUI, {
 				lib = Library.readTextArchive(*f);
