@@ -604,9 +604,10 @@ CVWidget2D : CVWidget {
 				midiLearn: midiLearn[slot]
 			);
 			this.initControllerActions(slot);
-			oldBounds = window.bounds;
-			if(window.respondsTo(\name), { oldName = window.name });
-		})
+		});
+		
+		oldBounds = window.bounds;
+		if(window.respondsTo(\name), { oldName = window.name });
 	}
 	
 	open { |parent, wdgtBounds|
