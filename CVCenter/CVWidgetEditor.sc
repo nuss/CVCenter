@@ -143,67 +143,69 @@ CVWidgetEditor {
 				switch(unicode,
 					111, { thisEditor.tabs.focus(2) }, // "o" -> osc
 					109, { thisEditor.tabs.focus(1) }, // "m" -> midi
-					97, { thisEditor.tabs.focus(3) }, // "a" -> actions
-					115, { thisEditor.tabs.focus(0) }, // "s" -> specs
+					97, { if(widget.class != CVWidgetMS, { thisEditor.tabs.focus(3) }) }, // "a" -> actions
+					115, { if(widget.class != CVWidgetMS, { thisEditor.tabs.focus(0) }) }, // "s" -> specs
 					120, { this.close(slot) }, // "x" -> close editor
 					99, { OSCCommands.makeWindow } // "c" -> collect OSC-commands resp. open the collector's GUI
 				)
 			});
-						
-			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@95)
-				.font_(staticTextFont)
-				.stringColor_(staticTextColor)
-				.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq.asSpec \nor [20, 20000, \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
-			;
-
-			cvString = widget.getSpec(slot).asString.split($ );
-
-			cvString = cvString[1..cvString.size-1].join(" ");
 			
-			specField = TextField(thisEditor.tabs.views[0], flow0.bounds.width-20@15)
-				.font_(staticTextFont)
-				.string_(cvString)
-				.action_({ |tf|
-					widget.setSpec(tf.string.interpret, slot)
-				})
-			;
-			
-			flow0.shift(0, 5);
-
-			specsList = PopUpMenu(thisEditor.tabs.views[0], flow0.bounds.width-20@20)
-				.action_({ |sl|
-					widget.setSpec(specsListSpecs[sl.value], slot);
-				})
-			;
-			
-			if(editorEnv.specsListSpecs.isNil, { 
-				specsListSpecs = List() 
-			}, {
-				specsListSpecs = editorEnv.specsListSpecs;
-			});
-			
-			if(editorEnv.specsListItems.notNil, {
-				specsList.items_(editorEnv.specsListItems);
-			}, {
-				Spec.specs.pairsDo({ |k, v|
-					if(v.isKindOf(ControlSpec), {
-						specsList.items_(specsList.items.add(k++":"+v));
-						specsListSpecs.add(v);
+			if(widget.class != CVWidgetMS, {			
+				StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@95)
+					.font_(staticTextFont)
+					.stringColor_(staticTextColor)
+					.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq.asSpec \nor [20, 20000, \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
+				;
+	
+				cvString = widget.getSpec(slot).asString.split($ );
+	
+				cvString = cvString[1..cvString.size-1].join(" ");
+				
+				specField = TextField(thisEditor.tabs.views[0], flow0.bounds.width-20@15)
+					.font_(staticTextFont)
+					.string_(cvString)
+					.action_({ |tf|
+						widget.setSpec(tf.string.interpret, slot)
 					})
+				;
+				
+				flow0.shift(0, 5);
+	
+				specsList = PopUpMenu(thisEditor.tabs.views[0], flow0.bounds.width-20@20)
+					.action_({ |sl|
+						widget.setSpec(specsListSpecs[sl.value], slot);
+					})
+				;
+				
+				if(editorEnv.specsListSpecs.isNil, { 
+					specsListSpecs = List() 
+				}, {
+					specsListSpecs = editorEnv.specsListSpecs;
+				});
+				
+				if(editorEnv.specsListItems.notNil, {
+					specsList.items_(editorEnv.specsListItems);
+				}, {
+					Spec.specs.pairsDo({ |k, v|
+						if(v.isKindOf(ControlSpec), {
+							specsList.items_(specsList.items.add(k++":"+v));
+							specsListSpecs.add(v);
+						})
+					})
+				});
+							
+				tmp = specsListSpecs.detectIndex({ |spec, i| spec == widget.getSpec(slot) });
+				if(tmp.notNil, {
+					specsList.value_(tmp);
+				}, {
+					specsListSpecs.array_([widget.getSpec(slot)]++specsListSpecs.array);
+					specsList.items = List["custom:"+widget.getSpec(slot).asString]++specsList.items;
+				});
+				
+				window.onClose_({
+					editorEnv.specsListSpecs = specsListSpecs;
+					editorEnv.specsListItems = specsList.items;
 				})
-			});
-						
-			tmp = specsListSpecs.detectIndex({ |spec, i| spec == widget.getSpec(slot) });
-			if(tmp.notNil, {
-				specsList.value_(tmp);
-			}, {
-				specsListSpecs.array_([widget.getSpec(slot)]++specsListSpecs.array);
-				specsList.items = List["custom:"+widget.getSpec(slot).asString]++specsList.items;
-			});
-			
-			window.onClose_({
-				editorEnv.specsListSpecs = specsListSpecs;
-				editorEnv.specsListItems = specsList.items;
 			});
 						
 			// MIDI editing
@@ -643,102 +645,106 @@ CVWidgetEditor {
 				false, { calibBut.value_(1) }
 			);
 			
-			actionName = TextField(thisEditor.tabs.views[3], flow3.bounds.width-100@20)
-				.string_("action-name")
-				.font_(textFieldFont)
-			;
-			
-			flow3.shift(5, 0);
-			
-			enterActionBut = Button(thisEditor.tabs.views[3], 57@20)
-				.font_(staticTextFont)
-				.states_([
-					["add Action", Color.white, Color.blue],
-				])
-				.action_({ |ab|
-					if(actionName.string != "action-name" and:{
-						enterAction.string != "{ |cv| /* do something */ }"
-					}, {
-						widget.addAction(actionName.string.asSymbol, enterAction.string.replace("\t", "    "), slot.asSymbol);
+			if(widget.class != CVWidgetMS, {
+				actionName = TextField(thisEditor.tabs.views[3], flow3.bounds.width-100@20)
+					.string_("action-name")
+					.font_(textFieldFont)
+				;
+				
+				flow3.shift(5, 0);
+				
+				enterActionBut = Button(thisEditor.tabs.views[3], 57@20)
+					.font_(staticTextFont)
+					.states_([
+						["add Action", Color.white, Color.blue],
+					])
+					.action_({ |ab|
+						if(actionName.string != "action-name" and:{
+							enterAction.string != "{ |cv| /* do something */ }"
+						}, {
+							widget.addAction(actionName.string.asSymbol, enterAction.string.replace("\t", "    "), slot.asSymbol);
+						})
 					})
+				;
+	
+				flow3.shift(0, 0);
+	
+				enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+					.background_(Color.white)
+					.font_(textFieldFont)
+					.string_("{ |cv| /* do something */ }")
+					.syntaxColorize
+	//				.keyDownAction_({ |v| v.string_(v.string.copy.replace("\t", "    ")) })
+				;
+				
+				if(slot.notNil, {
+					wdgtActions = widget.wdgtActions[slot];
+				}, {
+					wdgtActions = widget.wdgtActions;
+				});
+				
+				wdgtActions.pairsDo({ |name, action|
+													
+					actionsList = actionsList.put(name, ());
+					
+					flow3.shift(0, 5);
+					
+					actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-173@15)
+						.font_(staticTextFont)
+						.background_(Color(1.0, 1.0, 1.0, 0.5))
+						.string_(""+name.asString)
+					;
+					
+					flow3.shift(5, 0);
+					
+					actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
+						.font_(staticTextFont)
+						.states_([
+							["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+							["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
+						])
+						.action_({ |rb|
+							switch(rb.value, 
+								0, { widget.activateAction(name, false, slot) },
+								1, { widget.activateAction(name, true, slot) }
+							)
+						})
+					;
+					
+					switch(action.asArray[0][1], 
+						true, {
+							actionsList[name].activate.value_(1);
+						},
+						false, {
+							actionsList[name].activate.value_(0);
+						}
+					);
+					
+					flow3.shift(5, 0);
+					
+					actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 60@15)
+						.font_(staticTextFont)
+						.states_([
+							["remove", Color.white, Color.red],
+						])
+						.action_({ |rb|
+							widget.removeAction(name.asSymbol, slot.asSymbol);
+						})
+					;
+					
+					flow3.shift(0, 0);
+					
+					actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+						.background_(Color(1.0, 1.0, 1.0, 0.5))
+						.font_(textFieldFont)
+						.string_(action.asArray[0][0].replace("\t", "    "))
+						.syntaxColorize
+						.editable_(false)
+					;
 				})
-			;
-
-			flow3.shift(0, 0);
-
-			enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
-				.background_(Color.white)
-				.font_(textFieldFont)
-				.string_("{ |cv| /* do something */ }")
-				.syntaxColorize
-//				.keyDownAction_({ |v| v.string_(v.string.copy.replace("\t", "    ")) })
-			;
-			
-			if(slot.notNil, {
-				wdgtActions = widget.wdgtActions[slot];
-			}, {
-				wdgtActions = widget.wdgtActions;
 			});
 			
-			wdgtActions.pairsDo({ |name, action|
-												
-				actionsList = actionsList.put(name, ());
-				
-				flow3.shift(0, 5);
-				
-				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-173@15)
-					.font_(staticTextFont)
-					.background_(Color(1.0, 1.0, 1.0, 0.5))
-					.string_(""+name.asString)
-				;
-				
-				flow3.shift(5, 0);
-				
-				actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
-					.font_(staticTextFont)
-					.states_([
-						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
-						["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
-					])
-					.action_({ |rb|
-						switch(rb.value, 
-							0, { widget.activateAction(name, false, slot) },
-							1, { widget.activateAction(name, true, slot) }
-						)
-					})
-				;
-				
-				switch(action.asArray[0][1], 
-					true, {
-						actionsList[name].activate.value_(1);
-					},
-					false, {
-						actionsList[name].activate.value_(0);
-					}
-				);
-				
-				flow3.shift(5, 0);
-				
-				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 60@15)
-					.font_(staticTextFont)
-					.states_([
-						["remove", Color.white, Color.red],
-					])
-					.action_({ |rb|
-						widget.removeAction(name.asSymbol, slot.asSymbol);
-					})
-				;
-				
-				flow3.shift(0, 0);
-				
-				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
-					.background_(Color(1.0, 1.0, 1.0, 0.5))
-					.font_(textFieldFont)
-					.string_(action.asArray[0][0].replace("\t", "    "))
-					.syntaxColorize
-					.editable_(false)
-				;
-			})
+			if(widget.class == CVWidgetMS, { [0, 3].do(tabs.removeAt(_)) });
 			
 		});
 		
@@ -781,75 +787,77 @@ CVWidgetEditor {
 		
 		var staticTextFont = Font(Font.defaultSansFace, 10);
 
-		switch(addRemove, 
-			\add, {
-				
-				actionsList.put(name, ());
-				flow3.shift(0, 5);
-				
-				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-173@15)
-					.font_(staticTextFont)
-					.background_(Color(1.0, 1.0, 1.0, 0.5))
-					.string_(""+name.asString)
-				;
-				
-				flow3.shift(5, 0);
-				
-				actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
-					.font_(staticTextFont)
-					.states_([
-						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
-						["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
-					])
-					.action_({ |rb|
-						switch(rb.value, 
-							0, { widget.activateAction(name, false, slot) },
-							1, { widget.activateAction(name, true, slot) }
-						)
-					})
-				;
-
-				switch(active, 
-					true, {
-						actionsList[name].activate.value_(1);
-					},
-					false, {
-						actionsList[name].activate.value_(0);
-					}
-				);
-				
-				flow3.shift(5, 0);
-				
-				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 60@15)
-					.font_(staticTextFont)
-					.states_([
-						["remove", Color.white, Color.red],
-					])
-					.action_({ |ab|
-						widget.removeAction(name.asSymbol, slot.asSymbol);
-					})
-				;
-				
-				flow3.shift(0, 0);
-				
-				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
-					.background_(Color(1.0, 1.0, 1.0, 0.5))
-					.font_(Font("Helvetica", 9))
-					.string_(action.asArray[0][0])
-					.syntaxColorize
-					.editable_(false)
-				;
-			},
-			\remove, {
-				[
-					actionsList[name].nameField, 
-					actionsList[name].activate, 
-					actionsList[name].removeBut, 
-					actionsList[name].actionView
-				].do(_.remove);
-				flow3.reFlow(thisEditor.tabs.views[3]);
-			}		
-		)
+		if(widget.class != CVWidgetMS, {
+			switch(addRemove, 
+				\add, {
+					
+					actionsList.put(name, ());
+					flow3.shift(0, 5);
+					
+					actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-173@15)
+						.font_(staticTextFont)
+						.background_(Color(1.0, 1.0, 1.0, 0.5))
+						.string_(""+name.asString)
+					;
+					
+					flow3.shift(5, 0);
+					
+					actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
+						.font_(staticTextFont)
+						.states_([
+							["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+							["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
+						])
+						.action_({ |rb|
+							switch(rb.value, 
+								0, { widget.activateAction(name, false, slot) },
+								1, { widget.activateAction(name, true, slot) }
+							)
+						})
+					;
+	
+					switch(active, 
+						true, {
+							actionsList[name].activate.value_(1);
+						},
+						false, {
+							actionsList[name].activate.value_(0);
+						}
+					);
+					
+					flow3.shift(5, 0);
+					
+					actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 60@15)
+						.font_(staticTextFont)
+						.states_([
+							["remove", Color.white, Color.red],
+						])
+						.action_({ |ab|
+							widget.removeAction(name.asSymbol, slot.asSymbol);
+						})
+					;
+					
+					flow3.shift(0, 0);
+					
+					actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+						.background_(Color(1.0, 1.0, 1.0, 0.5))
+						.font_(Font("Helvetica", 9))
+						.string_(action.asArray[0][0])
+						.syntaxColorize
+						.editable_(false)
+					;
+				},
+				\remove, {
+					[
+						actionsList[name].nameField, 
+						actionsList[name].activate, 
+						actionsList[name].removeBut, 
+						actionsList[name].actionView
+					].do(_.remove);
+					flow3.reFlow(thisEditor.tabs.views[3]);
+				}		
+			)
+		})
 			
 	}
 			

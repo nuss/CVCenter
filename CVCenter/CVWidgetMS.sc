@@ -1,22 +1,7 @@
-/* (c) 2010-2012 Stefan Nussbaumer */
-/* 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 3 of the License, or
- (at your option) any later version.
- 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-*/
 CVWidgetMS : CVWidget {
 
 	var <mSlider, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
+	var <msEditor;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
@@ -72,7 +57,7 @@ CVWidgetMS : CVWidget {
 		prMidiResolution = 1 ! thisSize;
 		prSoftWithin = 0.1 ! thisSize;
 						
-		guiEnv = Array.newClear(thisSize);
+		guiEnv = ();
 		cvcGui !? { isCVCWidget = true };
 
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { 
@@ -97,7 +82,7 @@ CVWidgetMS : CVWidget {
 //		editor = ();
 
 //		TO DO
-		thisSize.do(this.initControllersAndModels(controllersAndModels, _));
+//		thisSize.do(this.initControllersAndModels(controllersAndModels, _));
 		
 		setupArgs !? {
 			thisSize.do({ |slot|
@@ -196,7 +181,7 @@ CVWidgetMS : CVWidget {
 		;
 		nextY = thisXY.y+mSlider.bounds.height+label.bounds.height+1;
 		numVal = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.string_(widgetCV.value.asString).font_(Font("Helvetica", 9.5))
+			.string_(widgetCV.value.asCompileString).font_(Font("Helvetica", 9.5))
 		;
 		nextY = thisXY.y+numVal.bounds.top+numVal.bounds.height+1;
 		midiBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/4, 15))
@@ -204,7 +189,14 @@ CVWidgetMS : CVWidget {
 				["MIDI", Color.black, this.bgColor]
 			])
 			.font_(Font("Helvetica", 9))
-			.action_({ |mb| })
+			.action_({ |mb| 
+				if(msEditor.isNil or:{ msEditor.isClosed }, {
+					msEditor = CVWidgetMSEditor(this, thisName, 0);
+					guiEnv.msEditor = msEditor;
+				}, {
+					msEditor.front(0)
+				})
+			})
 		;
 		nextX = thisXY.x+1+midiBut.bounds.width;
 		oscBut = Button(window, Rect(nextX, nextY, thisWidth-2/4, 15))
@@ -212,7 +204,14 @@ CVWidgetMS : CVWidget {
 				["OSC", Color.black, this.bgColor]
 			])
 			.font_(Font("Helvetica", 9))
-			.action_({ |oscb| })
+			.action_({ |oscb| 
+				if(msEditor.isNil or:{ msEditor.isClosed }, {
+					msEditor = CVWidgetMSEditor(this, thisName, 1);
+					guiEnv.msEditor = msEditor;
+				}, {
+					msEditor.front(1)
+				})
+			})
 		;
 		nextX = nextX+oscBut.bounds.width;
 		specBut = Button(window, Rect(nextX, nextY, thisWidth-2/4, 15))
@@ -220,7 +219,14 @@ CVWidgetMS : CVWidget {
 				["Spec", Color.white, Color(1.0, 0.3)]
 			])
 			.font_(Font("Helvetica", 9))
-			.action_({ |spb| })
+			.action_({ |spb|
+				if(msEditor.isNil or:{ msEditor.isClosed }, {
+					msEditor = CVWidgetMSEditor(this, thisName, 2);
+					guiEnv.msEditor = msEditor;
+				}, {
+					msEditor.front(2)
+				})
+			})
 		;
 		nextX = nextX+specBut.bounds.width;
 		actionsBut = Button(window, Rect(nextX, nextY, thisWidth-2/4, 15))
@@ -228,7 +234,14 @@ CVWidgetMS : CVWidget {
 				["Actions", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])
 			.font_(Font("Helvetica", 9))
-			.action_({ |spb| })
+			.action_({ |spb|
+				if(msEditor.isNil or:{ msEditor.isClosed }, {
+					msEditor = CVWidgetMSEditor(this, thisName, 3);
+					guiEnv.msEditor = msEditor;
+				}, {
+					msEditor.front(3)
+				})
+			})
 		;
 		
 		visibleGuiEls = [
@@ -252,17 +265,17 @@ CVWidgetMS : CVWidget {
 			actionsBut
 		];
 		
-		thisSize.do({ |slot|
-			guiEnv[slot] = (
-				editor: editor[slot],
-				mSlider: mSlider,
-				numVal: numVal,
-				midiBut: midiBut[slot],
-				oscBut: oscBut[slot]
-				specBut: specBut[slot],
-				actionsBut: actionsBut[slot]
-			)
-		});
+//		thisSize.do({ |slot|
+//			guiEnv[slot] = (
+//				editor: editor[slot],
+//				mSlider: mSlider,
+//				numVal: numVal,
+//				midiBut: midiBut[slot],
+//				oscBut: oscBut[slot]
+//				specBut: specBut[slot],
+//				actionsBut: actionsBut[slot]
+//			)
+//		});
 		
 		widgetCV.connect(mSlider);
 		oldBounds = window.bounds;
