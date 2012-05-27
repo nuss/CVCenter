@@ -58,6 +58,9 @@ CVWidgetMS : CVWidget {
 		prMidiMean = 64 ! msSize;
 		prMidiResolution = 1 ! msSize;
 		prSoftWithin = 0.1 ! msSize;
+		prCtrlButtonBank = nil ! msSize;
+		
+//		"setup: %\n".postf([prCalibrate, prMidiMode, prMidiMean, prMidiResolution, prSoftWithin]);
 						
 		guiEnv = ();
 		cvcGui !? { isCVCWidget = true };

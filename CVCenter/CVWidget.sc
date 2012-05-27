@@ -847,7 +847,7 @@ CVWidget {
 		}, {
 			wdgtControllersAndModels ?? {
 				switch(this.class, 
-					CVWidgetMS, { wdgtControllersAndModels = Array.newClear(this.msSize) },
+					CVWidgetMS, { wdgtControllersAndModels = (slots: Array.newClear(this.msSize)) },
 					{ wdgtControllersAndModels = () }
 				)
 			}
@@ -857,16 +857,21 @@ CVWidget {
 			if(wdgtControllersAndModels[slot].isNil, {
 				switch(this.class,
 					CVWidget2D, { wdgtControllersAndModels.put(slot, ()) },
-					CVWidgetMS, { wdgtControllersAndModels[slot] = () }
+					CVWidgetMS, { wdgtControllersAndModels.slots[slot] = () }
 				)
 			})
 		};
 		
 		if(slot.notNil, {
-			wcm = wdgtControllersAndModels[slot];
+			switch(this.class,
+				CVWidget2D, { wcm = wdgtControllersAndModels[slot] },
+				CVWidgetMS, { wcm = wdgtControllersAndModels.slots[slot] }
+			)
 		}, {
 			wcm = wdgtControllersAndModels;
 		});
+		
+		"wcm: %\n".postf(wcm);
 								
 		wcm.calibration ?? {
 			wcm.calibration = ();
@@ -879,11 +884,25 @@ CVWidget {
 			})
 		};		
 		wcm.cvSpec ?? {
-			wcm.cvSpec = ();
+			switch(this.class,
+				CVWidgetMS, {
+					wdgtControllersAndModels.cvSpec ?? {
+						wdgtControllersAndModels.cvSpec = ();
+					}
+				},
+				{ wcm.cvSpec = () }
+			)
 		};
-		wcm.cvSpec.model ?? { 
-			wcm.cvSpec.model = Ref(this.getSpec(slot));
-		};
+		switch(this.class, 
+			CVWidgetMS, {
+				wdgtControllersAndModels.cvSpec.model ?? {
+					wdgtControllersAndModels.cvSpec.model = Ref(this.getSpec);
+				}
+			}, 
+			{ wcm.cvSpec.model ?? { 
+				wcm.cvSpec.model = Ref(this.getSpec(slot));
+			}}
+		);
 		wcm.oscInputRange ?? {
 			wcm.oscInputRange = ();
 		};
@@ -926,14 +945,27 @@ CVWidget {
 			wcm.midiOptions = ();
 		};
 		wcm.midiOptions.model ?? {
-			wcm.midiOptions.model = Ref(
-				(
-					midiMode: prMidiMode, 
-					midiMean: prMidiMean, 
-					ctrlButtonBank: prCtrlButtonBank, 
-					midiResolution: prMidiResolution, 
-					softWithin: prSoftWithin
-				)
+			switch(this.class,
+				CVWidgetMS, {
+					wcm.midiOptions.model = Ref(
+						(
+							midiMode: prMidiMode[slot], 
+							midiMean: prMidiMean[slot], 
+							ctrlButtonBank: prCtrlButtonBank[slot], 
+							midiResolution: prMidiResolution[slot], 
+							softWithin: prSoftWithin[slot]
+						)
+					)
+				},
+				{ wcm.midiOptions.model = Ref(
+					(
+						midiMode: prMidiMode, 
+						midiMean: prMidiMean, 
+						ctrlButtonBank: prCtrlButtonBank, 
+						midiResolution: prMidiResolution, 
+						softWithin: prSoftWithin
+					)
+				)}
 			)
 		};
 		wcm.mapConstrainterLo ?? { 
@@ -942,12 +974,26 @@ CVWidget {
 		wcm.mapConstrainterHi ?? { 
 			wcm.mapConstrainterHi = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[1]);
 		};
-		wcm.actions ?? {
-			wcm.actions = ();
-		};
-		wcm.actions.model ?? {
-			wcm.actions.model = Ref((numActions: 0, activeActions: 0))
-		};
+		switch(this.class,
+			CVWidgetMS, {
+				wdgtControllersAndModels.actions ?? {
+					wdgtControllersAndModels.actions = ()
+				}
+			},
+			{ wcm.actions ?? {
+				wcm.actions = ();
+			}}
+		);
+		switch(this.class,
+			CVWidgetMS, {
+				wdgtControllersAndModels.actions.model ?? {
+					wdgtControllersAndModels.actions.model = Ref((numActions: 0, activeActions: 0))
+				}
+			},
+			{ wcm.actions.model ?? {
+				wcm.actions.model = Ref((numActions: 0, activeActions: 0))
+			}}
+		)
 		
 	}
 		
