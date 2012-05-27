@@ -78,13 +78,8 @@ CVWidgetMS : CVWidget {
 		if(name.isNil, { thisName = "multislider" }, { thisName = name });
 		wdgtInfo = thisName.asString;
 		
-//		hmm...
-//		numVal = (); specBut = ();
-//		midiHead = (); midiLearn = (); midiSrc = (); midiChan = (); midiCtrl = ();
-//		oscEditBut = (); calibBut = (); actionsBut = ();
-
 //		what's the editor gonna look like?
-//		editor = ();
+		editor = (msEditor: (), editors: ()!msSize);
 
 //		TO DO
 		msSize.do(this.initControllersAndModels(controllersAndModels, _));

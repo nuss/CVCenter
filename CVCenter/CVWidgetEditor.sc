@@ -138,6 +138,8 @@ CVWidgetEditor {
 
 			thisEditor.tabs = tabs;
 			
+			
+			
 			thisEditor.tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
 //				[view, char, modifiers, unicode, keycode].postln;
 				switch(unicode,

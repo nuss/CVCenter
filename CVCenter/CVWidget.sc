@@ -306,7 +306,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -320,7 +320,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class, 
 			CVWidgetKnob, {
@@ -358,7 +358,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -372,7 +372,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class, 
 			CVWidgetKnob, {
@@ -410,7 +410,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -424,7 +424,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class, 
 			CVWidgetKnob, {
@@ -466,7 +466,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -480,7 +480,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class, 
 			CVWidgetKnob, {
@@ -518,7 +518,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -532,7 +532,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		if(bool.isKindOf(Boolean).not, {
 			Error("calibration can only be set to true or false!").throw;
@@ -565,7 +565,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -610,7 +610,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		if(mapping.asSymbol !== \linlin and:{
 			mapping.asSymbol !== \linexp and:{
@@ -647,7 +647,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class, 
 			CVWidgetKnob, {
@@ -665,7 +665,7 @@ CVWidget {
 
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		
 		if(ip.size > 0 and:{
@@ -711,7 +711,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class, 
 			CVWidgetKnob, {
@@ -732,7 +732,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -765,7 +765,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -783,7 +783,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		if(constraintsHiLo.isKindOf(Point).not, {
 			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
@@ -812,7 +812,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgtMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInt }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -1003,9 +1003,17 @@ CVWidget {
 						
 		if(slot.notNil, {
 			wcm = wdgtControllersAndModels[slot];
-			thisGuiEnv = this.guiEnv[slot];
 			midiOscEnv = this.midiOscEnv[slot];
-			thisWidgetCV = this.widgetCV[slot];
+			switch(this.class,
+				CVWidget2D, { 
+					thisWidgetCV = this.widgetCV[slot];
+					thisGuiEnv = this.guiEnv[slot];
+				},
+				CVWidgetMS, { 
+					thisWidgetCV = this.widgetCV;
+					thisGuiEnv = this.guiEnv;
+				}
+			);
 			thisCalib = prCalibrate[slot];
 		}, {
 			wcm = wdgtControllersAndModels;
