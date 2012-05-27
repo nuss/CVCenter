@@ -29,7 +29,7 @@ CVWidgetMSEditor {
 	
 	init { |widget, widgetName, tab|
 		var tabs, cvString;
-		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
+		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var addr, wcmMS, thisGuiEnv, labelColors;
 		var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
@@ -61,15 +61,16 @@ CVWidgetMSEditor {
 		widget.wdgtControllersAndModels !? { 
 			wcmMS = widget.wdgtControllersAndModels;
 		};
-//		widget.msSize.do({ |i|
-//			thisMidiMode[i] = widget.getMidiMode(i);
-//			thisMidiMean[i] = widget.getMidiMean(i);
-//			thisMidiResolution[i] = widget.getMidiResolution(i);
-//			thisSoftWithin[i] = widget.getSoftWithin(i);
-//			thisCtrlButtonBank[i] = widget.getCtrlButtonBank(i);
-//		});
+		widget.msSize.do({ |i|
+			thisMidiMode[i] = widget.getMidiMode(i);
+			thisMidiMean[i] = widget.getMidiMean(i);
+			thisMidiResolution[i] = widget.getMidiResolution(i);
+			thisSoftWithin[i] = widget.getSoftWithin(i);
+			thisCtrlButtonBank[i] = widget.getCtrlButtonBank(i);
+		});
 		
 		staticTextFont = Font(Font.defaultSansFace, 10);
+		staticTextFontBold = Font(Font.defaultSansFace, 10, true);
 		staticTextColor = Color(0.2, 0.2, 0.2);
 		textFieldFont = Font(Font.defaultMonoFace, 9);
 		textFieldFontColor = Color.black;
@@ -118,6 +119,94 @@ CVWidgetMSEditor {
 				120, { this.close }, // "x" -> close editor
 				99, { OSCCommands.makeWindow } // "c" -> collect OSC-commands resp. open the collector's GUI
 			)
+		});
+		
+		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@50)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20!5, 20000!5, \\exp, 0.0, [440, 330, 220, 110, 55], \"Hz\")\nor \\freq \nor [[20, 20, 20, 20, 20], [20000, 20000, 20000, 20000, 20000], \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
+		;
+		
+		flow0.shift(0, 5);
+		
+		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@40)
+			.font_(staticTextFontBold)
+			.stringColor_(staticTextColor)
+			.string_("NOTE: CVWidgetMS it expects a Spec whose minvals, maxvals, step-sizes and/or default-values are arrays of the size of the number of sliders in the multislider. However, you may provide a spec like 'freq' and its parameters will internally expanded to arrays of the required size.")
+		;
+		
+		cvString = widget.getSpec.asCompileString.split($ );
+
+		cvString = cvString[1..cvString.size-1].join(" ");
+		
+		specField = TextField(thisEditor.tabs.views[0], flow0.bounds.width-20@15)
+			.font_(staticTextFont)
+			.string_(cvString)
+			.action_({ |tf|
+				tmp = tf.string.interpret.asSpec;
+				if(tmp.isKindOf(ControlSpec) and:{
+					[tmp.minval, tmp.maxval, tmp.step, tmp.default].select(_.isArray).size == 0
+				}, {
+					widget.setSpec(ControlSpec(
+						tmp.minval!widget.msSize,
+						tmp.maxval!widget.msSize,
+						tmp.warp,
+						tmp.step!widget.msSize,
+						tmp.default!widget.msSize
+					))
+				}, {
+					widget.setSpec(tf.string.interpret)
+				})
+			})
+		;
+		
+		flow0.shift(0, 5);
+
+		specsList = PopUpMenu(thisEditor.tabs.views[0], flow0.bounds.width-20@20)
+			.action_({ |sl|
+				tmp = specsListSpecs[sl.value];
+				if([tmp.minval, tmp.maxval, tmp.step, tmp.default].select(_.isArray).size == 0, {
+					widget.setSpec(
+						tmp.minval!widget.msSize, 
+						tmp.maxval!widget.msSize, 
+						tmp.warp,
+						tmp.step!widget.msSize, 
+						tmp.default!widget.msSize
+					)
+				}, {
+					widget.setSpec(tmp)
+				})
+			})
+		;
+		
+		if(msEditorEnv.specsListSpecs.isNil, { 
+			specsListSpecs = List() 
+		}, {
+			specsListSpecs = msEditorEnv.specsListSpecs;
+		});
+		
+		if(msEditorEnv.specsListItems.notNil, {
+			specsList.items_(msEditorEnv.specsListItems);
+		}, {
+			Spec.specs.pairsDo({ |k, v|
+				if(v.isKindOf(ControlSpec), {
+					specsList.items_(specsList.items.add(k++":"+v));
+					specsListSpecs.add(v);
+				})
+			})
+		});
+					
+		tmp = specsListSpecs.detectIndex({ |spec, i| spec == widget.getSpec });
+		if(tmp.notNil, {
+			specsList.value_(tmp);
+		}, {
+			specsListSpecs.array_([widget.getSpec]++specsListSpecs.array);
+			specsList.items = List["custom:"+widget.getSpec.asString]++specsList.items;
+		});
+		
+		window.onClose_({
+			msEditorEnv.specsListSpecs = specsListSpecs;
+			msEditorEnv.specsListItems = specsList.items;
 		});
 		
 		tab !? { 

@@ -871,7 +871,7 @@ CVWidget {
 			wcm = wdgtControllersAndModels;
 		});
 		
-		"wcm: %\n".postf(wcm);
+//		"wcm: %\n".postf(wcm);
 								
 		wcm.calibration ?? {
 			wcm.calibration = ();

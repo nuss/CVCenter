@@ -79,7 +79,7 @@ CVWidgetMS : CVWidget {
 		wdgtInfo = thisName.asString;
 		
 //		what's the editor gonna look like?
-		editor = (msEditor: (), editors: ()!msSize);
+		editor = (editors: Array.newClear(msSize));
 
 //		TO DO
 		msSize.do(this.initControllersAndModels(controllersAndModels, _));
@@ -118,9 +118,9 @@ CVWidgetMS : CVWidget {
 		cvcGui ?? { 
 			window.onClose_({
 				msSize.do({ |slot|
-					if(editor[slot].notNil, {
-						if(editor[slot].isClosed.not, {
-							editor[slot].close(slot);
+					if(editor.editors[slot].notNil, {
+						if(editor.editors[slot].isClosed.not, {
+							editor.editors[slot].close(slot);
 						}, {
 							if(CVWidgetEditor.allEditors.notNil and:{
 								CVWidgetEditor.allEditors[thisName.asSymbol].notNil
@@ -132,7 +132,20 @@ CVWidgetMS : CVWidget {
 							})
 						})
 					})
-				})
+				});
+				editor.msEditor !? {
+					if(editor.msEditor.isClosed.not, {
+						editor.msEditor.close;
+					}, {
+						if(CVWidgetMSEditor.allMSEditors.notNil and:{
+							CVWidgetMSEditor.allMSEditors[thisName.asSymbol].notNil
+						}, {	
+							if(CVWidgetMSEditor.allMSEditors[thisName.asSymbol].isEmpty, {
+								CVWidgetMSEditor.allMSEditors.removeAt(thisName.asSymbol);
+							})
+						})
+					})
+				}
 			})
 		};
 
@@ -191,10 +204,10 @@ CVWidgetMS : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.action_({ |mb| 
 				if(msEditor.isNil or:{ msEditor.isClosed }, {
-					msEditor = CVWidgetMSEditor(this, thisName, 0);
-					guiEnv.msEditor = msEditor;
+					editor.msEditor = CVWidgetMSEditor(this, thisName, 1);
+					guiEnv.msEditor = editor.msEditor;
 				}, {
-					msEditor.front(0)
+					editor.msEditor.front(0)
 				})
 			})
 		;
@@ -206,10 +219,10 @@ CVWidgetMS : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.action_({ |oscb| 
 				if(msEditor.isNil or:{ msEditor.isClosed }, {
-					msEditor = CVWidgetMSEditor(this, thisName, 1);
-					guiEnv.msEditor = msEditor;
+					editor.msEditor = CVWidgetMSEditor(this, thisName, 2);
+					guiEnv.msEditor = editor.msEditor;
 				}, {
-					msEditor.front(1)
+					editor.msEditor.front(1)
 				})
 			})
 		;
@@ -221,10 +234,10 @@ CVWidgetMS : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.action_({ |spb|
 				if(msEditor.isNil or:{ msEditor.isClosed }, {
-					msEditor = CVWidgetMSEditor(this, thisName, 2);
-					guiEnv.msEditor = msEditor;
+					editor.msEditor = CVWidgetMSEditor(this, thisName, 0);
+					guiEnv.msEditor = editor.msEditor;
 				}, {
-					msEditor.front(2)
+					editor.msEditor.front(2)
 				})
 			})
 		;
@@ -236,10 +249,10 @@ CVWidgetMS : CVWidget {
 			.font_(Font("Helvetica", 9))
 			.action_({ |spb|
 				if(msEditor.isNil or:{ msEditor.isClosed }, {
-					msEditor = CVWidgetMSEditor(this, thisName, 3);
-					guiEnv.msEditor = msEditor;
+					editor.msEditor = CVWidgetMSEditor(this, thisName, 3);
+					guiEnv.msEditor = editor.msEditor;
 				}, {
-					msEditor.front(3)
+					editor.msEditor.front(3)
 				})
 			})
 		;
