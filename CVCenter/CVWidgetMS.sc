@@ -1,6 +1,6 @@
 CVWidgetMS : CVWidget {
 
-	var <mSlider, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
+	var <msSize, <mSlider, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
 	var <msEditor;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
@@ -21,7 +21,7 @@ CVWidgetMS : CVWidget {
 	}
 	
 	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, server|
-		var thisSize, thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
+		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		// hmmm...
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextX, nextY, knobX, knobY;
@@ -44,18 +44,20 @@ CVWidgetMS : CVWidget {
 			Error("CVWidgetMS expects a multidimensional ControlSpec within its CV. Otherwise use CVWidgetKnob").throw;
 		});
 		
-		thisSize = [
+		msSize = [
 			widgetCV.spec.minval.size, 
 			widgetCV.spec.maxval.size, 
 			widgetCV.spec.step.size, 
 			widgetCV.spec.default.size
 		].maxItem;
 		
-		prCalibrate = true ! thisSize;
-		prMidiMode = 0 ! thisSize;
-		prMidiMean = 64 ! thisSize;
-		prMidiResolution = 1 ! thisSize;
-		prSoftWithin = 0.1 ! thisSize;
+//		"msSize: %\n".postf(msSize);
+		
+		prCalibrate = true ! msSize;
+		prMidiMode = 0 ! msSize;
+		prMidiMean = 64 ! msSize;
+		prMidiResolution = 1 ! msSize;
+		prSoftWithin = 0.1 ! msSize;
 						
 		guiEnv = ();
 		cvcGui !? { isCVCWidget = true };
@@ -63,10 +65,10 @@ CVWidgetMS : CVWidget {
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { 
 			midiOscEnv = cvcGui.midiOscEnv
 		}, {
-			midiOscEnv = ()!thisSize
+			midiOscEnv = ()!msSize
 		});
 		
-		thisSize.do({ |i|
+		msSize.do({ |i|
 			midiOscEnv[i].oscMapping ?? { midiOscEnv[i].oscMapping = \linlin };
 		});
 						
@@ -82,10 +84,10 @@ CVWidgetMS : CVWidget {
 //		editor = ();
 
 //		TO DO
-//		thisSize.do(this.initControllersAndModels(controllersAndModels, _));
+		msSize.do(this.initControllersAndModels(controllersAndModels, _));
 		
 		setupArgs !? {
-			thisSize.do({ |slot|
+			msSize.do({ |slot|
 				setupArgs[slot] !? { setupArgs[slot][\midiMode] !? { this.setMidiMode(setupArgs[slot][\midiMode], slot) }};
 				setupArgs[slot] !? { setupArgs[slot][\midiResolution] !? { this.setMidiResolution(setupArgs[slot][\midiResolution], slot) }};
 				setupArgs[slot] !? { setupArgs[slot][\midiMean] !? { this.setMidiMean(setupArgs[slot][\midiMean], slot) }};
@@ -117,7 +119,7 @@ CVWidgetMS : CVWidget {
 												
 		cvcGui ?? { 
 			window.onClose_({
-				thisSize.do({ |slot|
+				msSize.do({ |slot|
 					if(editor[slot].notNil, {
 						if(editor[slot].isClosed.not, {
 							editor[slot].close(slot);
@@ -139,7 +141,7 @@ CVWidgetMS : CVWidget {
 		cvcGui ?? {
 			if(persistent == false or:{ persistent.isNil }, {
 				window.onClose_(window.onClose.addFunc({
-					thisSize.do({ |slot|
+					msSize.do({ |slot|
 						midiOscEnv[slot].oscResponder !? { midiOscEnv[slot].oscResponder.remove };
 						midiOscEnv[slot].cc !? { midiOscEnv[slot].cc.remove };
 						wdgtControllersAndModels[slot].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
@@ -265,7 +267,7 @@ CVWidgetMS : CVWidget {
 			actionsBut
 		];
 		
-//		thisSize.do({ |slot|
+//		msSize.do({ |slot|
 //			guiEnv[slot] = (
 //				editor: editor[slot],
 //				mSlider: mSlider,
