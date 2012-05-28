@@ -1000,9 +1000,25 @@ CVWidget {
 	initControllerActions { |slot|
 		var wcm, thisGuiEnv, midiOscEnv, tmpSetup, thisWidgetCV;
 		var thisCalib;
+		
+//		(
+//			slot: slot,
+//			wdgtControllersAndModels: wdgtControllersAndModels[slot], 
+//			midiOscEnv: this.midiOscEnv[slot], 
+//			widgetCV: this.widgetCV, 
+//			guiEnv: this.guiEnv[slot], 
+//			prCalibrate: prCalibrate[slot]
+//		).pairsDo({ |k, v| [k, v].postcs });
 						
 		if(slot.notNil, {
-			wcm = wdgtControllersAndModels[slot];
+			switch(this.class,
+				CVWidget2D, { wcm = wdgtControllersAndModels[slot] };
+				CVWidgetMS, { 
+					wcm = wdgtControllersAndModels.slots[slot];
+					wcm.cvSpec = wdgtControllersAndModels.cvSpec;
+					wcm.actions = wdgtControllersAndModels.actions;
+				};
+			);
 			midiOscEnv = this.midiOscEnv[slot];
 			switch(this.class,
 				CVWidget2D, { 
@@ -1083,12 +1099,19 @@ CVWidget {
 	
 	prInitSpecControl { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var tmp, tmpMapping;
+		var specEditor;
+		
+		switch(this.class, 
+			CVWidgetMS, { specEditor = thisGuiEnv.msEditor },
+			{ specEditor = thisGuiEnv.editor }
+		);
 		
 		wcm.cvSpec.controller ?? {
 			wcm.cvSpec.controller = SimpleController(wcm.cvSpec.model);
 		};
-			
+
 		wcm.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
+			[theChanger, what, moreArgs].postln;
 			if(theChanger.value.minval <= 0.0 or:{
 				theChanger.value.maxval <= 0.0
 			}, {
@@ -1096,37 +1119,37 @@ CVWidget {
 					midiOscEnv.oscMapping === \expexp
 				}, {
 					midiOscEnv.oscMapping = \linlin;
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not
+					if(specEditor.notNil and:{
+						specEditor.isClosed.not
 					}, {
-						thisGuiEnv.editor.mappingSelect.value_(0);
+						specEditor.mappingSelect.value_(0);
 					})
 				})
 			}, {
-				if(thisGuiEnv.editor.notNil and:{
-					thisGuiEnv.editor.isClosed.not	
+				if(specEditor.notNil and:{
+					specEditor.isClosed.not	
 				}, {
-					tmpMapping = thisGuiEnv.editor.mappingSelect.item;
-					thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
+					tmpMapping = specEditor.mappingSelect.item;
+					specEditor.mappingSelect.items.do({ |item, i|
 						if(item == tmpMapping, {
-							thisGuiEnv.editor.mappingSelect.value_(i)
+							specEditor.mappingSelect.value_(i)
 						})
 					});
 				})
 			});
 			
-			if(thisGuiEnv.editor.notNil and:{
-				thisGuiEnv.editor.isClosed.not	
+			if(specEditor.notNil and:{
+				specEditor.isClosed.not	
 			}, {
-				thisGuiEnv.editor.specField.string_(theChanger.value.asCompileString);
-				tmp = thisGuiEnv.editor.specsListSpecs.detectIndex({ |item, i| item == theChanger.value });
+				specEditor.specField.string_(theChanger.value.asCompileString);
+				tmp = specEditor.specsListSpecs.detectIndex({ |item, i| item == theChanger.value });
 				if(tmp.notNil, {
-					thisGuiEnv.editor.specsList.value_(tmp);
+					specEditor.specsList.value_(tmp);
 				}, {
-					thisGuiEnv.editor.specsList.items = List["custom:"+(theChanger.value.asString)]++thisGuiEnv.editor.specsList.items;
-					thisGuiEnv.editor.specsListSpecs.array_([theChanger.value]++thisGuiEnv.editor.specsListSpecs.array);
-					thisGuiEnv.editor.specsList.value_(0);
-					thisGuiEnv.editor.specsList.refresh;
+					specEditor.specsList.items = List["custom:"+(theChanger.value.asString)]++specEditor.specsList.items;
+					specEditor.specsListSpecs.array_([theChanger.value]++specEditor.specsListSpecs.array);
+					specEditor.specsList.value_(0);
+					specEditor.specsList.refresh;
 				})
 			});
 			
@@ -1149,6 +1172,8 @@ CVWidget {
 			wcm.midiConnection.controller = SimpleController(wcm.midiConnection.model);
 		};
 		
+//		wcm.pairsDo({ |k, v| [k, v].postcs; });
+//			
 		wcm.midiConnection.controller.put(\value, { |theChanger, what, moreArgs|
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|

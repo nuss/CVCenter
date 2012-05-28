@@ -278,17 +278,19 @@ CVWidgetMS : CVWidget {
 			actionsBut
 		];
 		
-//		msSize.do({ |slot|
-//			guiEnv[slot] = (
-//				editor: editor[slot],
-//				mSlider: mSlider,
-//				numVal: numVal,
-//				midiBut: midiBut[slot],
-//				oscBut: oscBut[slot]
-//				specBut: specBut[slot],
-//				actionsBut: actionsBut[slot]
-//			)
-//		});
+		msSize.do({ |slot|
+			guiEnv[slot] = (
+				msEditor: editor.msEditor,
+				editors: editor.editors[slot],
+				mSlider: mSlider,
+				numVal: numVal,
+				midiBut: midiBut,
+				oscBut: oscBut,
+				specBut: specBut,
+				actionsBut: actionsBut
+			);
+			this.initControllerActions(slot);
+		});
 		
 		widgetCV.connect(mSlider);
 		oldBounds = window.bounds;
