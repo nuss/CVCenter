@@ -925,14 +925,7 @@ CVWidget {
 		};
 			
 		wcm.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
-<<<<<<< HEAD
-			if(theChanger.value.minval <= 0.0 or:{
-				theChanger.value.maxval <= 0.0
-			}, {
-=======
-			[theChanger, what, moreArgs].postln;
 			if(theChanger.value.hasZeroCrossing, {
->>>>>>> f1b4188... simplify detection of specs whose minval, maxval are not same-signed
 				if(midiOscEnv.oscMapping === \linexp or:{
 					midiOscEnv.oscMapping === \expexp
 				}, {
