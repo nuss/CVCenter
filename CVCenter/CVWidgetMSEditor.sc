@@ -143,20 +143,7 @@ CVWidgetMSEditor {
 			.font_(staticTextFont)
 			.string_(cvString)
 			.action_({ |tf|
-				tmp = tf.string.interpret.asSpec;
-				if(tmp.isKindOf(ControlSpec) and:{
-					[tmp.minval, tmp.maxval, tmp.step, tmp.default].select(_.isArray).size == 0
-				}, {
-					widget.setSpec(ControlSpec(
-						tmp.minval!widget.msSize,
-						tmp.maxval!widget.msSize,
-						tmp.warp,
-						tmp.step!widget.msSize,
-						tmp.default!widget.msSize
-					))
-				}, {
-					widget.setSpec(tf.string.interpret)
-				})
+				widget.setSpec(tf.string.interpret)
 			})
 		;
 		
@@ -164,18 +151,7 @@ CVWidgetMSEditor {
 
 		specsList = PopUpMenu(thisEditor.tabs.views[0], flow0.bounds.width-20@20)
 			.action_({ |sl|
-				tmp = specsListSpecs[sl.value];
-				if([tmp.minval, tmp.maxval, tmp.step, tmp.default].select(_.isArray).size == 0, {
-					widget.setSpec(
-						tmp.minval!widget.msSize, 
-						tmp.maxval!widget.msSize, 
-						tmp.warp,
-						tmp.step!widget.msSize, 
-						tmp.default!widget.msSize
-					)
-				}, {
-					widget.setSpec(tmp)
-				})
+				widget.setSpec(specsListSpecs[sl.value])
 			})
 		;
 		
