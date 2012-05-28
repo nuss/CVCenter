@@ -1133,16 +1133,12 @@ CVWidget {
 			argWidgetCV.spec_(theChanger.value);
 			
 			if(this.class === CVWidgetKnob, {
-				block { |break|
-					#[pan, boostcut, bipolar, detune].do({ |symbol| 
-						if(argWidgetCV.spec == symbol.asSpec, { 
-							break.value(thisGuiEnv.knob.centered_(true));
-						}, {
-							thisGuiEnv.knob.centered_(false);
-						})			
-					})
-				}
-			});
+				if(argWidgetCV.spec.minval == argWidgetCV.spec.maxval.neg, {
+					thisGuiEnv.knob.centered_(true);
+				}, {
+					thisGuiEnv.knob.centered_(false);
+				})
+			})
 		})
 	}
 	

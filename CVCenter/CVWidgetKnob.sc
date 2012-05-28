@@ -160,11 +160,7 @@ CVWidgetKnob : CVWidget {
 		knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
 			.canFocus_(false)
 		;
-		block { |break|
-			#[pan, boostcut, bipolar, detune].do({ |symbol| 
-				if(widgetCV.spec == symbol.asSpec, { break.value(knob.centered_(true)) });
-			})
-		};
+		if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
 		nextY = thisXY.y+thisHeight-132;
 		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(widgetCV.value).font_(Font("Helvetica", 9.5))
