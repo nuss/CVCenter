@@ -1006,7 +1006,7 @@ CVWidget {
 //			wdgtControllersAndModels: wdgtControllersAndModels[slot], 
 //			midiOscEnv: this.midiOscEnv[slot], 
 //			widgetCV: this.widgetCV, 
-//			guiEnv: this.guiEnv[slot], 
+//			guiEnv: this.guiEnv, 
 //			prCalibrate: prCalibrate[slot]
 //		).pairsDo({ |k, v| [k, v].postcs });
 						
@@ -1100,58 +1100,99 @@ CVWidget {
 	prInitSpecControl { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var tmp, tmpMapping;
 		var specEditor;
-		
-		switch(this.class, 
-			CVWidgetMS, { specEditor = thisGuiEnv.msEditor },
-			{ specEditor = thisGuiEnv.editor }
-		);
-		
+		var thisSpec, customName;
+				
 		wcm.cvSpec.controller ?? {
 			wcm.cvSpec.controller = SimpleController(wcm.cvSpec.model);
 		};
 
 		wcm.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
-			[theChanger, what, moreArgs].postln;
+//			[theChanger, what, moreArgs].postln;
+
+			switch(this.class, 
+				CVWidgetMS, { specEditor = thisGuiEnv.msEditor },
+				{ specEditor = thisGuiEnv.editor }
+			);
+				
 			if(theChanger.value.hasZeroCrossing, {
 				if(midiOscEnv.oscMapping === \linexp or:{
 					midiOscEnv.oscMapping === \expexp
 				}, {
 					midiOscEnv.oscMapping = \linlin;
-					if(specEditor.notNil and:{
-						specEditor.isClosed.not
-					}, {
-						specEditor.mappingSelect.value_(0);
-					})
+//					if(specEditor.notNil and:{
+//						specEditor.isClosed.not
+//					}, {
+//						specEditor.mappingSelect.value_(0);
+//					})
 				})
 			}, {
 				if(specEditor.notNil and:{
 					specEditor.isClosed.not	
 				}, {
-					tmpMapping = specEditor.mappingSelect.item;
-					specEditor.mappingSelect.items.do({ |item, i|
-						if(item == tmpMapping, {
-							specEditor.mappingSelect.value_(i)
-						})
-					});
+//					tmpMapping = specEditor.mappingSelect.item;
+//					specEditor.mappingSelect.items.do({ |item, i|
+//						if(item == tmpMapping, {
+//							specEditor.mappingSelect.value_(i)
+//						})
+//					});
 				})
 			});
 			
 			if(specEditor.notNil and:{
 				specEditor.isClosed.not	
 			}, {
-				specEditor.specField.string_(theChanger.value.asCompileString);
-				tmp = specEditor.specsListSpecs.detectIndex({ |item, i| item == theChanger.value });
+				if(this.class == CVWidgetMS, {
+					if([ 
+						theChanger.value.minval,
+						theChanger.value.maxval,
+						theChanger.value.warp,
+						theChanger.value.step,
+						theChanger.value.default
+					].select(_.isArray).size == 0, {
+						thisSpec = ControlSpec(
+							theChanger.value.minval!this.msSize,
+							theChanger.value.maxval!this.msSize,
+							theChanger.value.warp,
+							theChanger.value.step!this.msSize,
+							theChanger.value.default!this.msSize,
+							theChanger.value.units,
+						)
+					}, {
+						thisSpec = theChanger.value;
+					});
+					tmp = [
+						thisSpec.minval.size, 
+						thisSpec.maxval.size, 
+						thisSpec.step.size, 
+						thisSpec.default.size
+					].maxItem;
+					if(Spec.findKeyForSpec(theChanger.value).notNil, {
+						customName = Spec.findKeyForSpec(theChanger.value).asString++"["++tmp++"]";
+					}, {
+						customName = "custom["++tmp++"]";
+					});
+//					"customName: %\n".postf(customName);
+				}, {
+					thisSpec = theChanger.value;
+				});
+				
+//				"thisSpec: %\n".postf(thisSpec);
+					
+				specEditor.specField.string_(thisSpec.asCompileString);
+				tmp = specEditor.specsListSpecs.detectIndex({ |item, i| item == thisSpec });
 				if(tmp.notNil, {
 					specEditor.specsList.value_(tmp);
 				}, {
-					specEditor.specsList.items = List["custom:"+(theChanger.value.asString)]++specEditor.specsList.items;
-					specEditor.specsListSpecs.array_([theChanger.value]++specEditor.specsListSpecs.array);
+					customName ?? { customName = "custom" };
+					specEditor.specsList.items = List[customName++":"+(thisSpec.asString)]++specEditor.specsList.items;
+					Spec.add(customName, thisSpec);
+					specEditor.specsListSpecs.array_([thisSpec]++specEditor.specsListSpecs.array);
 					specEditor.specsList.value_(0);
 					specEditor.specsList.refresh;
 				})
 			});
 			
-			argWidgetCV.spec_(theChanger.value);
+			argWidgetCV.spec_(thisSpec);
 			
 			if(this.class === CVWidgetKnob, {
 				if(argWidgetCV.spec.minval == argWidgetCV.spec.maxval.neg, {

@@ -1,5 +1,4 @@
 CVWidgetMS : CVWidget {
-
 	var <msSize, <mSlider, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
 	var <msEditor;
 	// persistent widgets
@@ -236,6 +235,7 @@ CVWidgetMS : CVWidget {
 				if(msEditor.isNil or:{ msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 0);
 					guiEnv.msEditor = editor.msEditor;
+					"guiEnv: %\n".postf(guiEnv);
 				}, {
 					editor.msEditor.front(2)
 				})
@@ -278,10 +278,10 @@ CVWidgetMS : CVWidget {
 			actionsBut
 		];
 		
-		msSize.do({ |slot|
-			guiEnv[slot] = (
-				msEditor: editor.msEditor,
-				editors: editor.editors[slot],
+//		msSize.do({ |slot|
+			guiEnv = (
+//				msEditor: editor.msEditor,
+//				editors: editor.editors,
 				mSlider: mSlider,
 				numVal: numVal,
 				midiBut: midiBut,
@@ -289,8 +289,10 @@ CVWidgetMS : CVWidget {
 				specBut: specBut,
 				actionsBut: actionsBut
 			);
-			this.initControllerActions(slot);
-		});
+//			this.initControllerActions(slot);
+//		});
+
+		msSize.do({ |slot| this.initControllerActions(slot) });
 		
 		widgetCV.connect(mSlider);
 		oldBounds = window.bounds;
