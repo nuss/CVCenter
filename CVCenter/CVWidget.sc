@@ -1112,9 +1112,7 @@ CVWidget {
 
 		wcm.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
 			[theChanger, what, moreArgs].postln;
-			if(theChanger.value.minval <= 0.0 or:{
-				theChanger.value.maxval <= 0.0
-			}, {
+			if(theChanger.value.hasZeroCrossing, {
 				if(midiOscEnv.oscMapping === \linexp or:{
 					midiOscEnv.oscMapping === \expexp
 				}, {
