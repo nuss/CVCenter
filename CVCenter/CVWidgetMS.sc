@@ -1,5 +1,5 @@
 CVWidgetMS : CVWidget {
-	var <msSize, <mSlider, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
+	var <msSize, <mSlider, <numVal, <midiBut, <oscBut, <specBut, <actionsBut, msValue;
 	var <msEditor;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
@@ -185,18 +185,25 @@ CVWidgetMS : CVWidget {
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
-		mSlider = MultiSliderView(window, Rect(thisXY.x+1, thisXY.y+16, thisWidth-2, thisHeight-2-45-1))
+		mSlider = MultiSliderView(window, Rect(thisXY.x+1, thisXY.y+16, thisWidth-2, thisHeight-2-75-1))
 			.drawRects_(true)
 			.isFilled_(true)
 			.colors_(Color.clear, Color.blue)
 			.elasticMode_(1)
 		;
 		nextY = thisXY.y+mSlider.bounds.height+label.bounds.height+1;
-		numVal = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		numVal = TextView(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.string_(widgetCV.value.asCompileString).font_(Font("Helvetica", 9.5))
+			.keyDownAction_({ |nv, char, modifiers, unicode, keycode|
+				if(char == $\r and:{ modifiers == 131072 }, {
+					if(nv.string.interpret.class == Array and:{
+						nv.string.interpret.select(_.isNumber).size == mSlider.size
+					}, { widgetCV.value_(nv.string.interpret) })
+				})
+			})
 		;
 		nextY = thisXY.y+numVal.bounds.top+numVal.bounds.height+1;
-		midiBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/4, 15))
+		midiBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
 				["MIDI", Color.black, this.bgColor]
 			])
@@ -210,8 +217,17 @@ CVWidgetMS : CVWidget {
 				})
 			})
 		;
+		
+		if(GUI.current.name === \QtGUI, {
+			midiBut.mouseEnterAction_({ |mb|
+				mb.states_([["MIDI", Color.white, Color.red]])
+			}).mouseLeaveAction_({ |mb|
+				mb.states_([["MIDI", Color.black, this.bgColor]])
+			})
+		});
+
 		nextX = thisXY.x+1+midiBut.bounds.width;
-		oscBut = Button(window, Rect(nextX, nextY, thisWidth-2/4, 15))
+		oscBut = Button(window, Rect(nextX, nextY, thisWidth-2/2, 15))
 			.states_([
 				["OSC", Color.black, this.bgColor]
 			])
@@ -225,8 +241,21 @@ CVWidgetMS : CVWidget {
 				})
 			})
 		;
-		nextX = nextX+oscBut.bounds.width;
-		specBut = Button(window, Rect(nextX, nextY, thisWidth-2/4, 15))
+		
+		if(GUI.current.name === \QtGUI, {
+			oscBut.mouseEnterAction_({ |oscb|
+				if(wdgtControllersAndModels.oscConnection.model.value === false, {
+					oscb.states_([["edit OSC", Color.white, Color.cyan(0.5)]]);
+				})
+			}).mouseLeaveAction_({ |oscb|
+				if(wdgtControllersAndModels.oscConnection.model.value === false, {
+					oscb.states_([["edit OSC", Color.black, this.bgColor]])
+				})
+			})
+		});
+		
+		nextY = nextY+oscBut.bounds.height; 
+		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
 				["Spec", Color.white, Color(1.0, 0.3)]
 			])
@@ -242,7 +271,7 @@ CVWidgetMS : CVWidget {
 			})
 		;
 		nextX = nextX+specBut.bounds.width;
-		actionsBut = Button(window, Rect(nextX, nextY, thisWidth-2/4, 15))
+		actionsBut = Button(window, Rect(thisXY.x+1+specBut.bounds.width, nextY, thisWidth-2/2, 15))
 			.states_([
 				["Actions", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])
@@ -295,6 +324,7 @@ CVWidgetMS : CVWidget {
 		msSize.do({ |slot| this.initControllerActions(slot) });
 		
 		widgetCV.connect(mSlider);
+		widgetCV.connect(numVal);
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
 	}

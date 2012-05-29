@@ -1160,12 +1160,16 @@ CVWidget {
 					}, {
 						thisSpec = theChanger.value;
 					});
+
 					tmp = [
 						thisSpec.minval.size, 
 						thisSpec.maxval.size, 
 						thisSpec.step.size, 
 						thisSpec.default.size
 					].maxItem;
+
+					if(tmp < this.msSize, { this.mSlider.indexThumbSize_(this.mSlider.bounds.width/tmp) });
+
 					if(Spec.findKeyForSpec(theChanger.value).notNil, {
 						customName = Spec.findKeyForSpec(theChanger.value).asString++"["++tmp++"]";
 					}, {
