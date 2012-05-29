@@ -19,7 +19,7 @@
 // <view>.string must be an array of numbers
 
 CVSyncText : CVSync {
-	classvar <>deferInit = 0.2;
+	classvar <>deferInit = 0.2, <>valRound=0.01;
 	
 	// add to CV's viewDictionary
 	*initClass {
@@ -40,7 +40,7 @@ CVSyncText : CVSync {
 	
 	update { | changer, what ...moreArgs |
 		switch( what,
-			\synch, { defer { view.string = cv.value.collect(_.round(0.01)).asCompileString }; }
+			\synch, { defer { view.string = cv.value.collect(_.round(valRound)).asCompileString }; }
 		); 
 	}
 	

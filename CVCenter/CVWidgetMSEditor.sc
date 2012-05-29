@@ -19,6 +19,11 @@ CVWidgetMSEditor {
 	classvar <allMSEditors;
 	var thisEditor, <window, <tabs, msEditorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
+	var <ipField, <portField, <nameField, <indexField;
+	var <calibBut, <calibNumBoxes;
+	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
+	var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
+	var <mappingSelect, <connectorBut;
 	var actionName, enterAction, enterActionBut, <actionsList;
 	var name;
 	var flow0, flow1, flow2, flow3;
@@ -191,6 +196,261 @@ CVWidgetMSEditor {
 			specsList.items = List["custom:"+widget.getSpec.asString]++specsList.items;
 		});
 		
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@40)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("Sliders within a CVWidgetMS can be conected to external OSC-controllers one by one or you can batch-connect them using the following mask. Basically this happens by running a do-loop over an array of controller-numbers. For example (your widget is stored in the variable 'm', the command-name is '/mfader/(1-10)':")
+		;
+
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@20)
+			.font_(staticTextFont)
+			.stringColor_(textFieldFont)
+			.string_(" (1..10).do({ |n, i| format(\"m.oscConnect(nil, nil, '/mfader/%, 1, %)\", n, i).interpret })")
+			.background_(Color(1.0, 1.0, 1.0, 0.5))
+		;
+		
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@50)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("In the above example 2 placeholders are used (%). the first is the external controller-number, the second the slider-index within the multislider. You may specifiy one placeholder either within the command-name or the slot (depending on the layout of the OSC-command your widget shall listen to). For further information check the String-helpfile resp. CVWidget:oscConnect")
+		;
+
+		flow2.shift(0, 10);
+		
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-155@15)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("IP-address (optional)")
+		;
+		
+		flow2.shift(0, 0);
+		
+		StaticText(thisEditor.tabs.views[2], 130@15)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("port (usually not necessary)")
+		;
+
+		ipField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-155@15)
+			.font_(textFieldFont)
+			.stringColor_(textFieldFontColor)
+			.background_(textFieldBg)
+			.string_("")
+		;
+		
+		flow2.shift(0, 0);
+
+		portField = TextField(thisEditor.tabs.views[2], 130@15)
+			.font_(textFieldFont)
+			.stringColor_(textFieldFontColor)
+			.background_(textFieldBg)
+			.string_("")
+		;
+
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@40)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("OSC command-name, e.g.: /my/cmd/name / OSC message slot: Either choose from a list of command-names (as set by the selected device) or add your custom one ")
+		;
+
+		flow2.shift(0, 0);
+		
+		deviceListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-40@15)
+			.items_(["select device..."])
+			.font_(Font("Helvetica", 10))
+			.action_({ |m|
+				cmdListMenu.items_(["command-names..."]);
+				thisCmdNames = [nil];
+				if(m.value != 0, {
+					orderedCmds = cmdNames[m.items[m.value].asSymbol].order;
+					orderedCmdSlots = cmdNames[m.items[m.value].asSymbol].atAll(orderedCmds);
+					orderedCmds.do({ |cmd, i|
+						cmdListMenu.items_(cmdListMenu.items.add(cmd.asString+"("++orderedCmdSlots[i]++")"));
+						thisCmdNames = thisCmdNames.add(cmd.asString);
+					})
+				})
+			})
+			.mouseDownAction_({ |m|
+				cmdNames = OSCCommands.deviceCmds;
+				deviceListMenu.items_(["select device..."]);
+				cmdNames.pairsDo({ |dev, cmds|
+					deviceListMenu.items_(deviceListMenu.items ++ dev);
+				})
+			})
+		;
+		
+		flow2.shift(0, 0);
+		
+		cmdListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-11@15)
+			.items_(["command-names..."])
+			.font_(Font("Helvetica", 10))
+			.action_({ |m|
+				if(nameField.enabled, {
+					nameField.string_(thisCmdNames[m.value]);
+					indexField.clipHi_(orderedCmdSlots[m.value-1]);
+				})
+			})
+		;
+		
+		cmdNames.pairsDo({ |dev, cmds|
+			deviceListMenu.items = deviceListMenu.items ++ dev;
+		});
+		
+		flow2.shift(0, 0);
+		
+		addDeviceBut = Button(thisEditor.tabs.views[2], 29@15)
+			.states_([
+				["new", Color.white, Color(0.15, 0.5, 0.15)]
+			])
+			.font_(staticTextFont)
+			.action_({ OSCCommands.makeWindow })
+		;
+
+		nameField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
+			.font_(textFieldFont)
+			.stringColor_(textFieldFontColor)
+			.background_(textFieldBg)
+			.string_("/my/cmd/name")
+		;
+					
+		flow2.shift(5, 0);
+		
+		indexField = NumberBox(thisEditor.tabs.views[2], 36@15)
+			.font_(textFieldFont)
+			.normalColor_(textFieldFontColor)
+			.clipLo_(1)
+			.clipHi_(inf)
+			.shift_scale_(1)
+			.ctrl_scale_(1)
+			.alt_scale_(1)
+			.value_(1)
+		;
+		
+		flow2.shift(0, 0);
+
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("OSC-input constraints + compensation")
+		;
+								
+		inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
+			.font_(textFieldFont)
+			.normalColor_(textFieldFontColor)
+//			.value_(wcmHiLo.oscInputRange.model.value[0])
+			.enabled_(false)
+		;
+		
+		flow2.shift(5, 0);
+		
+		inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
+			.font_(textFieldFont)
+			.normalColor_(textFieldFontColor)
+//			.value_(wcmHiLo.oscInputRange.model.value[1])
+			.enabled_(false)
+		;
+					
+		flow2.shift(5, 0);
+		
+		alwaysPosField = StaticText(thisEditor.tabs.views[2], 32@15)
+			.font_(staticTextFont)
+			.string_(" +"++widget.alwaysPositive)
+			.stringColor_(Color(0.5))
+			.background_(Color(0.95, 0.95, 0.95))
+		;
+					
+		flow2.shift(5, 0);
+
+		calibBut = Button(thisEditor.tabs.views[2], 60@15)
+			.font_(staticTextFont)
+			.states_([
+				["calibrating", Color.white, Color.red],
+				["calibrate", Color.black, Color.green]
+			])
+		;
+
+		flow2.shift(0, 0);
+
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
+			.font_(staticTextFont)
+			.string_("Input to Output mapping")
+		;
+		
+		flow2.shift(0, 0);
+
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
+			.font_(staticTextFont)
+			.background_(Color.white)
+//			.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(slot).minval+"/"+widget.getSpec(slot).maxval)
+		;
+
+		flow2.shift(5, 0);
+		
+		mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
+		
+		mappingSelect = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width-15@20)
+			.font_(Font("Helvetica", 12))
+			.items_(mappingSelectItems)
+//			.action_({ |ms|
+//				widget.setOscMapping(ms.item, slot);
+//			})
+		;
+		
+//		if(widget.getOscMapping(slot).notNil, {
+//			mappingSelectItems.do({ |item, i|
+//				if(item.asSymbol === widget.getOscMapping(slot), {
+//					mappingSelect.value_(i);
+//				});
+//			}, {
+//				mappingSelect.value_(0);
+//			})
+//		});
+					
+		flow2.shift(0, 0);
+
+		connectorBut = Button(thisEditor.tabs.views[2], flow2.bounds.width-15@25)
+			.font_(staticTextFont)
+			.states_([
+				["connect OSC-controller", Color.white, Color.blue],
+				["disconnect OSC-controller", Color.white, Color.red]
+			])
+//			.action_({ |cb|
+//				cb.value.switch(
+//					1, { 
+//						widget.oscConnect(
+//							ipField.string,
+//							portField.value,
+//							nameField.string, 
+//							indexField.value.asInt,
+//							slot
+//						);
+//					},
+//					0, { widget.oscDisconnect(slot) }
+//				)
+//			})
+		;
+
+//		calibNumBoxes = (lo: inputConstraintLoField, hi: inputConstraintHiField);
+//		
+//		calibBut.action_({ |but|
+//			but.value.switch(
+//				0, { 
+//					widget.setCalibrate(true, slot);
+//					wcmHiLo.calibration.model.value_(true).changed(\value);
+//				},
+//				1, { 
+//					widget.setCalibrate(false, slot);
+//					wcmHiLo.calibration.model.value_(false).changed(\value);
+//				}
+//			)
+//		});
+//
+//		widget.getCalibrate(slot).switch(
+//			true, { calibBut.value_(0) },
+//			false, { calibBut.value_(1) }
+//		);
+		
+				
 		window.onClose_({
 			msEditorEnv.specsListSpecs = specsListSpecs;
 			msEditorEnv.specsListItems = specsList.items;

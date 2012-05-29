@@ -543,9 +543,6 @@ CVWidget {
 				wdgtControllersAndModels.oscConnection.model.value_(
 					wdgtControllersAndModels.oscConnection.model.value
 				).changed(\value);
-//				wdgtControllersAndModels.oscDisplay.model.value_(
-//					wdgtControllersAndModels.oscDisplay.model.value
-//				).changed(\value);
 				wdgtControllersAndModels.calibration.model.value_(bool).changed(\value);
 			},
 			{
@@ -553,9 +550,6 @@ CVWidget {
 				wdgtControllersAndModels[thisSlot].oscConnection.model.value_(
 					wdgtControllersAndModels[thisSlot].oscConnection.model.value
 				).changed(\value);
-//				wdgtControllersAndModels[thisSlot].oscDisplay.model.value_(
-//					wdgtControllersAndModels[thisSlot].oscDisplay.model.value
-//				).changed(\value);
 				wdgtControllersAndModels[thisSlot].calibration.model.value_(bool).changed(\value);
 			}
 		)
@@ -1171,9 +1165,9 @@ CVWidget {
 					if(tmp < this.msSize, { this.mSlider.indexThumbSize_(this.mSlider.bounds.width/tmp) });
 
 					if(Spec.findKeyForSpec(theChanger.value).notNil, {
-						customName = Spec.findKeyForSpec(theChanger.value).asString++"["++tmp++"]";
+						customName = Spec.findKeyForSpec(theChanger.value).asString++tmp;
 					}, {
-						customName = "custom["++tmp++"]";
+						customName = "custom"++tmp;
 					});
 //					"customName: %\n".postf(customName);
 				}, {

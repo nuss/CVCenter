@@ -1,5 +1,5 @@
 CVWidgetMS : CVWidget {
-	var <msSize, <mSlider, <numVal, <midiBut, <oscBut, <specBut, <actionsBut, msValue;
+	var <msSize, <mSlider, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
 	var <msEditor;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
