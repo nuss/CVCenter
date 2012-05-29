@@ -124,7 +124,7 @@ CVWidgetMSEditor {
 		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@50)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20!5, 20000!5, \\exp, 0.0, [440, 330, 220, 110, 55], \"Hz\")\nor \\freq \nor [[20, 20, 20, 20, 20], [20000, 20000, 20000, 20000, 20000], \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
+			.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq \nor [[20, 20, 20, 20, 20], [20000, 20000, 20000, 20000, 20000], \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
 		;
 		
 		flow0.shift(0, 5);
@@ -132,7 +132,7 @@ CVWidgetMSEditor {
 		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@45)
 			.font_(staticTextFontBold)
 			.stringColor_(staticTextColor)
-			.string_("NOTE: CVWidgetMS it expects a Spec whose minvals, maxvals, step-sizes and/or default-values are arrays of the size of the number of sliders in the multislider. However, you may provide a spec like 'freq' and its parameters will internally expanded to arrays of the required size.")
+			.string_("NOTE: CVWidgetMS expects a Spec whose minvals, maxvals, step-sizes and/or default-values are arrays of the size of the number of sliders in the multislider. However, you may provide a spec like 'freq' and its parameters will internally expanded to arrays of the required size.")
 		;
 		
 		flow0.shift(0, 5);
@@ -140,26 +140,20 @@ CVWidgetMSEditor {
 		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@10)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("Enter the desired Spec and execute it shift+return.")
+			.string_("Enter the desired Spec and execute it by hitting shift+return.")
 		;
 
 		flow0.shift(0, 5);
 		
 		cvString = widget.getSpec.asCompileString;
-//		cvString = widget.getSpec.asCompileString.split($ );
-//		cvString.postcs;
-//		cvString = cvString[1..cvString.size-1].join(" ");
-		
-		flow0.shift(0, 5);
-		
 		specField = TextView(thisEditor.tabs.views[0], flow0.bounds.width-20@105)
 			.font_(staticTextFont)
-			.enterInterpretsSelection_(true)
 			.string_(cvString)
 			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
 //				[tf, char, modifiers, unicode, keycode].postcs;
 				if(char == $\r and:{ modifiers == 131072 }, {
-					widget.setSpec(tf.string.interpret)
+					widget.setSpec(tf.string.interpret);
+					widget.mSlider.refresh;
 				})
 			})
 		;
