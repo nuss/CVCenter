@@ -4,7 +4,7 @@ CVWidgetMS : CVWidget {
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
-	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, server|
+	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, numSliders=5, server|
 		^super.new.init(
 			parent, 
 			cv, 
@@ -14,12 +14,13 @@ CVWidgetMS : CVWidget {
 			setup,
 			controllersAndModels, 
 			cvcGui, 
-			persistent, 
+			persistent,
+			numSliders,
 			server // swing compatibility. well, ...
 		)
 	}
 	
-	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, server|
+	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, numSliders, server|
 		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		// hmmm...
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
@@ -28,7 +29,7 @@ CVWidgetMS : CVWidget {
 		this.bgColor ?? { this.bgColor = Color.white };
 		
 		if(cv.isNil, {
-			widgetCV = CV([0!3, 1!3]);
+			widgetCV = CV([0 ! numSliders, 1 ! numSliders]);
 		}, {
 			widgetCV = cv;
 		});
@@ -40,7 +41,14 @@ CVWidgetMS : CVWidget {
 				}
 			}
 		}, {
-			Error("CVWidgetMS expects a multidimensional ControlSpec within its CV. Otherwise use CVWidgetKnob").throw;
+			widgetCV.spec_(ControlSpec(
+				widgetCV.spec.minval ! numSliders,
+				widgetCV.spec.maxval ! numSliders,
+				widgetCV.spec.warp,
+				widgetCV.spec.step ! numSliders,
+				widgetCV.spec.default ! numSliders,
+				widgetCV.spec.units
+			))
 		});
 		
 		msSize = [

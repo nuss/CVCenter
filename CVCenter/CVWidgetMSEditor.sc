@@ -196,27 +196,6 @@ CVWidgetMSEditor {
 			specsList.items = List["custom:"+widget.getSpec.asString]++specsList.items;
 		});
 		
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@40)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("Sliders within a CVWidgetMS can be conected to external OSC-controllers one by one or you can batch-connect them using the following mask. Basically this happens by running a do-loop over an array of controller-numbers. For example (your widget is stored in the variable 'm', the command-name is '/mfader/(1-10)':")
-		;
-
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@20)
-			.font_(staticTextFont)
-			.stringColor_(textFieldFont)
-			.string_(" (1..10).do({ |n, i| format(\"m.oscConnect(nil, nil, '/mfader/%, 1, %)\", n, i).interpret })")
-			.background_(Color(1.0, 1.0, 1.0, 0.5))
-		;
-		
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@50)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("In the above example 2 placeholders are used (%). the first is the external controller-number, the second the slider-index within the multislider. You may specifiy one placeholder either within the command-name or the slot (depending on the layout of the OSC-command your widget shall listen to). For further information check the String-helpfile resp. CVWidget:oscConnect")
-		;
-
-		flow2.shift(0, 10);
-		
 		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-155@15)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)

@@ -994,7 +994,7 @@ CVWidget {
 	initControllerActions { |slot|
 		var wcm, thisGuiEnv, midiOscEnv, tmpSetup, thisWidgetCV;
 		var thisCalib;
-		
+				
 //		(
 //			slot: slot,
 //			wdgtControllersAndModels: wdgtControllersAndModels[slot], 
@@ -1006,7 +1006,7 @@ CVWidget {
 						
 		if(slot.notNil, {
 			switch(this.class,
-				CVWidget2D, { wcm = wdgtControllersAndModels[slot] };
+				CVWidget2D, { wcm = wdgtControllersAndModels[slot] },
 				CVWidgetMS, { 
 					wcm = wdgtControllersAndModels.slots[slot];
 					wcm.cvSpec = wdgtControllersAndModels.cvSpec;
@@ -1047,7 +1047,7 @@ CVWidget {
 	}	
 		
 	prInitCalibration { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		
+				
 		wcm.calibration.controller ?? { 
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
