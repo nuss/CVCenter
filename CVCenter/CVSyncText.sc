@@ -17,25 +17,26 @@
 
 // connect TextFields and TextViews to MultiSliderViews
 // <view>.string must be an array of numbers
+// Qt only (it seems...)
 
 CVSyncText : CVSync {
-	classvar <>deferInit = 0.2, <>valRound=0.01;
+	classvar <>initDelay = 0.2, <>valRound=0.01;
 	
 	// add to CV's viewDictionary
 	*initClass {
 		var class, connectDictionary;
 				
-		connectDictionary = (textView: this, textField: this);
+		connectDictionary = (textView: this, textField: this, staticText: this);
 				
 		{ CV.viewDictionary !? {
 			GUI.schemes.do({ |scheme|
-				#[textView, textField].collect({ |name|
+				#[textView, textField, staticText].collect({ |name|
 					if((class = scheme.perform(name)).notNil, {
 						CV.viewDictionary.put(class, connectDictionary[name]);
 					})					
 				})
 			});
-		}}.defer(deferInit);
+		}}.defer(initDelay);
 	}
 	
 	update { | changer, what ...moreArgs |
@@ -46,9 +47,11 @@ CVSyncText : CVSync {
 	
 	value { 
 		var arr = view.string.interpret;
+//		[arr, arr.class].postln;
 		if(arr.isKindOf(SequenceableCollection) and:{
 			arr.flat.select(_.isNumber).size == arr.flat.size
 		}, {
+//			arr.flat.postln;
 			cv.value = arr.flat;
 		})
 	}

@@ -217,7 +217,7 @@ CVWidgetMS : CVWidget {
 			])
 			.font_(Font("Helvetica", 9))
 			.action_({ |mb| 
-				if(msEditor.isNil or:{ msEditor.isClosed }, {
+				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 1);
 					guiEnv.msEditor = editor.msEditor;
 				}, {
@@ -241,7 +241,7 @@ CVWidgetMS : CVWidget {
 			])
 			.font_(Font("Helvetica", 9))
 			.action_({ |oscb| 
-				if(msEditor.isNil or:{ msEditor.isClosed }, {
+				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 2);
 					guiEnv.msEditor = editor.msEditor;
 				}, {
@@ -269,7 +269,7 @@ CVWidgetMS : CVWidget {
 			])
 			.font_(Font("Helvetica", 9))
 			.action_({ |spb|
-				if(msEditor.isNil or:{ msEditor.isClosed }, {
+				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 0);
 					guiEnv.msEditor = editor.msEditor;
 					"guiEnv: %\n".postf(guiEnv);

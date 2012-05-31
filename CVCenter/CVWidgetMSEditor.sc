@@ -19,7 +19,7 @@ CVWidgetMSEditor {
 	classvar <allMSEditors;
 	var thisEditor, <window, <tabs, msEditorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
-	var <ipField, <portField, <nameField, <indexField;
+	var <ipField, <portField, <extCtrlArrayField, <nameField, <intStartIndexField, <indexField;
 	var <calibBut, <calibNumBoxes;
 	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 	var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
@@ -196,7 +196,7 @@ CVWidgetMSEditor {
 			specsList.items = List["custom:"+widget.getSpec.asString]++specsList.items;
 		});
 		
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-155@15)
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-150@15)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
 			.string_("IP-address (optional)")
@@ -210,7 +210,7 @@ CVWidgetMSEditor {
 			.string_("port (usually not necessary)")
 		;
 
-		ipField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-155@15)
+		ipField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-150@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
@@ -225,15 +225,9 @@ CVWidgetMSEditor {
 			.background_(textFieldBg)
 			.string_("")
 		;
-
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@40)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("OSC command-name, e.g.: /my/cmd/name / OSC message slot: Either choose from a list of command-names (as set by the selected device) or add your custom one ")
-		;
-
-		flow2.shift(0, 0);
 		
+		flow2.shift(0, 0);
+
 		deviceListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-40@15)
 			.items_(["select device..."])
 			.font_(Font("Helvetica", 10))
@@ -285,16 +279,57 @@ CVWidgetMSEditor {
 			.action_({ OSCCommands.makeWindow })
 		;
 
-		nameField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
+		StaticText(thisEditor.tabs.views[2], 65@40)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+//			.background_(Color.red)
+			.string_("ext. sliders (numeric array)")
+		;
+
+		flow2.shift(0, 10);
+		
+		StaticText(thisEditor.tabs.views[2], 190@40)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+//			.background_(Color.red)
+			.string_("OSC-command (use % as placeholder)")
+		;
+
+		flow2.shift(0, -5);
+		
+		StaticText(thisEditor.tabs.views[2], 60@40)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+//			.background_(Color.red)
+			.string_("Multislider start-index")
+		;
+
+		flow2.shift(0, -5);
+		
+		StaticText(thisEditor.tabs.views[2], 60@40)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+//			.background_(Color.red)
+			.string_("msg.-slot (use % as placeholder)")
+		;
+
+		flow2.shift(0, 0);
+		
+		extCtrlArrayField = TextField(thisEditor.tabs.views[2], 65@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
-			.string_("/my/cmd/name")
+			.string_("(from..to)")
 		;
 					
-		flow2.shift(5, 0);
+		nameField = TextField(thisEditor.tabs.views[2], 190@15)
+			.font_(textFieldFont)
+			.stringColor_(textFieldFontColor)
+			.background_(textFieldBg)
+			.string_("/my/cmd/name/%")
+		;
 		
-		indexField = NumberBox(thisEditor.tabs.views[2], 36@15)
+		intStartIndexField = NumberBox(thisEditor.tabs.views[2], 60@15)
 			.font_(textFieldFont)
 			.normalColor_(textFieldFontColor)
 			.clipLo_(1)
@@ -304,70 +339,27 @@ CVWidgetMSEditor {
 			.alt_scale_(1)
 			.value_(1)
 		;
+					
+		indexField = TextField(thisEditor.tabs.views[2], 60@15)
+			.font_(textFieldFont)
+			.string_("n or \%")
+		;
 		
 		flow2.shift(0, 0);
 
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("OSC-input constraints + compensation")
-		;
-								
-		inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
-			.font_(textFieldFont)
-			.normalColor_(textFieldFontColor)
-//			.value_(wcmHiLo.oscInputRange.model.value[0])
-			.enabled_(false)
-		;
-		
-		flow2.shift(5, 0);
-		
-		inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
-			.font_(textFieldFont)
-			.normalColor_(textFieldFontColor)
-//			.value_(wcmHiLo.oscInputRange.model.value[1])
-			.enabled_(false)
-		;
-					
-		flow2.shift(5, 0);
-		
-		alwaysPosField = StaticText(thisEditor.tabs.views[2], 32@15)
-			.font_(staticTextFont)
-			.string_(" +"++widget.alwaysPositive)
-			.stringColor_(Color(0.5))
-			.background_(Color(0.95, 0.95, 0.95))
-		;
-					
-		flow2.shift(5, 0);
-
-		calibBut = Button(thisEditor.tabs.views[2], 60@15)
-			.font_(staticTextFont)
-			.states_([
-				["calibrating", Color.white, Color.red],
-				["calibrate", Color.black, Color.green]
-			])
-		;
-
-		flow2.shift(0, 0);
-
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width/2-10@15)
 			.font_(staticTextFont)
 			.string_("Input to Output mapping")
 		;
-		
-		flow2.shift(0, 0);
-
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
+				
+		StaticText(thisEditor.tabs.views[2], flow2.bounds.width/2-10@15)
 			.font_(staticTextFont)
-			.background_(Color.white)
-//			.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(slot).minval+"/"+widget.getSpec(slot).maxval)
+			.string_("Global Calibration")
 		;
-
-		flow2.shift(5, 0);
-		
+				
 		mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 		
-		mappingSelect = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width-15@20)
+		mappingSelect = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-10@20)
 			.font_(Font("Helvetica", 12))
 			.items_(mappingSelectItems)
 //			.action_({ |ms|
@@ -384,14 +376,22 @@ CVWidgetMSEditor {
 //				mappingSelect.value_(0);
 //			})
 //		});
-					
+		
+		calibBut = Button(thisEditor.tabs.views[2],  flow2.bounds.width/2-10@20)
+			.font_(staticTextFont)
+			.states_([
+				["calibrating all", Color.white, Color.red],
+				["calibrate all", Color.black, Color.green]
+			])
+		;
+
 		flow2.shift(0, 0);
 
 		connectorBut = Button(thisEditor.tabs.views[2], flow2.bounds.width-15@25)
 			.font_(staticTextFont)
 			.states_([
-				["connect OSC-controller", Color.white, Color.blue],
-				["disconnect OSC-controller", Color.white, Color.red]
+				["connect OSC-controllers", Color.white, Color.blue],
+				["disconnect OSC-controllers", Color.white, Color.red]
 			])
 //			.action_({ |cb|
 //				cb.value.switch(
