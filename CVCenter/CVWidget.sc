@@ -694,8 +694,12 @@ CVWidget {
 				wdgtControllersAndModels.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
 				CmdPeriod.add({ this.oscDisconnect });
 			},
-			{
+			CVWidget2D, {
 				wdgtControllersAndModels[thisSlot].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
+				CmdPeriod.add({ this.oscDisconnect(thisSlot) });
+			},
+			CVWidgetMS, {
+				wdgtControllersAndModels.slots[thisSlot].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changed(\value);
 				CmdPeriod.add({ this.oscDisconnect(thisSlot) });
 			}
 		)
@@ -1008,7 +1012,7 @@ CVWidget {
 			switch(this.class,
 				CVWidget2D, { wcm = wdgtControllersAndModels[slot] },
 				CVWidgetMS, { 
-					wcm = wdgtControllersAndModels.slots[slot];
+					wcm = wdgtControllersAndModels.slots[slot]; [slot, wcm.oscConnection].postln;
 					wcm.cvSpec = wdgtControllersAndModels.cvSpec;
 					wcm.actions = wdgtControllersAndModels.actions;
 				};
@@ -1432,14 +1436,18 @@ CVWidget {
 	
 	prInitOscConnect { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var oscResponderAction;
-				
+						
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
 		};
 
 		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
+			
+			"prCalibrate: %, theChanger: %".postf(prCalibrate, theChanger);
+			
 			switch(prCalibrate.class, 
 				Event, { thisCalib = prCalibrate[slot] },
+				Array, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
 			);
 						
@@ -1500,17 +1508,17 @@ CVWidget {
 					midiOscEnv.oscResponder.action_(oscResponderAction);
 				});
 				
-				wcm.oscDisplay.model.value_(
-					(
-						but: [theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)],
-						ipField: theChanger.value[0].asString,
-						portField: theChanger.value[1].asString,
-						nameField: theChanger.value[2].asString,
-						index: theChanger.value[3],
-						connectorButVal: 1, 
-						editEnabled: false
-					)
-				).changed(\value);
+//				wcm.oscDisplay.model.value_(
+//					(
+//						but: [theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)],
+//						ipField: theChanger.value[0].asString,
+//						portField: theChanger.value[1].asString,
+//						nameField: theChanger.value[2].asString,
+//						index: theChanger.value[3],
+//						connectorButVal: 1, 
+//						editEnabled: false
+//					)
+//				).changed(\value);
 			});
 			if(theChanger.value == false, {
 				midiOscEnv.oscResponder.remove;

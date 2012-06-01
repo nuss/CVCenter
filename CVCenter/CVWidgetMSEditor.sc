@@ -27,6 +27,7 @@ CVWidgetMSEditor {
 	var actionName, enterAction, enterActionBut, <actionsList;
 	var name;
 	var flow0, flow1, flow2, flow3;
+	var oscFlow0, oscFlow1;
 
 	*new { |widget, widgetName, tab|
 		^super.new.init(widget, widgetName, tab);
@@ -34,9 +35,13 @@ CVWidgetMSEditor {
 	
 	init { |widget, widgetName, tab|
 		var tabs, cvString;
+		var oscTabs, midiTabs;
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var addr, wcmMS, thisGuiEnv, labelColors;
+		var oscLabelColor, midiLabelColor, oscLabelStringColor, midiLabelStringColor;
+		var oscConnectCondition = 0;
+		var oscConnectWarning = "Couldn't connect OSC-controllers:";
 		var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
@@ -107,12 +112,27 @@ CVWidgetMSEditor {
 		tabs.stringColor_(Color.white);
 		tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
 		tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-		tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
+		tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 0@0, 0@0);
 		tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 		(0..3).do({ |t| tabs.focusActions[t] = { tabs.stringFocusedColor_(labelStringColors[t]) } });
 		tabs.stringFocusedColor_(labelStringColors[tab]);
+		
+		oscTabs = TabbedView(tabs.views[2], Rect(0, 1, tabs.views[2].bounds.width-4, tabs.views[2].bounds.height-4), ["Batch Connection", "Individual Sliders"], scroll: true);
+		oscTabs.view.resize_(tabs.view.resize);
+		oscLabelColor = labelColors[2];
+		oscLabelStringColor = labelStringColors[2];
+		oscTabs.tabCurve_(4)
+			.labelColors_(Color.white!2)
+			.unfocusedColors_([oscLabelColor])
+			.stringColor_(Color.white)
+			.stringFocusedColor_(oscLabelStringColor)
+		;
+		oscTabs.views[0].decorator = oscFlow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
+		oscTabs.views[1].decorator = oscFlow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 
 		thisEditor.tabs = tabs;
+		thisEditor.oscTabs = oscTabs;
+		thisEditor.midiTabs = midiTabs;
 		
 		thisEditor.tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
 //				[view, char, modifiers, unicode, keycode].postln;
@@ -196,39 +216,39 @@ CVWidgetMSEditor {
 			specsList.items = List["custom:"+widget.getSpec.asString]++specsList.items;
 		});
 		
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width-150@15)
+		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
 			.string_("IP-address (optional)")
 		;
 		
-		flow2.shift(0, 0);
+		oscFlow0.shift(0, 0);
 		
-		StaticText(thisEditor.tabs.views[2], 130@15)
+		StaticText(thisEditor.oscTabs.views[0], 130@15)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
 			.string_("port (usually not necessary)")
 		;
-
-		ipField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-150@15)
+		
+		ipField = TextField(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
 			.string_("")
 		;
 		
-		flow2.shift(0, 0);
+		oscFlow0.shift(0, 0);
 
-		portField = TextField(thisEditor.tabs.views[2], 130@15)
+		portField = TextField(thisEditor.oscTabs.views[0], 130@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
 			.string_("")
 		;
 		
-		flow2.shift(0, 0);
+		oscFlow0.shift(0, 0);
 
-		deviceListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-40@15)
+		deviceListMenu = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-46@15)
 			.items_(["select device..."])
 			.font_(Font("Helvetica", 10))
 			.action_({ |m|
@@ -252,15 +272,14 @@ CVWidgetMSEditor {
 			})
 		;
 		
-		flow2.shift(0, 0);
+		oscFlow0.shift(0, 0);
 		
-		cmdListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-11@15)
+		cmdListMenu = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-11@15)
 			.items_(["command-names..."])
 			.font_(Font("Helvetica", 10))
 			.action_({ |m|
 				if(nameField.enabled, {
 					nameField.string_(thisCmdNames[m.value]);
-					indexField.clipHi_(orderedCmdSlots[m.value-1]);
 				})
 			})
 		;
@@ -269,9 +288,9 @@ CVWidgetMSEditor {
 			deviceListMenu.items = deviceListMenu.items ++ dev;
 		});
 		
-		flow2.shift(0, 0);
+		oscFlow0.shift(0, 0);
 		
-		addDeviceBut = Button(thisEditor.tabs.views[2], 29@15)
+		addDeviceBut = Button(thisEditor.oscTabs.views[0], 29@15)
 			.states_([
 				["new", Color.white, Color(0.15, 0.5, 0.15)]
 			])
@@ -279,87 +298,83 @@ CVWidgetMSEditor {
 			.action_({ OSCCommands.makeWindow })
 		;
 
-		StaticText(thisEditor.tabs.views[2], 65@40)
+		StaticText(thisEditor.oscTabs.views[0], 65@40)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-//			.background_(Color.red)
 			.string_("ext. sliders (numeric array)")
 		;
 
-		flow2.shift(0, 10);
+		oscFlow0.shift(0, 10);
 		
-		StaticText(thisEditor.tabs.views[2], 190@40)
+		StaticText(thisEditor.oscTabs.views[0], 185@40)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-//			.background_(Color.red)
 			.string_("OSC-command (use % as placeholder)")
 		;
 
-		flow2.shift(0, -5);
+		oscFlow0.shift(0, -5);
 		
-		StaticText(thisEditor.tabs.views[2], 60@40)
+		StaticText(thisEditor.oscTabs.views[0], 60@40)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-//			.background_(Color.red)
 			.string_("Multislider start-index")
 		;
 
-		flow2.shift(0, -5);
+		oscFlow0.shift(0, -5);
 		
-		StaticText(thisEditor.tabs.views[2], 60@40)
+		StaticText(thisEditor.oscTabs.views[0], 60@40)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-//			.background_(Color.red)
 			.string_("msg.-slot (use % as placeholder)")
 		;
 
-		flow2.shift(0, 0);
+		oscFlow0.shift(0, 0);
 		
-		extCtrlArrayField = TextField(thisEditor.tabs.views[2], 65@15)
+		extCtrlArrayField = TextField(thisEditor.oscTabs.views[0], 65@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
 			.string_("(from..to)")
 		;
 					
-		nameField = TextField(thisEditor.tabs.views[2], 190@15)
+		nameField = TextField(thisEditor.oscTabs.views[0], 185@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
 			.string_("/my/cmd/name/%")
 		;
 		
-		intStartIndexField = NumberBox(thisEditor.tabs.views[2], 60@15)
+		intStartIndexField = NumberBox(thisEditor.oscTabs.views[0], 60@15)
 			.font_(textFieldFont)
 			.normalColor_(textFieldFontColor)
-			.clipLo_(1)
-			.clipHi_(inf)
+			.clipLo_(0)
+			.clipHi_(widget.msSize)
 			.shift_scale_(1)
 			.ctrl_scale_(1)
 			.alt_scale_(1)
-			.value_(1)
+			.value_(0)
 		;
 					
-		indexField = TextField(thisEditor.tabs.views[2], 60@15)
+		indexField = TextField(thisEditor.oscTabs.views[0], 60@15)
 			.font_(textFieldFont)
-			.string_("n or \%")
+			.string_("int or %")
 		;
 		
-		flow2.shift(0, 0);
+		oscFlow0.shift(0, 0);
 
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width/2-10@15)
+		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-10@15)
 			.font_(staticTextFont)
 			.string_("Input to Output mapping")
 		;
 				
-		StaticText(thisEditor.tabs.views[2], flow2.bounds.width/2-10@15)
+		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-10@15)
 			.font_(staticTextFont)
 			.string_("Global Calibration")
 		;
 				
 		mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 		
-		mappingSelect = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-10@20)
+		mappingSelect = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-12@20)
 			.font_(Font("Helvetica", 12))
 			.items_(mappingSelectItems)
 //			.action_({ |ms|
@@ -377,36 +392,59 @@ CVWidgetMSEditor {
 //			})
 //		});
 		
-		calibBut = Button(thisEditor.tabs.views[2],  flow2.bounds.width/2-10@20)
+		calibBut = Button(thisEditor.oscTabs.views[0],  oscFlow0.bounds.width/2-12@20)
 			.font_(staticTextFont)
 			.states_([
 				["calibrating all", Color.white, Color.red],
+				["partially calibrating", Color.white, Color.red(0.7)],
 				["calibrate all", Color.black, Color.green]
 			])
 		;
 
-		flow2.shift(0, 0);
+		oscFlow0.shift(0, 0);
 
-		connectorBut = Button(thisEditor.tabs.views[2], flow2.bounds.width-15@25)
+		connectorBut = Button(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-21@25)
 			.font_(staticTextFont)
 			.states_([
 				["connect OSC-controllers", Color.white, Color.blue],
 				["disconnect OSC-controllers", Color.white, Color.red]
 			])
-//			.action_({ |cb|
+			.action_({ |cb|
 //				cb.value.switch(
 //					1, { 
-//						widget.oscConnect(
-//							ipField.string,
-//							portField.value,
-//							nameField.string, 
-//							indexField.value.asInt,
-//							slot
-//						);
+//						if(extCtrlArrayField.string.interpret.isArray and:{
+//							extCtrlArrayField.string.interpret.collect(_.isInteger).size == 
+//							extCtrlArrayField.string.interpret
+//						}, {
+//							oscConnectCondition = oscConnectCondition+1;
+//						}, {
+//							oscConnectWarning = oscConnectWarning++"\n\t- 'ext. sliders' must be an array of integers";
+//						});
+////						if(nameField.string.includes($%) and:{ indexField.string.includes($%) }, {
+////							oscConnectWarning = oscConnectWarning++"\n\t- the OSC-command-name and the msg. slot both contain a placeholder: ";
+////						});
+//						if(indexField.string != "%" and:{ indexField.string.interpret.isInteger.not }, {
+//							oscConnectWarning = oscConnectWarning++"\n\t- msg. slot must either contain '%' (a placeholder) or an integer";
+//						}, {
+//							oscConnectCondition = oscConnectCondition+1;
+//						});
+//						if(oscConnectCondition >= 2, {
+//							if(nameField.string.includes($%) and:{ indexField.string.includes($%) }, {
+//								extCtrlArrayField.string.interpret.do({ |ext|
+//									"widget.oscConnect(
+//										ipField.string,
+//										portField.value,
+//										nameField.string, 
+//										i+intStartIndexField,
+//										slot
+//									)".format()
+//								})
+//							})
+//						})
 //					},
 //					0, { widget.oscDisconnect(slot) }
 //				)
-//			})
+			})
 		;
 
 //		calibNumBoxes = (lo: inputConstraintLoField, hi: inputConstraintHiField);

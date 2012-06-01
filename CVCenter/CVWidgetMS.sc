@@ -193,12 +193,14 @@ CVWidgetMS : CVWidget {
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
+				
 		mSlider = MultiSliderView(window, Rect(thisXY.x+1, thisXY.y+16, thisWidth-2, thisHeight-2-75-1))
 			.drawRects_(true)
 			.isFilled_(true)
 			.colors_(Color.clear, Color.blue)
 			.elasticMode_(1)
 		;
+		
 		nextY = thisXY.y+mSlider.bounds.height+label.bounds.height+1;
 		numVal = TextView(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.string_(widgetCV.value.asCompileString).font_(Font("Helvetica", 9.5))
@@ -206,11 +208,13 @@ CVWidgetMS : CVWidget {
 				if(char == $\r and:{ modifiers == 131072 }, {
 					if(nv.string.interpret.class == Array and:{
 						nv.string.interpret.select(_.isNumber).size == mSlider.size
-					}, { widgetCV.value_(nv.string.interpret) })
+					}, { nv.doAction })
 				})
 			})
 		;
+
 		nextY = thisXY.y+numVal.bounds.top+numVal.bounds.height+1;
+		
 		midiBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
 				["MIDI", Color.black, this.bgColor]
@@ -333,6 +337,7 @@ CVWidgetMS : CVWidget {
 		
 		widgetCV.connect(mSlider);
 		widgetCV.connect(numVal);
+		if(GUI.current != CocoaGUI, { widgetCV.connect(numVal) });
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
 	}

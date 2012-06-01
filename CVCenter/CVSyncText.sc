@@ -15,9 +15,8 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-// connect TextFields and TextViews to MultiSliderViews
+// connect TextFields and TextViews to CVs
 // <view>.string must be an array of numbers
-// Qt only (it seems...)
 
 CVSyncText : CVSync {
 	classvar <>initDelay = 0.2, <>valRound=0.01;
@@ -47,11 +46,9 @@ CVSyncText : CVSync {
 	
 	value { 
 		var arr = view.string.interpret;
-//		[arr, arr.class].postln;
 		if(arr.isKindOf(SequenceableCollection) and:{
 			arr.flat.select(_.isNumber).size == arr.flat.size
 		}, {
-//			arr.flat.postln;
 			cv.value = arr.flat;
 		})
 	}
