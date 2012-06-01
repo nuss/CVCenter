@@ -1435,26 +1435,25 @@ CVWidget {
 	}
 	
 	prInitOscConnect { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		var oscResponderAction;
+		var oscResponderAction, tmp;
 						
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
 		};
 
 		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
-			
-			"prCalibrate: %, theChanger: %".postf(prCalibrate, theChanger);
-			
+						
 			switch(prCalibrate.class, 
 				Event, { thisCalib = prCalibrate[slot] },
 				Array, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
 			);
-						
+									
 			if(theChanger.value.size == 4, {
 // 				OSCresponderNode: t, r, msg
 // 				OSCfunc: msg, time, addr // for the future
 				oscResponderAction = { |t, r, msg|
+					"msg[theChanger[3]]: %\n".postf(msg[theChanger.value[3]]);
 					if(thisCalib, { 
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
@@ -1464,17 +1463,17 @@ CVWidget {
 							}, { alwaysPositive = msg[theChanger.value[3]].abs+0.1 });
 							if(msg[theChanger.value[3]] < midiOscEnv.calibConstraints.lo, { 
 								midiOscEnv.calibConstraints.lo = msg[theChanger.value[3]];
-								wcm.oscInputRange.model.value_([
-									msg[theChanger.value[3]], 
-									wcm.oscInputRange.model.value[1]
-								]).changed(\value);
+//								wcm.oscInputRange.model.value_([
+//									msg[theChanger.value[3]], 
+//									wcm.oscInputRange.model.value[1]
+//								]).changed(\value);
 							});
 							if(msg[theChanger.value[3]] > midiOscEnv.calibConstraints.hi, {
 								midiOscEnv.calibConstraints.hi = msg[theChanger.value[3]];
-								wcm.oscInputRange.model.value_([
-									wcm.oscInputRange.model.value[0], 
-									msg[theChanger.value[3]]
-								]).changed(\value);
+//								wcm.oscInputRange.model.value_([
+//									wcm.oscInputRange.model.value[0], 
+//									msg[theChanger.value[3]]
+//								]).changed(\value);
 							});
 						});
 						wcm.mapConstrainterLo.value_(midiOscEnv.calibConstraints.lo);
@@ -1488,17 +1487,28 @@ CVWidget {
 						})
 					});
 					if(this.class == CVWidgetKnob or:{ this.class == CVWidget2D }, {
-					argWidgetCV.value_(
-						(msg[theChanger.value[3]]+alwaysPositive).perform(
-							midiOscEnv.oscMapping,
-							midiOscEnv.calibConstraints.lo+alwaysPositive, 
-							midiOscEnv.calibConstraints.hi+alwaysPositive,
-							this.getSpec(slot).minval, this.getSpec(slot).maxval,
-							\minmax
+						argWidgetCV.value_(
+							(msg[theChanger.value[3]]+alwaysPositive).perform(
+								midiOscEnv.oscMapping,
+								midiOscEnv.calibConstraints.lo+alwaysPositive, 
+								midiOscEnv.calibConstraints.hi+alwaysPositive,
+								this.getSpec(slot).minval, this.getSpec(slot).maxval,
+								\minmax
+							)
 						)
-					)
 					}, {
-						// else: CVWidgetMS - do what?
+						argWidgetCV.value_([
+							argWidgetCV.value[..(slot-1)],
+							(msg[theChanger.value[3]]+alwaysPositive).perform(
+								midiOscEnv.oscMapping,
+								midiOscEnv.calibConstraints.lo+alwaysPositive, 
+								midiOscEnv.calibConstraints.hi+alwaysPositive,
+								[this.getSpec(slot).minval].flat.wrapAt(slot), 
+								[this.getSpec(slot).maxval].flat.wrapAt(slot),
+								\minmax
+							),
+							argWidgetCV.value[(slot+1)..]
+						].flat);
 					})
 				};
 								
@@ -1525,23 +1535,23 @@ CVWidget {
 //				).changed(\value);
 			});
 			if(theChanger.value == false, {
-				midiOscEnv.oscResponder.remove;
-				midiOscEnv.oscResponder = nil;
-				midiOscEnv.msgIndex = nil;
-				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changed(\value);
-				midiOscEnv.calibConstraints = nil;
-				
-				wcm.oscDisplay.model.value_(
-					(
-						but: ["edit OSC", Color.black, Color.clear],
-						ipField: wcm.oscDisplay.model.value.ipField,
-						portField: wcm.oscDisplay.model.value.portField,
-						nameField: wcm.oscDisplay.model.value.nameField,
-						index: wcm.oscDisplay.model.value.index,
-						connectorButVal: 0, 
-						editEnabled: true
-					)
-				).changed(\value);
+//				midiOscEnv.oscResponder.remove;
+//				midiOscEnv.oscResponder = nil;
+//				midiOscEnv.msgIndex = nil;
+//				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changed(\value);
+//				midiOscEnv.calibConstraints = nil;
+//				
+//				wcm.oscDisplay.model.value_(
+//					(
+//						but: ["edit OSC", Color.black, Color.clear],
+//						ipField: wcm.oscDisplay.model.value.ipField,
+//						portField: wcm.oscDisplay.model.value.portField,
+//						nameField: wcm.oscDisplay.model.value.nameField,
+//						index: wcm.oscDisplay.model.value.index,
+//						connectorButVal: 0, 
+//						editEnabled: true
+//					)
+//				).changed(\value);
 			})
 		})
 	}
