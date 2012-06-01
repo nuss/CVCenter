@@ -717,9 +717,14 @@ CVWidget {
 				wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
 				CmdPeriod.remove({ this.oscDisconnect });
 			},
-			{
+			CVWidget2D, {
 				wdgtControllersAndModels[thisSlot].oscConnection.model.value_(false).changed(\value);
 				wdgtControllersAndModels[thisSlot].oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
+				CmdPeriod.remove({ this.oscDisconnect(slot) });
+			},
+			CVWidgetMS, {
+				wdgtControllersAndModels.slots[thisSlot].oscConnection.model.value_(false).changed(\value);
+				wdgtControllersAndModels.slots[thisSlot].oscInputRange.model.value_([0.00001, 0.00001]).changed(\value);
 				CmdPeriod.remove({ this.oscDisconnect(slot) });
 			}
 		)
@@ -1535,12 +1540,12 @@ CVWidget {
 //				).changed(\value);
 			});
 			if(theChanger.value == false, {
-//				midiOscEnv.oscResponder.remove;
-//				midiOscEnv.oscResponder = nil;
-//				midiOscEnv.msgIndex = nil;
-//				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changed(\value);
-//				midiOscEnv.calibConstraints = nil;
-//				
+				midiOscEnv.oscResponder.remove;
+				midiOscEnv.oscResponder = nil;
+				midiOscEnv.msgIndex = nil;
+				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changed(\value);
+				midiOscEnv.calibConstraints = nil;
+				
 //				wcm.oscDisplay.model.value_(
 //					(
 //						but: ["edit OSC", Color.black, Color.clear],
