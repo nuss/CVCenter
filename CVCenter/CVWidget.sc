@@ -1487,6 +1487,7 @@ CVWidget {
 							)
 						})
 					});
+					if(this.class == CVWidgetKnob or:{ this.class == CVWidget2D }, {
 					argWidgetCV.value_(
 						(msg[theChanger.value[3]]+alwaysPositive).perform(
 							midiOscEnv.oscMapping,
@@ -1496,6 +1497,9 @@ CVWidget {
 							\minmax
 						)
 					)
+					}, {
+						// else: CVWidgetMS - do what?
+					})
 				};
 								
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
