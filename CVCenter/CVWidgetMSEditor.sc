@@ -42,6 +42,7 @@ CVWidgetMSEditor {
 		var oscLabelColor, midiLabelColor, oscLabelStringColor, midiLabelStringColor;
 		var oscConnectCondition = 0;
 		var oscConnectWarning = "Couldn't connect OSC-controllers:";
+		var connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart;
 		var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
@@ -410,40 +411,60 @@ CVWidgetMSEditor {
 				["disconnect OSC-controllers", Color.white, Color.red]
 			])
 			.action_({ |cb|
-//				cb.value.switch(
-//					1, { 
-//						if(extCtrlArrayField.string.interpret.isArray and:{
-//							extCtrlArrayField.string.interpret.collect(_.isInteger).size == 
-//							extCtrlArrayField.string.interpret
-//						}, {
-//							oscConnectCondition = oscConnectCondition+1;
-//						}, {
-//							oscConnectWarning = oscConnectWarning++"\n\t- 'ext. sliders' must be an array of integers";
-//						});
-////						if(nameField.string.includes($%) and:{ indexField.string.includes($%) }, {
-////							oscConnectWarning = oscConnectWarning++"\n\t- the OSC-command-name and the msg. slot both contain a placeholder: ";
-////						});
-//						if(indexField.string != "%" and:{ indexField.string.interpret.isInteger.not }, {
-//							oscConnectWarning = oscConnectWarning++"\n\t- msg. slot must either contain '%' (a placeholder) or an integer";
-//						}, {
-//							oscConnectCondition = oscConnectCondition+1;
-//						});
-//						if(oscConnectCondition >= 2, {
-//							if(nameField.string.includes($%) and:{ indexField.string.includes($%) }, {
-//								extCtrlArrayField.string.interpret.do({ |ext|
-//									"widget.oscConnect(
-//										ipField.string,
-//										portField.value,
-//										nameField.string, 
-//										i+intStartIndexField,
-//										slot
-//									)".format()
-//								})
-//							})
-//						})
-//					},
-//					0, { widget.oscDisconnect(slot) }
-//				)
+				// user-input: 
+				// 	extCtrlArrayField -> external controllers
+				//	ipField -> IP-address
+				//	portField -> port
+				//	nameField -> osc-cmds, ext. controllers as placeholders
+				//	intStartIndexField -> multislider-index to start connecting at
+				//	indexField -> msg-slot, an integer or a placeholder, starting at 1
+				cb.value.switch(
+					1, { 
+						if(extCtrlArrayField.string.interpret.isArray and:{
+							extCtrlArrayField.string.interpret.collect(_.isInteger).size == 
+							extCtrlArrayField.string.interpret.size
+						}, {
+							oscConnectCondition = oscConnectCondition+1;
+						}, {
+							oscConnectWarning = oscConnectWarning++"\n\t- 'ext. sliders' must be an array of integers";
+						});
+						if(indexField.string != "%" and:{ indexField.string.interpret.isInteger.not }, {
+							oscConnectWarning = oscConnectWarning++"\n\t- msg. slot must either contain '%' (a placeholder) or an integer";
+						}, {
+							oscConnectCondition = oscConnectCondition+1;
+						});
+						if(oscConnectCondition >= 2, {
+							"ok, we're ready to rock".postln;
+							extCtrlArrayField.string.interpret.do({ |ext, i|
+								if(ipField.string.size > 0, { connectIP = ipField.string }, { connectIP = "nil" });
+								if(portField.string.size > 0, { 
+									connectPort = portField.string;
+								}, { 
+									connectPort = "nil";
+								});
+								if(nameField.string.includes($%), { 
+									connectName = nameField.string.format(ext);
+								}, {
+									connectName = nameField.string;
+								});
+								if(indexField.string.includes($%), {
+									connectOscMsgIndex = indexField.string.format(ext).asInt;
+								}, {
+									connectOscMsgIndex = indexField.string.asInt;
+								});
+								connectIndexStart = intStartIndexField.value+i;
+								widget.oscConnect(
+									name: connectIP, 
+									port: connectPort, 
+									name: connectName, 
+									oscMsgIndex: connectOscMsgIndex,
+									slot: connectIndexStart
+								)
+							})
+						})
+					},
+					0, {/* widget.oscDisconnect(slot) */}
+				)
 			})
 		;
 

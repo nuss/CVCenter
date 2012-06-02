@@ -656,7 +656,7 @@ CVWidget {
 	oscConnect { |ip, port, name, oscMsgIndex=1, slot|
 		var thisSlot;
 		var thisIP, intPort;
-
+		
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
 			CVWidgetMS, { thisSlot = slot.asInt }
@@ -1017,7 +1017,7 @@ CVWidget {
 			switch(this.class,
 				CVWidget2D, { wcm = wdgtControllersAndModels[slot] },
 				CVWidgetMS, { 
-					wcm = wdgtControllersAndModels.slots[slot]; [slot, wcm.oscConnection].postln;
+					wcm = wdgtControllersAndModels.slots[slot];
 					wcm.cvSpec = wdgtControllersAndModels.cvSpec;
 					wcm.actions = wdgtControllersAndModels.actions;
 				};
@@ -1458,7 +1458,7 @@ CVWidget {
 // 				OSCresponderNode: t, r, msg
 // 				OSCfunc: msg, time, addr // for the future
 				oscResponderAction = { |t, r, msg|
-					"msg[theChanger[3]]: %\n".postf(msg[theChanger.value[3]]);
+//					"msg[theChanger[3]]: %\n".postf(msg[theChanger.value[3]]);
 					if(thisCalib, { 
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
