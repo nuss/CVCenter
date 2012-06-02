@@ -43,7 +43,7 @@ CVWidgetEditor {
 		var addr, wcm, thisGuiEnv, labelColors; 
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
-		var mappingSelectItems;
+		var specConstraintsText, mappingSelectItems;
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
 		var tmp; // multipurpose short-term var
@@ -582,11 +582,16 @@ CVWidgetEditor {
 			
 			flow2.shift(0, 0);
 	
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
+			specConstraintsText = StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.background_(Color.white)
-				.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(slot).minval+"/"+widget.getSpec(slot).maxval)
 			;
+			
+			if(widget.class == CVWidgetMS, {
+				specConstraintsText.string_(" current widget-spec constraints lo / hi:"+widget.getSpec.minval.wrapAt(slot)+"/"+widget.getSpec.maxval.wrapAt(slot))
+			}, {
+				specConstraintsText.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(slot).minval+"/"+widget.getSpec(slot).maxval)
+			});
 	
 			flow2.shift(5, 0);
 			
@@ -753,7 +758,13 @@ CVWidgetEditor {
 				})
 			});
 			
-			if(widget.class == CVWidgetMS, { [3, 0].do(tabs.removeAt(_)) });
+			if(widget.class == CVWidgetMS, {
+				[3, 0].do({ |i| 
+					tabs.removeAt(i);
+					labelColors.removeAt(i);
+//					labelStringColors.removeAt(i);
+				})
+			})
 			
 		});
 		

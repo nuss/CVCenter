@@ -500,10 +500,10 @@ CVWidgetMSEditor {
 					.font_(staticTextFont)
 					.action_({ |bt|
 						if(widget.editor[sindex].isNil or:{ widget.editor[sindex].isClosed }, {
-							widget.editor[sindex] = CVWidgetEditor(widget, widget.label.states[0][0]++"["++sindex++"]", 2, sindex);
+							widget.editor[sindex] = CVWidgetEditor(widget, widget.label.states[0][0], 1, sindex);
 							widget.guiEnv.editor[sindex] = widget.editor[sindex];
 						}, {
-							widget.editor[sindex].front(2)
+							widget.editor[sindex].front(1)
 						});
 //						wdgtControllersAndModels.oscDisplay.model.value_(
 //							wdgtControllersAndModels.oscDisplay.model.value;
