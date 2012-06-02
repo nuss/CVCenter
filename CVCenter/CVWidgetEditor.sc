@@ -40,7 +40,7 @@ CVWidgetEditor {
 		var tabs, cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
-		var addr, wcmHiLo, thisGuiEnv, labelColors; 
+		var addr, wcm, thisGuiEnv, labelColors; 
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
 		var mappingSelectItems;
@@ -64,9 +64,18 @@ CVWidgetEditor {
 		};
 
 		if(slot.notNil, {
-			widget.wdgtControllersAndModels[slot] !? { 
-				wcmHiLo = widget.wdgtControllersAndModels[slot];
-			};
+			switch(widget.class,
+				CVWidget2D, {
+//					widget.wdgtControllersAndModels[slot] !? { 
+						wcm = widget.wdgtControllersAndModels[slot];
+//					}
+				},
+				CVWidgetMS, {
+//					widget.wdgtControllersAndModels.slots[slot] !? {
+						wcm = widget.wdgtControllersAndModels.slots[slot];
+//					}
+				}
+			);
 			thisMidiMode = widget.getMidiMode(slot);
 			thisMidiMean = widget.getMidiMean(slot);
 			thisMidiResolution = widget.getMidiResolution(slot);
@@ -74,7 +83,7 @@ CVWidgetEditor {
 			thisCtrlButtonBank = widget.getCtrlButtonBank(slot);
 		}, { 
 			widget.wdgtControllersAndModels !? { 
-				wcmHiLo = widget.wdgtControllersAndModels;
+				wcm = widget.wdgtControllersAndModels;
 			};
 			thisMidiMode = widget.getMidiMode;
 			thisMidiMean = widget.getMidiMean;
@@ -137,8 +146,6 @@ CVWidgetEditor {
 			tabs.stringFocusedColor_(labelStringColors[tab]);
 
 			thisEditor.tabs = tabs;
-			
-			
 			
 			thisEditor.tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
 //				[view, char, modifiers, unicode, keycode].postln;
@@ -348,11 +355,11 @@ CVWidgetEditor {
 				.background_(Color.white)
 				.action_({ |tf|
 					if(tf.string != msrc, {
-						wcmHiLo.midiDisplay.model.value_((
+						wcm.midiDisplay.model.value_((
 							learn: "C",
 							src: tf.string,
-							chan: wcmHiLo.midiDisplay.model.value.chan,
-							ctrl: wcmHiLo.midiDisplay.model.value.ctrl
+							chan: wcm.midiDisplay.model.value.chan,
+							ctrl: wcm.midiDisplay.model.value.ctrl
 						)).changed(\value)
 					})
 				})
@@ -374,11 +381,11 @@ CVWidgetEditor {
 				.background_(Color.white)
 				.action_({ |tf|
 					if(tf.string != mchan, {
-						wcmHiLo.midiDisplay.model.value_((
+						wcm.midiDisplay.model.value_((
 							learn: "C",
-							src: wcmHiLo.midiDisplay.model.value.src,
+							src: wcm.midiDisplay.model.value.src,
 							chan: tf.string,
-							ctrl: wcmHiLo.midiDisplay.model.value.ctrl
+							ctrl: wcm.midiDisplay.model.value.ctrl
 						)).changed(\value)
 					})
 				})
@@ -400,10 +407,10 @@ CVWidgetEditor {
 				.background_(Color.white)
 				.action_({ |tf|
 					if(tf.string != mctrl, {
-						wcmHiLo.midiDisplay.model.value_((
+						wcm.midiDisplay.model.value_((
 							learn: "C",
-							src: wcmHiLo.midiDisplay.model.value.src,
-							chan: wcmHiLo.midiDisplay.model.value.chan,
+							src: wcm.midiDisplay.model.value.src,
+							chan: wcm.midiDisplay.model.value.chan,
 							ctrl: tf.string
 						)).changed(\value)
 					})
@@ -534,7 +541,7 @@ CVWidgetEditor {
 			inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
-				.value_(wcmHiLo.oscInputRange.model.value[0])
+				.value_(wcm.oscInputRange.model.value[0])
 				.enabled_(false)
 			;
 			
@@ -543,7 +550,7 @@ CVWidgetEditor {
 			inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
-				.value_(wcmHiLo.oscInputRange.model.value[1])
+				.value_(wcm.oscInputRange.model.value[1])
 				.enabled_(false)
 			;
 						
@@ -633,11 +640,11 @@ CVWidgetEditor {
 				but.value.switch(
 					0, { 
 						widget.setCalibrate(true, slot);
-						wcmHiLo.calibration.model.value_(true).changed(\value);
+						wcm.calibration.model.value_(true).changed(\value);
 					},
 					1, { 
 						widget.setCalibrate(false, slot);
-						wcmHiLo.calibration.model.value_(false).changed(\value);
+						wcm.calibration.model.value_(false).changed(\value);
 					}
 				)
 			});
@@ -746,7 +753,7 @@ CVWidgetEditor {
 				})
 			});
 			
-			if(widget.class == CVWidgetMS, { [0, 3].do(tabs.removeAt(_)) });
+			if(widget.class == CVWidgetMS, { [3, 0].do(tabs.removeAt(_)) });
 			
 		});
 		

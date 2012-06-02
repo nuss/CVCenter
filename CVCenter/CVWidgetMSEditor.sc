@@ -21,6 +21,7 @@ CVWidgetMSEditor {
 	var <specField, <specsList, <specsListSpecs;
 	var <ipField, <portField, <extCtrlArrayField, <nameField, <intStartIndexField, <indexField;
 	var <calibBut, <calibNumBoxes;
+	var <oscEditBtns, <oscCalibBtns;
 	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 	var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
 	var <mappingSelect, <connectorBut;
@@ -54,6 +55,8 @@ CVWidgetMSEditor {
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
 		};
+		
+		#oscEditBtns, oscCalibBtns = []!2;
 
 		name = widgetName.asSymbol;
 		msEditorEnv = ();
@@ -487,6 +490,31 @@ CVWidgetMSEditor {
 //			true, { calibBut.value_(0) },
 //			false, { calibBut.value_(1) }
 //		);
+
+		widget.msSize.do({ |sindex|
+			oscEditBtns = oscEditBtns.add(
+				Button(thisEditor.oscTabs.views[1], oscFlow0.bounds.width/5-10@25)
+					.states_([
+						[sindex.asString++": edit OSC", Color.black, Color.white(0.2)]
+					])
+					.font_(staticTextFont)
+					.action_({ |bt|
+						if(widget.editor[sindex].isNil or:{ widget.editor[sindex].isClosed }, {
+							widget.editor[sindex] = CVWidgetEditor(widget, widget.label.states[0][0]++"["++sindex++"]", 2, sindex);
+							widget.guiEnv.editor[sindex] = widget.editor[sindex];
+						}, {
+							widget.editor[sindex].front(2)
+						});
+//						wdgtControllersAndModels.oscDisplay.model.value_(
+//							wdgtControllersAndModels.oscDisplay.model.value;
+//						).changed(\value);
+//						wdgtControllersAndModels.midiDisplay.model.value_(
+//							wdgtControllersAndModels.midiDisplay.model.value
+//						).changed(\value);
+					})
+				;
+			);
+		});
 		
 				
 		window.onClose_({
