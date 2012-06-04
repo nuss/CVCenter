@@ -150,8 +150,18 @@ CVWidgetEditor {
 			thisEditor.tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
 //				[view, char, modifiers, unicode, keycode].postln;
 				switch(unicode,
-					111, { thisEditor.tabs.focus(2) }, // "o" -> osc
-					109, { thisEditor.tabs.focus(1) }, // "m" -> midi
+					111, { // "o" -> osc
+						switch(widget.class,
+							CVWidgetMS, { thisEditor.tabs.focus(1) },
+							{ thisEditor.focus(2) }
+						)
+					},
+					109, { // "m" -> midi
+						switch(widget.class,
+							CVWidgetMS, { thisEditor.tabs.focus(0) }, 
+							{ thisEditor.tabs.focus(1) }
+						)
+					},
 					97, { if(widget.class != CVWidgetMS, { thisEditor.tabs.focus(3) }) }, // "a" -> actions
 					115, { if(widget.class != CVWidgetMS, { thisEditor.tabs.focus(0) }) }, // "s" -> specs
 					120, { this.close(slot) }, // "x" -> close editor

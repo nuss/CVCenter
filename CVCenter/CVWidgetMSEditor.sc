@@ -381,9 +381,9 @@ CVWidgetMSEditor {
 		mappingSelect = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-12@20)
 			.font_(Font("Helvetica", 12))
 			.items_(mappingSelectItems)
-//			.action_({ |ms|
-//				widget.setOscMapping(ms.item, slot);
-//			})
+			.action_({ |ms|
+				widget.msSize.do(widget.setOscMapping(ms.item, _));
+			})
 		;
 		
 //		if(widget.getOscMapping(slot).notNil, {
@@ -437,7 +437,7 @@ CVWidgetMSEditor {
 							oscConnectCondition = oscConnectCondition+1;
 						});
 						if(oscConnectCondition >= 2, {
-							"ok, we're ready to rock".postln;
+//							"ok, we're ready to rock".postln;
 							extCtrlArrayField.string.interpret.do({ |ext, i|
 								if(ipField.string.size > 0, { connectIP = ipField.string }, { connectIP = "nil" });
 								if(portField.string.size > 0, { 
@@ -466,7 +466,7 @@ CVWidgetMSEditor {
 							})
 						})
 					},
-					0, {/* widget.oscDisconnect(slot) */}
+					0, { widget.msSize.do(widget.oscDisconnect(_)) }
 				)
 			})
 		;
@@ -499,11 +499,18 @@ CVWidgetMSEditor {
 					])
 					.font_(staticTextFont)
 					.action_({ |bt|
-						if(widget.editor[sindex].isNil or:{ widget.editor[sindex].isClosed }, {
-							widget.editor[sindex] = CVWidgetEditor(widget, widget.label.states[0][0], 1, sindex);
-							widget.guiEnv.editor[sindex] = widget.editor[sindex];
+						if(widget.editor.editors[sindex].isNil or:{ widget.editor.editors[sindex].isClosed }, {
+							widget.editor.editors[sindex] = CVWidgetEditor(
+								widget, widget.label.states[0][0], 1, sindex
+							);
+							if(widget.guiEnv.editor.notNil, {
+								"widget.guiEnv.editor: %\n".postf(widget.guiEnv.editor);
+							}, {
+								"no widget.guiEnv.editor yet - create it first".postln;
+							});
+							widget.guiEnv.editor[sindex] = widget.editor.editors[sindex];
 						}, {
-							widget.editor[sindex].front(1)
+							widget.editor.editors[sindex].front(1)
 						});
 //						wdgtControllersAndModels.oscDisplay.model.value_(
 //							wdgtControllersAndModels.oscDisplay.model.value;

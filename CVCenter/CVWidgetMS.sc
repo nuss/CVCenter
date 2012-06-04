@@ -322,7 +322,7 @@ CVWidgetMS : CVWidget {
 //		msSize.do({ |slot|
 			guiEnv = (
 //				msEditor: editor.msEditor,
-//				editors: editor.editors,
+				editor: editor.editors,
 				mSlider: mSlider,
 				numVal: numVal,
 				midiBut: midiBut,
