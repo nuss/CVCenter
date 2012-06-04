@@ -117,10 +117,10 @@ CVWidgetSpecsEditor {
 		
 		specsList = ["Select a spec..."];		
 		specsListSpecs = [nil];
-		Spec.specs.pairsDo({ |k, v|
-			if(v.isKindOf(ControlSpec), {
-				specsList = specsList.add(k++":"+v);
-				specsListSpecs = specsListSpecs.add(v);
+		Spec.specs.asSortedArray.do({ |spec|
+			if(spec[1].isKindOf(ControlSpec), {
+				specsList = specsList.add(spec[0]++":"+spec[1]);
+				specsListSpecs = specsListSpecs.add(spec[1]);
 			})
 		});
 				

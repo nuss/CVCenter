@@ -204,10 +204,10 @@ CVWidgetMSEditor {
 		if(msEditorEnv.specsListItems.notNil, {
 			specsList.items_(msEditorEnv.specsListItems);
 		}, {
-			Spec.specs.pairsDo({ |k, v|
-				if(v.isKindOf(ControlSpec), {
-					specsList.items_(specsList.items.add(k++":"+v));
-					specsListSpecs.add(v);
+			Spec.specs.asSortedArray({ |spec|
+				if(spec[1].isKindOf(ControlSpec), {
+					specsList.items_(specsList.items.add(spec[0]++":"+spec[1]));
+					specsListSpecs.add(spec[1]);
 				})
 			})
 		});
