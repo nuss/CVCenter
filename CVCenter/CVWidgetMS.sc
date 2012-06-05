@@ -1,5 +1,6 @@
 CVWidgetMS : CVWidget {
 	var <msSize, <mSlider, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
+	var numOscResponders, numMidiResponders;
 	var <msEditor;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
@@ -27,6 +28,7 @@ CVWidgetMS : CVWidget {
 		var nextX, nextY, knobX, knobY;
 		
 		this.bgColor ?? { this.bgColor = Color.white };
+		#numOscResponders, numMidiResponders = 0!2;
 		
 		if(cv.isNil, {
 			widgetCV = CV([0 ! numSliders, 1 ! numSliders]);
@@ -217,7 +219,7 @@ CVWidgetMS : CVWidget {
 		
 		midiBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
-				["MIDI", Color.black, this.bgColor]
+				["MIDI"+"("++numMidiResponders++"/"++msSize++")", Color.black, this.bgColor]
 			])
 			.font_(Font("Helvetica", 9))
 			.action_({ |mb| 
@@ -230,18 +232,18 @@ CVWidgetMS : CVWidget {
 			})
 		;
 		
-		if(GUI.current.name === \QtGUI, {
+		if(GUI.current == QtGUI, {
 			midiBut.mouseEnterAction_({ |mb|
-				mb.states_([["MIDI", Color.white, Color.red]])
+				mb.states_([[mb.states[0][0], Color.white, Color.red]])
 			}).mouseLeaveAction_({ |mb|
-				mb.states_([["MIDI", Color.black, this.bgColor]])
+				mb.states_([[mb.states[0][0], Color.black, this.bgColor]])
 			})
 		});
 
 		nextX = thisXY.x+1+midiBut.bounds.width;
 		oscBut = Button(window, Rect(nextX, nextY, thisWidth-2/2, 15))
 			.states_([
-				["OSC", Color.black, this.bgColor]
+				["OSC"+"("++numOscResponders++"/"++msSize++")", Color.black, this.bgColor]
 			])
 			.font_(Font("Helvetica", 9))
 			.action_({ |oscb| 
@@ -254,15 +256,11 @@ CVWidgetMS : CVWidget {
 			})
 		;
 		
-		if(GUI.current.name === \QtGUI, {
+		if(GUI.current == QtGUI, {
 			oscBut.mouseEnterAction_({ |oscb|
-				if(wdgtControllersAndModels.oscConnection.model.value === false, {
-					oscb.states_([["edit OSC", Color.white, Color.cyan(0.5)]]);
-				})
+				oscb.states_([[oscb.states[0][0], Color.white, Color.cyan(0.5)]]);
 			}).mouseLeaveAction_({ |oscb|
-				if(wdgtControllersAndModels.oscConnection.model.value === false, {
-					oscb.states_([["edit OSC", Color.black, this.bgColor]])
-				})
+				oscb.states_([[oscb.states[0][0], Color.black, this.bgColor]])
 			})
 		});
 		
@@ -337,7 +335,7 @@ CVWidgetMS : CVWidget {
 		
 		widgetCV.connect(mSlider);
 		widgetCV.connect(numVal);
-		if(GUI.current != CocoaGUI, { widgetCV.connect(numVal) });
+				
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
 	}
