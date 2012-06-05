@@ -352,7 +352,7 @@ CVWidgetMSEditor {
 			.font_(textFieldFont)
 			.normalColor_(textFieldFontColor)
 			.clipLo_(0)
-			.clipHi_(widget.msSize)
+			.clipHi_(widget.msSize-1)
 			.shift_scale_(1)
 			.ctrl_scale_(1)
 			.alt_scale_(1)

@@ -1577,6 +1577,7 @@ CVWidget {
 	}
 	
 	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+		var thisEditor, thisOscEditBut;
 		
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
@@ -1587,33 +1588,60 @@ CVWidget {
 				Event, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
 			);
+			
+			if(this.class == CVWidgetMS, { 
+				thisEditor = thisGuiEnv.editor[slot];
+				thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot];
+//				"thisOscEditBut: %\n".postf(thisOscEditBut);
+//				thisMidiOscEnv = midiOscEnv[slot]; // hmmm...
+			}, {
+				thisEditor = thisGuiEnv.editor;
+				thisOscEditBut = thisGuiEnv.oscEditBut;
+			});
+//			"thisEditor: %\n".postf(thisEditor);
+
 			if(this.window.isClosed.not, {
 				thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
 				thisGuiEnv.oscEditBut.refresh;
 			});
 			defer {
-				if(thisGuiEnv.editor.notNil and:{
-					thisGuiEnv.editor.isClosed.not
+				if(thisGuiEnv.msEditor.notNil and:{
+					thisGuiEnv.msEditor.isClosed.net
 				}, {
-					thisGuiEnv.editor.connectorBut.value_(theChanger.value.connectorButVal);
-					thisGuiEnv.editor.ipField.string_(theChanger.value.ipField);
-					thisGuiEnv.editor.portField.string_(theChanger.value.portField);
-					thisGuiEnv.editor.nameField.string_(theChanger.value.nameField);
+					thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
+					thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
+					thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
+					thisGuiEnv.msEditor.nameField.string_(theChanger.value.nameField);
+					thisGuiEnv.msEditor.indexField.value_(theChanger.value.index);
+					[
+						thisGuiEnv.msEditor.ipField,
+						thisGuiEnv.msEditor.portField,
+						thisGuiEnv.msEditor.nameField,
+						thisGuiEnv.msEditor.indexField
+					].do(_.enabled_(theChanger.value.editEnabled))
+				});
+				
+				if(thisEditor.notNil and:{
+					thisEditor.isClosed.not
+				}, {
+					thisEditor.connectorBut.value_(theChanger.value.connectorButVal);
+					thisEditor.ipField.string_(theChanger.value.ipField);
+					thisEditor.portField.string_(theChanger.value.portField);
+					thisEditor.nameField.string_(theChanger.value.nameField);
 					if(thisCalib, {
 						[
-//							thisGuiEnv.editor.inputConstraintLoField, 
-//							thisGuiEnv.editor.inputConstraintHiField
-							thisGuiEnv.editor.calibNumBoxes.lo, 
-							thisGuiEnv.editor.calibNumBoxes.hi
+							thisEditor.inputConstraintLoField, 
+							thisEditor.inputConstraintHiField,
+							thisEditor.calibNumBoxes.lo, 
+							thisEditor.calibNumBoxes.hi
 						].do(_.enabled_(theChanger.value.editEnabled));
 					});
-					thisGuiEnv.editor.indexField.value_(theChanger.value.index);
-					thisGuiEnv.editor.connectorBut.value_(theChanger.value.connectorButVal);
+					thisEditor.indexField.value_(theChanger.value.index);
 					[
-						thisGuiEnv.editor.ipField,
-						thisGuiEnv.editor.portField,
-						thisGuiEnv.editor.nameField,
-						thisGuiEnv.editor.indexField
+						thisEditor.ipField,
+						thisEditor.portField,
+						thisEditor.nameField,
+						thisEditor.indexField
 					].do(_.enabled_(theChanger.value.editEnabled))
 				})
 			}
@@ -1632,18 +1660,18 @@ CVWidget {
 
 		wcm.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
 			[theChanger, what, moreArgs].postln;
-			"thisGuiEnv: %, slot: %\n".postf(thisGuiEnv.asCompileString, slot);
+//			"thisGuiEnv: %, slot: %\n".postf(thisGuiEnv.asCompileString, slot);
 			
 			if(this.class == CVWidgetMS, { 
 				thisEditor = thisGuiEnv.editor[slot];
 				thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot];
-				"thisOscEditBut: %\n".postf(thisOscEditBut);
-	//			thisMidiOscEnv = midiOscEnv[slot]; // hmmm...
+//				"thisOscEditBut: %\n".postf(thisOscEditBut);
+//				thisMidiOscEnv = midiOscEnv[slot]; // hmmm...
 			}, {
 				thisEditor = thisGuiEnv.editor;
 				thisOscEditBut = thisGuiEnv.oscEditBut;
 			});
-	//		"thisEditor: %\n".postf(thisEditor);
+//			"thisEditor: %\n".postf(thisEditor);
 		
 			{
 				if(thisEditor.notNil and:{
