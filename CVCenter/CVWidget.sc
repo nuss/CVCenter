@@ -1338,7 +1338,7 @@ CVWidget {
 						].do(_.enabled_(theChanger.value.editEnabled));
 					});
 					thisGuiEnv.editor.indexField.value_(theChanger.value.index);
-					thisGuiEnv.editor.connectorBut.value_(theChanger.value.connectorButVal);
+//					thisGuiEnv.editor.connectorBut.value_(theChanger.value.connectorButVal);
 					[
 						thisGuiEnv.editor.ipField,
 						thisGuiEnv.editor.portField,
