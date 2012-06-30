@@ -159,6 +159,7 @@ CVWidgetKnob : CVWidget {
 		});						
 		knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
 			.canFocus_(false)
+			.mode_(\vert)
 		;
 		if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
 		nextY = thisXY.y+thisHeight-132;
