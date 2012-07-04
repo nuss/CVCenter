@@ -2,23 +2,27 @@ CVCenter is a container of CVs as well as it provides a graphical control-interf
 
 For more info check out CVCenter.html resp. CVWidget.html.
 
-Installation: 
-1) get SuperCollider from http://sourceforge.net/projects/supercollider/files/
-2) install the required extensions via the Quarks-mechanism:
-	a) Conductor
-	b) TabbedView
-	c) wslib (optional)
+Installation
+------------
+1. get SuperCollider from http://sourceforge.net/projects/supercollider/files/
+2. install the required extensions via the Quarks-mechanism:
+	- Conductor
+	- TabbedView
+	- wslib (optional)  
 	see the Quarks-helpfile for more information on how to do this.
-2) after installing SuperCollider and the required extensions put all content of CVCenter in your user-app-support directory. Execute the following line SuperCollider to see where that is:
+2. after installing SuperCollider and the required extensions put all content of CVCenter in your user-app-support directory. Execute the following line SuperCollider to see where that is:
 
-Platform.userAppSupportDir
+		Platform.userAppSupportDir
 
 Under OSX this will resolve to:
-~/Library/Application Support/SuperCollider
+
+	~/Library/Application Support/SuperCollider
 
 Under Linux, using the latest Developer-Version of SuperCollider this will resolve to
-~/.local/share/SuperCollider
+
+	~/.local/share/SuperCollider
 
 If not present yet create a directory 'Extensions' and put CVCenter in there.
 
 Note: if you're on Linux you will need to have installed SuperCollider >= 3.5 as CVCenter depends on QtGUI. Under MacOSX CVCenter *should* be compatible with SC >= 3.4 resp. QtGUI as well as Cocoa.
+
