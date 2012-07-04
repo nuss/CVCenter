@@ -12,7 +12,7 @@ Installation
 	see the Quarks-helpfile for more information on how to do this.
 2. after installing SuperCollider and the required extensions put all content of CVCenter in your user-app-support directory. Execute the following line SuperCollider to see where that is:
 
-	Platform.userAppSupportDir
+		Platform.userAppSupportDir
 
 Under OSX this will resolve to:
 
