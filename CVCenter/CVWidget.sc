@@ -28,6 +28,14 @@ CVWidget {
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
+	*initClass {
+		StartUp.add({
+			if(Quarks.isInstalled("cruciallib"), {
+				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
+			})
+		})
+	}	
+	
 	setup {
 		^(
 			midiMode: prMidiMode, 
