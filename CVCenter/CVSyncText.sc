@@ -19,7 +19,7 @@
 // <view>.string must be an array of numbers
 
 CVSyncText : CVSync {
-	classvar <>initDelay = 0.2, <>valRound=0.01;
+	classvar <>valRound=0.01;
 	
 	// add to CV's viewDictionary
 	*initClass {
@@ -27,7 +27,7 @@ CVSyncText : CVSync {
 				
 		connectDictionary = (textView: this, textField: this, staticText: this);
 				
-		{ CV.viewDictionary !? {
+		StartUp.add({ CV.viewDictionary !? {
 			GUI.schemes.do({ |scheme|
 				#[textView, textField, staticText].collect({ |name|
 					if((class = scheme.perform(name)).notNil, {
@@ -35,7 +35,7 @@ CVSyncText : CVSync {
 					})					
 				})
 			});
-		}}.defer(initDelay);
+		}});
 	}
 	
 	update { | changer, what ...moreArgs |
