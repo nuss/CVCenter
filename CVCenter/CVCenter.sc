@@ -653,7 +653,12 @@ CVCenter {
 		};
 		
 		thisSpec = spec.asSpec;
-		thisVal = value ?? { thisVal = thisSpec.default };
+
+		if(value.notNil and:{ value.isNumber }, {
+			thisVal = value;
+		}, {
+			thisVal = thisSpec.default;
+		});
 
 		if(thisSlot.notNil and:{ widgetStates[thisKey][thisSlot][\made] != true }, {
 			widgetStates[thisKey][thisSlot].made = true;
