@@ -177,7 +177,7 @@ CVWidgetEditor {
 			;
 			
 			if(editorEnv.specsListSpecs.isNil, { 
-				specsListSpecs = List() 
+				specsListSpecs = List();
 			}, {
 				specsListSpecs = editorEnv.specsListSpecs;
 			});
@@ -185,7 +185,7 @@ CVWidgetEditor {
 			if(editorEnv.specsListItems.notNil, {
 				specsList.items_(editorEnv.specsListItems);
 			}, {
-				Spec.specs.asSortedArray({ |spec|
+				Spec.specs.asSortedArray.do({ |spec|
 					if(spec[1].isKindOf(ControlSpec), {
 						specsList.items_(specsList.items.add(spec[0]++":"+spec[1]));
 						specsListSpecs.add(spec[1]);
