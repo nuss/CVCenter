@@ -26,7 +26,7 @@ CVSyncText : CVSync {
 		var class, connectDictionary;
 				
 		connectDictionary = (textView: this, textField: this, staticText: this);
-				
+		
 		{ CV.viewDictionary !? {
 			GUI.schemes.do({ |scheme|
 				#[textView, textField, staticText].collect({ |name|
