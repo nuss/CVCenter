@@ -171,9 +171,10 @@ CVCenter {
 						104, { // key "h" -> start History and open History window
 							if(History.started === false, { History.start });
 							if(historyWin.isNil or:{ historyWin.isClosed }, {
-								historyGui = History.makeWin(Window.screenBounds.width-300 @ Window.screenBounds.height);
+								historyGui = History.makeWin(
+									Window.screenBounds.width-300 @ Window.screenBounds.height
+								);
 								historyWin = historyGui.w;
-								historyWin.postln;
 							});
 							if(historyWin.notNil and:{ historyWin.isClosed.not }, { historyWin.front })
 						},
