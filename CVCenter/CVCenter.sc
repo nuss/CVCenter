@@ -23,7 +23,7 @@ CVCenter {
 	classvar widgetStates;
 	classvar tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=181, colwidth, rowheight;
-	classvar nDefWin, pDefWin, tDefWin, allWin;
+	classvar nDefWin, pDefWin, tDefWin, allWin, historyWin;
 	
 	*new { |cvs...setUpArgs|
 		var r, g, b;
@@ -83,7 +83,7 @@ CVCenter {
 		var cvcArgs, btnColor;
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
 		var midiFlag, oscFlag, loadFlag, tmp, wdgtActions;
-		var nDefGui, pDefGui, tDefGui, allGui;
+		var nDefGui, pDefGui, tDefGui, allGui, historyGui;
 					
 		cvs !? { this.put(*cvs) };
 		
@@ -149,7 +149,7 @@ CVCenter {
 			
 			[tabs.view, tabs.views, prefPane].flat.do({ |v|
 				v.keyDownAction_({ |view, char, modifiers, unicode, keycode|
-//					[view, char, modifiers, unicode, keycode].postcs;
+					[view, char, modifiers, unicode, keycode].postcs;
 					switch(keycode, 
 						16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
 						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
@@ -171,8 +171,13 @@ CVCenter {
 						104, { // key "h" -> start History and open History window
 							if(History.started === false, { 
 								History.start;
-								History.makeWin(Window.screenBounds.width-300 @ Window.screenBounds.height);
-							})
+								if(historyWin.isNil or:{ historyWin.isClosed }, {
+									historyGui = History.makeWin(Window.screenBounds.width-300 @ Window.screenBounds.height);
+									historyWin = historyGui.w;
+									historyWin.postln;
+								})
+							});
+							if(historyWin.notNil and:{ historyWin.isClosed.not }, { historyWin.front })
 						},
 						110, {
 							if(nDefWin.isNil or:{ nDefWin.isClosed }, {
