@@ -23,6 +23,7 @@ CVCenter {
 	classvar widgetStates;
 	classvar tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=181, colwidth, rowheight;
+	classvar nDefWin, pDefWin, tDefWin, allWin;
 	
 	*new { |cvs...setUpArgs|
 		var r, g, b;
@@ -82,6 +83,7 @@ CVCenter {
 		var cvcArgs, btnColor;
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
 		var midiFlag, oscFlag, loadFlag, tmp, wdgtActions;
+		var nDefGui, pDefGui, tDefGui, allGui;
 					
 		cvs !? { this.put(*cvs) };
 		
@@ -172,10 +174,31 @@ CVCenter {
 								History.makeWin(Window.screenBounds.width-300 @ Window.screenBounds.height);
 							})
 						},
-						110, { NdefMixer(Server.default) }, // key "n" -> the NdefMixer for the default server
-						112, { PdefAllGui() }, // key "p"
-						116, { TdefAllGui() }, // key "t"
-						97, { if(Quarks.isInstalled("AllGui"), { AllGui() }) } // key "a"
+						110, {
+							if(nDefWin.isNil or:{ nDefWin.isClosed }, {
+								nDefGui = NdefMixer(Server.default); nDefWin = nDefGui.parent;
+							});
+							if(nDefWin.notNil and:{ nDefWin.isClosed.not }, { nDefWin.front });
+						}, // key "n" -> the NdefMixer for the default server
+						112, {
+							if(pDefWin.isNil or: { pDefWin.isClosed }, {
+								pDefGui = PdefAllGui(); pDefWin = pDefGui.parent;
+							});
+							if(pDefWin.notNil and:{ pDefWin.isClosed.not }, { pDefWin.front });
+						}, // key "p"
+						116, {
+							if(tDefWin.isNil or:{ tDefWin.isClosed }, {
+								tDefGui = TdefAllGui(); tDefWin = tDefGui.parent;
+							});
+							if(tDefWin.notNil and:{ tDefWin.isClosed.not }, { tDefWin.front });
+						}, // key "t"
+						97, { if(Quarks.isInstalled("AllGui"), {
+								if(allWin.isNil or:{ allWin.isClosed }, {
+									allGui = AllGui(); allWin = allGui.parent;
+								});
+								if(allWin.notNil and:{ allWin.isClosed.not }, { allWin.front })
+							})
+						} // key "a"
 					);
 					if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }});
 					if(modifiers == 131072 and:{ unicode == 72 and:{ History.started }}, { 
