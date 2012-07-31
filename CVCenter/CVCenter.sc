@@ -23,7 +23,7 @@ CVCenter {
 	classvar widgetStates;
 	classvar tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=181, colwidth, rowheight;
-	classvar nDefWin, pDefWin, tDefWin, allWin, historyWin;
+	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin;
 	
 	*new { |cvs...setUpArgs|
 		var r, g, b;
@@ -83,7 +83,7 @@ CVCenter {
 		var cvcArgs, btnColor;
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
 		var midiFlag, oscFlag, loadFlag, tmp, wdgtActions;
-		var nDefGui, pDefGui, tDefGui, allGui, historyGui;
+		var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui;
 					
 		cvs !? { this.put(*cvs) };
 		
@@ -149,7 +149,7 @@ CVCenter {
 			
 			[tabs.view, tabs.views, prefPane].flat.do({ |v|
 				v.keyDownAction_({ |view, char, modifiers, unicode, keycode|
-					[view, char, modifiers, unicode, keycode].postcs;
+//					[view, char, modifiers, unicode, keycode].postcs;
 					switch(keycode, 
 						16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
 						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
@@ -191,6 +191,12 @@ CVCenter {
 							});
 							if(pDefWin.notNil and:{ pDefWin.isClosed.not }, { pDefWin.front });
 						}, // key "p"
+						80, {
+							if(pDefnWin.isNil or: { pDefnWin.isClosed }, {
+								pDefnGui = PdefnAllGui(); pDefnWin = pDefnGui.parent;
+							});
+							if(pDefnWin.notNil and:{ pDefnWin.isClosed.not }, { pDefnWin.front });
+						}, // key shift+"p"
 						116, {
 							if(tDefWin.isNil or:{ tDefWin.isClosed }, {
 								tDefGui = TdefAllGui(); tDefWin = tDefGui.parent;
