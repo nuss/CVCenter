@@ -1,6 +1,6 @@
 CVCenter is a container of CVs as well as it provides a graphical control-interface that lets you connect synth-controls or controls within patterns to hardware midi-sliders or OSC-controllers. A CV models a value constrained by a ControlSpec. Within CVCenter they get represented within CVWidgets that can hold one or more CVs. Each of them can be connected to an unlimited number GUI-elements or/and control parameters in running Synths or set values in Patterns. As CV inherits from Stream any instance can be used as any other Pattern (Pseq, Prand, Pwhite etcetc.).
 
-For more info check out CVCenter.html resp. CVWidget.html.
+For more info check out the CVenter- resp. CVWidget-helpfile.
 
 Installation
 ------------
