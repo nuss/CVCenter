@@ -442,27 +442,27 @@ CVCenter {
 					CVWidgetKnob, {
 						cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value_(
 							cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value
-						).changed(\value);
+						).changedKeys(cvWidgets[k].synchKeys);
 						cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value_(
 							cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value
-						).changed(\value);
+						).changedKeys(cvWidgets[k].synchKeys);
 						cvWidgets[k].wdgtControllersAndModels.actions.model.value_((
 							numActions: cvWidgets[k].wdgtActions.size,
 							activeActions: cvWidgets[k].wdgtActions.select({ |v| v.asArray[0][1] == true }).size
-						)).changed(\value);
+						)).changedKeys(cvWidgets[k].synchKeys);
 					},
 					CVWidget2D, {
 						#[lo, hi].do({ |hilo|
 							cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value_(
 								cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value
-							).changed(\value);
+							).changedKeys(cvWidgets[k].synchKeys);
 							cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value_(
 								cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value
-							).changed(\value);
+							).changedKeys(cvWidgets[k].synchKeys);
 							cvWidgets[k].wdgtControllersAndModels[hilo].actions.model.value_((
 								numActions: cvWidgets[k].wdgtActions[hilo].size,
 								activeActions: cvWidgets[k].wdgtActions[hilo].select({ |v| v.asArray[0][1] == true }).size
-							)).changed(\value);
+							)).changedKeys(cvWidgets[k].synchKeys);
 						})
 					}
 				);
@@ -926,7 +926,7 @@ CVCenter {
 									);
 									cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
 										[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
-									).changed(\value);
+									).changedKeys(cvWidgets[key].synchKeys);
 									cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo)
 								})
 							});
@@ -970,7 +970,7 @@ CVCenter {
 								);
 								cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
 									[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
-								).changed(\value);
+								).changedKeys(cvWidgets[key].synchKeys);
 								cvWidgets[key].setOscMapping(v.osc.oscMapping)
 							}
 						});

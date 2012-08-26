@@ -42,6 +42,7 @@ CVWidget2D : CVWidget {
 		var actionLo, actionHi;
 				
 		this.bgColor ?? { this.bgColor_(Color.white) };
+		synchKeys ?? { synchKeys = [\value] };
 		
 		if(GUI.scheme === QtGUI, { 
 			CV.viewDictionary[QSlider2D].props_(#[xValue, yValue]);
@@ -236,10 +237,10 @@ CVWidget2D : CVWidget {
 				});
 				wdgtControllersAndModels.lo.oscConnection.model.value_(
 					wdgtControllersAndModels.lo.oscConnection.model.value;
-				).changed(\value);
+				).changedKeys(synchKeys);
 				wdgtControllersAndModels.lo.midiConnection.model.value_(
 					wdgtControllersAndModels.lo.midiConnection.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 			})
 		;
 		specBut.hi = Button(window)
@@ -252,10 +253,10 @@ CVWidget2D : CVWidget {
 				});
 				wdgtControllersAndModels.hi.oscDisplay.model.value_(
 					wdgtControllersAndModels.hi.oscDisplay.model.value;
-				).changed(\value);
+				).changedKeys(synchKeys);
 				wdgtControllersAndModels.hi.midiDisplay.model.value_(
 					wdgtControllersAndModels.hi.midiDisplay.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 			})
 		;
 		midiHead.lo = Button(window)
@@ -268,10 +269,10 @@ CVWidget2D : CVWidget {
 				});
 				wdgtControllersAndModels.lo.oscDisplay.model.value_(
 					wdgtControllersAndModels.lo.oscDisplay.model.value;
-				).changed(\value);
+				).changedKeys(synchKeys);
 				wdgtControllersAndModels.lo.midiDisplay.model.value_(
 					wdgtControllersAndModels.lo.midiDisplay.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 			})
 		;
 		midiHead.hi = Button(window)
@@ -284,10 +285,10 @@ CVWidget2D : CVWidget {
 				});
 				wdgtControllersAndModels.hi.oscConnection.model.value_(
 					wdgtControllersAndModels.hi.oscConnection.model.value;
-				).changed(\value);
+				).changedKeys(synchKeys);
 				wdgtControllersAndModels.hi.midiConnection.model.value_(
 					wdgtControllersAndModels.hi.midiConnection.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 			})
 		;
 		midiLearn.lo = Button(window);
@@ -370,7 +371,7 @@ CVWidget2D : CVWidget {
 						src: tf.string,
 						chan: wdgtControllersAndModels[v[0]].midiDisplay.model.value.chan,
 						ctrl: wdgtControllersAndModels[v[0]].midiDisplay.model.value.ctrl
-					)).changed(\value)
+					)).changedKeys(synchKeys)
 				})
 			})
 			.mouseDownAction_({ |tf|
@@ -399,7 +400,7 @@ CVWidget2D : CVWidget {
 						src: wdgtControllersAndModels[v[0]].midiDisplay.model.value.src,
 						chan: tf.string,
 						ctrl: wdgtControllersAndModels[v[0]].midiDisplay.model.value.ctrl
-					)).changed(\value)
+					)).changedKeys(synchKeys)
 				})
 			})
 			.mouseDownAction_({ |tf|
@@ -426,7 +427,7 @@ CVWidget2D : CVWidget {
 						src: wdgtControllersAndModels[v[0]].midiDisplay.model.value.src,
 						chan: wdgtControllersAndModels[v[0]].midiDisplay.model.value.chan,
 						ctrl: tf.string
-					)).changed(\value)
+					)).changedKeys(synchKeys)
 				})
 			})
 			.mouseDownAction_({ |tf|
@@ -491,10 +492,10 @@ CVWidget2D : CVWidget {
 				};
 				wdgtControllersAndModels[v[0]].oscDisplay.model.value_(
 					wdgtControllersAndModels[v[0]].oscDisplay.model.value;
-				).changed(\value);
+				).changedKeys(synchKeys);
 				wdgtControllersAndModels[v[0]].midiDisplay.model.value_(
 					wdgtControllersAndModels[v[0]].midiDisplay.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 			});
 			
 			if(GUI.scheme === QtGUI, {
@@ -633,19 +634,19 @@ CVWidget2D : CVWidget {
 			#[lo, hi].do({ |hilo|
 				thisWdgt.wdgtControllersAndModels[hilo].oscDisplay.model.value_(
 					wdgtControllersAndModels[hilo].oscDisplay.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 				thisWdgt.wdgtControllersAndModels[hilo].midiOptions.model.value_(
 					wdgtControllersAndModels[hilo].midiOptions.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 				thisWdgt.wdgtControllersAndModels[hilo].midiDisplay.model.value_(
 					wdgtControllersAndModels[hilo].midiDisplay.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 				thisWdgt.wdgtControllersAndModels[hilo].actions.model.value_(
 					wdgtControllersAndModels[hilo].actions.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 				thisWdgt.wdgtControllersAndModels[hilo].calibration.model.value_(
 					wdgtControllersAndModels[hilo].calibration.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 			});
 			thisWdgt.window.onClose_(thisWdgt.window.onClose.addFunc({
 				#[lo, hi].do({ |hilo|
