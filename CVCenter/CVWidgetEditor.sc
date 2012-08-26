@@ -349,7 +349,7 @@ CVWidgetEditor {
 							src: tf.string,
 							chan: wcmHiLo.midiDisplay.model.value.chan,
 							ctrl: wcmHiLo.midiDisplay.model.value.ctrl
-						)).changed(\value)
+						)).changedKeys(widget.synchKeys)
 					})
 				})
 				.mouseDownAction_({ |tf|
@@ -375,7 +375,7 @@ CVWidgetEditor {
 							src: wcmHiLo.midiDisplay.model.value.src,
 							chan: tf.string,
 							ctrl: wcmHiLo.midiDisplay.model.value.ctrl
-						)).changed(\value)
+						)).changedKeys(widget.synchKeys)
 					})
 				})
 				.mouseDownAction_({ |tf|
@@ -401,7 +401,7 @@ CVWidgetEditor {
 							src: wcmHiLo.midiDisplay.model.value.src,
 							chan: wcmHiLo.midiDisplay.model.value.chan,
 							ctrl: tf.string
-						)).changed(\value)
+						)).changedKeys(widget.synchKeys)
 					})
 				})
 				.mouseDownAction_({ |tf|
@@ -629,11 +629,11 @@ CVWidgetEditor {
 				but.value.switch(
 					0, { 
 						widget.setCalibrate(true, slot);
-						wcmHiLo.calibration.model.value_(true).changed(\value);
+						wcmHiLo.calibration.model.value_(true).changedKeys(widget.synchKeys);
 					},
 					1, { 
 						widget.setCalibrate(false, slot);
-						wcmHiLo.calibration.model.value_(false).changed(\value);
+						wcmHiLo.calibration.model.value_(false).changedKeys(widget.synchKeys);
 					}
 				)
 			});

@@ -42,6 +42,7 @@ CVWidgetKnob : CVWidget {
 		var nextY, knobX, knobY;
 				
 		this.bgColor ?? { this.bgColor = Color.white };
+		synchKeys ?? { synchKeys = [\value] };
 		
 		prCalibrate = true;
 		prMidiMode = 0;
@@ -180,10 +181,10 @@ CVWidgetKnob : CVWidget {
 				});
 				wdgtControllersAndModels.oscDisplay.model.value_(
 					wdgtControllersAndModels.oscDisplay.model.value;
-				).changed(\value);
+				).changedKeys(synchKeys);
 				wdgtControllersAndModels.midiDisplay.model.value_(
 					wdgtControllersAndModels.midiDisplay.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 			})
 		;
 		nextY = nextY+specBut.bounds.height+1;
@@ -200,10 +201,10 @@ CVWidgetKnob : CVWidget {
 				});
 				wdgtControllersAndModels.oscDisplay.model.value_(
 					wdgtControllersAndModels.oscDisplay.model.value;
-				).changed(\value);
+				).changedKeys(synchKeys);
 				wdgtControllersAndModels.midiDisplay.model.value_(
 					wdgtControllersAndModels.midiDisplay.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 			})
 		;
 		
@@ -254,7 +255,7 @@ CVWidgetKnob : CVWidget {
 						src: tf.string,
 						chan: wdgtControllersAndModels.midiDisplay.model.value.chan,
 						ctrl: wdgtControllersAndModels.midiDisplay.model.value.ctrl
-					)).changed(\value)
+					)).changedKeys(synchKeys)
 				})
 			})
 			.mouseDownAction_({ |tf|
@@ -280,7 +281,7 @@ CVWidgetKnob : CVWidget {
 						src: wdgtControllersAndModels.midiDisplay.model.value.src,
 						chan: tf.string,
 						ctrl: wdgtControllersAndModels.midiDisplay.model.value.ctrl
-					)).changed(\value)
+					)).changedKeys(synchKeys)
 				})
 			})
 			.mouseDownAction_({ |tf|
@@ -305,7 +306,7 @@ CVWidgetKnob : CVWidget {
 						src: wdgtControllersAndModels.midiDisplay.model.value.src,
 						chan: wdgtControllersAndModels.midiDisplay.model.value.chan,
 						ctrl: tf.string
-					)).changed(\value)
+					)).changedKeys(synchKeys)
 				})
 			})
 			.mouseDownAction_({ |tf|
@@ -340,10 +341,10 @@ CVWidgetKnob : CVWidget {
 				};
 				wdgtControllersAndModels.oscDisplay.model.value_(
 					wdgtControllersAndModels.oscDisplay.model.value;
-				).changed(\value);
+				).changedKeys(synchKeys);
 				wdgtControllersAndModels.midiDisplay.model.value_(
 					wdgtControllersAndModels.midiDisplay.model.value
-				).changed(\value);
+				).changedKeys(synchKeys);
 			})
 		;
 		
@@ -462,19 +463,19 @@ CVWidgetKnob : CVWidget {
 			).front;
 			thisWdgt.wdgtControllersAndModels.oscDisplay.model.value_(
 				wdgtControllersAndModels.oscDisplay.model.value
-			).changed(\value);
+			).changedKeys(synchKeys);
 			thisWdgt.wdgtControllersAndModels.midiOptions.model.value_(
 				wdgtControllersAndModels.midiOptions.model.value
-			).changed(\value);
+			).changedKeys(synchKeys);
 			thisWdgt.wdgtControllersAndModels.midiDisplay.model.value_(
 				wdgtControllersAndModels.midiDisplay.model.value
-			).changed(\value);
+			).changedKeys(synchKeys);
 			thisWdgt.wdgtControllersAndModels.actions.model.value_(
 				wdgtControllersAndModels.actions.model.value
-			).changed(\value);
+			).changedKeys(synchKeys);
 			thisWdgt.wdgtControllersAndModels.calibration.model.value_(
 				wdgtControllersAndModels.calibration.model.value
-			).changed(\value);
+			).changedKeys(synchKeys);
 			thisWdgt.window.onClose_(thisWdgt.window.onClose.addFunc({
 				if(thisWdgt.editor.notNil and:{
 					thisWdgt.editor.isClosed.not
