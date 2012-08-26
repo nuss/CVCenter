@@ -277,7 +277,7 @@ CVWidget {
 			CVWidgetKnob, {
 				prMidiMode = mode;
 				wdgtControllersAndModels !? {
-					tmp = wdgtControllersAndModels.midiOptions.model.value_(
+					wdgtControllersAndModels.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode,
 							midiMean: prMidiMean,
@@ -285,9 +285,7 @@ CVWidget {
 							midiResolution: prMidiResolution,
 							softWithin: prSoftWithin
 						)
-					);
-					"tmp.class: %\n".postf(tmp.class);
-					tmp.changedKeys(synchKeys);
+					).changedKeys(synchKeys);
 				}
 			},
 			{
