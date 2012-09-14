@@ -1425,7 +1425,7 @@ CVWidget {
 					k.controller.put(thisKey, func)
 				})
 			}, {
-				wdgtControllersAndModels[thisContr].put(thisKey, func)
+				wdgtControllersAndModels[thisContr].controller.put(thisKey, func)
 			})
 		})
 	}
