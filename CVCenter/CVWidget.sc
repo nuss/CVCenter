@@ -889,7 +889,7 @@ CVWidget {
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
 
-		wcm.calibration.controller.put(\value, { |theChanger, what, moreArgs|
+		wcm.calibration.controller.put(\default, { |theChanger, what, moreArgs|
 			theChanger.value.switch(
 				true, { 
 					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
@@ -935,7 +935,7 @@ CVWidget {
 			wcm.cvSpec.controller = SimpleController(wcm.cvSpec.model);
 		};
 			
-		wcm.cvSpec.controller.put(\value, { |theChanger, what, moreArgs|
+		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
 			if(theChanger.value.hasZeroCrossing, {
 				if(midiOscEnv.oscMapping === \linexp or:{
 					midiOscEnv.oscMapping === \expexp
@@ -994,7 +994,7 @@ CVWidget {
 			wcm.midiConnection.controller = SimpleController(wcm.midiConnection.model);
 		};
 		
-		wcm.midiConnection.controller.put(\value, { |theChanger, what, moreArgs|
+		wcm.midiConnection.controller.put(\default, { |theChanger, what, moreArgs|
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
 					ctrlString ? ctrlString = num+1;
@@ -1080,7 +1080,7 @@ CVWidget {
 			wcm.midiDisplay.controller = SimpleController(wcm.midiDisplay.model);
 		};
 		
-		wcm.midiDisplay.controller.put(\value, { |theChanger, what, moreArgs|
+		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			theChanger.value.learn.switch(
 				"X", {
 					defer {
@@ -1200,7 +1200,7 @@ CVWidget {
 			wcm.midiOptions.controller = SimpleController(wcm.midiOptions.model);
 		};
 		
-		wcm.midiOptions.controller.put(\value, { |theChanger, what, moreArgs|
+		wcm.midiOptions.controller.put(\default, { |theChanger, what, moreArgs|
 			if(thisGuiEnv.editor.notNil and:{
 				thisGuiEnv.editor.isClosed.not
 			}, {
@@ -1220,7 +1220,7 @@ CVWidget {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
 		};
 
-		wcm.oscConnection.controller.put(\value, { |theChanger, what, moreArgs|
+		wcm.oscConnection.controller.put(\default, { |theChanger, what, moreArgs|
 			switch(prCalibrate.class, 
 				Event, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
@@ -1323,7 +1323,7 @@ CVWidget {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
 		};
 		
-		wcm.oscDisplay.controller.put(\value, { |theChanger, what, moreArgs|
+		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			switch(prCalibrate.class, 
 				Event, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
@@ -1367,7 +1367,7 @@ CVWidget {
 			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
 		};
 
-		wcm.oscInputRange.controller.put(\value, { |theChanger, what, moreArgs|
+		wcm.oscInputRange.controller.put(\default, { |theChanger, what, moreArgs|
 			{
 				if(thisGuiEnv.editor.notNil and:{
 					thisGuiEnv.editor.isClosed.not
@@ -1399,7 +1399,7 @@ CVWidget {
 			wcm.actions.controller = SimpleController(wcm.actions.model);
 		};
 		
-		wcm.actions.controller.put(\value, { |theChanger, what, moreArgs|
+		wcm.actions.controller.put(\default, { |theChanger, what, moreArgs|
 			if(this.window.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[
 					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
@@ -1407,6 +1407,35 @@ CVWidget {
 					Color(0.32, 0.67, 0.76),
 				]])
 			})
+		})
+	}
+	
+	// EXPERIMENTAL: extended API
+	extend { |key, func, controller|
+		var thisKey, thisContr;
+		
+		thisKey = key.asSymbol;
+		thisContr = controller.asSymbol;
+		
+		synchKeys = synchKeys.add(thisKey);
+		
+		if(thisContr !== \default, {
+			if(controller.isNil, {
+				wdgtControllersAndModels.do({ |k|
+					k.controller.put(thisKey, func)
+				})
+			}, {
+				wdgtControllersAndModels[thisContr].put(thisKey, func)
+			})
+		})
+	}
+	
+	reduce { |key|
+		var thisKey;
+		
+		thisKey = key.asSymbol;
+		if(key.notNil and:{ thisKey !== \default and:{ synchKeys.includes(thisKey) }}, {
+			synchKeys.remove(thisKey);
 		})
 	}
 
