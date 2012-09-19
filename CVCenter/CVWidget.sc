@@ -18,7 +18,7 @@
 CVWidget {
 
 	var <window, <guiEnv;
-	var <widgetCV, <synchKeys, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
+	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, allGuiEls, isCVCWidget = false;
@@ -27,6 +27,8 @@ CVWidget {
 	var <wdgtControllersAndModels, <midiOscEnv;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
+	// extended API
+	var synchKeys, synchedActions;
 
 	*initClass {
 		StartUp.add({
@@ -1416,16 +1418,18 @@ CVWidget {
 		
 		thisKey = key.asSymbol;
 		thisContr = controller.asSymbol;
+		synchedActions ?? { synchedActions = IdentityDictionary.new };
 		
 		synchKeys = synchKeys.add(thisKey);
-		
+		synchedActions.put(thisKey, func);
+				
 		if(thisContr !== \default, {
 			if(controller.isNil, {
 				wdgtControllersAndModels.do({ |k|
-					k.controller.put(thisKey, func)
+					k.controller.put(thisKey, synchedActions[thisKey])
 				})
 			}, {
-				wdgtControllersAndModels[thisContr].controller.put(thisKey, func)
+				wdgtControllersAndModels[thisContr].controller.put(thisKey, synchedActions[thisKey])
 			})
 		})
 	}
@@ -1435,6 +1439,7 @@ CVWidget {
 		
 		thisKey = key.asSymbol;
 		if(key.notNil and:{ thisKey !== \default and:{ synchKeys.includes(thisKey) }}, {
+			synchedActions[thisKey] = nil;
 			synchKeys.remove(thisKey);
 		})
 	}
