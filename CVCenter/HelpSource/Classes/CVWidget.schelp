@@ -4,7 +4,7 @@ categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVCenter, Classes/CV, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/ControlSpec, Classes/SimpleController
 
 DESCRIPTION::
-CVWidget is the abstract superclass of all CVWidgets (currently: code::CVWidgetKnob:: and code::CVWidget2D::). However, it implements a couple of useful methods that are common to all its subclasses.
+CVWidget is the abstract superclass of all CVWidgets (currently: link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D::). However, it implements a couple of useful methods that are common to all its subclasses.
 
 
 CLASSMETHODS::
@@ -13,7 +13,7 @@ CLASSMETHODS::
 INSTANCEMETHODS::
 
 METHOD:: setup
-The current widget-setup, returned as an code::Event::. If the widget is a code::CVWidget2D:: each key of the returned Event will be split in a code::\lo:: and a code::\hi:: value:
+The current widget-setup, returned as an link::Classes/Event::. If the widget is a link::Classes/CVWidget2D:: each key of the returned Event will be split in a code::\lo:: and a code::\hi:: value:
 definitionList::
 	## midiMode || as set by link::#-setMidiMode::. default: code::0::
 	## calibrate || indicates wether OSC-calibration is active or not, set by link::#-setCalibrate::. default: code::true::
@@ -23,7 +23,7 @@ definitionList::
 	## softWithin || if code::midiMode:: is set to code::0:: this determines the tolerance at which a MIDI-slider will respond when moved. For a more detailed explanation see link::#-setSoftWithin::. default: code::0.1::
 ::
 
-returns:: an code::Event::
+returns:: an link::Classes/Event::
 
 METHOD:: setMidiMode
 Different MIDI-devices may have different output modes: either values from 0-127 or an in-/decremental value (e.g. -1 or +1). These modes may be taken in account as follows:
@@ -34,10 +34,10 @@ table::
 ::
 
 argument:: mode
-an code::Integer::
+an link::Classes/Integer::
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
@@ -45,18 +45,18 @@ METHOD:: getMidiMode
 Get the current midiMode (0 or 1).
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: an code::Integer::
+returns:: an link::Classes/Integer::
 
 METHOD:: setMidiMean
 Devices which output a in-/decremental may output a standard value + in-/decrement. code::midiMean:: gets automatically subtracted from this value, so in-/decrement remains. Applies only if midiMode is set to code::1::.
 
 argument:: meanval
-an code::Integer::. default: code::64::
+an link::Classes/Integer::. default: code::64::
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns::  the receiver
 
@@ -64,18 +64,18 @@ METHOD:: getMidiMean
 Get the current midiMean value.
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: an code::Integer::
+returns:: an link::Classes/Integer::
 
 METHOD:: setSoftWithin
 If code::midiMode:: has been set to code::0:: moving a widget-slider will set the CV to a new value. However, if a MIDI-slider is connected to that widget, moving the MIDI-slider will set the CV's value immediatly to the value that is stored in the MIDI-slider i.e. a "jump" will happen. code::softWithin:: will ease this behavior by setting the CV's value only if the slider gets within code::softWithin/2::. Applies only if midiMode is set to code::0::.
 
 argument:: threshold
-a code::Float:: - default: code::0.1::.
+a link::Classes/Float:: - default: code::0.1::.
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns::  the receiver
 
@@ -83,19 +83,19 @@ METHOD:: getSoftWithin
 Get the current softWithin value.
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: a code::Float::
+returns:: a link::Classes/Float::
 
 METHOD:: setCtrlButtonBank
 Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI. 
 code::ctrlButtonBank:: translates the hardware-layout in a way that makes it easy to see the slider's bank and number: slider 17 becomes 2:1 (bank 2,  nr. 1).
 
 argument:: numSliders
-an code::Integer::, representing the number of sliders in one bank.
+an link::Classes/Integer::, representing the number of sliders in one bank.
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
@@ -103,15 +103,15 @@ METHOD:: getCtrlButtonBank
 Get the current ctrlButtonBank value
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: an code::Integer::, representing the number of sliders in one bank.
+returns:: an link::Classes/Integer::, representing the number of sliders in one bank.
 
 METHOD:: setMidiResolution
 If code::midiMode:: has been set to 1 (by calling link::#-setMidiMode::), this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
 
 argument:: resolution
-a code::Float::, representing the stepsize:
+a link::Classes/Float::, representing the stepsize:
 
 lower values -> higher resolution 
 
@@ -120,7 +120,7 @@ higher values -> lower resolution
 default: code::1::
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
@@ -128,18 +128,18 @@ METHOD:: getMidiResolution
 Get the current value midiResolution value.
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns::  a code::Float::
+returns::  a link::Classes/Float::
 
 METHOD:: setCalibrate
 Unlike MIDI the range of incoming OSC-values isn't 0-127 - it is unknown at the time of initialization of the OSC-responder. All CVWidgets have an inbuilt calibration mechanism that determines the range automatically. At initialization the range is set to [0.0001, 0.0001]. If the mechanism detects a value that is lower or higher than the values set at initialization it will set the constraints accordingly. This method allows to stop or start the calibration-process.
 
 argument:: bool
-a code::Boolean::, indicating wether the calibration-process shall be started or stopped.
+a link::Classes/Boolean::, indicating wether the calibration-process shall be started or stopped.
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
@@ -147,39 +147,39 @@ METHOD:: getCalibrate
 Get the current calibration-status
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: a code::Boolean::
+returns:: a link::Classes/Boolean::
 
 METHOD:: setSpec
-Every CVWidget wraps one or more code::CV::s whose internal spec can be set with this method.
+Every CVWidget wraps one or more link::Classes/CV::s whose internal spec can be set with this method.
 
 argument:: spec
 can either be:
 list::
-	## a code::ControlSpec::
-	## an code::Array:: that can be converted to a valid ControlSpec by calling code::asSpec:: on it
-	## a code::Symbol:: representing the name of a valid ControlSpec (e.g. code::\freq::)
+	## a link::Classes/ControlSpec::
+	## an link::Classes/Array:: that can be converted to a valid ControlSpec by calling code::asSpec:: on it
+	## a link::Classes/Symbol:: representing the name of a valid ControlSpec (e.g. code::\freq::)
 ::
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
 METHOD:: getSpec
-Get the current spec of the widget's code::CV::.
+Get the current spec of the widget's link::Classes/CV::.
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: a code::ControlSpec::
+returns:: a link::Classes/ControlSpec::
 
 METHOD:: setOscMapping
-Within an code::OSCresponder::'s function values coming in are being mapped to the code::ControlSpec::'s range, defined by its code::minval:: and code::maxval::. Furthermore a spec may implement a non-linear code::warp:: for the transition from code::minval:: to code::maxval::. Especially when work with accelerometers and orientation-sensors setting oscMapping to some non-linear mode will allow a much more fine-grained control.
+Within an link::Classes/OSCresponder::'s function values coming in are being mapped to the link::Classes/ControlSpec::'s range, defined by its code::minval:: and code::maxval::. Furthermore a spec may implement a non-linear code::warp:: for the transition from code::minval:: to code::maxval::. Especially when work with accelerometers and orientation-sensors setting oscMapping to some non-linear mode will allow a much more fine-grained control.
 
 argument:: mapping
-a code::Symbol:: - can be:
+a link::Classes/Symbol:: - can be:
 list::
 	## code::\linlin:: - linear to linear mapping
 	## code::\linexp:: - linear to exponential mapping
@@ -188,7 +188,7 @@ list::
 ::
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
@@ -196,21 +196,21 @@ METHOD:: getOscMapping
 Get the current oscMapping-mode
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns::  a code::Symbol::, indicating the oscMapping-mode
+returns::  a link::Classes/Symbol::, indicating the oscMapping-mode
 
 METHOD:: oscConnect
 Connect a widget to an OSC-device resp. a program that sends OSC-messages to SuperCollider
 
 argument:: ip
-optional - if set the code::OSCresponder:: will only listen to messages coming from that IP-address.
+optional - if set the link::Classes/OSCresponder:: will only listen to messages coming from that IP-address.
 
 argument:: port
-optional - if set the code::OSCresponder:: will only listen to messages coming from that port.
+optional - if set the link::Classes/OSCresponder:: will only listen to messages coming from that port.
 
 argument:: name
-a code::String:: or a code::Symbol::\: The OSC-command-name to which the OSCresponder will listen. E.g. code::'/touch/x':: or code::'/accelerometer/x'::. Every widget has an inbuilt mechanism that allows the user to scan connected devices for possible command-names. This mechanism is implemented in the class code::OSCCommands:: which may not only be used in connection with CVWidgets. code::OSCCommands:: stores a list of devices and commands to disk so the user does not have to rescan every time (s)he restarts SC.
+a link::Classes/String:: or a link::Classes/Symbol::\: The OSC-command-name to which the OSCresponder will listen. E.g. code::'/touch/x':: or code::'/accelerometer/x'::. Every widget has an inbuilt mechanism that allows the user to scan connected devices for possible command-names. This mechanism is implemented in the class code::OSCCommands:: which may not only be used in connection with CVWidgets. code::OSCCommands:: stores a list of devices and commands to disk so the user does not have to rescan every time (s)he restarts SC.
 
 argument:: oscMsgIndex
 messages you receive from an OSC-device/-program usually consist of the commend-name and one or more slots, containing numerical values. An orientation-sensor might e.g. send a message like the following:
@@ -220,20 +220,20 @@ code:: [ '/orientation', 178, 67, 78 ]::
 the first slot is the command-name and the subsequent slots are code::x::, code::y:: and code::z::. code::oscMsgIndex:: allows you to select which of those three values you want to use in your widget.
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
 METHOD:: oscDisconnect
-Disconnects the OSC-device/-application reps. removes the code::OSCresponder::
+Disconnects the OSC-device/-application reps. removes the link::Classes/OSCresponder::
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
 METHOD:: midiConnect
-Connect a widget to a MIDI-device utilizing a code::CCResponder::.
+Connect a widget to a MIDI-device utilizing a link::Classes/CCResponder::.
 
 argument:: uid
 optional - the ID under which the device gets registered in SuperCollider
@@ -245,15 +245,15 @@ argument:: num
 optional - the controller-number to which the program will listen
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
 METHOD:: midiDisconnect
-Terminate a MIDi-connection reps. remove the code::CCResponder::.
+Terminate a MIDi-connection reps. remove the link::Classes/CCResponder::.
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
@@ -261,10 +261,10 @@ METHOD:: setOscInputConstraints
 Any widget has a mechanism built in that is supposed to detect the constraints of the values coming in via OSC. However, you my set these constraints manually as well with this method.
 
 argument:: constraintsHiLo
-a code::Point:: - e.g. code::Point(-20, 20):: or code::0@360::
+a link::Classes/Point:: - e.g. code::Point(-20, 20):: or code::0@360::
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
@@ -272,25 +272,25 @@ METHOD:: getOscInputConstraints
 Get the current oscInputConstraints. This will return code::nil:: as the widget is not connected and the calibration-mechanism hasn't set any values.
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
-returns:: code::nil:: or an code::Event:: containing the constraints in the keys code::\lo:: and code::\hi:: (not related to the \lo and \hi keys in a code::CVWidget2D::)
+returns:: code::nil:: or an link::Classes/Event:: containing the constraints in the keys code::\lo:: and code::\hi:: (not related to the \lo and \hi keys in a link::Classes/CVWidget2D::)
 
 METHOD:: addAction
-Add an action to the widget's code::CV::. 
+Add an action to the widget's link::Classes/CV::. 
 
 argument:: name
-a code::Symbol:: or a code::String::, representing the name under which the action will be stored
+a link::Classes/Symbol:: or a link::Classes/String::, representing the name under which the action will be stored
 
 argument:: action
-a code::Function:: or a code::String:: that compiles to one if code::interpret:: is called on it. If the function contains an argument the code::CV:: will be provided in this argument:
+a code::Function:: or a link::Classes/String:: that compiles to one if code::interpret:: is called on it. If the function contains an argument the link::Classes/CV:: will be provided in this argument:
 code::{ |cv| "the CV's current value is %\n".postf(cv.value) }::
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 argument:: active
-a code::Boolean::, indicating wether the action shall become active immediatly
+a link::Classes/Boolean::, indicating wether the action shall become active immediatly
 
 returns:: the receiver
 
@@ -298,10 +298,10 @@ METHOD:: removeAction
 Remove an action given by its name
 
 argument:: name
-a code::Symbol:: or a code::String::, representing the action's name
+a link::Classes/Symbol:: or a link::Classes/String::, representing the action's name
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
@@ -309,13 +309,13 @@ METHOD:: activateAction
 Activate or deactivate a stored action
 
 argument:: name
-a code::Symbol:: or a code::String::, representing the action's name
+a link::Classes/Symbol:: or a link::Classes/String::, representing the action's name
 
 argument:: activate
-a code::Boolean::, indicating wether the action shall be activated or deactivated
+a link::Classes/Boolean::, indicating wether the action shall be activated or deactivated
 
 argument:: slot
-only needed if the widget is a code::CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 returns:: the receiver
 
@@ -331,25 +331,25 @@ code::myWidget.wdgtControllersAndModels.someModel = someValue::
 Models are designed for internal bookkeeping and all methods within CVWidget are supposed to do the right thing with them.
 ::
 
-All models and controllers are stored within the wdgtControllersAndModels instance-var. If the widget is a code::CVWidget2D:: wdgtControllersAndModels will be split up in a code::\lo:: and a code::\hi:: slot, each containing the following models ( code::CVWidgetKnob:: simply keeps  them under wdgtControllersAndModels):
+All models and controllers are stored within the wdgtControllersAndModels instance-var. If the widget is a link::Classes/CVWidget2D:: wdgtControllersAndModels will be split up in a code::\lo:: and a code::\hi:: slot, each containing the following models ( link::Classes/CVWidgetKnob:: simply keeps  them under wdgtControllersAndModels):
 
 definitionList::
 	## calibrate || the current calibration-state as set with link::#-setCalibrate:: - either code::Ref(true):: (default at initialization) or code::Ref(false)::.
-	## cvSpec || the code::CV::'s current spec as set at initialization or with code::setSpec:: - a code::Ref:: to a code::ControlSpec::.
+	## cvSpec || the link::Classes/CV::'s current spec as set at initialization or with code::setSpec:: - a link::Classes/Ref:: to a link::Classes/ControlSpec::.
 	## oscInputRange || the current input-range, set by the widget's input mechanism with code::setInputRange:: - default at initialization: code::Ref([0.0001, 0.0001])::.
 	## oscConnection || the current OSC-connection (if present): code::Ref([<IP-address>, <port>, <command-name>, <message-index>])::. If no connection is present it will be code::Ref(false)::.
-	## oscDisplayModel || stores all OSC-related visual properties of a widget and its editor. A code::Ref:: to an code::Event::, containing the following slots:
+	## oscDisplayModel || stores all OSC-related visual properties of a widget and its editor. A link::Classes/Ref:: to an link::Classes/Event::, containing the following slots:
 	list::
 		## strong::but::: the state of the OSC-button ("edit OSC")
-		## strong::ipField::: the IP-field under the OSC-tab of the editor (see code::CVWidgetEditor::)
-		## strong::portField::: the port-field under the OSC-tab of the editor (see code::CVWidgetEditor::)
-		## strong::nameField::: the field for the OSC-command-name under the OSC-tab of the editor (see code::CVWidgetEditor::)
-		## strong::index::: the field for the message-index under the OSC-tab of the editor (see code::CVWidgetEditor::)
-		## strong::connectorButVal::: the value of the connect-button under the OSC-tab of the editor connectorButVal (see code::CVWidgetEditor::)
+		## strong::ipField::: the IP-field under the OSC-tab of the editor (see link::Classes/CVWidgetEditor::)
+		## strong::portField::: the port-field under the OSC-tab of the editor (see link::Classes/CVWidgetEditor::)
+		## strong::nameField::: the field for the OSC-command-name under the OSC-tab of the editor (see link::Classes/CVWidgetEditor::)
+		## strong::index::: the field for the message-index under the OSC-tab of the editor (see link::Classes/CVWidgetEditor::)
+		## strong::connectorButVal::: the value of the connect-button under the OSC-tab of the editor connectorButVal (see link::Classes/CVWidgetEditor::)
 		## strong::editEnabled::: if a connection is established editor-fields will be made uneditable and this slot is set to code::false:: 
 	::
 	## midiConnection || the currentMIDI-connection (if present): code::Ref((src\: <val>, chan\: <val>, num\: <val>))::. If no connection is present this will be: code::Ref(nil)::.
-	## midiDisplay || stores all MIDI-related visual properties of a widget and its editor. A code::Ref:: to an code::Event::, containing the following slots:
+	## midiDisplay || stores all MIDI-related visual properties of a widget and its editor. A link::Classes/Ref:: to an link::Classes/Event::, containing the following slots:
 	list::
 		## strong::learn::: the current state of the 'learn'-button of the widget and the 'learn'-button under the MIDI-tab of the editor
 		## strong::src::: the current string of the 'src'-field of the widget and the 'src'-field under the MIDI-tab of the editor (the ID under which the device gets registered in SC)
@@ -364,36 +364,36 @@ definitionList::
 		## strong::midiResolution::: the current code::midiResolution:: - see also link::#-setMidiResolution:: 
 		## strong::softWithin::: the current value for code::softWithin:: - see also link::#-setSoftWithin:: 
 	::
-	## mapConstrainterLo || a code::CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[0]:: as value
-	## mapConstrainterLo || a code::CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[1]:: as value
-	## actions || a code::Ref:: to an code::Event::: code::Ref((numActions\: <val>, activeActions\: <val>))::. This model reflects the number of actions resp. active actions as displayed in the 'actions'-button of the widget.
+	## mapConstrainterLo || a link::Classes/CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[0]:: as value
+	## mapConstrainterLo || a link::Classes/CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[1]:: as value
+	## actions || a link::Classes/Ref:: to an link::Classes/Event::: code::Ref((numActions\: <val>, activeActions\: <val>))::. This model reflects the number of actions resp. active actions as displayed in the 'actions'-button of the widget.
 ::
 
-returns:: an code::Event::
+returns:: an link::Classes/Event::
 
 METHOD:: midiOscEnv
-Get the current MIDI-/OSC-environment of the widget. If the widget is a code::CVWidget2D:: calling this method will return an code::Event:: containing the environments in 2 slots: code::\lo:: and code::\hi::, else the environment will be returned:
+Get the current MIDI-/OSC-environment of the widget. If the widget is a link::Classes/CVWidget2D:: calling this method will return an link::Classes/Event:: containing the environments in 2 slots: code::\lo:: and code::\hi::, else the environment will be returned:
 definitionList::
-	## oscMapping || input- to output-mapping of the values coming from the code::OSCresponder::\: either code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp:: (see also: link::#-setOscMapping::). By default the entry will be code::\linlin::.
-	## oscMsgIndex || if an code::OSCresponder:: is present this will reflect the index of the message at which the values are received (see also: link::#-oscConnect::).
-	## calibConstraints || if an code::OSCresponder:: is present this will reflect the current constraints for values coming in via OSC. Usually the constraints are set automatically by the widget's internal calibration-mechanism. However, you may set them manually by link::#-setOscInputConstraints:: or deactivate the calibration-mechanism by link:: #-setCalibrate::.
-	## oscResponder || if an if an code::OSCresponder:: is present it will be stored under this slot.
-	## midiResponder || if a code::CCResponder:: is present it will stored under this slot.
+	## oscMapping || input- to output-mapping of the values coming from the link::Classes/OSCresponder::\: either code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp:: (see also: link::#-setOscMapping::). By default the entry will be code::\linlin::.
+	## oscMsgIndex || if an link::Classes/OSCresponder:: is present this will reflect the index of the message at which the values are received (see also: link::#-oscConnect::).
+	## calibConstraints || if an link::Classes/OSCresponder:: is present this will reflect the current constraints for values coming in via OSC. Usually the constraints are set automatically by the widget's internal calibration-mechanism. However, you may set them manually by link::#-setOscInputConstraints:: or deactivate the calibration-mechanism by link:: #-setCalibrate::.
+	## oscResponder || if an if an link::Classes/OSCresponder:: is present it will be stored under this slot.
+	## midiResponder || if a link::Classes/CCResponder:: is present it will stored under this slot.
 ::
 
-returns:: an code::Event::
+returns:: an link::Classes/Event::
 
 METHOD:: widgetCV
-The widget's code::CV::. If the widget is a code::CVWidget2D:: an code::Event::, containing to slots code::\lo:: and code::\hi:: is returned.
+The widget's link::Classes/CV::. If the widget is a link::Classes/CVWidget2D:: an link::Classes/Event::, containing to slots code::\lo:: and code::\hi:: is returned.
 
-returns:: either a code::CV:: ( code::CVWidgetKnob::) or an code::Event:: ( code::CVWidget2D::)
+returns:: either a link::Classes/CV:: ( link::Classes/CVWidgetKnob::) or an link::Classes/Event:: ( link::Classes/CVWidget2D::)
 
 METHOD:: wdgtActions
 All actions (active and inactive) specified for the given widget.
 warning:: Though this has to be a setter/getter for some reason. strong::Do not attempt to set an action like:: code::myWidget.wdgtActions_(some action)::. Rather use link::#-addAction::, link::#-removeAction:: resp. link::#-activateAction::
 ::
 
-returns:: an code::Event::, containing active and inactive actions of a widget.
+returns:: an link::Classes/Event::, containing active and inactive actions of a widget.
 
 METHOD:: alwaysPositive
 If code::\explin:: or code::\expexp:: has been chosen for input to output mapping with link::#-setOscMapping:: both constraints of the input-range have to be same-signed - otherwise the operation would produce code::NaN::s. code::alwaysPositive:: will be calculated automatically, so the user shouldn't have to worry about it.
@@ -412,18 +412,45 @@ private:: prInitOscDisplay
 private:: prInitOscInputRange
 private:: prInitActionsControl
 
+subsection:: Extending the API
+note::The following features are experimental. Probably they should get redesigned in future releases. However, they allow extending the inbuilt functionality of the widgets in a way that the user can synch custom GUIs resp. their elements with what's displayed within the widgts. E.g. one may want to create a button in an external GUI that connects MIDI or OSC. By default these buttons would keep their states if the connection happens from inside a widget or is done via from the commandline (e.g. code::myWidget.oscConnect()::). The following methods allow the user to add functions to the existing controllers resp. remove them again at any time. strong::Note that the default functionality will always be executed first and cannot be removed:: (extending the API should be unobstrusive).
+::
+Have a look at the examples-section for a simple example.
+
+METHOD:: extend
+adds a custom function to one or all of the widget's internal link::Classes/SimpleController::s. These can also keep references to user-defined GUIs resp. their elements, thus allowing the user to synch his/her GUIs with CVWidgets.
+
+argument:: key
+a link::Classes/Symbol:: or a link::Classes/String:: - mandatory, used internally by the widget's link::Classes/SimpleController::s
+
+argument:: func
+a link::Classes/Function:: - mandatory. A custom function, extending the widget's resp. your custom GUI's functionality. The user may pass the content of the model, the key and more to the function if they are stated as arguments at the beginning of the function. See the link::Classes/SimpleController::-helpfile for more info.
+
+argument:: controller
+A CVWidget contains several models and controllers, contained in link::#-wdgtControllersAndModels::. If no specific controller is given the function will be executed when ever a model changes. Providing a controller may save some cpu. However, if the user provides a specific controller (s)he should know under which circumstances the given controller is being executed in order to get the desired result. 
+
+returns:: the receiver
+
+METHOD:: reduce
+removes user-defined functions from that have been added to the widget's inbuilt link::Classes/SimpleController::s.
+
+argument:: key
+a link::Classes/Symbol:: or a link::Classes/String:: - indicating which function shall be removed. Will not touch the default functionality of a CVWidget.
+
+returns:: the receiver
+
 subsection:: GUI properties and methods
-CVWidget implements a few GUI-elements that are common to code::CVWidgetKnob:: as well as code::CVWidget2D::. Descriptions of the rest of the elements can be found in the documentation for the regarding classes.
+optional - CVWidget implements a few GUI-elements that are common to link::Classes/CVWidgetKnob:: as well as link::Classes/CVWidget2D::. Descriptions of the rest of the elements can be found in the documentation for the regarding classes.
 
 METHOD:: window
 The window containing the widget
 
-returns:: a code::Window::
+returns:: a link::Classes/Window::
 
 METHOD:: guiEnv
-An code::Event:: containing certain elements of the GUI.
+An link::Classes/Event:: containing certain elements of the GUI.
 
-returns:: an code::Event::
+returns:: an link::Classes/Event::
 
 METHOD:: front
 Sends the widget's window to front.
@@ -431,32 +458,32 @@ Sends the widget's window to front.
 returns:: the receiver
 
 METHOD:: editor
-Every widget has one or more editors that will open in a new window ( code::CVWidgetKnob:: 1 editor, code::CVWidget2D:: 2 editors - code::\lo:: and code::\hi::). This method returns a reference to them. 
+Every widget has one or more editors that will open in a new window ( link::Classes/CVWidgetKnob:: 1 editor, link::Classes/CVWidget2D:: 2 editors - code::\lo:: and code::\hi::). This method returns a reference to them. 
 
-returns:: a code::CVWidgetEditor:: or an code::Event::, containing a reference two 2 or more code::CVWidgetEditor::s
+returns:: a link::Classes/CVWidgetEditor:: or an link::Classes/Event::, containing a reference two 2 or more link::Classes/CVWidgetEditor::s
 
 private:: bgColor
 
 METHOD:: widgetBg
-A code::UserView:: upon which all other elements of the GUI will be placed
+A link::Classes/UserView:: upon which all other elements of the GUI will be placed
 
-returns:: a code::UserView::
+returns:: a link::Classes/UserView::
 
 METHOD:: label
-A button, containing the name of the widget. When clicked the widget will switch to a code::TextView:: that can be used to write down notices.
+A button, containing the name of the widget. When clicked the widget will switch to a link::Classes/TextView:: that can be used to write down notices.
 
-returns:: a code::Button::
+returns:: a link::Classes/Button::
 
 METHOD:: nameField
-A code::TextView:: that can be used to write down notices.
+A link::Classes/TextView:: that can be used to write down notices.
 
-returns:: a code::TextView::
+returns:: a link::Classes/TextView::
 
 METHOD:: toggleComment
 Toggles between code::nameField:: and the regular widget-appearance.
 
 argument:: visible
-a code::Boolean::
+a link::Classes/Boolean::
 
 returns:: the receiver
 
@@ -464,19 +491,19 @@ METHOD:: widgetXY
 Sets/gets the XY-position of a widget within its parent window.
 
 argument:: point
-a code::Point::
+a link::Classes/Point::
 
-returns:: a code::Point::
+returns:: a link::Classes/Point::
 
 METHOD:: widgetProps
-Returns the width/height of a widget as code::Point::. 
+Returns the width/height of a widget as link::Classes/Point::. 
 
-returns:: a code::Point::
+returns:: a link::Classes/Point::
 
 METHOD:: bounds
-Returns the bounds of a widget as code::Rect::.
+Returns the bounds of a widget as link::Classes/Rect::.
 
-returns:: a code::Rect::
+returns:: a link::Classes/Rect::
 
 METHOD:: remove
 Removes all GUI-elements (buttons, text-fields, sliders etc.) from a widget.
@@ -542,7 +569,7 @@ Server.default.waitForBoot{
 ::
 
 subsection:: reusable widgets
-By default windows created in SC lack the ability to be opened again once they're closed (even evaluating the variable under which the window has been created will still return the window). The following section describes a workaround in CVWidget (resp. code::CVWidgetKnob:: and code::CVWidget2D::) that enables the user to keep a widget's responders and open and close it as many times as the user needs to ( strong::open:: is implemented in link::Classes/CVWidgetKnob#-open#CVWidgetKnob:: and link::Classes/CVWidget2D#-open#CVWidget2D::).
+By default windows created in SC lack the ability to be opened again once they're closed (even evaluating the variable under which the window has been created will still return the window). The following section describes a workaround in CVWidget (resp. link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D::) that enables the user to keep a widget's responders and open and close it as many times as the user needs to ( strong::open:: is implemented in link::Classes/CVWidgetKnob#-open#CVWidgetKnob:: and link::Classes/CVWidget2D#-open#CVWidget2D::).
 code::
 // create some widgets
 // if a widget is made 'persistent' its OSC-/MID-responders 
@@ -565,4 +592,27 @@ Server.default.waitForBoot{ ~noise = { SinOsc.ar(\freq.kr([0, 0]), mul: \amp.kr)
 // actions, responders etc. of the old one
 ~knob = ~knob.open;
 ~twoDee = ~twoDee.open;
+::
+
+subsection:: extending the functionality of a CVWidget resp. synching user-defined GUIs
+code::
+// create a window that displays command-names that are used to connect OSC-devices
+~win = Window("OSC-responders", Rect(100, 100, 300, 40)).front;
+
+// the command-name will be displayed immediately after connecting the device 
+// resp. disappear when disconnected
+(
+~knob.extend(\myOSCdisplay, { |theChanger, what, more|
+	if(~knob.midiOscEnv.oscResponder.notNil, {
+		~responderDisplay = StaticText(~win, Rect(7, 7, ~win.bounds.width-14, ~win.bounds.height-14))
+			.string_(~knob.midiOscEnv.oscResponder.cmdName)
+			.background_(Color.white)
+			.font_(Font.sansSerif(14, true))
+	}, { ~responderDisplay.remove })
+}, \oscConnection)
+)
+
+// remove the previously adde functionality
+// the window is no longer synched with the CVWidget
+~knob.reduce(\myOSCdisplay)
 ::
