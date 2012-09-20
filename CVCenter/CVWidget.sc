@@ -28,7 +28,7 @@ CVWidget {
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 	// extended API
-	var synchKeys, synchedActions;
+	var <synchKeys, synchedActions;
 
 	*initClass {
 		StartUp.add({
