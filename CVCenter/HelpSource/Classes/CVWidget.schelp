@@ -603,6 +603,8 @@ code::
 // resp. disappear when disconnected
 (
 ~knob.extend(\myOSCdisplay, { |theChanger, what, more|
+	// have a look at what's coming in
+	[theChanger, what, more].postln;
 	if(~knob.midiOscEnv.oscResponder.notNil, {
 		~responderDisplay = StaticText(~win, Rect(7, 7, ~win.bounds.width-14, ~win.bounds.height-14))
 			.string_(~knob.midiOscEnv.oscResponder.cmdName)
