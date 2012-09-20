@@ -4,7 +4,7 @@ categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
 
 DESCRIPTION::
-A CVWidgetKnob is widget that can be used to set e.g. controls in running code::Synth::s, code::Ndef::s, code::ProxySpace:: slots, code::NodeProxy::s and other other values that can be set at runtime. Also it may be used in connection with code::Pattern::s. Contrary to code::CVWidget2D:: it holds only one code::CV::.
+A CVWidgetKnob is widget that can be used to set e.g. controls in running link::Classes/Synth::s, link::Classes/Ndef::s, link::Classes/ProxySpace:: slots, link::Classes/NodeProxy::s and other other values that can be set at runtime. Also it may be used in connection with link::Classes/Pattern::s. Contrary to link::Classes/CVWidget2D:: it holds only one link::Classes/CV::.
 
 CLASSMETHODS::
 
@@ -12,22 +12,22 @@ METHOD:: new
 Create a new CVWidgetKnob. To display the widget on screen you must call code::front:: on the resulting object.
 
 argument:: parent
-an instance of code::Window:: - optional. If none is given the it will be created internally.
+an instance of link::Classes/Window:: - optional. If none is given the it will be created internally.
 
 argument:: cv
-an instance of code::CV:: - optional. If none is given it will be created internally.
+an instance of link::Classes/CV:: - optional. If none is given it will be created internally.
 
 argument:: name
-a code::String:: or a code::Symbol:: - optional. If none is given the widget will be named "knob".
+a link::Classes/String:: or a link::Classes/Symbol:: - optional. If none is given the widget will be named "knob".
 
 argument:: bounds
-a code::Rect:: - optional. If none is given the widget will be created with a default size.
+a link::Classes/Rect:: - optional. If none is given the widget will be created with a default size.
 
 argument:: defaultAction
-optional - a code::Function:: or a code::String:: that compiles to one when link::Classes/String#-interpret#interpret:: is called on it. If an argument is added to the function it will provide the widget's code::CV::. E.g.: code::{ arg cv; cv.value.postln }:: 
+optional - a link::Classes/Function:: or a link::Classes/String:: that compiles to one when link::Classes/String#-interpret#interpret:: is called on it. If an argument is added to the function it will provide the widget's link::Classes/CV::. E.g.: code::{ arg cv; cv.value.postln }:: 
 
 argument:: setup
-optional - an code::Event:: containing the following optional keys:
+optional - an link::Classes/Event:: containing the following optional keys:
 
 definitionList::
 ## midiMode || see link::Classes/CVWidget#-setMidiMode::. default: code::0::
@@ -39,7 +39,7 @@ definitionList::
 ::
 
 argument:: controllersAndModels
-if a widget wraps a code::CV:: that has been created within some the CVWidget the models and controllers of that other widget can be added here. However, it is emphasis::not:: recommended to do so as there are specific methods that allow you to recreate widgets that have already been closed. See also link::Classes/CVWidget#-wdgtControllersAndModels::
+if a widget wraps a link::Classes/CV:: that has been created within some the CVWidget the models and controllers of that other widget can be added here. However, it is emphasis::not:: recommended to do so as there are specific methods that allow you to recreate widgets that have already been closed. See also link::Classes/CVWidget#-wdgtControllersAndModels::
 
 argument:: cvcGui
 a multi-purpose argument: usually you will not set anything here. It is used with the link::#-open:: method resp. CVCenter. Within these it is used to pass in OSC-/MIDI-responders resp. the widgets MIDI-/OSC-environment. See also link::Classes/CVWidget#-midiOscEnv::
@@ -48,7 +48,7 @@ argument:: persistent
 if set to code::true:: the widget's OSC-/MIDI-responders will not be removed when the widget gets closed - default: code::nil::
 
 argument:: server
-only used for code::SwingOSC:: compatability (untested)
+only used for link::Classes/SwingOSC:: compatability (untested)
 
 returns:: this (a CVWidgetKnob)
 
@@ -63,71 +63,71 @@ code::x = x.open // the old widget was stored in x which will afterwards hold th
 See example in link::Classes/CVWidget#reusable_widgets::
 
 argument:: parent
-a code::Window:: or nil - if none is provided the window will be created internally
+a link::Classes/Window:: or nil - if none is provided the window will be created internally
 
 argument:: wdgtBounds
-a code::Rect:: or nil - if none is provided the bounds of the old widget will be used.
+a link::Classes/Rect:: or nil - if none is provided the bounds of the old widget will be used.
 
 returns:: a code::CVCWidgetKnob::
 
 subsection:: GUI-elements
 
 METHOD:: knob
-A code::Knob:: displaying or setting the current value of the widget's code::CV::.
+A link::Classes/Knob:: displaying or setting the current value of the widget's link::Classes/CV::.
 
-returns:: a code::Knob::
+returns:: a link::Classes/Knob::
 
 METHOD:: numVal
-A code::NumberBox:: displaying or setting the current value of the widget's code::CV::.
+A link::Classes/NumberBox:: displaying or setting the current value of the widget's link::Classes/CV::.
 
-returns:: a code::NumberBox::
+returns:: a link::Classes/NumberBox::
 
 METHOD:: specBut
-A code::Button:: linking to spec-tab within the widget's editor (see also: code::CVWidgetEditor::)
+A link::Classes/Button:: linking to spec-tab within the widget's editor (see also: link::Classes/CVWidgetEditor::)
 
-returns:: a code::Button::
+returns:: a link::Classes/Button::
 
 METHOD:: midiHead
-A code::Button:: linking to MIDI-tab within the widget's editor (see also: code::CVWidgetEditor::)
+A link::Classes/Button:: linking to MIDI-tab within the widget's editor (see also: link::Classes/CVWidgetEditor::)
 
-returns:: a code::Button::
+returns:: a link::Classes/Button::
 
 METHOD:: midiLearn
-A code::Button:: that, if clicked, either triggers the MIDI-learn functionality (button-label: "L") or creates a code::CCResponder:: for the values entered in link::#-midiSrc::, link::#-midiChan:: or/and link::#-midiCtrl:: (button-label: "C"). If a code::CCResponder:: is present the button-label gets changed to "X" - upon clicking the responder gets removed again.
+A link::Classes/Button:: that, if clicked, either triggers the MIDI-learn functionality (button-label: "L") or creates a link::Classes/CCResponder:: for the values entered in link::#-midiSrc::, link::#-midiChan:: or/and link::#-midiCtrl:: (button-label: "C"). If a link::Classes/CCResponder:: is present the button-label gets changed to "X" - upon clicking the responder gets removed again.
 
-returns:: a code::Button::
+returns:: a link::Classes/Button::
 
 METHOD:: midiSrc
-A code::TextField:: displaying the ID of a connected MIDI-device. If no code::CCResponder:: is present one may enter the ID of a device (if known) and when clicking the link::#-midiLearn:: button the widget will create a code::CCResponder:: listening to that device.
+A link::Classes/TextField:: displaying the ID of a connected MIDI-device. If no link::Classes/CCResponder:: is present one may enter the ID of a device (if known) and when clicking the link::#-midiLearn:: button the widget will create a link::Classes/CCResponder:: listening to that device.
 
-returns:: a code::TextField::
+returns:: a link::Classes/TextField::
 
 METHOD:: midiChan
-A code::TextField:: displaying the channel for an existing code::CCResponder:: or, if none is present, one may use this field to set the channel for which the code::CCResponder:: shall be created.
+A link::Classes/TextField:: displaying the channel for an existing link::Classes/CCResponder:: or, if none is present, one may use this field to set the channel for which the link::Classes/CCResponder:: shall be created.
 
-returns:: a code::TextField::
+returns:: a link::Classes/TextField::
 
 METHOD:: midiCtrl
-A code::TextField:: displaying the controller-number of an existing code::CCResponder:: or, if none is present, one may use this field to set the controller-number for which the code::CCResponder:: shall be created.
+A link::Classes/TextField:: displaying the controller-number of an existing link::Classes/CCResponder:: or, if none is present, one may use this field to set the controller-number for which the link::Classes/CCResponder:: shall be created.
 note:: SuperCollider numbers hardware-controllers internally beginning with code::0:: - if code::0:: gets entered here the controller will be displayed as code::1:: as most devices will probably number their knobs and sliders beginning with code::1::. Also, the way controller-numbers are displayed is related to the code::ctrlButtonBank:: setting which can be set with link::Classes/CVWidget#-setCtrlButtonBank::
 :: 
 
-returns:: a code::TextField::
+returns:: a link::Classes/TextField::
 
 METHOD:: oscEditBut
-A code::Button:: that links to the widget's OSC-tab within the code::CVWidgetEditor::. If an code::OSCresponder:: is present, the button-label will display the command-name, the message-slot and the current link::Classes/CVWidget#-setOscMapping#OSC-mapping:: (if the button is big enough to display all this information - mapping can be code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp::).
+A link::Classes/Button:: that links to the widget's OSC-tab within the link::Classes/CVWidgetEditor::. If an link::Classes/OSCresponder:: is present, the button-label will display the command-name, the message-slot and the current link::Classes/CVWidget#-setOscMapping#OSC-mapping:: (if the button is big enough to display all this information - mapping can be code::\linlin::, code::\linexp::, code::\explin:: or code::\expexp::).
 
-returns:: a code::Button::
+returns:: a link::Classes/Button::
 
 METHOD:: calibBut
-A code::Button:: that links to the OSC-tab within the code::CVWidgetEditor::, displaying the current link::CLasses/CVWidget#-setCalibrate#calibration::-status.
+A link::Classes/Button:: that links to the OSC-tab within the link::Classes/CVWidgetEditor::, displaying the current link::CLasses/CVWidget#-setCalibrate#calibration::-status.
 
-returns:: a code::Button::
+returns:: a link::Classes/Button::
 
 METHOD:: actionsBut
-A code::Button:: linking to the actions-tab within the widget's code::CVWidgetEditor::. The button displays the number of active actions resp. existing actions in total.
+A link::Classes/Button:: linking to the actions-tab within the widget's link::Classes/CVWidgetEditor::. The button displays the number of active actions resp. existing actions in total.
 
-returns:: a code::Button::
+returns:: a link::Classes/Button::
 
 private:: init
 

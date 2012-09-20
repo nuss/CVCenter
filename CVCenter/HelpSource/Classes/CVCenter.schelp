@@ -57,36 +57,36 @@ returns:: this (CVCenter)
 
 
 METHOD:: use
-Use an arbitrary name for creating a new code::CVWidget:: (a code::CVWidgetKnob:: or a code::CVWidget2D::, depending on the argument code::slot::).
-note:: strong::This is the recommended way for creating new widgets.:: This method should be convenient in most situations. It simply creates a new code::CVWidget:: and returns the code::CV::. As code::CV:: inherits from code::Stream:: this method may directly be used in code::Pattern::s. Any reevaluation will leave a once created code::CV:: untouched.
+Use an arbitrary name for creating a new link::Classes/CVWidget:: (a code::CVWidgetKnob:: or a link::Classes/CVWidget2D::, depending on the argument code::slot::).
+note:: strong::This is the recommended way for creating new widgets.:: This method should be convenient in most situations. It simply creates a new link::Classes/CVWidget:: and returns the link::Classes/CV::. As link::Classes/CV:: inherits from code::Stream:: this method may directly be used in code::Pattern::s. Any reevaluation will leave a once created link::Classes/CV:: untouched.
 
-You may omit the arguments code::slot:: and code::tab:: when creating a code::CVWidget2D:: and its first slot has already been created. However, if the widget is used within patterns you always strong::must:: provide the slot as execution of the pattern depends on the right CV to be returned (if omitted the widget would return an event, composed of the \lo and \hi key).
+You may omit the arguments code::slot:: and code::tab:: when creating a link::Classes/CVWidget2D:: and its first slot has already been created. However, if the widget is used within patterns you always strong::must:: provide the slot as execution of the pattern depends on the right CV to be returned (if omitted the widget would return an event, composed of the \lo and \hi key).
 ::
 
 argument:: key
-a code::Symbol:: or a code::String:: - the resulting code::CV:: will be put into code::CVCenter.all:: under this name and the widget will be labeled the same.
+a link::Classes/Symbol:: or a link::Classes/String:: - the resulting link::Classes/CV:: will be put into link::#*all#CVCenter.all:: under this name and the widget will be labeled the same.
 
 argument:: spec
-a code::ControlSpec:: - default: code::ControlSpec.new::
+a link::Classes/ControlSpec:: - default: code::ControlSpec.new::
 
 argument:: value
-a default value for the code::CV:: - default: the code::ControlSpec::'s default value
+a default value for the link::Classes/CV:: - default: the link::Classes/ControlSpec::'s default value
 
 argument:: tab
-a code::String:: or a code::Symbol:: - the tab under which the widget will appear. If not provided the widget will be added under the tab that's currently in front.
+a link::Classes/String:: or a link::Classes/Symbol:: - the tab under which the widget will appear. If not provided the widget will be added under the tab that's currently in front.
 
 argument:: slot
-only needed if a code::CVWidget2D:: shall be created. Either code::\lo:: or code::\hi::
+only needed if a link::Classes/CVWidget2D:: shall be created. Either code::\lo:: or code::\hi::
 
-returns:: a code::CV::
+returns:: a link::Classes/CV::
 
 
 METHOD:: put
-Put new code::CV::s into CVCenter
+Put new link::Classes/CV::s into CVCenter
 note::It shouldn't be necessary to initialize CVCenter with an explicit call to strong::*new::. Rather use strong::*use:: whenever possible as (strong::*use:: uses strong::*put:: internally)::
 argument::  ... args
 key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV),  \wdgtNameN, a CV::
-If the number of arguments is odd and the last one is a code::Boolean:: this will indicate wether already contained values will be overwritten (default: code::false::)
+If the number of arguments is odd and the last one is a link::Classes/Boolean:: this will indicate wether already contained values will be overwritten (default: code::false::)
 
 returns:: this (CVCenter)
 
@@ -143,36 +143,36 @@ returns:: this (CVCenter)
 subsection:: Convenience methods
 
 METHOD:: at
-Return the code::CV:: at the given key. If the key belongs to a code::CVWidget2D:: an code::Event:: will rather be returned, containing 2 CVs: code::\lo:: and code::\hi::. If your code relies on a CV being returned by this method, make sure you call the right slot (e.G.: code:: CVCenter.at(\myKey).lo::).
+Return the link::Classes/CV:: at the given key. If the key belongs to a link::Classes/CVWidget2D:: an link::Classes/Event:: will rather be returned, containing 2 CVs: code::\lo:: and code::\hi::. If your code relies on a CV being returned by this method, make sure you call the right slot (e.G.: code:: CVCenter.at(\myKey).lo::).
 
 argument:: key
-a code::Symbol:: or a code::String::
+a link::Classes/Symbol:: or a link::Classes/String::
 
-returns:: a code::CV:: resp. an code::Event::
+returns:: a link::Classes/CV:: resp. an link::Classes/Event::
 
 
 METHOD:: removeAt
-Remove a given widget including its code::CV::(s). . Existing OSC- or MIDI-connections will be resolved automatically.
+Remove a given widget including its link::Classes/CV::(s). . Existing OSC- or MIDI-connections will be resolved automatically.
 
 argument:: key
-a code::Symbol:: or code::String::
+a link::Classes/Symbol:: or link::Classes/String::
 
 returns:: this (CVCenter)
 
 
 METHOD:: removeAll
-Remove given code::CVWidget::s including their code::CV::s or all. Existing OSC- or MIDI-connections will be resolved automatically.
+Remove given link::Classes/CVWidget::s including their link::Classes/CV::s or all. Existing OSC- or MIDI-connections will be resolved automatically.
 
 argument::  ... keys
-widget-keys, given as code::String::s or code::Symbol::s. If no keys are given strong::all:: widgets will be removed. 
+widget-keys, given as link::Classes/String::s or link::Classes/Symbol::s. If no keys are given strong::all:: widgets will be removed. 
 
 returns:: this (CVCenter)
 
 METHOD:: removeAtTab
-Remove code::CVWidget::s under a given tab and remove the tab (if there's currently more than one tab) or rename it to "default" (if the given tab is the only tab in the CVCenter GUI).
+Remove link::Classes/CVWidget::s under a given tab and remove the tab (if there's currently more than one tab) or rename it to "default" (if the given tab is the only tab in the CVCenter GUI).
 
 argument:: label
-The name of the tab as code::String:: or code::Symbol::
+The name of the tab as link::Classes/String:: or link::Classes/Symbol::
 
 returns:: this (CVCenter)
 
@@ -181,19 +181,19 @@ METHOD:: addActionAt
 Add an action given in code::action:: to a widget's CV given in code::key:: under the name code::name::
 
 argument:: key
-a code::Symbol:: or code::String:: - representing a code::CVWidget:: resp. its code::CV::
+a link::Classes/Symbol:: or link::Classes/String:: - representing a link::Classes/CVWidget:: resp. its link::Classes/CV::
 
 argument:: name
-a code::Symbol:: or a code::String:: - the name under which the action will be added. The action may be removed or deactivated again by referring to this name.
+a link::Classes/Symbol:: or a link::Classes/String:: - the name under which the action will be added. The action may be removed or deactivated again by referring to this name.
 
 argument:: action
-a code::Function:: or a code::String:: - if one or more arguments are added, the first will automatically be a representation of the CV. The function can also be provided as a string that compiles to a function when you call code::interpret:: on it.
+a code::Function:: or a link::Classes/String:: - if one or more arguments are added, the first will automatically be a representation of the CV. The function can also be provided as a string that compiles to a function when you call code::interpret:: on it.
 
 argument:: slot
-a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D::
+a link::Classes/String:: or link::Classes/Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a link::Classes/CVWidget2D::
 
 argument:: active
-a code::Boolean:: - activate or deactivate the action. default: code::true::
+a link::Classes/Boolean:: - activate or deactivate the action. default: code::true::
 
 returns:: this (CVCenter)
 
@@ -202,13 +202,13 @@ METHOD:: removeActionAt
 Remove an action from a widget's CV given in code::key:: under the name code::name::
 
 argument:: key
-a code::Symbol:: or code::String:: - representing a code::CVWidget:: resp. its code::CV::s
+a link::Classes/Symbol:: or link::Classes/String:: - representing a link::Classes/CVWidget:: resp. its link::Classes/CV::s
 
 argument:: name
-a code::Symbol:: or a code::String:: - the name under which the action is stored.
+a link::Classes/Symbol:: or a link::Classes/String:: - the name under which the action is stored.
 
 argument:: slot
-a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D::
+a link::Classes/String:: or link::Classes/Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a link::Classes/CVWidget2D::
 
 returns:: this (CVCenter)
 
@@ -217,20 +217,20 @@ METHOD:: activateActionAt
 Activates or deactivates an action at code::key:: (representing the widget) and code::name:: (the name under which the action is stored)
 
 argument:: key
-a code::Symbol:: or code::String:: - representing a code::CVWidget:: resp. its code::CV::s
+a link::Classes/Symbol:: or link::Classes/String:: - representing a link::Classes/CVWidget:: resp. its link::Classes/CV::s
 
 argument:: name
-a code::Symbol:: or a code::String:: - the name under which the action is stored.
+a link::Classes/Symbol:: or a link::Classes/String:: - the name under which the action is stored.
 
 argument:: activate
-a code::Boolean::
+a link::Classes/Boolean::
 definitionList::
 ## true || - activate the action
 ## false || - deactivate the action
 ::
 
 argument:: slot
-a code::String:: or code::Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a code::CVWidget2D::
+a link::Classes/String:: or link::Classes/Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a link::Classes/CVWidget2D::
 
 returns:: this (CVCenter)
 
@@ -250,7 +250,7 @@ METHOD:: guiMoveTo
 Moves the GUI to a given position on screen.
 
 argument:: point
-a code::Point::
+a link::Classes/Point::
 
 returns:: this (CVCenter)
 
@@ -259,7 +259,7 @@ METHOD:: guiMoveTo
 Moves the GUI to a given position on screen.
 
 argument:: point
-a code::Point::
+a link::Classes/Point::
 
 returns:: this (CVCenter)
 
@@ -268,7 +268,7 @@ METHOD:: guiChangeDimensions
 Set the GUI's dimension to the given value.
 
 argument:: point
-a code::Point::
+a link::Classes/Point::
 
 returns:: this (CVCenter)
 
@@ -277,20 +277,20 @@ METHOD:: renameTab
 Set a tab-name from code::oldName:: to code::newName::
 
 argument:: oldName
-a code::String:: or a code::Symbol::
+a link::Classes/String:: or a link::Classes/Symbol::
 
 argument:: newName
-a code::String:: or a code::Symbol::
+a link::Classes/String:: or a link::Classes/Symbol::
 
 returns:: this (CVCenter)
 
 METHOD:: widgetsAtTab
-Get an code::Array:: containing all widgets (names) under the give tab.
+Get an link::Classes/Array:: containing all widgets (names) under the give tab.
 
 argument:: label
-a code::String:: or a code::Symbol:: representing the name of the selected tab
+a link::Classes/String:: or a link::Classes/Symbol:: representing the name of the selected tab
 
-returns:: an code::Array::
+returns:: an link::Classes/Array::
 
 subsection:: Saving and loading setups
 
@@ -335,27 +335,27 @@ list::
 ## code::softWithin::
 ::
 
-returns:: an code::Event::
+returns:: an link::Classes/Event::
 
 
 METHOD:: all
 
-returns:: an IdentityDictionary, containing all CVs added to CVCenter
+returns:: an link::Classes/IdentityDictionary::, containing all CVs added to CVCenter
 
 METHOD:: cvWidgets
-all widgets (currently either CVWidgetKnobs or CVWidget2Ds) displayed within the main GUI of CVCenter
+all widgets (currently either link::Classes/CVWidgetKnob::s or link::Classes/CVWidget2D::s) displayed within the main GUI of CVCenter
 
-returns:: an IdentityDictionary, containing all CVWidgets
+returns:: an link::Classes/IdentityDictionary::, containing all link::Classes/CVWidget::s
 
 METHOD:: window
 The main window of CVCenter
 
-returns:: an instance of Window
+returns:: an instance of link::Classes/Window::
 
 METHOD:: tabs
-A TabbedView, containing the widgets
+A link::Classes/TabbedView::, containing the widgets
 
-returns:: a TabbedView
+returns:: a link::Classes/TabbedView::
 
 METHOD:: guix
 The x-position at which the GUI will be created - has no direct effect besides when being set ahead from initializing CVCenter.
@@ -397,16 +397,16 @@ definitionList::
 ## right arrow-key || navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
 ## left arrow-key || navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
 ## 0-9 || Select tabs and focus them. The numbers represent the order of the tabs.
-## "c" || Open the code::OSCCommands:: GUI. This will also trigger code::OSCCommands:collect::
-## "o" || See a list of already connected OSC-controllers (see also: code::CVCenterControllersMonitor::).
-## "m" || See a list of already connected MIDI-controllers (see also: code::CVCenterControllersMonitor::).
-## "x" || If the code::CVCenterControllersMonitor:: GUI is open, close it.
-## "h" || Start the code::History:: and open its GUI.
-## <shift> + "h" || End the code::History::, close its GUI a and open a new code::Document:: containing the recorded code::History::.
-## "n" || Open an code::NdefMixer:: for the default code::Server::
-## "p" || Open a new code::PdefAllGui::.
-## "t" || Open a new code::TdefAllGui::.
-## "a" || If the code::Quark:: code::AllGui:: is installed open a new code::AllGui::.
+## c || Open the code::OSCCommands:: GUI. This will also trigger code::OSCCommands:collect::
+## o || See a list of already connected OSC-controllers (see also: code::CVCenterControllersMonitor::).
+## m || See a list of already connected MIDI-controllers (see also: code::CVCenterControllersMonitor::).
+## x || If the code::CVCenterControllersMonitor:: GUI is open, close it.
+## h || Start the code::History:: and open its GUI.
+## <shift> + h || End the code::History::, close its GUI a and open a new code::Document:: containing the recorded code::History::.
+## n || Open an code::NdefMixer:: for the default code::Server::
+## p || Open a new code::PdefAllGui::.
+## t || Open a new code::TdefAllGui::.
+## a || If the code::Quark:: code::AllGui:: is installed open a new code::AllGui::.
 ::
 
 EXAMPLES::

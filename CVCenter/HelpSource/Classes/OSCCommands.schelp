@@ -15,7 +15,7 @@ METHOD:: collect
 Starts the collection-process when set to code::true::. Stop the process by calling the same method, argument code::play:: set to code::false:: 
 
 argument:: play
-a code::Boolean:: indicating whether the process shall be started or stopped - default: code::true::
+a link::Classes/Boolean:: indicating whether the process shall be started or stopped - default: code::true::
 
 returns:: this (OSCCommands)
 
@@ -23,7 +23,7 @@ METHOD:: saveCmdSet
 Save the current list of commands to disk.
 
 argument:: deviceName
-a code::String:: or a code::Symbol:: representing the name of the current collection. If the collection-process is still active it will be stopped. 
+a link::Classes/String:: or a link::Classes/Symbol:: representing the name of the current collection. If the collection-process is still active it will be stopped. 
 
 returns:: this (OSCCommands)
 
@@ -33,25 +33,25 @@ Open the interactive GUI that shows the user all currently collected command-nam
 returns:: this (OSCCommands)
 
 METHOD:: deviceCmds
-If a code::deviceName:: has been given return an code::Event:: with command-names stored to disk under the deviceName code::deviceName::. Else return an code::Event:: with all currently storedcommands resp. their keys.
+If a code::deviceName:: has been given return an link::Classes/Event:: with command-names stored to disk under the deviceName code::deviceName::. Else return an link::Classes/Event:: with all currently storedcommands resp. their keys.
 
 argument:: deviceName
-a code::String:: or a code::Symbol:: representing the name under which the list of commands has been stored.
+a link::Classes/String:: or a link::Classes/Symbol:: representing the name under which the list of commands has been stored.
 
-returns:: an code::Event::
+returns:: an link::Classes/Event::
 
 METHOD:: clearCmdsAt
 Removes all commands stored to disk under the name given in code::deviceName::.
 
 argument:: deviceName
-a code::String:: or a code::Symbol::
+a link::Classes/String:: or a link::Classes/Symbol::
 
 returns:: this (OSCCommands)
 
 METHOD:: storedDevices
-Returnes a code::Set:: of all currently stored device-names.
+Returnes a link::Classes/Set:: of all currently stored device-names.
 
-returns:: a code::Set::
+returns:: a link::Classes/Set::
 
 
 INSTANCEMETHODS::
