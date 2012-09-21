@@ -413,9 +413,14 @@ private:: prInitOscInputRange
 private:: prInitActionsControl
 
 subsection:: Extending the API
-note::The following features are experimental. Probably they should get redesigned in future releases. However, they allow extending the inbuilt functionality of the widgets in a way that the user can synch custom GUIs resp. their elements with what's displayed within the widgts. E.g. one may want to create a button in an external GUI that connects MIDI or OSC. By default these buttons would keep their states if the connection happens from inside a widget or is done via from the commandline (e.g. code::myWidget.oscConnect()::). The following methods allow the user to add functions to the existing controllers resp. remove them again at any time. strong::Note that the default functionality will always be executed first and cannot be removed:: (extending the API should be unobstrusive).
+note::The following features are experimental and one should study the internal workings of CVWidget closely before using them - especially the structure of controllers and models: link::#-wdgtControllersAndModels::.
 ::
-Have a look at the examples-section for a simple example.
+Within a CVWidget the functionality of most of its methods is implemented within a MVC-paradigm (strong::m::odel-strong::v::iew-strong::c::ontroller) which means that rather than executing an action within a method directly the method updates a model (an object keeping some data) and triggers the controller via a 'changed'-message (non-working example-code):
+
+code::myModel.value_(someValue).changed(\key):: 
+
+When the 'changed'-message is sent the controller will execute its action. By default there is only one key specified: code::\default:: (see link::#-synchKeys::). However, it is possible to extend the functionality of a controller with one or more custom code::key/function:: pairs which means one can sync custom-guis and its elements to a given CVWidget (e.g. a button in some GUI cannot only connect MIDI or OSC but can also immediatly reflect the current connection-status).
+Have a look at the examples-section for a simple example. Extending the API in the suggested way should keep the CVWidget-functionality unobstrusive!
 
 METHOD:: extend
 adds a custom function to one or all of the widget's internal link::Classes/SimpleController::s. These can also keep references to user-defined GUIs resp. their elements, thus allowing the user to synch his/her GUIs with CVWidgets.
@@ -438,6 +443,11 @@ argument:: key
 a link::Classes/Symbol:: or a link::Classes/String:: - indicating which function shall be removed. Will not touch the default functionality of a CVWidget.
 
 returns:: the receiver
+
+METHOD:: synchKeys
+an link::Classes/Array:: of link::Classes/Symbol::s, keeping the keys over which a link::Classes/SimpleController:: within a CVWidget will iterate. By default it is code::[ \default ]::. The user should not alter this directly as adding and removing keys is handled within link::#-extend:: resp. link::#-reduce::.
+
+returns:: an link::Classes/Array:: of link::Classes/Symbol::s
 
 subsection:: GUI properties and methods
 optional - CVWidget implements a few GUI-elements that are common to link::Classes/CVWidgetKnob:: as well as link::Classes/CVWidget2D::. Descriptions of the rest of the elements can be found in the documentation for the regarding classes.
