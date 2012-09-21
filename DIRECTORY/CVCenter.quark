@@ -6,7 +6,7 @@
 	\author:		"Stefan Nussbaumer",
 
 // optional:
-	\version:		0.85, // must be a float
+	\version:		0.87, // must be a float
 	\since:		"2010",
 	\schelp:		"Overviews/CVCenter",
 	\url:			"http://pustota.5tefan.us/coding/CVCenter",
