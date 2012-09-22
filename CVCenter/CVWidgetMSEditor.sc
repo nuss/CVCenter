@@ -477,11 +477,11 @@ CVWidgetMSEditor {
 //			but.value.switch(
 //				0, { 
 //					widget.setCalibrate(true, slot);
-//					wcmHiLo.calibration.model.value_(true).changed(\value);
+//					wcmHiLo.calibration.model.value_(true).changedKeys(synchKeys);
 //				},
 //				1, { 
 //					widget.setCalibrate(false, slot);
-//					wcmHiLo.calibration.model.value_(false).changed(\value);
+//					wcmHiLo.calibration.model.value_(false).changedKeys(synchKeys);
 //				}
 //			)
 //		});
@@ -514,10 +514,10 @@ CVWidgetMSEditor {
 						});
 //						wdgtControllersAndModels.oscDisplay.model.value_(
 //							wdgtControllersAndModels.oscDisplay.model.value;
-//						).changed(\value);
+//						).changedKeys(synchKeys);
 //						wdgtControllersAndModels.midiDisplay.model.value_(
 //							wdgtControllersAndModels.midiDisplay.model.value
-//						).changed(\value);
+//						).changedKeys(synchKeys);
 					})
 				;
 			);

@@ -42,7 +42,7 @@ CVWidget2D : CVWidget {
 		var actionLo, actionHi;
 				
 		this.bgColor ?? { this.bgColor_(Color.white) };
-		synchKeys ?? { synchKeys = [\value] };
+		synchKeys ?? { synchKeys = [\default] };
 		
 		if(GUI.scheme === QtGUI, { 
 			CV.viewDictionary[QSlider2D].props_(#[xValue, yValue]);

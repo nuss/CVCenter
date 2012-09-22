@@ -42,7 +42,7 @@ CVWidgetKnob : CVWidget {
 		var nextY, knobX, knobY;
 				
 		this.bgColor ?? { this.bgColor = Color.white };
-		synchKeys ?? { synchKeys = [\value] };
+		synchKeys ?? { synchKeys = [\default] };
 		
 		prCalibrate = true;
 		prMidiMode = 0;

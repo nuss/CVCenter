@@ -28,6 +28,7 @@ CVWidgetMS : CVWidget {
 		var nextX, nextY, knobX, knobY;
 		
 		this.bgColor ?? { this.bgColor = Color.white };
+		synchKeys ?? { synchKeys = [\default] };
 		#numOscResponders, numMidiResponders = 0!2;
 		
 		if(cv.isNil, {
