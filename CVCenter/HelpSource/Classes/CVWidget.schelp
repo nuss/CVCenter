@@ -432,7 +432,7 @@ argument:: func
 a link::Classes/Function:: - mandatory. A custom function, extending the widget's resp. your custom GUI's functionality. The user may pass the content of the model, the key and more to the function if they are stated as arguments at the beginning of the function. See the link::Classes/SimpleController::-helpfile for more info.
 
 argument:: controller
-A CVWidget contains several models and controllers, contained in link::#-wdgtControllersAndModels::. If no specific controller is given the function will be executed when ever a model changes. Providing a controller may save some cpu. However, if the user provides a specific controller (s)he should know under which circumstances the given controller is being executed in order to get the desired result. 
+A CVWidget contains several models and controllers, contained in link::#-wdgtControllersAndModels::. If no specific controller is given the function will be added to strong::all:: controllers within link::#-wdgtControllersAndModels::. If a specific controller is provided is provided the function will only be added to that controller which might make calculations a bit cheaper. However, if the user provides a specific controller (s)he should know under which circumstances the given controller is being executed in order to get the desired result. 
 
 returns:: the receiver
 
