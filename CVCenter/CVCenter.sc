@@ -133,7 +133,8 @@ CVCenter {
 			tabs.view.resize_(5);
 			
 			tabs.labelColors_(labelColors);
-			tabs.labelPadding_(5);
+			tabs.labelPadding_(7);
+			tabs.tabHeight_(15);
 			tabs.unfocusedColors_(unfocusedColors);
 			tabs.font_(GUI.font.new("Helvetica", 10, true));
 			tabs.tabCurve_(3);
