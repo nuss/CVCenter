@@ -94,7 +94,7 @@ CVCenter {
 
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
-			if(Quarks.isInstalled("wslib") and:{ GUI.scheme !== SwingGUI }, { window.background_(Color.black) });
+			if(Quarks.isInstalled("wslib") and:{ GUI.scheme.asSymbol !== \SwingGUI }, { window.background_(Color.black) });
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
 			window.view.decorator = flow;
