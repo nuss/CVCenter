@@ -5,6 +5,10 @@ CVCenterPreferences {
 	*makeWindow {
 		var tabs, flow0, flow1, flow3;
 		var labelColors, labelStringColors;
+		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
+		var saveGuiPosition=true;
+		var saveClassVars=false;
+		var saveMidiMode, saveMidiResolution, saveCtrlButtonBank, saveMidiMean, saveSoftWithin;
 
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter: preferences", Rect(
@@ -31,6 +35,25 @@ CVCenterPreferences {
 			tabs.stringFocusedColor_(labelStringColors[tabs.activeTab]);
 			tabs.unfocusedColors_(labelColors);
 			tabs.stringColor_(Color.white);
+
+			staticTextFont = Font(Font.defaultSansFace, 10);
+			staticTextColor = Color(0.2, 0.2, 0.2);
+			textFieldFont = Font(Font.defaultMonoFace, 9);
+			textFieldFontColor = Color.black;
+			textFieldBg = Color.white;
+
+
+			StaticText(tabs.views[0], flow0.bounds.width-20@80)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("Make CVCenter remember its current position and properties on screen upon shut-down")
+			;
+			if(GUI.id === \cocoa, {
+
+			}, {
+
+			})
+
 		});
 		window.front;
 	}
