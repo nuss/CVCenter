@@ -1,15 +1,15 @@
 /* (c) 2010-2012 Stefan Nussbaumer */
-/* 
+/*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -22,63 +22,63 @@ CVWidget2D : CVWidget {
 
 	*new { |parent, cvs, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, persistent, server|
 		^super.new.init(
-			parent, 
-			cvs, 
-			name, 
+			parent,
+			cvs,
+			name,
 			bounds,
-			defaultActions, 
+			defaultActions,
 			setup,
 			controllersAndModels,
 			cvcGui,
-			persistent, 
+			persistent,
 			server
 		)
 	}
-	
+
 	init { |parentView, cvs, name, bounds, actions, setupArgs, controllersAndModels, cvcGui, persistent, server|
 		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, rightBarX, oscEditButHeight, right, left;
 		var actionLo, actionHi;
-				
+
 		this.bgColor ?? { this.bgColor_(Color.white) };
 		synchKeys ?? { synchKeys = [\default] };
-		
-		if(GUI.scheme === QtGUI, { 
+
+		if(GUI.id === \qt, {
 			CV.viewDictionary[QSlider2D].props_(#[xValue, yValue]);
 			CV.viewDictionary[QRangeSlider].props_(#[loValue, hiValue]);
 		});
 
 		setupArgs !? {
-			(setupArgs.class !== Event).if{ 
+			(setupArgs.class !== Event).if{
 				Error( "a setup for a CVWidget2D has to be provided as an Event: (lo: (argname: arg), hi: (argname: arg))!").throw;
 			}
 		};
-		
+
 		prCalibrate = (lo: true, hi: true);
 		prMidiMode = (lo: 0, hi: 0);
 		prMidiMean = (lo: 64, hi:64);
 		prMidiResolution = (lo: 1, hi: 1);
 		prSoftWithin = (lo: 0.1, hi: 0.1);
 		prCtrlButtonBank = ();
-		
+
 		this.wdgtActions ?? { this.wdgtActions = (lo: (), hi: ()) };
-				
+
 		guiEnv = (lo: (), hi: ());
 
 		cvcGui !? { isCVCWidget = true };
-		
+
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
 		#[lo, hi].do({ |hilo|
 			midiOscEnv[hilo] ?? { midiOscEnv.put(hilo, ()) };
 			midiOscEnv[hilo].oscMapping ?? { midiOscEnv[hilo].oscMapping = \linlin };
 		});
-		
+
 		if(name.isNil, { thisName = "2D" }, { thisName = name });
 		wdgtInfo = thisName.asString;
-		
+
 		widgetCV = ();
-		
+
 		if(cvs.isNil, {
 			widgetCV.lo = CV.new; widgetCV.hi = CV.new;
 		}, {
@@ -89,14 +89,14 @@ CVWidget2D : CVWidget {
 				if(cvs[1].isNil, { widgetCV.hi = CV.new }, { widgetCV.hi = cvs[1] });
 			})
 		});
-				
+
 		numVal = (); specBut = ();
 		midiHead = (); midiLearn = (); midiSrc = (); midiChan = (); midiCtrl = ();
 		oscEditBut = (); calibBut = (); actionsBut = ();
 		editor = ();
-		
+
 		#[lo, hi].do(this.initControllersAndModels(controllersAndModels, _));
-		
+
 		setupArgs !? {
 			#[lo, hi].do({ |slot|
 				setupArgs[slot] !? { setupArgs[slot][\midiMode] !? { this.setMidiMode(setupArgs[slot][\midiMode], slot) }};
@@ -107,7 +107,7 @@ CVWidget2D : CVWidget {
 				setupArgs[slot] !? { setupArgs[slot][\calibrate] !? { this.setCalibrate(setupArgs[slot][\calibrate], slot) }};
 			})
 		};
-					
+
 		actions !? {
 			if(actions.class !== Event, {
 				Error("Please provide actions in the following way: (lo: action1, hi: action2)").throw;
@@ -117,7 +117,7 @@ CVWidget2D : CVWidget {
 			})
 		};
 
-		if(bounds.isNil, {		
+		if(bounds.isNil, {
 			thisXY = 7@0;
 			thisX = 50; thisY = 50;
 			thisWidth = 122;
@@ -128,14 +128,14 @@ CVWidget2D : CVWidget {
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
-				
+
 		if(parentView.isNil, {
 			window = Window(thisName, Rect(thisX, thisY, thisWidth+14, thisHeight+7), server: server);
 		}, {
 			window = parentView;
 		});
-												
-		cvcGui ?? { 
+
+		cvcGui ?? {
 			window.onClose_({
 				#[lo, hi].do({ |hilo|
 					if(editor[hilo].notNil, {
@@ -171,7 +171,7 @@ CVWidget2D : CVWidget {
 		};
 
 		persistent !? { if(persistent, { isPersistent = true }) };
-		
+
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color.green)
 			.background_(Color.white)
@@ -193,9 +193,9 @@ CVWidget2D : CVWidget {
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
-		
+
 		nextY = thisXY.y+1+label.bounds.height;
-		
+
 		slider2d = Slider2D(window, Rect(thisXY.x+1, nextY, thisWidth-42, thisWidth-47))
 			.canFocus_(false)
 			.background_(Color.white)
@@ -216,17 +216,17 @@ CVWidget2D : CVWidget {
 
 		numVal.lo = NumberBox(window);
 		numVal.hi = NumberBox(window);
-		
+
 		[numVal.lo, [thisXY.x+1, widgetCV.lo], numVal.hi, [thisXY.x+(thisWidth-42/2), widgetCV.hi]].pairsDo({ |k, v|
 			k.bounds_(Rect(
-				v[0], 
+				v[0],
 				nextY,
 				this.rangeSlider.bounds.width/2,
 				15
 			));
 			k.value_(v[1].value).font_(Font("Helvetica", 9.5));
 		});
-		
+
 		specBut.lo = Button(window)
 			.action_({ |btn|
 				if(editor.lo.isNil or:{ editor.lo.isClosed }, {
@@ -299,7 +299,7 @@ CVWidget2D : CVWidget {
 		midiChan.hi = TextField(window);
 		midiCtrl.lo = TextField(window);
 		midiCtrl.hi = TextField(window);
-		
+
 		nextY = thisXY.y+1+label.bounds.height;
 		rightBarX = thisXY.x+slider2d.bounds.width+1;
 
@@ -309,25 +309,25 @@ CVWidget2D : CVWidget {
 //			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 		});
-		
+
 		nextY = nextY+14;
-				
+
 		[midiHead.hi, nextY, midiHead.lo, nextY+52].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX, v, 28, 13))
 			.font_(Font("Helvetica", 7))
 //			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, this.bgColor]]);
-			
-			if(GUI.scheme === QtGUI, {
-				k.mouseEnterAction_({ |mb| 
+
+			if(GUI.id === \qt, {
+				k.mouseEnterAction_({ |mb|
 					mb.states_([["MIDI", Color.white, Color.red]])
 				}).mouseLeaveAction_({ |mb|
 					mb.states_([["MIDI", Color.black, this.bgColor]])
 				})
 			})
 		});
-		
-		
+
+
 		[midiLearn.hi, [\hi, nextY], midiLearn.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX+midiHead.lo.bounds.width, v[1], 12, 13))
 			.font_(Font("Helvetica", 7))
@@ -340,8 +340,8 @@ CVWidget2D : CVWidget {
 				ml.value.switch(
 					1, {
 						margs = [
-							[midiSrc[v[0]].string, msrc], 
-							[midiChan[v[0]].string, mchan], 
+							[midiSrc[v[0]].string, msrc],
+							[midiChan[v[0]].string, mchan],
 							[midiCtrl[v[0]].string, mctrl]
 						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
@@ -354,9 +354,9 @@ CVWidget2D : CVWidget {
 				)
 			})
 		});
-		
+
 		nextY = nextY+13;
-		
+
 		[midiSrc.hi, [\hi, nextY], midiSrc.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX, v[1], 40, 13))
 			.font_(Font("Helvetica", 8.5))
@@ -381,7 +381,7 @@ CVWidget2D : CVWidget {
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
-			}) 
+			})
 		});
 
 		nextY = nextY+13;
@@ -410,7 +410,7 @@ CVWidget2D : CVWidget {
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
-			}) 
+			})
 		});
 
 		[midiCtrl.hi, [\hi, nextY], midiCtrl.lo, [\lo, nextY+52]].pairsDo({ |k, v|
@@ -437,39 +437,39 @@ CVWidget2D : CVWidget {
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
-			}) 
+			})
 		});
-		
+
 		if(
 			(left = slider2d.bounds.height
 			+rangeSlider.bounds.height
 			+numVal.lo.bounds.height)
-			>= 
+			>=
 			(right = specBut.lo.bounds.height
 			+midiLearn.lo.bounds.height
 			+midiSrc.lo.bounds.height
-			+midiChan.lo.bounds.height*2), 
+			+midiChan.lo.bounds.height*2),
 		{
-			nextY = 
+			nextY =
 			label.bounds.top
 			+label.bounds.height
 			+left;
 			oscEditButHeight = thisHeight-left-47;
 		}, {
-			nextY = 
+			nextY =
 			label.bounds.top
 			+label.bounds.height
 			+right;
 			oscEditButHeight = thisHeight-right-47;
 		});
-		
+
 		oscEditBut.lo = Button(window);
 		oscEditBut.hi = Button(window);
 		calibBut.lo = Button(window);
 		calibBut.hi = Button(window);
 		actionsBut.lo = Button(window);
 		actionsBut.hi = Button(window);
-		
+
 		[oscEditBut.lo, [\lo, thisXY.x+1], oscEditBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, oscEditButHeight))
 			.font_(Font("Helvetica", 8.5))
@@ -497,8 +497,8 @@ CVWidget2D : CVWidget {
 					wdgtControllersAndModels[v[0]].midiDisplay.model.value
 				).changedKeys(synchKeys);
 			});
-			
-			if(GUI.scheme === QtGUI, {
+
+			if(GUI.id === \qt, {
 				k.mouseEnterAction_({ |oscb|
 					if(wdgtControllersAndModels[v[0]].oscConnection.model.value === false, {
 						oscb.states_([["edit OSC", Color.white, Color.cyan(0.5)]]);
@@ -510,9 +510,9 @@ CVWidget2D : CVWidget {
 				})
 			})
 		});
-		
+
 		nextY = nextY+oscEditBut.lo.bounds.height;
-		
+
 		[calibBut.lo, [\lo, thisXY.x+1], calibBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
 			.font_(Font("Helvetica", 9))
@@ -528,11 +528,11 @@ CVWidget2D : CVWidget {
 				)
 			})
 		});
-		
+
 		nextY = nextY+calibBut.lo.bounds.height;
-		
+
 		[actionsBut.lo, [\lo, thisXY.x+1], actionsBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
-			
+
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
 			.font_(Font("Helvetica", 9))
 //			.focusColor_(Color(alpha: 0))
@@ -550,45 +550,45 @@ CVWidget2D : CVWidget {
 		});
 
 		#[lo, hi].do({ |slot| if(prCalibrate[slot], { calibBut[slot].value_(0) }, { calibBut[slot].value_(1) }) });
-		
+
 		// widgetCV
 		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
 		widgetCV.lo.connect(numVal.lo);
 		widgetCV.hi.connect(numVal.hi);
-		
+
 		visibleGuiEls = [
-			slider2d, 
-			rangeSlider, 
-			numVal.lo, numVal.hi, 
+			slider2d,
+			rangeSlider,
+			numVal.lo, numVal.hi,
 			specBut.lo, specBut.hi,
-			midiHead.lo, midiHead.hi, 
-			midiLearn.lo, midiLearn.hi, 
-			midiSrc.lo, midiSrc.hi, 
-			midiChan.lo, midiChan.hi, 
-			midiCtrl.lo, midiCtrl.hi, 
-			oscEditBut.lo, oscEditBut.hi, 
+			midiHead.lo, midiHead.hi,
+			midiLearn.lo, midiLearn.hi,
+			midiSrc.lo, midiSrc.hi,
+			midiChan.lo, midiChan.hi,
+			midiCtrl.lo, midiCtrl.hi,
+			oscEditBut.lo, oscEditBut.hi,
 			calibBut.lo, calibBut.hi,
 			actionsBut.lo, actionsBut.hi
 		];
 
 		allGuiEls = [
-			widgetBg, 
-			label, 
-			nameField, 
-			slider2d, 
-			rangeSlider, 
-			numVal.lo, numVal.hi, 
-			specBut.lo, specBut.hi, 
-			midiHead.lo, midiHead.hi, 
-			midiLearn.lo, midiLearn.hi, 
-			midiSrc.lo, midiSrc.hi, 
-			midiChan.lo, midiChan.hi, 
-			midiCtrl.lo, midiCtrl.hi, 
-			oscEditBut.lo, oscEditBut.hi, 
+			widgetBg,
+			label,
+			nameField,
+			slider2d,
+			rangeSlider,
+			numVal.lo, numVal.hi,
+			specBut.lo, specBut.hi,
+			midiHead.lo, midiHead.hi,
+			midiLearn.lo, midiLearn.hi,
+			midiSrc.lo, midiSrc.hi,
+			midiChan.lo, midiChan.hi,
+			midiCtrl.lo, midiCtrl.hi,
+			oscEditBut.lo, oscEditBut.hi,
 			calibBut.lo, calibBut.hi,
 			actionsBut.lo, actionsBut.hi
 		];
-		
+
 		#[lo, hi].do({ |slot|
 			guiEnv[slot] = (
 				editor: editor[slot],
@@ -606,28 +606,28 @@ CVWidget2D : CVWidget {
 			);
 			this.initControllerActions(slot);
 		});
-		
+
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
 	}
-	
+
 	open { |parent, wdgtBounds|
 		var thisWdgt, thisBounds;
-						
+
 		if(parent.isNil, {
 			thisBounds = Rect(oldBounds.left, oldBounds.top, oldBounds.width-14, oldBounds.height-7);
 		}, {
 			if(wdgtBounds.isNil, { thisBounds = oldBounds });
 		});
-				
+
 		if(this.notNil and:{ this.isClosed and:{ isPersistent }}, {
 			thisWdgt = this.class.new(
 				parent: parent,
-				cvs: [widgetCV.lo, widgetCV.hi], 
-				name: oldName, 
-				bounds: thisBounds, 
-				setup: this.setup, 
-				controllersAndModels: wdgtControllersAndModels, 
+				cvs: [widgetCV.lo, widgetCV.hi],
+				name: oldName,
+				bounds: thisBounds,
+				setup: this.setup,
+				controllersAndModels: wdgtControllersAndModels,
 				cvcGui: (midiOscEnv: midiOscEnv),
 				persistent: true
 			).front;
@@ -660,5 +660,5 @@ CVWidget2D : CVWidget {
 			"Either the widget you're trying to reopen hasn't been closed yet or it doesn't even exist.".warn;
 		})
 	}
-	
+
 }

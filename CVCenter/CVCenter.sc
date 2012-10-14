@@ -263,7 +263,7 @@ CVCenter {
 
 			swFlow.shift(5, 2);
 
-			if(GUI.scheme === CocoaGUI, {
+			if(GUI.id === \cocoa, {
 				loadActionsRadio = Button(prefPane, Rect(0, 0, 15, 15))
 					.font_(Font("Helvetica", 10))
 					.states_([
@@ -286,7 +286,7 @@ CVCenter {
 
 			swFlow.shift(5, 2);
 
-			if(GUI.scheme === CocoaGUI, {
+			if(GUI.id === \cocoa, {
 				autoConnectMIDIRadio = Button(prefPane, Rect(0, 0, 15, 15))
 					.font_(Font("Helvetica", 10))
 					.states_([
@@ -309,7 +309,7 @@ CVCenter {
 
 			swFlow.shift(5, 2);
 
-			if(GUI.scheme === CocoaGUI, {
+			if(GUI.id === \cocoa, {
 				autoConnectOSCRadio = Button(prefPane, Rect(0, 0, 15, 15))
 					.font_(Font("Helvetica", 10))
 					.states_([
@@ -879,7 +879,7 @@ CVCenter {
 				lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
 			});
 
-			if(GUI.scheme === QtGUI, {
+			if(GUI.id === \cocoa, {
 				lib.writeTextArchive(*f);
 			}, {
 				lib.writeTextArchive(f);
@@ -887,7 +887,7 @@ CVCenter {
 			lib = nil;
 		};
 		if(path.isNil, {
-			if(GUI.scheme !== QtGUI, {
+			if(GUI.id !== \qt, {
 				File.saveDialog(
 					prompt: "Save your current setup to a file",
 					defaultName: "Setup",
@@ -903,7 +903,7 @@ CVCenter {
 		var lib, midiOscEnvs, successFunc;
 
 		successFunc = { |f|
-			if(GUI.scheme === QtGUI, {
+			if(GUI.id === \qt, {
 				lib = Library.readTextArchive(*f);
 			}, {
 				lib = Library.readTextArchive(f);
@@ -1008,7 +1008,7 @@ CVCenter {
 		};
 
 		if(path.isNil, {
-			if(GUI.scheme === QtGUI, {
+			if(GUI.id === \qt, {
 				QDialog.getPaths(successFunc, allowsMultiple: false);
 			}, {
 				File.openDialog(
