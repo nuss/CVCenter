@@ -200,10 +200,10 @@ definitionList::
 ## m || bring the "MIDI"-tab to front
 ## o || bring the "OSC"-tab to front
 ## a || bring the "Actions"-tab to front
-## c || open the code::OSCCommands:: GUI (starts collecting immediatly)
+## c || open the link::Classes/OSCCommands:: GUI (starts collecting immediately)
 ## x || close the editor
-## <shift> + o || open the code::CVCenterControllersMonitor::, focusing its "OSC"-tab 
-## <shift> + m || open the code::CVCenterControllersMonitor::, focusing its "MIDI"-tab.
+## <shift> + o || open the link::Classes/CVCenterControllersMonitor::, focusing its "OSC"-tab 
+## <shift> + m || open the link::Classes/CVCenterControllersMonitor::, focusing its "MIDI"-tab.
 ::
 
 EXAMPLES::
