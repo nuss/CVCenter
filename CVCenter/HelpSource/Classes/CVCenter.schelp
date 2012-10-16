@@ -397,16 +397,16 @@ definitionList::
 ## right arrow-key || navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
 ## left arrow-key || navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
 ## 0-9 || Select tabs and focus them. The numbers represent the order of the tabs.
-## c || Open the code::OSCCommands:: GUI. This will also trigger code::OSCCommands:collect::
-## o || See a list of already connected OSC-controllers (see also: code::CVCenterControllersMonitor::).
-## m || See a list of already connected MIDI-controllers (see also: code::CVCenterControllersMonitor::).
-## x || If the code::CVCenterControllersMonitor:: GUI is open, close it.
-## h || Start the code::History:: and open its GUI.
-## <shift> + h || End the code::History::, close its GUI a and open a new code::Document:: containing the recorded code::History::.
-## n || Open an code::NdefMixer:: for the default code::Server::
-## p || Open a new code::PdefAllGui::.
-## t || Open a new code::TdefAllGui::.
-## a || If the code::Quark:: code::AllGui:: is installed open a new code::AllGui::.
+## c || Open the link::Classes/OSCCommands:: GUI. This will also trigger link::Classes/OSCCommands#*collect::
+## o || See a list of already connected OSC-controllers (see also: link::Classes/CVCenterControllersMonitor::).
+## m || See a list of already connected MIDI-controllers (see also: link::Classes/CVCenterControllersMonitor::).
+## x || If the link::Classes/CVCenterControllersMonitor:: GUI is open, close it.
+## h || Start the link::Classes/History:: and open its GUI.
+## <shift> + h || End the link::Classes/History::, close its GUI a and (if Patform.ideName != "scqt") open a new link::Classes/Document:: containing the recorded link::Classes/History::. note:: code::History.document:: will only work with GUI-systems that support link::Classes/Document::. When using the new SC-IDE consider using link::Classes/History#-saveCS#History.saveCS:: ( code::History.saveCS(path, forward)::)::
+## n || Open an link::Classes/NdefMixer:: for the default link::Classes/Server::
+## p || Open a new link::Classes/PdefAllGui::.
+## t || Open a new link::Classes/TdefAllGui::.
+## a || If the code::Quark:: link::Classes/AllGui:: is installed open a new link::Classes/AllGui::.
 ::
 
 EXAMPLES::

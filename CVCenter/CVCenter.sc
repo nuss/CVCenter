@@ -214,7 +214,8 @@ CVCenter {
 					if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }});
 					if(modifiers == 131072 and:{ unicode == 72 and:{ History.started }}, {
 						// keys <shift> + "h" -> end History and open History in a new document
-						History.end; History.document;
+						History.end;
+						if(Platform.ideName != "scqt", { History.document });
 					})
 				})
 			});
