@@ -4,7 +4,7 @@ categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/SimpleController, Classes/ControlSpec, Classes/OSCCommands
 
 DESCRIPTION::
-The interface defined within code::CVWidget:: resp. its subclasses link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D:: defines a number of methods that can also be triggered via their GUI. However these GUIs don't offer enough space to display all options a widget incorporates. Therefore each widget has an inbuilt editor which is defined within CVWidgetEditor.
+The interface defined within link::Classes/CVWidget:: resp. its subclasses link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D:: defines a number of methods that can also be triggered via their GUI. However these GUIs don't offer enough space to display all options a widget incorporates. Therefore each widget has an inbuilt editor which is defined within CVWidgetEditor.
 note::CVWidgetEditor is not supposed to be used directly. Rather editors should always be instantiated from within the widget it belongs to.::
 
 
