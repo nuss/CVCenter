@@ -1,14 +1,34 @@
 CVCenterPreferences {
 
 	classvar <window;
+	// classvar guiProps, saveClassvars;
+	// classvar setMidiMode, setMidiResolution, setCtrlButtonBank, setMidiMean, setSoftWithin;
 
 	*makeWindow {
-		var tabs, flow0, flow1, flow3;
-		var labelColors, labelStringColors;
+		var labelColors, labelStringColors, flow;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
-		var saveGuiPosition=true;
-		var saveClassVars=false;
+		var saveGuiPosition;
+		var saveClassVars;
 		var saveMidiMode, saveMidiResolution, saveCtrlButtonBank, saveMidiMean, saveSoftWithin;
+		var buildCheckbox;
+
+		buildCheckbox = { |active|
+			var cBox;
+			"window.view: %\n".postf(window.view);
+			if(GUI.id === \cocoa, {
+				cBox = Button(window, 15@15)
+					.states_([
+						["X", Color.red, Color.white],
+						["", Color.white, Color.white]
+					])
+					.font_(Font(Font.defaultMonoFace, 15))
+				;
+				if(active, { cBox.value_(0) }, { cBox.value_(1) });
+			}, {
+				cBox = CheckBox(window.view, 15@15).value_(active);
+			});
+			cBox;
+		};
 
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter: preferences", Rect(
@@ -17,43 +37,23 @@ CVCenterPreferences {
 				500, 350
 			)).front;
 
-			tabs = TabbedView(window, Rect(0, 1, window.bounds.width, window.bounds.height), ["General", "GUI properties", "MIDI preferences"], scroll: true);
-			tabs.view.resize_(5);
-			tabs.tabCurve_(4);
-			tabs.tabHeight_(20);
-			tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			tabs.views[2].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			tabs.labelColors_(Color.white!4);
-			labelColors = [
-				Color(0.4, 0.4, 0.4), //general
-				Color(0.4, 0.4, 0.4), //GUI properties
-				Color.red, //midi
-			];
-			labelStringColors = labelColors.collect({ |c| Color(c.red * 0.8, c.green * 0.8, c.blue * 0.8) });
-			(0..2).do({ |t| tabs.focusActions[t] = { tabs.stringFocusedColor_(labelStringColors[t]) } });
-			tabs.stringFocusedColor_(labelStringColors[tabs.activeTab]);
-			tabs.unfocusedColors_(labelColors);
-			tabs.stringColor_(Color.white);
-
-			staticTextFont = Font(Font.defaultSansFace, 10);
+			staticTextFont = Font(Font.defaultSansFace, 15);
 			staticTextColor = Color(0.2, 0.2, 0.2);
-			textFieldFont = Font(Font.defaultMonoFace, 9);
+			textFieldFont = Font(Font.defaultMonoFace, 12);
 			textFieldFontColor = Color.black;
 			textFieldBg = Color.white;
 
+			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
 
-			StaticText(tabs.views[0], flow0.bounds.width-20@80)
+			saveGuiPosition = buildCheckbox.(true);
+
+			flow.shift(0, -15);
+
+			StaticText(window.view, flow.bounds.width-20@80)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("Make CVCenter remember its current position and properties on screen upon shut-down")
+				.string_("Remember CVCenter's screen-properties on shutdown")
 			;
-			if(GUI.id === \cocoa, {
-
-			}, {
-
-			})
-
 		});
 		window.front;
 	}
