@@ -1,70 +1,70 @@
 /* (c) 2010-2012 Stefan Nussbaumer */
-/* 
+/*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
 CVWidgetKnob : CVWidget {
-	
+
 	var <knob, <numVal, <specBut, <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
 	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, server|
 		^super.new.init(
-			parent, 
-			cv, 
-			name, 
-			bounds, 
+			parent,
+			cv,
+			name,
+			bounds,
 			defaultAction,
 			setup,
-			controllersAndModels, 
-			cvcGui, 
-			persistent, 
+			controllersAndModels,
+			cvcGui,
+			persistent,
 			server // swing compatibility. well, ...
 		)
 	}
-	
+
 	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, server|
 		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
-				
+
 		this.bgColor ?? { this.bgColor = Color.white };
 		synchKeys ?? { synchKeys = [\default] };
-		
+
 		prCalibrate = true;
 		prMidiMode = 0;
 		prMidiMean = 64;
 		prMidiResolution = 1;
 		prSoftWithin = 0.1;
-						
+
 		guiEnv = ();
 		cvcGui !? { isCVCWidget = true };
 
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
 		midiOscEnv.oscMapping ?? { midiOscEnv.oscMapping = \linlin };
-						
+
 		if(name.isNil, { thisName = "knob" }, { thisName = name });
 		wdgtInfo = thisName.asString;
-		
+
 		if(cv.isNil, {
 			widgetCV = CV.new;
 		}, {
 			widgetCV = cv;
 		});
-				
+
 		this.initControllersAndModels(controllersAndModels);
 
 		setupArgs !? {
@@ -76,9 +76,9 @@ CVWidgetKnob : CVWidget {
 			setupArgs[\softWithin] !? { this.setSoftWithin(setupArgs[\softWithin]) };
 			setupArgs[\calibrate] !? { this.setCalibrate(setupArgs[\calibrate]) };
 		};
-								
+
 		action !? { this.addAction(\default, action) };
-		
+
 		if(bounds.isNil, {
 			thisXY = 7@0;
 			thisX = 50; thisY = 50;
@@ -90,14 +90,14 @@ CVWidgetKnob : CVWidget {
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
-		
+
 		if(parentView.isNil, {
 			window = Window(thisName, Rect(thisX, thisY, thisWidth+14, thisHeight+7), server: server);
 		}, {
 			window = parentView;
 		});
-										
-		cvcGui ?? { 
+
+		cvcGui ?? {
 			window.onClose_({
 				if(editor.notNil, {
 					if(editor.isClosed.not, {
@@ -112,7 +112,7 @@ CVWidgetKnob : CVWidget {
 				})
 			})
 		};
-		
+
 		cvcGui ?? {
 			if(persistent == false or:{ persistent.isNil }, {
 				window.onClose_(window.onClose.addFunc({
@@ -124,9 +124,9 @@ CVWidgetKnob : CVWidget {
 				isPersistent = true;
 			})
 		};
-		
+
 		persistent !? { if(persistent, { isPersistent = true }) };
-						
+
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color(alpha: 1.0))
 			.background_(this.bgColor)
@@ -157,7 +157,7 @@ CVWidgetKnob : CVWidget {
 			knobsize = thisHeight-143;
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = thisXY.y+16;
-		});						
+		});
 		knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
 			.canFocus_(false)
 			.mode_(\vert)
@@ -207,7 +207,7 @@ CVWidgetKnob : CVWidget {
 				).changedKeys(synchKeys);
 			})
 		;
-		
+
 		if(GUI.current.name === \QtGUI, {
 			midiHead.mouseEnterAction_({ |mb|
 				mb.states_([["MIDI", Color.white, Color.red]])
@@ -215,7 +215,7 @@ CVWidgetKnob : CVWidget {
 				mb.states_([["MIDI", Color.black, this.bgColor]])
 			})
 		});
-		
+
 		midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
 			.font_(Font("Helvetica", 9))
 //			.focusColor_(Color(alpha: 0))
@@ -227,8 +227,8 @@ CVWidgetKnob : CVWidget {
 				ml.value.switch(
 					1, {
 						margs = [
-							[midiSrc.string, msrc], 
-							[midiChan.string, mchan], 
+							[midiSrc.string, msrc],
+							[midiChan.string, mchan],
 							[midiCtrl.string, mctrl]
 						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
@@ -265,7 +265,7 @@ CVWidgetKnob : CVWidget {
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
-			}) 
+			})
 		;
 		nextY = nextY+midiSrc.bounds.height;
 		midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
@@ -291,7 +291,7 @@ CVWidgetKnob : CVWidget {
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
-			}) 
+			})
 		;
 		midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
@@ -316,10 +316,10 @@ CVWidgetKnob : CVWidget {
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
-			}) 
+			})
 		;
 		nextY = nextY+midiCtrl.bounds.height+1;
-				
+
 		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.font_(Font("Helvetica", 9))
 //			.focusColor_(Color(alpha: 0))
@@ -347,7 +347,7 @@ CVWidgetKnob : CVWidget {
 				).changedKeys(synchKeys);
 			})
 		;
-		
+
 		if(GUI.current.name === \QtGUI, {
 			oscEditBut.mouseEnterAction_({ |oscb|
 				if(wdgtControllersAndModels.oscConnection.model.value === false, {
@@ -359,7 +359,7 @@ CVWidgetKnob : CVWidget {
 				})
 			})
 		});
-		
+
 		nextY = nextY+oscEditBut.bounds.height;
 		calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
@@ -392,38 +392,38 @@ CVWidgetKnob : CVWidget {
 			})
 		;
 		if(prCalibrate, { calibBut.value_(0) }, { calibBut.value_(1) });
-		
-				
+
+
 		[knob, numVal].do({ |view| widgetCV.connect(view) });
 		visibleGuiEls = [
-			knob, 
-			numVal, 
-			specBut, 
-			midiHead, 
-			midiLearn, 
-			midiSrc, 
-			midiChan, 
-			midiCtrl, 
-			oscEditBut, 
+			knob,
+			numVal,
+			specBut,
+			midiHead,
+			midiLearn,
+			midiSrc,
+			midiChan,
+			midiCtrl,
+			oscEditBut,
 			calibBut,
 			actionsBut
 		];
 		allGuiEls = [
-			widgetBg, 
-			label, 
-			nameField, 
-			knob, 
-			numVal, 
-			specBut, 
-			midiHead, 
-			midiLearn, 
-			midiSrc, 
-			midiChan, 
-			midiCtrl, 
-			oscEditBut, 
+			widgetBg,
+			label,
+			nameField,
+			knob,
+			numVal,
+			specBut,
+			midiHead,
+			midiLearn,
+			midiSrc,
+			midiChan,
+			midiCtrl,
+			oscEditBut,
 			calibBut,
 			actionsBut
-		];		
+		];
 		guiEnv = (
 			editor: editor,
 			calibBut: calibBut,
@@ -440,24 +440,24 @@ CVWidgetKnob : CVWidget {
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
 	}
-		
+
 	open { |parent, wdgtBounds|
 		var thisWdgt, thisBounds;
-								
+
 		if(parent.isNil, {
 			thisBounds = Rect(oldBounds.left, oldBounds.top, oldBounds.width-14, oldBounds.height-7);
 		}, {
 			if(wdgtBounds.isNil, { thisBounds = oldBounds });
 		});
-				
+
 		if(this.notNil and:{ this.isClosed and:{ isPersistent }}, {
 			thisWdgt = this.class.new(
 				parent: parent,
-				cv: widgetCV, 
-				name: oldName, 
-				bounds: thisBounds, 
-				setup: this.setup, 
-				controllersAndModels: wdgtControllersAndModels, 
+				cv: widgetCV,
+				name: oldName,
+				bounds: thisBounds,
+				setup: this.setup,
+				controllersAndModels: wdgtControllersAndModels,
 				cvcGui: (midiOscEnv: midiOscEnv),
 				persistent: true
 			).front;
@@ -486,5 +486,5 @@ CVWidgetKnob : CVWidget {
 			"Either the widget you're trying to reopen hasn't been closed yet or it doesn't even exist.".warn;
 		})
 	}
-	
+
 }
