@@ -62,7 +62,7 @@ CVCenterPreferences {
 			window = Window("CVCenter: preferences", Rect(
 				Window.screenBounds.width/2-250,
 				Window.screenBounds.height/2-140,
-				500, 280
+				500, 313
 			)).front;
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
@@ -132,6 +132,12 @@ CVCenterPreferences {
 				.string_("Set CVCenter's midi-mode (0 or 1).")
 			;
 
+			if(GUI.id !== \cocoa, {
+				[saveMidiMode, textMidiMode].do(_.toolTip_(
+					"Set MIDI-device's mode: 0-127 (0) or in-/decremental (1).\nFor more information please have a look at the regarding\nmethod-explanation in CVCenter's helpfile."
+				))
+			});
+
 			flow.nextLine.shift(28, 0);
 
 			saveMidiResolution = buildNumTextBox.(CVCenter.midiResolution, \text);
@@ -143,6 +149,12 @@ CVCenterPreferences {
 				.stringColor_(staticTextColor)
 				.string_("Set CVCenter's midi-resolution. Applies only if midi-mode is 1.")
 			;
+
+			if(GUI.id !== \cocoa, {
+				[saveMidiResolution, textMidiResolution].do(_.toolTip_(
+					"Set the resolution for your hardware-sliders. Lower numbers\nresult in a higher resolution. A sensible default is 0.1.\nFor more information please have a look at the regarding\nmethod-explanation in CVCenter's helpfile."
+				))
+			});
 
 			flow.nextLine.shift(28, 0);
 
@@ -156,6 +168,12 @@ CVCenterPreferences {
 				.string_("Set CVCenter's midi-mean: the default-output of your MIDI-device's\nsliders in neutral position. Applies only if midi-mode is 1.")
 			;
 
+			if(GUI.id !== \cocoa, {
+				[saveMidiMean, textMidiMean].do(_.toolTip_(
+					"Set an arbitrary number. This could e.g. be 64 or 0.\nFor more information please have a look at the regarding\nmethod-explanation in CVCenter's helpfile."
+				))
+			});
+
 			flow.nextLine.shift(28, 0);
 
 			saveSoftWithin = buildNumTextBox.(CVCenter.softWithin, \text);
@@ -167,20 +185,45 @@ CVCenterPreferences {
 				.stringColor_(staticTextColor)
 				.string_("Set the soft-within threshold: the widget will only respond if the\ncurrent MIDI-output is within the widget's current value +/- threshold.\nApplies only if midi-mode is 0.");
 
+			if(GUI.id !== \cocoa, {
+				[saveSoftWithin, textSoftWithin].do(_.toolTip_(
+					"Set an arbitrary floating point value. Recomended: 0.1.\nFor more information please have a look at the regarding\nmethod-explanation in CVCenter's helpfile."
+				))
+			});
+
 			flow.nextLine.shift(28, 0);
 
-			saveSoftWithin = buildNumTextBox.(CVCenter.ctrlButtonBank, \text);
+			saveCtrlButtonBank = buildNumTextBox.(CVCenter.ctrlButtonBank, \text);
 
 			flow.shift(5, 2);
 
 			if(GUI.id === \cocoa, { specialHeight = 60 }, { specialHeight = 54 });
 
-			textSoftWithin = StaticText(window.view, flow.bounds.width-100@specialHeight)
+			textCtrlButtonBank = StaticText(window.view, flow.bounds.width-100@specialHeight)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-			.string_("Set the numbers of sliders on in one bank of your MIDI-device.\nSetting this number will display the selected slider in a widget not as\na single number but rather as combination of the selected bank and the\nslider number (e.g.: 4:3 means bank nr. 4, slider nr. 3)")
+				.string_("Set the number of sliders on in one bank of your MIDI-device.\nSetting this number will display the selected slider in a widget not as\na single number but rather as combination of the selected bank and\nthe slider number (e.g.: 4:3 means bank nr. 4, slider nr. 3)")
 			;
 
+			if(GUI.id !== \cocoa, {
+				[saveCtrlButtonBank, textCtrlButtonBank].do(_.toolTip_(
+					"Set an arbitrary integer number, corresponding to\nthe number of sliders on your device. For more\ninformation please have a look at the regarding\nmethod-explanation in CVCenter's helpfile."
+				))
+			});
+
+			flow.nextLine.shift(0, 8);
+
+			Button(window.view, flow.bounds.width/2-10@25)
+				.states_([["Cancel", Color.black, Color.white]])
+				.font_(Font(Font.defaultSansFace, 14, true))
+			;
+
+			flow.shift(-2, 0);
+
+			Button(window.view, flow.bounds.width/2-10@25)
+				.states_([["Save", Color.white, Color.red]])
+				.font_(Font(Font.defaultSansFace, 14, true))
+			;
 		});
 		window.front;
 	}
