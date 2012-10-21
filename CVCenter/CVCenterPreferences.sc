@@ -115,9 +115,10 @@ CVCenterPreferences {
 			;
 
 			if(GUI.id !== \cocoa, {
-				[saveClassVars, classVarsText].do(_.toolTip_(
-					"Selecting this option will make CVCenter remember\nthe currently set values for midiMode, midiResolution,\nmidiMean, softWithin and ctrlButtonBank.\nFor more information please have a look at the regarding\nsections in CVCenter's helpfile."
-				))
+				classVarsText.toolTip_(
+					"Selecting this option will make CVCenter remember the current\nvalues for midiMode, midiResolution, midiMean, softWithin and\nctrlButtonBank. These can also be set by entering appropriate\nvalues in the following text-boxes. If this option is not selected\nany of the following values will only be remembered until the\nnext library recompilation.\nNote also that these values get overridden by the corresponding\nsettings in a CVWidget.\nFor more information please have a look at the regarding\nsections in CVCenter's helpfile."
+				);
+				saveClassVars.toolTip_("Select this option to make CVCenter remember the current values\nof its classvars midiMode, midiResolution, midiMean, softWithin,\nctrlButtonBank on shutdown resp. startup.")
 			});
 
 			flow.nextLine.shift(28, 0);
@@ -133,9 +134,9 @@ CVCenterPreferences {
 			;
 
 			if(GUI.id !== \cocoa, {
-				[saveMidiMode, textMidiMode].do(_.toolTip_(
-					"Set MIDI-device's mode: 0-127 (0) or in-/decremental (1).\nFor more information please have a look at the regarding\nmethod-explanation in CVCenter's helpfile."
-				))
+				saveMidiMode.toolTip_(
+					"Either 0 (hardware-slider output 0-127)\nor 1 (in-/decremental output)."
+				)
 			});
 
 			flow.nextLine.shift(28, 0);
@@ -151,9 +152,9 @@ CVCenterPreferences {
 			;
 
 			if(GUI.id !== \cocoa, {
-				[saveMidiResolution, textMidiResolution].do(_.toolTip_(
-					"Set the resolution for your hardware-sliders. Lower numbers\nresult in a higher resolution. A sensible default is 0.1.\nFor more information please have a look at the regarding\nmethod-explanation in CVCenter's helpfile."
-				))
+				saveMidiResolution.toolTip_(
+					"A floating point value representing the slider's resolution.\n0.1 has proven to be a sensible default. Smaller values mean\na higher resolution. Applies only if midiMode is set to 1."
+				)
 			});
 
 			flow.nextLine.shift(28, 0);
@@ -169,9 +170,9 @@ CVCenterPreferences {
 			;
 
 			if(GUI.id !== \cocoa, {
-				[saveMidiMean, textMidiMean].do(_.toolTip_(
-					"Set an arbitrary number. This could e.g. be 64 or 0.\nFor more information please have a look at the regarding\nmethod-explanation in CVCenter's helpfile."
-				))
+				saveMidiMean.toolTip_(
+					"The output of your device's sliders in neutral position.\nOnly needed if output != 0 and midiMode is set to 1."
+				)
 			});
 
 			flow.nextLine.shift(28, 0);
@@ -186,9 +187,9 @@ CVCenterPreferences {
 				.string_("Set the soft-within threshold: the widget will only respond if the\ncurrent MIDI-output is within the widget's current value +/- threshold.\nApplies only if midi-mode is 0.");
 
 			if(GUI.id !== \cocoa, {
-				[saveSoftWithin, textSoftWithin].do(_.toolTip_(
-					"Set an arbitrary floating point value. Recomended: 0.1.\nFor more information please have a look at the regarding\nmethod-explanation in CVCenter's helpfile."
-				))
+				saveSoftWithin.toolTip_(
+					"Set an arbitrary floating point value. Recomended: 0.1.\nApplies only if midiMode is set to 0."
+				)
 			});
 
 			flow.nextLine.shift(28, 0);
@@ -206,9 +207,9 @@ CVCenterPreferences {
 			;
 
 			if(GUI.id !== \cocoa, {
-				[saveCtrlButtonBank, textCtrlButtonBank].do(_.toolTip_(
-					"Set an arbitrary integer number, corresponding to\nthe number of sliders on your device. For more\ninformation please have a look at the regarding\nmethod-explanation in CVCenter's helpfile."
-				))
+				saveCtrlButtonBank.toolTip_(
+					"Set an arbitrary integer number, corresponding\nto the number of sliders on your device."
+				)
 			});
 
 			flow.nextLine.shift(0, 8);
