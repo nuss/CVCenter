@@ -217,6 +217,7 @@ CVCenterPreferences {
 			Button(window.view, flow.bounds.width/2-10@25)
 				.states_([["Cancel", Color.black, Color.white]])
 				.font_(Font(Font.defaultSansFace, 14, true))
+				.action_({ window.close })
 			;
 
 			flow.shift(-2, 0);
@@ -224,9 +225,58 @@ CVCenterPreferences {
 			Button(window.view, flow.bounds.width/2-10@25)
 				.states_([["Save", Color.white, Color.red]])
 				.font_(Font(Font.defaultSansFace, 14, true))
+				.action_({
+					this.writePreferences(
+						saveGuiPosition.value,
+						saveClassVars.value,
+						saveMidiMode.string.interpret,
+						saveMidiResolution.string.interpret,
+						saveMidiMean.string.interpret,
+						saveSoftWithin.string.interpret,
+						saveCtrlButtonBank.string.interpret
+					);
+					window.close;
+				})
 			;
 		});
 		window.front;
 	}
 
+	*writePreferences { |saveGuiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank|
+		var prefsPath, prefs = ();
+		[saveGuiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].postln;
+		prefsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterPreferences";
+		if(saveGuiProperties == true, {
+			prefs.put(\saveGuiProperties, true)
+		});
+		if(saveClassVars == true, {
+			prefs.put(\midiMode, midiMode);
+			prefs.put(\midiResolution, midiResolution);
+			prefs.put(\midiMean, midiMean);
+			prefs.put(\softWithin, softWithin);
+			prefs.put(\ctrlButtonBank, ctrlButtonBank);
+		});
+		CVCenter.midiMode_(midiMode);
+		CVCenter.midiResolution_(midiResolution);
+		CVCenter.midiMean_(midiMean);
+		CVCenter.softWithin_(softWithin);
+		CVCenter.ctrlButtonBank_(ctrlButtonBank);
+		prefs.writeArchive(prefsPath);
+	}
+
+	*readPreferences { |...args|
+		var prefsPath, prefs, res;
+		prefsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterPreferences";
+		if(File.exists(prefsPath), {
+			prefs = Object.readArchive(prefsPath);
+			if(args.size > 0, {
+				res = ();
+				args.do({ |val| res.put(val.asSymbol, prefs[val.asSymbol]) });
+				^res;
+			}, {
+				^prefs;
+			})
+		})
+		^nil;
+	}
 }
