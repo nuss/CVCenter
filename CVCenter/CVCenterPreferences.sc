@@ -243,18 +243,25 @@ CVCenterPreferences {
 	}
 
 	*writePreferences { |saveGuiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank|
-		var prefsPath, prefs = ();
-		[saveGuiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].postln;
+		var prefsPath, prefs;
+		// [saveGuiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].postln;
 		prefsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterPreferences";
-		if(saveGuiProperties == true, {
+		if(File.exists(prefsPath), {
+			prefs = Object.readArchive(prefsPath);
+		}, {
+			prefs = ();
+		});
+		if(saveGuiProperties, {
 			prefs.put(\saveGuiProperties, true)
 		});
-		if(saveClassVars == true, {
+		if(saveClassVars, {
 			prefs.put(\midiMode, midiMode);
 			prefs.put(\midiResolution, midiResolution);
 			prefs.put(\midiMean, midiMean);
 			prefs.put(\softWithin, softWithin);
 			prefs.put(\ctrlButtonBank, ctrlButtonBank);
+		}, {
+			#[midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].do(prefs.removeAt(_));
 		});
 		CVCenter.midiMode_(midiMode);
 		CVCenter.midiResolution_(midiResolution);
