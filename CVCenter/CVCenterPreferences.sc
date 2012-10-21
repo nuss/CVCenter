@@ -4,7 +4,7 @@ CVCenterPreferences {
 	// classvar guiProps, saveClassvars;
 	// classvar setMidiMode, setMidiResolution, setCtrlButtonBank, setMidiMean, setSoftWithin;
 
-	*makeWindow {
+	*dialog {
 		var labelColors, labelStringColors, flow;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var saveGuiPosition;
