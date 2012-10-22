@@ -7,11 +7,11 @@ CVCenterPreferences {
 	*dialog {
 		var labelColors, labelStringColors, flow;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
-		var saveGuiPosition;
+		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
 		var saveClassVars;
 		var saveMidiMode, saveMidiResolution, saveCtrlButtonBank, saveMidiMean, saveSoftWithin;
 		var textMidiMode, textMidiResolution, textCtrlButtonBank, textMidiMean, textSoftWithin;
-		var buildCheckbox, buildNumTextBox, uView;
+		var guiVal, buildCheckbox, buildNumTextBox, uView;
 		var cvcenterBounds, propsText, classVarsText;
 		var fFact, specialHeight;
 
@@ -41,17 +41,17 @@ CVCenterPreferences {
 			cBox;
 		};
 
-		buildNumTextBox = { |val, kind, clip|
+		buildNumTextBox = { |val, kind, width, height, clip|
 			var ntBox;
 			case
 				{ kind === \text } {
-					ntBox = TextField(window.view, 30@20).string_(val);
+					ntBox = TextField(window.view, (width ?? { 30 }) @ (height ?? { 20 })).string_(val);
 				}
 				{ kind === \num } {
-					ntBox = NumberBox(window.view, 30@20)
+					ntBox = NumberBox(window.view, (width ?? { 30 }) @ ( height ?? { 20 }))
 						.value_(val)
-						.clipLo_(clip[0])
-						.clipHi_(clip[1])
+						.clipLo_(clip[0] ?? { -100 })
+						.clipHi_(clip[1] ?? { 100 })
 					;
 				}
 			;
@@ -61,37 +61,104 @@ CVCenterPreferences {
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter: preferences", Rect(
 				Window.screenBounds.width/2-250,
-				Window.screenBounds.height/2-140,
-				500, 313
+				Window.screenBounds.height/2-162,
+				500, 324
 			)).front;
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
 
-			uView = UserView(window.view, flow.bounds.width-20@40)
+			uView = UserView(window.view, flow.bounds.width-20@50)
 				.background_(Color(0.95, 0.95, 0.95))
 				.enabled_(false)
 			;
 
 			// "flow.left before shift: %\n".postf(flow.left);
-			flow.nextLine.shift(5, -40);
+			flow.nextLine.shift(5, -50);
 			// "flow.left after shift: %\n".postf(flow.left);
 
-			saveGuiPosition = buildCheckbox.(false);
-
-			flow.shift(5, 1);
-
-			cvcenterBounds = CVCenter.window !? { CVCenter.bounds };
-
-			propsText = StaticText(window.view, flow.bounds.width-100@30)
-				.font_(staticTextFont)
-				.stringColor_(staticTextColor)
-				.string_("Remember CVCenter's screen-properties on shutdown.\nThe current properties are: x: %, y: %, width: %, height: %".format(
-					cvcenterBounds !? { cvcenterBounds.left },
-					cvcenterBounds !? { cvcenterBounds.top },
-					cvcenterBounds !? { cvcenterBounds.width },
-					cvcenterBounds !? { cvcenterBounds.height }
-				))
+			saveGuiPosition = PopUpMenu(window.view, flow.bounds.width-30@20)
+				.items_([
+					"No specific settings for GUI-properties",
+					"Remember GUI-properties on shutdown / window-close",
+					"Remember GUI-properties as given below"
+				])
+				.value_(guiVal ?? { 0 })
+				.font_(textFieldFont)
 			;
+
+			leftText = StaticText(window.view, flow.bounds.width/7@20)
+				.string_("left: ")
+				.font_(staticTextFont)
+				.align_(\right)
+			;
+
+			flow.shift(0, 0);
+
+			left = buildNumTextBox.(kind: \text, width: 40);
+
+			flow.shift(0, 0);
+
+			topText = StaticText(window.view, flow.bounds.width/7@20)
+				.string_("top: ")
+				.font_(staticTextFont)
+				.align_(\right)
+			;
+
+			top = buildNumTextBox.(kind: \text);
+
+			flow.shift(0, 0);
+
+			widthText = StaticText(window.view, flow.bounds.width/7@20)
+				.string_("width: ")
+				.font_(staticTextFont)
+				.align_(\right)
+			;
+
+			width = buildNumTextBox.(kind: \text, width: 40);
+
+			flow.shift(0, 0);
+
+			heightText = StaticText(window.view, flow.bounds.width/7@20)
+				.string_("height: ")
+				.font_(staticTextFont)
+				.align_(\right)
+			;
+
+			height = buildNumTextBox.(kind: \text, width: 40);
+
+			if(saveGuiPosition.value == 0 or:{ saveGuiPosition.value == 1 }, {
+				[leftText, topText, widthText, heightText].do(_.stringColor_(Color(0.7, 0.7, 0.7, 0.7)));
+				[left, top, width, height].do(_.enabled_(false));
+			}, {
+				[leftText, topText, widthText, heightText].do(_.stringColor_(Color.black));
+				[left, top, width, height].do(_.enabled_(true));
+			});
+
+			saveGuiPosition.action_({ |dd|
+				if(dd.value == 0 or:{ dd.value == 1 }, {
+					[leftText, topText, widthText, heightText].do(_.stringColor_(Color(0.7, 0.7, 0.7, 0.7)));
+					[left, top, width, height].do(_.enabled_(false));
+				}, {
+					[leftText, topText, widthText, heightText].do(_.stringColor_(Color.black));											[left, top, width, height].do(_.enabled_(true));
+				})
+			});
+
+			// saveGuiPosition = buildCheckbox.(false);
+			//
+			// flow.shift(5, 1);
+			//
+			// cvcenterBounds = CVCenter.window !? { CVCenter.bounds };
+			//
+			// propsText = StaticText(window.view, flow.bounds.width-100@30)
+			// .font_(staticTextFont)
+			// .stringColor_(staticTextColor)
+			// .string_("Remember CVCenter's screen-properties on shutdown.\nThe current properties are: x: %, y: %, width: %, height: %".format(
+			// 	cvcenterBounds !? { cvcenterBounds.left },
+			// 	cvcenterBounds !? { cvcenterBounds.top },
+			// 	cvcenterBounds !? { cvcenterBounds.width },
+			// 	cvcenterBounds !? { cvcenterBounds.height }
+			// ))
+			// ;
 
 			flow.nextLine.shift(0, 10);
 
@@ -226,16 +293,25 @@ CVCenterPreferences {
 				.states_([["Save", Color.white, Color.red]])
 				.font_(Font(Font.defaultSansFace, 14, true))
 				.action_({
-					this.writePreferences(
-						saveGuiPosition.value,
-						saveClassVars.value,
-						saveMidiMode.string.interpret,
-						saveMidiResolution.string.interpret,
-						saveMidiMean.string.interpret,
-						saveSoftWithin.string.interpret,
-						saveCtrlButtonBank.string.interpret
-					);
-					window.close;
+					if(saveGuiPosition.value == 2 and:{
+						[left, top, width, height].select({ |field|
+							field.string.interpret.isInteger
+						}).size < 4
+					}, {
+						[leftText, topText, widthText, heightText].do(_.stringColor_(Color.red));
+						"Please supply valid values (integer numbers) for 'left', 'top', 'width', 'height'".warn;
+					}, {
+						this.writePreferences(
+							saveGuiPosition.value,
+							saveClassVars.value,
+							saveMidiMode.string.interpret,
+							saveMidiResolution.string.interpret,
+							saveMidiMean.string.interpret,
+							saveSoftWithin.string.interpret,
+							saveCtrlButtonBank.string.interpret
+						);
+						window.close;
+					})
 				})
 			;
 		});
@@ -251,9 +327,7 @@ CVCenterPreferences {
 		}, {
 			prefs = ();
 		});
-		if(saveGuiProperties, {
-			prefs.put(\saveGuiProperties, true)
-		});
+		prefs.put(\saveGuiProperties, saveGuiProperties);
 		if(saveClassVars, {
 			prefs.put(\midiMode, midiMode);
 			prefs.put(\midiResolution, midiResolution);
