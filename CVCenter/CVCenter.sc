@@ -25,6 +25,22 @@ CVCenter {
 	classvar widgetwidth, widgetheight=181, colwidth, rowheight;
 	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin;
 
+	*initClass {
+		var prefs;
+		Class.initClassTree(CVCenterPreferences);
+		prefs = CVCenterPreferences.readPreferences;
+		prefs[\saveGuiProperties] !? {
+			switch(prefs[\saveGuiProperties],
+				2, {
+					this.guix_(prefs[\guiProperties].left);
+					this.guiy_(prefs[\guiProperties].top);
+					this.guiwidth_(prefs[\guiProperties].width);
+					this.guiheight_(prefs[\guiProperties].height);
+				}
+			)
+		}
+	}
+
 	*new { |cvs...setUpArgs|
 		var r, g, b;
 

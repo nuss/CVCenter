@@ -86,7 +86,7 @@ CVCenterPreferences {
 				.font_(textFieldFont)
 			;
 
-			leftText = StaticText(window.view, flow.bounds.width/7@20)
+			leftText = StaticText(window.view, flow.bounds.width/10@20)
 				.string_("left: ")
 				.font_(staticTextFont)
 				.align_(\right)
@@ -94,37 +94,37 @@ CVCenterPreferences {
 
 			flow.shift(0, 0);
 
-			left = buildNumTextBox.(kind: \text, width: 40);
+			left = buildNumTextBox.(kind: \text, width: 60);
 
 			flow.shift(0, 0);
 
-			topText = StaticText(window.view, flow.bounds.width/7@20)
+			topText = StaticText(window.view, flow.bounds.width/10@20)
 				.string_("top: ")
 				.font_(staticTextFont)
 				.align_(\right)
 			;
 
-			top = buildNumTextBox.(kind: \text);
+			top = buildNumTextBox.(kind: \text, width: 60);
 
 			flow.shift(0, 0);
 
-			widthText = StaticText(window.view, flow.bounds.width/7@20)
+			widthText = StaticText(window.view, flow.bounds.width/10@20)
 				.string_("width: ")
 				.font_(staticTextFont)
 				.align_(\right)
 			;
 
-			width = buildNumTextBox.(kind: \text, width: 40);
+			width = buildNumTextBox.(kind: \text, width: 60);
 
 			flow.shift(0, 0);
 
-			heightText = StaticText(window.view, flow.bounds.width/7@20)
+			heightText = StaticText(window.view, flow.bounds.width/10@20)
 				.string_("height: ")
 				.font_(staticTextFont)
 				.align_(\right)
 			;
 
-			height = buildNumTextBox.(kind: \text, width: 40);
+			height = buildNumTextBox.(kind: \text, width: 60);
 
 			if(saveGuiPosition.value == 0 or:{ saveGuiPosition.value == 1 }, {
 				[leftText, topText, widthText, heightText].do(_.stringColor_(Color(0.7, 0.7, 0.7, 0.7)));
@@ -142,23 +142,6 @@ CVCenterPreferences {
 					[leftText, topText, widthText, heightText].do(_.stringColor_(Color.black));											[left, top, width, height].do(_.enabled_(true));
 				})
 			});
-
-			// saveGuiPosition = buildCheckbox.(false);
-			//
-			// flow.shift(5, 1);
-			//
-			// cvcenterBounds = CVCenter.window !? { CVCenter.bounds };
-			//
-			// propsText = StaticText(window.view, flow.bounds.width-100@30)
-			// .font_(staticTextFont)
-			// .stringColor_(staticTextColor)
-			// .string_("Remember CVCenter's screen-properties on shutdown.\nThe current properties are: x: %, y: %, width: %, height: %".format(
-			// 	cvcenterBounds !? { cvcenterBounds.left },
-			// 	cvcenterBounds !? { cvcenterBounds.top },
-			// 	cvcenterBounds !? { cvcenterBounds.width },
-			// 	cvcenterBounds !? { cvcenterBounds.height }
-			// ))
-			// ;
 
 			flow.nextLine.shift(0, 10);
 
@@ -303,6 +286,12 @@ CVCenterPreferences {
 					}, {
 						this.writePreferences(
 							saveGuiPosition.value,
+							Rect(
+								left.value.interpret,
+								top.value.interpret,
+								width.value.interpret,
+								height.value.interpret
+							),
 							saveClassVars.value,
 							saveMidiMode.string.interpret,
 							saveMidiResolution.string.interpret,
@@ -318,9 +307,23 @@ CVCenterPreferences {
 		window.front;
 	}
 
-	*writePreferences { |saveGuiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank|
-		var prefsPath, prefs;
-		// [saveGuiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].postln;
+	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank|
+		var prefsPath, prefs, thisGuiProperties;
+
+		guiProperties !? {
+			if(guiProperties.isArray, {
+				thisGuiProperties = guiProperties.asRect;
+			}, {
+				thisGuiProperties = guiProperties;
+			})
+		};
+
+		if(saveGuiProperties == 2 and:{
+			guiProperties.isNil
+		}, {
+			Error("Please provide either a Rect or an Array for your desired GUI-properties").throw;
+		});
+
 		prefsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterPreferences";
 		if(File.exists(prefsPath), {
 			prefs = Object.readArchive(prefsPath);
@@ -328,6 +331,7 @@ CVCenterPreferences {
 			prefs = ();
 		});
 		prefs.put(\saveGuiProperties, saveGuiProperties);
+		if(saveGuiProperties == 2, { prefs.put(\guiProperties, thisGuiProperties) });
 		if(saveClassVars, {
 			prefs.put(\midiMode, midiMode);
 			prefs.put(\midiResolution, midiResolution);
