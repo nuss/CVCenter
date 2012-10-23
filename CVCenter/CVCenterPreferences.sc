@@ -1,19 +1,21 @@
 CVCenterPreferences {
 
 	classvar <window;
-	// classvar guiProps, saveClassvars;
-	// classvar setMidiMode, setMidiResolution, setCtrlButtonBank, setMidiMean, setSoftWithin;
 
 	*dialog {
 		var labelColors, labelStringColors, flow;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
-		var saveClassVars;
+		var saveClassVars, removeResponders;
 		var saveMidiMode, saveMidiResolution, saveCtrlButtonBank, saveMidiMean, saveSoftWithin;
 		var textMidiMode, textMidiResolution, textCtrlButtonBank, textMidiMean, textSoftWithin;
-		var guiVal, buildCheckbox, buildNumTextBox, uView;
+		var guiVal, buildCheckbox, buildNumTextBox, uView, vHeight;
 		var cvcenterBounds, propsText, classVarsText;
 		var fFact, specialHeight;
+		var prefs;
+
+		prefs = this.readPreferences;
+		prefs.postln;
 
 		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
 
@@ -60,9 +62,9 @@ CVCenterPreferences {
 
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter: preferences", Rect(
-				Window.screenBounds.width/2-250,
-				Window.screenBounds.height/2-162,
-				500, 324
+				Window.screenBounds.width/2-249,
+				Window.screenBounds.height/2-180,
+				498, 360
 			)).front;
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
@@ -80,10 +82,10 @@ CVCenterPreferences {
 				.items_([
 					"No specific settings for GUI-properties",
 					"Remember GUI-properties on shutdown / window-close",
-					"Remember GUI-properties as given below"
+					"Remember GUI-properties as set below"
 				])
 				.value_(guiVal ?? { 0 })
-				.font_(textFieldFont)
+				.font_(staticTextFont)
 			;
 
 			leftText = StaticText(window.view, flow.bounds.width/10@20)
@@ -129,6 +131,7 @@ CVCenterPreferences {
 			if(saveGuiPosition.value == 0 or:{ saveGuiPosition.value == 1 }, {
 				[leftText, topText, widthText, heightText].do(_.stringColor_(Color(0.7, 0.7, 0.7, 0.7)));
 				[left, top, width, height].do(_.enabled_(false));
+				uView.background_(Color(0.95, 0.95, 0.95));
 			}, {
 				[leftText, topText, widthText, heightText].do(_.stringColor_(Color.black));
 				[left, top, width, height].do(_.enabled_(true));
@@ -138,20 +141,23 @@ CVCenterPreferences {
 				if(dd.value == 0 or:{ dd.value == 1 }, {
 					[leftText, topText, widthText, heightText].do(_.stringColor_(Color(0.7, 0.7, 0.7, 0.7)));
 					[left, top, width, height].do(_.enabled_(false));
+					uView.background_(Color(0.95, 0.95, 0.95));
 				}, {
 					[leftText, topText, widthText, heightText].do(_.stringColor_(Color.black));											[left, top, width, height].do(_.enabled_(true));
 				})
 			});
 
-			flow.nextLine.shift(0, 10);
+			flow.nextLine.shift(0, 6);
 
-			uView = UserView(window.view, flow.bounds.width-20@220)
+			if(GUI.id ===\cocoa, { vHeight = 226 }, { vHeight = 220 });
+
+			UserView(window.view, flow.bounds.width-20@vHeight)
 				.background_(Color(0.95, 0.95, 0.95))
 				.enabled_(false)
 			;
 
 			// "flow.left before shift: %\n".postf(flow.left);
-			flow.nextLine.shift(5, -220);
+			flow.nextLine.shift(5, vHeight.neg);
 			// "flow.left after shift: %\n".postf(flow.left);
 
 			saveClassVars = buildCheckbox.(false);
@@ -203,7 +209,7 @@ CVCenterPreferences {
 
 			if(GUI.id !== \cocoa, {
 				saveMidiResolution.toolTip_(
-					"A floating point value representing the slider's resolution.\n0.1 has proven to be a sensible default. Smaller values mean\na higher resolution. Applies only if midiMode is set to 1."
+					"A floating point value representing the slider's resolution.\n1 has proven to be a sensible default. Smaller values mean\na higher resolution. Applies only if midiMode is set to 1."
 				)
 			});
 
@@ -264,6 +270,25 @@ CVCenterPreferences {
 
 			flow.nextLine.shift(0, 8);
 
+			UserView(window.view, flow.bounds.width-20@25)
+				.background_(Color(0.95, 0.95, 0.95))
+				.enabled_(false)
+			;
+
+			flow.nextLine.shift(5, -25);
+
+			removeResponders = buildCheckbox.(true);
+
+			flow.shift(5, 1);
+
+			StaticText(window.view, flow.bounds.width-100@20)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("Remove all OSC-/MIDI-responders on cmd/ctrl-period.")
+			;
+
+			flow.nextLine.shift(0, 8);
+
 			Button(window.view, flow.bounds.width/2-10@25)
 				.states_([["Cancel", Color.black, Color.white]])
 				.font_(Font(Font.defaultSansFace, 14, true))
@@ -282,22 +307,24 @@ CVCenterPreferences {
 						}).size < 4
 					}, {
 						[leftText, topText, widthText, heightText].do(_.stringColor_(Color.red));
+						uView.background_(Color.yellow);
 						"Please supply valid values (integer numbers) for 'left', 'top', 'width', 'height'".warn;
 					}, {
 						this.writePreferences(
 							saveGuiPosition.value,
 							Rect(
-								left.value.interpret,
-								top.value.interpret,
-								width.value.interpret,
-								height.value.interpret
+								left.value.interpret.asInteger,
+								top.value.interpret.asInteger,
+								width.value.interpret.asInteger,
+								height.value.interpret.asInteger
 							),
 							saveClassVars.value,
 							saveMidiMode.string.interpret,
 							saveMidiResolution.string.interpret,
 							saveMidiMean.string.interpret,
 							saveSoftWithin.string.interpret,
-							saveCtrlButtonBank.string.interpret
+							saveCtrlButtonBank.string.interpret,
+							removeResponders.value
 						);
 						window.close;
 					})
@@ -307,8 +334,11 @@ CVCenterPreferences {
 		window.front;
 	}
 
-	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank|
-		var prefsPath, prefs, thisGuiProperties;
+	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders|
+		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders;
+
+		thisSaveClassVars = saveClassVars.asBoolean;
+		thisRemoveResponders = removeResponders.asBoolean;
 
 		guiProperties !? {
 			if(guiProperties.isArray, {
@@ -332,20 +362,16 @@ CVCenterPreferences {
 		});
 		prefs.put(\saveGuiProperties, saveGuiProperties);
 		if(saveGuiProperties == 2, { prefs.put(\guiProperties, thisGuiProperties) });
-		if(saveClassVars, {
-			prefs.put(\midiMode, midiMode);
-			prefs.put(\midiResolution, midiResolution);
-			prefs.put(\midiMean, midiMean);
-			prefs.put(\softWithin, softWithin);
-			prefs.put(\ctrlButtonBank, ctrlButtonBank);
+		if(thisSaveClassVars, {
+			prefs.put(\midiMode, midiMode.asInteger);
+			prefs.put(\midiResolution, midiResolution.asFloat);
+			prefs.put(\midiMean, midiMean.asInteger);
+			prefs.put(\softWithin, softWithin.asFloat);
+			prefs.put(\ctrlButtonBank, ctrlButtonBank.asInteger);
 		}, {
 			#[midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].do(prefs.removeAt(_));
 		});
-		CVCenter.midiMode_(midiMode);
-		CVCenter.midiResolution_(midiResolution);
-		CVCenter.midiMean_(midiMean);
-		CVCenter.softWithin_(softWithin);
-		CVCenter.ctrlButtonBank_(ctrlButtonBank);
+		prefs.put(\removeResponders, thisRemoveResponders);
 		prefs.writeArchive(prefsPath);
 	}
 
