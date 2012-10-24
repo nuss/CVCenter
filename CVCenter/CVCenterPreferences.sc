@@ -30,12 +30,12 @@ CVCenterPreferences {
 			if(GUI.id === \cocoa, {
 				cBox = Button(window.view, 15@15)
 					.states_([
+						["", Color.white, Color.white],
 						["X", Color.black, Color.white],
-						["", Color.white, Color.white]
 					])
 					.font_(Font(Font.defaultSansFace, 10, true))
 				;
-				if(active, { cBox.value_(0) }, { cBox.value_(1) });
+				if(active, { cBox.value_(1) }, { cBox.value_(0) });
 			}, {
 				cBox = CheckBox(window.view, 15@15).value_(active);
 			});
