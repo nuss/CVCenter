@@ -9,10 +9,10 @@ CVCenterPreferences {
 		var saveClassVars, removeResponders;
 		var saveMidiMode, saveMidiResolution, saveCtrlButtonBank, saveMidiMean, saveSoftWithin;
 		var textMidiMode, textMidiResolution, textCtrlButtonBank, textMidiMean, textSoftWithin;
-		var guiVal, buildCheckbox, buildNumTextBox, uView, vHeight;
-		var cvcenterBounds, propsText, classVarsText;
+		var prefSaveGuiProps, buildCheckbox, buildNumTextBox, uView, vHeight;
+		var cvcBounds, propsText, classVarsText;
 		var fFact, specialHeight;
-		var prefs;
+		var prefs, rect;
 
 		prefs = this.readPreferences;
 		prefs.postln;
@@ -60,6 +60,8 @@ CVCenterPreferences {
 			ntBox.font_(textFieldFont);
 		};
 
+		if(CVCenter.window.notNil and:{ CVCenter.window.isClosed.not }, { cvcBounds = CVCenter.bounds });
+
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter: preferences", Rect(
 				Window.screenBounds.width/2-249,
@@ -84,7 +86,7 @@ CVCenterPreferences {
 					"Remember GUI-properties on shutdown / window-close",
 					"Remember GUI-properties as set below"
 				])
-				.value_(guiVal ?? { 0 })
+			.value_(prefs !? { prefs[\saveGuiProperties] } ?? { 0 })
 				.font_(staticTextFont)
 			;
 
@@ -96,7 +98,11 @@ CVCenterPreferences {
 
 			flow.shift(0, 0);
 
-			left = buildNumTextBox.(kind: \text, width: 60);
+			left = buildNumTextBox.(prefs !? {
+				prefs[\guiProperties] !? {
+					prefs[\guiProperties].left ?? { cvcBounds.left }
+				}
+			}, kind: \text, width: 60);
 
 			flow.shift(0, 0);
 
@@ -106,7 +112,11 @@ CVCenterPreferences {
 				.align_(\right)
 			;
 
-			top = buildNumTextBox.(kind: \text, width: 60);
+			top = buildNumTextBox.(prefs !? {
+				prefs[\guiProperties] !? {
+					prefs[\guiProperties].top ?? { cvcBounds.top }
+				}
+			}, kind: \text, width: 60);
 
 			flow.shift(0, 0);
 
@@ -116,7 +126,11 @@ CVCenterPreferences {
 				.align_(\right)
 			;
 
-			width = buildNumTextBox.(kind: \text, width: 60);
+			width = buildNumTextBox.(prefs !? {
+				prefs[\guiProperties] !? {
+					prefs[\guiProperties].width ?? { cvcBounds.width }
+				}
+			}, kind: \text, width: 60);
 
 			flow.shift(0, 0);
 
@@ -126,7 +140,11 @@ CVCenterPreferences {
 				.align_(\right)
 			;
 
-			height = buildNumTextBox.(kind: \text, width: 60);
+			height = buildNumTextBox.(prefs !? {
+				prefs[\guiProperties] !? {
+					prefs[\guiProperties].height ?? { cvcBounds.height }
+				}
+			}, kind: \text, width: 60);
 
 			if(saveGuiPosition.value == 0 or:{ saveGuiPosition.value == 1 }, {
 				[leftText, topText, widthText, heightText].do(_.stringColor_(Color(0.7, 0.7, 0.7, 0.7)));
@@ -160,7 +178,11 @@ CVCenterPreferences {
 			flow.nextLine.shift(5, vHeight.neg);
 			// "flow.left after shift: %\n".postf(flow.left);
 
-			saveClassVars = buildCheckbox.(false);
+			if(prefs.notNil, {
+				saveClassVars = buildCheckbox.(prefs[\saveClassVars]);
+			}, {
+				saveClassVars = buildCheckbox.(false);
+			});
 
 			flow.shift(5, 1);
 
@@ -179,7 +201,9 @@ CVCenterPreferences {
 
 			flow.nextLine.shift(28, 0);
 
-			saveMidiMode = buildNumTextBox.(CVCenter.midiMode, \text);
+			saveMidiMode = buildNumTextBox.(prefs !? {
+				prefs[\midiMode] } ?? { CVCenter.midiMode }, \text
+			);
 
 			flow.shift(5, 2);
 
@@ -197,7 +221,9 @@ CVCenterPreferences {
 
 			flow.nextLine.shift(28, 0);
 
-			saveMidiResolution = buildNumTextBox.(CVCenter.midiResolution, \text);
+			saveMidiResolution = buildNumTextBox.(prefs !? {
+				prefs[\midiResolution] } ?? { CVCenter.midiResolution }, \text
+			);
 
 			flow.shift(5, 2);
 
@@ -215,7 +241,9 @@ CVCenterPreferences {
 
 			flow.nextLine.shift(28, 0);
 
-			saveMidiMean = buildNumTextBox.(CVCenter.midiMean, \text);
+			saveMidiMean = buildNumTextBox.(prefs !? {
+				prefs[\midiMean] } ?? { CVCenter.midiMean }, \text
+			);
 
 			flow.shift(5, 2);
 
@@ -233,7 +261,9 @@ CVCenterPreferences {
 
 			flow.nextLine.shift(28, 0);
 
-			saveSoftWithin = buildNumTextBox.(CVCenter.softWithin, \text);
+			saveSoftWithin = buildNumTextBox.(prefs !? {
+				prefs[\softWithin] } ?? { CVCenter.softWithin }, \text
+			);
 
 			flow.shift(5, 2);
 
@@ -250,7 +280,9 @@ CVCenterPreferences {
 
 			flow.nextLine.shift(28, 0);
 
-			saveCtrlButtonBank = buildNumTextBox.(CVCenter.ctrlButtonBank, \text);
+			saveCtrlButtonBank = buildNumTextBox.(prefs !? {
+				prefs[\ctrlButtonBank] } ?? { CVCenter.ctrlButtonBank }, \text
+			);
 
 			flow.shift(5, 2);
 
@@ -261,6 +293,42 @@ CVCenterPreferences {
 				.stringColor_(staticTextColor)
 				.string_("Set the number of sliders on in one bank of your MIDI-device.\nSetting this number will display the selected slider in a widget not as\na single number but rather as combination of the selected bank and\nthe slider number (e.g.: 4:3 means bank nr. 4, slider nr. 3)")
 			;
+
+			saveClassVars.action_({ |b|
+				if(b.value == false or:{ b.value == 0 }, {
+					[saveMidiMode, saveMidiMean, saveMidiResolution, saveSoftWithin, saveCtrlButtonBank].do(
+						_.enabled_(false)
+					);
+					[textMidiMode, textMidiMean, textMidiResolution, textSoftWithin, textCtrlButtonBank].do(
+						_.stringColor_(Color(0.7, 0.7, 0.7))
+					)
+				});
+				if(b.value == true or:{ b.value == 1 }, {
+					[saveMidiMode, saveMidiMean, saveMidiResolution, saveSoftWithin, saveCtrlButtonBank].do(
+						_.enabled_(true)
+					);
+					[textMidiMode, textMidiMean, textMidiResolution, textSoftWithin, textCtrlButtonBank].do(
+						_.stringColor_(Color.black)
+					)
+				})
+			});
+
+			if(saveClassVars.value == false or:{ saveClassVars.value == 0 }, {
+				[saveMidiMode, saveMidiMean, saveMidiResolution, saveSoftWithin, saveCtrlButtonBank].do(
+					_.enabled_(false)
+				);
+				[textMidiMode, textMidiMean, textMidiResolution, textSoftWithin, textCtrlButtonBank].do(
+					_.stringColor_(Color(0.7, 0.7, 0.7))
+				)
+			});
+			if(saveClassVars.value == true or:{ saveClassVars.value == 1 }, {
+				[saveMidiMode, saveMidiMean, saveMidiResolution, saveSoftWithin, saveCtrlButtonBank].do(
+					_.enabled_(true)
+				);
+				[textMidiMode, textMidiMean, textMidiResolution, textSoftWithin, textCtrlButtonBank].do(
+					_.stringColor_(Color.black)
+				)
+			});
 
 			if(GUI.id !== \cocoa, {
 				saveCtrlButtonBank.toolTip_(
@@ -277,7 +345,11 @@ CVCenterPreferences {
 
 			flow.nextLine.shift(5, -25);
 
-			removeResponders = buildCheckbox.(true);
+			if(prefs.notNil and:{ prefs[\removeResponders].notNil }, {
+				removeResponders = buildCheckbox.(prefs[\removeResponders])
+			}, {
+				removeResponders = buildCheckbox.(CVCenter.removeResponders)
+			});
 
 			flow.shift(5, 1);
 
@@ -310,14 +382,17 @@ CVCenterPreferences {
 						uView.background_(Color.yellow);
 						"Please supply valid values (integer numbers) for 'left', 'top', 'width', 'height'".warn;
 					}, {
+						if([left, top, width, height].select({ |f| f.string.interpret.notNil }).size == 4, {
+							rect = Rect(
+								left.string.interpret.asInteger,
+								top.string.interpret.asInteger,
+								width.string.interpret.asInteger,
+								height.string.interpret.asInteger
+							)
+						});
 						this.writePreferences(
 							saveGuiPosition.value,
-							Rect(
-								left.value.interpret.asInteger,
-								top.value.interpret.asInteger,
-								width.value.interpret.asInteger,
-								height.value.interpret.asInteger
-							),
+							rect,
 							saveClassVars.value,
 							saveMidiMode.string.interpret,
 							saveMidiResolution.string.interpret,
@@ -363,12 +438,14 @@ CVCenterPreferences {
 		prefs.put(\saveGuiProperties, saveGuiProperties);
 		if(saveGuiProperties == 2, { prefs.put(\guiProperties, thisGuiProperties) });
 		if(thisSaveClassVars, {
-			prefs.put(\midiMode, midiMode.asInteger);
-			prefs.put(\midiResolution, midiResolution.asFloat);
-			prefs.put(\midiMean, midiMean.asInteger);
-			prefs.put(\softWithin, softWithin.asFloat);
-			prefs.put(\ctrlButtonBank, ctrlButtonBank.asInteger);
+			prefs.put(\saveClassVars, true);
+			midiMode.notNil.if({ prefs.put(\midiMode, midiMode.asInteger) }, { prefs.removeAt(\midiMode) });
+			midiResolution.notNil.if({ prefs.put(\midiResolution, midiResolution.asFloat) }, { prefs.removeAt(\midiResolution) });
+			midiMean.notNil.if({ prefs.put(\midiMean, midiMean.asInteger) }, { prefs.removeAt(\midiMean) });
+			softWithin.notNil.if({ prefs.put(\softWithin, softWithin.asFloat) }, { prefs.removeAt(\softWithin) });
+			ctrlButtonBank.notNil.if({ prefs.put(\ctrlButtonBank, ctrlButtonBank.asInteger) }, { prefs.removeAt(\ctrlButtonBank) });
 		}, {
+			prefs.put(\saveClassVars, false);
 			#[midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].do(prefs.removeAt(_));
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);

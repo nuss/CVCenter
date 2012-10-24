@@ -19,6 +19,7 @@ CVCenter {
 
 	classvar <all, nextCVKey, <cvWidgets, <window, <tabs, prefPane, removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
+	classvar <>removeResponders=true;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight;
 	classvar widgetStates;
 	classvar tabProperties, colors, nextColor;
@@ -29,15 +30,20 @@ CVCenter {
 		var prefs;
 		Class.initClassTree(CVCenterPreferences);
 		prefs = CVCenterPreferences.readPreferences;
-		prefs[\saveGuiProperties] !? {
-			switch(prefs[\saveGuiProperties],
-				2, {
-					this.guix_(prefs[\guiProperties].left);
-					this.guiy_(prefs[\guiProperties].top);
-					this.guiwidth_(prefs[\guiProperties].width);
-					this.guiheight_(prefs[\guiProperties].height);
-				}
-			)
+
+		"prefs in CVCenter: %\n".postf(prefs);
+
+		prefs !? {
+			prefs[\saveGuiProperties] !? {
+				switch(prefs[\saveGuiProperties],
+					2, {
+						this.guix_(prefs[\guiProperties].left);
+						this.guiy_(prefs[\guiProperties].top);
+						this.guiwidth_(prefs[\guiProperties].width);
+						this.guiheight_(prefs[\guiProperties].height);
+					}
+				)
+			}
 		}
 	}
 
