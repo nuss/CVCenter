@@ -15,7 +15,7 @@ CVCenterPreferences {
 		var prefs, rect;
 
 		prefs = this.readPreferences;
-		prefs.postln;
+		// prefs.postln;
 
 		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
 
@@ -39,7 +39,6 @@ CVCenterPreferences {
 			}, {
 				cBox = CheckBox(window.view, 15@15).value_(active);
 			});
-			// cBox.bounds.postln;
 			cBox;
 		};
 
@@ -436,7 +435,9 @@ CVCenterPreferences {
 			prefs = ();
 		});
 		prefs.put(\saveGuiProperties, saveGuiProperties);
-		if(saveGuiProperties == 2, { prefs.put(\guiProperties, thisGuiProperties) });
+		if(saveGuiProperties == 2 or:{ saveGuiProperties == 1 }, {
+			prefs.put(\guiProperties, thisGuiProperties)
+		});
 		if(thisSaveClassVars, {
 			prefs.put(\saveClassVars, true);
 			midiMode.notNil.if({ prefs.put(\midiMode, midiMode.asInteger) }, { prefs.removeAt(\midiMode) });
@@ -450,6 +451,7 @@ CVCenterPreferences {
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);
 		prefs.writeArchive(prefsPath);
+		"wrote preferences".postln;
 	}
 
 	*readPreferences { |...args|

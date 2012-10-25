@@ -27,23 +27,47 @@ CVCenter {
 	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin;
 
 	*initClass {
-		var prefs;
+		var prefs, newPrefs;
 		Class.initClassTree(CVCenterPreferences);
+		Class.initClassTree(CVWidget);
 		prefs = CVCenterPreferences.readPreferences;
 
 		"prefs in CVCenter: %\n".postf(prefs);
 
 		prefs !? {
 			prefs[\saveGuiProperties] !? {
-				switch(prefs[\saveGuiProperties],
-					2, {
-						this.guix_(prefs[\guiProperties].left);
-						this.guiy_(prefs[\guiProperties].top);
-						this.guiwidth_(prefs[\guiProperties].width);
-						this.guiheight_(prefs[\guiProperties].height);
-					}
-				)
-			}
+				if(prefs[\saveGuiProperties] == 1 or:{
+					prefs[\saveGuiProperties] == 2
+				}, {
+					this.guix_(prefs[\guiProperties] !? { prefs[\guiProperties].left });
+					this.guiy_(prefs[\guiProperties] !? { prefs[\guiProperties].top });
+					this.guiwidth_(prefs[\guiProperties] !? { prefs[\guiProperties].width });
+					this.guiheight_(prefs[\guiProperties] !? { prefs[\guiProperties].height });
+				});
+				if(prefs[\saveGuiProperties] == 1, {
+					ShutDown.add({
+						newPrefs = CVCenterPreferences.readPreferences;
+						CVCenterPreferences.writePreferences(
+							newPrefs[\saveGuiProperties],
+							prefs[\guiProperties],
+							newPrefs[\saveClassVars],
+							newPrefs[\midiMode],
+							newPrefs[\midiResolution],
+							newPrefs[\midiMean],
+							newPrefs[\softWithin],
+							newPrefs[\ctrlButtonBank],
+							newPrefs[\removeResponders]
+						)
+					})
+				})
+			};
+			if(prefs[\saveClassVars], {
+				prefs[\midiMode] !? { this.midiMode_(prefs[\midiMode]) };
+				prefs[\midiResolution] !? { this.midiResolution_(prefs[\midiResolution]) };
+				prefs[\midiMean] !? { this.midiMean_(prefs[\midiMean]) };
+				prefs[\softWithin] !? { this.softWithin_(prefs[\softWithin]) };
+			});
+			CVWidget.removeResponders_(prefs[\removeResponders]);
 		}
 	}
 
@@ -106,13 +130,15 @@ CVCenter {
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
 		var midiFlag, oscFlag, loadFlag, tmp, wdgtActions;
 		var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui;
+		var prefs, newPrefs;
 
 		cvs !? { this.put(*cvs) };
+		prefs = CVCenterPreferences.readPreferences;
 
-		this.guix ?? { this.guix_(0) };
-		this.guiy ?? { this.guiy_(0) };
-		this.guiwidth ?? { this.guiwidth_(500) };
-		this.guiheight ?? { this.guiheight_(265) };
+		this.guix ?? { this.guix_(prefs !? { prefs[\guiProperties] !? { prefs[\guiProperties].left }} ?? { 0 }) };
+		this.guiy ?? { this.guiy_(prefs !? { prefs[\guiProperties] !? { prefs[\guiProperties].top }} ?? { 0 }) };
+		this.guiwidth ?? { this.guiwidth_(prefs !? { prefs[\guiProperties] !? { prefs[\guiProperties].width }} ?? { 500 }) };
+		this.guiheight ?? { this.guiheight_(prefs !? { prefs[\guiProperties] !? { prefs[\guiProperties].height }} ?? { 265 }) };
 
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
@@ -345,6 +371,7 @@ CVCenter {
 			});
 
 			window.onClose_({
+				"now closing".postln;
 				CVWidgetEditor.allEditors.pairsDo({ |editor, val|
 					switch(cvWidgets[editor].class,
 						CVWidgetKnob, {
@@ -358,6 +385,28 @@ CVCenter {
 					)
 				});
 				tabProperties.do(_.nextPos_(0@0));
+				if(prefs[\saveGuiProperties] == 1, {
+					newPrefs = CVCenterPreferences.readPreferences;
+					if(newPrefs[\saveGuiProperties] == 1, {
+						this.guix_(prefs[\guiProperties].left)
+							.guiy_(prefs[\guiProperties].top)
+							.guiwidth_(prefs[\guiProperties].width)
+							.guiheight_(prefs[\guiProperties].height)
+						;
+						newPrefs.put(\guiProperties, prefs[\guiProperties]);
+						CVCenterPreferences.writePreferences(
+							newPrefs[\saveGuiProperties],
+							prefs[\guiProperties],
+							newPrefs[\saveClassVars],
+							newPrefs[\midiMode],
+							newPrefs[\midiResolution],
+							newPrefs[\midiMean],
+							newPrefs[\softWithin],
+							newPrefs[\ctrlButtonBank],
+							newPrefs[\removeResponders]
+						)
+					});
+				})
 			});
 
 			thisNextPos = 0@0;
@@ -555,6 +604,8 @@ CVCenter {
 				try {
 					if(window.bounds.width != lastUpdateWidth, {
 						this.prRegroupWidgets(tabs.activeTab);
+						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
+						prefs[\guiProperties].postln;
 					})
 				};
 				lastUpdateWidth = window.bounds.width;
@@ -974,13 +1025,15 @@ CVCenter {
 							});
 							if(autoConnectMIDI, {
 								if(v[hilo].midi.notNil and:{ v[hilo].midi.num.notNil }, {
-									cvWidgets[key].midiConnect(
-										// v[hilo].midi.src,
-										nil,
-										v[hilo].midi.chan,
-										v[hilo].midi.num,
-										hilo
-									)
+									try {
+										cvWidgets[key].midiConnect(
+											// v[hilo].midi.src,
+											nil,
+											v[hilo].midi.chan,
+											v[hilo].midi.num,
+											hilo
+										)
+									}
 								})
 							})
 						})
@@ -1019,12 +1072,14 @@ CVCenter {
 						});
 						if(autoConnectMIDI, {
 							v.midi.num !? {
-								cvWidgets[key].midiConnect(
-									// v.midi.src,
-									nil,
-									v.midi.chan,
-									v.midi.num
-								)
+								try {
+									cvWidgets[key].midiConnect(
+										// v.midi.src,
+										nil,
+										v.midi.chan,
+										v.midi.num
+									)
+								}
 							}
 						})
 					}
