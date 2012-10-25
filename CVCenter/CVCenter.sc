@@ -952,13 +952,15 @@ CVCenter {
 							});
 							if(autoConnectMIDI, {
 								if(v[hilo].midi.notNil and:{ v[hilo].midi.num.notNil }, {
-									cvWidgets[key].midiConnect(
-										// v[hilo].midi.src,
-										nil,
-										v[hilo].midi.chan,
-										v[hilo].midi.num,
-										hilo
-									)
+									try {
+										cvWidgets[key].midiConnect(
+											// v[hilo].midi.src,
+											nil,
+											v[hilo].midi.chan,
+											v[hilo].midi.num,
+											hilo
+										)
+									}
 								})
 							})
 						})
@@ -997,12 +999,14 @@ CVCenter {
 						});
 						if(autoConnectMIDI, {
 							v.midi.num !? {
-								cvWidgets[key].midiConnect(
-									// v.midi.src,
-									nil,
-									v.midi.chan,
-									v.midi.num
-								)
+								try {
+									cvWidgets[key].midiConnect(
+										// v.midi.src,
+										nil,
+										v.midi.chan,
+										v.midi.num
+									)
+								}
 							}
 						})
 					}

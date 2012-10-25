@@ -1,15 +1,15 @@
 /* (c) 2010-2012 2010-2012 Stefan Nussbaumer */
-/* 
+/*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
@@ -36,23 +36,23 @@ CVWidget {
 				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
 			})
 		})
-	}	
-	
+	}
+
 	setup {
 		^(
-			midiMode: prMidiMode, 
-			midiResolution: prMidiResolution, 
-			midiMean: prMidiMean, 
-			ctrlButtonBank: prCtrlButtonBank, 
-			softWithin: prSoftWithin, 
+			midiMode: prMidiMode,
+			midiResolution: prMidiResolution,
+			midiMean: prMidiMean,
+			ctrlButtonBank: prCtrlButtonBank,
+			softWithin: prSoftWithin,
 			calibrate: prCalibrate
 		);
 	}
-	
+
 	toggleComment { |visible|
 		visible.switch(
-			false, { 
-				visibleGuiEls.do({ |el| 
+			false, {
+				visibleGuiEls.do({ |el|
 					el.visible_(true);
 					nameField.visible_(false);
 				})
@@ -65,39 +65,39 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	widgetXY_ { |point|
 		var originXZero, originYZero;
 		originXZero = allGuiEls.collect({ |view| view.bounds.left });
 		originXZero = originXZero-originXZero.minItem;
 		originYZero = allGuiEls.collect({ |view| view.bounds.top });
 		originYZero = originYZero-originYZero.minItem;
-		
+
 		allGuiEls.do({ |view, i|
 			view.bounds_(Rect(originXZero[i]+point.x, originYZero[i]+point.y, view.bounds.width, view.bounds.height));
 		})
 	}
-	
+
 	widgetXY {
 		^widgetBg.bounds.left@widgetBg.bounds.top;
 	}
-	
+
 	widgetProps {
 		^widgetBg.bounds.width@widgetBg.bounds.height;
 	}
-	
+
 	bounds {
 		^Rect(this.widgetXY.x, this.widgetXY.y, this.widgetProps.x, this.widgetProps.y);
 	}
-	
+
 	remove {
 		allGuiEls.do(_.remove);
 	}
-	
+
 	close {
 		if(isCVCWidget and:{ isPersistent == false or:{ isPersistent == nil }}, { this.remove }, { this.window.close });
 	}
-	
+
 	addAction { |name, action, slot, active=true|
 		var act, controller, thisGuiEnv;
 		name ?? { Error("Please provide a name under which the action will be added to the widget").throw };
@@ -120,7 +120,7 @@ CVWidget {
 						controller = widgetCV[slot.asSymbol].action_(act);
 						this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, [act.asCompileString, true]);
 					}, {
-						controller = \dummy;	
+						controller = \dummy;
 						this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, [act.asCompileString, false]);
 					});
 					wdgtControllersAndModels[slot.asSymbol].actions.model.value_((
@@ -163,7 +163,7 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	removeAction { |name, slot|
 		var controller, thisGuiEnv;
 		name ?? { Error("Please provide the action's name!").throw };
@@ -172,7 +172,7 @@ CVWidget {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as second argument to removeAction!").throw };
 				thisGuiEnv = this.guiEnv[slot.asSymbol];
 				this.wdgtActions[slot.asSymbol][name.asSymbol] !? {
-					this.wdgtActions[slot.asSymbol][name.asSymbol].keys.do({ |c| 
+					this.wdgtActions[slot.asSymbol][name.asSymbol].keys.do({ |c|
 						if(c.class === SimpleController, { c.remove });
 					});
 					this.wdgtActions[slot.asSymbol].removeAt(name.asSymbol);
@@ -213,7 +213,7 @@ CVWidget {
 		);
 		controller.do({ |c| c = nil });
 	}
-	
+
 	activateAction { |name, activate=true, slot|
 		var action, actions, cv, thisGuiEnv, wcm, controller, thisAction;
 
@@ -230,9 +230,9 @@ CVWidget {
 			thisGuiEnv = this.guiEnv;
 			wcm = wdgtControllersAndModels;
 		});
-		
+
 		if(action.notNil, {
-			switch(activate, 
+			switch(activate,
 				true, {
 					if(action.keys.asArray[0].class != SimpleController, {
 						if(action.asArray[0][0].class === String, {
@@ -262,7 +262,7 @@ CVWidget {
 				thisGuiEnv.editor.isClosed.not;
 			}, {
 				switch(activate,
-					true, { 
+					true, {
 						thisGuiEnv.editor.actionsList[name.asSymbol].activate.value_(1);
 					},
 					false, {
@@ -272,7 +272,7 @@ CVWidget {
 			})
 		})
 	}
-	
+
 	setMidiMode { |mode, slot|
 		var tmp;
 		switch(this.class,
@@ -306,7 +306,7 @@ CVWidget {
 			}
 		);
 	}
-	
+
 	getMidiMode { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -315,9 +315,9 @@ CVWidget {
 			{ ^prMidiMode[slot.asSymbol] }
 		)
 	}
-	
+
 	setMidiMean { |meanval, slot|
-		switch(this.class, 
+		switch(this.class,
 			CVWidgetKnob, {
 				prMidiMean = meanval;
 				wdgtControllersAndModels !? {
@@ -345,10 +345,10 @@ CVWidget {
 						)
 					).changedKeys(synchKeys);
 				}
-			}			
+			}
 		)
 	}
-	
+
 	getMidiMean { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -357,9 +357,9 @@ CVWidget {
 			{ ^prMidiMean[slot.asSymbol] }
 		)
 	}
-	
+
 	setSoftWithin { |threshold, slot|
-		switch(this.class, 
+		switch(this.class,
 			CVWidgetKnob, {
 				prSoftWithin = threshold;
 				wdgtControllersAndModels !? {
@@ -388,9 +388,9 @@ CVWidget {
 					).changedKeys(synchKeys);
 				}
 			}
-		)	
+		)
 	}
-	
+
 	getSoftWithin { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -399,9 +399,9 @@ CVWidget {
 			{ ^prSoftWithin[slot.asSymbol] }
 		)
 	}
-	
+
 	setCtrlButtonBank { |numSliders, slot|
-		switch(this.class, 
+		switch(this.class,
 			CVWidgetKnob, {
 				if(numSliders.asString == "nil" or:{ numSliders.asInt === 0 }, {
 					prCtrlButtonBank = nil;
@@ -436,7 +436,7 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	getCtrlButtonBank { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -445,9 +445,9 @@ CVWidget {
 			{ ^prCtrlButtonBank[slot.asSymbol] }
 		)
 	}
-	
+
 	setMidiResolution { |resolution, slot|
-		switch(this.class, 
+		switch(this.class,
 			CVWidgetKnob, {
 				prMidiResolution = resolution;
 				wdgtControllersAndModels !? {
@@ -478,7 +478,7 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	getMidiResolution { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -487,12 +487,12 @@ CVWidget {
 			{ ^prMidiResolution[slot.asSymbol] }
 		)
 	}
-	
+
 	setCalibrate { |bool, slot|
 		if(bool.isKindOf(Boolean).not, {
 			Error("calibration can only be set to true or false!").throw;
 		});
-		switch(this.class, 
+		switch(this.class,
 			CVWidgetKnob, {
 				prCalibrate = bool;
 				wdgtControllersAndModels.oscConnection.model.value_(
@@ -515,7 +515,7 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	getCalibrate { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -524,7 +524,7 @@ CVWidget {
 			{ ^prCalibrate[slot.asSymbol] }
 		)
 	}
-	
+
 	setSpec { |spec, slot|
 		var thisSpec;
 		if(spec.class == String, { thisSpec = spec.asSymbol }, { thisSpec = spec });
@@ -544,7 +544,7 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	getSpec { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -555,7 +555,7 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	setOscMapping { |mapping, slot|
 		if(mapping.asSymbol !== \linlin and:{
 			mapping.asSymbol !== \linexp and:{
@@ -576,7 +576,7 @@ CVWidget {
 					wdgtControllersAndModels.cvSpec.model.value;
 				).changedKeys(synchKeys);
 			},
-			{	
+			{
 				midiOscEnv[slot.asSymbol].oscMapping = mapping.asSymbol;
 				wdgtControllersAndModels[slot.asSymbol].oscInputRange.model.value_(
 					wdgtControllersAndModels[slot.asSymbol].oscInputRange.model.value;
@@ -587,9 +587,9 @@ CVWidget {
 			}
 		)
 	}
-		
+
 	getOscMapping { |slot|
-		switch(this.class, 
+		switch(this.class,
 			CVWidgetKnob, {
 				^midiOscEnv.oscMapping;
 			},
@@ -598,10 +598,10 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	oscConnect { |ip, port, name, oscMsgIndex=1, slot|
 		var thisIP, intPort;
-		
+
 		if(ip.size > 0 and:{
 			"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not and:{
 				ip != "nil"
@@ -609,7 +609,7 @@ CVWidget {
 		}, {
 			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
 		});
-		
+
 		if(port.size > 0, {
 			if("^[0-9]{1,5}$".matchRegexp(port).not and:{ port != "nil" }, {
 				Error("Please provide a valid port or leave this field empty").throw;
@@ -617,18 +617,18 @@ CVWidget {
 				intPort = port.asInt;
 			})
 		});
-		
+
 		if(ip == "nil", { thisIP = "" }, { thisIP = ip });
 		if(port == "nil", { intPort = nil });
-		
+
 		if("^\/".matchRegexp(name.asString).not, {
 			Error("You have to supply a valid OSC-typetag (command-name), beginning with an \"/\" as third argument to oscConnect").throw;
 		});
-		
+
 		if(oscMsgIndex.isKindOf(Integer).not, {
 			Error("You have to supply an integer as forth argument to oscConnect").throw;
 		});
-		
+
 		switch(this.class,
 			CVWidgetKnob, {
 				wdgtControllersAndModels.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
@@ -640,9 +640,9 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	oscDisconnect { |slot|
-		switch(this.class, 
+		switch(this.class,
 			CVWidgetKnob, {
 				wdgtControllersAndModels.oscConnection.model.value_(false).changedKeys(synchKeys);
 				wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changedKeys(synchKeys);
@@ -655,7 +655,7 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	// if all arguments besides 'slot' are nil .learn should be triggered
 	midiConnect { |uid, chan, num, slot|
 		switch(this.class,
@@ -666,7 +666,7 @@ CVWidget {
 					).changedKeys(synchKeys);
 					CmdPeriod.add({ this !? { this.midiDisconnect } });
 				}, {
-					"Already connected!".warn;	
+					"Already connected!".warn;
 				})
 			},
 			{
@@ -679,25 +679,25 @@ CVWidget {
 					).changedKeys(synchKeys);
 					CmdPeriod.add({ this !? { this.midiDisconnect(slot) } });
 				}, {
-					"Already connected!".warn;	
+					"Already connected!".warn;
 				})
 			}
 		)
 	}
-	
+
 	midiDisconnect { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
 				wdgtControllersAndModels.midiConnection.model.value_(nil).changedKeys(synchKeys);
 				CmdPeriod.remove({ this.midiDisconnect });
-			}, 
+			},
 			{
 				wdgtControllersAndModels[slot.asSymbol].midiConnection.model.value_(nil).changedKeys(synchKeys);
 				CmdPeriod.remove({ this.midiDisconnect(slot) });
 			}
-		)		
+		)
 	}
-	
+
 	setOscInputConstraints { |constraintsHiLo, slot|
 		if(constraintsHiLo.isKindOf(Point).not, {
 			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
@@ -721,7 +721,7 @@ CVWidget {
 			)
 		})
 	}
-	
+
 	getOscInputConstraints { |slot|
 		switch(this.class,
 			CVWidgetKnob, {
@@ -732,14 +732,14 @@ CVWidget {
 			}
 		)
 	}
-	
+
 	front {
 		this.window.front;
 	}
-	
+
 	isClosed {
 		if(isCVCWidget, {
-			// we're within a CVCenter-gui or some other gui 
+			// we're within a CVCenter-gui or some other gui
 			// -> a widget 'is closed' if its elements have been removed
 			if(allGuiEls.select({ |el| el.isClosed.not }).size == 0, { ^true }, { ^false });
 		}, {
@@ -747,30 +747,30 @@ CVWidget {
 			^this.window.isClosed;
 		})
 	}
-	
+
 	// controllers, controllers, controllers...
-	
+
 	initControllersAndModels { |controllersAndModels, slot|
 		var wcm;
-						
+
 		if(controllersAndModels.notNil, {
 			wdgtControllersAndModels = controllersAndModels;
 		}, {
 			wdgtControllersAndModels ?? { wdgtControllersAndModels = () };
 		});
-				
+
 		slot !? {
 			if(wdgtControllersAndModels[slot].isNil, {
 				wdgtControllersAndModels.put(slot, ());
 			})
 		};
-		
+
 		if(slot.notNil, {
 			wcm = wdgtControllersAndModels[slot];
 		}, {
 			wcm = wdgtControllersAndModels;
 		});
-								
+
 		wcm.calibration ?? {
 			wcm.calibration = ();
 		};
@@ -780,11 +780,11 @@ CVWidget {
 			}, {
 				wcm.calibration.model = Ref(prCalibrate);
 			})
-		};		
+		};
 		wcm.cvSpec ?? {
 			wcm.cvSpec = ();
 		};
-		wcm.cvSpec.model ?? { 
+		wcm.cvSpec.model ?? {
 			wcm.cvSpec.model = Ref(this.getSpec(slot));
 		};
 		wcm.oscInputRange ?? {
@@ -808,8 +808,8 @@ CVWidget {
 				ipField: "",
 				portField: "",
 				nameField: "/my/cmd/name",
-				index: 1, 
-				connectorButVal: 0, 
+				index: 1,
+				connectorButVal: 0,
 				editEnabled: true
 			))
 		};
@@ -831,18 +831,18 @@ CVWidget {
 		wcm.midiOptions.model ?? {
 			wcm.midiOptions.model = Ref(
 				(
-					midiMode: prMidiMode, 
-					midiMean: prMidiMean, 
-					ctrlButtonBank: prCtrlButtonBank, 
-					midiResolution: prMidiResolution, 
+					midiMode: prMidiMode,
+					midiMean: prMidiMean,
+					ctrlButtonBank: prCtrlButtonBank,
+					midiResolution: prMidiResolution,
 					softWithin: prSoftWithin
 				)
 			)
 		};
-		wcm.mapConstrainterLo ?? { 
+		wcm.mapConstrainterLo ?? {
 			wcm.mapConstrainterLo = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[0]);
 		};
-		wcm.mapConstrainterHi ?? { 
+		wcm.mapConstrainterHi ?? {
 			wcm.mapConstrainterHi = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[1]);
 		};
 		wcm.actions ?? {
@@ -851,13 +851,13 @@ CVWidget {
 		wcm.actions.model ?? {
 			wcm.actions.model = Ref((numActions: 0, activeActions: 0))
 		};
-		
+
 	}
-		
+
 	initControllerActions { |slot|
 		var wcm, thisGuiEnv, midiOscEnv, tmpSetup, thisWidgetCV;
 		var thisCalib;
-						
+
 		if(slot.notNil, {
 			wcm = wdgtControllersAndModels[slot];
 			thisGuiEnv = this.guiEnv[slot];
@@ -871,10 +871,10 @@ CVWidget {
 			thisWidgetCV = this.widgetCV;
 			thisCalib = prCalibrate;
 		});
-		
+
 		#[
-			prInitCalibration, 
-			prInitSpecControl, 
+			prInitCalibration,
+			prInitSpecControl,
 			prInitMidiConnect,
 			prInitMidiDisplay,
 			prInitMidiOptions,
@@ -883,45 +883,45 @@ CVWidget {
 			prInitOscInputRange,
 			prInitActionsControl
 		].do({ |method| this.perform(method, wcm, thisGuiEnv, midiOscEnv, thisWidgetCV, thisCalib, slot) });
-	}	
-		
+	}
+
 	prInitCalibration { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		
-		wcm.calibration.controller ?? { 
+
+		wcm.calibration.controller ?? {
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
 
 		wcm.calibration.controller.put(\default, { |theChanger, what, moreArgs|
 			theChanger.value.switch(
-				true, { 
+				true, {
 					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
 					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
 						thisGuiEnv.editor.calibBut.value_(0);
-						wcm.mapConstrainterLo ?? { 
+						wcm.mapConstrainterLo ?? {
 							wcm.mapConstrainterLo = CV([-inf, inf].asSpec, 0.00001);
 							wcm.mapConstrainterLo.connect(thisGuiEnv.editor.calibNumBoxes.lo);
 						};
-						wcm.mapConstrainterHi ?? { 
+						wcm.mapConstrainterHi ?? {
 							wcm.mapConstrainterHi = CV([-inf, inf].asSpec, 0.00001);
 							wcm.mapConstrainterHi.connect(thisGuiEnv.editor.calibNumBoxes.hi);
 						};
-						[thisGuiEnv.editor.calibNumBoxes.lo, thisGuiEnv.editor.calibNumBoxes.hi].do({ |nb| 
+						[thisGuiEnv.editor.calibNumBoxes.lo, thisGuiEnv.editor.calibNumBoxes.hi].do({ |nb|
 							nb.enabled_(false);
 							nb.action_(nil);
 						})
 					})
 				},
-				false, { 
+				false, {
 					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
 					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
 						thisGuiEnv.editor.calibBut.value_(1);
 						[wcm.mapConstrainterLo, wcm.mapConstrainterHi].do({ |cv| cv = nil; });
-						[thisGuiEnv.editor.calibNumBoxes.lo, thisGuiEnv.editor.calibNumBoxes.hi].do({ |nb| 
+						[thisGuiEnv.editor.calibNumBoxes.lo, thisGuiEnv.editor.calibNumBoxes.hi].do({ |nb|
 							nb.enabled_(true);
-							nb.action_({ |b| 
+							nb.action_({ |b|
 								this.setOscInputConstraints(
 									thisGuiEnv.editor.calibNumBoxes.lo.value @ thisGuiEnv.editor.calibNumBoxes.hi.value, slot;
-								) 
+								)
 							})
 						})
 					})
@@ -929,14 +929,14 @@ CVWidget {
 			)
 		})
 	}
-	
+
 	prInitSpecControl { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var tmp, tmpMapping;
-		
+
 		wcm.cvSpec.controller ?? {
 			wcm.cvSpec.controller = SimpleController(wcm.cvSpec.model);
 		};
-			
+
 		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
 			if(theChanger.value.hasZeroCrossing, {
 				if(midiOscEnv.oscMapping === \linexp or:{
@@ -951,7 +951,7 @@ CVWidget {
 				})
 			}, {
 				if(thisGuiEnv.editor.notNil and:{
-					thisGuiEnv.editor.isClosed.not	
+					thisGuiEnv.editor.isClosed.not
 				}, {
 					tmpMapping = thisGuiEnv.editor.mappingSelect.item;
 					thisGuiEnv.editor.mappingSelect.items.do({ |item, i|
@@ -961,9 +961,9 @@ CVWidget {
 					});
 				})
 			});
-			
+
 			if(thisGuiEnv.editor.notNil and:{
-				thisGuiEnv.editor.isClosed.not	
+				thisGuiEnv.editor.isClosed.not
 			}, {
 				thisGuiEnv.editor.specField.string_(theChanger.value.asCompileString);
 				tmp = thisGuiEnv.editor.specsListSpecs.detectIndex({ |item, i| item == theChanger.value });
@@ -976,9 +976,9 @@ CVWidget {
 					thisGuiEnv.editor.specsList.refresh;
 				})
 			});
-			
+
 			argWidgetCV.spec_(theChanger.value);
-			
+
 			if(this.class === CVWidgetKnob, {
 				if(argWidgetCV.spec.minval == argWidgetCV.spec.maxval.neg, {
 					thisGuiEnv.knob.centered_(true);
@@ -988,14 +988,14 @@ CVWidget {
 			})
 		})
 	}
-	
+
 	prInitMidiConnect { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var ctrlString, meanVal, ccResponderAction, makeCCResponder;
-		
+
 		wcm.midiConnection.controller ?? {
 			wcm.midiConnection.controller = SimpleController(wcm.midiConnection.model);
 		};
-		
+
 		wcm.midiConnection.controller.put(\default, { |theChanger, what, moreArgs|
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
@@ -1012,16 +1012,16 @@ CVWidget {
 					});
 
 					this.getMidiMode(slot).switch(
-						0, { 
+						0, {
 							if(val/127 < (argWidgetCV.input+(this.getSoftWithin(slot)/2)) and: {
 								val/127 > (argWidgetCV.input-(this.getSoftWithin(slot)/2));
-							}, { 
+							}, {
 								argWidgetCV.input_(val/127);
 							})
 						},
-						1, { 
+						1, {
 							meanVal = this.getMidiMean(slot);
-							argWidgetCV.input_(argWidgetCV.input+((val-meanVal)/127*this.getMidiResolution(slot))) 
+							argWidgetCV.input_(argWidgetCV.input+((val-meanVal)/127*this.getMidiResolution(slot)))
 						}
 					);
 					src !? { midiOscEnv.midisrc = src };
@@ -1035,7 +1035,7 @@ CVWidget {
 						midiOscEnv.cc.function_(ccResponderAction);
 					})
 				};
-				
+
 				{
 					block { |break|
 						loop {
@@ -1048,9 +1048,9 @@ CVWidget {
 								break.value(
 									wcm.midiDisplay.model.value_(
 										(
-											src: midiOscEnv.midisrc, 
-											chan: midiOscEnv.midichan, 
-											ctrl: midiOscEnv.midinum, 
+											src: midiOscEnv.midisrc,
+											chan: midiOscEnv.midichan,
+											ctrl: midiOscEnv.midinum,
 											learn: "X"
 										)
 									).changedKeys(synchKeys)
@@ -1075,13 +1075,13 @@ CVWidget {
 			})
 		})
 	}
-	
+
 	prInitMidiDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		
+
 		wcm.midiDisplay.controller ?? {
 			wcm.midiDisplay.controller = SimpleController(wcm.midiDisplay.model);
 		};
-		
+
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			theChanger.value.learn.switch(
 				"X", {
@@ -1195,13 +1195,13 @@ CVWidget {
 			)
 		})
 	}
-	
+
 	prInitMidiOptions { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 
 		wcm.midiOptions.controller ?? {
 			wcm.midiOptions.controller = SimpleController(wcm.midiOptions.model);
 		};
-		
+
 		wcm.midiOptions.controller.put(\default, { |theChanger, what, moreArgs|
 			if(thisGuiEnv.editor.notNil and:{
 				thisGuiEnv.editor.isClosed.not
@@ -1214,42 +1214,42 @@ CVWidget {
 			})
 		})
 	}
-	
+
 	prInitOscConnect { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var oscResponderAction;
-				
+
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
 		};
 
 		wcm.oscConnection.controller.put(\default, { |theChanger, what, moreArgs|
-			switch(prCalibrate.class, 
+			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
 			);
-						
+
 			if(theChanger.value.size == 4, {
 // 				OSCresponderNode: t, r, msg
 // 				OSCfunc: msg, time, addr // for the future
 				oscResponderAction = { |t, r, msg|
-					if(thisCalib, { 
+					if(thisCalib, {
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
 						}, {
 							if(msg[theChanger.value[3]] <= 0 and:{
 								msg[theChanger.value[3]].abs > alwaysPositive;
 							}, { alwaysPositive = msg[theChanger.value[3]].abs+0.1 });
-							if(msg[theChanger.value[3]] < midiOscEnv.calibConstraints.lo, { 
+							if(msg[theChanger.value[3]] < midiOscEnv.calibConstraints.lo, {
 								midiOscEnv.calibConstraints.lo = msg[theChanger.value[3]];
 								wcm.oscInputRange.model.value_([
-									msg[theChanger.value[3]], 
+									msg[theChanger.value[3]],
 									wcm.oscInputRange.model.value[1]
 								]).changedKeys(synchKeys);
 							});
 							if(msg[theChanger.value[3]] > midiOscEnv.calibConstraints.hi, {
 								midiOscEnv.calibConstraints.hi = msg[theChanger.value[3]];
 								wcm.oscInputRange.model.value_([
-									wcm.oscInputRange.model.value[0], 
+									wcm.oscInputRange.model.value[0],
 									msg[theChanger.value[3]]
 								]).changedKeys(synchKeys);
 							});
@@ -1259,7 +1259,7 @@ CVWidget {
 					}, {
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (
-								lo: wcm.oscInputRange.model.value[0], 
+								lo: wcm.oscInputRange.model.value[0],
 								hi: wcm.oscInputRange.model.value[1]
 							)
 						})
@@ -1267,24 +1267,24 @@ CVWidget {
 					argWidgetCV.value_(
 						(msg[theChanger.value[3]]+alwaysPositive).perform(
 							midiOscEnv.oscMapping,
-							midiOscEnv.calibConstraints.lo+alwaysPositive, 
+							midiOscEnv.calibConstraints.lo+alwaysPositive,
 							midiOscEnv.calibConstraints.hi+alwaysPositive,
 							this.getSpec(slot).minval, this.getSpec(slot).maxval,
 							\minmax
 						)
 					)
 				};
-								
+
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
-												
-				if(midiOscEnv.oscResponder.isNil, { 
+
+				if(midiOscEnv.oscResponder.isNil, {
 					midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;
 //					midiOscEnv.oscResponder = OSCFunc(oscResponderAction, theChanger.value[2].asSymbol, netAddr);
 					midiOscEnv.oscMsgIndex = theChanger.value[3];
 				}, {
 					midiOscEnv.oscResponder.action_(oscResponderAction);
 				});
-				
+
 				wcm.oscDisplay.model.value_(
 					(
 						but: [theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)],
@@ -1292,7 +1292,7 @@ CVWidget {
 						portField: theChanger.value[1].asString,
 						nameField: theChanger.value[2].asString,
 						index: theChanger.value[3],
-						connectorButVal: 1, 
+						connectorButVal: 1,
 						editEnabled: false
 					)
 				).changedKeys(synchKeys);
@@ -1303,7 +1303,7 @@ CVWidget {
 				midiOscEnv.msgIndex = nil;
 				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changedKeys(synchKeys);
 				midiOscEnv.calibConstraints = nil;
-				
+
 				wcm.oscDisplay.model.value_(
 					(
 						but: ["edit OSC", Color.black, Color.clear],
@@ -1311,22 +1311,22 @@ CVWidget {
 						portField: wcm.oscDisplay.model.value.portField,
 						nameField: wcm.oscDisplay.model.value.nameField,
 						index: wcm.oscDisplay.model.value.index,
-						connectorButVal: 0, 
+						connectorButVal: 0,
 						editEnabled: true
 					)
 				).changedKeys(synchKeys);
 			})
 		})
 	}
-	
+
 	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		
+
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
 		};
-		
+
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
-			switch(prCalibrate.class, 
+			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
 			);
@@ -1344,9 +1344,9 @@ CVWidget {
 					thisGuiEnv.editor.nameField.string_(theChanger.value.nameField);
 					if(thisCalib, {
 						[
-//							thisGuiEnv.editor.inputConstraintLoField, 
+//							thisGuiEnv.editor.inputConstraintLoField,
 //							thisGuiEnv.editor.inputConstraintHiField
-							thisGuiEnv.editor.calibNumBoxes.lo, 
+							thisGuiEnv.editor.calibNumBoxes.lo,
 							thisGuiEnv.editor.calibNumBoxes.hi
 						].do(_.enabled_(theChanger.value.editEnabled));
 					});
@@ -1362,9 +1362,9 @@ CVWidget {
 			}
 		})
 	}
-	
+
 	prInitOscInputRange { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		
+
 		wcm.oscInputRange.controller ?? {
 			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
 		};
@@ -1394,13 +1394,13 @@ CVWidget {
 			}.defer;
 		})
 	}
-	
+
 	prInitActionsControl { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		
+
 		wcm.actions.controller ?? {
 			wcm.actions.controller = SimpleController(wcm.actions.model);
 		};
-		
+
 		wcm.actions.controller.put(\default, { |theChanger, what, moreArgs|
 			if(this.window.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[
@@ -1411,18 +1411,18 @@ CVWidget {
 			})
 		})
 	}
-	
+
 	// EXPERIMENTAL: extended API
 	extend { |key, func, controller|
 		var thisKey, thisContr;
-		
+
 		thisKey = key.asSymbol;
 		thisContr = controller.asSymbol;
 		synchedActions ?? { synchedActions = IdentityDictionary.new };
-		
+
 		synchKeys = synchKeys.add(thisKey);
 		synchedActions.put(thisKey, func);
-				
+
 		if(thisContr !== \default, {
 			if(controller.isNil, {
 				wdgtControllersAndModels.do({ |k|
@@ -1433,10 +1433,10 @@ CVWidget {
 			})
 		})
 	}
-	
+
 	reduce { |key|
 		var thisKey;
-		
+
 		thisKey = key.asSymbol;
 		if(key.notNil and:{ thisKey !== \default and:{ synchKeys.includes(thisKey) }}, {
 			synchedActions[thisKey] = nil;
