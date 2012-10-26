@@ -451,7 +451,7 @@ CVCenterPreferences {
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);
 		prefs.writeArchive(prefsPath);
-		// "wrote preferences".postln;
+		"Your preferences have successfully been written to disk and will become active after library-recompilation.".postln;
 	}
 
 	*readPreferences { |...args|

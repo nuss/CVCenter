@@ -269,19 +269,27 @@ CVCenter {
 				})
 			});
 
-//			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
-//				.font_(Font("Helvetica", 10))
-//				.states_([["preferences", Color.red, Color.yellow]])
-//				.action_({ |pb| })
-//			;
-//
-//			swFlow.shift(1, 0);
+			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
+				.font_(Font("Helvetica", 10))
+				.states_([["preferences", Color.white, Color(0.3, 0.3, 0.3)]])
+				.action_({ |pb| CVCenterPreferences.dialog })
+			;
+
+			if(GUI.id !== \cocoa, {
+				prefBut.toolTip_("Edit the global preferences for CVCenter (resp.\nCVWidget). Preferences will be written to disk\nand become active upon library-recompile.")
+			});
+
+			swFlow.shift(1, 0);
 
 			saveBut = Button(prefPane, Rect(0, 0, 70, 20))
 				.font_(Font("Helvetica", 10))
 				.states_([["save setup", Color.white, Color(0.15, 0.15, 0.15)]])
 				.action_({ |sb| this.saveSetup })
 			;
+
+			if(GUI.id !== \cocoa, {
+				saveBut.toolTip_("Save the current setup of CVCenter,\nincluding currently active OSC-/MIDI-\nresponders and actions.")
+			});
 
 			swFlow.shift(1, 0);
 
@@ -302,16 +310,11 @@ CVCenter {
 				})
 			;
 
-			swFlow.shift(8, 0);
+			if(GUI.id !== \cocoa, {
+				loadBut.toolTip_("Load a CVCenter-setup from disk. You\nmay load OSC-/MIDI-responders and\nactions if the corresponding checkboxes\nto the right are checked accordingly.")
+			});
 
-			StaticText(prefPane, Rect(0, 0, 60, 20))
-				.font_(Font("Helvetica", 10))
-				.stringColor_(Color.white)
-				.string_("load actions")
-				.align_(\right)
-			;
-
-			swFlow.shift(5, 2);
+			swFlow.shift(10, 2);
 
 			if(GUI.id === \cocoa, {
 				loadActionsRadio = Button(prefPane, Rect(0, 0, 15, 15))
@@ -325,16 +328,16 @@ CVCenter {
 				loadActionsRadio = CheckBox(prefPane, Rect(0, 0, 15, 15)).value_(true)
 			});
 
-			swFlow.shift(5, -2);
+			swFlow.shift(0, -2);
 
-			StaticText(prefPane, Rect(0, 0, 90, 20))
+			StaticText(prefPane, Rect(0, 0, 60, 20))
 				.font_(Font("Helvetica", 10))
 				.stringColor_(Color.white)
-				.string_("auto-connect MIDI")
+				.string_("load actions")
 				.align_(\right)
 			;
 
-			swFlow.shift(5, 2);
+			swFlow.shift(10, 2);
 
 			if(GUI.id === \cocoa, {
 				autoConnectMIDIRadio = Button(prefPane, Rect(0, 0, 15, 15))
@@ -348,16 +351,16 @@ CVCenter {
 				autoConnectMIDIRadio = CheckBox(prefPane, Rect(0, 0, 15, 15)).value_(true)
 			});
 
-			swFlow.shift(5, -2);
+			swFlow.shift(0, -2);
 
-			StaticText(prefPane, Rect(5, 0, 90, 20))
+			StaticText(prefPane, Rect(0, 0, 90, 20))
 				.font_(Font("Helvetica", 10))
 				.stringColor_(Color.white)
-				.string_("auto-connect OSC")
+				.string_("auto-connect MIDI")
 				.align_(\right)
 			;
 
-			swFlow.shift(5, 2);
+			swFlow.shift(10, 2);
 
 			if(GUI.id === \cocoa, {
 				autoConnectOSCRadio = Button(prefPane, Rect(0, 0, 15, 15))
@@ -370,6 +373,15 @@ CVCenter {
 			}, {
 				autoConnectOSCRadio = CheckBox(prefPane, Rect(0, 0, 15, 15)).value_(true)
 			});
+
+			swFlow.shift(0, -2);
+
+			StaticText(prefPane, Rect(5, 0, 90, 20))
+				.font_(Font("Helvetica", 10))
+				.stringColor_(Color.white)
+				.string_("auto-connect OSC")
+				.align_(\right)
+			;
 
 			window.onClose_({
 				// "now closing".postln;
