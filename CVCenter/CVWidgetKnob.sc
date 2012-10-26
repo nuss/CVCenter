@@ -40,6 +40,7 @@ CVWidgetKnob : CVWidget {
 		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
+		var text, tActions;
 
 		// "this.removeResponders: %\n".postf(this.class.removeResponders);
 
@@ -150,6 +151,9 @@ CVWidgetKnob : CVWidget {
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
+
+		if(GUI.id !== \cocoa, { [label, nameField].do(_.toolTip_("Add some notes if you like")) });
+
 		knobsize = thisHeight-2-145;
 		if(knobsize >= thisWidth, {
 			knobsize = thisWidth;
@@ -189,6 +193,8 @@ CVWidgetKnob : CVWidget {
 				).changedKeys(synchKeys);
 			})
 		;
+		if(GUI.id !== \cocoa, { specBut.toolTip_("Edit the CV's ControlSpec:\n"++(this.getSpec.asCompileString)) });
+
 		nextY = nextY+specBut.bounds.height+1;
 		midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
 			.font_(Font("Helvetica", 9))
@@ -209,6 +215,7 @@ CVWidgetKnob : CVWidget {
 				).changedKeys(synchKeys);
 			})
 		;
+		if(GUI.id !== \cocoa, { midiHead.toolTip_("Edit all MIDI-options\nof this widget.\nmidiMode:"+this.getMidiMode++"\nmidiMean:"+this.getMidiMean++"\nmidiResolution:"+this.getMidiResolution++"\nsoftWithin:"+this.getSoftWithin++"\nctrlButtonBank:"+this.getCtrlButtonBank) });
 
 		if(GUI.current.name === \QtGUI, {
 			midiHead.mouseEnterAction_({ |mb|
@@ -243,6 +250,8 @@ CVWidgetKnob : CVWidget {
 				)
 			})
 		;
+		if(GUI.id !== \cocoa, { midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget to that slider.") });
+
 		nextY = nextY+midiLearn.bounds.height;
 		midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
 			.font_(Font("Helvetica", 9))
@@ -269,6 +278,8 @@ CVWidgetKnob : CVWidget {
 				})
 			})
 		;
+		if(GUI.id !== \cocoa, { midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget") });
+
 		nextY = nextY+midiSrc.bounds.height;
 		midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
@@ -295,6 +306,8 @@ CVWidgetKnob : CVWidget {
 				})
 			})
 		;
+		if(GUI.id !== \cocoa, { midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget") });
+
 		midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
 //			.focusColor_(Color(alpha: 0))
@@ -320,6 +333,8 @@ CVWidgetKnob : CVWidget {
 				})
 			})
 		;
+		if(GUI.id !== \cocoa, { midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget") });
+
 		nextY = nextY+midiCtrl.bounds.height+1;
 
 		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
@@ -361,6 +376,7 @@ CVWidgetKnob : CVWidget {
 				})
 			})
 		});
+		if(GUI.id !== \cocoa, { oscEditBut.toolTip_("no OSC-responders present.\nClick to edit.") });
 
 		nextY = nextY+oscEditBut.bounds.height;
 		calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
@@ -377,6 +393,15 @@ CVWidgetKnob : CVWidget {
 				)
 			})
 		;
+		if(GUI.id !== \cocoa, {
+			if(this.getCalibrate, {
+				text = "Calibration is active.\nClick to dectivate.";
+			}, {
+				text = "Calibration is inactive.\nClick to activate.";
+			});
+			calibBut.toolTip_(text);
+		});
+
 		nextY = nextY+calibBut.bounds.height;
 		actionsBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
@@ -393,8 +418,15 @@ CVWidgetKnob : CVWidget {
 				});
 			})
 		;
-		if(prCalibrate, { calibBut.value_(0) }, { calibBut.value_(1) });
+		if(GUI.id !== \cocoa, {
+			text = [];
+			text = text.add(this.wdgtActions.size);
+			text = text.add(this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size);
+			if(text[0] == 1, { tActions = "action" }, { tActions = "actions" });
+			actionsBut.toolTip_("% of % % active.\nClick to edit.".format(text[1], text[0], tActions));
+		});
 
+		if(prCalibrate, { calibBut.value_(0) }, { calibBut.value_(1) });
 
 		[knob, numVal].do({ |view| widgetCV.connect(view) });
 		visibleGuiEls = [

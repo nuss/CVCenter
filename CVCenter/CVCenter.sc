@@ -67,6 +67,7 @@ CVCenter {
 				prefs[\midiResolution] !? { this.midiResolution_(prefs[\midiResolution]) };
 				prefs[\midiMean] !? { this.midiMean_(prefs[\midiMean]) };
 				prefs[\softWithin] !? { this.softWithin_(prefs[\softWithin]) };
+				prefs[\ctrlButtonBank] !? { this.ctrlButtonBank_(prefs[\ctrlButtonBank]) };
 			});
 			CVWidget.removeResponders_(prefs[\removeResponders]);
 		}
