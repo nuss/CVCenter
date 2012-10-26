@@ -32,7 +32,7 @@ CVCenter {
 		Class.initClassTree(CVWidget);
 		prefs = CVCenterPreferences.readPreferences;
 
-		"prefs in CVCenter: %\n".postf(prefs);
+		// "prefs in CVCenter: %\n".postf(prefs);
 
 		prefs !? {
 			prefs[\saveGuiProperties] !? {
@@ -46,10 +46,11 @@ CVCenter {
 				});
 				if(prefs[\saveGuiProperties] == 1, {
 					ShutDown.add({
+						// "shutdown action triggered".postln;
 						newPrefs = CVCenterPreferences.readPreferences;
 						CVCenterPreferences.writePreferences(
 							newPrefs[\saveGuiProperties],
-							prefs[\guiProperties],
+							newPrefs[\guiProperties],
 							newPrefs[\saveClassVars],
 							newPrefs[\midiMode],
 							newPrefs[\midiResolution],
@@ -122,7 +123,7 @@ CVCenter {
 	*makeWindow { |tab...cvs|
 		var flow, rowwidth, colcount;
 		var cvTabIndex, order, orderedCVs;
-		var updateRoutine, lastUpdate, lastUpdateWidth, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
+		var updateRoutine, lastUpdate, lastUpdateBounds, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
 		var lastCtrlBtnsMode, swFlow;
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
 		var funcToAdd;
@@ -371,7 +372,7 @@ CVCenter {
 			});
 
 			window.onClose_({
-				"now closing".postln;
+				// "now closing".postln;
 				CVWidgetEditor.allEditors.pairsDo({ |editor, val|
 					switch(cvWidgets[editor].class,
 						CVWidgetKnob, {
@@ -602,13 +603,15 @@ CVCenter {
 					lastUpdate = all.size;
 				});
 				try {
-					if(window.bounds.width != lastUpdateWidth, {
+					if(window.bounds.width != lastUpdateBounds.width, {
 						this.prRegroupWidgets(tabs.activeTab);
+					});
+					if(window.bounds != lastUpdateBounds, {
 						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
-						prefs[\guiProperties].postln;
+						// prefs[\guiProperties].postln;
 					})
 				};
-				lastUpdateWidth = window.bounds.width;
+				lastUpdateBounds = window.bounds;
 				lastSetUp = this.setup;
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});

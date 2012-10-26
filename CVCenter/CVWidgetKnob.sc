@@ -41,7 +41,7 @@ CVWidgetKnob : CVWidget {
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
 
-		"this.removeResponders: %\n".postf(this.class.removeResponders);
+		// "this.removeResponders: %\n".postf(this.class.removeResponders);
 
 		this.bgColor ?? { this.bgColor = Color.white };
 		synchKeys ?? { synchKeys = [\default] };
