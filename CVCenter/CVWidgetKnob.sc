@@ -217,7 +217,7 @@ CVWidgetKnob : CVWidget {
 		;
 		if(GUI.id !== \cocoa, { midiHead.toolTip_("Edit all MIDI-options\nof this widget.\nmidiMode:"+this.getMidiMode++"\nmidiMean:"+this.getMidiMean++"\nmidiResolution:"+this.getMidiResolution++"\nsoftWithin:"+this.getSoftWithin++"\nctrlButtonBank:"+this.getCtrlButtonBank) });
 
-		if(GUI.current.name === \QtGUI, {
+		if(GUI.id === \qt, {
 			midiHead.mouseEnterAction_({ |mb|
 				mb.states_([["MIDI", Color.white, Color.red]])
 			}).mouseLeaveAction_({ |mb|
@@ -365,7 +365,7 @@ CVWidgetKnob : CVWidget {
 			})
 		;
 
-		if(GUI.current.name === \QtGUI, {
+		if(GUI.id === \qt, {
 			oscEditBut.mouseEnterAction_({ |oscb|
 				if(wdgtControllersAndModels.oscConnection.model.value === false, {
 					oscb.states_([["edit OSC", Color.white, Color.cyan(0.5)]]);

@@ -25,9 +25,10 @@ CVCenter {
 	classvar tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=181, colwidth, rowheight;
 	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin;
+	classvar prefs, boundsOnShutDown;
 
 	*initClass {
-		var prefs, newPrefs;
+		var newPrefs, newBounds;
 		Class.initClassTree(CVCenterPreferences);
 		Class.initClassTree(CVWidget);
 		prefs = CVCenterPreferences.readPreferences;
@@ -50,7 +51,7 @@ CVCenter {
 						newPrefs = CVCenterPreferences.readPreferences;
 						CVCenterPreferences.writePreferences(
 							newPrefs[\saveGuiProperties],
-							newPrefs[\guiProperties],
+							boundsOnShutDown ?? { newPrefs[\guiProperties] },
 							newPrefs[\saveClassVars],
 							newPrefs[\midiMode],
 							newPrefs[\midiResolution],
@@ -625,6 +626,7 @@ CVCenter {
 					})
 				};
 				lastUpdateBounds = window.bounds;
+				if(prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
 				lastSetUp = this.setup;
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});

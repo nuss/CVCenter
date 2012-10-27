@@ -39,7 +39,7 @@ CVWidget2D : CVWidget {
 		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, rightBarX, oscEditButHeight, right, left;
-		var actionLo, actionHi;
+		var text, tActions;
 
 		this.bgColor ?? { this.bgColor_(Color.white) };
 		synchKeys ?? { synchKeys = [\default] };
@@ -186,6 +186,7 @@ CVWidget2D : CVWidget {
 				this.toggleComment(b.value.asBoolean);
 			})
 		;
+
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Helvetica", 9))
@@ -193,6 +194,8 @@ CVWidget2D : CVWidget {
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
+
+		if(GUI.id !== \cocoa, { [label, nameField].do(_.toolTip_("Add some notes if you like")) });
 
 		nextY = thisXY.y+1+label.bounds.height;
 
@@ -259,6 +262,7 @@ CVWidget2D : CVWidget {
 				).changedKeys(synchKeys);
 			})
 		;
+
 		midiHead.lo = Button(window)
 			.action_({ |btn|
 				if(editor.lo.isNil or:{ editor.lo.isClosed }, {
@@ -310,6 +314,12 @@ CVWidget2D : CVWidget {
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 		});
 
+		if(GUI.id !== \cocoa, {
+			specBut.pairsDo({ |k, v|
+				v.toolTip_("Edit the CV's ControlSpec:\n"++(this.getSpec(k).asCompileString))
+			})
+		});
+
 		nextY = nextY+14;
 
 		[midiHead.hi, nextY, midiHead.lo, nextY+52].pairsDo({ |k, v|
@@ -327,6 +337,11 @@ CVWidget2D : CVWidget {
 			})
 		});
 
+		if(GUI.id !== \cocoa, {
+			midiHead.pairsDo({ |k, v|
+				v.toolTip_("Edit all MIDI-options\nof this widget.\nmidiMode:"+this.getMidiMode(k)++"\nmidiMean:"+this.getMidiMean(k)++"\nmidiResolution:"+this.getMidiResolution(k)++"\nsoftWithin:"+this.getSoftWithin(k)++"\nctrlButtonBank:"+this.getCtrlButtonBank(k))
+			})
+		});
 
 		[midiLearn.hi, [\hi, nextY], midiLearn.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX+midiHead.lo.bounds.width, v[1], 12, 13))
@@ -355,6 +370,13 @@ CVWidget2D : CVWidget {
 			})
 		});
 
+		if(GUI.id !== \cocoa, {
+			midiLearn.pairsDo({ |k, v|
+				v.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget to that slider.")
+			})
+		});
+
+
 		nextY = nextY+13;
 
 		[midiSrc.hi, [\hi, nextY], midiSrc.lo, [\lo, nextY+52]].pairsDo({ |k, v|
@@ -381,6 +403,12 @@ CVWidget2D : CVWidget {
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
+			})
+		});
+
+		if(GUI.id !== \cocoa, {
+			midiSrc.pairsDo({ |k, v|
+				v.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget")
 			})
 		});
 
@@ -413,6 +441,12 @@ CVWidget2D : CVWidget {
 			})
 		});
 
+		if(GUI.id !== \cocoa, {
+			midiChan.pairsDo({ |k, v|
+				v.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget")
+			})
+		});
+
 		[midiCtrl.hi, [\hi, nextY], midiCtrl.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX+15, v[1], 25, 13))
 			.font_(Font("Helvetica", 8.5))
@@ -437,6 +471,12 @@ CVWidget2D : CVWidget {
 				if(unicode == 13, {
 					tf.stringColor_(Color.black);
 				})
+			})
+		});
+
+		if(GUI.id !== \cocoa, {
+			midiCtrl.pairsDo({ |k, v|
+				v.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget")
 			})
 		});
 
@@ -511,6 +551,12 @@ CVWidget2D : CVWidget {
 			})
 		});
 
+		if(GUI.id !== \cocoa, {
+			oscEditBut.pairsDo({ |k, v|
+				v.toolTip_("no OSC-responders present.\nClick to edit.")
+			})
+		});
+
 		nextY = nextY+oscEditBut.lo.bounds.height;
 
 		[calibBut.lo, [\lo, thisXY.x+1], calibBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
@@ -526,6 +572,17 @@ CVWidget2D : CVWidget {
 					0, { this.setCalibrate(true, v[0]) },
 					1, { this.setCalibrate(false, v[0]) }
 				)
+			})
+		});
+
+		if(GUI.id !== \cocoa, {
+			calibBut.pairsDo({ |k, v|
+				if(this.getCalibrate(k), {
+					text = "Calibration is active.\nClick to dectivate.";
+				}, {
+					text = "Calibration is inactive.\nClick to activate.";
+				});
+				v.toolTip_(text);
 			})
 		});
 
@@ -546,6 +603,16 @@ CVWidget2D : CVWidget {
 				}, {
 					editor[v[0]].front(3)
 				});
+			})
+		});
+
+		if(GUI.id !== \cocoa, {
+			actionsBut.pairsDo({ |k, v|
+				text = [];
+				text = text.add(this.wdgtActions[k].size);
+				text = text.add(this.wdgtActions[k].select({ |vv| vv.asArray[0][1] == true }).size);
+				if(text[0] == 1, { tActions = "action" }, { tActions = "actions" });
+				v.toolTip_("% of % % active.\nClick to edit.".format(text[1], text[0], tActions));
 			})
 		});
 
