@@ -316,7 +316,7 @@ CVWidget2D : CVWidget {
 
 		if(GUI.id !== \cocoa, {
 			specBut.pairsDo({ |k, v|
-				v.toolTip_("Edit the CV's ControlSpec:\n"++(this.getSpec(k).asCompileString))
+				v.toolTip_("Edit the CV's ControlSpec in '"++k++"':\n"++(this.getSpec(k).asCompileString))
 			})
 		});
 
@@ -339,7 +339,7 @@ CVWidget2D : CVWidget {
 
 		if(GUI.id !== \cocoa, {
 			midiHead.pairsDo({ |k, v|
-				v.toolTip_("Edit all MIDI-options\nof this widget.\nmidiMode:"+this.getMidiMode(k)++"\nmidiMean:"+this.getMidiMean(k)++"\nmidiResolution:"+this.getMidiResolution(k)++"\nsoftWithin:"+this.getSoftWithin(k)++"\nctrlButtonBank:"+this.getCtrlButtonBank(k))
+				v.toolTip_("Edit all MIDI-options\nof this widget's '"++k++"' slot.\nmidiMode:"+this.getMidiMode(k)++"\nmidiMean:"+this.getMidiMean(k)++"\nmidiResolution:"+this.getMidiResolution(k)++"\nsoftWithin:"+this.getSoftWithin(k)++"\nctrlButtonBank:"+this.getCtrlButtonBank(k))
 			})
 		});
 
@@ -408,7 +408,7 @@ CVWidget2D : CVWidget {
 
 		if(GUI.id !== \cocoa, {
 			midiSrc.pairsDo({ |k, v|
-				v.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget")
+				v.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to the widget's '"++k++"' slot")
 			})
 		});
 
@@ -443,7 +443,7 @@ CVWidget2D : CVWidget {
 
 		if(GUI.id !== \cocoa, {
 			midiChan.pairsDo({ |k, v|
-				v.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget")
+				v.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget's '"++k++"' slot.")
 			})
 		});
 
@@ -476,7 +476,7 @@ CVWidget2D : CVWidget {
 
 		if(GUI.id !== \cocoa, {
 			midiCtrl.pairsDo({ |k, v|
-				v.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget")
+				v.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget's '"++k++"' slot")
 			})
 		});
 
@@ -553,7 +553,7 @@ CVWidget2D : CVWidget {
 
 		if(GUI.id !== \cocoa, {
 			oscEditBut.pairsDo({ |k, v|
-				v.toolTip_("no OSC-responders present.\nClick to edit.")
+				v.toolTip_("no OSC-responder present in '"++k++"'.\nClick to edit.")
 			})
 		});
 
@@ -578,9 +578,9 @@ CVWidget2D : CVWidget {
 		if(GUI.id !== \cocoa, {
 			calibBut.pairsDo({ |k, v|
 				if(this.getCalibrate(k), {
-					text = "Calibration is active.\nClick to dectivate.";
+					text = "Calibration in '"++k++"' is active.\nClick to dectivate.";
 				}, {
-					text = "Calibration is inactive.\nClick to activate.";
+					text = "Calibration in '"++k++"' is inactive.\nClick to activate.";
 				});
 				v.toolTip_(text);
 			})
@@ -612,7 +612,7 @@ CVWidget2D : CVWidget {
 				text = text.add(this.wdgtActions[k].size);
 				text = text.add(this.wdgtActions[k].select({ |vv| vv.asArray[0][1] == true }).size);
 				if(text[0] == 1, { tActions = "action" }, { tActions = "actions" });
-				v.toolTip_("% of % % active.\nClick to edit.".format(text[1], text[0], tActions));
+				v.toolTip_("% of % % active in '"++k++"'.\nClick to edit.".format(text[1], text[0], tActions));
 			})
 		});
 

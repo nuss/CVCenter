@@ -979,9 +979,10 @@ CVWidget {
 			});
 
 			argWidgetCV.spec_(theChanger.value);
+			"argWidgetCV: %\n".postf(argWidgetCV);
 
 			if(this.class === CVWidgetKnob, {
-				if(argWidgetCV.spec.minval == argWidgetCV.spec.maxval.neg, {
+				if(argWidgetCV.spec.excludingZeroCrossing, {
 					thisGuiEnv.knob.centered_(true);
 				}, {
 					thisGuiEnv.knob.centered_(false);
