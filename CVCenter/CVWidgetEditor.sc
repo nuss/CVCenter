@@ -135,6 +135,8 @@ CVWidgetEditor {
 			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			(0..3).do({ |t| tabs.focusActions[t] = { tabs.stringFocusedColor_(labelStringColors[t]) } });
 			tabs.stringFocusedColor_(labelStringColors[tab]);
+			tabs.views.do(_.background_(Color(0,5, 0.5, 0.5)));
+			// tabs.views.collect({ |t| t.background }).postln;
 
 			thisEditor.tabs = tabs;
 
