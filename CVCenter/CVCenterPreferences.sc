@@ -19,9 +19,9 @@ CVCenterPreferences {
 
 		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
 
-		staticTextFont = Font(Font.defaultSansFace, 13 * fFact);
+		staticTextFont = Font("Arial", 12 * fFact);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font(Font.defaultMonoFace, 12);
+		textFieldFont = Font("Andale Mono", 12);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 

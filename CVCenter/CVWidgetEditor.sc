@@ -102,7 +102,13 @@ CVWidgetEditor {
 
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 
-			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 265));
+			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(
+				Window.screenBounds.width/2-150,
+				Window.screenBounds.height/2-100,
+				270, 265
+			))
+				.background_(Color(0.7, 0.7, 0.7, 0.0))
+			;
 
 			if(slot.isNil, {
 				allEditors.put(name, (window: window, name: widgetName))
@@ -137,7 +143,8 @@ CVWidgetEditor {
 			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			(0..3).do({ |t| tabs.focusActions[t] = { tabs.stringFocusedColor_(labelStringColors[t]) } });
 			tabs.stringFocusedColor_(labelStringColors[tab]);
-			tabs.views.do(_.background_(Color(0,5, 0.5, 0.5)));
+			tabs.views.do(_.background_(Color(0.5, 0.5, 0.5, 1.0)));
+			tabs.views.do({ |t| [t.class, t.background].postln });
 			// tabs.views.collect({ |t| t.background }).postln;
 
 			thisEditor.tabs = tabs;
