@@ -979,7 +979,17 @@ CVWidget {
 			});
 
 			argWidgetCV.spec_(theChanger.value);
-			"argWidgetCV: %\n".postf(argWidgetCV);
+
+			if(this.specBut.class == Event, {
+				this.specBut[slot].toolTip_(
+					"Edit the CV's ControlSpec in '"++slot++"':\n"++(this.getSpec(slot).asCompileString)
+				)
+			}, {
+				this.specBut.toolTip_(
+					"Edit the CV's ControlSpec:\n"++(this.getSpec.asCompileString)
+				)
+			});
+
 
 			if(this.class === CVWidgetKnob, {
 				if(argWidgetCV.spec.excludingZeroCrossing, {
@@ -1085,6 +1095,9 @@ CVWidget {
 		};
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
+
+			theChanger.value.postln;
+
 			theChanger.value.learn.switch(
 				"X", {
 					defer {
@@ -1199,6 +1212,7 @@ CVWidget {
 	}
 
 	prInitMidiOptions { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+		var typeText;
 
 		wcm.midiOptions.controller ?? {
 			wcm.midiOptions.controller = SimpleController(wcm.midiOptions.model);
@@ -1213,6 +1227,12 @@ CVWidget {
 				thisGuiEnv.editor.softWithinNB.value_(theChanger.value.softWithin);
 				thisGuiEnv.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
 				thisGuiEnv.editor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
+			});
+
+			// thisGuiEnv.postln;
+			if(window.notNil and:{ window.notClosed }, {
+				if(slot.notNil, { typeText = "'s '"++slot++"' slot" }, { typeText = "" });
+				thisGuiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
 			})
 		})
 	}

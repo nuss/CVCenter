@@ -464,6 +464,7 @@ CVWidgetKnob : CVWidget {
 			actionsBut: actionsBut,
 			knob: knob,
 			oscEditBut: oscEditBut,
+			midiHead: midiHead,
 			midiSrc: midiSrc,
 			midiChan: midiChan,
 			midiCtrl: midiCtrl,

@@ -666,6 +666,7 @@ CVWidget2D : CVWidget {
 				oscEditBut: oscEditBut[slot],
 				calibBut: calibBut[slot],
 				actionsBut: actionsBut[slot],
+				midiHead: midiHead[slot],
 				midiSrc: midiSrc[slot],
 				midiChan: midiChan[slot],
 				midiCtrl: midiCtrl[slot],

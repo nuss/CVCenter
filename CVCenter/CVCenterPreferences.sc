@@ -19,9 +19,9 @@ CVCenterPreferences {
 
 		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
 
-		staticTextFont = Font("Arial", 12 * fFact);
+		staticTextFont = Font(Font.defaultSansFace, 13 * fFact);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font("Andale Mono", 12);
+		textFieldFont = Font(Font.defaultMonoFace, 12);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
@@ -437,7 +437,7 @@ CVCenterPreferences {
 		prefs.put(\saveGuiProperties, saveGuiProperties);
 		if(saveGuiProperties == 2 or:{ saveGuiProperties == 1 }, {
 			prefs.put(\guiProperties, thisGuiProperties)
-		});
+		}, { prefs.removeAt(\guiProperties) });
 		if(thisSaveClassVars, {
 			prefs.put(\saveClassVars, true);
 			midiMode.notNil.if({ prefs.put(\midiMode, midiMode.asInteger) }, { prefs.removeAt(\midiMode) });
