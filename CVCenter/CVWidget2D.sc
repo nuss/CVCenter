@@ -372,7 +372,7 @@ CVWidget2D : CVWidget {
 
 		if(GUI.id !== \cocoa, {
 			midiLearn.pairsDo({ |k, v|
-				v.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget to that slider.")
+				v.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget at '"++k++"' to that slider.")
 			})
 		});
 
@@ -612,7 +612,7 @@ CVWidget2D : CVWidget {
 				text = text.add(this.wdgtActions[k].size);
 				text = text.add(this.wdgtActions[k].select({ |vv| vv.asArray[0][1] == true }).size);
 				if(text[0] == 1, { tActions = "action" }, { tActions = "actions" });
-				v.toolTip_("% of % % active in '"++k++"'.\nClick to edit.".format(text[1], text[0], tActions));
+				v.toolTip_("% of % % active in '%'.\nClick to edit.".format(text[1], text[0], tActions));
 			})
 		});
 

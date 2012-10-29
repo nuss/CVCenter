@@ -1095,13 +1095,14 @@ CVWidget {
 		};
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
+			var typeText, r, p;
 
-			theChanger.value.postln;
+			// theChanger.value.postln;
 
 			theChanger.value.learn.switch(
 				"X", {
 					defer {
-						if(this.window.isClosed.not, {
+						if(window.isClosed.not, {
 							thisGuiEnv.midiSrc.string_(theChanger.value.src.asString)
 								.background_(Color.red)
 								.stringColor_(Color.white)
@@ -1117,7 +1118,9 @@ CVWidget {
 								.stringColor_(Color.white)
 								.canFocus_(false)
 							;
-							thisGuiEnv.midiLearn.value_(1);
+							if(slot.notNil, { typeText = " at '"++slot++"'" }, { typeText = " " });								thisGuiEnv.midiLearn.value_(1);
+							// "thisGuiEnv.midiLearn: %\n".postf(thisGuiEnv.midiLearn);
+							thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
 						});
 
 						if(thisGuiEnv.editor.notNil and:{
@@ -1143,22 +1146,57 @@ CVWidget {
 					}
 				},
 				"C", {
-					thisGuiEnv.midiLearn.states_([
-						["C", Color.white, Color(0.11, 0.38, 0.2)],
-						["X", Color.white, Color.red]
-					]).refresh;
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not
-					}, {
-						thisGuiEnv.editor.midiLearnBut.states_([
+					if(window.isClosed.not, {
+						thisGuiEnv.midiLearn.states_([
 							["C", Color.white, Color(0.11, 0.38, 0.2)],
 							["X", Color.white, Color.red]
 						]).refresh;
+						if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
+						thisGuiEnv.midiLearn.value_(0);
+						thisGuiEnv.midiLearn.toolTip_("Click to connect the widget% to\nthe slider(s) as given in the fields below.".format(typeText));
+						r = [
+							thisGuiEnv.midiSrc.string != "source" and:{
+								try{ thisGuiEnv.midiSrc.string.interpret.isInteger }
+							},
+							thisGuiEnv.midiChan.string != "chan" and:{
+								try{ thisGuiEnv.midiChan.string.interpret.isInteger }
+							},
+							thisGuiEnv.midiCtrl.string != "ctrl"
+						].collect({ |r| r }).postln;
+
+						// "Enter your MIDI-device's ID,
+						// \nhit 'return' and click 'C' to
+						// \nconnect all sliders of your
+						// \ndevice to the widget's '"++k++"' slot"
+
+						p = "Use ";
+						if(r[0], { p = p++" MIDI-device ID "++theChanger.value.src++",\n" });
+						if(r[1], { p = p++"channel nr. "++theChanger.value.chan++",\n" });
+						if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
+						p = p++"\nto connect widget%to MIDI";
+
+						[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
+							_.toolTip_(p.format(slot !? { " at "++slot++" " } ?? { " " }))
+						);
+
+						// window.midiSrc.toolTip_("% to connect this widget% to % %".formatf(
+					});
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not
+					}, {
+						thisGuiEnv.editor.midiLearnBut
+							.states_([
+								["C", Color.white, Color(0.11, 0.38, 0.2)],
+								["X", Color.white, Color.red]
+							])
+							.value_(0)
+							// .refresh
+						;
 					})
 				},
 				"L", {
 					defer {
-						if(this.window.isClosed.not, {
+						if(window.isClosed.not, {
 							thisGuiEnv.midiSrc.string_(theChanger.value.src)
 								.background_(Color.white)
 								.stringColor_(Color.black)
@@ -1179,6 +1217,8 @@ CVWidget {
 								["X", Color.white, Color.red]
 							])
 							.value_(0).refresh;
+							if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
+							thisGuiEnv.midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
 						});
 
 						if(thisGuiEnv.editor.notNil and:{
@@ -1348,12 +1388,17 @@ CVWidget {
 		};
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
+
+			// theChanger.value.postln;
+			// midiOscEnv.postln;
+
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
 			);
-			if(this.window.isClosed.not, {
+			if(window.isClosed.not, {
 				thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
+				thisGuiEnv.oscEditBut.toolTip_("Connected, listening to\n%, msg-index %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
 				thisGuiEnv.oscEditBut.refresh;
 			});
 			defer {
@@ -1403,7 +1448,7 @@ CVWidget {
 					});
 					thisGuiEnv.editor.alwaysPosField.string_(" +"++(alwaysPositive.trunc(0.1)));
 				});
-				if(this.window.isClosed.not, {
+				if(window.isClosed.not, {
 					if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 						thisGuiEnv.oscEditBut.states_([[
 							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
@@ -1411,7 +1456,8 @@ CVWidget {
 							thisGuiEnv.oscEditBut.states[0][2]
 						]]);
 						thisGuiEnv.oscEditBut.refresh;
-					})
+					});
+
 				})
 			}.defer;
 		})
