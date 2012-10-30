@@ -96,7 +96,7 @@ CVWidget {
 	}
 
 	close {
-		if(isCVCWidget and:{ isPersistent == false or:{ isPersistent == nil }}, { this.remove }, { this.window.close });
+		if(isCVCWidget and:{ isPersistent == false or:{ isPersistent == nil }}, { this.remove }, { window.close });
 	}
 
 	addAction { |name, action, slot, active=true|
@@ -735,7 +735,7 @@ CVWidget {
 	}
 
 	front {
-		this.window.front;
+		window.front;
 	}
 
 	isClosed {
@@ -745,7 +745,7 @@ CVWidget {
 			if(allGuiEls.select({ |el| el.isClosed.not }).size == 0, { ^true }, { ^false });
 		}, {
 			// we just want to check for a single widget resp. its parent window
-			^this.window.isClosed;
+			^window.isClosed;
 		})
 	}
 
@@ -895,7 +895,7 @@ CVWidget {
 		wcm.calibration.controller.put(\default, { |theChanger, what, moreArgs|
 			theChanger.value.switch(
 				true, {
-					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
+					window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
 					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
 						thisGuiEnv.editor.calibBut.value_(0);
 						wcm.mapConstrainterLo ?? {
@@ -913,7 +913,7 @@ CVWidget {
 					})
 				},
 				false, {
-					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
+					window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
 					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
 						thisGuiEnv.editor.calibBut.value_(1);
 						[wcm.mapConstrainterLo, wcm.mapConstrainterHi].do({ |cv| cv = nil; });
@@ -1431,6 +1431,7 @@ CVWidget {
 	}
 
 	prInitOscInputRange { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+		var p;
 
 		wcm.oscInputRange.controller ?? {
 			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
@@ -1455,9 +1456,12 @@ CVWidget {
 							thisGuiEnv.oscEditBut.states[0][1],
 							thisGuiEnv.oscEditBut.states[0][2]
 						]]);
+						p = thisGuiEnv.oscEditBut.toolTip.split($\n);
+						p[2] = "using '"++midiOscEnv.oscMapping.asString++"' in-output mapping";
+						p = p.join("\n");
+						thisGuiEnv.oscEditBut.toolTip_(p);
 						thisGuiEnv.oscEditBut.refresh;
-					});
-
+					})
 				})
 			}.defer;
 		})
@@ -1470,12 +1474,13 @@ CVWidget {
 		};
 
 		wcm.actions.controller.put(\default, { |theChanger, what, moreArgs|
-			if(this.window.isClosed.not, {
+			if(window.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[
 					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
 					Color(0.08, 0.09, 0.14),
 					Color(0.32, 0.67, 0.76),
-				]])
+				]]);
+				thisGuiEnv.actionsBut.toolTip_(""++theChanger.value.activeActions++" of "++theChanger.value.numActions++" active.\nClick to edit")
 			})
 		})
 	}
