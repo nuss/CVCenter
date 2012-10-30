@@ -1162,7 +1162,7 @@ CVWidget {
 								try{ thisGuiEnv.midiChan.string.interpret.isInteger }
 							},
 							thisGuiEnv.midiCtrl.string != "ctrl"
-						].collect({ |r| r }).postln;
+						].collect(_);
 
 						// "Enter your MIDI-device's ID,
 						// \nhit 'return' and click 'C' to
@@ -1382,6 +1382,7 @@ CVWidget {
 	}
 
 	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+		var p;
 
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
@@ -1389,7 +1390,7 @@ CVWidget {
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 
-			// theChanger.value.postln;
+			theChanger.value.but.postln;
 			// midiOscEnv.postln;
 
 			switch(prCalibrate.class,
@@ -1398,7 +1399,12 @@ CVWidget {
 			);
 			if(window.isClosed.not, {
 				thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
-				thisGuiEnv.oscEditBut.toolTip_("Connected, listening to\n%, msg-index %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
+				if(theChanger.value.but[0] == "edit OSC", {
+					if(slot.notNil, { p =  " in '"++slot++"'" }, { p = "" });
+					thisGuiEnv.oscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
+				}, {
+					thisGuiEnv.oscEditBut.toolTip_("Connected, listening to\n%, msg-slot %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
+				});
 				thisGuiEnv.oscEditBut.refresh;
 			});
 			defer {
