@@ -1162,7 +1162,7 @@ CVWidget {
 								try{ thisGuiEnv.midiChan.string.interpret.isInteger }
 							},
 							thisGuiEnv.midiCtrl.string != "ctrl"
-						].collect(_);
+						].collect({ |r| r });
 
 						// "Enter your MIDI-device's ID,
 						// \nhit 'return' and click 'C' to
@@ -1176,7 +1176,7 @@ CVWidget {
 						p = p++"\nto connect widget%to MIDI";
 
 						[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
-							_.toolTip_(p.format(slot !? { " at "++slot++" " } ?? { " " }))
+							_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
 						);
 
 						// window.midiSrc.toolTip_("% to connect this widget% to % %".formatf(
