@@ -1390,7 +1390,7 @@ CVWidget {
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 
-			theChanger.value.but.postln;
+			// theChanger.value.but.postln;
 			// midiOscEnv.postln;
 
 			switch(prCalibrate.class,

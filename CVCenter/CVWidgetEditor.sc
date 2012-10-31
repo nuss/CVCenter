@@ -238,6 +238,10 @@ CVWidgetEditor {
 				})
 			;
 
+			if(GUI.id !== \cocoa, {
+				midiModeSelect.toolTip_("Set the mode according to the output\nof your MIDI-device: 0-127 if it outputs\nabsolute values or +/- for in- resp.\ndecremental values")
+			});
+
 			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
@@ -255,6 +259,10 @@ CVWidgetEditor {
 				.step_(1.0)
 				.clipLo_(0.0)
 			;
+
+			if(GUI.id !== \cocoa, {
+				midiMeanNB.toolTip_("If your device outputs in-/decremental\nvalues often a slider's output in neutral\nposition will not be 0. E.g. it could be 64")
+			});
 
 			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
@@ -275,6 +283,10 @@ CVWidgetEditor {
 				.clipHi_(0.5)
 			;
 
+			if(GUI.id !== \cocoa, {
+				softWithinNB.toolTip_("If your device outputs absolute values\nyou can set here a threshold to the\ncurrent CV-value within which a slider\nwill react and set a new value. This avoids\njumps if a new value set by a slider\nis far away from the previous value")
+			});
+
 			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
@@ -293,6 +305,10 @@ CVWidgetEditor {
 				.clipLo_(0.001)
 				.clipHi_(10.0)
 			;
+
+			if(GUI.id !== \cocoa, {
+				midiResolutionNB.toolTip_("Higher values mean lower\nresolution and vice versa.")
+			});
 
 			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
@@ -313,6 +329,10 @@ CVWidgetEditor {
 					})
 				})
 			;
+
+			if(GUI.id !== \cocoa, {
+				ctrlButtonBankField.toolTip_("Set the number of sliders on in one bank of your MIDI-device.\nSetting this number will display the selected slider in a widget not as\na single number but rather as combination of the selected bank and\nthe slider number (e.g.: 4:3 means bank nr. 4, slider nr. 3)")
+			});
 
 			flow1.shift(0, 10);
 
@@ -440,6 +460,10 @@ CVWidgetEditor {
 				.string_("")
 			;
 
+			if(GUI.id !== \cocoa, {
+				ipField.toolTip_("Optional: the device's IP-address\nCan be used to restrict listening to\nthis address only.")
+			});
+
 			flow2.shift(5, 0);
 
 			portField = TextField(thisEditor.tabs.views[2], 36@15)
@@ -448,6 +472,10 @@ CVWidgetEditor {
 				.background_(textFieldBg)
 				.string_("")
 			;
+
+			if(GUI.id !== \cocoa, {
+				portField.toolTip_("Optional: the device's port\nCan be used to restrict listening to\nthis port only.")
+			});
 
 			flow2.shift(0, 0);
 
@@ -510,12 +538,20 @@ CVWidgetEditor {
 				.action_({ OSCCommands.makeWindow })
 			;
 
+			if(GUI.id !== \cocoa, {
+				addDeviceBut.toolTip_("Scan for incoming OSC-messages\nresp. their commandnames. These\ncan be saved to disk together with a\ndevice-name. You may then quickly\nselect from devices + commandnames\nfrom the dropdowns on the left.")
+			});
+
 			nameField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
 				.string_("/my/cmd/name")
 			;
+
+			if(GUI.id !== \cocoa, {
+				nameField.toolTip_("Enter a commandname manualy or first\nselect the device in the dropdown-\nmenu above and then a commandname.\nThe commandname will automatically\nbe filled in here");
+			});
 
 			flow2.shift(5, 0);
 
@@ -529,6 +565,10 @@ CVWidgetEditor {
 				.alt_scale_(1)
 				.value_(1)
 			;
+
+			if(GUI.id !== \cocoa, {
+				indexField.toolTip_("A CVWidget expects values coming in in the\nsucceeding slots of the OSC-message (an array)\nbehind the comandname. An OSC-message\nmay have one or n slots. Select a valid slot\nby moving the mouse clicked up and down.")
+			});
 
 			flow2.shift(0, 0);
 
@@ -554,6 +594,10 @@ CVWidgetEditor {
 				.enabled_(false)
 			;
 
+			if(GUI.id !== \cocoa, {
+				[inputConstraintLoField, inputConstraintHiField].do(_.toolTip_("The constraints for incoming values - either\ndetermined automatically if calibration is on\nor set them manualy if calibration is off"))
+			});
+
 			flow2.shift(5, 0);
 
 			alwaysPosField = StaticText(thisEditor.tabs.views[2], 32@15)
@@ -562,6 +606,10 @@ CVWidgetEditor {
 				.stringColor_(Color(0.5))
 				.background_(Color(0.95, 0.95, 0.95))
 			;
+
+			if(GUI.id !== \cocoa, {
+				alwaysPosField.toolTip_("Make all input same-signed.\nAvoid NaN-results in calculations.")
+			});
 
 			flow2.shift(5, 0);
 
@@ -659,6 +707,10 @@ CVWidgetEditor {
 				.font_(textFieldFont)
 			;
 
+			if(GUI.id !== \cocoa, {
+				actionName.toolTip_("Mandatory: each action must\nbe saved under a unique name")
+			});
+
 			flow3.shift(5, 0);
 
 			enterActionBut = Button(thisEditor.tabs.views[3], 57@20)
@@ -684,6 +736,10 @@ CVWidgetEditor {
 				.syntaxColorize
 //				.keyDownAction_({ |v| v.string_(v.string.copy.replace("\t", "    ")) })
 			;
+
+			if(GUI.id !== \cocoa, {
+				enterAction.toolTip_("The variable 'cv' holds the widget's CV resp.\n'cv.value' its current value. You may enter an\narbitrary function using this variable (or not).")
+			});
 
 			if(slot.notNil, {
 				wdgtActions = widget.wdgtActions[slot];
