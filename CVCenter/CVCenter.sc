@@ -828,6 +828,30 @@ CVCenter {
 		})
 	}
 
+	// spec inference - if it does not find the name, zaps all the non-alpha and looks again
+	// This allows "freq 1" to resolve to \freq
+	*findSpec { |name|
+		var spec = name.asSymbol.asSpec;
+		if (spec.isNil, {
+			spec = name.asString.select({ | c | c.isAlpha}).asSymbol.asSpec
+		});
+		^spec;
+	}
+
+	// add a CV using spec inference
+	*add { |key, spec, value, tab, slot|
+		this.use(key, spec ?? { this.findSpec(key) }, value, tab, slot)
+	}
+
+	// key/value array way to connect CV's to a node
+	// this allows a number of variants documented in the Conductor help file (see below)
+	*connectToNode { |tab, node, kvArray|
+		forBy(1, kvArray.size - 1, 2, { |i|
+			kvArray.put(i, this.at(kvArray[i].asSymbol));
+		});
+		kvArray.postln.connectToNode(node.server, node.nodeID)
+	}
+
 	*setup {
 		^(
 			midiMode: this.midiMode,
