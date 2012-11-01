@@ -846,11 +846,19 @@ CVCenter {
 	// key/value array way to connect CV's to a node
 	// this allows a number of variants documented in the Conductor help file (see below)
 	*connectToNode { |tab, node, kvArray|
+		var cvcKeys = [];
+		// "kvArray: %\n".postf(kvArray);
 		forBy(1, kvArray.size - 1, 2, { |i|
-			kvArray.put(i, this.at(kvArray[i].asSymbol));
+			if(kvArray[i].isArray and:{ kvArray[i].isString.not }, {
+				cvcKeys = cvcKeys.add(kvArray[i]);
+				kvArray.put(i, kvArray[i].collect({ |key| this.at(key.asSymbol) }));
+			}, {
+				kvArray.put(i, this.at(kvArray[i].asSymbol));
+			});
+			// "after - kvArray: %\n".postf(kvArray);
 		});
 		if(node.class == String or:{ node.class == Symbol }, {
-			kvArray.cvcConnectToNode(node.interpret.server, node.interpret.nodeID, node)
+			kvArray.cvcConnectToNode(node.interpret.server, node.interpret.nodeID, node, cvcKeys)
 		}, {
 			kvArray.cvcConnectToNode(node.server, node.nodeID)
 		})

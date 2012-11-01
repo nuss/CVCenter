@@ -4,31 +4,61 @@
 		if(minval != 0 and:{ maxval != 0 }) {
 			^this.hasZeroCrossing
 		}
+		^false
 	}
 
 }
 
 +Array {
 
-	cvCenterBuildCVConnections { | connectFunc, disconnectFuncBuilder, node |
-		var parameters, cvLinks, k;
+	cvCenterBuildCVConnections { | connectFunc, disconnectFuncBuilder, node, cvcKeys |
+		var parameters, cvLinks, k, wdgtIndex, action;
+		"cvcKeys: %\n".postf(cvcKeys);
 		parameters = this.copy.clump(2);
 		cvLinks = Array(parameters.size);
 		parameters = parameters.collect { | p |
 			var label, cv, expr;
+			// "p: %\n".postf(p);
 			#label, cv = p;
-			if (cv.isKindOf(Function)) { cv = cv.value };
-			#cv, expr = cv.asArray;
+			// "label, cv: %, %\n".postf(label, cv);
+			if(cv.class !== Array, {
+				if(cv.isKindOf(Function), { cv = cv.value });
+				#cv, expr = cv.asArray;
+			}, {
+				cv.do({ |c, i|
+					c.isKindOf(Function).if({ cv[i] = cv[i].value });
+				})
+			});
+
+			"cv, expr: %, %\n".postf(cv, expr);
 			expr = expr ? cv;
-			if (expr.isNumber.not) {
-				cv.asArray.do { | cv |
-					if((k = CVCenter.all.findKeyForValue(cv)).notNil and:{ node.notNil }, {
-						cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| "++node++".set('"++label++"', cv.value) }"));
+			// "cv, expr: %, %\n".postf(cv, expr);
+			if(expr.isNumber.not, {
+				// if(cv.isArray, { action = nil!(cv.size) });
+				cv.asArray.do({ |c, i|
+					if((k = CVCenter.all.findKeyForValue(c)).notNil and:{ node.notNil }, {
+						if(cv.size > 1, {
+							// "action: %\n".postf(action);
+							// "key, cv, index of c: %, %, %\n".postf(k, c, CVCenter.all.detectIndex({ |cv| cv === c }));
+							action = nil!(cv.size);
+							cv.do({ |cvau, i|
+								if(cvau === CVCenter.at(k), {
+									action[i] = "cv.value";
+								}, {
+									action[i] = "CVCenter.at('"++CVCenter.all.findKeyForValue(cvau)++"').value";
+								})
+							});
+							// "action: %\n".postf(action);
+							cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| "++node++".setn('"++label++"', ["++action.join(",")++"]) }"));
+							action = nil;
+						}, {
+							cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| "++node++".set('"++label++"', cv.value) }"));
+						})
 					}, {
-						cvLinks.add(cv.action_({connectFunc.value(label, expr)}));
+						cvLinks.add(c.action_({ connectFunc.value(label, expr) }));
 					})
-				}
-			};
+				})
+			});
 			[label,expr.value]
 		};
 
@@ -36,7 +66,7 @@
 		^parameters;
 	}
 
-	cvcConnectToNode { |server, nodeID, node|
+	cvcConnectToNode { |server, nodeID, node, cvcKeys|
 		^this.cvCenterBuildCVConnections(
 			{ | label, expr|
 				var val, group, addAction, msg;
@@ -61,7 +91,7 @@
 						{ arg time, resp, msg; cvLinks.do({ arg n; n.remove}); resp.remove;}
 					).add;
 				}
-			}, node
+			}, node, cvcKeys
 		).flatten(1);
 	}
 

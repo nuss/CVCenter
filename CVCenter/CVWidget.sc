@@ -994,8 +994,8 @@ CVWidget {
 			if(this.class === CVWidgetKnob, {
 				if(argWidgetCV.spec.excludingZeroCrossing, {
 					thisGuiEnv.knob.centered_(true);
-				}, {
-					thisGuiEnv.knob.centered_(false);
+					}, {
+						thisGuiEnv.knob.centered_(false);
 				})
 			})
 		})
