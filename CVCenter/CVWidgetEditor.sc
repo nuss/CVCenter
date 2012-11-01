@@ -131,12 +131,12 @@ CVWidgetEditor {
 			}, {
 				nextX = xySlots.last[0].x+275; nextY = xySlots.last[0].y;
 			});
-			if(nextY+295 > Window.screenBounds.height, {
-				shiftXY ?? { shiftXY = 25 };
-				#nextX, nextY = shiftXY!2;
-				"start again: %\n".postf([nextX, nextY]);
-				shiftXY = shiftXY+25;
-			});
+			// if(nextY+295 > Window.screenBounds.height, {
+			// 	shiftXY ?? { shiftXY = 25 };
+			// 	#nextX, nextY = shiftXY!2;
+			// 	"start again: %\n".postf([nextX, nextY]);
+			// 	shiftXY = shiftXY+25;
+			// });
 
 			// [xySlots, nextX, nextY].postln;
 
