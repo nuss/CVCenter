@@ -17,7 +17,7 @@
 
 CVWidgetEditor {
 
-	classvar <allEditors;
+	classvar <allEditors, xySlots, nextX, nextY, shiftXY;
 	var thisEditor, <window, <tabs, editorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
@@ -46,10 +46,12 @@ CVWidgetEditor {
 		var mappingSelectItems;
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
-		var tmp; // multipurpose short-term var
+		var tmp, gapNextX, gapNextY;
 
 		name = widgetName.asSymbol;
-
+		// "nextX, nextY at init: %, %\n".postf(nextX, nextY);
+		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
+		xySlots ?? { xySlots = [] };
 		editorEnv = ();
 
 		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
@@ -102,13 +104,41 @@ CVWidgetEditor {
 
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 
+			// any seats left empty?
+			block { |break|
+				xySlots.do({ |p, i|
+					if(p[1] == 0, {
+						break.value(
+							#gapNextX, gapNextY = p[0].asArray;
+							// "gapNextX, gapNextY: %, %\n".postf(gapNextX, gapNextY);
+							xySlots[i][1] = name++slotHiLo;
+						);
+					})
+				})
+			};
+
 			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(
-				Window.screenBounds.width/2-150,
-				Window.screenBounds.height/2-100,
-				270, 265
+				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 270, 265
 			))
 				.background_(Color(0.7, 0.7, 0.7, 0.0))
 			;
+
+			xySlots = xySlots.add([nextX@nextY, name++slotHiLo]);
+			// [xySlots, nextX, nextY].postln;
+			if(nextX+275 > Window.screenBounds.width, {
+				nextX = shiftXY ?? { 0 }; nextY = xySlots.last[0].y+295;
+				"go to next line: %\n".postf([nextX, nextY]);
+			}, {
+				nextX = xySlots.last[0].x+275; nextY = xySlots.last[0].y;
+			});
+			if(nextY+295 > Window.screenBounds.height, {
+				shiftXY ?? { shiftXY = 25 };
+				#nextX, nextY = shiftXY!2;
+				"start again: %\n".postf([nextX, nextY]);
+				shiftXY = shiftXY+25;
+			});
+
+			// [xySlots, nextX, nextY].postln;
 
 			if(slot.isNil, {
 				allEditors.put(name, (window: window, name: widgetName))
@@ -215,6 +245,11 @@ CVWidgetEditor {
 			window.onClose_({
 				editorEnv.specsListSpecs = specsListSpecs;
 				editorEnv.specsListItems = specsList.items;
+				tmp = xySlots.detectIndex({ |n| n[1] == (name.asString++slotHiLo) });
+				// "slot vor empty: %\n".postf(xySlots[tmp]);
+				xySlots[tmp][1] = 0;
+				// "slot nach empty: %\n".postf(xySlots[tmp]);
+				// xySlots.postln;
 			});
 
 			// MIDI editing

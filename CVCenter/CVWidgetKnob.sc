@@ -152,7 +152,9 @@ CVWidgetKnob : CVWidget {
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
 
-		if(GUI.id !== \cocoa, { [label, nameField].do(_.toolTip_("Add some notes if you like")) });
+		if(GUI.id !== \cocoa, {
+			[label, nameField].do(_.toolTip_("Add some notes if you like"));
+		});
 
 		knobsize = thisHeight-2-145;
 		if(knobsize >= thisWidth, {

@@ -195,7 +195,9 @@ CVWidget2D : CVWidget {
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
 
-		if(GUI.id !== \cocoa, { [label, nameField].do(_.toolTip_("Add some notes if you like")) });
+		if(GUI.id !== \cocoa, {
+			[label, nameField].do(_.toolTip_("Add some notes if you like"));
+		});
 
 		nextY = thisXY.y+1+label.bounds.height;
 
