@@ -849,7 +849,11 @@ CVCenter {
 		forBy(1, kvArray.size - 1, 2, { |i|
 			kvArray.put(i, this.at(kvArray[i].asSymbol));
 		});
-		kvArray.postln.connectToNode(node.server, node.nodeID)
+		if(node.class == String or:{ node.class == Symbol }, {
+			kvArray.cvcConnectToNode(node.interpret.server, node.interpret.nodeID, node)
+		}, {
+			kvArray.cvcConnectToNode(node.server, node.nodeID)
+		})
 	}
 
 	*setup {
