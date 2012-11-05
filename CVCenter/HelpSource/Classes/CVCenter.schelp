@@ -8,8 +8,8 @@ CVCenter lets you collect an arbitrary number of link::Classes/CV::s (you need t
 
 strong:: What's a CV? ::
 
-A link::Classes/CV:: models a value constrained by a link::Classes/ControlSpec::. The value can be a single link::Classes/Float:: or an array of Floats. Whenever the link::Classes/CV::'s value changes, it sends a changed message labeled 'synch'.  This way dependants (such as GUI objects or server value) can be updated with link::Classes/SimpleController::s. 
-A link::Classes/CV::'s value can be read with the 'value' message. 
+A link::Classes/CV:: models a value constrained by a link::Classes/ControlSpec::. The value can be a single link::Classes/Float:: or an array of Floats. Whenever the link::Classes/CV::'s value changes, it sends a changed message labeled 'synch'.  This way dependants (such as GUI objects or server value) can be updated with link::Classes/SimpleController::s.
+A link::Classes/CV::'s value can be read with the 'value' message.
 
 CLASSMETHODS::
 
@@ -39,7 +39,7 @@ definitionlist::
 	## strong::ctrlButtonBank:: || - default: nil (for a detailed explanation see: link::#*ctrlButtonBank::)
 ::
 
-For a detailed description of the above listet arguments see the descriptions of the according classvar-methods. 
+For a detailed description of the above listet arguments see the descriptions of the according classvar-methods.
 
 returns:: this (CVCenter)
 
@@ -108,7 +108,7 @@ default: code::0::
 returns:: this (CVCenter)
 
 METHOD:: midiResolution
-When code::midiMode:: has been set to 1, this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
+When code::midiMode:: has been set to 1, this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders.
 
 standard-value: 1
 lower values -> higher resolution (lower stepsize)
@@ -119,7 +119,7 @@ default: code::1::
 returns:: this (CVCenter)
 
 METHOD:: ctrlButtonBank
-Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 hardware-sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI. 
+Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 hardware-sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI.
 code::ctrlButtonBank:: translates the hardware-layout in a way that makes it easy to see the slider's bank and number: slider 17 becomes 2:1 (bank 2,  nr. 1).
 
 default: code::nil::
@@ -164,7 +164,7 @@ METHOD:: removeAll
 Remove given link::Classes/CVWidget::s including their link::Classes/CV::s or all. Existing OSC- or MIDI-connections will be resolved automatically.
 
 argument::  ... keys
-widget-keys, given as link::Classes/String::s or link::Classes/Symbol::s. If no keys are given strong::all:: widgets will be removed. 
+widget-keys, given as link::Classes/String::s or link::Classes/Symbol::s. If no keys are given strong::all:: widgets will be removed.
 
 returns:: this (CVCenter)
 
@@ -304,7 +304,7 @@ returns:: this (CVCenter)
 
 
 METHOD:: loadSetup
-Loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup. 
+Loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup.
 
 argument:: path
 optional - expects the full path to the location where the setup shall be stored to disk. If given no file-open dialog will be displayed.
@@ -418,13 +418,13 @@ CVCenter.use(\knobTest, tab: \test);
 CVCenter.addActionAt(\knobTest, \testFunc, { |cv| "knobTest: %\n".postf(cv.value) }, active: false);
 CVCenter.use(\test2D, tab: \test, slot: \lo);
 // arguments 'tab' and 'slot' may be omitted when creating the 'hi' slot as the widget knows under which
-// tab it's living and which slot has already been created. Also the operation doesn't depend 
+// tab it's living and which slot has already been created. Also the operation doesn't depend
 // on a CV being returned
 CVCenter.use(\test2D);
 CVCenter.addActionAt(\test2D, \testFunc, { |cv| "test2D lo: %\n".postf(cv.value) }, \lo);
 CVCenter.addActionAt(\test2D, \testFunc, { |cv| "test2D hi: %\n".postf(cv.value) }, \hi);
 
-// action activation and deactivation 
+// action activation and deactivation
 // watch the "actions"-button at the bottom of the widget
 // turn the knob to see the effect
 CVCenter.activateActionAt(\knobTest, \testFunc, true);
@@ -460,34 +460,36 @@ CVCenter.removeAll;
 subsection:: Creating CVWidgets within CVCenter GUI from running Synths, NodeProxies, Ndefs and ProxySpaces
 
 code::
-// a SynthDef, including some arrayed controls 
+// a SynthDef, including some arrayed controls
 (
 SynthDef('dynKlank', { |impFreq1, impFreq2, freqs1=#[800, 1071, 1153, 1723], freqs2=#[789, 1067, 1150, 1720], ringtimes1=#[1, 1, 1, 1], ringtimes2=#[1, 1, 1, 1]|
 	var signal1, signal2;
 	signal1 = DynKlank.ar(`[freqs1, nil, ringtimes1 ], Impulse.ar(impFreq1, 0, 0.1));
 	signal2 = DynKlank.ar(`[freqs2, nil, ringtimes2 ], Impulse.ar(impFreq2, 0, 0.1));
 	Out.ar(0, [signal1, signal2]);
-}, 
+},
 // specs, defined within the SynthDef's metadata will be considered when auto-creating the GUI
 metadata: (
 	specs: (
-		freqs1: \freq, 
-		freqs2: \freq, 
-		impFreq1: [0.1, 5], 
-		impFreq2: [0.1, 5], 
-		ringtimes1: [1, 20], 
+		freqs1: \freq,
+		freqs2: \freq,
+		impFreq1: [0.1, 5],
+		impFreq2: [0.1, 5],
+		ringtimes1: [1, 20],
 		ringtimes2: [1, 20]
 	)
 )).add; // must be 'added' if the GUI shall be auto-created
 )
 
-Server.default.waitForBoot { a = Synth(\dynKlank) };
-
-// GUI creation - note that actions within widgets representing arrayed controls will
-// rather use setn to set the regarding controls
-// have a look at the Synth helpfile to see all possible arguments for cvcGui
-a.cvcGui(pairs2D: (impFreqs: #[impFreq1, impFreq2]));
-
+(
+Server.default.waitForBoot {
+	a = Synth(\dynKlank);
+	// GUI creation - note that actions within widgets representing arrayed controls will
+	// rather use setn to set the regarding controls
+	// have a look at the Synth helpfile to see all possible arguments for cvcGui
+	a.cvcGui(pairs2D: (impFreqs: #[impFreq1, impFreq2]));
+};
+)
 
 
 /////////////////////////////////// CVCenter and Ndefs /////////////////////////////////////////////////

@@ -120,7 +120,7 @@ CVWidgetEditor {
 			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(
 				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 270, 265
 			))
-			// .background_(Color(0.7, 0.7, 0.7, 1.0))
+			// .background_(Color(0.8, 0.8, 0.8, 1.0))
 			;
 
 			xySlots = xySlots.add([nextX@nextY, name++slotHiLo]);
@@ -171,13 +171,14 @@ CVWidgetEditor {
 			tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			// tabs.views.do({ |v| v.background_(Color(0.5, 0.5, 0.5, 1.0)) });
-			tabs.views.do({ |v| v.background_(Color.gray) });
-			(0..3).do({ |t| tabs.focusActions[t] = {
-				tabs.stringFocusedColor_(labelStringColors[t]);
-				// tabs.views[t].background.alpha_(1.0);
-				("alpha:"+tabs.views[t].background.alpha).postln;
-			}});
+			tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
+			(0..3).do({ |t|
+				tabs.focusActions[t] = {
+					tabs.stringFocusedColor_(labelStringColors[t]);
+					tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0));
+					// ("alpha:"+[t, tabs.views[t].background, tabs.views[t].background.alpha]).postln;
+				};
+			});
 			tabs.stringFocusedColor_(labelStringColors[tab]);
 			// tabs.views.do({ |t| [t.class, t.background].postln });
 			// tabs.views.collect({ |t| t.background.alpha }).postln;
