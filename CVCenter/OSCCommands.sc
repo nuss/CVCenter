@@ -84,7 +84,7 @@ OSCCommands {
 		var window, flow, fields = (), deviceNameField, saveBut;
 		var progress, progressStates, progressRoutine, collectRoutine, stopFunc;
 		var makeField, nextFields;
-		var staticTextFont = Font("Arial", 10);
+		var staticTextFont = Font("Arial", 9.4);
 		var staticTextColor = Color(0.2, 0.2, 0.2);
 		var textFieldFont = Font("Andale Mono", 9);
 		var textFieldFontColor = Color.black;
@@ -133,7 +133,7 @@ OSCCommands {
 
 		flow.shift(0, 0);
 
-		progress = StaticText(window, Rect(0, 0, 470, 30)).font_(Font(Font.defaultSansFace, 20, true));
+		progress = StaticText(window, Rect(0, 0, 470, 30)).font_(Font("Arial", 20, true));
 
 		flow.shift(-470, 30);
 

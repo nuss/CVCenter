@@ -203,8 +203,10 @@ CVCenter {
 				v.keyDownAction_({ |view, char, modifiers, unicode, keycode|
 					// [view, char, modifiers, unicode, keycode].postcs;
 					switch(keycode,
-						16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
+						// 16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+						// 16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
+						114, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+						113, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
 						// when and why have the keycodes been changed??
 						124, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
 						123, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
