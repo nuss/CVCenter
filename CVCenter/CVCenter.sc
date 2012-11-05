@@ -255,7 +255,7 @@ CVCenter {
 							if(tDefWin.notNil and:{ tDefWin.isClosed.not }, { tDefWin.front });
 						}, // key "t"
 						97, {
-							if(Class.exists(AllGui), {
+							if(\AllGui.asClass.notNil, {
 								if(allWin.isNil or:{ allWin.isClosed }, {
 									allGui = AllGui(); allWin = allGui.parent;
 								});
@@ -263,7 +263,7 @@ CVCenter {
 							})
 						}, // key "a"
 						101, {
-							if(Class.exists(MasterEQ), {
+							if(\MasterEQ.asClass.notNil, {
 								if(eqWin.isNil or:{ eqWin.isClosed }, {
 									eqGui = MasterEQ(Server.default.options.firstPrivateBus, Server.default);
 									eqWin = eqGui.window;
@@ -855,7 +855,7 @@ CVCenter {
 
 	// key/value array way to connect CV's to a node
 	// this allows a number of variants documented in the Conductor help file (see below)
-	*connectToNode { |tab, node, kvArray|
+	*connectToNode { |node, kvArray|
 		var cvcKeys = [];
 		// "kvArray: %\n".postf(kvArray);
 		forBy(1, kvArray.size - 1, 2, { |i|
