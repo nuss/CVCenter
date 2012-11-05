@@ -24,7 +24,7 @@ CVCenter {
 	classvar widgetStates;
 	classvar tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=181, colwidth, rowheight;
-	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin;
+	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin, eqWin;
 	classvar prefs, boundsOnShutDown;
 
 	*initClass {
@@ -132,7 +132,7 @@ CVCenter {
 		var cvcArgs, btnColor;
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
 		var midiFlag, oscFlag, loadFlag, tmp, wdgtActions;
-		var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui;
+		var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
 
 		cvs !? { this.put(*cvs) };
@@ -201,7 +201,7 @@ CVCenter {
 
 			[tabs.view, tabs.views, prefPane].flat.do({ |v|
 				v.keyDownAction_({ |view, char, modifiers, unicode, keycode|
-//					[view, char, modifiers, unicode, keycode].postcs;
+					// [view, char, modifiers, unicode, keycode].postcs;
 					switch(keycode,
 						16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
 						16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
@@ -254,13 +254,23 @@ CVCenter {
 							});
 							if(tDefWin.notNil and:{ tDefWin.isClosed.not }, { tDefWin.front });
 						}, // key "t"
-						97, { if(Quarks.isInstalled("AllGui"), {
+						97, {
+							if(Class.exists(AllGui), {
 								if(allWin.isNil or:{ allWin.isClosed }, {
 									allGui = AllGui(); allWin = allGui.parent;
 								});
 								if(allWin.notNil and:{ allWin.isClosed.not }, { allWin.front })
 							})
-						} // key "a"
+						}, // key "a"
+						101, {
+							if(Class.exists(MasterEQ), {
+								if(eqWin.isNil or:{ eqWin.isClosed }, {
+									eqGui = MasterEQ(Server.default.options.firstPrivateBus, Server.default);
+									eqWin = eqGui.window;
+								});
+								if(eqWin.notNil and: { eqWin.isClosed.not }, { eqWin.front });
+							})
+						} // key "e"
 					);
 					if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }});
 					if(modifiers == 131072 and:{ unicode == 72 and:{ History.started }}, {
