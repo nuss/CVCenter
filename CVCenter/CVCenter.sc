@@ -1492,6 +1492,8 @@ CVCenter {
 			}
 		);
 
+		varNames.postln;
+
 		if(more.specEnterText.notNil and:{
 			more.specEnterText.interpret.asSpec.isKindOf(ControlSpec)
 		}, {

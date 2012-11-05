@@ -84,9 +84,9 @@ OSCCommands {
 		var window, flow, fields = (), deviceNameField, saveBut;
 		var progress, progressStates, progressRoutine, collectRoutine, stopFunc;
 		var makeField, nextFields;
-		var staticTextFont = Font(Font.defaultSansFace, 10);
+		var staticTextFont = Font("Arial", 10);
 		var staticTextColor = Color(0.2, 0.2, 0.2);
-		var textFieldFont = Font(Font.defaultMonoFace, 9);
+		var textFieldFont = Font("Andale Mono", 9);
 		var textFieldFontColor = Color.black;
 		var textFieldBg = Color.white;
 
