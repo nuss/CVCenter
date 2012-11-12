@@ -11,9 +11,9 @@
 
 +Array {
 
-	cvCenterBuildCVConnections { | connectFunc, disconnectFuncBuilder, node, cvcKeys |
-		var parameters, cvLinks, k, wdgtIndex, action;
-		"cvcKeys: %\n".postf(cvcKeys);
+	cvCenterBuildCVConnections { | connectFunc, disconnectFuncBuilder, node, cvcKeys, server, nodeID |
+		var parameters, cvLinks, k, wdgtIndex, cvValues;
+		("cvCenterBuildConnections: "++[connectFunc, disconnectFuncBuilder, node, cvcKeys]).postcs;
 		parameters = this.copy.clump(2);
 		cvLinks = Array(parameters.size);
 		parameters = parameters.collect { | p |
@@ -30,33 +30,39 @@
 				})
 			});
 
-			"cv, expr: %, %\n".postf(cv, expr);
+			// "cv, expr: %, %\n".postf(cv, expr);
 			expr = expr ? cv;
 			// "cv, expr: %, %\n".postf(cv, expr);
 			if(expr.isNumber.not, {
 				// if(cv.isArray, { action = nil!(cv.size) });
 				cv.asArray.do({ |c, i|
-					"c: %\n".postf(c);
-					if((k = CVCenter.all.findKeyForValue(c)).notNil and:{ node.notNil }, {
+					// "c: %\n".postf(c);
+					if((k = CVCenter.all.findKeyForValue(c)).notNil, {
 						if(cv.size > 1, {
-							// "action: %\n".postf(action);
-							// "key, cv, index of c: %, %, %\n".postf(k, c, CVCenter.all.detectIndex({ |cv| cv === c }));
-							action = nil!(cv.size);
+							cvValues = nil!(cv.size);
 							cv.do({ |cvau, i|
 								if(cvau === CVCenter.at(k), {
-									action[i] = "cv.value";
+									cvValues[i] = "cv.value";
 								}, {
-									action[i] = "CVCenter.at('"++CVCenter.all.findKeyForValue(cvau)++"').value";
+									cvValues[i] = "CVCenter.at('"++CVCenter.all.findKeyForValue(cvau)++"').value";
 								})
-							});
-							// "action: %\n".postf(action);
-							cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| "++node++".setn('"++label++"', ["++action.join(",")++"]) }"));
-							action = nil;
+							})
+						});
+						if(node.notNil, {
+							if(cv.size > 1, {
+								// "k, k.class, action: %\n".postf(k, k.class, action);
+								cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| "++node++".setn('"++label++"', ["++cvValues.join(", ")++"]) }"));
+								cvValues = nil;
+							}, {
+								cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| "++node++".set('"++label++"', cv.value) }"));
+							})
 						}, {
-							cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| "++node++".set('"++label++"', cv.value) }"));
+							if(cv.size > 1, {
+								cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', "++cv.size++", "++cvValues.join(", ")++"]) }"));
+							}, {
+								cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', 1, cv.value]) }"));
+							})
 						})
-					}, {
-						cvLinks.add(c.action_({ connectFunc.value(label, expr) }));
 					})
 				})
 			});
@@ -68,12 +74,14 @@
 	}
 
 	cvcConnectToNode { |server, nodeID, node, cvcKeys|
+		("cvcConnectToNode: "++[server, nodeID, node, cvcKeys]).postln;
 		^this.cvCenterBuildCVConnections(
 			{ | label, expr|
 				var val, group, addAction, msg;
 				// "label, expr: %, %\n".postf(label, expr);
 				if (label != 'group') {
-					val = expr.value.asArray;
+					val = expr.collect({ |v| v.value });
+					// "val.value: %\n".postf(val.value);
 					msg = ['/n_setn', nodeID, label, val.size] ++ val;
 				} {
 					val = expr.asArray;
@@ -87,14 +95,16 @@
 					);
 				};
 				"msg: %\n".postf(msg);
+				// "server: %\n".postf(server.asCompileString);
 				server.sendBundle(server.latency, msg);
 			}, { | cvLinks|
 				node ?? {
+					cvLinks.postln;
 					OSCpathResponder(server.addr, ["/n_end", nodeID],
 						{ arg time, resp, msg; cvLinks.do({ arg n; n.remove}); resp.remove;}
 					).add;
 				}
-			}, node, cvcKeys
+			}, node, cvcKeys, server, nodeID
 		).flatten(1);
 	}
 

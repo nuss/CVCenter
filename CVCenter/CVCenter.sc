@@ -859,22 +859,20 @@ CVCenter {
 	// this allows a number of variants documented in the Conductor help file (see below)
 	*connectToNode { |node, kvArray, environment|
 		var cvcKeys = [], nodeVars;
-		"kvArray: %\n".postf(kvArray);
 		if(node.class !== Symbol and:{ node.class !== String }, {
 			nodeVars = node.getObjectVarNames(environment)
 		});
+		// "nodeVars: %\n".postf(nodeVars);
 		forBy(1, kvArray.size - 1, 2, { |i|
-			if(kvArray[i].isArray ,{ kvArray[i].isString.not }, {
+			if(kvArray[i].isArray and:{ kvArray[i].isString.not }, {
 				cvcKeys = cvcKeys.add(kvArray[i]);
 				kvArray.put(i, kvArray[i].collect({ |key| this.at(key.asSymbol) }));
 			}, {
 				kvArray.put(i, this.at(kvArray[i].asSymbol));
 			});
-			// "after - kvArray: %\n".postf(kvArray);
 		});
-		if(nodeVars.notNil, {
+		if(nodeVars.notNil and:{ nodeVars.size > 0 }, {
 			nodeVars.do({ |n|
-				"n: %, %, %, %\n".postf(n, n.class, n.asString.interpret.server, n.asString.interpret.nodeID);
 				kvArray.cvcConnectToNode(n.asString.interpret.server, n.asString.interpret.nodeID, n, cvcKeys);
 			})
 		}, {
