@@ -858,7 +858,7 @@ CVCenter {
 	// key/value array way to connect CV's to a node
 	// this allows a number of variants documented in the Conductor help file (see below)
 	*connectToNode { |node, kvArray, environment|
-		var cvcKeys = [], nodeVars, defName;
+		var cvcKeys = [], nodeVars, activate;
 		if(node.class !== Symbol and:{ node.class !== String }, {
 			nodeVars = node.getObjectVarNames(environment)
 		});
@@ -873,14 +873,15 @@ CVCenter {
 			});
 		});
 		if(nodeVars.notNil and:{ nodeVars.size > 0 }, {
-			nodeVars.do({ |n|
-				kvArray.cvcConnectToNode(n.asString.interpret.server, n.asString.interpret.nodeID, n, cvcKeys);
+			nodeVars.do({ |n, i|
+				if(i == 0, { activate = true }, { activate = false });
+				kvArray.cvCenterBuildCVConnections(n.asString.interpret.server, n.asString.interpret.nodeID, n, cvcKeys, activate);
 			})
 		}, {
 			if(node.class == String or:{ node.class == Symbol }, {
-				kvArray.cvcConnectToNode(node.interpret.server, node.interpret.nodeID, node, cvcKeys)
+				kvArray.cvCenterBuildCVConnections(node.interpret.server, node.interpret.nodeID, node, cvcKeys)
 			}, {
-				kvArray.cvcConnectToNode(node.server, node.nodeID)
+				kvArray.cvCenterBuildCVConnections(node.server, node.nodeID)
 			})
 		})
 	}

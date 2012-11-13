@@ -11,10 +11,10 @@
 
 +Array {
 
-	cvCenterBuildCVConnections { | connectFunc, disconnectFuncBuilder, node, cvcKeys, server, nodeID |
+	cvCenterBuildCVConnections { | server, nodeID, node, cvcKeys, setActive |
 		var parameters, cvLinks, k, wdgtIndex, cvValues;
 		var label, cv, expr;
-		("cvCenterBuildConnections: "++[connectFunc, disconnectFuncBuilder, node, cvcKeys]).postln;
+		// ("cvCenterBuildConnections: "++[node, cvcKeys, server, nodeID]).postln;
 		parameters = this.copy.clump(2);
 		cvLinks = Array(parameters.size);
 		parameters = parameters.collect { | p |
@@ -36,7 +36,7 @@
 			if(expr.isNumber.not, {
 				// if(cv.isArray, { action = nil!(cv.size) });
 				cv.asArray.do({ |c, i|
-					// "c: %\n".postf(c);
+					// "c, i: %, %\n".postf(c, i);
 					if((k = CVCenter.all.findKeyForValue(c)).notNil, {
 						if(cv.size > 1, {
 							cvValues = nil!(cv.size);
@@ -51,18 +51,32 @@
 						if(node.notNil, {
 							if(cv.size > 1, {
 								// "k, k.class, action: %\n".postf(k, k.class, action);
-								cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| "++node++".setn('"++label++"', ["++cvValues.join(", ")++"]) }"));
+								cvLinks.add(CVCenter.addActionAt(
+									k, "default_"++node.asString,
+									"{ |cv| "++node++".setn('"++label++"', ["++cvValues.join(", ")++"]) }",
+									active: setActive
+								));
 								cvValues = nil;
 							}, {
-								cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| "++node++".set('"++label++"', cv.value) }"));
+								cvLinks.add(CVCenter.addActionAt(
+									k, "default_"++node.asString,
+									"{ |cv| "++node++".set('"++label++"', cv.value) }",
+									active: setActive
+								))
 							})
 						}, {
 							if(cv.size > 1, {
-								[k, c.value].postln;
-								cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', "++cv.size++", "++cvValues.join(", ")++"]) }"));
+								// [k, c.value].postln;
+								cvLinks.add(CVCenter.addActionAt(
+									k, \default,
+									"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', "++cv.size++", "++cvValues.join(", ")++"]) }"
+								))
 							}, {
-								[k, c.value].postln;
-								cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', 1, cv.value]) }"));
+								// [k, c.value].postln;
+								cvLinks.add(CVCenter.addActionAt(
+									k, \default,
+									"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', 1, cv.value]) }"
+								))
 							})
 						})
 					})
@@ -75,42 +89,7 @@
 		// 	"ending".postln;
 		// 	// disconnectFuncBuilder.value(cvLinks);
 		// });
-		^parameters;
-	}
-
-	cvcConnectToNode { |server, nodeID, node, cvcKeys|
-		("cvcConnectToNode: "++[server, nodeID, node, cvcKeys]).postln;
-		^this.cvCenterBuildCVConnections(
-			{ /*| label, expr|
-				var val, group, addAction, msg;
-				// "label, expr: %, %\n".postf(label, expr);
-				if (label != 'group') {
-					val = expr.collect({ |v| v.value });
-					// "val.value: %\n".postf(val.value);
-					msg = ['/n_setn', nodeID, label, val.size] ++ val;
-				} {
-					val = expr.asArray;
-					group = val[0].value;
-					addAction = val[1].value ? 0;
-					msg = switch (addAction,
-						0, { ['/g_head', group, nodeID] },
-						1, { ['/g_tail', group, nodeID] },
-						2, { ['/n_before', nodeID, group ] },
-						3, { ['/n_after', nodeID, group ] }
-					);
-				};
-				"msg: %\n".postf(msg);
-				// "server: %\n".postf(server.asCompileString);
-				server.sendBundle(server.latency, msg);
-			*/}, { /*| cvLinks|
-				node ?? {
-					"cvLinks called in disconnectFunc: %\n".postf(cvLinks);
-					OSCpathResponder(server.addr, ["/n_end", nodeID],
-						{ arg time, resp, msg; cvLinks.do({ arg n; n.remove}); resp.remove;}
-					).add;
-				}
-			*/}, node, cvcKeys, server, nodeID
-		).flatten(1);
+		^parameters.flatten(1);
 	}
 
 }
