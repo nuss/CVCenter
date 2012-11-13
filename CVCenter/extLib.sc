@@ -13,11 +13,11 @@
 
 	cvCenterBuildCVConnections { | connectFunc, disconnectFuncBuilder, node, cvcKeys, server, nodeID |
 		var parameters, cvLinks, k, wdgtIndex, cvValues;
-		("cvCenterBuildConnections: "++[connectFunc, disconnectFuncBuilder, node, cvcKeys]).postcs;
+		var label, cv, expr;
+		("cvCenterBuildConnections: "++[connectFunc, disconnectFuncBuilder, node, cvcKeys]).postln;
 		parameters = this.copy.clump(2);
 		cvLinks = Array(parameters.size);
 		parameters = parameters.collect { | p |
-			var label, cv, expr;
 			// "p: %\n".postf(p);
 			#label, cv = p;
 			// "label, cv: %, %\n".postf(label, cv);
@@ -58,25 +58,30 @@
 							})
 						}, {
 							if(cv.size > 1, {
+								[k, c.value].postln;
 								cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', "++cv.size++", "++cvValues.join(", ")++"]) }"));
 							}, {
+								[k, c.value].postln;
 								cvLinks.add(CVCenter.addActionAt(k, \default, "{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', 1, cv.value]) }"));
 							})
 						})
 					})
 				})
-			});
-			[label,expr.value]
+			})
+			// [label,expr.value]
 		};
 
-		if (cvLinks.size > 0) { disconnectFuncBuilder.value(cvLinks)};
+		// if (cvLinks.size > 0, {
+		// 	"ending".postln;
+		// 	// disconnectFuncBuilder.value(cvLinks);
+		// });
 		^parameters;
 	}
 
 	cvcConnectToNode { |server, nodeID, node, cvcKeys|
 		("cvcConnectToNode: "++[server, nodeID, node, cvcKeys]).postln;
 		^this.cvCenterBuildCVConnections(
-			{ | label, expr|
+			{ /*| label, expr|
 				var val, group, addAction, msg;
 				// "label, expr: %, %\n".postf(label, expr);
 				if (label != 'group') {
@@ -97,14 +102,14 @@
 				"msg: %\n".postf(msg);
 				// "server: %\n".postf(server.asCompileString);
 				server.sendBundle(server.latency, msg);
-			}, { | cvLinks|
+			*/}, { /*| cvLinks|
 				node ?? {
-					cvLinks.postln;
+					"cvLinks called in disconnectFunc: %\n".postf(cvLinks);
 					OSCpathResponder(server.addr, ["/n_end", nodeID],
 						{ arg time, resp, msg; cvLinks.do({ arg n; n.remove}); resp.remove;}
 					).add;
 				}
-			}, node, cvcKeys, server, nodeID
+			*/}, node, cvcKeys, server, nodeID
 		).flatten(1);
 	}
 
