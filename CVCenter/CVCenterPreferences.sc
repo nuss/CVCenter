@@ -54,7 +54,7 @@ CVCenterPreferences {
 				;
 				if(active, { cBox.value_(1) }, { cBox.value_(0) });
 			}, {
-				cBox = CheckBox(window.view, 15@15).value_(active);
+				cBox = \CheckBox.asClass.new(window.view, 15@15).value_(active);
 			});
 			cBox;
 		};
