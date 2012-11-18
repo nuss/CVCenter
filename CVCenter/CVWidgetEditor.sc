@@ -127,7 +127,6 @@ CVWidgetEditor {
 			// [xySlots, nextX, nextY].postln;
 			if(nextX+275 > Window.screenBounds.width, {
 				nextX = shiftXY ?? { 0 }; nextY = xySlots.last[0].y+295;
-				"go to next line: %\n".postf([nextX, nextY]);
 			}, {
 				nextX = xySlots.last[0].x+275; nextY = xySlots.last[0].y;
 			});

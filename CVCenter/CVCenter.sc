@@ -855,37 +855,6 @@ CVCenter {
 		this.use(key, spec ?? { this.findSpec(key) }, value, tab, slot)
 	}
 
-	// key/value array way to connect CV's to a node
-	// this allows a number of variants documented in the Conductor help file (see below)
-	*connectToNode { |node, kvArray, environment|
-		var cvcKeys = [], nodeVars, activate;
-		if(node.class !== Symbol and:{ node.class !== String }, {
-			nodeVars = node.getObjectVarNames(environment)
-		});
-		nodeVars.postln;
-		// "nodeVars: %\n".postf(nodeVars);
-		forBy(1, kvArray.size - 1, 2, { |i|
-			if(kvArray[i].isArray and:{ kvArray[i].isString.not }, {
-				cvcKeys = cvcKeys.add(kvArray[i]);
-				kvArray.put(i, kvArray[i].collect({ |key| this.at(key.asSymbol) }));
-			}, {
-				kvArray.put(i, this.at(kvArray[i].asSymbol));
-			});
-		});
-		if(nodeVars.notNil and:{ nodeVars.size > 0 }, {
-			nodeVars.do({ |n, i|
-				if(i == 0, { activate = true }, { activate = false });
-				kvArray.cvCenterBuildCVConnections(n.asString.interpret.server, n.asString.interpret.nodeID, n, cvcKeys, activate);
-			})
-		}, {
-			if(node.class == String or:{ node.class == Symbol }, {
-				kvArray.cvCenterBuildCVConnections(node.interpret.server, node.interpret.nodeID, node, cvcKeys)
-			}, {
-				kvArray.cvCenterBuildCVConnections(node.server, node.nodeID)
-			})
-		})
-	}
-
 	*setup {
 		^(
 			midiMode: this.midiMode,
@@ -1443,6 +1412,39 @@ CVCenter {
 
 	/* utilities */
 
+	// key/value array way to connect CV's to a node
+	// this allows a number of variants documented in the Conductor help file (see below)
+	*connectToNode { |node, kvArray, environment|
+		var cvcKeys = [], nodeVars, activate;
+
+		if(node.class !== Symbol and:{ node.class !== String }, {
+			nodeVars = node.getObjectVarNames(environment)
+		});
+
+		// "nodeVars: %\n".postf(nodeVars);
+		forBy(1, kvArray.size - 1, 2, { |i|
+			if(kvArray[i].isArray and:{ kvArray[i].isString.not }, {
+				cvcKeys = cvcKeys.add(kvArray[i]);
+				kvArray.put(i, kvArray[i].collect({ |key| this.at(key.asSymbol) }));
+			}, {
+				kvArray.put(i, this.at(kvArray[i].asSymbol));
+			});
+		});
+		if(nodeVars.notNil and:{ nodeVars.size > 0 }, {
+			nodeVars.do({ |n, i|
+				if(i == 0, { activate = true }, { activate = false });
+				kvArray.cvCenterBuildCVConnections(n.asString.interpret.server, n.asString.interpret.nodeID, n, cvcKeys, activate);
+			})
+		}, {
+			if(node.class == String or:{ node.class == Symbol }, {
+				kvArray.cvCenterBuildCVConnections(node.interpret.server, node.interpret.nodeID, node, cvcKeys)
+			}, {
+				kvArray.cvCenterBuildCVConnections(node.server, node.nodeID)
+			})
+		})
+	}
+
+	// not to be called directly - called internally by Synth:-cvcGui resp. NodeProxy:-cvcGui
 	*finishGui { |obj, ctrlName, environment, more|
 		// var interpreterVars, varNames = [], envs = [], thisSpec;
 		// var pSpaces = [], proxySpace;
