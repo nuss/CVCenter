@@ -339,7 +339,7 @@ CVCenter {
 					])
 				;
 			}, {
-				loadActionsRadio = CheckBox(prefPane, Rect(0, 0, 15, 15)).value_(true)
+				loadActionsRadio = \CheckBox.asClass.new(prefPane, Rect(0, 0, 15, 15)).value_(true)
 			});
 
 			swFlow.shift(0, -2);
@@ -362,7 +362,7 @@ CVCenter {
 					])
 				;
 			}, {
-				autoConnectMIDIRadio = CheckBox(prefPane, Rect(0, 0, 15, 15)).value_(true)
+				autoConnectMIDIRadio = \CheckBox.asClass.new(prefPane, Rect(0, 0, 15, 15)).value_(true)
 			});
 
 			swFlow.shift(0, -2);
