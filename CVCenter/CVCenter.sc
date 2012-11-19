@@ -203,13 +203,22 @@ CVCenter {
 							});
 							if(tDefWin.notNil and:{ tDefWin.isClosed.not }, { tDefWin.front });
 						}, // key "t"
-						97, { if(Quarks.isInstalled("AllGui"), {
+						97, { if(\AllGui.asClass.notNil, {
 								if(allWin.isNil or:{ allWin.isClosed }, {
-									allGui = AllGui(); allWin = allGui.parent;
+									allGui = \AllGui.asClass.new; allWin = allGui.parent;
 								});
 								if(allWin.notNil and:{ allWin.isClosed.not }, { allWin.front })
 							})
-						} // key "a"
+						}, // key "a"
+						101, {
+							if(\MasterEQ.asClass.notNil, {
+								if(eqWin.isNil or:{ eqWin.isClosed }, {
+									eqGui = \MasterEQ.asClass.new(Server.default.options.firstPrivateBus, Server.default);
+									eqWin = eqGui.window;
+								});
+								if(eqWin.notNil and: { eqWin.isClosed.not }, { eqWin.front });
+							})
+						} // key "e"
 					);
 					if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }});
 					if(modifiers == 131072 and:{ unicode == 72 and:{ History.started }}, {
