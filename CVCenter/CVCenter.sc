@@ -259,7 +259,7 @@ CVCenter {
 						97, {
 							if(\AllGui.asClass.notNil, {
 								if(allWin.isNil or:{ allWin.isClosed }, {
-									allGui = AllGui(); allWin = allGui.parent;
+									allGui = \AllGui.asClass.new; allWin = allGui.parent;
 								});
 								if(allWin.notNil and:{ allWin.isClosed.not }, { allWin.front })
 							})
@@ -267,7 +267,7 @@ CVCenter {
 						101, {
 							if(\MasterEQ.asClass.notNil, {
 								if(eqWin.isNil or:{ eqWin.isClosed }, {
-									eqGui = MasterEQ(Server.default.options.firstPrivateBus, Server.default);
+									eqGui = \MasterEQ.asClass.new(Server.default.options.firstPrivateBus, Server.default);
 									eqWin = eqGui.window;
 								});
 								if(eqWin.notNil and: { eqWin.isClosed.not }, { eqWin.front });
