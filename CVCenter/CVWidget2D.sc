@@ -193,7 +193,7 @@ CVWidget2D : CVWidget {
 		;
 
 		if(GUI.id !== \cocoa, {
-			label.toolTip_("Add some notes if you like");
+			[label, nameField].do(_.toolTip_("Add some notes if you like"));
 		});
 
 		label.action_({ |lbl|
