@@ -140,9 +140,6 @@ CVWidgetKnob : CVWidget {
 				[""+thisName.asString, Color.black, Color.yellow],
 			])
 			.font_(Font("Helvetica", 9))
-			.action_({ |b|
-				this.toggleComment(b.value.asBoolean);
-			})
 		;
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
@@ -153,7 +150,14 @@ CVWidgetKnob : CVWidget {
 		;
 
 		if(GUI.id !== \cocoa, {
-			[label, nameField].do(_.toolTip_("Add some notes if you like"));
+			label.toolTip_("Add some notes if you like");
+		});
+
+		label.action_({ |lbl|
+			this.toggleComment(lbl.value.asBoolean);
+			if(nameField.string != thisName.asString, {
+				lbl.toolTip_(nameField.string)
+			}, { lbl.toolTip_("Add some notes if you like") });
 		});
 
 		knobsize = thisHeight-2-145;
