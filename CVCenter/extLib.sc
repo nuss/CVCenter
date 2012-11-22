@@ -13,7 +13,7 @@
 
 	cvCenterBuildCVConnections { | server, nodeID, node, cvcKeys, setActive |
 		var parameters, cvLinks, k, wdgtKey, cvValues;
-		var label, cv, expr;
+		var label, cv, expr, whatToSet;
 
 		parameters = this.copy.clump(2);
 		cvLinks = Array(parameters.size);
@@ -47,7 +47,7 @@
 							if(cv.size > 1, {
 								cvLinks.add(CVCenter.addActionAt(
 									wdgtKey, "default_"++node.asString,
-									"{ |cv| "++node++".setn('"++label++"', ["++cvValues.join(", ")++"]) }",
+									"{ |cv| "++node+"!? {"+node++".setn('"++label++"', ["++cvValues.join(", ")++"]) }}",
 									// slot:
 									active: setActive
 								));
@@ -58,15 +58,15 @@
 										if(label.isArray, {
 											(label++[\lo, \hi]).clump(2).flop.do({ |pair|
 												cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString,
-													"{ |cv| "++node++".set('"++pair[0]++"', cv.value) }", pair[1]
+													"{ |cv| "++node+"!? {"+node++".set('"++pair[0]++"', cv.value) }}", pair[1]
 												))
 											})
 										}, {
 											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString,
-												"{ |cv| "++node++".setn('"++label++"', [cv.value, CVCenter.at('"++wdgtKey++"').hi.value]) }", \lo
+												"{ |cv| "++node+"!? {"+node++".setn('"++label++"', [cv.value, CVCenter.at('"++wdgtKey++"').hi.value]) }}", \lo
 											));
 											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString,
-												"{ |cv| "++node++".setn('"++label++"', [CVCenter.at('"++wdgtKey++"').lo.value, cv.value]) }", \hi
+												"{ |cv| "++node+"!? {"+node++".setn('"++label++"', [CVCenter.at('"++wdgtKey++"').lo.value, cv.value]) }}", \hi
 											));
 										})
 									},
@@ -76,7 +76,7 @@
 									{
 										cvLinks.add(CVCenter.addActionAt(
 											wdgtKey, "default_"++node.asString,
-											"{ |cv| "++node++".set('"++label++"', cv.value) }",
+											"{ |cv| "++node+"!? {"+node++".set('"++label++"', cv.value) }}",
 											active: setActive
 										))
 									}
@@ -87,7 +87,7 @@
 								CVCenter.cvWidgets[wdgtKey].class.postln;
 								cvLinks.add(CVCenter.addActionAt(
 									wdgtKey, \default,
-									"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', "++cv.size++", "++cvValues.join(", ")++"]) }"//, slot:
+									"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', "++cv.size++", "++cvValues.join(", ")++"]) }"
 
 								))
 							}, {
