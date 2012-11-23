@@ -144,20 +144,18 @@ CVWidgetKnob : CVWidget {
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Helvetica", 9))
-			.string_(wdgtInfo)
+			.string_("Add some notes if you like")
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
 
 		if(GUI.id !== \cocoa, {
-			[label, nameField].do(_.toolTip_("Add some notes if you like"));
+			label.toolTip_(nameField.string);
 		});
 
 		label.action_({ |lbl|
 			this.toggleComment(lbl.value.asBoolean);
-			if(nameField.string != thisName.asString, {
-				lbl.toolTip_(nameField.string)
-			}, { lbl.toolTip_("Add some notes if you like") });
+			lbl.toolTip_(nameField.string)
 		});
 
 		knobsize = thisHeight-2-145;
