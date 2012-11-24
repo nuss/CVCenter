@@ -992,6 +992,7 @@ CVCenter {
 						)
 					}
 				);
+				lib[\all][k].notes = cvWidgets[k].nameField.string;
 				lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
 			});
 
@@ -1125,8 +1126,10 @@ CVCenter {
 							}
 						})
 					}
-				)
-			});
+				);
+				cvWidgets[key].nameField.string_(v.notes);
+				if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes); });
+			})
 		};
 
 		if(path.isNil, {
