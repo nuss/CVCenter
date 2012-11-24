@@ -1118,7 +1118,7 @@ CVWidget {
 								.stringColor_(Color.white)
 								.canFocus_(false)
 							;
-							if(slot.notNil, { typeText = " at '"++slot++"'" }, { typeText = " " });
+							if(slot.notNil, { typeText = " at '"++slot++"'" }, { typeText = "" });
 							thisGuiEnv.midiLearn.value_(1);
 							if(GUI.id !== \cocoa, {
 								thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
