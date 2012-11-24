@@ -1118,9 +1118,16 @@ CVWidget {
 								.stringColor_(Color.white)
 								.canFocus_(false)
 							;
-							if(slot.notNil, { typeText = " at '"++slot++"'" }, { typeText = " " });								thisGuiEnv.midiLearn.value_(1);
-							// "thisGuiEnv.midiLearn: %\n".postf(thisGuiEnv.midiLearn);
-							thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
+							if(slot.notNil, { typeText = " at '"++slot++"'" }, { typeText = " " });
+							thisGuiEnv.midiLearn.value_(1);
+							if(GUI.id !== \cocoa, {
+								thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
+								[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do({ |elem|
+									elem.toolTip_(
+										"currently connected to\ndevice-ID %,\non channel %,\ncontroller %".format(theChanger.value.src.asString, (theChanger.value.chan+1).asString, theChanger.value.ctrl)
+									)
+								})
+							})
 						});
 
 						if(thisGuiEnv.editor.notNil and:{
@@ -1141,7 +1148,7 @@ CVWidget {
 								.stringColor_(Color.white)
 								.canFocus_(false)
 							;
-							thisGuiEnv.editor.midiLearnBut.value_(1)
+							thisGuiEnv.editor.midiLearnBut.value_(1);
 						})
 					}
 				},
@@ -1169,15 +1176,17 @@ CVWidget {
 						// \nconnect all sliders of your
 						// \ndevice to the widget's '"++k++"' slot"
 
-						p = "Use ";
-						if(r[0], { p = p++" MIDI-device ID "++theChanger.value.src++",\n" });
-						if(r[1], { p = p++"channel nr. "++theChanger.value.chan++",\n" });
-						if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
-						p = p++"\nto connect widget%to MIDI";
+						if(GUI.id !== \cocoa, {
+							p = "Use ";
+							if(r[0], { p = p++" MIDI-device ID "++theChanger.value.src++",\n" });
+							if(r[1], { p = p++"channel nr. "++theChanger.value.chan++",\n" });
+							if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
+							p = p++"\nto connect widget%to MIDI";
 
-						[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
-							_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
-						);
+							[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
+								_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
+							)
+						});
 
 						// window.midiSrc.toolTip_("% to connect this widget% to % %".formatf(
 					});
@@ -1217,8 +1226,13 @@ CVWidget {
 								["X", Color.white, Color.red]
 							])
 							.value_(0).refresh;
+							if(GUI.id !== \cocoa, {
 							if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
-							thisGuiEnv.midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
+								thisGuiEnv.midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
+								thisGuiEnv.midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%".format(typeText));
+								thisGuiEnv.midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%".format(typeText));
+								thisGuiEnv.midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%".format(typeText));
+							})
 						});
 
 						if(thisGuiEnv.editor.notNil and:{
