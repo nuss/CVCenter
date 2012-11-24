@@ -754,7 +754,7 @@ CVCenter {
 		^all.at(key.asSymbol);
 	}
 
-	*use { |key, spec, value, tab, slot|
+	*add { |key, spec, value, tab, slot|
 		var thisKey, thisSpec, thisVal, thisSlot, thisTab, widget2DKey;
 
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
@@ -841,15 +841,14 @@ CVCenter {
 	// This allows "freq 1" to resolve to \freq
 	*findSpec { |name|
 		var spec = name.asSymbol.asSpec;
-		if (spec.isNil, {
-			spec = name.asString.select({ | c | c.isAlpha}).asSymbol.asSpec
-		});
+		spec ?? { spec = name.asString.select({ | c | c.isAlpha}).asSymbol.asSpec };
 		^spec;
 	}
 
 	// add a CV using spec inference
-	*add { |key, spec, value, tab, slot|
-		this.use(key, spec ?? { this.findSpec(key) }, value, tab, slot)
+	*use { |key, spec, value, tab, slot|
+		var thisKey = spec.asSymbol;
+		^this.use(key, spec ?? { this.findSpec(key) }, value, tab, slot)
 	}
 
 	*setup {
@@ -1034,7 +1033,7 @@ CVCenter {
 				switch(v.wdgtClass,
 					CVWidget2D, {
 						#[lo, hi].do({ |hilo|
-							this.use(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
+							this.add(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
 							cvWidgets[key].setMidiMode(v[hilo].midi.midiMode, hilo)
 								.setMidiMean(v[hilo].midi.midiMean, hilo)
 								.setSoftWithin(v[hilo].midi.softWithin, hilo)
@@ -1082,7 +1081,7 @@ CVCenter {
 						})
 					},
 					CVWidgetKnob, {
-						this.use(key, v.spec, v.val, v.tabLabel);
+						this.add(key, v.spec, v.val, v.tabLabel);
 						cvWidgets[key].setMidiMode(v.midi.midiMode)
 							.setMidiMean(v.midi.midiMean)
 							.setSoftWithin(v.midi.softWithin)
@@ -1472,7 +1471,7 @@ CVCenter {
 		if(more.type.notNil, {
 			if(more.type === \w2d or:{ more.type === \w2dc }, {
 				#[lo, hi].do({ |slot, i|
-					this.use(more.cName, thisSpec, more.slots[i], more.enterTab, slot);
+					this.add(more.cName, thisSpec, more.slots[i], more.enterTab, slot);
 					if(more.type == \w2d, {
 						if(slot === \lo, {
 							wms = "cv.value, CVCenter.at('"++more.cName++"').hi.value";
@@ -1507,7 +1506,7 @@ CVCenter {
 			}, {
 				if(more.type === \wms, {
 					more.slots.do({ |sl, i|
-						this.use(more.cName.asString++(i+1), thisSpec, sl, more.enterTab);
+						this.add(more.cName.asString++(i+1), thisSpec, sl, more.enterTab);
 						wms = [];
 						more.slots.size.do({ |j|
 							if(this.at((more.cName.asString++(j+1)).asSymbol) === this.at((more.cName.asString++(i+1)).asSymbol), {
@@ -1529,7 +1528,7 @@ CVCenter {
 				})
 			})
 		}, {
-			this.use(more.cName, thisSpec, more.slots[0], more.enterTab);
+			this.add(more.cName, thisSpec, more.slots[0], more.enterTab);
 			if(varNames.size > 0, {
 				varNames.do({ |v, j|
 					// "varNames: %\n".postf(v);
