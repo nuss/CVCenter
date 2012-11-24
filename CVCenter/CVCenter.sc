@@ -311,15 +311,9 @@ CVCenter {
 				.font_(Font("Helvetica", 10))
 				.states_([["load setup", Color.white, Color(0.15, 0.15, 0.15)]])
 				.action_({ |pb|
-					if(loadActionsRadio.value == 0 or:{
-						loadActionsRadio.value == false
-					}, { loadFlag = true }, { loadFlag = false });
-					if(autoConnectMIDIRadio.value == 0 or:{
-						autoConnectMIDIRadio.value == false
-					}, { midiFlag = true }, { midiFlag = false });
-					if(autoConnectOSCRadio.value == 0 or:{
-						autoConnectOSCRadio.value == false
-					}, { oscFlag = true }, { oscFlag = false });
+					if(loadActionsRadio.value.asBoolean, { loadFlag = true }, { loadFlag = false });
+					if(autoConnectMIDIRadio.value.asBoolean, { midiFlag = true }, { midiFlag = false });
+					if(autoConnectOSCRadio.value.asBoolean, { oscFlag = true }, { oscFlag = false });
 					this.loadSetup(autoConnectMIDI: midiFlag, autoConnectOSC: oscFlag, loadActions: loadFlag);
 				})
 			;
@@ -334,9 +328,10 @@ CVCenter {
 				loadActionsRadio = Button(prefPane, Rect(0, 0, 15, 15))
 					.font_(Font("Helvetica", 10))
 					.states_([
-						["X", Color.red, Color.white],
-						["", Color.red, Color.white]
+						["", Color.red, Color.white],
+						["X", Color.red, Color.white]
 					])
+					.value_(1)
 				;
 			}, {
 				loadActionsRadio = \CheckBox.asClass.new(prefPane, Rect(0, 0, 15, 15)).value_(true)
@@ -357,9 +352,10 @@ CVCenter {
 				autoConnectMIDIRadio = Button(prefPane, Rect(0, 0, 15, 15))
 					.font_(Font("Helvetica", 10))
 					.states_([
-						["X", Color.red, Color.white],
-						["", Color.red, Color.white]
+						["", Color.red, Color.white],
+						["X", Color.red, Color.white]
 					])
+					.value_(1)
 				;
 			}, {
 				autoConnectMIDIRadio = \CheckBox.asClass.new(prefPane, Rect(0, 0, 15, 15)).value_(true)
@@ -380,9 +376,10 @@ CVCenter {
 				autoConnectOSCRadio = Button(prefPane, Rect(0, 0, 15, 15))
 					.font_(Font("Helvetica", 10))
 					.states_([
-						["X", Color.red, Color.white],
-						["", Color.red, Color.white]
+						["", Color.red, Color.white],
+						["X", Color.red, Color.white]
 					])
+					.value_(1)
 				;
 			}, {
 				autoConnectOSCRadio = CheckBox(prefPane, Rect(0, 0, 15, 15)).value_(true)
@@ -1028,9 +1025,9 @@ CVCenter {
 				lib = Library.readTextArchive(f);
 			});
 			all !? {
-				if(addToExisting == true, {
+				if(addToExisting === false, {
 					this.removeAll;
-				});
+				})
 			};
 			lib[\all].pairsDo({ |key, v|
 				switch(v.wdgtClass,
