@@ -134,21 +134,28 @@ A simple example
 
 code::
 (
-SynthDef(\connectTest, { |freq=#[220, 222, 227, 238], amp=#[0.3, 0.3]|
+SynthDef(\connectTest, { |freq=#[220, 222, 227, 238], ampLeft=0.3, ampRight=0.3]|
 	var son = SinOsc.ar(freq);
-	Out.ar(0, Splay.ar(son) * amp);
+	Out.ar(0, Splay.ar(son) * [ampLeft, ampRight]);
 }).add
 )
 
+(
 #[lo, hi].do({ |slot| CVCenter.use(\amp, slot: slot) }); // a 2D-widget for 'amp'
-4.do({ |i| CVCenter.use("freq"++(i+1) }); // 4 single widgets for the freq-control (4 slots)
+4.do({ |i| CVCenter.use("freq"++(i+1)) }); // 4 single widgets for the freq-control (4 slots)
+)
 
 x = Synth(\connectTest);
 
+(
 CVCenter.connectToNode(x, [
 	freq: ["freq1", "freq2", "freq3", "freq4"],
-	amp: ["amp"]
+	#[ampLeft, ampRight]: ["amp"]
 ])
+)
+
+x.free;
+CVCenter.removeAll;
 ::
 
 subsection:: Setup options (classvar getters and setters)
