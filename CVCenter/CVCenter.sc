@@ -847,7 +847,7 @@ CVCenter {
 
 	// add a CV using spec inference
 	*use { |key, spec, value, tab, slot|
-		^this.use(key, spec ?? { this.findSpec(key) }, value, tab, slot)
+		^this.add(key, spec ?? { this.findSpec(key) }, value, tab, slot)
 	}
 
 	*setup {
