@@ -14,6 +14,8 @@ As link::Classes/CVCenter#*all#CVCenter.all:: cannot contain a name twice you ma
 argument:: pairs2D
 An link::Classes/Event:: that creates a link::Classes/CVWidget2D:: rather than a link::Classes/CVWidgetKnob:: for the given control-names and the given widget-name:
 
-code::(widgetName1: #[controlName1_lo, controlName1_hi], widgetName2: #[controlName2_lo, controlName2_hi, … widgetNameN: #[controlNameN_lo, controlNameN_hi])::
+code::(widgetName1: #[controlName1_lo, controlName1_hi], widgetName2: #[controlName2_lo, controlName2_hi], … widgetNameN: #[controlNameN_lo, controlNameN_hi])::
 
-returns:: this (a link::Classes/NodeProxy::)
+Defining pairs2D is strong::only:: necessary if 1-dimensional controls shall be combined in a CVWidget2D - 2-dimensional controls will automatically result in a CVWidget2D.
+
+returns:: this (a link::Classes/NodeProxy::, an link::Classes/Ndef:: or a link::Classes/ProxySpace::-slot)

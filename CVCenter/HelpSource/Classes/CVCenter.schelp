@@ -134,7 +134,7 @@ A simple example
 
 code::
 (
-SynthDef(\connectTest, { |freq=#[220, 222, 227, 238], ampLeft=0.3, ampRight=0.3]|
+SynthDef(\connectTest, { |freq=#[220, 222, 227, 238], ampLeft=0.3, ampRight=0.3|
 	var son = SinOsc.ar(freq);
 	Out.ar(0, Splay.ar(son) * [ampLeft, ampRight]);
 }).add
@@ -157,6 +157,8 @@ CVCenter.connectToNode(x, [
 x.free;
 CVCenter.removeAll;
 ::
+
+note:: If the user doesn't provide the object in a variable or the variable-name can't be determined fallback-actions will be created ( code:: s.sendBundle(s.latency, [...])::). However, these will address the object's nodeID. If the object gets removed and recreated with a new nodeID the actions will stop working.::
 
 subsection:: Setup options (classvar getters and setters)
 
