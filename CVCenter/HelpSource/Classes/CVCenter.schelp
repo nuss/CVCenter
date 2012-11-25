@@ -57,14 +57,14 @@ returns:: this (CVCenter)
 
 
 METHOD:: use
-Use an arbitrary name for creating a new link::Classes/CVWidget:: (a code::CVWidgetKnob:: or a link::Classes/CVWidget2D::, depending on the argument code::slot::).
+Use an arbitrary name for creating a new link::Classes/CVWidget:: (a link::Classes/CVWidgetKnob:: or a link::Classes/CVWidget2D::, depending on the argument code::slot::).
 note:: strong::This is the recommended way for creating new widgets.:: This method should be convenient in most situations. It simply creates a new link::Classes/CVWidget:: and returns the link::Classes/CV::. As link::Classes/CV:: inherits from code::Stream:: this method may directly be used in code::Pattern::s. Any reevaluation will leave a once created link::Classes/CV:: untouched.
 
 You may omit the arguments code::slot:: and code::tab:: when creating a link::Classes/CVWidget2D:: and its first slot has already been created. However, if the widget is used within patterns you always strong::must:: provide the slot as execution of the pattern depends on the right CV to be returned (if omitted the widget would return an event, composed of the \lo and \hi key).
 ::
 
 argument:: key
-a link::Classes/Symbol:: or a link::Classes/String:: - the resulting link::Classes/CV:: will be put into link::#*all#CVCenter.all:: under this name and the widget will be labeled the same.
+a link::Classes/Symbol:: or a link::Classes/String:: - the resulting link::Classes/CV:: will be put into link::#*all#CVCenter.all:: under this name and the widget will be labeled the same. If the given key resembles to the name of an existing link::Classes/ControlSpec:: it can be used automatically for the resulting CV's spec (if 'spec' hasn't been given explictely as the second argument). If the key consists of valid a ControlSpec-name and numeric characters only (e.g. 'freq 1' but not 'my freq') the spec's name will be extracted automatically.
 
 argument:: spec
 a link::Classes/ControlSpec:: - default: code::ControlSpec.new::
@@ -90,6 +90,66 @@ If the number of arguments is odd and the last one is a link::Classes/Boolean:: 
 
 returns:: this (CVCenter)
 
+subsection:: Connecting Nodes (Groups, Synths) and NodeProxies
+
+It is possible to create GUIs from running Synths, NodeProxies (Ndefs as well as ProxySpaces) with one simple method-call. You can find thes methods documented in link::Classes/Synth#-cvcGui:: resp link::Classes/NodeProxy#-cvcGui::.
+
+code::
+(
+SynthDef(\simpleSine, { |freq=220, amp=0.3|
+	Out.ar(0, SinOsc.ar([freq, freq+1], mul: amp))
+}).add // SynthDefs *must* be 'added' or 'stored'
+)
+
+x = Synth(\simpleSine).cvcGui;
+x.free;
+CVCenter.removeAll; // remove widgets from CVCenter again
+::
+
+For more complex SynthDefs the cvcGui-method will take care for special requirements like arrayed controls and treat them adequately.
+
+If the user has already created widgets in CVCenter and wants to connect controls of a running Synth or a NodeProxy to these the following method might be suitable:
+
+METHOD:: connectToNode
+
+argument:: node
+mandatory - a link::Classes/Group::, a link::Classes/Synth::, a link::Classes/NodeProxy::, an link::Classes/Ndef:: or a slot in a link::Classes/ProxySpace:: (pushed or not) whose controls shall be connected to the widgets in CVCenter. The objects can be given as variables (a, b, c, d...), environment-variables (~mySynth). Also variables can be given as strings/symbols (e.g. a as code::"a":: or code::\a::).
+
+argument:: kvArray
+mandatory - an link::Classes/Array:: consisting of pairs of control-name(s) / widget-name(s):
+definitionlist::
+	## a 1-dimensional control: || control-name: ["widgetName"]
+	## an arrayed control: || control-name: ["widget-name1", "widget-name2",... "widgetNameN"]
+	## 2 controls combined in a link::Classes/CVWidget2D::: || #[control-name1, control-name2]: ["widget2D-name"]
+	## a 2-dimensional control in a single control-name: || 2D-control-name: ["widget2D-name"]
+::
+
+argument:: environment
+optional - if the object is given as slot in an array or dictionary the method will try to look it up in the given environment.
+
+returns:: this (CVCenter)
+
+
+A simple example
+
+code::
+(
+SynthDef(\connectTest, { |freq=#[220, 222, 227, 238], amp=#[0.3, 0.3]|
+	var son = SinOsc.ar(freq);
+	Out.ar(0, Splay.ar(son) * amp);
+}).add
+)
+
+#[lo, hi].do({ |slot| CVCenter.use(\amp, slot: slot) }); // a 2D-widget for 'amp'
+4.do({ |i| CVCenter.use("freq"++(i+1) }); // 4 single widgets for the freq-control (4 slots)
+
+x = Synth(\connectTest);
+
+CVCenter.connectToNode(x, [
+	freq: ["freq1", "freq2", "freq3", "freq4"],
+	amp: ["amp"]
+])
+::
 
 subsection:: Setup options (classvar getters and setters)
 
