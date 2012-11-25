@@ -841,13 +841,13 @@ CVCenter {
 	// This allows "freq 1" to resolve to \freq
 	*findSpec { |name|
 		var spec = name.asSymbol.asSpec;
-		spec ?? { spec = name.asString.select({ | c | c.isAlpha}).asSymbol.asSpec };
+		spec ?? { spec = name.asString.select({ |c| c.isAlpha }).asSymbol.asSpec };
 		^spec;
 	}
 
 	// add a CV using spec inference
 	*use { |key, spec, value, tab, slot|
-		this.use(key, spec ?? { this.findSpec(spec) }, value, tab, slot)
+		^this.use(key, spec ?? { this.findSpec(key) }, value, tab, slot)
 	}
 
 	*setup {
