@@ -42,8 +42,8 @@
 			})
 		});
 
-		switch(this.class,
-			Synth, {
+		case
+			{ this.isKindOf(Node) } {
 				environment !? {
 					envs = interpreterVars.select({ |n|
 						thisProcess.interpreter.perform(n) === environment;
@@ -58,8 +58,8 @@
 					})
 				};
 				varNames = varNames++envs;
-			},
-			NodeProxy, {
+			}
+			{ this.isKindOf(NodeProxy) and:{ this.class != Ndef }} {
 				// the NodeProxy passed in could be part of a ProxySpace
 				if(varNames.size < 1, {
 					pSpaces = pSpaces ++ interpreterVars.select({ |n|
@@ -87,11 +87,9 @@
 					})
 				})
 
-			},
-			Ndef, {
-				varNames = varNames.add(this.asString);
 			}
-		);
+			{ this.class == Ndef } { varNames = varNames.add(this.asString) }
+		;
 		^varNames;
 	}
 
