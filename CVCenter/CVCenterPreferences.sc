@@ -177,7 +177,8 @@ CVCenterPreferences {
 					[left, top, width, height].do(_.enabled_(false));
 					uView.background_(Color(0.95, 0.95, 0.95));
 				}, {
-					[leftText, topText, widthText, heightText].do(_.stringColor_(Color.black));											[left, top, width, height].do(_.enabled_(true));
+					[leftText, topText, widthText, heightText].do(_.stringColor_(Color.black));
+					[left, top, width, height].do(_.enabled_(true));
 				})
 			});
 
@@ -468,7 +469,7 @@ CVCenterPreferences {
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);
 		prefs.writeArchive(prefsPath);
-		"Your preferences have successfully been written to disk and will become active after library-recompilation.".postln;
+		"Your CVCenter-preferences have successfully been written to disk and will become active after library-recompilation.".inform;
 	}
 
 	*readPreferences { |...args|

@@ -9,6 +9,8 @@ CVWidget is the abstract superclass of all CVWidgets (currently: link::Classes/C
 
 CLASSMETHODS::
 
+METHOD:: removeResponders
+A link::Classes/Boolean::, indicating wether MIDI- and OSC-responders shall be removed upon hitting Cmd/Ctrl-period. If it is set to code::false:: unreferenced ghost-responders are left that may be hard to remove.
 
 INSTANCEMETHODS::
 
@@ -88,7 +90,7 @@ only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: o
 returns:: a link::Classes/Float::
 
 METHOD:: setCtrlButtonBank
-Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI. 
+Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI.
 code::ctrlButtonBank:: translates the hardware-layout in a way that makes it easy to see the slider's bank and number: slider 17 becomes 2:1 (bank 2,  nr. 1).
 
 argument:: numSliders
@@ -108,12 +110,12 @@ only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: o
 returns:: an link::Classes/Integer::, representing the number of sliders in one bank.
 
 METHOD:: setMidiResolution
-If code::midiMode:: has been set to 1 (by calling link::#-setMidiMode::), this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
+If code::midiMode:: has been set to 1 (by calling link::#-setMidiMode::), this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders.
 
 argument:: resolution
 a link::Classes/Float::, representing the stepsize:
 
-lower values -> higher resolution 
+lower values -> higher resolution
 
 higher values -> lower resolution
 
@@ -277,7 +279,7 @@ only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: o
 returns:: code::nil:: or an link::Classes/Event:: containing the constraints in the keys code::\lo:: and code::\hi:: (not related to the \lo and \hi keys in a link::Classes/CVWidget2D::)
 
 METHOD:: addAction
-Add an action to the widget's link::Classes/CV::. 
+Add an action to the widget's link::Classes/CV::.
 
 argument:: name
 a link::Classes/Symbol:: or a link::Classes/String::, representing the name under which the action will be stored
@@ -322,11 +324,11 @@ returns:: the receiver
 subsection:: Models and Controllers, internal bookkeeping
 
 METHOD:: wdgtControllersAndModels
-CVWidgets are designed in an MVC-architecture (MVC = "model - view - controller"). Any time a new CVWidget gets instantiated the models get initialized. Any time the model is changed the function in the regarding controller gets invoked. 
+CVWidgets are designed in an MVC-architecture (MVC = "model - view - controller"). Any time a new CVWidget gets instantiated the models get initialized. Any time the model is changed the function in the regarding controller gets invoked.
 
-warning:: Do not try to change the models directly, e.g. by doing something like 
+warning:: Do not try to change the models directly, e.g. by doing something like
 
-code::myWidget.wdgtControllersAndModels.someModel = someValue:: 
+code::myWidget.wdgtControllersAndModels.someModel = someValue::
 
 Models are designed for internal bookkeeping and all methods within CVWidget are supposed to do the right thing with them.
 ::
@@ -346,7 +348,7 @@ definitionList::
 		## strong::nameField::: the field for the OSC-command-name under the OSC-tab of the editor (see link::Classes/CVWidgetEditor::)
 		## strong::index::: the field for the message-index under the OSC-tab of the editor (see link::Classes/CVWidgetEditor::)
 		## strong::connectorButVal::: the value of the connect-button under the OSC-tab of the editor connectorButVal (see link::Classes/CVWidgetEditor::)
-		## strong::editEnabled::: if a connection is established editor-fields will be made uneditable and this slot is set to code::false:: 
+		## strong::editEnabled::: if a connection is established editor-fields will be made uneditable and this slot is set to code::false::
 	::
 	## midiConnection || the currentMIDI-connection (if present): code::Ref((src\: <val>, chan\: <val>, num\: <val>))::. If no connection is present this will be: code::Ref(nil)::.
 	## midiDisplay || stores all MIDI-related visual properties of a widget and its editor. A link::Classes/Ref:: to an link::Classes/Event::, containing the following slots:
@@ -358,11 +360,11 @@ definitionList::
 	::
 	## midiOptions || the current MIDI-setup, analogue to link::#-setup:::
 	list::
-		## strong::midiMode::: the current code::midiMode:: - see also link::#-setMidiMode:: 
-		## strong::midiMean::: the current code::midiMean:: - see also link::#-setMidiMean:: 
-		## strong::ctrlButtonBank::: the current value for code::ctrlButtonBank:: - see also link::#-setCtrlButtonBank:: 
-		## strong::midiResolution::: the current code::midiResolution:: - see also link::#-setMidiResolution:: 
-		## strong::softWithin::: the current value for code::softWithin:: - see also link::#-setSoftWithin:: 
+		## strong::midiMode::: the current code::midiMode:: - see also link::#-setMidiMode::
+		## strong::midiMean::: the current code::midiMean:: - see also link::#-setMidiMean::
+		## strong::ctrlButtonBank::: the current value for code::ctrlButtonBank:: - see also link::#-setCtrlButtonBank::
+		## strong::midiResolution::: the current code::midiResolution:: - see also link::#-setMidiResolution::
+		## strong::softWithin::: the current value for code::softWithin:: - see also link::#-setSoftWithin::
 	::
 	## mapConstrainterLo || a link::Classes/CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[0]:: as value
 	## mapConstrainterLo || a link::Classes/CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[1]:: as value
@@ -417,7 +419,7 @@ note::The following features are experimental and one should study the internal 
 ::
 Within a CVWidget the functionality of most of its methods is implemented within a MVC-paradigm (strong::m::odel-strong::v::iew-strong::c::ontroller) which means that rather than executing an action within a method directly the method updates a model (an object keeping some data) and triggers the controller via a 'changed'-message (non-working example-code):
 
-code::myModel.value_(someValue).changed(\key):: 
+code::myModel.value_(someValue).changed(\key)::
 
 When the 'changed'-message is sent the controller will execute its action. By default there is only one key specified: code::\default:: (see link::#-synchKeys::). However, it is possible to extend the functionality of a controller with one or more custom code::key/function:: pairs which means one can sync custom-guis and its elements to a given CVWidget (e.g. a button in some GUI cannot only connect MIDI or OSC but can also immediatly reflect the current connection-status).
 Have a look at the examples-section for a simple example. Extending the API in the suggested way should keep the CVWidget-functionality unobstrusive!
@@ -432,7 +434,7 @@ argument:: func
 a link::Classes/Function:: - mandatory. A custom function, extending the widget's resp. your custom GUI's functionality. The user may pass the content of the model, the key and more to the function if they are stated as arguments at the beginning of the function. See the link::Classes/SimpleController::-helpfile for more info.
 
 argument:: controller
-A CVWidget contains several models and controllers, contained in link::#-wdgtControllersAndModels::. If no specific controller is given the function will be added to strong::all:: controllers within link::#-wdgtControllersAndModels::. If a specific controller is provided the function will only be added to that controller which might make calculations a bit cheaper. However, if the user provides a specific controller (s)he should know under which circumstances the given controller is being executed in order to get the desired result. 
+A CVWidget contains several models and controllers, contained in link::#-wdgtControllersAndModels::. If no specific controller is given the function will be added to strong::all:: controllers within link::#-wdgtControllersAndModels::. If a specific controller is provided the function will only be added to that controller which might make calculations a bit cheaper. However, if the user provides a specific controller (s)he should know under which circumstances the given controller is being executed in order to get the desired result.
 
 returns:: the receiver
 
@@ -468,7 +470,7 @@ Sends the widget's window to front.
 returns:: the receiver
 
 METHOD:: editor
-Every widget has one or more editors that will open in a new window ( link::Classes/CVWidgetKnob:: 1 editor, link::Classes/CVWidget2D:: 2 editors - code::\lo:: and code::\hi::). This method returns a reference to them. 
+Every widget has one or more editors that will open in a new window ( link::Classes/CVWidgetKnob:: 1 editor, link::Classes/CVWidget2D:: 2 editors - code::\lo:: and code::\hi::). This method returns a reference to them.
 
 returns:: a link::Classes/CVWidgetEditor:: or an link::Classes/Event::, containing a reference two 2 or more link::Classes/CVWidgetEditor::s
 
@@ -506,7 +508,7 @@ a link::Classes/Point::
 returns:: a link::Classes/Point::
 
 METHOD:: widgetProps
-Returns the width/height of a widget as link::Classes/Point::. 
+Returns the width/height of a widget as link::Classes/Point::.
 
 returns:: a link::Classes/Point::
 
@@ -542,25 +544,25 @@ code::
 
 // some noise
 (
-Server.default.waitForBoot{ 
+Server.default.waitForBoot{
 	~noise = { |trigFreq=10, freqMod=0|
 		var trig, seq, freq;
 		trig = Impulse.kr(trigFreq);
 		seq = Drand([Dseq((1..5).mirror1, 1), Drand((4..10), 8)], 2000);
 		freq = Demand.kr(trig, 0, seq * 100);
 		SinOsc.ar(freq + [0,0.7]).cubed.cubed.scaleneg(freqMod) * 0.1;
-	}.play 
+	}.play
 }
 )
 
-// add another action to set trigFreq in ~noise 
+// add another action to set trigFreq in ~noise
 ~twoDee.addAction(\trigFreq, { |cv| ~noise.set(\trigFreq, cv.value) }, \lo);
 
 // change the widget's spec to something nore suitable
 // a linear ControlSpec, reaching from 10 to 30
 ~twoDee.setSpec(#[10, 30], \lo);
 
-// add another action to set freqMod in ~noise 
+// add another action to set freqMod in ~noise
 ~twoDee.addAction(\trigFreq, { |cv| ~noise.set(\freqMod, cv.value) }, \hi);
 
 // change the widget's spec to something nore suitable
@@ -569,7 +571,7 @@ Server.default.waitForBoot{
 ~twoDee.setSpec(\pan, \hi);
 
 // deactivate posting values to the post-window
-// the action can be reactivated at any time with the same 
+// the action can be reactivated at any time with the same
 // method-call, providing true as its parameter
 ~twoDee.activateAction(\post, false, \lo);
 ~twoDee.activateAction(\post, false, \hi);
@@ -582,7 +584,7 @@ subsection:: reusable widgets
 By default windows created in SC lack the ability to be opened again once they're closed (even evaluating the variable under which the window has been created will still return the window). The following section describes a workaround in CVWidget (resp. link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D::) that enables the user to keep a widget's responders and open and close it as many times as the user needs to ( strong::open:: is implemented in link::Classes/CVWidgetKnob#-open#CVWidgetKnob:: and link::Classes/CVWidget2D#-open#CVWidget2D::).
 code::
 // create some widgets
-// if a widget is made 'persistent' its OSC-/MID-responders 
+// if a widget is made 'persistent' its OSC-/MID-responders
 // will not be removed when the widget gets closed
 ~knob = CVWidgetKnob(bounds: Rect(490, 0, 80, 210), persistent: true).front;
 ~twoDee = CVWidget2D(bounds: Rect(330, 0, 140, 210), persistent: true).front;
@@ -598,7 +600,7 @@ Server.default.waitForBoot{ ~noise = { SinOsc.ar(\freq.kr([0, 0]), mul: \amp.kr)
 
 // close the widgets and open them again
 // note: rather than simply opening them you should re-assign while opening them
-// as the open-method always returns a new widget but it will keep properties, 
+// as the open-method always returns a new widget but it will keep properties,
 // actions, responders etc. of the old one
 ~knob = ~knob.open;
 ~twoDee = ~twoDee.open;
@@ -609,7 +611,7 @@ code::
 // create a window that displays command-names that are used to connect OSC-devices
 ~win = Window("OSC-responders", Rect(100, 100, 300, 40)).front;
 
-// the command-name will be displayed immediately after connecting the device 
+// the command-name will be displayed immediately after connecting the device
 // resp. disappear when disconnected
 (
 ~knob.extend(\myOSCdisplay, { |theChanger, what, more|
