@@ -1089,6 +1089,7 @@ CVWidget {
 	}
 
 	prInitMidiDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+		var ctrlToolTip;
 
 		wcm.midiDisplay.controller ?? {
 			wcm.midiDisplay.controller = SimpleController(wcm.midiDisplay.model);
@@ -1123,8 +1124,12 @@ CVWidget {
 							if(GUI.id !== \cocoa, {
 								thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
 								[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do({ |elem|
+									if(theChanger.value.ctrl.includes($:), {
+										ctrlToolTip = theChanger.value.ctrl.split($:);
+										ctrlToolTip = ctrlToolTip[1]++" in bank "++ctrlToolTip[0];
+									}, { ctrlToolTip = theChanger.value.ctrl });
 									elem.toolTip_(
-										"currently connected to\ndevice-ID %,\non channel %,\ncontroller %".format(theChanger.value.src.asString, (theChanger.value.chan+1).asString, theChanger.value.ctrl)
+										"currently connected to\ndevice-ID %,\non channel %,\ncontroller %".format(theChanger.value.src.asString, (theChanger.value.chan+1).asString, ctrlToolTip)
 									)
 								})
 							})
