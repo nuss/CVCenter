@@ -46,7 +46,7 @@
 						if(node.notNil, {
 							if(cv.size > 1, {
 								cvLinks.add(CVCenter.addActionAt(
-									wdgtKey, "default_"++node.asString,
+									wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
 									"{ |cv| "++node+"!? {"+node++".setn('"++label++"', ["++cvValues.join(", ")++"]) }}",
 									// slot:
 									active: setActive
@@ -57,15 +57,15 @@
 									CVWidget2D, {
 										if(label.isArray, {
 											(label++[\lo, \hi]).clump(2).flop.do({ |pair|
-												cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString,
+												cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
 													"{ |cv| "++node+"!? {"+node++".set('"++pair[0]++"', cv.value) }}", pair[1]
 												))
 											})
 										}, {
-											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString,
+											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
 												"{ |cv| "++node+"!? {"+node++".setn('"++label++"', [cv.value, CVCenter.at('"++wdgtKey++"').hi.value]) }}", \lo
 											));
-											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString,
+											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
 												"{ |cv| "++node+"!? {"+node++".setn('"++label++"', [CVCenter.at('"++wdgtKey++"').lo.value, cv.value]) }}", \hi
 											));
 										})
@@ -75,7 +75,7 @@
 									// },
 									{
 										cvLinks.add(CVCenter.addActionAt(
-											wdgtKey, "default_"++node.asString,
+											wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
 											"{ |cv| "++node+"!? {"+node++".set('"++label++"', cv.value) }}",
 											active: setActive
 										))
@@ -95,15 +95,15 @@
 									CVWidget2D, {
 										if(label.isArray, {
 											(label++[\lo, \hi]).clump(2).flop.do({ |pair|
-												cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString,
+												cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
 													"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++pair[0]++"', 1, cv.value]) }", pair[1]
 												))
 											})
 										}, {
-											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString,
+											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
 												"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', 2, cv.value, CVCenter.at('"++wdgtKey++"').hi.value]) }", \lo
 											));
-											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString,
+											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
 												"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', 2, CVCenter.at('"++wdgtKey++"').lo.value, cv.value]) }", \hi
 											));
 										})
