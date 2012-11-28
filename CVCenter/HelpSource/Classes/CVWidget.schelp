@@ -340,7 +340,7 @@ definitionList::
 	## cvSpec || the link::Classes/CV::'s current spec as set at initialization or with code::setSpec:: - a link::Classes/Ref:: to a link::Classes/ControlSpec::.
 	## oscInputRange || the current input-range, set by the widget's input mechanism with code::setInputRange:: - default at initialization: code::Ref([0.0001, 0.0001])::.
 	## oscConnection || the current OSC-connection (if present): code::Ref([<IP-address>, <port>, <command-name>, <message-index>])::. If no connection is present it will be code::Ref(false)::.
-	## oscDisplayModel || stores all OSC-related visual properties of a widget and its editor. A link::Classes/Ref:: to an link::Classes/Event::, containing the following slots:
+	## oscDisplay || stores all OSC-related visual properties of a widget and its editor. A link::Classes/Ref:: to an link::Classes/Event::, containing the following slots:
 	list::
 		## strong::but::: the state of the OSC-button ("edit OSC")
 		## strong::ipField::: the IP-field under the OSC-tab of the editor (see link::Classes/CVWidgetEditor::)
@@ -367,7 +367,7 @@ definitionList::
 		## strong::softWithin::: the current value for code::softWithin:: - see also link::#-setSoftWithin::
 	::
 	## mapConstrainterLo || a link::Classes/CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[0]:: as value
-	## mapConstrainterLo || a link::Classes/CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[1]:: as value
+	## mapConstrainterHi || a link::Classes/CV::, containing the spec code::[-inf, inf].asSpec:: and code::oscInputRange.model.value[1]:: as value
 	## actions || a link::Classes/Ref:: to an link::Classes/Event::: code::Ref((numActions\: <val>, activeActions\: <val>))::. This model reflects the number of actions resp. active actions as displayed in the 'actions'-button of the widget.
 ::
 
@@ -415,7 +415,7 @@ private:: prInitOscInputRange
 private:: prInitActionsControl
 
 subsection:: Extending the API
-note::The following features are experimental and one should study the internal workings of CVWidget closely before using them - especially the structure of controllers and models: link::#-wdgtControllersAndModels::.
+warning::The following features are experimental and one should study the internal workings of CVWidget closely before using them - especially the structure of controllers and models: link::#-wdgtControllersAndModels::.
 ::
 Within a CVWidget the functionality of most of its methods is implemented within a MVC-paradigm (strong::m::odel-strong::v::iew-strong::c::ontroller) which means that rather than executing an action within a method directly the method updates a model (an object keeping some data) and triggers the controller via a 'changed'-message (non-working example-code):
 
@@ -423,6 +423,67 @@ code::myModel.value_(someValue).changed(\key)::
 
 When the 'changed'-message is sent the controller will execute its action. By default there is only one key specified: code::\default:: (see link::#-synchKeys::). However, it is possible to extend the functionality of a controller with one or more custom code::key/function:: pairs which means one can sync custom-guis and its elements to a given CVWidget (e.g. a button in some GUI cannot only connect MIDI or OSC but can also immediatly reflect the current connection-status).
 Have a look at the examples-section for a simple example. Extending the API in the suggested way should keep the CVWidget-functionality unobstrusive!
+
+code::
+// create a widget
+~knob = CVWidgetKnob(bounds: Rect(490, 0, 80, 210)).front;
+
+// create a window that displays properties of OSC-connections in ~knob
+(
+~win = Window("data", Rect(100, 100, 300, 40)).front;
+~responderDisplay = StaticText(~win, Rect(7, 7, ~win.bounds.width-14, ~win.bounds.height-14))
+.background_(Color.white)
+.font_(Font.sansSerif(14, true));
+)
+
+
+// a simple monitor displaying current model-data
+/*
+   models used in CVWidget are:
+   calibrate, cvSpec, oscInputRange,
+   oscConnection, oscDisplay
+   midiConnection, midiDisplay
+   midiOptions, actions
+
+   have a look at the section 'wdgtControllersAndModels'
+   for more information
+*/
+
+/*
+   not to be used with CVWidget:-extend:
+   mapConstrainterLo, mapConstrainterHi
+*/
+
+// the function within extend will be put in any possible controller
+// thus whenever one of them is triggered something will be displayed
+
+(
+~knob.extend(\mySync, { |theChanger, what, more|
+	// have a look at what's being passed into the models
+	~responderDisplay.string_("data:"+theChanger.value);
+})
+)
+
+// remove the previously added functionality
+// the window is no longer synched with the CVWidget
+~knob.reduce(\mySync)
+
+// to get all data is likely going to be confusing
+// but the user may just as well extend only one controller
+// e.g.: like in the following example 'oscConnection'
+// only data is being displayed that gets passed into the
+// oscConnection-model resp. when the oscConnection-controller
+// gets triggered
+
+(
+~knob.extend(\mySync, { |theChanger, what, more|
+	~responderDisplay.string_("data:"+theChanger.value);
+}, \oscConnection)
+)
+
+~knob.reduce(\mySync);
+::
+
 
 METHOD:: extend
 adds a custom function to one or all of the widget's internal link::Classes/SimpleController::s. These can also keep references to user-defined GUIs resp. their elements, thus allowing the user to synch his/her GUIs with CVWidgets.
@@ -604,29 +665,4 @@ Server.default.waitForBoot{ ~noise = { SinOsc.ar(\freq.kr([0, 0]), mul: \amp.kr)
 // actions, responders etc. of the old one
 ~knob = ~knob.open;
 ~twoDee = ~twoDee.open;
-::
-
-subsection:: extending the functionality of a CVWidget resp. synching user-defined GUIs
-code::
-// create a window that displays command-names that are used to connect OSC-devices
-~win = Window("OSC-responders", Rect(100, 100, 300, 40)).front;
-
-// the command-name will be displayed immediately after connecting the device
-// resp. disappear when disconnected
-(
-~knob.extend(\myOSCdisplay, { |theChanger, what, more|
-	// have a look at what's coming in
-	[theChanger, what, more].postln;
-	if(~knob.midiOscEnv.oscResponder.notNil, {
-		~responderDisplay = StaticText(~win, Rect(7, 7, ~win.bounds.width-14, ~win.bounds.height-14))
-			.string_(~knob.midiOscEnv.oscResponder.cmdName)
-			.background_(Color.white)
-			.font_(Font.sansSerif(14, true))
-	}, { ~responderDisplay.remove })
-}, \oscConnection)
-)
-
-// remove the previously adde functionality
-// the window is no longer synched with the CVWidget
-~knob.reduce(\myOSCdisplay)
 ::

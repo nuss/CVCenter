@@ -1124,7 +1124,7 @@ CVWidget {
 							if(GUI.id !== \cocoa, {
 								thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
 								[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do({ |elem|
-									if(theChanger.value.ctrl.includes($:), {
+									if(theChanger.value.class == String and:{ theChanger.value.ctrl.includes($:) }, {
 										ctrlToolTip = theChanger.value.ctrl.split($:);
 										ctrlToolTip = ctrlToolTip[1]++" in bank "++ctrlToolTip[0];
 									}, { ctrlToolTip = theChanger.value.ctrl });
@@ -1523,8 +1523,12 @@ CVWidget {
 
 		if(thisContr !== \default, {
 			if(controller.isNil, {
-				wdgtControllersAndModels.do({ |k|
-					k.controller.put(thisKey, synchedActions[thisKey])
+				wdgtControllersAndModels.pairsDo({ |k, v|
+					if(k != \mapConstrainterHi and:{
+						k != \mapConstrainterLo
+					}, {
+						v.controller.put(thisKey, synchedActions[thisKey])
+					})
 				})
 			}, {
 				wdgtControllersAndModels[thisContr].controller.put(thisKey, synchedActions[thisKey])
