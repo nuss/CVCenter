@@ -8,8 +8,8 @@ CVCenter lets you collect an arbitrary number of link::Classes/CV::s (you need t
 
 strong:: What's a CV? ::
 
-A link::Classes/CV:: models a value constrained by a link::Classes/ControlSpec::. The value can be a single link::Classes/Float:: or an array of Floats. Whenever the link::Classes/CV::'s value changes, it sends a changed message labeled 'synch'.  This way dependants (such as GUI objects or server value) can be updated with link::Classes/SimpleController::s. 
-A link::Classes/CV::'s value can be read with the 'value' message. 
+A link::Classes/CV:: models a value constrained by a link::Classes/ControlSpec::. The value can be a single link::Classes/Float:: or an array of Floats. Whenever the link::Classes/CV::'s value changes, it sends a changed message labeled 'synch'.  This way dependants (such as GUI objects or server value) can be updated with link::Classes/SimpleController::s.
+A link::Classes/CV::'s value can be read with the 'value' message.
 
 CLASSMETHODS::
 
@@ -39,7 +39,7 @@ definitionlist::
 	## strong::ctrlButtonBank:: || - default: nil (for a detailed explanation see: link::#*ctrlButtonBank::)
 ::
 
-For a detailed description of the above listet arguments see the descriptions of the according classvar-methods. 
+For a detailed description of the above listet arguments see the descriptions of the according classvar-methods.
 
 returns:: this (CVCenter)
 
@@ -57,14 +57,14 @@ returns:: this (CVCenter)
 
 
 METHOD:: use
-Use an arbitrary name for creating a new link::Classes/CVWidget:: (a code::CVWidgetKnob:: or a link::Classes/CVWidget2D::, depending on the argument code::slot::).
+Use an arbitrary name for creating a new link::Classes/CVWidget:: (a link::Classes/CVWidgetKnob:: or a link::Classes/CVWidget2D::, depending on the argument code::slot::).
 note:: strong::This is the recommended way for creating new widgets.:: This method should be convenient in most situations. It simply creates a new link::Classes/CVWidget:: and returns the link::Classes/CV::. As link::Classes/CV:: inherits from code::Stream:: this method may directly be used in code::Pattern::s. Any reevaluation will leave a once created link::Classes/CV:: untouched.
 
 You may omit the arguments code::slot:: and code::tab:: when creating a link::Classes/CVWidget2D:: and its first slot has already been created. However, if the widget is used within patterns you always strong::must:: provide the slot as execution of the pattern depends on the right CV to be returned (if omitted the widget would return an event, composed of the \lo and \hi key).
 ::
 
 argument:: key
-a link::Classes/Symbol:: or a link::Classes/String:: - the resulting link::Classes/CV:: will be put into link::#*all#CVCenter.all:: under this name and the widget will be labeled the same.
+a link::Classes/Symbol:: or a link::Classes/String:: - the resulting link::Classes/CV:: will be put into link::#*all#CVCenter.all:: under this name and the widget will be labeled the same. If the given key resembles to the name of an existing link::Classes/ControlSpec:: it can be used automatically for the resulting CV's spec (if 'spec' hasn't been given explictely as the second argument). If the key consists of valid a ControlSpec-name and numeric characters only (e.g. 'freq 1' but not 'my freq') the spec's name will be extracted automatically.
 
 argument:: spec
 a link::Classes/ControlSpec:: - default: code::ControlSpec.new::
@@ -90,6 +90,75 @@ If the number of arguments is odd and the last one is a link::Classes/Boolean:: 
 
 returns:: this (CVCenter)
 
+subsection:: Connecting Nodes (Groups, Synths) and NodeProxies
+
+It is possible to create GUIs from running Synths, NodeProxies (Ndefs as well as ProxySpaces) with one simple method-call. You can find thes methods documented in link::Classes/Synth#-cvcGui:: resp link::Classes/NodeProxy#-cvcGui::.
+
+code::
+(
+SynthDef(\simpleSine, { |freq=220, amp=0.3|
+	Out.ar(0, SinOsc.ar([freq, freq+1], mul: amp))
+}).add // SynthDefs *must* be 'added' or 'stored'
+)
+
+x = Synth(\simpleSine).cvcGui;
+x.free;
+CVCenter.removeAll; // remove widgets from CVCenter again
+::
+
+For more complex SynthDefs the cvcGui-method will take care for special requirements like arrayed controls and treat them adequately.
+
+If the user has already created widgets in CVCenter and wants to connect controls of a running Synth or a NodeProxy to these the following method might be suitable:
+
+METHOD:: connectToNode
+
+argument:: node
+mandatory - a link::Classes/Group::, a link::Classes/Synth::, a link::Classes/NodeProxy::, an link::Classes/Ndef:: or a slot in a link::Classes/ProxySpace:: (pushed or not) whose controls shall be connected to the widgets in CVCenter. The objects can be given as variables (a, b, c, d...), environment-variables (~mySynth). Also variables can be given as strings/symbols (e.g. a as code::"a":: or code::\a::).
+
+argument:: kvArray
+mandatory - an link::Classes/Array:: consisting of pairs of control-name(s) / widget-name(s):
+definitionlist::
+	## a 1-dimensional control: || control-name: ["widgetName"]
+	## an arrayed control: || control-name: ["widget-name1", "widget-name2",... "widgetNameN"]
+	## 2 controls combined in a link::Classes/CVWidget2D::: || #[control-name1, control-name2]: ["widget2D-name"]
+	## a 2-dimensional control in a single control-name: || 2D-control-name: ["widget2D-name"]
+::
+
+argument:: environment
+optional - if the object is given as slot in an array or dictionary the method will try to look it up in the given environment.
+
+returns:: this (CVCenter)
+
+
+A simple example
+
+code::
+(
+SynthDef(\connectTest, { |freq=#[220, 222, 227, 238], ampLeft=0.3, ampRight=0.3|
+	var son = SinOsc.ar(freq);
+	Out.ar(0, Splay.ar(son) * [ampLeft, ampRight]);
+}).add
+)
+
+(
+#[lo, hi].do({ |slot| CVCenter.use(\amp, slot: slot) }); // a 2D-widget for 'amp'
+4.do({ |i| CVCenter.use("freq"++(i+1)) }); // 4 single widgets for the freq-control (4 slots)
+)
+
+x = Synth(\connectTest);
+
+(
+CVCenter.connectToNode(x, [
+	freq: ["freq1", "freq2", "freq3", "freq4"],
+	#[ampLeft, ampRight]: ["amp"]
+])
+)
+
+x.free;
+CVCenter.removeAll;
+::
+
+note:: If the user doesn't provide the object in a variable or the variable-name can't be determined fallback-actions will be created ( code:: s.sendBundle(s.latency, [...])::). However, these will address the object's nodeID. If the object gets removed and recreated with a new nodeID the actions will stop working.::
 
 subsection:: Setup options (classvar getters and setters)
 
@@ -108,7 +177,7 @@ default: code::0::
 returns:: this (CVCenter)
 
 METHOD:: midiResolution
-When code::midiMode:: has been set to 1, this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders. 
+When code::midiMode:: has been set to 1, this method allows to set the resolution (= stepsize) of the connected hardware MIDI-sliders.
 
 standard-value: 1
 lower values -> higher resolution (lower stepsize)
@@ -119,7 +188,7 @@ default: code::1::
 returns:: this (CVCenter)
 
 METHOD:: ctrlButtonBank
-Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 hardware-sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI. 
+Some MIDI-devices provide several banks of sliders. I.e. a device may be equipped with 16 hardware-sliders and 4 banks that can be switched. So, slider 1 in bank 2 is slider nr. 17, slider 3 in bank 3 is slider nr. 35. By default these sliders would have to be addressed in a link::Classes/CCResponder:: as 16 (slider 17) and 34 (slider 35) which makes it hard to immediately get the right slider from what is displayed within the GUI.
 code::ctrlButtonBank:: translates the hardware-layout in a way that makes it easy to see the slider's bank and number: slider 17 becomes 2:1 (bank 2,  nr. 1).
 
 default: code::nil::
@@ -164,7 +233,7 @@ METHOD:: removeAll
 Remove given link::Classes/CVWidget::s including their link::Classes/CV::s or all. Existing OSC- or MIDI-connections will be resolved automatically.
 
 argument::  ... keys
-widget-keys, given as link::Classes/String::s or link::Classes/Symbol::s. If no keys are given strong::all:: widgets will be removed. 
+widget-keys, given as link::Classes/String::s or link::Classes/Symbol::s. If no keys are given strong::all:: widgets will be removed.
 
 returns:: this (CVCenter)
 
@@ -304,7 +373,7 @@ returns:: this (CVCenter)
 
 
 METHOD:: loadSetup
-Loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup. 
+Loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup.
 
 argument:: path
 optional - expects the full path to the location where the setup shall be stored to disk. If given no file-open dialog will be displayed.
@@ -418,13 +487,13 @@ CVCenter.use(\knobTest, tab: \test);
 CVCenter.addActionAt(\knobTest, \testFunc, { |cv| "knobTest: %\n".postf(cv.value) }, active: false);
 CVCenter.use(\test2D, tab: \test, slot: \lo);
 // arguments 'tab' and 'slot' may be omitted when creating the 'hi' slot as the widget knows under which
-// tab it's living and which slot has already been created. Also the operation doesn't depend 
+// tab it's living and which slot has already been created. Also the operation doesn't depend
 // on a CV being returned
 CVCenter.use(\test2D);
 CVCenter.addActionAt(\test2D, \testFunc, { |cv| "test2D lo: %\n".postf(cv.value) }, \lo);
 CVCenter.addActionAt(\test2D, \testFunc, { |cv| "test2D hi: %\n".postf(cv.value) }, \hi);
 
-// action activation and deactivation 
+// action activation and deactivation
 // watch the "actions"-button at the bottom of the widget
 // turn the knob to see the effect
 CVCenter.activateActionAt(\knobTest, \testFunc, true);
@@ -460,34 +529,36 @@ CVCenter.removeAll;
 subsection:: Creating CVWidgets within CVCenter GUI from running Synths, NodeProxies, Ndefs and ProxySpaces
 
 code::
-// a SynthDef, including some arrayed controls 
+// a SynthDef, including some arrayed controls
 (
 SynthDef('dynKlank', { |impFreq1, impFreq2, freqs1=#[800, 1071, 1153, 1723], freqs2=#[789, 1067, 1150, 1720], ringtimes1=#[1, 1, 1, 1], ringtimes2=#[1, 1, 1, 1]|
 	var signal1, signal2;
 	signal1 = DynKlank.ar(`[freqs1, nil, ringtimes1 ], Impulse.ar(impFreq1, 0, 0.1));
 	signal2 = DynKlank.ar(`[freqs2, nil, ringtimes2 ], Impulse.ar(impFreq2, 0, 0.1));
 	Out.ar(0, [signal1, signal2]);
-}, 
+},
 // specs, defined within the SynthDef's metadata will be considered when auto-creating the GUI
 metadata: (
 	specs: (
-		freqs1: \freq, 
-		freqs2: \freq, 
-		impFreq1: [0.1, 5], 
-		impFreq2: [0.1, 5], 
-		ringtimes1: [1, 20], 
+		freqs1: \freq,
+		freqs2: \freq,
+		impFreq1: [0.1, 5],
+		impFreq2: [0.1, 5],
+		ringtimes1: [1, 20],
 		ringtimes2: [1, 20]
 	)
 )).add; // must be 'added' if the GUI shall be auto-created
 )
 
-Server.default.waitForBoot { a = Synth(\dynKlank) };
-
-// GUI creation - note that actions within widgets representing arrayed controls will
-// rather use setn to set the regarding controls
-// have a look at the Synth helpfile to see all possible arguments for cvcGui
-a.cvcGui(pairs2D: (impFreqs: #[impFreq1, impFreq2]));
-
+(
+Server.default.waitForBoot {
+	a = Synth(\dynKlank);
+	// GUI creation - note that actions within widgets representing arrayed controls will
+	// rather use setn to set the regarding controls
+	// have a look at the Synth helpfile to see all possible arguments for cvcGui
+	a.cvcGui(pairs2D: (impFreqs: #[impFreq1, impFreq2]));
+};
+)
 
 
 /////////////////////////////////// CVCenter and Ndefs /////////////////////////////////////////////////

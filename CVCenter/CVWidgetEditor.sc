@@ -17,7 +17,7 @@
 
 CVWidgetEditor {
 
-	classvar <allEditors;
+	classvar <allEditors, xySlots, nextX, nextY, shiftXY;
 	var thisEditor, <window, <tabs, editorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
@@ -37,7 +37,7 @@ CVWidgetEditor {
 	}
 
 	init { |widget, widgetName, tab, slot|
-		var tabs, cvString, slotHiLo;
+		var cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var addr, wcmHiLo, thisGuiEnv, labelColors;
@@ -46,10 +46,12 @@ CVWidgetEditor {
 		var mappingSelectItems;
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
-		var tmp; // multipurpose short-term var
+		var tmp, gapNextX, gapNextY;
 
 		name = widgetName.asSymbol;
-
+		// "nextX, nextY at init: %, %\n".postf(nextX, nextY);
+		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
+		xySlots ?? { xySlots = [] };
 		editorEnv = ();
 
 		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
@@ -83,10 +85,11 @@ CVWidgetEditor {
 			thisCtrlButtonBank = widget.getCtrlButtonBank;
 		});
 
-
-		staticTextFont = Font(Font.defaultSansFace, 10);
-		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font(Font.defaultMonoFace, 9);
+		// staticTextFont = Font(Font.defaultSansFont, 10);
+		staticTextFont = Font("Arial", 9.4);
+		staticTextColor = Color(0.2, 0.2, 0.2, 1.0);
+		// textFieldFont = Font(Font.defaultMonoFace, 9);
+		textFieldFont = Font("Andale Mono", 9);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
@@ -100,7 +103,40 @@ CVWidgetEditor {
 
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 
-			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(Window.screenBounds.width/2-150, Window.screenBounds.height/2-100, 270, 265));
+			// any seats left empty?
+			block { |break|
+				xySlots.do({ |p, i|
+					if(p[1] == 0, {
+						break.value(
+							#gapNextX, gapNextY = p[0].asArray;
+							// "gapNextX, gapNextY: %, %\n".postf(gapNextX, gapNextY);
+							xySlots[i][1] = name++slotHiLo;
+						);
+					})
+				})
+			};
+
+			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(
+				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 270, 265
+			))
+			// .background_(Color(0.8, 0.8, 0.8, 1.0))
+			;
+
+			xySlots = xySlots.add([nextX@nextY, name++slotHiLo]);
+			// [xySlots, nextX, nextY].postln;
+			if(nextX+275 > Window.screenBounds.width, {
+				nextX = shiftXY ?? { 0 }; nextY = xySlots.last[0].y+295;
+			}, {
+				nextX = xySlots.last[0].x+275; nextY = xySlots.last[0].y;
+			});
+			// if(nextY+295 > Window.screenBounds.height, {
+			// 	shiftXY ?? { shiftXY = 25 };
+			// 	#nextX, nextY = shiftXY!2;
+			// 	"start again: %\n".postf([nextX, nextY]);
+			// 	shiftXY = shiftXY+25;
+			// });
+
+			// [xySlots, nextX, nextY].postln;
 
 			if(slot.isNil, {
 				allEditors.put(name, (window: window, name: widgetName))
@@ -133,26 +169,33 @@ CVWidgetEditor {
 			tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			(0..3).do({ |t| tabs.focusActions[t] = { tabs.stringFocusedColor_(labelStringColors[t]) } });
+			tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
+			(0..3).do({ |t|
+				tabs.focusActions[t] = {
+					tabs.stringFocusedColor_(labelStringColors[t]);
+					tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0));
+					// ("alpha:"+[t, tabs.views[t].background, tabs.views[t].background.alpha]).postln;
+				};
+			});
 			tabs.stringFocusedColor_(labelStringColors[tab]);
-			tabs.views.do(_.background_(Color(0,5, 0.5, 0.5)));
-			// tabs.views.collect({ |t| t.background }).postln;
+			// tabs.views.do({ |t| [t.class, t.background].postln });
+			// tabs.views.collect({ |t| t.background.alpha }).postln;
 
-			thisEditor.tabs = tabs;
+			thisEditor[\tabs] = tabs;
 
-			thisEditor.tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
+			thisEditor[\tabs].view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
 //				[view, char, modifiers, unicode, keycode].postln;
 				switch(unicode,
-					111, { thisEditor.tabs.focus(2) }, // "o" -> osc
-					109, { thisEditor.tabs.focus(1) }, // "m" -> midi
-					97, { thisEditor.tabs.focus(3) }, // "a" -> actions
-					115, { thisEditor.tabs.focus(0) }, // "s" -> specs
+					111, { thisEditor[\tabs].focus(2) }, // "o" -> osc
+					109, { thisEditor[\tabs].focus(1) }, // "m" -> midi
+					97, { thisEditor[\tabs].focus(3) }, // "a" -> actions
+					115, { thisEditor[\tabs].focus(0) }, // "s" -> specs
 					120, { this.close(slot) }, // "x" -> close editor
 					99, { OSCCommands.makeWindow } // "c" -> collect OSC-commands resp. open the collector's GUI
 				)
 			});
 
-			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@95)
+			StaticText(thisEditor[\tabs].views[0], flow0.bounds.width-20@95)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq.asSpec \nor [20, 20000, \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
@@ -162,7 +205,7 @@ CVWidgetEditor {
 
 			cvString = cvString[1..cvString.size-1].join(" ");
 
-			specField = TextField(thisEditor.tabs.views[0], flow0.bounds.width-20@15)
+			specField = TextField(thisEditor[\tabs].views[0], flow0.bounds.width-20@15)
 				.font_(staticTextFont)
 				.string_(cvString)
 				.action_({ |tf|
@@ -172,7 +215,7 @@ CVWidgetEditor {
 
 			flow0.shift(0, 5);
 
-			specsList = PopUpMenu(thisEditor.tabs.views[0], flow0.bounds.width-20@20)
+			specsList = PopUpMenu(thisEditor[\tabs].views[0], flow0.bounds.width-20@20)
 				.action_({ |sl|
 					widget.setSpec(specsListSpecs[sl.value], slot);
 				})
@@ -206,11 +249,16 @@ CVWidgetEditor {
 			window.onClose_({
 				editorEnv.specsListSpecs = specsListSpecs;
 				editorEnv.specsListItems = specsList.items;
+				tmp = xySlots.detectIndex({ |n| n[1] == (name.asString++slotHiLo) });
+				// "slot vor empty: %\n".postf(xySlots[tmp]);
+				xySlots[tmp][1] = 0;
+				// "slot nach empty: %\n".postf(xySlots[tmp]);
+				// xySlots.postln;
 			});
 
 			// MIDI editing
 
-			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+40@15)
+			StaticText(thisEditor[\tabs].views[1], flow1.bounds.width/2+40@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-mode: 0-127 or in/decremental")
@@ -220,7 +268,7 @@ CVWidgetEditor {
 
 			midiModes = ["0-127", "+/-"];
 
-			midiModeSelect = PopUpMenu(thisEditor.tabs.views[1], flow1.bounds.width/2-70@15)
+			midiModeSelect = PopUpMenu(thisEditor[\tabs].views[1], flow1.bounds.width/2-70@15)
 				.font_(staticTextFont)
 				.items_(midiModes)
 				.value_(thisMidiMode)
@@ -229,7 +277,11 @@ CVWidgetEditor {
 				})
 			;
 
-			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
+			if(GUI.id !== \cocoa, {
+				midiModeSelect.toolTip_("Set the mode according to the output\nof your MIDI-device: 0-127 if it outputs\nabsolute values or +/- for in- resp.\ndecremental values")
+			});
+
+			StaticText(thisEditor[\tabs].views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-mean (in/decremental mode only)")
@@ -237,7 +289,7 @@ CVWidgetEditor {
 
 			flow1.shift(5, 0);
 
-			midiMeanNB = NumberBox(thisEditor.tabs.views[1], flow1.bounds.width/2-90@15)
+			midiMeanNB = NumberBox(thisEditor[\tabs].views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
 				.value_(thisMidiMean)
 				.action_({ |mb|
@@ -247,7 +299,11 @@ CVWidgetEditor {
 				.clipLo_(0.0)
 			;
 
-			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
+			if(GUI.id !== \cocoa, {
+				midiMeanNB.toolTip_("If your device outputs in-/decremental\nvalues often a slider's output in neutral\nposition will not be 0. E.g. it could be 64")
+			});
+
+			StaticText(thisEditor[\tabs].views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("minimum distance for the slider (0-127 only)")
@@ -255,7 +311,7 @@ CVWidgetEditor {
 
 			flow1.shift(5, 0);
 
-			softWithinNB = NumberBox(thisEditor.tabs.views[1], flow1.bounds.width/2-90@15)
+			softWithinNB = NumberBox(thisEditor[\tabs].views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
 				.value_(thisSoftWithin)
 				.action_({ |mb|
@@ -266,7 +322,11 @@ CVWidgetEditor {
 				.clipHi_(0.5)
 			;
 
-			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
+			if(GUI.id !== \cocoa, {
+				softWithinNB.toolTip_("If your device outputs absolute values\nyou can set here a threshold to the\ncurrent CV-value within which a slider\nwill react and set a new value. This avoids\njumps if a new value set by a slider\nis far away from the previous value")
+			});
+
+			StaticText(thisEditor[\tabs].views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-resolution (+/- only)")
@@ -274,7 +334,7 @@ CVWidgetEditor {
 
 			flow1.shift(5, 0);
 
-			midiResolutionNB = NumberBox(thisEditor.tabs.views[1], flow1.bounds.width/2-90@15)
+			midiResolutionNB = NumberBox(thisEditor[\tabs].views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
 				.value_(thisMidiResolution)
 				.action_({ |mb|
@@ -285,7 +345,11 @@ CVWidgetEditor {
 				.clipHi_(10.0)
 			;
 
-			StaticText(thisEditor.tabs.views[1], flow1.bounds.width/2+60@15)
+			if(GUI.id !== \cocoa, {
+				midiResolutionNB.toolTip_("Higher values mean lower\nresolution and vice versa.")
+			});
+
+			StaticText(thisEditor[\tabs].views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("number of sliders per bank")
@@ -293,7 +357,7 @@ CVWidgetEditor {
 
 			flow1.shift(5, 0);
 
-			ctrlButtonBankField = TextField(thisEditor.tabs.views[1], flow1.bounds.width/2-90@15)
+			ctrlButtonBankField = TextField(thisEditor[\tabs].views[1], flow1.bounds.width/2-90@15)
 				.font_(staticTextFont)
 				.string_(thisCtrlButtonBank)
 				.action_({ |mb|
@@ -305,15 +369,19 @@ CVWidgetEditor {
 				})
 			;
 
+			if(GUI.id !== \cocoa, {
+				ctrlButtonBankField.toolTip_("Set the number of sliders on in one bank of your MIDI-device.\nSetting this number will display the selected slider in a widget not as\na single number but rather as combination of the selected bank and\nthe slider number (e.g.: 4:3 means bank nr. 4, slider nr. 3)")
+			});
+
 			flow1.shift(0, 10);
 
-			StaticText(thisEditor.tabs.views[1], flow1.bounds.width-20@15)
+			StaticText(thisEditor[\tabs].views[1], flow1.bounds.width-20@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("(learn | connect) / source-ID (device) / chan / ctrl-nr.")
 			;
 
-			midiLearnBut = Button(thisEditor.tabs.views[1], 15@15)
+			midiLearnBut = Button(thisEditor[\tabs].views[1], 15@15)
 				.font_(staticTextFont)
 				.states_([
 					["L", Color.white, Color.blue],
@@ -340,7 +408,7 @@ CVWidgetEditor {
 
 			flow1.shift(0, 0);
 
-			midiSrcField = TextField(thisEditor.tabs.views[1], flow1.bounds.width-165@15)
+			midiSrcField = TextField(thisEditor[\tabs].views[1], flow1.bounds.width-165@15)
 				.font_(staticTextFont)
 				.string_(msrc)
 				.background_(Color.white)
@@ -366,7 +434,7 @@ CVWidgetEditor {
 
 			flow1.shift(0, 0);
 
-			midiChanField = TextField(thisEditor.tabs.views[1], 60@15)
+			midiChanField = TextField(thisEditor[\tabs].views[1], 60@15)
 				.font_(staticTextFont)
 				.string_(mchan)
 				.background_(Color.white)
@@ -392,7 +460,7 @@ CVWidgetEditor {
 
 			flow1.shift(0, 0);
 
-			midiCtrlField = TextField(thisEditor.tabs.views[1], 60@15)
+			midiCtrlField = TextField(thisEditor[\tabs].views[1], 60@15)
 				.font_(staticTextFont)
 				.string_(mctrl)
 				.background_(Color.white)
@@ -418,31 +486,39 @@ CVWidgetEditor {
 
 			// OSC editting
 
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@12)
+			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-20@12)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("device-IP/port")
 			;
 
-			ipField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
+			ipField = TextField(thisEditor[\tabs].views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
 				.string_("")
 			;
+
+			if(GUI.id !== \cocoa, {
+				ipField.toolTip_("Optional: the device's IP-address\nCan be used to restrict listening to\nthis address only.")
+			});
 
 			flow2.shift(5, 0);
 
-			portField = TextField(thisEditor.tabs.views[2], 36@15)
+			portField = TextField(thisEditor[\tabs].views[2], 36@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
 				.string_("")
 			;
 
+			if(GUI.id !== \cocoa, {
+				portField.toolTip_("Optional: the device's port\nCan be used to restrict listening to\nthis port only.")
+			});
+
 			flow2.shift(0, 0);
 
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-20@40)
+			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-20@40)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("OSC command-name, e.g.: /my/cmd/name / OSC message slot: Either choose from a list of command-names (as set by the selected device) or add your custom one ")
@@ -450,7 +526,7 @@ CVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			deviceListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-40@15)
+			deviceListMenu = PopUpMenu(thisEditor[\tabs].views[2], flow2.bounds.width/2-40@15)
 				.items_(["select device..."])
 				.font_(Font("Helvetica", 10))
 				.action_({ |m|
@@ -476,7 +552,7 @@ CVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			cmdListMenu = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width/2-11@15)
+			cmdListMenu = PopUpMenu(thisEditor[\tabs].views[2], flow2.bounds.width/2-11@15)
 				.items_(["command-names..."])
 				.font_(Font("Helvetica", 10))
 				.action_({ |m|
@@ -493,7 +569,7 @@ CVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			addDeviceBut = Button(thisEditor.tabs.views[2], 29@15)
+			addDeviceBut = Button(thisEditor[\tabs].views[2], 29@15)
 				.states_([
 					["new", Color.white, Color(0.15, 0.5, 0.15)]
 				])
@@ -501,16 +577,24 @@ CVWidgetEditor {
 				.action_({ OSCCommands.makeWindow })
 			;
 
-			nameField = TextField(thisEditor.tabs.views[2], flow2.bounds.width-60@15)
+			if(GUI.id !== \cocoa, {
+				addDeviceBut.toolTip_("Scan for incoming OSC-messages\nresp. their commandnames. These\ncan be saved to disk together with a\ndevice-name. You may then quickly\nselect from devices + commandnames\nfrom the dropdowns on the left.")
+			});
+
+			nameField = TextField(thisEditor[\tabs].views[2], flow2.bounds.width-60@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
 				.string_("/my/cmd/name")
 			;
 
+			if(GUI.id !== \cocoa, {
+				nameField.toolTip_("Enter a commandname manualy or first\nselect the device in the dropdown-\nmenu above and then a commandname.\nThe commandname will automatically\nbe filled in here");
+			});
+
 			flow2.shift(5, 0);
 
-			indexField = NumberBox(thisEditor.tabs.views[2], 36@15)
+			indexField = NumberBox(thisEditor[\tabs].views[2], 36@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.clipLo_(1)
@@ -521,15 +605,19 @@ CVWidgetEditor {
 				.value_(1)
 			;
 
+			if(GUI.id !== \cocoa, {
+				indexField.toolTip_("A CVWidget expects values coming in in the\nsucceeding slots of the OSC-message (an array)\nbehind the comandname. An OSC-message\nmay have one or n slots. Select a valid slot\nby moving the mouse clicked up and down.")
+			});
+
 			flow2.shift(0, 0);
 
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
+			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("OSC-input constraints + compensation")
 			;
 
-			inputConstraintLoField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
+			inputConstraintLoField = NumberBox(thisEditor[\tabs].views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(wcmHiLo.oscInputRange.model.value[0])
@@ -538,25 +626,33 @@ CVWidgetEditor {
 
 			flow2.shift(5, 0);
 
-			inputConstraintHiField = NumberBox(thisEditor.tabs.views[2], flow2.bounds.width/2-66@15)
+			inputConstraintHiField = NumberBox(thisEditor[\tabs].views[2], flow2.bounds.width/2-66@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(wcmHiLo.oscInputRange.model.value[1])
 				.enabled_(false)
 			;
 
+			if(GUI.id !== \cocoa, {
+				[inputConstraintLoField, inputConstraintHiField].do(_.toolTip_("The constraints for incoming values - either\ndetermined automatically if calibration is on\nor set them manualy if calibration is off"))
+			});
+
 			flow2.shift(5, 0);
 
-			alwaysPosField = StaticText(thisEditor.tabs.views[2], 32@15)
+			alwaysPosField = StaticText(thisEditor[\tabs].views[2], 32@15)
 				.font_(staticTextFont)
 				.string_(" +"++widget.alwaysPositive)
 				.stringColor_(Color(0.5))
-				.background_(Color(0.95, 0.95, 0.95))
+				.background_(Color(0.95, 0.95, 0.95, 1.0))
 			;
+
+			if(GUI.id !== \cocoa, {
+				alwaysPosField.toolTip_("Make all input same-signed.\nAvoid NaN-results in calculations.")
+			});
 
 			flow2.shift(5, 0);
 
-			calibBut = Button(thisEditor.tabs.views[2], 60@15)
+			calibBut = Button(thisEditor[\tabs].views[2], 60@15)
 				.font_(staticTextFont)
 				.states_([
 					["calibrating", Color.white, Color.red],
@@ -566,14 +662,14 @@ CVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
+			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.string_("Input to Output mapping")
 			;
 
 			flow2.shift(0, 0);
 
-			StaticText(thisEditor.tabs.views[2], flow2.bounds.width-15@15)
+			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.background_(Color.white)
 				.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(slot).minval+"/"+widget.getSpec(slot).maxval)
@@ -583,7 +679,7 @@ CVWidgetEditor {
 
 			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 
-			mappingSelect = PopUpMenu(thisEditor.tabs.views[2], flow2.bounds.width-15@20)
+			mappingSelect = PopUpMenu(thisEditor[\tabs].views[2], flow2.bounds.width-15@20)
 				.font_(Font("Helvetica", 12))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
@@ -603,7 +699,7 @@ CVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			connectorBut = Button(thisEditor.tabs.views[2], flow2.bounds.width-15@25)
+			connectorBut = Button(thisEditor[\tabs].views[2], flow2.bounds.width-15@25)
 				.font_(staticTextFont)
 				.states_([
 					["connect OSC-controller", Color.white, Color.blue],
@@ -645,14 +741,18 @@ CVWidgetEditor {
 				false, { calibBut.value_(1) }
 			);
 
-			actionName = TextField(thisEditor.tabs.views[3], flow3.bounds.width-100@20)
+			actionName = TextField(thisEditor[\tabs].views[3], flow3.bounds.width-100@20)
 				.string_("action-name")
 				.font_(textFieldFont)
 			;
 
+			if(GUI.id !== \cocoa, {
+				actionName.toolTip_("Mandatory: each action must\nbe saved under a unique name")
+			});
+
 			flow3.shift(5, 0);
 
-			enterActionBut = Button(thisEditor.tabs.views[3], 57@20)
+			enterActionBut = Button(thisEditor[\tabs].views[3], 57@20)
 				.font_(staticTextFont)
 				.states_([
 					["add Action", Color.white, Color.blue],
@@ -668,13 +768,17 @@ CVWidgetEditor {
 
 			flow3.shift(0, 0);
 
-			enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+			enterAction = TextView(thisEditor[\tabs].views[3], flow3.bounds.width-35@50)
 				.background_(Color.white)
 				.font_(textFieldFont)
 				.string_("{ |cv| /* do something */ }")
 				.syntaxColorize
 //				.keyDownAction_({ |v| v.string_(v.string.copy.replace("\t", "    ")) })
 			;
+
+			if(GUI.id !== \cocoa, {
+				enterAction.toolTip_("The variable 'cv' holds the widget's CV resp.\n'cv.value' its current value. You may enter an\narbitrary function using this variable (or not).")
+			});
 
 			if(slot.notNil, {
 				wdgtActions = widget.wdgtActions[slot];
@@ -688,15 +792,15 @@ CVWidgetEditor {
 
 				flow3.shift(0, 5);
 
-				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-173@15)
+				actionsList[name].nameField = StaticText(thisEditor[\tabs].views[3], flow3.bounds.width-173@15)
 					.font_(staticTextFont)
-					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.background_(Color.white)
 					.string_(""+name.asString)
 				;
 
 				flow3.shift(5, 0);
 
-				actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
+				actionsList[name].activate = Button(thisEditor[\tabs].views[3], 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -721,7 +825,7 @@ CVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 60@15)
+				actionsList[name].removeBut = Button(thisEditor[\tabs].views[3], 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["remove", Color.white, Color.red],
@@ -733,8 +837,8 @@ CVWidgetEditor {
 
 				flow3.shift(0, 0);
 
-				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
-					.background_(Color(1.0, 1.0, 1.0, 0.5))
+				actionsList[name].actionView = TextView(thisEditor[\tabs].views[3], flow3.bounds.width-35@50)
+					.background_(Color.white)
 					.font_(textFieldFont)
 					.string_(action.asArray[0][0].replace("\t", "    "))
 					.syntaxColorize
@@ -745,7 +849,7 @@ CVWidgetEditor {
 		});
 
 		tab !? {
-			thisEditor.tabs.focus(tab);
+			thisEditor[\tabs].focus(tab);
 		};
 		thisEditor.window.front;
 	}
@@ -753,8 +857,8 @@ CVWidgetEditor {
 	front { |tab|
 		thisEditor.window.front;
 		tab !? {
-			thisEditor.tabs.stringFocusedColor_(labelStringColors[tab]);
-			thisEditor.tabs.focus(tab);
+			thisEditor[\tabs].stringFocusedColor_(labelStringColors[tab]);
+			thisEditor[\tabs].focus(tab);
 		}
 	}
 
@@ -781,7 +885,7 @@ CVWidgetEditor {
 
 	amendActionsList { |widget, addRemove, name, action, slot, active|
 
-		var staticTextFont = Font(Font.defaultSansFace, 10);
+		var staticTextFont = Font("Arial", 10);
 
 		switch(addRemove,
 			\add, {
@@ -789,15 +893,15 @@ CVWidgetEditor {
 				actionsList.put(name, ());
 				flow3.shift(0, 5);
 
-				actionsList[name].nameField = StaticText(thisEditor.tabs.views[3], flow3.bounds.width-173@15)
+				actionsList[name].nameField = StaticText(thisEditor[\tabs].views[3], flow3.bounds.width-173@15)
 					.font_(staticTextFont)
-					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.background_(Color.white)
 					.string_(""+name.asString)
 				;
 
 				flow3.shift(5, 0);
 
-				actionsList[name].activate = Button(thisEditor.tabs.views[3], 60@15)
+				actionsList[name].activate = Button(thisEditor[\tabs].views[3], 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -822,7 +926,7 @@ CVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				actionsList[name].removeBut = Button(thisEditor.tabs.views[3], 60@15)
+				actionsList[name].removeBut = Button(thisEditor[\tabs].views[3], 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["remove", Color.white, Color.red],
@@ -834,8 +938,8 @@ CVWidgetEditor {
 
 				flow3.shift(0, 0);
 
-				actionsList[name].actionView = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
-					.background_(Color(1.0, 1.0, 1.0, 0.5))
+				actionsList[name].actionView = TextView(thisEditor[\tabs].views[3], flow3.bounds.width-35@50)
+					.background_(Color.white)
 					.font_(Font("Helvetica", 9))
 					.string_(action.asArray[0][0])
 					.syntaxColorize
@@ -849,7 +953,7 @@ CVWidgetEditor {
 					actionsList[name].removeBut,
 					actionsList[name].actionView
 				].do(_.remove);
-				flow3.reFlow(thisEditor.tabs.views[3]);
+				flow3.reFlow(thisEditor[\tabs].views[3]);
 			}
 		)
 

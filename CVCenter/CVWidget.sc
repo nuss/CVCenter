@@ -17,6 +17,7 @@
 
 CVWidget {
 
+	classvar <>removeResponders;
 	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
@@ -95,7 +96,7 @@ CVWidget {
 	}
 
 	close {
-		if(isCVCWidget and:{ isPersistent == false or:{ isPersistent == nil }}, { this.remove }, { this.window.close });
+		if(isCVCWidget and:{ isPersistent == false or:{ isPersistent == nil }}, { this.remove }, { window.close });
 	}
 
 	addAction { |name, action, slot, active=true|
@@ -610,11 +611,13 @@ CVWidget {
 			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
 		});
 
-		if(port.size > 0, {
-			if("^[0-9]{1,5}$".matchRegexp(port).not and:{ port != "nil" }, {
+		intPort = port.asString;
+
+		if(intPort.size > 0, {
+			if("^[0-9]{1,5}$".matchRegexp(intPort).not and:{ intPort != "nil" }, {
 				Error("Please provide a valid port or leave this field empty").throw;
 			}, {
-				intPort = port.asInt;
+				intPort = intPort.asInt;
 			})
 		});
 
@@ -625,18 +628,14 @@ CVWidget {
 			Error("You have to supply a valid OSC-typetag (command-name), beginning with an \"/\" as third argument to oscConnect").throw;
 		});
 
-		if(oscMsgIndex.isKindOf(Integer).not, {
-			Error("You have to supply an integer as forth argument to oscConnect").throw;
-		});
-
 		switch(this.class,
 			CVWidgetKnob, {
-				wdgtControllersAndModels.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
-				CmdPeriod.add({ this.oscDisconnect });
+				wdgtControllersAndModels.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex.asInteger]).changedKeys(synchKeys);
+				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect }) });
 			},
 			{
-				wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
-				CmdPeriod.add({ this.oscDisconnect(slot.asSymbol) });
+				wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex.asInteger]).changedKeys(synchKeys);
+				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect(slot.asSymbol) }) });
 			}
 		)
 	}
@@ -677,7 +676,7 @@ CVWidget {
 					wdgtControllersAndModels[slot.asSymbol].midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
 					).changedKeys(synchKeys);
-					CmdPeriod.add({ this !? { this.midiDisconnect(slot) } });
+					CmdPeriod.add({this !? { this.midiDisconnect(slot) } });
 				}, {
 					"Already connected!".warn;
 				})
@@ -734,7 +733,7 @@ CVWidget {
 	}
 
 	front {
-		this.window.front;
+		window.front;
 	}
 
 	isClosed {
@@ -744,7 +743,7 @@ CVWidget {
 			if(allGuiEls.select({ |el| el.isClosed.not }).size == 0, { ^true }, { ^false });
 		}, {
 			// we just want to check for a single widget resp. its parent window
-			^this.window.isClosed;
+			^window.isClosed;
 		})
 	}
 
@@ -894,7 +893,7 @@ CVWidget {
 		wcm.calibration.controller.put(\default, { |theChanger, what, moreArgs|
 			theChanger.value.switch(
 				true, {
-					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
+					window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
 					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
 						thisGuiEnv.editor.calibBut.value_(0);
 						wcm.mapConstrainterLo ?? {
@@ -913,6 +912,7 @@ CVWidget {
 				},
 				false, {
 					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
+					window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
 					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
 						thisGuiEnv.editor.calibBut.value_(1);
 						[wcm.mapConstrainterLo, wcm.mapConstrainterHi].do({ |cv| cv = nil; });
@@ -979,11 +979,21 @@ CVWidget {
 
 			argWidgetCV.spec_(theChanger.value);
 
+			if(this.specBut.class == Event, {
+				this.specBut[slot].toolTip_(
+					"Edit the CV's ControlSpec in '"++slot++"':\n"++(this.getSpec(slot).asCompileString)
+				)
+			}, {
+				this.specBut.toolTip_(
+					"Edit the CV's ControlSpec:\n"++(this.getSpec.asCompileString)
+				)
+			});
+
 			if(this.class === CVWidgetKnob, {
-				if(argWidgetCV.spec.minval == argWidgetCV.spec.maxval.neg, {
+				if(argWidgetCV.spec.excludingZeroCrossing, {
 					thisGuiEnv.knob.centered_(true);
-				}, {
-					thisGuiEnv.knob.centered_(false);
+					}, {
+						thisGuiEnv.knob.centered_(false);
 				})
 			})
 		})
@@ -1077,16 +1087,21 @@ CVWidget {
 	}
 
 	prInitMidiDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+		var ctrlToolTip;
 
 		wcm.midiDisplay.controller ?? {
 			wcm.midiDisplay.controller = SimpleController(wcm.midiDisplay.model);
 		};
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
+			var typeText, r, p;
+
+			// theChanger.value.postln;
+
 			theChanger.value.learn.switch(
 				"X", {
 					defer {
-						if(this.window.isClosed.not, {
+						if(window.isClosed.not, {
 							thisGuiEnv.midiSrc.string_(theChanger.value.src.asString)
 								.background_(Color.red)
 								.stringColor_(Color.white)
@@ -1102,7 +1117,20 @@ CVWidget {
 								.stringColor_(Color.white)
 								.canFocus_(false)
 							;
+							if(slot.notNil, { typeText = " at '"++slot++"'" }, { typeText = "" });
 							thisGuiEnv.midiLearn.value_(1);
+							if(GUI.id !== \cocoa, {
+								thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
+								[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do({ |elem|
+									if(theChanger.value.class == String and:{ theChanger.value.ctrl.includes($:) }, {
+										ctrlToolTip = theChanger.value.ctrl.split($:);
+										ctrlToolTip = ctrlToolTip[1]++" in bank "++ctrlToolTip[0];
+									}, { ctrlToolTip = theChanger.value.ctrl });
+									elem.toolTip_(
+										"currently connected to\ndevice-ID %,\non channel %,\ncontroller %".format(theChanger.value.src.asString, (theChanger.value.chan+1).asString, ctrlToolTip)
+									)
+								})
+							})
 						});
 
 						if(thisGuiEnv.editor.notNil and:{
@@ -1123,27 +1151,64 @@ CVWidget {
 								.stringColor_(Color.white)
 								.canFocus_(false)
 							;
-							thisGuiEnv.editor.midiLearnBut.value_(1)
+							thisGuiEnv.editor.midiLearnBut.value_(1);
 						})
 					}
 				},
 				"C", {
-					thisGuiEnv.midiLearn.states_([
-						["C", Color.white, Color(0.11, 0.38, 0.2)],
-						["X", Color.white, Color.red]
-					]).refresh;
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not
-					}, {
-						thisGuiEnv.editor.midiLearnBut.states_([
+					if(window.isClosed.not, {
+						thisGuiEnv.midiLearn.states_([
 							["C", Color.white, Color(0.11, 0.38, 0.2)],
 							["X", Color.white, Color.red]
 						]).refresh;
+						if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
+						thisGuiEnv.midiLearn.value_(0);
+						thisGuiEnv.midiLearn.toolTip_("Click to connect the widget% to\nthe slider(s) as given in the fields below.".format(typeText));
+						r = [
+							thisGuiEnv.midiSrc.string != "source" and:{
+								try{ thisGuiEnv.midiSrc.string.interpret.isInteger }
+							},
+							thisGuiEnv.midiChan.string != "chan" and:{
+								try{ thisGuiEnv.midiChan.string.interpret.isInteger }
+							},
+							thisGuiEnv.midiCtrl.string != "ctrl"
+						].collect({ |r| r });
+
+						// "Enter your MIDI-device's ID,
+						// \nhit 'return' and click 'C' to
+						// \nconnect all sliders of your
+						// \ndevice to the widget's '"++k++"' slot"
+
+						if(GUI.id !== \cocoa, {
+							p = "Use ";
+							if(r[0], { p = p++" MIDI-device ID "++theChanger.value.src++",\n" });
+							if(r[1], { p = p++"channel nr. "++theChanger.value.chan++",\n" });
+							if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
+							p = p++"\nto connect widget%to MIDI";
+
+							[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
+								_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
+							)
+						});
+
+						// window.midiSrc.toolTip_("% to connect this widget% to % %".formatf(
+					});
+					if(thisGuiEnv.editor.notNil and:{
+						thisGuiEnv.editor.isClosed.not
+					}, {
+						thisGuiEnv.editor.midiLearnBut
+							.states_([
+								["C", Color.white, Color(0.11, 0.38, 0.2)],
+								["X", Color.white, Color.red]
+							])
+							.value_(0)
+							// .refresh
+						;
 					})
 				},
 				"L", {
 					defer {
-						if(this.window.isClosed.not, {
+						if(window.isClosed.not, {
 							thisGuiEnv.midiSrc.string_(theChanger.value.src)
 								.background_(Color.white)
 								.stringColor_(Color.black)
@@ -1164,6 +1229,13 @@ CVWidget {
 								["X", Color.white, Color.red]
 							])
 							.value_(0).refresh;
+							if(GUI.id !== \cocoa, {
+							if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
+								thisGuiEnv.midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
+								thisGuiEnv.midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%".format(typeText));
+								thisGuiEnv.midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%".format(typeText));
+								thisGuiEnv.midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%".format(typeText));
+							})
 						});
 
 						if(thisGuiEnv.editor.notNil and:{
@@ -1197,6 +1269,7 @@ CVWidget {
 	}
 
 	prInitMidiOptions { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+		var typeText;
 
 		wcm.midiOptions.controller ?? {
 			wcm.midiOptions.controller = SimpleController(wcm.midiOptions.model);
@@ -1211,6 +1284,12 @@ CVWidget {
 				thisGuiEnv.editor.softWithinNB.value_(theChanger.value.softWithin);
 				thisGuiEnv.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
 				thisGuiEnv.editor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
+			});
+
+			// thisGuiEnv.postln;
+			if(window.notNil and:{ window.isClosed.not }, {
+				if(slot.notNil, { typeText = "'s '"++slot++"' slot" }, { typeText = "" });
+				thisGuiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
 			})
 		})
 	}
@@ -1320,6 +1399,7 @@ CVWidget {
 	}
 
 	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+		var p;
 
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
@@ -1330,8 +1410,14 @@ CVWidget {
 				Event, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
 			);
-			if(this.window.isClosed.not, {
+			if(window.isClosed.not, {
 				thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
+				if(theChanger.value.but[0] == "edit OSC", {
+					if(slot.notNil, { p =  " in '"++slot++"'" }, { p = "" });
+					thisGuiEnv.oscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
+				}, {
+					thisGuiEnv.oscEditBut.toolTip_("Connected, listening to\n%, msg-slot %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
+				});
 				thisGuiEnv.oscEditBut.refresh;
 			});
 			defer {
@@ -1364,6 +1450,7 @@ CVWidget {
 	}
 
 	prInitOscInputRange { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+		var p;
 
 		wcm.oscInputRange.controller ?? {
 			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
@@ -1381,13 +1468,17 @@ CVWidget {
 					});
 					thisGuiEnv.editor.alwaysPosField.string_(" +"++(alwaysPositive.trunc(0.1)));
 				});
-				if(this.window.isClosed.not, {
+				if(window.isClosed.not, {
 					if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 						thisGuiEnv.oscEditBut.states_([[
 							thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
 							thisGuiEnv.oscEditBut.states[0][1],
 							thisGuiEnv.oscEditBut.states[0][2]
 						]]);
+						p = thisGuiEnv.oscEditBut.toolTip.split($\n);
+						p[2] = "using '"++midiOscEnv.oscMapping.asString++"' in-output mapping";
+						p = p.join("\n");
+						thisGuiEnv.oscEditBut.toolTip_(p);
 						thisGuiEnv.oscEditBut.refresh;
 					})
 				})
@@ -1402,36 +1493,49 @@ CVWidget {
 		};
 
 		wcm.actions.controller.put(\default, { |theChanger, what, moreArgs|
-			if(this.window.isClosed.not, {
+			if(window.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[
 					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
 					Color(0.08, 0.09, 0.14),
 					Color(0.32, 0.67, 0.76),
-				]])
+				]]);
+				thisGuiEnv.actionsBut.toolTip_(""++theChanger.value.activeActions++" of "++theChanger.value.numActions++" active.\nClick to edit")
 			})
 		})
 	}
 
 	// EXPERIMENTAL: extended API
-	extend { |key, func, controller|
-		var thisKey, thisContr;
+	extend { |key, func ... controllers|
+		var thisKey, thisControllers;
 
 		thisKey = key.asSymbol;
-		thisContr = controller.asSymbol;
+		thisControllers = controllers.collect({ |c| c.asSymbol });
 		synchedActions ?? { synchedActions = IdentityDictionary.new };
 
 		synchKeys = synchKeys.add(thisKey);
 		synchedActions.put(thisKey, func);
 
-		if(thisContr !== \default, {
-			if(controller.isNil, {
-				wdgtControllersAndModels.do({ |k|
-					k.controller.put(thisKey, synchedActions[thisKey])
+		if(thisKey != \default, {
+			if(controllers.size == 0, {
+				wdgtControllersAndModels.pairsDo({ |k, v|
+					if(k != \mapConstrainterHi and:{
+						k != \mapConstrainterLo
+					}, {
+						v.controller.put(thisKey, synchedActions[thisKey])
+					})
 				})
 			}, {
-				wdgtControllersAndModels[thisContr].controller.put(thisKey, synchedActions[thisKey])
+				thisControllers.do({ |c|
+					if(wdgtControllersAndModels[c].notNil and:{
+						c != \mapConstrainterHi and:{
+							c != \mapConstrainterLo
+						}
+					}, {
+						wdgtControllersAndModels[c].controller.put(thisKey, synchedActions[thisKey]);
+					})
+				})
 			})
-		})
+		}, { Error("'default' is a reserved key and can not be used to extend a controller-action.").throw })
 	}
 
 	reduce { |key|
@@ -1441,6 +1545,13 @@ CVWidget {
 		if(key.notNil and:{ thisKey !== \default and:{ synchKeys.includes(thisKey) }}, {
 			synchedActions[thisKey] = nil;
 			synchKeys.remove(thisKey);
+		}, {
+			synchKeys.do({ |k|
+				if(k != \default, {
+					synchedActions[k] = nil;
+					synchKeys.remove[k];
+				})
+			})
 		})
 	}
 
