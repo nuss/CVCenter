@@ -611,11 +611,13 @@ CVWidget {
 			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
 		});
 
+		intPort = port.asString;
+
 		if(port.size > 0, {
-			if("^[0-9]{1,5}$".matchRegexp(port).not and:{ port != "nil" }, {
+			if("^[0-9]{1,5}$".matchRegexp(intPort).not and:{ port != "nil" }, {
 				Error("Please provide a valid port or leave this field empty").throw;
 			}, {
-				intPort = port.asInt;
+				intPort = intPort.asInt;
 			})
 		});
 
@@ -626,17 +628,13 @@ CVWidget {
 			Error("You have to supply a valid OSC-typetag (command-name), beginning with an \"/\" as third argument to oscConnect").throw;
 		});
 
-		if(oscMsgIndex.isKindOf(Integer).not, {
-			Error("You have to supply an integer as forth argument to oscConnect").throw;
-		});
-
 		switch(this.class,
 			CVWidgetKnob, {
-				wdgtControllersAndModels.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
+				wdgtControllersAndModels.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex.asInteger]).changedKeys(synchKeys);
 				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect }) });
 			},
 			{
-				wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
+				wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex.asInteger]).changedKeys(synchKeys);
 				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect(slot.asSymbol) }) });
 			}
 		)
@@ -1553,8 +1551,10 @@ CVWidget {
 			synchKeys.remove(thisKey);
 		}, {
 			synchKeys.do({ |k|
-				synchedActions[k] = nil;
-				synchKeys.remove[k];
+				if(k != \default, {
+					synchedActions[k] = nil;
+					synchKeys.remove[k];
+				})
 			})
 		})
 	}

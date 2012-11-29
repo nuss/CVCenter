@@ -469,19 +469,84 @@ code::
 
 ~knob.reduce(\mySync);
 ~win.close;
+::
 
-// a more practical example
-// an OSC connect button
+A slightly more practical (but also more complex) example: Edit an OSC-connection.
 
-~win = Window
-
+code::
 (
-~knob.extend(\mySync, { |theChanger, what, more|
-	~responderDisplay.string_("data:"+theChanger.value);
+var flow, staticTextFont, textFieldFont, buttonFont;
+
+// create a widget
+~knob = CVWidgetKnob(bounds: Rect(490, 0, 80, 210)).front;
+
+// another window with a button that shall get synched to the widget
+staticTextFont = Font("Arial", 12);
+textFieldFont = Font("Andala Mono", 12);
+buttonFont = Font("Arial", 14, true);
+
+// the window and its elements
+~win = Window("connect OSC", Rect(50, 100, 400, 100));
+
+~win.view.decorator = flow = FlowLayout(~win.view.bounds, 7@7, 2@2);
+
+StaticText(~win.view, 120@20).string_("IP-address").font_(staticTextFont);
+StaticText(~win.view, 50@20).string_("port").font_(staticTextFont);
+StaticText(~win.view, 170@20).string_("command-name").font_(staticTextFont);
+StaticText(~win.view, flow.indentedRemaining.width@20).string_("slot").font_(staticTextFont);
+
+flow.nextLine;
+
+~ip = TextField(~win.view, 120@20).font_(textFieldFont).string_("192.168.1.23");
+~port = NumberBox(~win.view, 50@20).font_(textFieldFont).value_(11111);
+~cmd = TextField(~win.view, 170@20).font_(textFieldFont).string_("/my/osc/command/name");
+~slot = NumberBox(~win.view, flow.indentedRemaining.width@20).font_(textFieldFont).value_(1).clipLo_(1);
+
+flow.nextLine;
+
+// a button that lets the user connect OSC
+~connect = Button(~win.view, flow.indentedRemaining.width@flow.indentedRemaining.height)
+.states_([
+	["connect OSC", Color.white, Color.blue],
+	["", Color.white, Color.red]
+])
+.font_(buttonFont)
+.action_({ |b|
+	switch(b.value,
+		1, { ~knob.oscConnect(~ip.string, ~port.value, ~cmd.string, ~slot.value) },
+		0, { ~knob.oscDisconnect }
+	)
+});
+~win.front;
+
+// extend the widget's controller
+// we only need the controller 'oscConnection
+~knob.extend(\oscConnectSync, { |theChanger, what, more|
+	// on calling ~knob.oscConnect theChanger.value will contain an array with 4 slots:
+	// the IP-address, port, the command-name, the message-slot
+	// on calling ~knob.oscDisconnect theChanger.value will only contain 'false'
+	if(theChanger.value.size == 4, {
+		theChanger.value.postln;
+		~connect.states_([
+			~connect.states[0],
+			["connected: %, %, %, %".format(*theChanger.value), ~connect.states[1][1], ~connect.states[1][2]]
+		]).value_(1)
+	}, {
+		~connect.states_([
+			["re-connect OSC", ~connect.states[0][1], ~connect.states[0][2]],
+			~connect.states[1]
+		]).value_(0)
+	})
 }, \oscConnection)
 )
 
-~knob.reduce(\mySync);
+// the user may also establish connect/disconnect programmatically
+// ~knob as well as the custom window ~win should reflect changes immediately
+~knob.oscConnect("192.168.1.23", 11111, "/my/osc/command/name", 1);
+~knob.oscDisconnect;
+
+~knob.reduce(\oscConnectSync);
+[~knob, ~win].do(_.close);
 ::
 
 
@@ -494,8 +559,8 @@ a link::Classes/Symbol:: or a link::Classes/String:: - mandatory, used internall
 argument:: func
 a link::Classes/Function:: - mandatory. A custom function, extending the widget's resp. your custom GUI's functionality. The user may pass the content of the model, the key and more to the function if they are stated as arguments at the beginning of the function. See the link::Classes/SimpleController::-helpfile for more info.
 
-argument:: controllers
-Controllers, given as link::Classes/Symbol::s or link::String::s. A CVWidget contains several models and controllers, contained in link::#-wdgtControllersAndModels::. If no specific controllers are given the function will be added to strong::all:: controllers within link::#-wdgtControllersAndModels::. If one or more specific controllers are provided the function will only be added to these controllers which might make calculations a bit cheaper. However, if the user provides a specific controller (s)he should know under which circumstances the given controller is being triggered in order to get the desired result.
+argument:: ... controllers
+Controllers, given as link::Classes/Symbol::s or link::Classes/String::s. A CVWidget contains several models and controllers, contained in link::#-wdgtControllersAndModels::. If no specific controllers are given the function will be added to strong::all:: controllers within link::#-wdgtControllersAndModels::. If one or more specific controllers are provided the function will only be added to these controllers which might make calculations a bit cheaper. However, if the user provides a specific controller (s)he should know under which circumstances the given controller is being triggered in order to get the desired result.
 
 returns:: the receiver
 
