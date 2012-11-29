@@ -545,6 +545,7 @@ flow.nextLine;
 ~knob.oscConnect("192.168.1.23", 11111, "/my/osc/command/name", 1);
 ~knob.oscDisconnect;
 
+// clean up
 ~knob.reduce(\oscConnectSync);
 [~knob, ~win].do(_.close);
 ::
