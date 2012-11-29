@@ -430,14 +430,14 @@ code::
 
 // create a window that displays properties of OSC-connections in ~knob
 (
-~win = Window("data", Rect(100, 100, 300, 40)).front;
+~win = Window("model", Rect(100, 100, 400, 40)).front;
 ~responderDisplay = StaticText(~win, Rect(7, 7, ~win.bounds.width-14, ~win.bounds.height-14))
 .background_(Color.white)
-.font_(Font.sansSerif(14, true));
+.font_(Font("Andale Mono", 10));
 )
 
 
-// a simple monitor displaying current model-data
+// a simple monitor displaying changed models
 /*
    models used in CVWidget are:
    calibrate, cvSpec, oscInputRange,
@@ -460,20 +460,20 @@ code::
 (
 ~knob.extend(\mySync, { |theChanger, what, more|
 	// have a look at what's being passed into the models
-	~responderDisplay.string_("data:"+theChanger.value);
+	~responderDisplay.string_(" model changed:"+theChanger.value);
 })
 )
 
 // remove the previously added functionality
 // the window is no longer synched with the CVWidget
-~knob.reduce(\mySync)
 
-// to get all data is likely going to be confusing
-// but the user may just as well extend only one controller
-// e.g.: like in the following example 'oscConnection'
-// only data is being displayed that gets passed into the
-// oscConnection-model resp. when the oscConnection-controller
-// gets triggered
+~knob.reduce(\mySync);
+~win.close;
+
+// a more practical example
+// an OSC connect button
+
+~win = Window
 
 (
 ~knob.extend(\mySync, { |theChanger, what, more|
@@ -494,16 +494,16 @@ a link::Classes/Symbol:: or a link::Classes/String:: - mandatory, used internall
 argument:: func
 a link::Classes/Function:: - mandatory. A custom function, extending the widget's resp. your custom GUI's functionality. The user may pass the content of the model, the key and more to the function if they are stated as arguments at the beginning of the function. See the link::Classes/SimpleController::-helpfile for more info.
 
-argument:: controller
-A CVWidget contains several models and controllers, contained in link::#-wdgtControllersAndModels::. If no specific controller is given the function will be added to strong::all:: controllers within link::#-wdgtControllersAndModels::. If a specific controller is provided the function will only be added to that controller which might make calculations a bit cheaper. However, if the user provides a specific controller (s)he should know under which circumstances the given controller is being executed in order to get the desired result.
+argument:: controllers
+Controllers, given as link::Classes/Symbol::s or link::String::s. A CVWidget contains several models and controllers, contained in link::#-wdgtControllersAndModels::. If no specific controllers are given the function will be added to strong::all:: controllers within link::#-wdgtControllersAndModels::. If one or more specific controllers are provided the function will only be added to these controllers which might make calculations a bit cheaper. However, if the user provides a specific controller (s)he should know under which circumstances the given controller is being triggered in order to get the desired result.
 
 returns:: the receiver
 
 METHOD:: reduce
-removes user-defined functions from that have been added to the widget's inbuilt link::Classes/SimpleController::s.
+removes user-defined functions that have been added to the widget's inbuilt link::Classes/SimpleController::s.
 
 argument:: key
-a link::Classes/Symbol:: or a link::Classes/String:: - indicating which function shall be removed. Will not touch the default functionality of a CVWidget.
+a link::Classes/Symbol:: or a link::Classes/String:: - indicating which function shall be removed. Will not touch the default functionality of a CVWidget. If no key is given all functions added by the user will be removed.
 
 returns:: the receiver
 

@@ -1289,7 +1289,7 @@ CVWidget {
 			});
 
 			// thisGuiEnv.postln;
-			if(window.notNil and:{ window.notClosed }, {
+			if(window.notNil and:{ window.isClosed.not }, {
 				if(slot.notNil, { typeText = "'s '"++slot++"' slot" }, { typeText = "" });
 				thisGuiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
 			})
@@ -1511,18 +1511,18 @@ CVWidget {
 	}
 
 	// EXPERIMENTAL: extended API
-	extend { |key, func, controller|
-		var thisKey, thisContr;
+	extend { |key, func ... controllers|
+		var thisKey, thisControllers;
 
 		thisKey = key.asSymbol;
-		thisContr = controller.asSymbol;
+		thisControllers = controllers.collect({ |c| c.asSymbol });
 		synchedActions ?? { synchedActions = IdentityDictionary.new };
 
 		synchKeys = synchKeys.add(thisKey);
 		synchedActions.put(thisKey, func);
 
-		if(thisContr !== \default, {
-			if(controller.isNil, {
+		if(thisKey != \default, {
+			if(controllers.size == 0, {
 				wdgtControllersAndModels.pairsDo({ |k, v|
 					if(k != \mapConstrainterHi and:{
 						k != \mapConstrainterLo
@@ -1531,9 +1531,17 @@ CVWidget {
 					})
 				})
 			}, {
-				wdgtControllersAndModels[thisContr].controller.put(thisKey, synchedActions[thisKey])
+				thisControllers.do({ |c|
+					if(wdgtControllersAndModels[c].notNil and:{
+						c != \mapConstrainterHi and:{
+							c != \mapConstrainterLo
+						}
+					}, {
+						wdgtControllersAndModels[c].controller.put(thisKey, synchedActions[thisKey]);
+					})
+				})
 			})
-		})
+		}, { Error("'default' is a reserved key and can not be used to extend a controller-action.").throw })
 	}
 
 	reduce { |key|
@@ -1543,6 +1551,11 @@ CVWidget {
 		if(key.notNil and:{ thisKey !== \default and:{ synchKeys.includes(thisKey) }}, {
 			synchedActions[thisKey] = nil;
 			synchKeys.remove(thisKey);
+		}, {
+			synchKeys.do({ |k|
+				synchedActions[k] = nil;
+				synchKeys.remove[k];
+			})
 		})
 	}
 
