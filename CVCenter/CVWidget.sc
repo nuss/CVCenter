@@ -1174,11 +1174,6 @@ CVWidget {
 							thisGuiEnv.midiCtrl.string != "ctrl"
 						].collect({ |r| r });
 
-						// "Enter your MIDI-device's ID,
-						// \nhit 'return' and click 'C' to
-						// \nconnect all sliders of your
-						// \ndevice to the widget's '"++k++"' slot"
-
 						if(GUI.id !== \cocoa, {
 							p = "Use ";
 							if(r[0], { p = p++" MIDI-device ID "++theChanger.value.src++",\n" });
@@ -1189,9 +1184,7 @@ CVWidget {
 							[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
 								_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
 							)
-						});
-
-						// window.midiSrc.toolTip_("% to connect this widget% to % %".formatf(
+						})
 					});
 					if(thisGuiEnv.editor.notNil and:{
 						thisGuiEnv.editor.isClosed.not
@@ -1202,7 +1195,6 @@ CVWidget {
 								["X", Color.white, Color.red]
 							])
 							.value_(0)
-							// .refresh
 						;
 					})
 				},
