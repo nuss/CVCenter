@@ -1122,7 +1122,7 @@ CVWidget {
 							if(GUI.id !== \cocoa, {
 								thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
 								[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do({ |elem|
-									if(theChanger.value.class == String and:{ theChanger.value.ctrl.includes($:) }, {
+									if(theChanger.value.ctrl.class == String and:{ theChanger.value.ctrl.includes($:) }, {
 										ctrlToolTip = theChanger.value.ctrl.split($:);
 										ctrlToolTip = ctrlToolTip[1]++" in bank "++ctrlToolTip[0];
 									}, { ctrlToolTip = theChanger.value.ctrl });
