@@ -170,11 +170,17 @@ CVWidgetEditor {
 			tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
+			// tabs.focusActions_((0..3).collect({ |t|
+			// 	tabs.stringFocusedColor_(labelStringColors[t]);
+			// 	tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0));
+			// 	("focused:"+[t, tabs.views[t].background, tabs.views[t].background.alpha]).postln;
+			// }));
+
 			(0..3).do({ |t|
 				tabs.focusActions[t] = {
+					("focused:"+[t, tabs.views[t].background, tabs.views[t].background.alpha]).postln;
 					tabs.stringFocusedColor_(labelStringColors[t]);
 					tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0));
-					// ("alpha:"+[t, tabs.views[t].background, tabs.views[t].background.alpha]).postln;
 				};
 			});
 			tabs.stringFocusedColor_(labelStringColors[tab]);
