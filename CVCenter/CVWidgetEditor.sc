@@ -49,7 +49,6 @@ CVWidgetEditor {
 		var tmp, gapNextX, gapNextY;
 
 		name = widgetName.asSymbol;
-		// "nextX, nextY at init: %, %\n".postf(nextX, nextY);
 		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
 		xySlots ?? { xySlots = [] };
 		editorEnv = ();
@@ -85,10 +84,8 @@ CVWidgetEditor {
 			thisCtrlButtonBank = widget.getCtrlButtonBank;
 		});
 
-		// staticTextFont = Font(Font.defaultSansFont, 10);
 		staticTextFont = Font("Arial", 9.4);
 		staticTextColor = Color(0.2, 0.2, 0.2, 1.0);
-		// textFieldFont = Font(Font.defaultMonoFace, 9);
 		textFieldFont = Font("Andale Mono", 9);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
@@ -109,7 +106,6 @@ CVWidgetEditor {
 					if(p[1] == 0, {
 						break.value(
 							#gapNextX, gapNextY = p[0].asArray;
-							// "gapNextX, gapNextY: %, %\n".postf(gapNextX, gapNextY);
 							xySlots[i][1] = name++slotHiLo;
 						);
 					})
@@ -118,9 +114,7 @@ CVWidgetEditor {
 
 			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(
 				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 270, 265
-			))
-			// .background_(Color(0.8, 0.8, 0.8, 1.0))
-			;
+			));
 
 			xySlots = xySlots.add([nextX@nextY, name++slotHiLo]);
 			// [xySlots, nextX, nextY].postln;
@@ -129,14 +123,6 @@ CVWidgetEditor {
 			}, {
 				nextX = xySlots.last[0].x+275; nextY = xySlots.last[0].y;
 			});
-			// if(nextY+295 > Window.screenBounds.height, {
-			// 	shiftXY ?? { shiftXY = 25 };
-			// 	#nextX, nextY = shiftXY!2;
-			// 	"start again: %\n".postf([nextX, nextY]);
-			// 	shiftXY = shiftXY+25;
-			// });
-
-			// [xySlots, nextX, nextY].postln;
 
 			if(slot.isNil, {
 				allEditors.put(name, (window: window, name: widgetName))
@@ -245,10 +231,7 @@ CVWidgetEditor {
 				editorEnv.specsListSpecs = specsListSpecs;
 				editorEnv.specsListItems = specsList.items;
 				tmp = xySlots.detectIndex({ |n| n[1] == (name.asString++slotHiLo) });
-				// "slot vor empty: %\n".postf(xySlots[tmp]);
 				xySlots[tmp][1] = 0;
-				// "slot nach empty: %\n".postf(xySlots[tmp]);
-				// xySlots.postln;
 			});
 
 			// MIDI editing
@@ -768,7 +751,6 @@ CVWidgetEditor {
 				.font_(textFieldFont)
 				.string_("{ |cv| /* do something */ }")
 				.syntaxColorize
-//				.keyDownAction_({ |v| v.string_(v.string.copy.replace("\t", "    ")) })
 			;
 
 			if(GUI.id !== \cocoa, {

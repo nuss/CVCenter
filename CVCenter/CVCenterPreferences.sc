@@ -32,7 +32,6 @@ CVCenterPreferences {
 		var prefs, rect;
 
 		prefs = this.readPreferences;
-		// prefs.postln;
 
 		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
 
@@ -92,9 +91,7 @@ CVCenterPreferences {
 				.enabled_(false)
 			;
 
-			// "flow.left before shift: %\n".postf(flow.left);
 			flow.nextLine.shift(5, -50);
-			// "flow.left after shift: %\n".postf(flow.left);
 
 			saveGuiPosition = PopUpMenu(window.view, flow.bounds.width-30@20)
 				.items_([
@@ -191,9 +188,7 @@ CVCenterPreferences {
 				.enabled_(false)
 			;
 
-			// "flow.left before shift: %\n".postf(flow.left);
 			flow.nextLine.shift(5, vHeight.neg);
-			// "flow.left after shift: %\n".postf(flow.left);
 
 			if(prefs.notNil, {
 				saveClassVars = buildCheckbox.(prefs[\saveClassVars]);

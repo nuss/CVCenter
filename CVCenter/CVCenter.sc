@@ -32,8 +32,6 @@ CVCenter {
 		Class.initClassTree(CVWidget);
 		prefs = CVCenterPreferences.readPreferences;
 
-		// "prefs in CVCenter: %\n".postf(prefs);
-
 		prefs !? {
 			prefs[\saveGuiProperties] !? {
 				if(prefs[\saveGuiProperties] == 1 or:{

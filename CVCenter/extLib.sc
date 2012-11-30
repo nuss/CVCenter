@@ -33,7 +33,6 @@
 					wdgtKey = CVCenter.all.findKeyForValue(c);
 					wdgtKey !? {
 						if(cv.size > 1, {
-							// "cv.size: %\n".postf(cv.size);
 							cvValues = nil!(cv.size);
 							cv.do({ |cvau, i|
 								if(cvau === CVCenter.at(wdgtKey), {

@@ -42,8 +42,6 @@ CVWidgetKnob : CVWidget {
 		var nextY, knobX, knobY;
 		var text, tActions;
 
-		// "this.removeResponders: %\n".postf(this.class.removeResponders);
-
 		this.bgColor ?? { this.bgColor = Color.white };
 		synchKeys ?? { synchKeys = [\default] };
 
@@ -131,7 +129,6 @@ CVWidgetKnob : CVWidget {
 		persistent !? { if(persistent, { isPersistent = true }) };
 
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
-//			.focusColor_(Color(alpha: 1.0))
 			.background_(this.bgColor)
 		;
 		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
@@ -180,7 +177,6 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+numVal.bounds.height;
 		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
-//			.focusColor_(Color(alpha: 0))
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 			.action_({ |btn|
 				if(editor.isNil or:{ editor.isClosed }, {
@@ -202,7 +198,6 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+specBut.bounds.height+1;
 		midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
 			.font_(Font("Helvetica", 9))
-//			.focusColor_(Color(alpha: 0))
 			.states_([["MIDI", Color.black, this.bgColor]])
 			.action_({ |ms|
 				if(editor.isNil or:{ editor.isClosed }, {
@@ -231,7 +226,6 @@ CVWidgetKnob : CVWidget {
 
 		midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
 			.font_(Font("Helvetica", 9))
-//			.focusColor_(Color(alpha: 0))
 			.states_([
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
@@ -259,7 +253,6 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+midiLearn.bounds.height;
 		midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
 			.font_(Font("Helvetica", 9))
-//			.focusColor_(Color(alpha: 0))
 			.string_(msrc)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -287,7 +280,6 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+midiSrc.bounds.height;
 		midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
-//			.focusColor_(Color(alpha: 0))
 			.string_(mchan)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -314,7 +306,6 @@ CVWidgetKnob : CVWidget {
 
 		midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Helvetica", 9))
-//			.focusColor_(Color(alpha: 0))
 			.string_(mctrl)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -343,7 +334,6 @@ CVWidgetKnob : CVWidget {
 
 		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.font_(Font("Helvetica", 9))
-//			.focusColor_(Color(alpha: 0))
 			.states_([
 				["edit OSC", Color.black, this.bgColor]
 			])
@@ -385,7 +375,6 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+oscEditBut.bounds.height;
 		calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
-//			.focusColor_(Color(alpha: 0))
 			.states_([
 				["calibrating", Color.white, Color.red],
 				["calibrate", Color.black, Color.green]
@@ -409,7 +398,6 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+calibBut.bounds.height;
 		actionsBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
-//			.focusColor_(Color(alpha: 0))
 			.states_([
 				["actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)],
 			])
