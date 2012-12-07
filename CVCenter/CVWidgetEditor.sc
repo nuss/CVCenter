@@ -751,6 +751,7 @@ CVWidgetEditor {
 				.font_(textFieldFont)
 				.string_("{ |cv| /* do something */ }")
 				.syntaxColorize
+				.tabWidth_("    ".bounds.width)
 			;
 
 			if(GUI.id !== \cocoa, {
