@@ -2,7 +2,7 @@ TITLE:: CVCenter
 SUMMARY:: a library aiming at the easy use of external hard- and software controllers within SuperCollider
 CATEGORIES:: Conductor, External Control>MIDI, External Control>OSC
 
-CVCenter is built upon on the concept of code::CV::s by Ron Kuivila. Its name-giving class CVCenter holds a collection of CVs and allows the user to easily created widgets for them that let her/him easily connect their external MIDI- or OSC-controllers. Widgets can be created from Synth-, Ndef-, NodeProxy-controls resp. it can also be used in connection with slots of a ProxySpace. 
+CVCenter is built upon on the concept of code::CV::s by Ron Kuivila. Its name-giving class CVCenter holds a collection of CVs and allows the user to easily created widgets for them that let her/him easily connect their external MIDI- or OSC-controllers. Widgets can be created from Synth-, Ndef-, NodeProxy-controls resp. it can also be used in connection with slots of a ProxySpace.
 As CVs enherit from Stream they may be used in Patterns as well (just like you would embed a regular Pattern in another).
 
 SECTION:: Classes
@@ -14,13 +14,14 @@ LIST::
 subsection:: Widgets
 LIST::
 ## link::Classes/CVWidget:: - the abstract superclass of all CVWidgets. Implements some useful methods for all CVWidgets
-## link::Classes/CVWidgetKnob::
-## link::Classes/CVWidget2D::
+## link::Classes/CVWidgetKnob:: - a widget containing a knob to control one parameter at a time
+## link::Classes/CVWidget2D:: - a widget containing a 2D-slider to control two parameters at a time
 ::
 
 subsection:: Utilities
 LIST::
-## link::Classes/OSCCommands::
+## link::Classes/CVCenterPreferences:: - save settings for CVCenter resp. CVWidgets to disk
+## link::Classes/OSCCommands:: - scan incoming OSC and save command-names to disk for later re-use
 ## link::Classes/CVCenterControllersMonitor::
 ::
 
