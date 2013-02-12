@@ -424,7 +424,8 @@ CVCenter {
 							newPrefs[\midiMean],
 							newPrefs[\softWithin],
 							newPrefs[\ctrlButtonBank],
-							newPrefs[\removeResponders]
+							newPrefs[\removeResponders],
+							"Your CVCenter-preferences have successfully been written to disk."
 						)
 					});
 				})

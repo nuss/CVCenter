@@ -421,8 +421,8 @@ CVCenterPreferences {
 		window.front;
 	}
 
-	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders|
-		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders;
+	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, informString|
+		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders, thisInformString;
 
 		thisSaveClassVars = saveClassVars.asBoolean;
 		thisRemoveResponders = removeResponders.asBoolean;
@@ -464,7 +464,10 @@ CVCenterPreferences {
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);
 		prefs.writeArchive(prefsPath);
-		"Your CVCenter-preferences have successfully been written to disk and will become active after library-recompilation.".inform;
+		if(informString.isNil, {
+			thisInformString = "Your CVCenter-preferences have successfully been written to disk and will become active after library-recompilation.";
+		}, { thisInformString = informString });
+		thisInformString.inform;
 	}
 
 	*readPreferences { |...args|
