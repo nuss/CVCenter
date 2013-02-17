@@ -12,5 +12,5 @@
 	\url:			"http://pustota.5tefan.us/coding/CVCenter",
 
 // or (3) arrays with info in this order: [name, version, repositoryBaseUrl]
-	\dependencies:	[["Conductor"], ["TabbedView"]]
+	\dependencies:	["Conductor", "TabbedView"]
 )
