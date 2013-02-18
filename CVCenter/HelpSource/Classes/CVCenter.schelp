@@ -461,7 +461,7 @@ PRIVATE:: finishGui
 INSTANCEMETHODS::
 
 SECTION:: Shortcuts
-When CVCenter GUI is sent to front a number of shortcuts apply:
+When CVCenter GUI is sent to front a number of shortcuts apply. Most of these shortcuts will open new windows. However, if the regarding window is already open (and maybe hidden under another window) it will rather be brought to front again than opened in another window.
 definitionList::
 ## right arrow-key || navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
 ## left arrow-key || navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
@@ -470,12 +470,14 @@ definitionList::
 ## o || See a list of already connected OSC-controllers (see also: link::Classes/CVCenterControllersMonitor::).
 ## m || See a list of already connected MIDI-controllers (see also: link::Classes/CVCenterControllersMonitor::).
 ## x || If the link::Classes/CVCenterControllersMonitor:: GUI is open, close it.
+## e || If link::Classes/MasterEQ:: from the link::Guides/Quarks##Quark:: code::wslib:: is installed, open it.
 ## h || Start the link::Classes/History:: and open its GUI.
 ## <shift> + h || End the link::Classes/History::, close its GUI a and (if Patform.ideName != "scqt") open a new link::Classes/Document:: containing the recorded link::Classes/History::. note:: code::History.document:: will only work with GUI-systems that support link::Classes/Document::. When using the new SC-IDE consider using link::Classes/History#-saveCS#History.saveCS:: ( code::History.saveCS(path, forward)::)::
 ## n || Open an link::Classes/NdefMixer:: for the default link::Classes/Server::
 ## p || Open a new link::Classes/PdefAllGui::.
+## <shift> + p || Open a new link::Classes/PdefnAllGui::.
 ## t || Open a new link::Classes/TdefAllGui::.
-## a || If the code::Quark:: link::Classes/AllGui:: is installed open a new link::Classes/AllGui::.
+## a || If the link::Guides/Quarks##Quark:: link::Classes/AllGui:: is installed open a new link::Classes/AllGui::.
 ::
 
 EXAMPLES::
