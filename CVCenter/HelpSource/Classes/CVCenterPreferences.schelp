@@ -4,7 +4,7 @@ categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVCenter, Classes/CVWidget
 
 DESCRIPTION::
-CVCenterPreferences implements persistant preferences for link::Classes/CVCenter:: and parts of link::Classes/CVWidget:: (resp. its subclassses link::Classes/CVWidgetKnob:: and link::CLasses/CVWidget2D::). Preferences may either be set via GUI or programmatically. They are stored in a file named strong::CVCenterPreferences:: in the same directory as the classfile.
+CVCenterPreferences implements persistant preferences for link::Classes/CVCenter:: and parts of link::Classes/CVWidget:: (resp. its subclassses link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D::). Preferences may either be set via GUI or programmatically. They are stored in a file named strong::CVCenterPreferences:: in the same directory as the classfile.
 
 
 CLASSMETHODS::
