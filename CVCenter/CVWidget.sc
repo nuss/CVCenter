@@ -911,7 +911,6 @@ CVWidget {
 					})
 				},
 				false, {
-					this.window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
 					window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
 					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
 						thisGuiEnv.editor.calibBut.value_(1);
@@ -1087,14 +1086,13 @@ CVWidget {
 	}
 
 	prInitMidiDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		var ctrlToolTip;
+		var ctrlToolTip, typeText, r, p;
 
 		wcm.midiDisplay.controller ?? {
 			wcm.midiDisplay.controller = SimpleController(wcm.midiDisplay.model);
 		};
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
-			var typeText, r, p;
 
 			// theChanger.value.postln;
 
@@ -1404,11 +1402,13 @@ CVWidget {
 			);
 			if(window.isClosed.not, {
 				thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
-				if(theChanger.value.but[0] == "edit OSC", {
-					if(slot.notNil, { p =  " in '"++slot++"'" }, { p = "" });
-					thisGuiEnv.oscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
-				}, {
-					thisGuiEnv.oscEditBut.toolTip_("Connected, listening to\n%, msg-slot %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
+				if(GUI.id !== \cocoa, {
+					if(theChanger.value.but[0] == "edit OSC", {
+						if(slot.notNil, { p =  " in '"++slot++"'" }, { p = "" });
+						thisGuiEnv.oscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
+					}, {
+						thisGuiEnv.oscEditBut.toolTip_("Connected, listening to\n%, msg-slot %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
+					})
 				});
 				thisGuiEnv.oscEditBut.refresh;
 			});
@@ -1467,10 +1467,12 @@ CVWidget {
 							thisGuiEnv.oscEditBut.states[0][1],
 							thisGuiEnv.oscEditBut.states[0][2]
 						]]);
-						p = thisGuiEnv.oscEditBut.toolTip.split($\n);
-						p[2] = "using '"++midiOscEnv.oscMapping.asString++"' in-output mapping";
-						p = p.join("\n");
-						thisGuiEnv.oscEditBut.toolTip_(p);
+						if(GUI.id !== \cocoa, {
+							p = thisGuiEnv.oscEditBut.toolTip.split($\n);
+							p[2] = "using '"++midiOscEnv.oscMapping.asString++"' in-output mapping";
+							p = p.join("\n");
+							thisGuiEnv.oscEditBut.toolTip_(p);
+						});
 						thisGuiEnv.oscEditBut.refresh;
 					})
 				})
@@ -1491,7 +1493,9 @@ CVWidget {
 					Color(0.08, 0.09, 0.14),
 					Color(0.32, 0.67, 0.76),
 				]]);
-				thisGuiEnv.actionsBut.toolTip_(""++theChanger.value.activeActions++" of "++theChanger.value.numActions++" active.\nClick to edit")
+				if(GUI.id !== \cocoa, {
+					thisGuiEnv.actionsBut.toolTip_(""++theChanger.value.activeActions++" of "++theChanger.value.numActions++" active.\nClick to edit")
+				})
 			})
 		})
 	}
