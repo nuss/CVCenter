@@ -1,4 +1,4 @@
-/* (c) 2010-2012 Stefan Nussbaumer */
+/* (c) 2010-2013 Stefan Nussbaumer */
 /*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -144,7 +144,7 @@ CVWidgetKnob : CVWidget {
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Helvetica", 9))
-			.string_(wdgtInfo)
+			.string_("Add some notes if you like")
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
