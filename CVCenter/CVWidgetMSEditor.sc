@@ -83,10 +83,10 @@ CVWidgetMSEditor {
 			thisCtrlButtonBank[i] = widget.getCtrlButtonBank(i);
 		});
 
-		staticTextFont = Font(Font.defaultSansFace, 10);
-		staticTextFontBold = Font(Font.defaultSansFace, 10, true);
+		staticTextFont = Font("Arial", 9.4);
+		staticTextFontBold = Font("Arial", 9.4, true);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font(Font.defaultMonoFace, 9);
+		textFieldFont = Font("Andale Mono", 9);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 

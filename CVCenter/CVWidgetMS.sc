@@ -7,30 +7,30 @@ CVWidgetMS : CVWidget {
 
 	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, numSliders=5, server|
 		^super.new.init(
-			parent, 
-			cv, 
-			name, 
-			bounds, 
+			parent,
+			cv,
+			name,
+			bounds,
 			defaultAction,
 			setup,
-			controllersAndModels, 
-			cvcGui, 
+			controllersAndModels,
+			cvcGui,
 			persistent,
 			numSliders,
 			server // swing compatibility. well, ...
 		)
 	}
-	
+
 	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, numSliders, server|
 		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		// hmmm...
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextX, nextY, knobX, knobY;
-		
+
 		this.bgColor ?? { this.bgColor = Color.white };
 		synchKeys ?? { synchKeys = [\default] };
 		#numOscResponders, numMidiResponders = 0!2;
-		
+
 		if(cv.isNil, {
 			widgetCV = CV([0 ! numSliders, 1 ! numSliders]);
 		}, {
@@ -53,47 +53,47 @@ CVWidgetMS : CVWidget {
 				widgetCV.spec.units
 			))
 		});
-		
+
 		msSize = [
-			widgetCV.spec.minval.size, 
-			widgetCV.spec.maxval.size, 
-			widgetCV.spec.step.size, 
+			widgetCV.spec.minval.size,
+			widgetCV.spec.maxval.size,
+			widgetCV.spec.step.size,
 			widgetCV.spec.default.size
 		].maxItem;
-		
+
 //		"msSize: %\n".postf(msSize);
-		
+
 		prCalibrate = true ! msSize;
 		prMidiMode = 0 ! msSize;
 		prMidiMean = 64 ! msSize;
 		prMidiResolution = 1 ! msSize;
 		prSoftWithin = 0.1 ! msSize;
 		prCtrlButtonBank = nil ! msSize;
-		
+
 //		"setup: %\n".postf([prCalibrate, prMidiMode, prMidiMean, prMidiResolution, prSoftWithin]);
-						
+
 		guiEnv = ();
 		cvcGui !? { isCVCWidget = true };
 
-		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { 
+		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, {
 			midiOscEnv = cvcGui.midiOscEnv
 		}, {
 			midiOscEnv = ()!msSize
 		});
-		
+
 		msSize.do({ |i|
 			midiOscEnv[i].oscMapping ?? { midiOscEnv[i].oscMapping = \linlin };
 		});
-						
+
 		if(name.isNil, { thisName = "multislider" }, { thisName = name });
 		wdgtInfo = thisName.asString;
-		
+
 //		what's the editor gonna look like?
 		editor = (editors: Array.newClear(msSize));
 
 //		TO DO
 		msSize.do(this.initControllersAndModels(controllersAndModels, _));
-		
+
 		setupArgs !? {
 			msSize.do({ |slot|
 				setupArgs[slot] !? { setupArgs[slot][\midiMode] !? { this.setMidiMode(setupArgs[slot][\midiMode], slot) }};
@@ -107,7 +107,7 @@ CVWidgetMS : CVWidget {
 
 		action !? { this.addAction(\default, action) };
 
-		if(bounds.isNil, {		
+		if(bounds.isNil, {
 			thisXY = 7@0;
 			thisX = 50; thisY = 50;
 			thisWidth = 122;
@@ -118,14 +118,14 @@ CVWidgetMS : CVWidget {
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
-				
+
 		if(parentView.isNil, {
 			window = Window(thisName, Rect(thisX, thisY, thisWidth+14, thisHeight+7), server: server);
 		}, {
 			window = parentView;
 		});
-												
-		cvcGui ?? { 
+
+		cvcGui ?? {
 			window.onClose_({
 				msSize.do({ |slot|
 					if(editor.editors[slot].notNil, {
@@ -149,7 +149,7 @@ CVWidgetMS : CVWidget {
 					}, {
 						if(CVWidgetMSEditor.allMSEditors.notNil and:{
 							CVWidgetMSEditor.allMSEditors[thisName.asSymbol].notNil
-						}, {	
+						}, {
 							if(CVWidgetMSEditor.allMSEditors[thisName.asSymbol].isEmpty, {
 								CVWidgetMSEditor.allMSEditors.removeAt(thisName.asSymbol);
 							})
@@ -174,7 +174,7 @@ CVWidgetMS : CVWidget {
 		};
 
 		persistent !? { if(persistent, { isPersistent = true }) };
-		
+
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color(alpha: 1.0))
 			.background_(this.bgColor)
@@ -196,14 +196,14 @@ CVWidgetMS : CVWidget {
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
-				
+
 		mSlider = MultiSliderView(window, Rect(thisXY.x+1, thisXY.y+16, thisWidth-2, thisHeight-2-75-1))
 			.drawRects_(true)
 			.isFilled_(true)
 			.colors_(Color.clear, Color.blue)
 			.elasticMode_(1)
 		;
-		
+
 		nextY = thisXY.y+mSlider.bounds.height+label.bounds.height+1;
 		numVal = TextView(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.string_(widgetCV.value.asCompileString).font_(Font("Helvetica", 9.5))
@@ -217,13 +217,13 @@ CVWidgetMS : CVWidget {
 		;
 
 		nextY = thisXY.y+numVal.bounds.top+numVal.bounds.height+1;
-		
+
 		midiBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
 				["MIDI"+"("++numMidiResponders++"/"++msSize++")", Color.black, this.bgColor]
 			])
 			.font_(Font("Helvetica", 9))
-			.action_({ |mb| 
+			.action_({ |mb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 1);
 					guiEnv.msEditor = editor.msEditor;
@@ -232,7 +232,7 @@ CVWidgetMS : CVWidget {
 				})
 			})
 		;
-		
+
 		if(GUI.current == QtGUI, {
 			midiBut.mouseEnterAction_({ |mb|
 				mb.states_([[mb.states[0][0], Color.white, Color.red]])
@@ -247,7 +247,7 @@ CVWidgetMS : CVWidget {
 				["OSC"+"("++numOscResponders++"/"++msSize++")", Color.black, this.bgColor]
 			])
 			.font_(Font("Helvetica", 9))
-			.action_({ |oscb| 
+			.action_({ |oscb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 2);
 					guiEnv.msEditor = editor.msEditor;
@@ -256,7 +256,7 @@ CVWidgetMS : CVWidget {
 				})
 			})
 		;
-		
+
 		if(GUI.current == QtGUI, {
 			oscBut.mouseEnterAction_({ |oscb|
 				oscb.states_([[oscb.states[0][0], Color.white, Color.cyan(0.5)]]);
@@ -264,8 +264,8 @@ CVWidgetMS : CVWidget {
 				oscb.states_([[oscb.states[0][0], Color.black, this.bgColor]])
 			})
 		});
-		
-		nextY = nextY+oscBut.bounds.height; 
+
+		nextY = nextY+oscBut.bounds.height;
 		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
 				["Spec", Color.white, Color(1.0, 0.3)]
@@ -296,31 +296,31 @@ CVWidgetMS : CVWidget {
 				})
 			})
 		;
-		
+
 		visibleGuiEls = [
-			mSlider, 
-			numVal, 
+			mSlider,
+			numVal,
 			midiBut,
 			specBut,
-			oscBut, 
+			oscBut,
 			actionsBut
 		];
 
 		allGuiEls = [
-			widgetBg, 
-			label, 
-			nameField, 
-			mSlider, 
-			numVal, 
-			midiBut, 
+			widgetBg,
+			label,
+			nameField,
+			mSlider,
+			numVal,
+			midiBut,
 			oscBut,
 			specBut,
 			actionsBut
 		];
-		
+
 //		msSize.do({ |slot|
 			guiEnv = (
-//				msEditor: editor.msEditor,
+			// msEditor: editor.msEditor,
 				editor: editor.editors,
 				mSlider: mSlider,
 				numVal: numVal,
@@ -333,10 +333,10 @@ CVWidgetMS : CVWidget {
 //		});
 
 		msSize.do({ |slot| this.initControllerActions(slot) });
-		
+
 		widgetCV.connect(mSlider);
 		widgetCV.connect(numVal);
-				
+
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
 	}

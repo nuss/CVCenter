@@ -1677,6 +1677,7 @@ CVWidget {
 //				"thisOscEditBut: %\n".postf(thisOscEditBut);
 //				thisMidiOscEnv = midiOscEnv[slot]; // hmmm...
 			}, {
+				// "no CVWidgetMS - thisGuiEnv.editor: %\n".postf(thisGuiEnv.editor);
 				thisEditor = thisGuiEnv.editor;
 				if(GUI.id !== \cocoa, {
 					if(theChanger.value.but[0] == "edit OSC", {
@@ -1720,8 +1721,8 @@ CVWidget {
 					thisEditor.nameField.string_(theChanger.value.nameField);
 					if(thisCalib, {
 						[
-							thisEditor.inputConstraintLoField,
-							thisEditor.inputConstraintHiField,
+							// thisEditor.inputConstraintLoField,
+							// thisEditor.inputConstraintHiField,
 							thisEditor.calibNumBoxes.lo,
 							thisEditor.calibNumBoxes.hi
 						].do(_.enabled_(theChanger.value.editEnabled));
@@ -1754,13 +1755,16 @@ CVWidget {
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
-				"slot: %\n".postf(slot);
-				"oscEditBtns: %\n".postf(thisGuiEnv.msEditor.oscEditBtns);
-				thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot];
+				// "slot: %\n".postf(slot);
+				// "thisGuiEnv: %\n".postf(thisGuiEnv);
+				thisGuiEnv.msEditor !? {
+					thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot];
+				}
 //				"thisOscEditBut: %\n".postf(thisOscEditBut);
 //				thisMidiOscEnv = midiOscEnv[slot]; // hmmm...
 			}, {
 				thisEditor = thisGuiEnv.editor;
+					"thisGuiEnv.oscEditBut: %\n".postf(thisGuiEnv.oscEditBut);
 				thisOscEditBut = thisGuiEnv.oscEditBut;
 			});
 //			"thisEditor: %\n".postf(thisEditor);
