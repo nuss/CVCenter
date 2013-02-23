@@ -660,7 +660,6 @@ returns:: code::true:: if the widget has been closed, otherwise code::false::
 
 EXAMPLES::
 subsection:: basic usage
-Like code::*new:: the method code::reopen:: is implemented within CVWidgetKnob
 code::
 // create some simple CVWidget
 ~twoDee = CVWidget2D.new.front;
