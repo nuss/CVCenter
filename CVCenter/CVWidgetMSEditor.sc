@@ -38,7 +38,7 @@ CVWidgetMSEditor {
 		var tabs, cvString;
 		var oscTabs, midiTabs;
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
-		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
+		var maxNum, msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var addr, wcmMS, thisGuiEnv, labelColors;
 		var oscLabelColor, midiLabelColor, oscLabelStringColor, midiLabelStringColor;
 		var oscConnectCondition = 0;
@@ -342,11 +342,17 @@ CVWidgetMSEditor {
 
 		oscFlow0.shift(0, 0);
 
+		maxNum = [
+			widget.getSpec.minval.size,
+			widget.getSpec.maxval.size,
+			widget.getSpec.default.size
+		].maxItem;
+
 		extCtrlArrayField = TextField(thisEditor.oscTabs.views[0], 65@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
-			.string_("(from..to)")
+			.string_("(1.."++maxNum++")")
 		;
 
 		nameField = TextField(thisEditor.oscTabs.views[0], 185@15)

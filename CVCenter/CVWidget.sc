@@ -1740,7 +1740,7 @@ CVWidget {
 	}
 
 	prInitOscInputRange { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		var thisEditor, thisOscEditBut, p;
+		var thisEditor, thisOscEditBut, p, numOscString;
 		 /*thisMidiOscEnv;*/
 
 //		"wcm.oscInputRange.model: %\n".postf(wcm.oscInputRange.model);
@@ -1791,19 +1791,28 @@ CVWidget {
 				});
 
 				if(window.isClosed.not, {
-					if(thisOscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
-						thisOscEditBut.states_([[
-							thisOscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
-							thisOscEditBut.states[0][1],
-							thisOscEditBut.states[0][2]
-						]]);
-						if(GUI.id !== \cocoa, {
-							p = thisOscEditBut.toolTip.split($\n);
-							p[2] = "using '"++midiOscEnv.oscMapping.asString++"' in-output mapping";
-							p = p.join("\n");
-							thisOscEditBut.toolTip_(p);
-						});
-						thisOscEditBut.refresh;
+					if(this.class != CVWidgetMS, {
+						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
+							thisGuiEnv.oscEditBut.states_([[
+								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
+								thisGuiEnv.oscEditBut.states[0][1],
+								thisGuiEnv.oscEditBut.states[0][2]
+							]]);
+							if(GUI.id !== \cocoa, {
+								p = thisGuiEnv.oscEditBut.toolTip.split($\n);
+								p[2] = "using '"++midiOscEnv.oscMapping.asString++"' in-output mapping";
+								p = p.join("\n");
+								thisGuiEnv.oscEditBut.toolTip_(p);
+							});
+							thisGuiEnv.oscEditBut.refresh;
+						})
+					}, {
+						numOscString = "("++this.midiOscEnv.size++"/"++this.msSize++")";
+						this.guiEnv.oscBut.states_([[
+							"OSC"+numOscString,
+							this.guiEnv.oscBut.states[0][1],
+							this.guiEnv.oscBut.states[0][2]
+						]])
 					})
 				})
 			}.defer;
