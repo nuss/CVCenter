@@ -1754,6 +1754,8 @@ CVWidget {
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
+				"slot: %\n".postf(slot);
+				"oscEditBtns: %\n".postf(thisGuiEnv.msEditor.oscEditBtns);
 				thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot];
 //				"thisOscEditBut: %\n".postf(thisOscEditBut);
 //				thisMidiOscEnv = midiOscEnv[slot]; // hmmm...

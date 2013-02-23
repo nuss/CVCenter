@@ -1,21 +1,21 @@
 /* (c) 2010-2012 Stefan Nussbaumer */
-/* 
+/*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 CVWidgetMSEditor {
-	
+
 	classvar <allMSEditors;
 	var thisEditor, <window, <tabs, msEditorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
@@ -33,7 +33,7 @@ CVWidgetMSEditor {
 	*new { |widget, widgetName, tab|
 		^super.new.init(widget, widgetName, tab);
 	}
-	
+
 	init { |widget, widgetName, tab|
 		var tabs, cvString;
 		var oscTabs, midiTabs;
@@ -51,28 +51,28 @@ CVWidgetMSEditor {
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
 		var tmp; // multipurpose short-term var
-		
+
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
 		};
-		
+
 		#oscEditBtns, oscCalibBtns = []!2;
 
 		name = widgetName.asSymbol;
 		msEditorEnv = ();
-		
+
 //		"widget: %\n".postf(widget.msSize);
-		
+
 		#thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank = Array.newClear(widget.msSize)!5;
-		
+
 		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
 		thisCmdNames ?? { thisCmdNames = [nil] };
-				
+
 		actionsList ?? { actionsList = () };
-		
+
 		thisGuiEnv = widget.guiEnv;
 
-		widget.wdgtControllersAndModels !? { 
+		widget.wdgtControllersAndModels !? {
 			wcmMS = widget.wdgtControllersAndModels;
 		};
 		widget.msSize.do({ |i|
@@ -82,25 +82,25 @@ CVWidgetMSEditor {
 			thisSoftWithin[i] = widget.getSoftWithin(i);
 			thisCtrlButtonBank[i] = widget.getCtrlButtonBank(i);
 		});
-		
+
 		staticTextFont = Font(Font.defaultSansFace, 10);
 		staticTextFontBold = Font(Font.defaultSansFace, 10, true);
 		staticTextColor = Color(0.2, 0.2, 0.2);
 		textFieldFont = Font(Font.defaultMonoFace, 9);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
-		
+
 		allMSEditors ?? { allMSEditors = IdentityDictionary() };
 
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-200, Window.screenBounds.height/2-150, 400, 300));
-			
+
 			allMSEditors.put(name, (window: window, name: widgetName));
 			thisEditor = allMSEditors[name];
-			
+
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 		});
-		
+
 		tabs = TabbedView(window, Rect(0, 1, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC", "Actions"], scroll: true);
 		tabs.view.resize_(5);
 		tabs.tabCurve_(4);
@@ -118,9 +118,13 @@ CVWidgetMSEditor {
 		tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 		tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 0@0, 0@0);
 		tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
-		(0..3).do({ |t| tabs.focusActions[t] = { tabs.stringFocusedColor_(labelStringColors[t]) } });
+		tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
+		tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
+			tabs.stringFocusedColor_(labelStringColors[t]);
+			{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+		}));
 		tabs.stringFocusedColor_(labelStringColors[tab]);
-		
+
 		oscTabs = TabbedView(tabs.views[2], Rect(0, 1, tabs.views[2].bounds.width-4, tabs.views[2].bounds.height-4), ["Batch Connection", "Individual Sliders"], scroll: true);
 		oscTabs.view.resize_(tabs.view.resize);
 		oscLabelColor = labelColors[2];
@@ -133,11 +137,15 @@ CVWidgetMSEditor {
 		;
 		oscTabs.views[0].decorator = oscFlow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
 		oscTabs.views[1].decorator = oscFlow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
+		oscTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
+		oscTabs.focusActions_((0..oscTabs.views.size-1).collect({ |t|
+			{ oscTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+		}));
 
 		thisEditor.tabs = tabs;
 		thisEditor.oscTabs = oscTabs;
 		thisEditor.midiTabs = midiTabs;
-		
+
 		thisEditor.tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
 //				[view, char, modifiers, unicode, keycode].postln;
 			switch(unicode,
@@ -149,23 +157,23 @@ CVWidgetMSEditor {
 				99, { OSCCommands.makeWindow } // "c" -> collect OSC-commands resp. open the collector's GUI
 			)
 		});
-		
+
 		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@50)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
 			.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq \nor [[20, 20, 20, 20, 20], [20000, 20000, 20000, 20000, 20000], \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
 		;
-		
+
 		flow0.shift(0, 5);
-		
+
 		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@45)
 			.font_(staticTextFontBold)
 			.stringColor_(staticTextColor)
 			.string_("NOTE: CVWidgetMS expects a Spec whose minvals, maxvals, step-sizes and/or default-values are arrays of the size of the number of sliders in the multislider. However, you may provide a spec like 'freq' and its parameters will internally expanded to arrays of the required size.")
 		;
-		
+
 		flow0.shift(0, 5);
-		
+
 		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@10)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
@@ -173,7 +181,7 @@ CVWidgetMSEditor {
 		;
 
 		flow0.shift(0, 5);
-		
+
 		cvString = widget.getSpec.asCompileString;
 		specField = TextView(thisEditor.tabs.views[0], flow0.bounds.width-20@105)
 			.font_(staticTextFont)
@@ -186,7 +194,7 @@ CVWidgetMSEditor {
 				})
 			})
 		;
-		
+
 		flow0.shift(0, 5);
 
 		specsList = PopUpMenu(thisEditor.tabs.views[0], flow0.bounds.width-20@20)
@@ -194,13 +202,13 @@ CVWidgetMSEditor {
 				widget.setSpec(specsListSpecs[sl.value])
 			})
 		;
-		
-		if(msEditorEnv.specsListSpecs.isNil, { 
-			specsListSpecs = List() 
+
+		if(msEditorEnv.specsListSpecs.isNil, {
+			specsListSpecs = List()
 		}, {
 			specsListSpecs = msEditorEnv.specsListSpecs;
 		});
-		
+
 		if(msEditorEnv.specsListItems.notNil, {
 			specsList.items_(msEditorEnv.specsListItems);
 		}, {
@@ -211,7 +219,7 @@ CVWidgetMSEditor {
 				})
 			})
 		});
-					
+
 		tmp = specsListSpecs.detectIndex({ |spec, i| spec == widget.getSpec });
 		if(tmp.notNil, {
 			specsList.value_(tmp);
@@ -219,28 +227,28 @@ CVWidgetMSEditor {
 			specsListSpecs.array_([widget.getSpec]++specsListSpecs.array);
 			specsList.items = List["custom:"+widget.getSpec.asString]++specsList.items;
 		});
-		
+
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
 			.string_("IP-address (optional)")
 		;
-		
+
 		oscFlow0.shift(0, 0);
-		
+
 		StaticText(thisEditor.oscTabs.views[0], 130@15)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
 			.string_("port (usually not necessary)")
 		;
-		
+
 		ipField = TextField(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
 			.string_("")
 		;
-		
+
 		oscFlow0.shift(0, 0);
 
 		portField = TextField(thisEditor.oscTabs.views[0], 130@15)
@@ -249,7 +257,7 @@ CVWidgetMSEditor {
 			.background_(textFieldBg)
 			.string_("")
 		;
-		
+
 		oscFlow0.shift(0, 0);
 
 		deviceListMenu = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-46@15)
@@ -275,9 +283,9 @@ CVWidgetMSEditor {
 				})
 			})
 		;
-		
+
 		oscFlow0.shift(0, 0);
-		
+
 		cmdListMenu = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-11@15)
 			.items_(["command-names..."])
 			.font_(Font("Helvetica", 10))
@@ -287,13 +295,13 @@ CVWidgetMSEditor {
 				})
 			})
 		;
-		
+
 		cmdNames.pairsDo({ |dev, cmds|
 			deviceListMenu.items = deviceListMenu.items ++ dev;
 		});
-		
+
 		oscFlow0.shift(0, 0);
-		
+
 		addDeviceBut = Button(thisEditor.oscTabs.views[0], 29@15)
 			.states_([
 				["new", Color.white, Color(0.15, 0.5, 0.15)]
@@ -309,7 +317,7 @@ CVWidgetMSEditor {
 		;
 
 		oscFlow0.shift(0, 10);
-		
+
 		StaticText(thisEditor.oscTabs.views[0], 185@40)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
@@ -317,7 +325,7 @@ CVWidgetMSEditor {
 		;
 
 		oscFlow0.shift(0, -5);
-		
+
 		StaticText(thisEditor.oscTabs.views[0], 60@40)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
@@ -325,7 +333,7 @@ CVWidgetMSEditor {
 		;
 
 		oscFlow0.shift(0, -5);
-		
+
 		StaticText(thisEditor.oscTabs.views[0], 60@40)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
@@ -333,21 +341,21 @@ CVWidgetMSEditor {
 		;
 
 		oscFlow0.shift(0, 0);
-		
+
 		extCtrlArrayField = TextField(thisEditor.oscTabs.views[0], 65@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
 			.string_("(from..to)")
 		;
-					
+
 		nameField = TextField(thisEditor.oscTabs.views[0], 185@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
 			.string_("/my/cmd/name/%")
 		;
-		
+
 		intStartIndexField = NumberBox(thisEditor.oscTabs.views[0], 60@15)
 			.font_(textFieldFont)
 			.normalColor_(textFieldFontColor)
@@ -358,26 +366,26 @@ CVWidgetMSEditor {
 			.alt_scale_(1)
 			.value_(0)
 		;
-					
+
 		indexField = TextField(thisEditor.oscTabs.views[0], 60@15)
 			.font_(textFieldFont)
 			.string_("int or %")
 		;
-		
+
 		oscFlow0.shift(0, 0);
 
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-10@15)
 			.font_(staticTextFont)
 			.string_("Input to Output mapping")
 		;
-				
+
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-10@15)
 			.font_(staticTextFont)
 			.string_("Global Calibration")
 		;
-				
+
 		mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
-		
+
 		mappingSelect = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-12@20)
 			.font_(Font("Helvetica", 12))
 			.items_(mappingSelectItems)
@@ -385,7 +393,7 @@ CVWidgetMSEditor {
 				widget.msSize.do(widget.setOscMapping(ms.item, _));
 			})
 		;
-		
+
 //		if(widget.getOscMapping(slot).notNil, {
 //			mappingSelectItems.do({ |item, i|
 //				if(item.asSymbol === widget.getOscMapping(slot), {
@@ -395,7 +403,7 @@ CVWidgetMSEditor {
 //				mappingSelect.value_(0);
 //			})
 //		});
-		
+
 		calibBut = Button(thisEditor.oscTabs.views[0],  oscFlow0.bounds.width/2-12@20)
 			.font_(staticTextFont)
 			.states_([
@@ -414,7 +422,7 @@ CVWidgetMSEditor {
 				["disconnect OSC-controllers", Color.white, Color.red]
 			])
 			.action_({ |cb|
-				// user-input: 
+				// user-input:
 				// 	extCtrlArrayField -> external controllers
 				//	ipField -> IP-address
 				//	portField -> port
@@ -422,9 +430,9 @@ CVWidgetMSEditor {
 				//	intStartIndexField -> multislider-index to start connecting at
 				//	indexField -> msg-slot, an integer or a placeholder, starting at 1
 				cb.value.switch(
-					1, { 
+					1, {
 						if(extCtrlArrayField.string.interpret.isArray and:{
-							extCtrlArrayField.string.interpret.collect(_.isInteger).size == 
+							extCtrlArrayField.string.interpret.collect(_.isInteger).size ==
 							extCtrlArrayField.string.interpret.size
 						}, {
 							oscConnectCondition = oscConnectCondition+1;
@@ -440,12 +448,12 @@ CVWidgetMSEditor {
 //							"ok, we're ready to rock".postln;
 							extCtrlArrayField.string.interpret.do({ |ext, i|
 								if(ipField.string.size > 0, { connectIP = ipField.string }, { connectIP = "nil" });
-								if(portField.string.size > 0, { 
+								if(portField.string.size > 0, {
 									connectPort = portField.string;
-								}, { 
+								}, {
 									connectPort = "nil";
 								});
-								if(nameField.string.includes($%), { 
+								if(nameField.string.includes($%), {
 									connectName = nameField.string.format(ext);
 								}, {
 									connectName = nameField.string;
@@ -457,9 +465,9 @@ CVWidgetMSEditor {
 								});
 								connectIndexStart = intStartIndexField.value+i;
 								widget.oscConnect(
-									name: connectIP, 
-									port: connectPort, 
-									name: connectName, 
+									name: connectIP,
+									port: connectPort,
+									name: connectName,
 									oscMsgIndex: connectOscMsgIndex,
 									slot: connectIndexStart
 								)
@@ -472,14 +480,14 @@ CVWidgetMSEditor {
 		;
 
 //		calibNumBoxes = (lo: inputConstraintLoField, hi: inputConstraintHiField);
-//		
+//
 //		calibBut.action_({ |but|
 //			but.value.switch(
-//				0, { 
+//				0, {
 //					widget.setCalibrate(true, slot);
 //					wcmHiLo.calibration.model.value_(true).changedKeys(synchKeys);
 //				},
-//				1, { 
+//				1, {
 //					widget.setCalibrate(false, slot);
 //					wcmHiLo.calibration.model.value_(false).changedKeys(synchKeys);
 //				}
@@ -522,39 +530,39 @@ CVWidgetMSEditor {
 				;
 			);
 		});
-		
-				
+
+
 		window.onClose_({
 			msEditorEnv.specsListSpecs = specsListSpecs;
 			msEditorEnv.specsListItems = specsList.items;
 		});
-		
-		tab !? { 
+
+		tab !? {
 			thisEditor.tabs.focus(tab);
 		};
 		thisEditor.window.front;
 	}
-	
+
 	front { |tab|
 		thisEditor.window.front;
-		tab !? { 
+		tab !? {
 			thisEditor.tabs.stringFocusedColor_(labelStringColors[tab]);
 			thisEditor.tabs.focus(tab);
 		}
 	}
-	
+
 	close { |slot|
 		thisEditor.window.close;
 		allMSEditors.removeAt(name);
 	}
-	
-	isClosed { 
+
+	isClosed {
 		var ret;
 		thisEditor.window !? {
 			ret = defer { thisEditor.window.isClosed };
 			^ret.value;
 		}
 	}
-	
-	
+
+
 }
