@@ -1375,7 +1375,7 @@ CVWidget {
 
 				wcm.oscDisplay.model.value_(
 					(
-						but: ["edit OSC", Color.black, Color.clear],
+						but: ["edit OSC", Color.black, this.bgColor],
 						ipField: wcm.oscDisplay.model.value.ipField,
 						portField: wcm.oscDisplay.model.value.portField,
 						nameField: wcm.oscDisplay.model.value.nameField,
