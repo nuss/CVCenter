@@ -953,7 +953,7 @@ CVWidget {
 		};
 		wcm.oscDisplay.model ?? {
 			wcm.oscDisplay.model = Ref((
-				but: ["edit OSC", Color.black, Color.clear],
+				but: ["edit OSC", Color.black, this.bgColor],
 				ipField: "",
 				portField: "",
 				nameField: "/my/cmd/name",
@@ -1624,17 +1624,20 @@ CVWidget {
 					midiOscEnv.oscResponder.action_(oscResponderAction);
 				});
 
-//				wcm.oscDisplay.model.value_(
-//					(
-//						but: [theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)],
-//						ipField: theChanger.value[0].asString,
-//						portField: theChanger.value[1].asString,
-//						nameField: theChanger.value[2].asString,
-//						index: theChanger.value[3],
-//						connectorButVal: 1,
-//						editEnabled: false
-//					)
-//				).changedKeys(synchKeys);
+				"wcm.oscDisplay.model: %\n".postf(wcm.oscDisplay.model);
+				if(this.class != CVWidgetMS, {
+					wcm.oscDisplay.model.value_(
+						(
+							but: [theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString, Color.white, Color.cyan(0.5)],
+							ipField: theChanger.value[0].asString,
+							portField: theChanger.value[1].asString,
+							nameField: theChanger.value[2].asString,
+							index: theChanger.value[3],
+							connectorButVal: 1,
+							editEnabled: false
+						)
+					).changedKeys(synchKeys);
+				})
 			});
 			if(theChanger.value == false, {
 				midiOscEnv.oscResponder.remove;
@@ -1643,17 +1646,19 @@ CVWidget {
 				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changedKeys(synchKeys);
 				midiOscEnv.calibConstraints = nil;
 
-//				wcm.oscDisplay.model.value_(
-//					(
-//						but: ["edit OSC", Color.black, Color.clear],
-//						ipField: wcm.oscDisplay.model.value.ipField,
-//						portField: wcm.oscDisplay.model.value.portField,
-//						nameField: wcm.oscDisplay.model.value.nameField,
-//						index: wcm.oscDisplay.model.value.index,
-//						connectorButVal: 0,
-//						editEnabled: true
-//					)
-//				).changedKeys(synchKeys);
+				if(this.class != CVWidgetMS, {
+					wcm.oscDisplay.model.value_(
+						(
+							but: ["edit OSC", Color.black, Color.clear],
+							ipField: wcm.oscDisplay.model.value.ipField,
+							portField: wcm.oscDisplay.model.value.portField,
+							nameField: wcm.oscDisplay.model.value.nameField,
+							index: wcm.oscDisplay.model.value.index,
+							connectorButVal: 0,
+							editEnabled: true
+						)
+					).changedKeys(synchKeys);
+				})
 			})
 		})
 	}
@@ -1668,8 +1673,11 @@ CVWidget {
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
+				Array, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
 			);
+
+			"theChanger.value.but: %\n".postf(theChanger.value.but);
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
