@@ -92,7 +92,9 @@ CVWidgetMS : CVWidget {
 		editor = (editors: Array.newClear(msSize));
 
 //		TO DO
+		// "wdgtControllersAndModels before init: %\n".postf(wdgtControllersAndModels);
 		msSize.do(this.initControllersAndModels(controllersAndModels, _));
+		// "wdgtControllersAndModels after init: %\n".postf(wdgtControllersAndModels);
 
 		setupArgs !? {
 			msSize.do({ |slot|
@@ -253,6 +255,15 @@ CVWidgetMS : CVWidget {
 					guiEnv.msEditor = editor.msEditor;
 				}, {
 					editor.msEditor.front(1)
+				});
+				msSize.do({ |i|
+					[i, wdgtControllersAndModels.slots[i]].postln;
+					wdgtControllersAndModels.slots[i].oscDisplay.model.value_(
+						wdgtControllersAndModels.slots[i].oscDisplay.model.value;
+					).changedKeys(synchKeys);
+					wdgtControllersAndModels.slots[i].midiDisplay.model.value_(
+						wdgtControllersAndModels.slots[i].midiDisplay.model.value
+					).changedKeys(synchKeys);
 				})
 			})
 		;

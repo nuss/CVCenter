@@ -1625,6 +1625,7 @@ CVWidget {
 				});
 
 				"wcm.oscDisplay.model: %\n".postf(wcm.oscDisplay.model);
+				// "wdgtControllersAndModels: %\n".postf(wdgtControllersAndModels.asCompileString);
 				if(this.class != CVWidgetMS, {
 					wcm.oscDisplay.model.value_(
 						(
@@ -1649,7 +1650,7 @@ CVWidget {
 				if(this.class != CVWidgetMS, {
 					wcm.oscDisplay.model.value_(
 						(
-							but: ["edit OSC", Color.black, Color.clear],
+							but: ["edit OSC", Color.black, this.bgColor],
 							ipField: wcm.oscDisplay.model.value.ipField,
 							portField: wcm.oscDisplay.model.value.portField,
 							nameField: wcm.oscDisplay.model.value.nameField,
@@ -1700,8 +1701,13 @@ CVWidget {
 //			"thisEditor: %\n".postf(thisEditor);
 
 			if(window.isClosed.not, {
-				thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
-				thisGuiEnv.oscEditBut.refresh;
+				if(this.class != CVWidgetMS, {
+					thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
+					thisGuiEnv.oscEditBut.refresh;
+				}, {
+					this.guiEnv.oscBut.states_([theChanger.value.but]);
+					this.guiEnv.oscBut.refresh;
+				})
 			});
 			defer {
 				if(thisGuiEnv.msEditor.notNil and:{
@@ -1772,7 +1778,7 @@ CVWidget {
 //				thisMidiOscEnv = midiOscEnv[slot]; // hmmm...
 			}, {
 				thisEditor = thisGuiEnv.editor;
-					"thisGuiEnv.oscEditBut: %\n".postf(thisGuiEnv.oscEditBut);
+				"thisGuiEnv.oscEditBut: %\n".postf(thisGuiEnv.oscEditBut);
 				thisOscEditBut = thisGuiEnv.oscEditBut;
 			});
 //			"thisEditor: %\n".postf(thisEditor);
