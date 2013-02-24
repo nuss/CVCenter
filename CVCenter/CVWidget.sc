@@ -803,7 +803,7 @@ CVWidget {
 		};
 		wcm.oscDisplay.model ?? {
 			wcm.oscDisplay.model = Ref((
-				but: ["edit OSC", Color.black, Color.clear],
+				but: ["edit OSC", Color.black, this.bgColor],
 				ipField: "",
 				portField: "",
 				nameField: "/my/cmd/name",
