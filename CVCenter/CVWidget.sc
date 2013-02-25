@@ -1670,7 +1670,7 @@ CVWidget {
 	}
 
 	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		var thisEditor, thisOscEditBut, p;
+		var thisEditor, thisOscEditBut, p, tmp;
 
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
@@ -1730,8 +1730,11 @@ CVWidget {
 							msSlots[slot] = midiOscEnv.oscMsgIndex;
 						}, { msSlots[slot] = nil })
 					});
-					msCmds.postln;
-					msSlots.postln;
+
+					tmp = msSlots.selectIndex({ |it, i| it.notNil })+1;
+					// "tmp, msSlots: %, %\n".postf(tmp, msSlots);
+					if(tmp.size == this.msSize, { tmp = "(1.."++this.msSize++")" }, { tmp = tmp.asCompileString });
+					thisGuiEnv.msEditor.extCtrlArrayField.string_(tmp);
 					thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 					thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
 					thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
