@@ -30,6 +30,8 @@ CVWidget {
 	var isPersistent, oldBounds, oldName;
 	// extended API
 	var <synchKeys, synchedActions;
+	// special bookkeeping for CVWidgetMS
+	var msCmds, msSlots;
 
 	*initClass {
 		StartUp.add({
@@ -1349,165 +1351,167 @@ CVWidget {
 		};
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
-			theChanger.value.learn.switch(
-				"X", {
-					defer {
-						if(window.isClosed.not, {
-							thisGuiEnv.midiSrc.string_(theChanger.value.src.asString)
-								.background_(Color.red)
-								.stringColor_(Color.white)
-								.canFocus_(false)
-							;
-							thisGuiEnv.midiChan.string_((theChanger.value.chan+1).asString)
-								.background_(Color.red)
-								.stringColor_(Color.white)
-								.canFocus_(false)
-							;
-							thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
-								.background_(Color.red)
-								.stringColor_(Color.white)
-								.canFocus_(false)
-							;
-							if(slot.notNil, { typeText = " at '"++slot++"'" }, { typeText = "" });
-							thisGuiEnv.midiLearn.value_(1);
-							if(GUI.id !== \cocoa, {
-								thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
-								[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do({ |elem|
-									if(theChanger.value.ctrl.class == String and:{ theChanger.value.ctrl.includes($:) }, {
-										ctrlToolTip = theChanger.value.ctrl.split($:);
-										ctrlToolTip = ctrlToolTip[1]++" in bank "++ctrlToolTip[0];
-									}, { ctrlToolTip = theChanger.value.ctrl });
-									elem.toolTip_(
-										"currently connected to\ndevice-ID %,\non channel %,\ncontroller %".format(theChanger.value.src.asString, (theChanger.value.chan+1).asString, ctrlToolTip)
-									)
+			if(this.class != CVWidgetMS, {
+				theChanger.value.learn.switch(
+					"X", {
+						defer {
+							if(window.isClosed.not, {
+								thisGuiEnv.midiSrc.string_(theChanger.value.src.asString)
+									.background_(Color.red)
+									.stringColor_(Color.white)
+									.canFocus_(false)
+								;
+								thisGuiEnv.midiChan.string_((theChanger.value.chan+1).asString)
+									.background_(Color.red)
+									.stringColor_(Color.white)
+									.canFocus_(false)
+								;
+								thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
+									.background_(Color.red)
+									.stringColor_(Color.white)
+									.canFocus_(false)
+								;
+								if(slot.notNil, { typeText = " at '"++slot++"'" }, { typeText = "" });
+								thisGuiEnv.midiLearn.value_(1);
+								if(GUI.id !== \cocoa, {
+									thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
+									[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do({ |elem|
+										if(theChanger.value.ctrl.class == String and:{ theChanger.value.ctrl.includes($:) }, {
+											ctrlToolTip = theChanger.value.ctrl.split($:);
+											ctrlToolTip = ctrlToolTip[1]++" in bank "++ctrlToolTip[0];
+										}, { ctrlToolTip = theChanger.value.ctrl });
+										elem.toolTip_(
+											"currently connected to\ndevice-ID %,\non channel %,\ncontroller %".format(theChanger.value.src.asString, (theChanger.value.chan+1).asString, ctrlToolTip)
+										)
+									})
 								})
+							});
+
+							if(thisGuiEnv.editor.notNil and:{
+								thisGuiEnv.editor.isClosed.not
+							}, {
+								thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
+									.background_(Color.red)
+									.stringColor_(Color.white)
+									.canFocus_(false)
+								;
+								thisGuiEnv.editor.midiChanField.string_((theChanger.value.chan+1).asString)
+									.background_(Color.red)
+									.stringColor_(Color.white)
+									.canFocus_(false)
+								;
+								thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
+									.background_(Color.red)
+									.stringColor_(Color.white)
+									.canFocus_(false)
+								;
+								thisGuiEnv.editor.midiLearnBut.value_(1)
 							})
-						});
-
-						if(thisGuiEnv.editor.notNil and:{
-							thisGuiEnv.editor.isClosed.not
-						}, {
-							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
-								.background_(Color.red)
-								.stringColor_(Color.white)
-								.canFocus_(false)
-							;
-							thisGuiEnv.editor.midiChanField.string_((theChanger.value.chan+1).asString)
-								.background_(Color.red)
-								.stringColor_(Color.white)
-								.canFocus_(false)
-							;
-							thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
-								.background_(Color.red)
-								.stringColor_(Color.white)
-								.canFocus_(false)
-							;
-							thisGuiEnv.editor.midiLearnBut.value_(1)
-						})
-					}
-				},
-				"C", {
-					if(window.isClosed.not, {
-						thisGuiEnv.midiLearn.states_([
-							["C", Color.white, Color(0.11, 0.38, 0.2)],
-							["X", Color.white, Color.red]
-						]).refresh;
-						if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
-						thisGuiEnv.midiLearn.value_(0);
-						thisGuiEnv.midiLearn.toolTip_("Click to connect the widget% to\nthe slider(s) as given in the fields below.".format(typeText));
-						r = [
-							thisGuiEnv.midiSrc.string != "source" and:{
-								try{ thisGuiEnv.midiSrc.string.interpret.isInteger }
-							},
-							thisGuiEnv.midiChan.string != "chan" and:{
-								try{ thisGuiEnv.midiChan.string.interpret.isInteger }
-							},
-							thisGuiEnv.midiCtrl.string != "ctrl"
-						].collect({ |r| r });
-
-						if(GUI.id !== \cocoa, {
-							p = "Use ";
-							if(r[0], { p = p++" MIDI-device ID "++theChanger.value.src++",\n" });
-							if(r[1], { p = p++"channel nr. "++theChanger.value.chan++",\n" });
-							if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
-							p = p++"\nto connect widget%to MIDI";
-
-							[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
-								_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
-							)
-						})
-					});
-					if(thisGuiEnv.editor.notNil and:{
-						thisGuiEnv.editor.isClosed.not
-					}, {
-						thisGuiEnv.editor.midiLearnBut
-							.states_([
+						}
+					},
+					"C", {
+						if(window.isClosed.not, {
+							thisGuiEnv.midiLearn.states_([
 								["C", Color.white, Color(0.11, 0.38, 0.2)],
 								["X", Color.white, Color.red]
-							])
-							.value_(0)
-						;
-					})
-				},
-				"L", {
-					defer {
-						if(window.isClosed.not, {
-							thisGuiEnv.midiSrc.string_(theChanger.value.src)
-								.background_(Color.white)
-								.stringColor_(Color.black)
-								.canFocus_(true)
-							;
-							thisGuiEnv.midiChan.string_(theChanger.value.chan)
-								.background_(Color.white)
-								.stringColor_(Color.black)
-								.canFocus_(true)
-							;
-							thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
-								.background_(Color.white)
-								.stringColor_(Color.black)
-								.canFocus_(true)
-							;
-							thisGuiEnv.midiLearn.states_([
-								["L", Color.white, Color.blue],
-								["X", Color.white, Color.red]
-							])
-							.value_(0).refresh;
+							]).refresh;
+							if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
+							thisGuiEnv.midiLearn.value_(0);
+							thisGuiEnv.midiLearn.toolTip_("Click to connect the widget% to\nthe slider(s) as given in the fields below.".format(typeText));
+							r = [
+								thisGuiEnv.midiSrc.string != "source" and:{
+									try{ thisGuiEnv.midiSrc.string.interpret.isInteger }
+								},
+								thisGuiEnv.midiChan.string != "chan" and:{
+									try{ thisGuiEnv.midiChan.string.interpret.isInteger }
+								},
+								thisGuiEnv.midiCtrl.string != "ctrl"
+							].collect({ |r| r });
+
 							if(GUI.id !== \cocoa, {
-								if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
-								thisGuiEnv.midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
-								thisGuiEnv.midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%".format(typeText));
-								thisGuiEnv.midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%".format(typeText));
-								thisGuiEnv.midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%".format(typeText));
+								p = "Use ";
+								if(r[0], { p = p++" MIDI-device ID "++theChanger.value.src++",\n" });
+								if(r[1], { p = p++"channel nr. "++theChanger.value.chan++",\n" });
+								if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
+								p = p++"\nto connect widget%to MIDI";
+
+								[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
+									_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
+								)
 							})
 						});
-
 						if(thisGuiEnv.editor.notNil and:{
 							thisGuiEnv.editor.isClosed.not
 						}, {
-							thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src)
-								.background_(Color.white)
-								.stringColor_(Color.black)
-								.canFocus_(true)
+							thisGuiEnv.editor.midiLearnBut
+								.states_([
+									["C", Color.white, Color(0.11, 0.38, 0.2)],
+									["X", Color.white, Color.red]
+								])
+								.value_(0)
 							;
-							thisGuiEnv.editor.midiChanField.string_(theChanger.value.chan)
-								.background_(Color.white)
-								.stringColor_(Color.black)
-								.canFocus_(true)
-							;
-							thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
-								.background_(Color.white)
-								.stringColor_(Color.black)
-								.canFocus_(true)
-							;
-							thisGuiEnv.editor.midiLearnBut.states_([
-								["L", Color.white, Color.blue],
-								["X", Color.white, Color.red]
-							])
-							.value_(0);
 						})
+					},
+					"L", {
+						defer {
+							if(window.isClosed.not, {
+								thisGuiEnv.midiSrc.string_(theChanger.value.src)
+									.background_(Color.white)
+									.stringColor_(Color.black)
+									.canFocus_(true)
+								;
+								thisGuiEnv.midiChan.string_(theChanger.value.chan)
+									.background_(Color.white)
+									.stringColor_(Color.black)
+									.canFocus_(true)
+								;
+								thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
+									.background_(Color.white)
+									.stringColor_(Color.black)
+									.canFocus_(true)
+								;
+								thisGuiEnv.midiLearn.states_([
+									["L", Color.white, Color.blue],
+									["X", Color.white, Color.red]
+								])
+								.value_(0).refresh;
+								if(GUI.id !== \cocoa, {
+									if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
+									thisGuiEnv.midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
+									thisGuiEnv.midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%".format(typeText));
+									thisGuiEnv.midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%".format(typeText));
+									thisGuiEnv.midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%".format(typeText));
+								})
+							});
+
+							if(thisGuiEnv.editor.notNil and:{
+								thisGuiEnv.editor.isClosed.not
+							}, {
+								thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src)
+									.background_(Color.white)
+									.stringColor_(Color.black)
+									.canFocus_(true)
+								;
+								thisGuiEnv.editor.midiChanField.string_(theChanger.value.chan)
+									.background_(Color.white)
+									.stringColor_(Color.black)
+									.canFocus_(true)
+								;
+								thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
+									.background_(Color.white)
+									.stringColor_(Color.black)
+									.canFocus_(true)
+								;
+								thisGuiEnv.editor.midiLearnBut.states_([
+									["L", Color.white, Color.blue],
+									["X", Color.white, Color.red]
+								])
+								.value_(0);
+							})
+						}
 					}
-				}
-			)
+				)
+			})
 		})
 	}
 
@@ -1684,7 +1688,7 @@ CVWidget {
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
 				"thisGuiEnv.msEditor: %\n".postf(thisGuiEnv.msEditor);
-				thisGuiEnv.msEditor !? { thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot] };
+				thisGuiEnv[\msEditor] !? { thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot] };
 //				thisMidiOscEnv = midiOscEnv[slot]; // hmmm...
 			}, {
 				// "no CVWidgetMS - thisGuiEnv.editor: %\n".postf(thisGuiEnv.editor);
@@ -1712,8 +1716,22 @@ CVWidget {
 			});
 			defer {
 				if(thisGuiEnv.msEditor.notNil and:{
-					thisGuiEnv.msEditor.isClosed.net
+					thisGuiEnv.msEditor.isClosed.not
 				}, {
+					// "theChanger.value: %\n".postf(theChanger.value);
+					// "midiOscEnv: %\n".postf(midiOscEnv);
+					msCmds ?? { msCmds = nil!this.msSize };
+					msSlots ?? { msSlots = nil!this.msSize };
+					if(slot < this.msSize, {
+						if(midiOscEnv[\oscResponder].notNil, {
+							msCmds[slot] = midiOscEnv.oscResponder.cmdName;
+						}, { msCmds[slot] = nil });
+						if(midiOscEnv[\oscMsgIndex].notNil, {
+							msSlots[slot] = midiOscEnv.oscMsgIndex;
+						}, { msSlots[slot] = nil })
+					});
+					msCmds.postln;
+					msSlots.postln;
 					thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 					thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
 					thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);

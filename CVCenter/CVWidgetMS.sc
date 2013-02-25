@@ -257,7 +257,7 @@ CVWidgetMS : CVWidget {
 					editor.msEditor.front(1)
 				});
 				msSize.do({ |i|
-					[i, wdgtControllersAndModels.slots[i]].postln;
+					// [i, wdgtControllersAndModels.slots[i]].postln;
 					wdgtControllersAndModels.slots[i].oscDisplay.model.value_(
 						wdgtControllersAndModels.slots[i].oscDisplay.model.value;
 					).changedKeys(synchKeys);
