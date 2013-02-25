@@ -1733,8 +1733,10 @@ CVWidget {
 
 					tmp = msSlots.selectIndex({ |it, i| it.notNil })+1;
 					// "tmp, msSlots: %, %\n".postf(tmp, msSlots);
-					if(tmp.size == this.msSize, { tmp = "(1.."++this.msSize++")" }, { tmp = tmp.asCompileString });
-					thisGuiEnv.msEditor.extCtrlArrayField.string_(tmp);
+					if(tmp.size != this.msSize, {
+						tmp = tmp.asCompileString;
+						thisGuiEnv.msEditor.extCtrlArrayField.string_(tmp);
+					});
 					thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 					thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
 					thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
