@@ -140,4 +140,9 @@
 		^this.selectIndexAs(function, this.species);
 	}
 
+	differenceIndex { |that|
+		var diffCol = this.copy.removeAll(that);
+		^this.selectIndexAs({ |elem, i| diffCol.includesEqual(elem) }, Array);
+	}
+
 }

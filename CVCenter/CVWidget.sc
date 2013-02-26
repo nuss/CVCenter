@@ -32,6 +32,7 @@ CVWidget {
 	var <synchKeys, synchedActions;
 	// special bookkeeping for CVWidgetMS
 	var msCmds, msSlots;
+	var firstCmdName, secondCmdName;
 
 	*initClass {
 		StartUp.add({
@@ -1543,6 +1544,7 @@ CVWidget {
 
 	prInitOscConnect { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var oscResponderAction, tmp;
+		var cmdNameDiff;
 
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
@@ -1650,17 +1652,24 @@ CVWidget {
 					msSlots ?? { msSlots = nil!this.msSize };
 					if(slot < this.msSize, {
 						if(midiOscEnv[\oscResponder].notNil, {
-							"should set a new value for msCmds[%]: %\n".postf(slot, midiOscEnv.oscResponder.cmdName);
+							// "should set a new value for msCmds[%]: %\n".postf(slot, midiOscEnv.oscResponder.cmdName);
 							msCmds[slot] = midiOscEnv.oscResponder.cmdName;
 						}/*, { "nil: %\n".postf(slot); msCmds[slot] = nil }*/);
 						if(midiOscEnv[\oscMsgIndex].notNil, {
-							"should set a new value for msSlots[%]: %\n".postf(slot, midiOscEnv.oscMsgIndex);
+							// "should set a new value for msSlots[%]: %\n".postf(slot, midiOscEnv.oscMsgIndex);
 							msSlots[slot] = midiOscEnv.oscMsgIndex;
 						}/*, { "nil: %\n".postf(slot); msSlots[slot] = nil }*/)
 					});
+
+					// take care of unaffected slots (slots without responders)
 					slot.do({ |i|
-						"this.midiOscEnv[%][\oscResponder]: %\n".postf(i, this.midiOscEnv[i][\oscResponder]);
+						// "this.midiOscEnv[%][\oscResponder]: %\n".postf(i, this.midiOscEnv[i][\oscResponder]);
 						this.midiOscEnv[i][\oscResponder] ?? { msCmds[i] = nil; msSlots[i] = nil };
+					});
+
+					firstCmdName ?? { firstCmdName = msCmds[slot] };
+					if(slot > 1 and: secondCmdName.notNil, {
+						cmdNameDiff = firstCmdName.difference
 					})
 				})
 			});
