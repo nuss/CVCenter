@@ -1643,6 +1643,26 @@ CVWidget {
 						editEnabled: false
 					)
 				).changedKeys(synchKeys);
+
+				if(this.class == CVWidgetMS, {
+					"msCmds: %\nmsSlots: %\n".postf(msCmds, msSlots);
+					msCmds ?? { msCmds = nil!this.msSize };
+					msSlots ?? { msSlots = nil!this.msSize };
+					if(slot < this.msSize, {
+						if(midiOscEnv[\oscResponder].notNil, {
+							"should set a new value for msCmds[%]: %\n".postf(slot, midiOscEnv.oscResponder.cmdName);
+							msCmds[slot] = midiOscEnv.oscResponder.cmdName;
+						}/*, { "nil: %\n".postf(slot); msCmds[slot] = nil }*/);
+						if(midiOscEnv[\oscMsgIndex].notNil, {
+							"should set a new value for msSlots[%]: %\n".postf(slot, midiOscEnv.oscMsgIndex);
+							msSlots[slot] = midiOscEnv.oscMsgIndex;
+						}/*, { "nil: %\n".postf(slot); msSlots[slot] = nil }*/)
+					});
+					slot.do({ |i|
+						"this.midiOscEnv[%][\oscResponder]: %\n".postf(i, this.midiOscEnv[i][\oscResponder]);
+						this.midiOscEnv[i][\oscResponder] ?? { msCmds[i] = nil; msSlots[i] = nil };
+					})
+				})
 			});
 
 			if(theChanger.value == false, {
@@ -1651,6 +1671,7 @@ CVWidget {
 				midiOscEnv.msgIndex = nil;
 				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changedKeys(synchKeys);
 				midiOscEnv.calibConstraints = nil;
+				// if(this.class == CVWidgetMS, { msSlots[slot] = nil; msCmds[slot] = nil });
 
 				tmp = "edit OSC";
 				if(this.class == CVWidgetMS, { tmp = slot.asString++":"+tmp });
@@ -1683,13 +1704,12 @@ CVWidget {
 				{ thisCalib = prCalibrate }
 			);
 
-			"theChanger.value.but: %\n".postf(theChanger.value.but);
+			// "theChanger.value.but: %\n".postf(theChanger.value.but);
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
-				"thisGuiEnv.msEditor: %\n".postf(thisGuiEnv.msEditor);
+				// "thisGuiEnv.msEditor: %\n".postf(thisGuiEnv.msEditor);
 				thisGuiEnv[\msEditor] !? { thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot] };
-//				thisMidiOscEnv = midiOscEnv[slot]; // hmmm...
 			}, {
 				// "no CVWidgetMS - thisGuiEnv.editor: %\n".postf(thisGuiEnv.editor);
 				thisEditor = thisGuiEnv.editor;
@@ -1720,23 +1740,14 @@ CVWidget {
 				}, {
 					// "theChanger.value: %\n".postf(theChanger.value);
 					// "midiOscEnv: %\n".postf(midiOscEnv);
-					msCmds ?? { msCmds = nil!this.msSize };
-					msSlots ?? { msSlots = nil!this.msSize };
-					if(slot < this.msSize, {
-						if(midiOscEnv[\oscResponder].notNil, {
-							msCmds[slot] = midiOscEnv.oscResponder.cmdName;
-						}, { msCmds[slot] = nil });
-						if(midiOscEnv[\oscMsgIndex].notNil, {
-							msSlots[slot] = midiOscEnv.oscMsgIndex;
-						}, { msSlots[slot] = nil })
-					});
 
 					tmp = msSlots.selectIndex({ |it, i| it.notNil })+1;
-					// "tmp, msSlots: %, %\n".postf(tmp, msSlots);
+					"tmp: %\n".postf(tmp);
 					if(tmp.size != this.msSize, {
+						// "tmp.size, this.msSize: %, %\n".postf(tmp.size, this.msSize);
 						tmp = tmp.asCompileString;
 						thisGuiEnv.msEditor.extCtrlArrayField.string_(tmp);
-					});
+					}, { thisGuiEnv.msEditor.extCtrlArrayField.string_("(1.."++this.msSize++")") });
 					thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 					thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
 					thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
@@ -1747,7 +1758,7 @@ CVWidget {
 						thisGuiEnv.msEditor.portField,
 						thisGuiEnv.msEditor.nameField,
 						thisGuiEnv.msEditor.indexField
-					].do(_.enabled_(theChanger.value.editEnabled))
+					].do(_.enabled_(theChanger.value.editEnabled));
 				});
 
 				if(thisEditor.notNil and:{
