@@ -32,7 +32,8 @@ CVWidget {
 	var <synchKeys, synchedActions;
 	// special bookkeeping for CVWidgetMS
 	var msCmds, msSlots;
-	var slotCmdName, intSlotsA, intSlotsB, msSlotsChecked = false;
+	var slotCmdName, lastIntSlots, msSlotsChecked = false;
+	var lastMsgIndex, msMsgIndexDiffers = false;
 
 	*initClass {
 		StartUp.add({
@@ -1544,6 +1545,7 @@ CVWidget {
 
 	prInitOscConnect { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var oscResponderAction, tmp;
+		var intSlots, thisMsgIndex;
 
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
@@ -1654,28 +1656,37 @@ CVWidget {
 						this.midiOscEnv[i][\oscResponder] ?? { msCmds[i] = nil; msSlots[i] = nil };
 					});
 
-					// cmdDiffIndexes ?? { cmdDiffIndexes = [] };
 					if(msSlotsChecked == false, {
-						intSlotsA = [];
+						intSlots = [];
 						slotCmdName = msCmds[slot].asString.split($/);
 						slotCmdName.do({ |it, i|
 							if("[a-zA-Z]".matchRegexp(it).not, {
 								if(it.interpret.isInteger, {
-									intSlotsA = intSlotsA.add([it.interpret, i]);
+									intSlots = intSlots.add([it.interpret, i]);
 								})
 							})
 						});
-						intSlotsB !? {
-							intSlotsA.do({ |it, i|
-								if(it[0] != intSlotsB[i][0], {
+						lastIntSlots !? {
+							intSlots.do({ |it, i|
+								if(it[0] != lastIntSlots[i][0], {
 									msSlotsChecked = true;
 									slotCmdName[it[1]] = "%";
 								})
 							})
 						};
-						intSlotsB = intSlotsA;
+						lastIntSlots = intSlots;
 					});
-					"slotCmdName: %\n".postf(slotCmdName);
+					// "slotCmdName: %\n".postf(slotCmdName);
+
+					if(msMsgIndexDiffers == false, {
+						if(lastMsgIndex.isNil, {
+							lastMsgIndex = midiOscEnv.oscMsgIndex;
+						}, {
+							if(midiOscEnv.oscMsgIndex != lastMsgIndex, {
+								msMsgIndexDiffers = true;
+							}, { lastMsgIndex = midiOscEnv.oscMsgIndex })
+						})
+					})
 				});
 				wcm.oscDisplay.model.value_(
 					(
@@ -1777,7 +1788,11 @@ CVWidget {
 					thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 					thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
 					thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
-					thisGuiEnv.msEditor.indexField.value_(theChanger.value.index);
+					if(msMsgIndexDiffers, {
+						thisGuiEnv.msEditor.indexField.string_("%")
+					}, {
+						thisGuiEnv.msEditor.indexField.string_(theChanger.value.index)
+					});
 					[
 						thisGuiEnv.msEditor.ipField,
 						thisGuiEnv.msEditor.portField,
