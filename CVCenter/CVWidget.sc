@@ -32,7 +32,7 @@ CVWidget {
 	var <synchKeys, synchedActions;
 	// special bookkeeping for CVWidgetMS
 	var msCmds, msSlots;
-	var firstCmdName, secondCmdName;
+	var slotCmdName, intSlotsA, intSlotsB, msSlotsChecked = false;
 
 	*initClass {
 		StartUp.add({
@@ -1544,7 +1544,6 @@ CVWidget {
 
 	prInitOscConnect { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var oscResponderAction, tmp;
-		var cmdNameDiff;
 
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
@@ -1633,21 +1632,9 @@ CVWidget {
 
 				// "wdgtControllersAndModels: %\n".postf(wdgtControllersAndModels.asCompileString);
 				tmp = theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString;
-				if(this.class == CVWidgetMS, { tmp = slot.asString++":"+tmp });
-				wcm.oscDisplay.model.value_(
-					(
-						but: [tmp, Color.white, Color.cyan(0.5)],
-						ipField: theChanger.value[0].asString,
-						portField: theChanger.value[1].asString,
-						nameField: theChanger.value[2].asString,
-						index: theChanger.value[3],
-						connectorButVal: 1,
-						editEnabled: false
-					)
-				).changedKeys(synchKeys);
-
 				if(this.class == CVWidgetMS, {
-					"msCmds: %\nmsSlots: %\n".postf(msCmds, msSlots);
+					tmp = slot.asString++":"+tmp;
+					// "msCmds: %\nmsSlots: %\n".postf(msCmds, msSlots);
 					msCmds ?? { msCmds = nil!this.msSize };
 					msSlots ?? { msSlots = nil!this.msSize };
 					if(slot < this.msSize, {
@@ -1667,11 +1654,40 @@ CVWidget {
 						this.midiOscEnv[i][\oscResponder] ?? { msCmds[i] = nil; msSlots[i] = nil };
 					});
 
-					firstCmdName ?? { firstCmdName = msCmds[slot] };
-					if(slot > 1 and: secondCmdName.notNil, {
-						cmdNameDiff = firstCmdName.difference
-					})
-				})
+					// cmdDiffIndexes ?? { cmdDiffIndexes = [] };
+					if(msSlotsChecked == false, {
+						intSlotsA = [];
+						slotCmdName = msCmds[slot].asString.split($/);
+						slotCmdName.do({ |it, i|
+							if("[a-zA-Z]".matchRegexp(it).not, {
+								if(it.interpret.isInteger, {
+									intSlotsA = intSlotsA.add([it.interpret, i]);
+								})
+							})
+						});
+						intSlotsB !? {
+							intSlotsA.do({ |it, i|
+								if(it[0] != intSlotsB[i][0], {
+									msSlotsChecked = true;
+									slotCmdName[it[1]] = "%";
+								})
+							})
+						};
+						intSlotsB = intSlotsA;
+					});
+					"slotCmdName: %\n".postf(slotCmdName);
+				});
+				wcm.oscDisplay.model.value_(
+					(
+						but: [tmp, Color.white, Color.cyan(0.5)],
+						ipField: theChanger.value[0].asString,
+						portField: theChanger.value[1].asString,
+						nameField: theChanger.value[2].asString,
+						index: theChanger.value[3],
+						connectorButVal: 1,
+						editEnabled: false
+					)
+				).changedKeys(synchKeys);
 			});
 
 			if(theChanger.value == false, {
@@ -1750,17 +1766,17 @@ CVWidget {
 					// "theChanger.value: %\n".postf(theChanger.value);
 					// "midiOscEnv: %\n".postf(midiOscEnv);
 
-					tmp = msSlots.selectIndex({ |it, i| it.notNil })+1;
-					"tmp: %\n".postf(tmp);
-					if(tmp.size != this.msSize, {
+						msSlots !? { tmp = msSlots.selectIndex({ |it, i| it.notNil })+1 };
+					// "tmp: %\n".postf(tmp);
+					if(tmp.notNil and:{ tmp.size != this.msSize }, {
 						// "tmp.size, this.msSize: %, %\n".postf(tmp.size, this.msSize);
 						tmp = tmp.asCompileString;
 						thisGuiEnv.msEditor.extCtrlArrayField.string_(tmp);
 					}, { thisGuiEnv.msEditor.extCtrlArrayField.string_("(1.."++this.msSize++")") });
+					slotCmdName !? { thisGuiEnv.msEditor.nameField.string_(slotCmdName.join($/)) };
 					thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 					thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
 					thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
-					thisGuiEnv.msEditor.nameField.string_(theChanger.value.nameField);
 					thisGuiEnv.msEditor.indexField.value_(theChanger.value.index);
 					[
 						thisGuiEnv.msEditor.ipField,

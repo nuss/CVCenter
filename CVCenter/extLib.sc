@@ -142,7 +142,7 @@
 
 	differenceIndex { |that|
 		var diffCol = this.copy.removeAll(that);
-		^this.selectIndexAs({ |elem, i| diffCol.includesEqual(elem) }, Array);
+		^this.selectIndexAs({ |elem, i| diffCol.includes(elem) }, Array);
 	}
 
 }
