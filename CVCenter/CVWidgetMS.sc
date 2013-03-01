@@ -149,11 +149,18 @@ CVWidgetMS : CVWidget {
 					if(editor.msEditor.isClosed.not, {
 						editor.msEditor.close;
 					}, {
-						if(CVWidgetMSEditor.allMSEditors.notNil and:{
-							CVWidgetMSEditor.allMSEditors[thisName.asSymbol].notNil
+						// if(CVWidgetMSEditor.allMSEditors.notNil and:{
+						// 	CVWidgetMSEditor.allMSEditors[thisName.asSymbol].notNil
+						// 	}, {
+						// 		if(CVWidgetMSEditor.allMSEditors[thisName.asSymbol].isEmpty, {
+						// 			CVWidgetMSEditor.allMSEditors.removeAt(thisName.asSymbol);
+						// 		})
+						// })
+						if(CVWidgetMSEditor.allEditors.notNil and:{
+								CVWidgetMSEditor.allEditors[(thisName.asString++"MS").asSymbol].notNil
 						}, {
-							if(CVWidgetMSEditor.allMSEditors[thisName.asSymbol].isEmpty, {
-								CVWidgetMSEditor.allMSEditors.removeAt(thisName.asSymbol);
+							if(CVWidgetMSEditor.allEditors[(thisName.asString++"MS").asSymbol].isEmpty, {
+								CVWidgetMSEditor.allEditors.removeAt((thisName.asString++"MS").asSymbol);
 							})
 						})
 					})

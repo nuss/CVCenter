@@ -15,22 +15,22 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-CVWidgetEditor {
+CVWidgetEditor : AbstractCVWidgetEditor {
 
-	classvar <allEditors, xySlots, nextX, nextY, shiftXY;
-	var thisEditor, <window, <tabs, editorEnv, labelStringColors;
-	var <specField, <specsList, <specsListSpecs;
-	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
-	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
-	var <calibBut, <calibNumBoxes;
-	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
-	var <ipField, <portField, <nameField, <indexField;
-	var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
-	var <mappingSelect;
-	var <connectorBut;
-	var actionName, enterAction, enterActionBut, <actionsList;
-	var name;
-	var flow0, flow1, flow2, flow3;
+	// classvar <allEditors, xySlots, nextX, nextY, shiftXY;
+	// var thisEditor, <window, <tabs, editorEnv, labelStringColors;
+	// var <specField, <specsList, <specsListSpecs;
+	// var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
+	// var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
+	// var <calibBut, <calibNumBoxes;
+	// var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
+	// var <ipField, <portField, <nameField, <indexField;
+	// var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
+	// var <mappingSelect;
+	// var <connectorBut;
+	// var actionName, enterAction, enterActionBut, <actionsList;
+	// var name;
+	// var flow0, flow1, flow2, flow3;
 
 	*new { |widget, widgetName, tab, slot|
 		^super.new.init(widget, widgetName, tab, slot)
@@ -869,14 +869,14 @@ CVWidgetEditor {
 		thisEditor.window.front;
 	}
 
-	front { |tab|
-		thisEditor.window.front;
-		tab !? {
-			thisEditor[\tabs].stringFocusedColor_(labelStringColors[tab]);
-			thisEditor[\tabs].focus(tab);
-		}
-	}
-
+	// front { |tab|
+	// 	thisEditor.window.front;
+	// 	tab !? {
+	// 		thisEditor[\tabs].stringFocusedColor_(labelStringColors[tab]);
+	// 		thisEditor[\tabs].focus(tab);
+	// 	}
+	// }
+	//
 	close { |slot|
 		thisEditor.window.close;
 		switch(allEditors[name].class,
@@ -888,13 +888,13 @@ CVWidgetEditor {
 		)
 	}
 
-	isClosed {
-		var ret;
-		thisEditor.window !? {
-			ret = defer { thisEditor.window.isClosed };
-			^ret.value;
-		}
-	}
+	// isClosed {
+	// 	var ret;
+	// 	thisEditor.window !? {
+	// 		ret = defer { thisEditor.window.isClosed };
+	// 		^ret.value;
+	// 	}
+	// }
 
 	// not to be used directly!
 

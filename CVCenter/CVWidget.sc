@@ -1,4 +1,4 @@
-/* (c) 2010-2012 2010-2013 Stefan Nussbaumer */
+/* (c) 2010-2013 Stefan Nussbaumer */
 /*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -1740,6 +1740,8 @@ CVWidget {
 				{ thisCalib = prCalibrate }
 			);
 
+			"theChanger: %\n".postf(theChanger.value);
+
 			// "theChanger.value.but: %\n".postf(theChanger.value.but);
 
 			if(this.class == CVWidgetMS, {
@@ -1777,16 +1779,17 @@ CVWidget {
 					// "theChanger.value: %\n".postf(theChanger.value);
 					// "midiOscEnv: %\n".postf(midiOscEnv);
 
-						msSlots !? { tmp = msSlots.selectIndex({ |it, i| it.notNil })+1 };
+					msSlots !? { tmp = msSlots.selectIndex({ |it, i| it.notNil })+1 };
 					// "tmp: %\n".postf(tmp);
 					if(tmp.notNil and:{ tmp.size != this.msSize }, {
 						// "tmp.size, this.msSize: %, %\n".postf(tmp.size, this.msSize);
 						tmp = tmp.asCompileString;
 						thisGuiEnv.msEditor.extCtrlArrayField.string_(tmp);
 					}, { thisGuiEnv.msEditor.extCtrlArrayField.string_("(1.."++this.msSize++")") });
-					slotCmdName !? { thisGuiEnv.msEditor.nameField.string_(slotCmdName.join($/)) };
+					slotCmdName !? { thisGuiEnv.msEditor.nameField.string_(slotCmdName.join($/)); msSlotsChecked = false };
 					thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 					thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
+					"theChanger.value.portField: %\n".postf(theChanger.value.portField);
 					thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
 					if(msMsgIndexDiffers, {
 						thisGuiEnv.msEditor.indexField.string_("%")

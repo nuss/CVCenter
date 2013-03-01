@@ -1,4 +1,4 @@
-/* (c) 2010-2012 Stefan Nussbaumer */
+/* (c) 2010-2013 Stefan Nussbaumer */
 /*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -14,20 +14,23 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
-CVWidgetMSEditor {
 
-	classvar <allMSEditors;
-	var thisEditor, <window, <tabs, msEditorEnv, labelStringColors;
-	var <specField, <specsList, <specsListSpecs;
-	var <ipField, <portField, <extCtrlArrayField, <nameField, <intStartIndexField, <indexField;
-	var <calibBut, <calibNumBoxes;
+CVWidgetMSEditor : AbstractCVWidgetEditor {
+
+	// classvar <allMSEditors;
+	var msEditorEnv;
+	// var thisEditor, <window, <tabs, labelStringColors;
+	// var <specField, <specsList, <specsListSpecs;
+	// var <ipField, <portField, <nameField, <indexField;
+	var <extCtrlArrayField, <intStartIndexField;
+	// var <calibBut, <calibNumBoxes;
 	var <oscEditBtns, <oscCalibBtns;
-	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
-	var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
-	var <mappingSelect, <connectorBut;
-	var actionName, enterAction, enterActionBut, <actionsList;
-	var name;
-	var flow0, flow1, flow2, flow3;
+	// var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
+	// var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
+	// var <mappingSelect, <connectorBut;
+	// var actionName, enterAction, enterActionBut, <actionsList;
+	// var name;
+	// var flow0, flow1, flow2, flow3;
 	var oscFlow0, oscFlow1;
 
 	*new { |widget, widgetName, tab|
@@ -51,6 +54,8 @@ CVWidgetMSEditor {
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
 		var tmp; // multipurpose short-term var
+
+		"widget, widgetName, tab: %, %, %\n".postf(widget, widgetName, tab);
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
@@ -90,13 +95,16 @@ CVWidgetMSEditor {
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
-		allMSEditors ?? { allMSEditors = IdentityDictionary() };
+		// allMSEditors ?? { allMSEditors = IdentityDictionary() };
+		allEditors ?? { allEditors = IdentityDictionary() };
 
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-200, Window.screenBounds.height/2-150, 400, 300));
 
-			allMSEditors.put(name, (window: window, name: widgetName));
-			thisEditor = allMSEditors[name];
+			// allMSEditors.put(name, (window: window, name: widgetName));
+			// thisEditor = allMSEditors[name];
+			allEditors.put((name.asString++"MS").asSymbol, (window: window, name: widgetName));
+			thisEditor = allEditors[(name.asString++"MS").asSymbol];
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 		});
@@ -549,26 +557,27 @@ CVWidgetMSEditor {
 		thisEditor.window.front;
 	}
 
-	front { |tab|
-		thisEditor.window.front;
-		tab !? {
-			thisEditor.tabs.stringFocusedColor_(labelStringColors[tab]);
-			thisEditor.tabs.focus(tab);
-		}
-	}
+	// front { |tab|
+	// 	thisEditor.window.front;
+	// 	tab !? {
+	// 		thisEditor[\tabs].stringFocusedColor_(labelStringColors[tab]);
+	// 		thisEditor[\tabs].focus(tab);
+	// 	}
+	// }
 
 	close { |slot|
 		thisEditor.window.close;
-		allMSEditors.removeAt(name);
+		// allMSEditors.removeAt(name);
+		allEditors.removeAt((name.asString++"MS").asSymbol);
 	}
 
-	isClosed {
-		var ret;
-		thisEditor.window !? {
-			ret = defer { thisEditor.window.isClosed };
-			^ret.value;
-		}
-	}
+	// isClosed {
+	// 	var ret;
+	// 	thisEditor.window !? {
+	// 		ret = defer { thisEditor.window.isClosed };
+	// 		^ret.value;
+	// 	}
+	// }
 
 
 }
