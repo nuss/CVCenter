@@ -869,14 +869,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		thisEditor.window.front;
 	}
 
-	// front { |tab|
-	// 	thisEditor.window.front;
-	// 	tab !? {
-	// 		thisEditor[\tabs].stringFocusedColor_(labelStringColors[tab]);
-	// 		thisEditor[\tabs].focus(tab);
-	// 	}
-	// }
-	//
 	close { |slot|
 		thisEditor.window.close;
 		switch(allEditors[name].class,
@@ -887,14 +879,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			{ allEditors.removeAt(name) };
 		)
 	}
-
-	// isClosed {
-	// 	var ret;
-	// 	thisEditor.window !? {
-	// 		ret = defer { thisEditor.window.isClosed };
-	// 		^ret.value;
-	// 	}
-	// }
 
 	// not to be used directly!
 

@@ -1728,6 +1728,7 @@ CVWidget {
 
 	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var thisEditor, thisOscEditBut, p, tmp;
+		var numOscString;
 
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
@@ -1740,7 +1741,7 @@ CVWidget {
 				{ thisCalib = prCalibrate }
 			);
 
-			"theChanger: %\n".postf(theChanger.value);
+			// "theChanger: %\n".postf(theChanger.value);
 
 			// "theChanger.value.but: %\n".postf(theChanger.value.but);
 
@@ -1767,10 +1768,17 @@ CVWidget {
 				if(this.class != CVWidgetMS, {
 					thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
 					thisGuiEnv.oscEditBut.refresh;
-				}/*, {
-					this.guiEnv.oscBut.states_([theChanger.value.but]);
+				}, {
+					numOscString = "OSC ("++this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size++"/"++this.msSize++")";
+					[numOscString, theChanger.value.but].postln;
+					this.guiEnv.oscBut.states_([
+						numOscString,
+						theChanger.value.but[1], // text
+						theChanger.value.but[2] ?? { this.bgColor } // background
+					]);
+					this.guiEnv.oscBut.states.postln;
 					this.guiEnv.oscBut.refresh;
-				}*/)
+				})
 			});
 			defer {
 				if(thisGuiEnv.msEditor.notNil and:{
@@ -1788,15 +1796,29 @@ CVWidget {
 					}, { thisGuiEnv.msEditor.extCtrlArrayField.string_("(1.."++this.msSize++")") });
 					slotCmdName !? { thisGuiEnv.msEditor.nameField.string_(slotCmdName.join($/)); msSlotsChecked = false };
 					thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
-					thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
-					"theChanger.value.portField: %\n".postf(theChanger.value.portField);
-					thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
+					if(theChanger.value.ipField.isNil or:{ theChanger.value.ipField == "nil" }, {
+						thisGuiEnv.msEditor.ipField.string_("");
+					}, {
+						thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
+					});
+					// "theChanger.value.portField (MSEditor): %\n".postf(theChanger.value.portField);
+					if(theChanger.value.portField.isNil or:{
+						theChanger.value.portField == "nil" or:{
+							theChanger.value.portField == "0"
+						}
+					}, {
+						thisGuiEnv.msEditor.portField.string_("");
+					}, {
+						thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
+					});
 					if(msMsgIndexDiffers, {
 						thisGuiEnv.msEditor.indexField.string_("%")
 					}, {
 						thisGuiEnv.msEditor.indexField.string_(theChanger.value.index)
 					});
 					[
+						thisGuiEnv.msEditor.extCtrlArrayField,
+						thisGuiEnv.msEditor.intStartIndexField,
 						thisGuiEnv.msEditor.ipField,
 						thisGuiEnv.msEditor.portField,
 						thisGuiEnv.msEditor.nameField,
@@ -1808,8 +1830,21 @@ CVWidget {
 					thisEditor.isClosed.not
 				}, {
 					thisEditor.connectorBut.value_(theChanger.value.connectorButVal);
-					thisEditor.ipField.string_(theChanger.value.ipField);
-					thisEditor.portField.string_(theChanger.value.portField);
+					if(theChanger.value.ipField.isNil or:{ theChanger.value.ipField == "nil" }, {
+						thisEditor.ipField.string_("");
+					}, {
+						thisEditor.ipField.string_(theChanger.value.ipField);
+					});
+						// "theChanger.value.portField (Editor): %\n".postf(theChanger.value.portField);
+					if(theChanger.value.portField.isNil or:{
+						theChanger.value.portField == "nil" or:{
+							theChanger.value.portField == "0"
+						}
+					}, {
+						thisEditor.portField.string_("");
+					}, {
+						thisEditor.portField.string_(theChanger.value.portField);
+					});
 					thisEditor.nameField.string_(theChanger.value.nameField);
 					if(thisCalib, {
 						[
@@ -1832,7 +1867,7 @@ CVWidget {
 	}
 
 	prInitOscInputRange { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		var thisEditor, thisOscEditBut, p, numOscString;
+		var thisEditor, thisOscEditBut, p;
 		 /*thisMidiOscEnv;*/
 
 //		"wcm.oscInputRange.model: %\n".postf(wcm.oscInputRange.model);
@@ -1856,7 +1891,7 @@ CVWidget {
 //				thisMidiOscEnv = midiOscEnv[slot]; // hmmm...
 			}, {
 				thisEditor = thisGuiEnv.editor;
-				"thisGuiEnv.oscEditBut: %\n".postf(thisGuiEnv.oscEditBut);
+					// "thisGuiEnv.oscEditBut: %\n".postf(thisGuiEnv.oscEditBut);
 				thisOscEditBut = thisGuiEnv.oscEditBut;
 			});
 //			"thisEditor: %\n".postf(thisEditor);
@@ -1866,7 +1901,7 @@ CVWidget {
 					thisEditor.isClosed.not
 				}, {
 					thisEditor.mappingSelect.items.do({ |item, i|
-						"midiOscEnv.oscMapping: %\n".postf(midiOscEnv.oscMapping);
+							// "midiOscEnv.oscMapping: %\n".postf(midiOscEnv.oscMapping);
 						if(item.asSymbol === midiOscEnv.oscMapping, {
 							thisEditor.mappingSelect.value_(i)
 						})
@@ -1883,7 +1918,7 @@ CVWidget {
 				});
 
 				if(window.isClosed.not, {
-					if(this.class != CVWidgetMS, {
+					// if(this.class != CVWidgetMS, {
 						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 							thisGuiEnv.oscEditBut.states_([[
 								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
@@ -1898,14 +1933,14 @@ CVWidget {
 							});
 							thisGuiEnv.oscEditBut.refresh;
 						})
-					}, {
-						numOscString = "("++this.midiOscEnv.size++"/"++this.msSize++")";
-						this.guiEnv.oscBut.states_([[
-							"OSC"+numOscString,
-							this.guiEnv.oscBut.states[0][1],
-							this.guiEnv.oscBut.states[0][2]
-						]])
-					})
+					// }, {
+					// 	numOscString = "("++this.midiOscEnv.size++"/"++this.msSize++")";
+					// 	this.guiEnv.oscBut.states_([[
+					// 		"OSC"+numOscString,
+					// 		this.guiEnv.oscBut.states[0][1],
+					// 		this.guiEnv.oscBut.states[0][2]
+					// 	]])
+					// })
 				})
 			}.defer;
 		})

@@ -17,20 +17,9 @@
 
 CVWidgetMSEditor : AbstractCVWidgetEditor {
 
-	// classvar <allMSEditors;
 	var msEditorEnv;
-	// var thisEditor, <window, <tabs, labelStringColors;
-	// var <specField, <specsList, <specsListSpecs;
-	// var <ipField, <portField, <nameField, <indexField;
 	var <extCtrlArrayField, <intStartIndexField;
-	// var <calibBut, <calibNumBoxes;
 	var <oscEditBtns, <oscCalibBtns;
-	// var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
-	// var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
-	// var <mappingSelect, <connectorBut;
-	// var actionName, enterAction, enterActionBut, <actionsList;
-	// var name;
-	// var flow0, flow1, flow2, flow3;
 	var oscFlow0, oscFlow1;
 
 	*new { |widget, widgetName, tab|
@@ -54,8 +43,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
 		var tmp; // multipurpose short-term var
-
-		"widget, widgetName, tab: %, %, %\n".postf(widget, widgetName, tab);
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
@@ -95,14 +82,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
-		// allMSEditors ?? { allMSEditors = IdentityDictionary() };
 		allEditors ?? { allEditors = IdentityDictionary() };
 
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-200, Window.screenBounds.height/2-150, 400, 300));
 
-			// allMSEditors.put(name, (window: window, name: widgetName));
-			// thisEditor = allMSEditors[name];
 			allEditors.put((name.asString++"MS").asSymbol, (window: window, name: widgetName));
 			thisEditor = allEditors[(name.asString++"MS").asSymbol];
 
@@ -481,6 +465,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 								widget.oscConnect(
 									name: connectIP,
 									port: connectPort,
+									ip: connectIP,
 									name: connectName,
 									oscMsgIndex: connectOscMsgIndex,
 									slot: connectIndexStart
@@ -557,27 +542,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		thisEditor.window.front;
 	}
 
-	// front { |tab|
-	// 	thisEditor.window.front;
-	// 	tab !? {
-	// 		thisEditor[\tabs].stringFocusedColor_(labelStringColors[tab]);
-	// 		thisEditor[\tabs].focus(tab);
-	// 	}
-	// }
-
 	close { |slot|
 		thisEditor.window.close;
-		// allMSEditors.removeAt(name);
 		allEditors.removeAt((name.asString++"MS").asSymbol);
 	}
-
-	// isClosed {
-	// 	var ret;
-	// 	thisEditor.window !? {
-	// 		ret = defer { thisEditor.window.isClosed };
-	// 		^ret.value;
-	// 	}
-	// }
-
 
 }
