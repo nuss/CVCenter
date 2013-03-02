@@ -1641,68 +1641,6 @@ CVWidget {
 					tmp = slot.asString++":"+tmp;
 				});
 
-				// "wdgtControllersAndModels: %\n".postf(wdgtControllersAndModels.asCompileString);
-				// tmp = theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString;
-				// if(this.class == CVWidgetMS, {
-				// 	tmp = slot.asString++":"+tmp;
-				// 	// "msCmds: %\nmsSlots: %\n".postf(msCmds, msSlots);
-				// 	msCmds ?? { msCmds = nil!this.msSize };
-				// 	msSlots ?? { msSlots = nil!this.msSize };
-				// 	if(slot < this.msSize, {
-				// 		if(midiOscEnv[\oscResponder].notNil, {
-				// 			// "should set a new value for msCmds[%]: %\n".postf(slot, midiOscEnv.oscResponder.cmdName);
-				// 			msCmds[slot] = midiOscEnv.oscResponder.cmdName;
-				// 		}/*, { "nil: %\n".postf(slot); msCmds[slot] = nil }*/);
-				// 		if(midiOscEnv[\oscMsgIndex].notNil, {
-				// 			// "should set a new value for msSlots[%]: %\n".postf(slot, midiOscEnv.oscMsgIndex);
-				// 			msSlots[slot] = midiOscEnv.oscMsgIndex;
-				// 		}/*, { "nil: %\n".postf(slot); msSlots[slot] = nil }*/)
-				// 	});
-				//
-				// 	// take care of unaffected slots (slots without responders)
-				// 	slot.do({ |i|
-				// 		// "this.midiOscEnv[%][\oscResponder]: %\n".postf(i, this.midiOscEnv[i][\oscResponder]);
-				// 		this.midiOscEnv[i][\oscResponder] ?? { msCmds[i] = nil; msSlots[i] = nil };
-				// 	});
-				//
-				// 	if(msSlotsChecked == false, {
-				// 		"not checked".postln;
-				// 		intSlots = [];
-				//
-				// 		// lastIntSlots ?? { lastIntSlots = [] };
-				// 		slotCmdName = msCmds[slot].asString.split($/);
-				// 		slotCmdName.do({ |it, i|
-				// 			if("[a-zA-Z]".matchRegexp(it).not, {
-				// 				if(it.interpret.isInteger, {
-				// 					intSlots = intSlots.add([it.interpret, i]);
-				// 				})
-				// 			})
-				// 		});
-				// 		lastIntSlots !? {
-				// 			intSlots.do({ |it, i|
-				// 				if(it[0] != lastIntSlots[i][0], {
-				// 					msSlotsChecked = true;
-				// 					"slotCmdName[it[1]] before: %\n".postf(slotCmdName[it[1]]);
-				// 					slotCmdName[it[1]] = "%";
-				// 					"slotCmdName[it[1]] after: %\n".postf(slotCmdName[it[1]])
-				// 				})
-				// 			})
-				// 		};
-				// 		lastIntSlots = intSlots;
-				// 	}, { "checked".postln });
-				// 	// "slotCmdName: %\n".postf(slotCmdName);
-				//
-				// 	if(msMsgIndexDiffers == false, {
-				// 		if(lastMsgIndex.isNil, {
-				// 			lastMsgIndex = midiOscEnv.oscMsgIndex;
-				// 			}, {
-				// 				if(midiOscEnv.oscMsgIndex != lastMsgIndex, {
-				// 					msMsgIndexDiffers = true;
-				// 				}, { lastMsgIndex = midiOscEnv.oscMsgIndex })
-				// 		})
-				// 	})
-				// });
-
 				wcm.oscDisplay.model.value_(
 					(
 						but: [tmp, Color.white, Color.cyan(0.5)],
@@ -1753,25 +1691,18 @@ CVWidget {
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 
-			// "oscDisplay: %\n".postf([theChanger, what, moreArgs]);
-			// "slot: %\n".postf(slot);
-
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
 				Array, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
 			);
 
-			// "theChanger: %\n".postf(theChanger.value);
-
-			// "theChanger.value.but: %\n".postf(theChanger.value.but);
-
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
-				// "thisGuiEnv.msEditor: %\n".postf(thisGuiEnv.msEditor);
-				thisGuiEnv[\msEditor] !? { thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot] };
+				thisGuiEnv[\msEditor] !? {
+					thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot];
+				};
 			}, {
-				// "no CVWidgetMS - thisGuiEnv.editor: %\n".postf(thisGuiEnv.editor);
 				thisEditor = thisGuiEnv.editor;
 				if(GUI.id !== \cocoa, {
 					if(theChanger.value.but[0] == "edit OSC", {
@@ -1783,7 +1714,6 @@ CVWidget {
 				});
 				thisOscEditBut = thisGuiEnv.oscEditBut;
 			});
-//			"thisEditor: %\n".postf(thisEditor);
 
 			if(window.isClosed.not, {
 				if(this.class != CVWidgetMS, {
@@ -1799,41 +1729,23 @@ CVWidget {
 						oscButBg = this.bgColor;
 						oscButTextColor = Color.black;
 					});
-						// [numOscString, theChanger.value.but].postln;
 					this.guiEnv[\oscBut].states_([[
 						numOscString,
 						oscButTextColor, // text
 						oscButBg // background
 					]]);
-						// this.guiEnv[\oscBut].states.postln;
-						// this.guiEnv.oscBut.refresh;
 				})
 			});
 			defer {
 				if(thisGuiEnv.msEditor.notNil and:{
 					thisGuiEnv.msEditor.isClosed.not
 				}, {
-					// "theChanger.value: %\n".postf(theChanger.value);
-					// "midiOscEnv: %\n".postf(midiOscEnv);
-
-						// msSlots !? { tmp = msSlots.selectIndex({ |it, i| it.notNil })+1 };
-					// "tmp: %\n".postf(tmp);
-						// if(tmp.notNil and:{ tmp.size != this.msSize }, {
-						// 	// "tmp.size, this.msSize: %, %\n".postf(tmp.size, this.msSize);
-						// 	tmp = tmp.asCompileString;
-						// 	thisGuiEnv.msEditor.extCtrlArrayField.string_(tmp);
-						// }, { thisGuiEnv.msEditor.extCtrlArrayField.string_("(1.."++this.msSize++")") });
-						// slotCmdName !? {
-						// 	thisGuiEnv.msEditor.nameField.string_(slotCmdName.join($/));
-						// 	msSlotsChecked = false;
-						// };
 					thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 					if(theChanger.value.ipField.isNil or:{ theChanger.value.ipField == "nil" }, {
 						thisGuiEnv.msEditor.ipField.string_("");
 					}, {
 						thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
 					});
-					// "theChanger.value.portField (MSEditor): %\n".postf(theChanger.value.portField);
 					if(theChanger.value.portField.isNil or:{
 						theChanger.value.portField == "nil" or:{
 							theChanger.value.portField == "0"
@@ -1843,11 +1755,9 @@ CVWidget {
 					}, {
 						thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
 					});
-						// if(msMsgIndexDiffers, {
-						// 	thisGuiEnv.msEditor.indexField.string_("%")
-						// 	}, {
-						// 		thisGuiEnv.msEditor.indexField.string_(theChanger.value.index)
-						// });
+					"thisOscEditBut.states before: %\n".postf(thisOscEditBut.states);
+					thisOscEditBut.states_([theChanger.value.but]);
+					"thisOscEditBut.states after: %\n".postf(thisOscEditBut.states);
 					[
 						thisGuiEnv.msEditor.extCtrlArrayField,
 						thisGuiEnv.msEditor.intStartIndexField,
