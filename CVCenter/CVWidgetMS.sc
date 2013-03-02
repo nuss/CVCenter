@@ -270,8 +270,10 @@ CVWidgetMS : CVWidget {
 
 		if(GUI.current == QtGUI, {
 			oscBut.mouseEnterAction_({ |oscb|
+				// "oscb.states[0][0] on enter: %\n".postf(oscb.states[0][0]);
 				oscb.states_([[oscb.states[0][0], Color.white, Color.cyan(0.5)]]);
 			}).mouseLeaveAction_({ |oscb|
+				// "oscb.states[0][0] on leave: %\n".postf(oscb.states[0][0]);
 				oscb.states_([[oscb.states[0][0], Color.black, this.bgColor]])
 			})
 		});

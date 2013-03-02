@@ -1547,12 +1547,16 @@ CVWidget {
 		var oscResponderAction, tmp;
 		var intSlots, thisMsgIndex;
 
+		// "wcm.oscConnection.model: %\n".postf(wcm.oscConnection.model);
+
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
 		};
 
 		wcm.oscConnection.controller.put(\default, { |theChanger, what, moreArgs|
-//			[theChanger, what, moreArgs].postln;
+
+			// "oscConnect: %\n".postf([theChanger, what, moreArgs]);
+
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
 				Array, { thisCalib = prCalibrate[slot] },
@@ -1728,13 +1732,18 @@ CVWidget {
 
 	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var thisEditor, thisOscEditBut, p, tmp;
-		var numOscString;
+		var numOscString, numOscResponders, oscButBg, oscButTextColor;
+
+		// "wcm.oscDisplay.model: %\n".postf(wcm.oscDisplay.model);
 
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
 		};
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
+
+			// "oscDisplay: %\n".postf([theChanger, what, moreArgs]);
+
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
 				Array, { thisCalib = prCalibrate[slot] },
@@ -1769,15 +1778,23 @@ CVWidget {
 					thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
 					thisGuiEnv.oscEditBut.refresh;
 				}, {
-					numOscString = "OSC ("++this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size++"/"++this.msSize++")";
-					[numOscString, theChanger.value.but].postln;
-					this.guiEnv.oscBut.states_([
+					numOscResponders = this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size;
+					numOscString = "OSC ("++numOscResponders++"/"++this.msSize++")";
+					if(numOscResponders > 0, {
+						oscButBg = Color.cyan(0.5);
+						oscButTextColor = Color.white;
+					}, {
+						oscButBg = this.bgColor;
+						oscButTextColor = Color.black;
+					});
+						// [numOscString, theChanger.value.but].postln;
+					this.guiEnv[\oscBut].states_([[
 						numOscString,
-						theChanger.value.but[1], // text
-						theChanger.value.but[2] ?? { this.bgColor } // background
-					]);
-					this.guiEnv.oscBut.states.postln;
-					this.guiEnv.oscBut.refresh;
+						oscButTextColor, // text
+						oscButBg // background
+					]]);
+					this.guiEnv[\oscBut].states.postln;
+						// this.guiEnv.oscBut.refresh;
 				})
 			});
 			defer {
@@ -1870,15 +1887,15 @@ CVWidget {
 		var thisEditor, thisOscEditBut, p;
 		 /*thisMidiOscEnv;*/
 
-//		"wcm.oscInputRange.model: %\n".postf(wcm.oscInputRange.model);
+		// "wcm.oscInputRange.model: %\n".postf(wcm.oscInputRange.model);
 
 		wcm.oscInputRange.controller ?? {
 			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
 		};
 
 		wcm.oscInputRange.controller.put(\default, { |theChanger, what, moreArgs|
-			[theChanger, what, moreArgs].postln;
-//			"thisGuiEnv: %, slot: %\n".postf(thisGuiEnv.asCompileString, slot);
+			// "oscInputRange:%\n".postf([theChanger, what, moreArgs]);
+			// "thisGuiEnv: %, slot: %\n".postf(thisGuiEnv.asCompileString, slot);
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
@@ -1918,7 +1935,7 @@ CVWidget {
 				});
 
 				if(window.isClosed.not, {
-					// if(this.class != CVWidgetMS, {
+					if(this.class != CVWidgetMS, {
 						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 							thisGuiEnv.oscEditBut.states_([[
 								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
@@ -1933,14 +1950,7 @@ CVWidget {
 							});
 							thisGuiEnv.oscEditBut.refresh;
 						})
-					// }, {
-					// 	numOscString = "("++this.midiOscEnv.size++"/"++this.msSize++")";
-					// 	this.guiEnv.oscBut.states_([[
-					// 		"OSC"+numOscString,
-					// 		this.guiEnv.oscBut.states[0][1],
-					// 		this.guiEnv.oscBut.states[0][2]
-					// 	]])
-					// })
+					})
 				})
 			}.defer;
 		})
