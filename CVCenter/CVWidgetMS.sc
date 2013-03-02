@@ -235,11 +235,15 @@ CVWidgetMS : CVWidget {
 			})
 		;
 
-		if(GUI.current == QtGUI, {
+		if(GUI.id === \qt, {
 			midiBut.mouseEnterAction_({ |mb|
-				mb.states_([[mb.states[0][0], Color.white, Color.red]])
+				if(wdgtControllersAndModels.slots.select({ |slot| slot.midiConnection.model.value.isNil }).size == msSize, {
+					mb.states_([[mb.states[0][0], Color.white, Color.red]])
+				})
 			}).mouseLeaveAction_({ |mb|
-				mb.states_([[mb.states[0][0], Color.black, this.bgColor]])
+				if(wdgtControllersAndModels.slots.select({ |slot| slot.midiConnection.model.value.isNil }).size == msSize, {
+					mb.states_([[mb.states[0][0], Color.black, this.bgColor]])
+				})
 			})
 		});
 
@@ -268,13 +272,17 @@ CVWidgetMS : CVWidget {
 			})
 		;
 
-		if(GUI.current == QtGUI, {
+		if(GUI.id === \qt, {
 			oscBut.mouseEnterAction_({ |oscb|
 				// "oscb.states[0][0] on enter: %\n".postf(oscb.states[0][0]);
-				oscb.states_([[oscb.states[0][0], Color.white, Color.cyan(0.5)]]);
+				if(wdgtControllersAndModels.slots.select({ |slot| slot.oscConnection.model.value == false }).size == msSize, {
+					oscb.states_([[oscb.states[0][0], Color.white, Color.cyan(0.5)]])
+				})
 			}).mouseLeaveAction_({ |oscb|
 				// "oscb.states[0][0] on leave: %\n".postf(oscb.states[0][0]);
-				oscb.states_([[oscb.states[0][0], Color.black, this.bgColor]])
+				if(wdgtControllersAndModels.slots.select({ |slot| slot.oscConnection.model.value == false }).size == msSize, {
+					oscb.states_([[oscb.states[0][0], Color.black, this.bgColor]])
+				})
 			})
 		});
 
