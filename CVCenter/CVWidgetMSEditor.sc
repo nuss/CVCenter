@@ -510,12 +510,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 							widget.editor.editors[sindex] = CVWidgetEditor(
 								widget, widget.label.states[0][0], 1, sindex
 							);
-							if(widget.guiEnv.editor.notNil, {
-								"widget.guiEnv.editor: %\n".postf(widget.guiEnv.editor);
-							}, {
-								"no widget.guiEnv.editor yet - create it first".postln;
-							});
-							widget.guiEnv.editor[sindex] = widget.editor.editors[sindex];
+						// if(widget.guiEnv.editor.notNil, {
+						// 	"widget.guiEnv.editor: %\n".postf(widget.guiEnv.editor);
+						// 	}, {
+						// 		"no widget.guiEnv.editor yet - create it first".postln;
+						// });
+						// widget.guiEnv.editor[sindex] = widget.editor.editors[sindex];
 						}, {
 							widget.editor.editors[sindex].front(1)
 						});
