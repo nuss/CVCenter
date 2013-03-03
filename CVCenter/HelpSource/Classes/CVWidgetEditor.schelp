@@ -51,7 +51,7 @@ an link::Classes/Integer:: providing the tab-index code::0-3::
 returns:: a code::CVWidgetEditor::
 
 METHOD:: close
-Close the editor resp. its code::Winow::.
+Close the editor resp. its code::Window::.
 If applied on an editor that belongs to a CVWidget2D the key code::\hi:: resp. code::\lo:: must be supplied with the editor:
 code::aCVWidget2D.editor[\lo].close::
 
