@@ -29,7 +29,7 @@ CVWidgetEditor {
 	var <mappingSelect;
 	var <connectorBut;
 	var actionName, enterAction, enterActionBut, <actionsList;
-	var name;
+	var name, editorSlot;
 	var flow0, flow1, flow2, flow3;
 
 	*new { |widget, widgetName, tab, slot|
@@ -52,6 +52,7 @@ CVWidgetEditor {
 		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
 		xySlots ?? { xySlots = [] };
 		editorEnv = ();
+		slot !? { editorSlot = slot };
 
 		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
 		thisCmdNames ?? { thisCmdNames = [nil] };
@@ -753,7 +754,7 @@ CVWidgetEditor {
 				.syntaxColorize
 			;
 			if(GUI.id !== \cocoa, { enterAction.tabWidth_("    ".bounds.width) });
-				
+
 			if(GUI.id !== \cocoa, {
 				enterAction.toolTip_("The variable 'cv' holds the widget's CV resp.\n'cv.value' its current value. You may enter an\narbitrary function using this variable (or not).")
 			});
@@ -840,11 +841,11 @@ CVWidgetEditor {
 		}
 	}
 
-	close { |slot|
+	close {
 		thisEditor.window.close;
 		switch(allEditors[name].class,
 			Event, {
-				allEditors[name].removeAt(slot);
+				allEditors[name].removeAt(editorSlot);
 				if(allEditors[name].isEmpty, { allEditors.removeAt(name) });
 			},
 			{ allEditors.removeAt(name) };
