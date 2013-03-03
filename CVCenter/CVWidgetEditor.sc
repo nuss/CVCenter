@@ -168,10 +168,12 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
-			tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
-				tabs.stringFocusedColor_(labelStringColors[t]);
-				{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
-			}));
+			// tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
+			// 	"i'm part of the focusAction. tabs now: %\n".postf(tabs.views);
+			// 	tabs.stringFocusedColor_(labelStringColors[t]);
+			// 	{ "deferred action taking place".postln; tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+			// 	"after focusing tabs[%]".postf(t);
+			// }));
 			tabs.stringFocusedColor_(labelStringColors[tab]);
 
 			thisEditor[\tabs] = tabs;
@@ -182,7 +184,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					111, { // "o" -> osc
 						switch(widget.class,
 							CVWidgetMS, { thisEditor[\tabs].focus(1) },
-							{ thisEditor.focus(2) }
+							{ thisEditor[\tabs].focus(2) }
 						)
 					},
 					109, { // "m" -> midi
@@ -500,6 +502,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.background_(textFieldBg)
 				.string_("")
 			;
+			"after setting background for ipField".postln;
 
 			if(GUI.id !== \cocoa, {
 				ipField.toolTip_("Optional: the device's IP-address\nCan be used to restrict listening to\nthis address only.")
@@ -861,8 +864,12 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					labelColors.removeAt(i);
 //					labelStringColors.removeAt(i);
 				})
-			})
+			});
 
+			tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
+				tabs.stringFocusedColor_(labelStringColors[t]);
+				{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+			}));
 		});
 
 		tab !? {

@@ -444,7 +444,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 							oscConnectCondition = oscConnectCondition+1;
 						});
 						if(oscConnectCondition >= 2, {
-//							"ok, we're ready to rock".postln;
+						// "ok, we're ready to rock: %".postf(extCtrlArrayField.string.interpret);
 							extCtrlArrayField.string.interpret.do({ |ext, i|
 								if(ipField.string.size > 0, { connectIP = ipField.string }, { connectIP = "nil" });
 								if(portField.string.size > 0, {
@@ -462,15 +462,18 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 								}, {
 									connectOscMsgIndex = indexField.string.asInt;
 								});
-								connectIndexStart = intStartIndexField.value+i;
-								widget.oscConnect(
-									name: connectIP,
-									port: connectPort,
-									ip: connectIP,
-									name: connectName,
-									oscMsgIndex: connectOscMsgIndex,
-									slot: connectIndexStart
-								)
+								connectIndexStart = intStartIndexField.value+ext;
+								"connectIndexStart: %\n".postf(connectIndexStart);
+								if(connectIndexStart >= 0 and:{ connectIndexStart < widget.msSize }, {
+									widget.oscConnect(
+										name: connectIP,
+										port: connectPort,
+										ip: connectIP,
+										name: connectName,
+										oscMsgIndex: connectOscMsgIndex,
+										slot: connectIndexStart
+									)
+								})
 							})
 						})
 					},
@@ -501,12 +504,13 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		widget.msSize.do({ |sindex|
 			oscEditBtns = oscEditBtns.add(
-				Button(thisEditor.oscTabs.views[1], oscFlow0.bounds.width/5-10@25)
+				Button(thisEditor.oscTabs.views[1], oscFlow1.bounds.width/5-10@25)
 					.states_([
 						[sindex.asString++": edit OSC", Color.black, Color.white(0.2)]
 					])
 					.font_(staticTextFont)
 					.action_({ |bt|
+					// "widget, widget.label.states[0][0], sindex: %, %, %\n".postf(widget, widget.label.states[0][0], sindex);
 						if(widget.editor.editors[sindex].isNil or:{ widget.editor.editors[sindex].isClosed }, {
 							widget.editor.editors[sindex] = CVWidgetEditor(
 								widget, widget.label.states[0][0], 1, sindex
@@ -529,6 +533,19 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					})
 				;
 			);
+
+			oscFlow1.shift(-13, oscEditBtns[sindex].bounds.height-10);
+
+			oscCalibBtns = oscCalibBtns.add(
+				Button(thisEditor.oscTabs.views[1], 10@10)
+					.states_([
+						["", Color.white, Color.red],
+						["", Color.black, Color.green]
+					])
+				;
+			);
+
+			oscFlow1.shift(0, (oscEditBtns[sindex].bounds.height-10).neg);
 		});
 
 

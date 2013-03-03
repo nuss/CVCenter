@@ -260,6 +260,11 @@ CVWidgetMS : CVWidget {
 				}, {
 					editor.msEditor.front(1)
 				});
+				if(midiOscEnv.select({ |slot| slot.oscResponder.notNil }).size > 0, {
+					editor.msEditor.oscTabs.focus(1)
+				}, {
+					editor.msEditor.oscTabs.focus(0)
+				});
 				msSize.do({ |i|
 					// [i, wdgtControllersAndModels.slots[i]].postln;
 					wdgtControllersAndModels.slots[i].oscDisplay.model.value_(
