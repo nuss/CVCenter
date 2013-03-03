@@ -20,6 +20,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 	var msEditorEnv;
 	var <extCtrlArrayField, <intStartIndexField;
 	var <oscEditBtns, <oscCalibBtns;
+	var <oscTabs, <midiTabs;
 	var oscFlow0, oscFlow1;
 
 	*new { |widget, widgetName, tab|
@@ -27,8 +28,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 	}
 
 	init { |widget, widgetName, tab|
-		var tabs, cvString;
-		var oscTabs, midiTabs;
+		var cvString;
+		// var oscTabs, midiTabs;
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var maxNum, msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var addr, wcmMS, thisGuiEnv, labelColors;
@@ -542,7 +543,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		thisEditor.window.front;
 	}
 
-	close { |slot|
+	close {
 		thisEditor.window.close;
 		allEditors.removeAt((name.asString++"MS").asSymbol);
 	}

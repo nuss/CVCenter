@@ -31,6 +31,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 	// var actionName, enterAction, enterActionBut, <actionsList;
 	// var name;
 	// var flow0, flow1, flow2, flow3;
+	var editorSlot;
 
 	*new { |widget, widgetName, tab, slot|
 		^super.new.init(widget, widgetName, tab, slot)
@@ -52,6 +53,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
 		xySlots ?? { xySlots = [] };
 		editorEnv = ();
+		slot !? { editorSlot = slot };
 
 		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
 		thisCmdNames ?? { thisCmdNames = [nil] };
@@ -869,17 +871,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		thisEditor.window.front;
 	}
 
-	close { |slot|
-		thisEditor.window.close;
-		switch(allEditors[name].class,
-			Event, {
-				allEditors[name].removeAt(slot);
-				if(allEditors[name].isEmpty, { allEditors.removeAt(name) });
-			},
-			{ allEditors.removeAt(name) };
-		)
-	}
-
 	// not to be used directly!
 
 	amendActionsList { |widget, addRemove, name, action, slot, active|
@@ -958,6 +949,17 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			)
 		})
 
+	}
+
+	close {
+		thisEditor.window.close;
+		switch(allEditors[name].class,
+			Event, {
+				allEditors[name].removeAt(editorSlot);
+				if(allEditors[name].isEmpty, { allEditors.removeAt(name) });
+			},
+			{ allEditors.removeAt(name) };
+		)
 	}
 
 }
