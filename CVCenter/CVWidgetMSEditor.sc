@@ -407,9 +407,24 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.font_(staticTextFont)
 			.states_([
 				["calibrating all", Color.white, Color.red],
-				["partially calibrating", Color.white, Color.red(0.7)],
 				["calibrate all", Color.black, Color.green]
 			])
+			.action_({ |cb|
+				cb.value.switch(
+					0, {
+						widget.msSize.do({ |i|
+							widget.setCalibrate(true, i);
+							wcmMS.slots[i].calibration.model.value_(true).changedKeys(widget.synchKeys);
+						})
+					},
+					1, {
+						widget.msSize.do({ |i|
+							widget.setCalibrate(false, i);
+							wcmMS.slots[i].calibration.model.value_(false).changedKeys(widget.synchKeys);
+						})
+					}
+				)
+			})
 		;
 
 		oscFlow0.shift(0, 0);
@@ -482,26 +497,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			})
 		;
 
-//		calibNumBoxes = (lo: inputConstraintLoField, hi: inputConstraintHiField);
-//
-//		calibBut.action_({ |but|
-//			but.value.switch(
-//				0, {
-//					widget.setCalibrate(true, slot);
-//					wcmHiLo.calibration.model.value_(true).changedKeys(synchKeys);
-//				},
-//				1, {
-//					widget.setCalibrate(false, slot);
-//					wcmHiLo.calibration.model.value_(false).changedKeys(synchKeys);
-//				}
-//			)
-//		});
-//
-//		widget.getCalibrate(slot).switch(
-//			true, { calibBut.value_(0) },
-//			false, { calibBut.value_(1) }
-//		);
-
 		widget.msSize.do({ |sindex|
 			oscEditBtns = oscEditBtns.add(
 				Button(thisEditor.oscTabs.views[1], oscFlow1.bounds.width/5-10@25)
@@ -524,12 +519,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						}, {
 							widget.editor.editors[sindex].front(1)
 						});
-//						wdgtControllersAndModels.oscDisplay.model.value_(
-//							wdgtControllersAndModels.oscDisplay.model.value;
-//						).changedKeys(synchKeys);
-//						wdgtControllersAndModels.midiDisplay.model.value_(
-//							wdgtControllersAndModels.midiDisplay.model.value
-//						).changedKeys(synchKeys);
+						wcmMS.slots[sindex].oscDisplay.model.value_(
+							wcmMS.slots[sindex].oscDisplay.model.value;
+						).changedKeys(widget.synchKeys);
+						wcmMS.slots[sindex].midiDisplay.model.value_(
+							wcmMS.slots[sindex].midiDisplay.model.value
+						).changedKeys(widget.synchKeys);
 					})
 				;
 			);
@@ -542,7 +537,24 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						["", Color.white, Color.red],
 						["", Color.black, Color.green]
 					])
+					.action_({ |cb|
+						cb.value.switch(
+							0, {
+								widget.setCalibrate(true, sindex);
+								wcmMS.slots[sindex].calibration.model.value_(true).changedKeys(widget.synchKeys);
+							},
+							1, {
+								widget.setCalibrate(false, sindex);
+								wcmMS.slots[sindex].calibration.model.value_(false).changedKeys(widget.synchKeys);
+							}
+						)
+					})
 				;
+			);
+
+			widget.getCalibrate(sindex).switch(
+				true, { oscCalibBtns[sindex].value_(0) },
+				false, { oscCalibBtns[sindex].value_(1) }
 			);
 
 			oscFlow1.shift(0, (oscEditBtns[sindex].bounds.height-10).neg);

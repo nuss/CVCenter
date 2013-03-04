@@ -502,7 +502,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.background_(textFieldBg)
 				.string_("")
 			;
-			"after setting background for ipField".postln;
 
 			if(GUI.id !== \cocoa, {
 				ipField.toolTip_("Optional: the device's IP-address\nCan be used to restrict listening to\nthis address only.")

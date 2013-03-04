@@ -560,6 +560,13 @@ CVWidget {
 				).changedKeys(synchKeys);
 				wdgtControllersAndModels.calibration.model.value_(bool).changedKeys(synchKeys);
 			},
+			CVWidgetMS, {
+				prCalibrate[thisSlot] = bool;
+				wdgtControllersAndModels.slots[thisSlot].oscConnection.model.value_(
+					wdgtControllersAndModels.slots[thisSlot].oscConnection.model.value
+				).changedKeys(synchKeys);
+				wdgtControllersAndModels.slots[thisSlot].calibration.model.value_(bool).changedKeys(synchKeys);
+			},
 			{
 				prCalibrate[thisSlot] = bool;
 				wdgtControllersAndModels[thisSlot].oscConnection.model.value_(
@@ -1091,17 +1098,27 @@ CVWidget {
 	}
 
 	prInitCalibration { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+		var thisEditor, numCalib;
+
+		if(this.class == CVWidgetMS, {
+			thisEditor = thisGuiEnv.editor[slot];
+		}, {
+			thisEditor = thisGuiEnv.editor;
+		});
 
 		wcm.calibration.controller ?? {
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
 
 		wcm.calibration.controller.put(\default, { |theChanger, what, moreArgs|
+			// "thisGuiEnv: %\n".postf(thisGuiEnv.asCompileString);
 			theChanger.value.switch(
 				true, {
-					window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
-					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
-						thisGuiEnv.editor.calibBut.value_(0);
+					if(this.class != CVWidgetMS, {
+						window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
+					});
+					if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
+						thisEditor.calibBut.value_(0);
 						wcm.mapConstrainterLo ?? {
 							wcm.mapConstrainterLo = CV([-inf, inf].asSpec, 0.00001);
 							wcm.mapConstrainterLo.connect(thisGuiEnv.editor.calibNumBoxes.lo);
@@ -1110,23 +1127,75 @@ CVWidget {
 							wcm.mapConstrainterHi = CV([-inf, inf].asSpec, 0.00001);
 							wcm.mapConstrainterHi.connect(thisGuiEnv.editor.calibNumBoxes.hi);
 						};
-						[thisGuiEnv.editor.calibNumBoxes.lo, thisGuiEnv.editor.calibNumBoxes.hi].do({ |nb|
+						[thisEditor.calibNumBoxes.lo, thisEditor.calibNumBoxes.hi].do({ |nb|
 							nb.enabled_(false);
 							nb.action_(nil);
+						})
+					});
+					if(this.class == CVWidgetMS, {
+						numCalib = this.msSize.collect(this.getCalibrate(_)).select(_ == true).size;
+						// "numCalib on true: %\n".postf(numCalib);
+						if(numCalib == this.msSize, {
+							if(thisGuiEnv.msEditor.notNil and:{
+								thisGuiEnv.msEditor.isClosed.not
+							}, {
+								thisGuiEnv.msEditor.calibBut.states_([
+									["calibrating all", Color.white, Color.red],
+									["calibrate all", Color.black, Color.green]
+								]).value_(0);
+								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(0);
+							})
+						}, {
+							if(thisGuiEnv.msEditor.notNil and:{
+								thisGuiEnv.msEditor.isClosed.not
+							}, {
+								thisGuiEnv.msEditor.calibBut.states_([
+									["partially calibrating", Color.white, Color.red],
+									["calibrate all", Color.black, Color.green]
+								]).value_(0);
+								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(0);
+							})
 						})
 					})
 				},
 				false, {
-					window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
-					if(thisGuiEnv.editor.notNil and:{ thisGuiEnv.editor.isClosed.not }, {
-						thisGuiEnv.editor.calibBut.value_(1);
+					if(this.class != CVWidgetMS, {
+						window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
+					});
+					if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
+						thisEditor.calibBut.value_(1);
 						[wcm.mapConstrainterLo, wcm.mapConstrainterHi].do({ |cv| cv = nil; });
-						[thisGuiEnv.editor.calibNumBoxes.lo, thisGuiEnv.editor.calibNumBoxes.hi].do({ |nb|
+						[thisEditor.calibNumBoxes.lo, thisEditor.calibNumBoxes.hi].do({ |nb|
 							nb.enabled_(true);
 							nb.action_({ |b|
 								this.setOscInputConstraints(
-									thisGuiEnv.editor.calibNumBoxes.lo.value @ thisGuiEnv.editor.calibNumBoxes.hi.value, slot;
+									thisEditor.calibNumBoxes.lo.value @ thisEditor.calibNumBoxes.hi.value, slot;
 								)
+							})
+						})
+					});
+					if(this.class == CVWidgetMS, {
+						numCalib = this.msSize.collect(this.getCalibrate(_)).select(_ == true).size;
+						// "numCalib on false: %\n".postf(numCalib);
+						if(numCalib == 0, {
+							if(thisGuiEnv.msEditor.notNil and:{
+								thisGuiEnv.msEditor.isClosed.not
+							}, {
+								thisGuiEnv.msEditor.calibBut.states_([
+									["calibrating all", Color.white, Color.red],
+									["calibrate all", Color.black, Color.green]
+								]).value_(1);
+								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(1);
+							})
+						}, {
+							if(thisGuiEnv.msEditor.notNil and:{
+								thisGuiEnv.msEditor.isClosed.not
+							}, {
+								thisGuiEnv.msEditor.calibBut.states_([
+									["partially calibrating", Color.white, Color.red],
+									["calibrate all", Color.black, Color.green]
+								]).value_(0);
+								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(1);
 							})
 						})
 					})
@@ -1690,6 +1759,8 @@ CVWidget {
 		};
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
+
+			// "oscDisplay: theChanger: %\n".postf(theChanger.value);
 
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
