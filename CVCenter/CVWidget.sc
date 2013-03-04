@@ -1100,18 +1100,18 @@ CVWidget {
 	prInitCalibration { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var thisEditor, numCalib;
 
-		if(this.class == CVWidgetMS, {
-			thisEditor = thisGuiEnv.editor[slot];
-		}, {
-			thisEditor = thisGuiEnv.editor;
-		});
-
 		wcm.calibration.controller ?? {
 			wcm.calibration.controller = SimpleController(wcm.calibration.model);
 		};
 
 		wcm.calibration.controller.put(\default, { |theChanger, what, moreArgs|
-			// "thisGuiEnv: %\n".postf(thisGuiEnv.asCompileString);
+
+			if(this.class == CVWidgetMS, {
+				thisEditor = thisGuiEnv[\editor][slot];
+			}, {
+				thisEditor = thisGuiEnv[\editor];
+			});
+
 			theChanger.value.switch(
 				true, {
 					if(this.class != CVWidgetMS, {
@@ -1176,7 +1176,6 @@ CVWidget {
 					});
 					if(this.class == CVWidgetMS, {
 						numCalib = this.msSize.collect(this.getCalibrate(_)).select(_ == true).size;
-						// "numCalib on false: %\n".postf(numCalib);
 						if(numCalib == 0, {
 							if(thisGuiEnv.msEditor.notNil and:{
 								thisGuiEnv.msEditor.isClosed.not
