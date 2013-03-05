@@ -1887,7 +1887,8 @@ CVWidget {
 	}
 
 	prInitOscInputRange { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		var thisEditor, thisOscEditBut, p;
+		var thisEditor, thisOscEditBut, p, tmp;
+		var mappingsDiffer;
 		 /*thisMidiOscEnv;*/
 
 		// "wcm.oscInputRange.model: %\n".postf(wcm.oscInputRange.model);
@@ -1921,7 +1922,6 @@ CVWidget {
 					thisEditor.isClosed.not
 				}, {
 					thisEditor.mappingSelect.items.do({ |item, i|
-							// "midiOscEnv.oscMapping: %\n".postf(midiOscEnv.oscMapping);
 						if(item.asSymbol === midiOscEnv.oscMapping, {
 							thisEditor.mappingSelect.value_(i)
 						})
@@ -1933,7 +1933,22 @@ CVWidget {
 					if(thisGuiEnv.msEditor.notNil and:{
 						thisGuiEnv.msEditor.isClosed.not
 					}, {
-						/* yaddayadda... */
+						tmp = this.msSize.collect({ |sl| this.getOscMapping(sl) });
+						block { |break|
+							(1..this.msSize-1).do({ |sl|
+								if(tmp[0] != tmp[sl], { break.value(mappingsDiffer = true) }, { mappingsDiffer = false });
+							})
+						};
+
+						if(mappingsDiffer, {
+							thisGuiEnv.msEditor.mappingSelect.value_(0);
+						}, {
+							thisGuiEnv.msEditor.mappingSelect.items.do({ |item, i|
+								if(item.asSymbol === midiOscEnv.oscMapping, {
+									thisGuiEnv.msEditor.mappingSelect.value_(i);
+								})
+							})
+						})
 					})
 				});
 

@@ -40,7 +40,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
-		var mappingSelectItems;
+		var mappingSelectItems, mappingDiffers;
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
 		var tmp; // multipurpose short-term var
@@ -383,7 +383,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.string_("Global Calibration")
 		;
 
-		mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
+		mappingSelectItems = ["set global mapping...", "linlin", "linexp", "explin", "expexp"];
 
 		mappingSelect = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-12@20)
 			.font_(Font("Helvetica", 12))
@@ -393,15 +393,22 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			})
 		;
 
-//		if(widget.getOscMapping(slot).notNil, {
-//			mappingSelectItems.do({ |item, i|
-//				if(item.asSymbol === widget.getOscMapping(slot), {
-//					mappingSelect.value_(i);
-//				});
-//			}, {
-//				mappingSelect.value_(0);
-//			})
-//		});
+		tmp = widget.msSize.collect({ |sl| widget.getOscMapping(sl) });
+		block { |break|
+			(1..widget.msSize-1).do({ |sl|
+				if(tmp[0] != tmp[sl], { break.value(mappingDiffers = true) }, { mappingDiffers = false });
+			})
+		};
+
+		if(mappingDiffers, {
+			mappingSelect.value_(0);
+		}, {
+			mappingSelectItems.do({ |item, i|
+				if(item.asSymbol === widget.getOscMapping(0), {
+					mappingSelect.value_(i);
+				})
+			})
+		});
 
 		calibBut = Button(thisEditor.oscTabs.views[0],  oscFlow0.bounds.width/2-12@20)
 			.font_(staticTextFont)
@@ -477,13 +484,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 								}, {
 									connectOscMsgIndex = indexField.string.asInt;
 								});
-								connectIndexStart = intStartIndexField.value+ext;
+								connectIndexStart = intStartIndexField.value+(ext-1);
 								"connectIndexStart: %\n".postf(connectIndexStart);
 								if(connectIndexStart >= 0 and:{ connectIndexStart < widget.msSize }, {
 									widget.oscConnect(
-										name: connectIP,
-										port: connectPort,
 										ip: connectIP,
+										port: connectPort,
 										name: connectName,
 										oscMsgIndex: connectOscMsgIndex,
 										slot: connectIndexStart
