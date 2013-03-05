@@ -1112,20 +1112,25 @@ CVWidget {
 				thisEditor = thisGuiEnv[\editor];
 			});
 
+			// [slot, thisEditor.calibNumBoxes.lo, thisEditor.calibNumBoxes.hi].postln;
+
 			theChanger.value.switch(
 				true, {
 					if(this.class != CVWidgetMS, {
 						window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
 					});
 					if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
+						// "hey, here i am!".postln;
 						thisEditor.calibBut.value_(0);
 						wcm.mapConstrainterLo ?? {
 							wcm.mapConstrainterLo = CV([-inf, inf].asSpec, 0.00001);
-							wcm.mapConstrainterLo.connect(thisGuiEnv.editor.calibNumBoxes.lo);
+							// wcm.mapConstrainterLo.connect(thisGuiEnv.editor.calibNumBoxes.lo);
+							wcm.mapConstrainterLo.connect(thisEditor.calibNumBoxes.lo);
 						};
 						wcm.mapConstrainterHi ?? {
 							wcm.mapConstrainterHi = CV([-inf, inf].asSpec, 0.00001);
-							wcm.mapConstrainterHi.connect(thisGuiEnv.editor.calibNumBoxes.hi);
+							// wcm.mapConstrainterHi.connect(thisGuiEnv.editor.calibNumBoxes.hi);
+							wcm.mapConstrainterHi.connect(thisEditor.calibNumBoxes.hi);
 						};
 						[thisEditor.calibNumBoxes.lo, thisEditor.calibNumBoxes.hi].do({ |nb|
 							nb.enabled_(false);
@@ -1658,6 +1663,7 @@ CVWidget {
 								]).changedKeys(synchKeys);
 							});
 						});
+						// [slot, midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi].postln;
 						wcm.mapConstrainterLo.value_(midiOscEnv.calibConstraints.lo);
 						wcm.mapConstrainterHi.value_(midiOscEnv.calibConstraints.hi);
 					}, {
@@ -1704,8 +1710,8 @@ CVWidget {
 					midiOscEnv.oscResponder.action_(oscResponderAction);
 				});
 
+				tmp = theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString;
 				if(this.class == CVWidgetMS, {
-					tmp = theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString;
 					tmp = slot.asString++":"+tmp;
 				});
 
@@ -1954,6 +1960,7 @@ CVWidget {
 
 				if(window.isClosed.not, {
 					if(this.class != CVWidgetMS, {
+						// "thisGuiEnv.oscEditBut.states[0][0]: %\n".postf(thisGuiEnv.oscEditBut.states[0][0]);
 						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 							thisGuiEnv.oscEditBut.states_([[
 								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,

@@ -306,7 +306,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		StaticText(thisEditor.oscTabs.views[0], 65@40)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("ext. sliders (numeric array)")
+			.string_("placeholder values (numeric array)")
 		;
 
 		oscFlow0.shift(0, 10);
@@ -485,7 +485,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 									connectOscMsgIndex = indexField.string.asInt;
 								});
 								connectIndexStart = intStartIndexField.value+(ext-1);
-								"connectIndexStart: %\n".postf(connectIndexStart);
 								if(connectIndexStart >= 0 and:{ connectIndexStart < widget.msSize }, {
 									widget.oscConnect(
 										ip: connectIP,
@@ -511,7 +510,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					])
 					.font_(staticTextFont)
 					.action_({ |bt|
-					// "widget, widget.label.states[0][0], sindex: %, %, %\n".postf(widget, widget.label.states[0][0], sindex);
+						// "widget, widget.label.states[0][0], sindex: %, %, %\n".postf(widget, widget.label.states[0][0], sindex);
 						if(widget.editor.editors[sindex].isNil or:{ widget.editor.editors[sindex].isClosed }, {
 							widget.editor.editors[sindex] = CVWidgetEditor(
 								widget, widget.label.states[0][0], 1, sindex
@@ -525,6 +524,20 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						}, {
 							widget.editor.editors[sindex].front(1)
 						});
+						widget.editor.editors[sindex].calibNumBoxes !? {
+							wcmMS.slots[sindex].mapConstrainterLo.connect(
+								widget.editor.editors[sindex].calibNumBoxes.lo;
+							);
+							widget.editor.editors[sindex].calibNumBoxes.lo.value_(
+								wcmMS.slots[sindex].oscInputRange.model.value[0];
+							);
+							wcmMS.slots[sindex].mapConstrainterHi.connect(
+								widget.editor.editors[sindex].calibNumBoxes.hi;
+							);
+							widget.editor.editors[sindex].calibNumBoxes.hi.value_(
+								wcmMS.slots[sindex].oscInputRange.model.value[1];
+							)
+						};
 						wcmMS.slots[sindex].oscDisplay.model.value_(
 							wcmMS.slots[sindex].oscDisplay.model.value;
 						).changedKeys(widget.synchKeys);
