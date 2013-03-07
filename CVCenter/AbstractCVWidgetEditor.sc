@@ -22,7 +22,7 @@ AbstractCVWidgetEditor {
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
-	var <calibBut, <calibNumBoxes;
+	var <calibBut;
 	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 	var <ipField, <portField, <nameField, <indexField;
 	var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;

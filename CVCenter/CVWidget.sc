@@ -594,19 +594,28 @@ CVWidget {
 	setSpec { |spec, slot|
 		var thisSpec;
 		if(spec.class == String, { thisSpec = spec.asSymbol }, { thisSpec = spec });
+		if(thisSpec.asSpec.isKindOf(ControlSpec).not, {
+			Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
+		});
+		thisSpec = thisSpec.asSpec;
 		switch(this.class,
 			CVWidget2D, {
-				if(thisSpec.asSpec.isKindOf(ControlSpec), {
-					wdgtControllersAndModels[slot.asSymbol].cvSpec.model.value_(thisSpec.asSpec).changedKeys(synchKeys);
-				}, {
-					Error("Please provide a valid ControlSpec!").throw;
-				})
+				wdgtControllersAndModels[slot.asSymbol].cvSpec.model.value_(thisSpec).changedKeys(synchKeys);
 			},
 			{
-				if(thisSpec.asSpec.isKindOf(ControlSpec).not, {
-					Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
+				if(this.class == CVWidgetMS, {
+					if([thisSpec.minval, thisSpec.maxval, thisSpec.warp, thisSpec.step, thisSpec.default].select(_.isArray).size == 0, {
+						thisSpec = ControlSpec(
+							thisSpec.minval!this.msSize,
+							thisSpec.maxval!this.msSize,
+							thisSpec.warp,
+							thisSpec.step!this.msSize,
+							thisSpec.default!this.msSize,
+							thisSpec.units,
+						)
+					})
 				});
-				wdgtControllersAndModels.cvSpec.model.value_(thisSpec.asSpec).changedKeys(synchKeys);
+				wdgtControllersAndModels.cvSpec.model.value_(thisSpec).changedKeys(synchKeys);
 			}
 		)
 	}
@@ -1228,12 +1237,11 @@ CVWidget {
 		};
 
 		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
-			// [theChanger, what, moreArgs].postln;
+			// [theChanger, slot, what, moreArgs].postln;
 
 			switch(this.class,
 				CVWidgetMS, {
 					specEditor = thisGuiEnv.msEditor;
-					"thisGuiEnv.editor: %\n".postf(thisGuiEnv.editor);
 					msEditors = thisGuiEnv.editor;
 				},
 				{ specEditor = thisGuiEnv.editor }
@@ -1243,12 +1251,21 @@ CVWidget {
 				if(midiOscEnv.oscMapping === \linexp or:{
 					midiOscEnv.oscMapping === \expexp
 				}, {
-					midiOscEnv.oscMapping = \linlin;
+					if(this.class == CVWidgetMS, {
+						this.msSize.do({ |sl| this.midiOscEnv[sl].oscMapping = \linlin });
+					}, {
+						midiOscEnv.oscMapping = \linlin;
+					});
 					if(specEditor.notNil and:{
 						specEditor.isClosed.not
 					}, {
 						if(this.class == CVWidgetMS, {
 							specEditor.mappingSelect.value_(1);
+							msEditors.do({ |it|
+								if(it.notNil and:{ it.isClosed.not }, {
+									it.mappingSelect.value_(0)
+								})
+							})
 						}, {
 							specEditor.mappingSelect.value_(0);
 						})
