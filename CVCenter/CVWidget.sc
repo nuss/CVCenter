@@ -634,44 +634,54 @@ CVWidget {
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 			}
 		);
+
+		// "mapping: %\n".postf(mapping);
+
 		if(mapping.asSymbol !== \linlin and:{
 			mapping.asSymbol !== \linexp and:{
 				mapping.asSymbol !== \explin and:{
-					mapping.asSymbol !== \expexp
+					mapping.asSymbol !== \expexp and:{
+						mapping.asSymbol !== 'set global mapping...'
+					}
 				}
 			}
 		}, {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		});
-		switch(this.class,
-			CVWidgetKnob, {
-				midiOscEnv.oscMapping = mapping.asSymbol;
-				wdgtControllersAndModels.oscInputRange.model.value_(
-					wdgtControllersAndModels.oscInputRange.model.value;
-				).changedKeys(synchKeys);
-				wdgtControllersAndModels.cvSpec.model.value_(
-					wdgtControllersAndModels.cvSpec.model.value;
-				).changedKeys(synchKeys);
-			},
-			{
-				midiOscEnv[thisSlot].oscMapping = mapping.asSymbol;
-				wcm.oscInputRange.model.value_(
-					wcm.oscInputRange.model.value;
-				).changedKeys(synchKeys);
-				switch(this.class,
-					CVWidget2D, {
-						wdgtControllersAndModels[thisSlot].cvSpec.model.value_(
-							wdgtControllersAndModels[thisSlot].cvSpec.model.value;
-						).changedKeys(synchKeys);
-					},
-					CVWidgetMS, {
-						wdgtControllersAndModels.cvSpec.model.value_(
-							wdgtControllersAndModels.cvSpec.model.value;
-						).changedKeys(synchKeys);
-					}
-				)
-			}
-		)
+
+		// if(mapping.asSymbol !== 'set global mapping...', {
+			switch(this.class,
+				CVWidgetKnob, {
+					midiOscEnv.oscMapping = mapping.asSymbol;
+					wdgtControllersAndModels.oscInputRange.model.value_(
+						wdgtControllersAndModels.oscInputRange.model.value;
+					).changedKeys(synchKeys);
+					wdgtControllersAndModels.cvSpec.model.value_(
+						wdgtControllersAndModels.cvSpec.model.value;
+					).changedKeys(synchKeys);
+				},
+				{
+					midiOscEnv[thisSlot].oscMapping = mapping.asSymbol;
+					wcm.oscInputRange.model.value_(
+						wcm.oscInputRange.model.value;
+					).changedKeys(synchKeys);
+				// "inputRange model updated".postln;
+					switch(this.class,
+						CVWidget2D, {
+							wdgtControllersAndModels[thisSlot].cvSpec.model.value_(
+								wdgtControllersAndModels[thisSlot].cvSpec.model.value;
+							).changedKeys(synchKeys);
+						},
+						CVWidgetMS, {
+							wdgtControllersAndModels.cvSpec.model.value_(
+								wdgtControllersAndModels.cvSpec.model.value;
+							).changedKeys(synchKeys);
+						// "spec model updated".postln;
+						}
+					)
+				}
+			)
+		// })
 	}
 
 	getOscMapping { |slot|
@@ -1218,7 +1228,7 @@ CVWidget {
 		};
 
 		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
-//			[theChanger, what, moreArgs].postln;
+			// [theChanger, what, moreArgs].postln;
 
 			switch(this.class,
 				CVWidgetMS, { specEditor = thisGuiEnv.msEditor },
@@ -1233,7 +1243,11 @@ CVWidget {
 					if(specEditor.notNil and:{
 						specEditor.isClosed.not
 					}, {
-						specEditor.mappingSelect.value_(0);
+						if(this.class == CVWidgetMS, {
+							specEditor.mappingSelect.value_(1);
+						}, {
+							specEditor.mappingSelect.value_(0);
+						})
 					})
 				})
 			}, {
@@ -1241,8 +1255,10 @@ CVWidget {
 					specEditor.isClosed.not
 				}, {
 					tmpMapping = specEditor.mappingSelect.item;
+							// "tmpMapping: %\n".postf(tmpMapping);
 					specEditor.mappingSelect.items.do({ |item, i|
 						if(item == tmpMapping, {
+									// "set mapping to item %\n".postf(item);
 							specEditor.mappingSelect.value_(i)
 						})
 					});
@@ -1945,6 +1961,8 @@ CVWidget {
 								if(tmp[0] != tmp[sl], { break.value(mappingsDiffer = true) }, { mappingsDiffer = false });
 							})
 						};
+
+							// "mappings differ: %, %\n".postf(tmp, slot);
 
 						if(mappingsDiffer, {
 							thisGuiEnv.msEditor.mappingSelect.value_(0);
