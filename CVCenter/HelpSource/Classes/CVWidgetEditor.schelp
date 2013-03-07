@@ -172,6 +172,11 @@ A link::Classes/StaticText:: displaying the auto-correction value for incoming O
 
 returns:: a link::Classes/StaticText::
 
+METHOD:: specConstraintsText
+A link::Classes/StaticText:: displaying the constraints (minval / maxval) of the currently set link::Classes/ControlSpec:: of the link::Classes/CV::.
+
+returns:: a link::Classes/StaticText::
+
 METHOD:: mappingSelect
 A link::Classes/PopUpMenu:: allowing the user to set the mapping of incoming OSC-values to the Output-spec. For an explanation see link::Classes/CVWidget#-setOscMapping::
 
