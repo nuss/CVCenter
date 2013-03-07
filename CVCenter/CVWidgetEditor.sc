@@ -31,6 +31,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 	// var actionName, enterAction, enterActionBut, <actionsList;
 	// var name;
 	// var flow0, flow1, flow2, flow3;
+	var <specConstraintsText;
 	var editorSlot;
 
 	*new { |widget, widgetName, tab, slot|
@@ -44,7 +45,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var addr, wcm, thisGuiEnv, labelColors;
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
-		var specConstraintsText, mappingSelectItems;
+		var mappingSelectItems;
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
 		var tmp, gapNextX, gapNextY; // multipurpose short-term var

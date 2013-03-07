@@ -1220,7 +1220,7 @@ CVWidget {
 
 	prInitSpecControl { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var tmp, tmpMapping;
-		var specEditor;
+		var specEditor, msEditors;
 		var thisSpec, customName;
 
 		wcm.cvSpec.controller ?? {
@@ -1231,7 +1231,11 @@ CVWidget {
 			// [theChanger, what, moreArgs].postln;
 
 			switch(this.class,
-				CVWidgetMS, { specEditor = thisGuiEnv.msEditor },
+				CVWidgetMS, {
+					specEditor = thisGuiEnv.msEditor;
+					"thisGuiEnv.editor: %\n".postf(thisGuiEnv.editor);
+					msEditors = thisGuiEnv.editor;
+				},
 				{ specEditor = thisGuiEnv.editor }
 			);
 
@@ -1255,10 +1259,8 @@ CVWidget {
 					specEditor.isClosed.not
 				}, {
 					tmpMapping = specEditor.mappingSelect.item;
-							// "tmpMapping: %\n".postf(tmpMapping);
 					specEditor.mappingSelect.items.do({ |item, i|
 						if(item == tmpMapping, {
-									// "set mapping to item %\n".postf(item);
 							specEditor.mappingSelect.value_(i)
 						})
 					});
@@ -1302,12 +1304,9 @@ CVWidget {
 					}, {
 						customName = "custom"++tmp;
 					});
-//					"customName: %\n".postf(customName);
 				}, {
 					thisSpec = theChanger.value;
 				});
-
-//				"thisSpec: %\n".postf(thisSpec);
 
 				specEditor.specField.string_(thisSpec.asCompileString);
 				tmp = specEditor.specsListSpecs.detectIndex({ |item, i| item == thisSpec });
@@ -1340,6 +1339,23 @@ CVWidget {
 					thisGuiEnv.knob.centered_(true);
 				}, {
 					thisGuiEnv.knob.centered_(false);
+				})
+			});
+
+			msEditors !? {
+				msEditors.do({ |ed|
+					if(ed.notNil and:{ ed.isClosed.not }, {
+						ed.specConstraintsText.string_(
+							" current widget-spec constraints lo / hi:"+this.getSpec.minval.wrapAt(slot)+"/"+this.getSpec.maxval.wrapAt(slot)
+						)
+					})
+				})
+			};
+			if(this.class != CVWidgetMS, {
+				if(specEditor.notNil and:{ specEditor.isClosed.not }, {
+					specEditor.specConstraintsText.string_(
+						" current widget-spec constraints lo / hi:"+this.getSpec(slot).minval+"/"+this.getSpec(slot).maxval
+					)
 				})
 			})
 		})
