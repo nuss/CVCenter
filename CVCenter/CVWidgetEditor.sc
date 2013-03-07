@@ -26,7 +26,7 @@ CVWidgetEditor {
 	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 	var <ipField, <portField, <nameField, <indexField;
 	var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
-	var <mappingSelect;
+	var <mappingSelect, <specConstraintsText;
 	var <connectorBut;
 	var actionName, enterAction, enterActionBut, <actionsList;
 	var name, editorSlot;
@@ -648,7 +648,7 @@ CVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-15@15)
+			specConstraintsText = StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-15@15)
 				.font_(staticTextFont)
 				.background_(Color.white)
 				.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(slot).minval+"/"+widget.getSpec(slot).maxval)

@@ -973,7 +973,7 @@ CVWidget {
 					thisGuiEnv.editor.specsListSpecs.array_([theChanger.value]++thisGuiEnv.editor.specsListSpecs.array);
 					thisGuiEnv.editor.specsList.value_(0);
 					thisGuiEnv.editor.specsList.refresh;
-				})
+				});
 			});
 
 			argWidgetCV.spec_(theChanger.value);
@@ -988,11 +988,19 @@ CVWidget {
 				)
 			});
 
+			if(thisGuiEnv.editor.notNil and:{
+				thisGuiEnv.editor.isClosed.not
+			}, {
+				thisGuiEnv.editor.specConstraintsText.string_(
+					" current widget-spec constraints lo / hi:"+this.getSpec(slot).minval+"/"+this.getSpec(slot).maxval
+				);
+			});
+
 			if(this.class === CVWidgetKnob, {
 				if(argWidgetCV.spec.excludingZeroCrossing, {
 					thisGuiEnv.knob.centered_(true);
-					}, {
-						thisGuiEnv.knob.centered_(false);
+				}, {
+					thisGuiEnv.knob.centered_(false);
 				})
 			})
 		})
