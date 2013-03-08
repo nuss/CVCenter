@@ -1,5 +1,5 @@
 CVWidgetMS : CVWidget {
-	var <msSize, <mSlider, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
+	var <msSize, <mSlider, <calibViews, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
 	var numOscResponders, numMidiResponders;
 	var <msEditor;
 	// persistent widgets
@@ -26,10 +26,14 @@ CVWidgetMS : CVWidget {
 		// hmmm...
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextX, nextY, knobX, knobY;
+		var calibViewsWidth, calibViewsNextX;
+		var text;
 
 		this.bgColor ?? { this.bgColor = Color.white };
 		synchKeys ?? { synchKeys = [\default] };
 		#numOscResponders, numMidiResponders = 0!2;
+
+		calibViews = [];
 
 		if(cv.isNil, {
 			widgetCV = CV([0 ! numSliders, 1 ! numSliders]);
@@ -199,7 +203,7 @@ CVWidgetMS : CVWidget {
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
 
-		mSlider = MultiSliderView(window, Rect(thisXY.x+1, thisXY.y+16, thisWidth-2, thisHeight-2-75-1))
+		mSlider = MultiSliderView(window, Rect(thisXY.x+1, thisXY.y+16, thisWidth-2, thisHeight-2-79-1))
 			.drawRects_(true)
 			.isFilled_(true)
 			.colors_(Color.clear, Color.blue)
@@ -207,6 +211,26 @@ CVWidgetMS : CVWidget {
 		;
 
 		nextY = thisXY.y+mSlider.bounds.height+label.bounds.height+1;
+
+		calibViewsWidth = (thisWidth-2).div(msSize);
+		calibViewsNextX = thisXY.x+1;
+		msSize.do({ |sl|
+			calibViews = calibViews.add(
+				UserView(window, Rect(calibViewsNextX, nextY, calibViewsWidth, 2)).background_(Color.green);
+			);
+			calibViewsNextX = calibViewsNextX+calibViewsWidth;
+			if(GUI.id !== \cocoa, {
+				if(this.getCalibrate(sl), {
+					text = "Calibration for slot % is active.".format(sl);
+				}, {
+					text = "Calibration for slot % is inactive.".format(sl);
+				});
+				calibViews[sl].toolTip_(text);
+			})
+		});
+
+		nextY = nextY+2+1;
+
 		numVal = TextView(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.string_(widgetCV.value.asCompileString).font_(Font("Helvetica", 9.5))
 			.keyDownAction_({ |nv, char, modifiers, unicode, keycode|
@@ -325,6 +349,7 @@ CVWidgetMS : CVWidget {
 
 		visibleGuiEls = [
 			mSlider,
+			calibViews,
 			numVal,
 			midiBut,
 			specBut,
@@ -337,6 +362,7 @@ CVWidgetMS : CVWidget {
 			label,
 			nameField,
 			mSlider,
+			calibViews,
 			numVal,
 			midiBut,
 			oscBut,
@@ -349,6 +375,7 @@ CVWidgetMS : CVWidget {
 			// msEditor: editor.msEditor,
 				editor: editor.editors,
 				mSlider: mSlider,
+				calibViews: calibViews,
 				numVal: numVal,
 				midiBut: midiBut,
 				oscBut: oscBut,

@@ -557,8 +557,8 @@ CVWidget2D : CVWidget {
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
 			.font_(Font("Helvetica", 9))
 			.states_([
-				["calibrating", Color.white, Color.red],
-				["calibrate", Color.black, Color.green]
+				["calibrating", Color.black, Color.green],
+				["calibrate", Color.white, Color.red]
 			])
 			.action_({ |cb|
 				switch(cb.value,

@@ -418,8 +418,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		calibBut = Button(thisEditor.oscTabs.views[0],  oscFlow0.bounds.width/2-12@20)
 			.font_(staticTextFont)
 			.states_([
-				["calibrating all", Color.white, Color.red],
-				["calibrate all", Color.black, Color.green]
+				["calibrating all", Color.black, Color.green],
+				["calibrate all", Color.white, Color.red]
 			])
 			.action_({ |cb|
 				cb.value.switch(
@@ -558,8 +558,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			oscCalibBtns = oscCalibBtns.add(
 				Button(thisEditor.oscTabs.views[1], 10@10)
 					.states_([
-						["", Color.white, Color.red],
-						["", Color.black, Color.green]
+						["", Color.black, Color.green],
+						["", Color.white, Color.red]
 					])
 					.action_({ |cb|
 						cb.value.switch(

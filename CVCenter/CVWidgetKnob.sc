@@ -379,8 +379,8 @@ CVWidgetKnob : CVWidget {
 		calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Helvetica", 9))
 			.states_([
-				["calibrating", Color.white, Color.red],
-				["calibrate", Color.black, Color.green]
+				["calibrating", Color.black, Color.green],
+				["calibrate", Color.white, Color.red]
 			])
 			.action_({ |cb|
 				switch(cb.value,

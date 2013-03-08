@@ -646,8 +646,8 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			calibBut = Button(thisEditor[\tabs].views[2], 60@15)
 				.font_(staticTextFont)
 				.states_([
-					["calibrating", Color.white, Color.red],
-					["calibrate", Color.black, Color.green]
+					["calibrating", Color.black, Color.green],
+					["calibrate", Color.white, Color.red]
 				])
 			;
 

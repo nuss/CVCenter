@@ -58,13 +58,21 @@ CVWidget {
 		visible.switch(
 			false, {
 				visibleGuiEls.do({ |el|
-					el.visible_(true);
+					if(el.isArray, {
+						el.do(_.visible_(true))
+					}, {
+						el.visible_(true)
+					});
 					nameField.visible_(false);
 				})
 			},
 			true, {
 				visibleGuiEls.do({ |el|
-					el.visible_(false);
+					if(el.isArray, {
+						el.do(_.visible_(false))
+					}, {
+						el.visible_(false)
+					});
 					nameField.visible_(true);
 				})
 			}
@@ -658,39 +666,20 @@ CVWidget {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		});
 
-		// if(mapping.asSymbol !== 'set global mapping...', {
-			switch(this.class,
-				CVWidgetKnob, {
-					midiOscEnv.oscMapping = mapping.asSymbol;
-					wdgtControllersAndModels.oscInputRange.model.value_(
-						wdgtControllersAndModels.oscInputRange.model.value;
-					).changedKeys(synchKeys);
-					wdgtControllersAndModels.cvSpec.model.value_(
-						wdgtControllersAndModels.cvSpec.model.value;
-					).changedKeys(synchKeys);
-				},
-				{
-					midiOscEnv[thisSlot].oscMapping = mapping.asSymbol;
-					wcm.oscInputRange.model.value_(
-						wcm.oscInputRange.model.value;
-					).changedKeys(synchKeys);
-				// "inputRange model updated".postln;
-					switch(this.class,
-						CVWidget2D, {
-							wdgtControllersAndModels[thisSlot].cvSpec.model.value_(
-								wdgtControllersAndModels[thisSlot].cvSpec.model.value;
-							).changedKeys(synchKeys);
-						},
-						CVWidgetMS, {
-							wdgtControllersAndModels.cvSpec.model.value_(
-								wdgtControllersAndModels.cvSpec.model.value;
-							).changedKeys(synchKeys);
-						// "spec model updated".postln;
-						}
-					)
-				}
-			)
-		// })
+		switch(this.class,
+			CVWidgetKnob, {
+				midiOscEnv.oscMapping = mapping.asSymbol;
+				wdgtControllersAndModels.oscInputRange.model.value_(
+					wdgtControllersAndModels.oscInputRange.model.value;
+				).changedKeys(synchKeys);
+			},
+			{
+				midiOscEnv[thisSlot].oscMapping = mapping.asSymbol;
+				wcm.oscInputRange.model.value_(
+					wcm.oscInputRange.model.value;
+				).changedKeys(synchKeys);
+			}
+		)
 	}
 
 	getOscMapping { |slot|
@@ -1137,6 +1126,8 @@ CVWidget {
 				true, {
 					if(this.class != CVWidgetMS, {
 						window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
+					}, {
+						window.isClosed.not.if { this.calibViews[slot].background_(Color.green) };
 					});
 					if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
 						thisEditor.calibBut.value_(0);
@@ -1161,8 +1152,8 @@ CVWidget {
 								thisGuiEnv.msEditor.isClosed.not
 							}, {
 								thisGuiEnv.msEditor.calibBut.states_([
-									["calibrating all", Color.white, Color.red],
-									["calibrate all", Color.black, Color.green]
+									["calibrating all", Color.black, Color.green],
+									["calibrate all", Color.white, Color.red]
 								]).value_(0);
 								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(0);
 							})
@@ -1171,8 +1162,8 @@ CVWidget {
 								thisGuiEnv.msEditor.isClosed.not
 							}, {
 								thisGuiEnv.msEditor.calibBut.states_([
-									["partially calibrating", Color.white, Color.red],
-									["calibrate all", Color.black, Color.green]
+									["partially calibrating", Color.black, Color.yellow],
+									["calibrate all", Color.white, Color.red]
 								]).value_(0);
 								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(0);
 							})
@@ -1182,6 +1173,8 @@ CVWidget {
 				false, {
 					if(this.class != CVWidgetMS, {
 						window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
+					}, {
+							window.isClosed.not.if { this.calibViews[slot].background_(Color.red) };
 					});
 					if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
 						thisEditor.calibBut.value_(1);
@@ -1202,8 +1195,8 @@ CVWidget {
 								thisGuiEnv.msEditor.isClosed.not
 							}, {
 								thisGuiEnv.msEditor.calibBut.states_([
-									["calibrating all", Color.white, Color.red],
-									["calibrate all", Color.black, Color.green]
+									["calibrating all", Color.black, Color.green],
+									["calibrate all", Color.white, Color.red]
 								]).value_(1);
 								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(1);
 							})
@@ -1212,8 +1205,8 @@ CVWidget {
 								thisGuiEnv.msEditor.isClosed.not
 							}, {
 								thisGuiEnv.msEditor.calibBut.states_([
-									["partially calibrating", Color.white, Color.red],
-									["calibrate all", Color.black, Color.green]
+									["partially calibrating", Color.black, Color.yellow],
+									["calibrate all", Color.white, Color.red]
 								]).value_(0);
 								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(1);
 							})
@@ -1249,9 +1242,9 @@ CVWidget {
 					midiOscEnv.oscMapping === \expexp
 				}, {
 					if(this.class == CVWidgetMS, {
-						this.msSize.do({ |sl| this.midiOscEnv[sl].oscMapping = \linlin });
+						this.msSize.do({ |sl| this.setOscMapping(\linlin, sl) });
 					}, {
-						midiOscEnv.oscMapping = \linlin;
+						this.setOscMapping(\linlin, slot);
 					});
 					if(specEditor.notNil and:{
 						specEditor.isClosed.not
