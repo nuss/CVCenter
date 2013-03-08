@@ -205,7 +205,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		if(msEditorEnv.specsListItems.notNil, {
 			specsList.items_(msEditorEnv.specsListItems);
 		}, {
-			Spec.specs.asSortedArray({ |spec|
+			Spec.specs.asSortedArray.do({ |spec|
 				if(spec[1].isKindOf(ControlSpec), {
 					specsList.items_(specsList.items.add(spec[0]++":"+spec[1]));
 					specsListSpecs.add(spec[1]);
