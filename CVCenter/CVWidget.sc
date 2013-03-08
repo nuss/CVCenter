@@ -611,18 +611,18 @@ CVWidget {
 				wdgtControllersAndModels[slot.asSymbol].cvSpec.model.value_(thisSpec).changedKeys(synchKeys);
 			},
 			{
-				if(this.class == CVWidgetMS, {
-					if([thisSpec.minval, thisSpec.maxval, thisSpec.warp, thisSpec.step, thisSpec.default].select(_.isArray).size == 0, {
-						thisSpec = ControlSpec(
-							thisSpec.minval!this.msSize,
-							thisSpec.maxval!this.msSize,
-							thisSpec.warp,
-							thisSpec.step!this.msSize,
-							thisSpec.default!this.msSize,
-							thisSpec.units,
-						)
-					})
-				});
+				// if(this.class == CVWidgetMS, {
+				// 	if([thisSpec.minval, thisSpec.maxval, thisSpec.warp, thisSpec.step, thisSpec.default].select(_.isArray).size == 0, {
+				// 		thisSpec = ControlSpec(
+				// 			thisSpec.minval!this.msSize,
+				// 			thisSpec.maxval!this.msSize,
+				// 			thisSpec.warp,
+				// 			thisSpec.step!this.msSize,
+				// 			thisSpec.default!this.msSize,
+				// 			thisSpec.units,
+				// 		)
+				// 	})
+				// });
 				wdgtControllersAndModels.cvSpec.model.value_(thisSpec).changedKeys(synchKeys);
 			}
 		)
@@ -657,9 +657,7 @@ CVWidget {
 		if(mapping.asSymbol !== \linlin and:{
 			mapping.asSymbol !== \linexp and:{
 				mapping.asSymbol !== \explin and:{
-					mapping.asSymbol !== \expexp and:{
-						mapping.asSymbol !== 'set global mapping...'
-					}
+					mapping.asSymbol !== \expexp
 				}
 			}
 		}, {
@@ -1238,6 +1236,7 @@ CVWidget {
 			);
 
 			if(theChanger.value.hasZeroCrossing, {
+				// "has zero crossing".postln;
 				if(midiOscEnv.oscMapping === \linexp or:{
 					midiOscEnv.oscMapping === \expexp
 				}, {
