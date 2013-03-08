@@ -641,6 +641,8 @@ CVWidget {
 
 	setOscMapping { |mapping, slot|
 		var thisSlot, wcm;
+		var thisMapping;
+
 		switch(this.class,
 			CVWidget2D, {
 				thisSlot = slot.asSymbol;
@@ -664,15 +666,19 @@ CVWidget {
 			Error("A valid mapping can either be \\linlin, \\linexp, \\explin or \\expexp").throw;
 		});
 
+		if(mapping.asSymbol === \linexp or:{ mapping.asSymbol === \expexp }, {
+			if(this.getSpec(thisSlot).hasZeroCrossing, { thisMapping = \linlin }, { thisMapping = mapping.asSymbol });
+		}, { thisMapping = mapping.asSymbol });
+
 		switch(this.class,
 			CVWidgetKnob, {
-				midiOscEnv.oscMapping = mapping.asSymbol;
+				midiOscEnv.oscMapping = thisMapping;
 				wdgtControllersAndModels.oscInputRange.model.value_(
 					wdgtControllersAndModels.oscInputRange.model.value;
 				).changedKeys(synchKeys);
 			},
 			{
-				midiOscEnv[thisSlot].oscMapping = mapping.asSymbol;
+				midiOscEnv[thisSlot].oscMapping = thisMapping;
 				wcm.oscInputRange.model.value_(
 					wcm.oscInputRange.model.value;
 				).changedKeys(synchKeys);
@@ -1939,23 +1945,16 @@ CVWidget {
 
 		wcm.oscInputRange.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscInputRange: %\n".postf(theChanger.value);
-			// "thisGuiEnv: %, slot: %\n".postf(thisGuiEnv.asCompileString, slot);
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
-				// "slot: %\n".postf(slot);
-				// "thisGuiEnv: %\n".postf(thisGuiEnv);
 				thisGuiEnv.msEditor !? {
 					thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot];
 				}
-//				"thisOscEditBut: %\n".postf(thisOscEditBut);
-//				thisMidiOscEnv = midiOscEnv[slot]; // hmmm...
 			}, {
 				thisEditor = thisGuiEnv.editor;
-					// "thisGuiEnv.oscEditBut: %\n".postf(thisGuiEnv.oscEditBut);
 				thisOscEditBut = thisGuiEnv.oscEditBut;
 			});
-//			"thisEditor: %\n".postf(thisEditor);
 
 			{
 				if(thisEditor.notNil and:{
@@ -1988,7 +1987,6 @@ CVWidget {
 							]])
 						};
 
-							// "mappings differ: %, %\n".postf(tmp, slot);
 
 						if(mappingsDiffer, {
 							thisGuiEnv.msEditor.mappingSelect.value_(0);
@@ -2004,7 +2002,6 @@ CVWidget {
 
 				if(window.isClosed.not, {
 					if(this.class != CVWidgetMS, {
-						// "thisGuiEnv.oscEditBut.states[0][0]: %\n".postf(thisGuiEnv.oscEditBut.states[0][0]);
 						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 							thisGuiEnv.oscEditBut.states_([[
 								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
