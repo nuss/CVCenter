@@ -941,7 +941,7 @@ CVWidget {
 				if(midiOscEnv.oscMapping === \linexp or:{
 					midiOscEnv.oscMapping === \expexp
 				}, {
-					midiOscEnv.oscMapping = \linlin;
+					this.setOscMapping(\linlin, slot);
 					if(thisGuiEnv.editor.notNil and:{
 						thisGuiEnv.editor.isClosed.not
 					}, {
