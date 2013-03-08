@@ -389,10 +389,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.font_(Font("Helvetica", 12))
 			.items_(mappingSelectItems)
 			.action_({ |ms|
-				widget.msSize.do({ |i|
-					if(i == 0, { tmp = ms.item });
-					widget.setOscMapping(tmp, i);
-				});
+				if(ms.value != 0, {
+					widget.msSize.do({ |i|
+						if(i == 0, { tmp = ms.item });
+						widget.setOscMapping(tmp, i);
+					})
+				})
 			})
 		;
 

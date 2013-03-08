@@ -1124,7 +1124,7 @@ CVWidget {
 		};
 
 		wcm.calibration.controller.put(\default, { |theChanger, what, moreArgs|
-
+			// "prInitCalibration: %\n".postf(theChanger.value);
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv[\editor][slot];
 			}, {
@@ -1139,16 +1139,13 @@ CVWidget {
 						window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
 					});
 					if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
-						// "hey, here i am!".postln;
 						thisEditor.calibBut.value_(0);
 						wcm.mapConstrainterLo ?? {
 							wcm.mapConstrainterLo = CV([-inf, inf].asSpec, 0.00001);
-							// wcm.mapConstrainterLo.connect(thisGuiEnv.editor.calibNumBoxes.lo);
 							wcm.mapConstrainterLo.connect(thisEditor.calibNumBoxes.lo);
 						};
 						wcm.mapConstrainterHi ?? {
 							wcm.mapConstrainterHi = CV([-inf, inf].asSpec, 0.00001);
-							// wcm.mapConstrainterHi.connect(thisGuiEnv.editor.calibNumBoxes.hi);
 							wcm.mapConstrainterHi.connect(thisEditor.calibNumBoxes.hi);
 						};
 						[thisEditor.calibNumBoxes.lo, thisEditor.calibNumBoxes.hi].do({ |nb|
@@ -1237,7 +1234,7 @@ CVWidget {
 		};
 
 		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
-			// [theChanger, slot, what, moreArgs].postln;
+			// "prInitSpecControl: %\n".postf(theChanger.value);
 
 			switch(this.class,
 				CVWidgetMS, {
@@ -1385,9 +1382,9 @@ CVWidget {
 			wcm.midiConnection.controller = SimpleController(wcm.midiConnection.model);
 		};
 
-//		wcm.pairsDo({ |k, v| [k, v].postcs; });
-//
 		wcm.midiConnection.controller.put(\default, { |theChanger, what, moreArgs|
+			// "prInitMidiConnect: %\n".postf(theChanger.value);
+
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
 					ctrlString ? ctrlString = num+1;
@@ -1475,6 +1472,8 @@ CVWidget {
 		};
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
+			// "prInitMidiDisplay: %\n".postf(theChanger.value);
+
 			if(this.class != CVWidgetMS, {
 				theChanger.value.learn.switch(
 					"X", {
@@ -1647,6 +1646,7 @@ CVWidget {
 		};
 
 		wcm.midiOptions.controller.put(\default, { |theChanger, what, moreArgs|
+			// "prInitMidiOptions: %\n".postf(theChanger.value);
 			if(thisGuiEnv.editor.notNil and:{
 				thisGuiEnv.editor.isClosed.not
 			}, {
@@ -1669,13 +1669,12 @@ CVWidget {
 		var oscResponderAction, tmp;
 		var intSlots;
 
-		// "wcm.oscConnection.model: %\n".postf(wcm.oscConnection.model);
-
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
 		};
 
 		wcm.oscConnection.controller.put(\default, { |theChanger, what, moreArgs|
+			// "prInitOscConnect: %\n".postf(theChanger.value);
 
 			// "oscConnect: %\n".postf([theChanger, what, moreArgs]);
 
@@ -1806,15 +1805,12 @@ CVWidget {
 		var thisEditor, thisOscEditBut, p, tmp;
 		var numOscString, numOscResponders, oscButBg, oscButTextColor;
 
-		// "wcm.oscDisplay.model: %\n".postf(wcm.oscDisplay.model);
-
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
 		};
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
-
-			// "oscDisplay: theChanger: %\n".postf(theChanger.value);
+			// "prInitOscDisplay: %\n".postf(theChanger.value);
 
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
@@ -1944,16 +1940,13 @@ CVWidget {
 	prInitOscInputRange { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var thisEditor, thisOscEditBut, p, tmp;
 		var mappingsDiffer;
-		 /*thisMidiOscEnv;*/
-
-		// "wcm.oscInputRange.model: %\n".postf(wcm.oscInputRange.model);
 
 		wcm.oscInputRange.controller ?? {
 			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
 		};
 
 		wcm.oscInputRange.controller.put(\default, { |theChanger, what, moreArgs|
-			// "oscInputRange:%\n".postf([theChanger, what, moreArgs]);
+			// "prInitOscInputRange: %\n".postf(theChanger.value);
 			// "thisGuiEnv: %, slot: %\n".postf(thisGuiEnv.asCompileString, slot);
 
 			if(this.class == CVWidgetMS, {
@@ -1993,6 +1986,14 @@ CVWidget {
 							(1..this.msSize-1).do({ |sl|
 								if(tmp[0] != tmp[sl], { break.value(mappingsDiffer = true) }, { mappingsDiffer = false });
 							})
+						};
+
+						midiOscEnv.oscResponder !? {
+							thisOscEditBut.states_([[
+								thisOscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
+								thisOscEditBut.states[0][1],
+								thisOscEditBut.states[0][2]
+							]])
 						};
 
 							// "mappings differ: %, %\n".postf(tmp, slot);
@@ -2039,6 +2040,7 @@ CVWidget {
 		};
 
 		wcm.actions.controller.put(\default, { |theChanger, what, moreArgs|
+			// "prInitActionsControl: %\n".postf(theChanger.value);
 			if(window.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[
 					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
