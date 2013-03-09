@@ -224,7 +224,9 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					specsList.items_(editorEnv.specsListItems);
 				}, {
 					Spec.specs.asSortedArray.do({ |spec|
-						if(spec[1].isKindOf(ControlSpec), {
+						if(spec[1].isKindOf(ControlSpec) and:{
+							[spec[1].minval, spec[1].maxval, spec[1].step, spec[1].default].select(_.isArray).size == 0
+						}, {
 							specsList.items_(specsList.items.add(spec[0]++":"+spec[1]));
 							specsListSpecs.add(spec[1]);
 						})
