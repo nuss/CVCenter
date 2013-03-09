@@ -1327,7 +1327,7 @@ CVWidget {
 				}, {
 					customName ?? { customName = "custom" };
 					specEditor.specsList.items = List[customName++":"+(thisSpec.asString)]++specEditor.specsList.items;
-					Spec.add(customName, thisSpec);
+					Spec.add(customName.asSymbol, thisSpec);
 					specEditor.specsListSpecs.array_([thisSpec]++specEditor.specsListSpecs.array);
 					specEditor.specsList.value_(0);
 					specEditor.specsList.refresh;

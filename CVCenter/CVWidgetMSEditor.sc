@@ -202,13 +202,26 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			specsListSpecs = msEditorEnv.specsListSpecs;
 		});
 
+		// "Spec.specs: %\n".postf(Spec.specs);
+
+		// Spec.specs.pairsDo({ |name, spec| [name, spec].postln });
+
 		if(msEditorEnv.specsListItems.notNil, {
 			specsList.items_(msEditorEnv.specsListItems);
 		}, {
 			Spec.specs.asSortedArray.do({ |spec|
 				if(spec[1].isKindOf(ControlSpec), {
-					specsList.items_(specsList.items.add(spec[0]++":"+spec[1]));
-					specsListSpecs.add(spec[1]);
+					if((tmp = [spec[1].minval, spec[1].maxval, spec[1].step, spec[1].default].select(_.isArray)).size > 0, {
+						// "array: %\n".postf(spec[1]);
+						if(tmp.collect(_.size).includes(widget.msSize), {
+							specsList.items_(specsList.items.add(spec[0]++":"+spec[1]));
+							specsListSpecs.add(spec[1]);
+						});
+					}, {
+						// "no array: %\n".postf(spec[1]);
+						specsList.items_(specsList.items.add(spec[0]++":"+spec[1]));
+						specsListSpecs.add(spec[1]);
+					})
 				})
 			})
 		});
