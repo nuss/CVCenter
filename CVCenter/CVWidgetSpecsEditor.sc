@@ -217,12 +217,14 @@ CVWidgetSpecsEditor {
 										specsList.includes(specName.asString++":"+(spec.asSpec)).not.if{
 											specsList = specsList.add(specName.asString++":"+(spec.asSpec));
 											// make spec available for all subsequent selections
-											Spec.add(specName, spec); 										}
+											Spec.add(specName.asSymbol, spec);
+										}
 									})
 								}, {
 									specsList = specsList.add(k.asString++":"+(spec.asSpec));
 									// make spec available for all subsequent selections
-									Spec.add(k, spec); 								});
+									Spec.add(k.asSymbol, spec);
+								});
 								elem.specSelect.items_(specsList);
 								specsListSpecs.includes(spec.asSpec).not.if{
 									specsListSpecs = specsListSpecs.add(spec.asSpec);
