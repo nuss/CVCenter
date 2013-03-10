@@ -161,7 +161,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			// 	{ "deferred action taking place".postln; tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
 			// 	"after focusing tabs[%]".postf(t);
 			// }));
-			tabs.stringFocusedColor_(labelStringColors[tab]);
+			// tabs.stringFocusedColor_(labelStringColors[tab]);
 
 			thisEditor[\tabs] = tabs;
 
@@ -850,13 +850,15 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				[3, 0].do({ |i|
 					tabs.removeAt(i);
 					labelColors.removeAt(i);
-//					labelStringColors.removeAt(i);
+					labelStringColors.removeAt(i);
 				})
 			});
 
 			tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
-				tabs.stringFocusedColor_(labelStringColors[t]);
-				{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+				{
+					tabs.stringFocusedColor_(labelStringColors[t]);
+					{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+				}
 			}));
 		});
 

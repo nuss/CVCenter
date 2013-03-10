@@ -1231,7 +1231,7 @@ CVWidget {
 		};
 
 		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
-			"prInitSpecControl: %\n".postf(theChanger.value);
+			// "prInitSpecControl: %\n".postf(theChanger.value);
 
 			switch(this.class,
 				CVWidgetMS, {
@@ -1339,7 +1339,6 @@ CVWidget {
 
 			if(theChanger.value.hasZeroCrossing, {
 				tmp = [];
-
 				this.msSize.do({ |sl|
 					if(argWidgetCV.spec.minval[sl].isNegative, {
 						tmp = tmp.add(0-argWidgetCV.spec.minval[sl]/(argWidgetCV.spec.maxval[sl]-argWidgetCV.spec.minval[sl]))

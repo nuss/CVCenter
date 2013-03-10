@@ -113,8 +113,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 		tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
 		tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
-			tabs.stringFocusedColor_(labelStringColors[t]);
-			{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+			{
+				tabs.stringFocusedColor_(labelStringColors[t]);
+				{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+			}
 		}));
 		tabs.stringFocusedColor_(labelStringColors[tab]);
 
@@ -132,7 +134,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		oscTabs.views[1].decorator = oscFlow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 		oscTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
 		oscTabs.focusActions_((0..oscTabs.views.size-1).collect({ |t|
-			{ oscTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+			{
+				{ oscTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+			}
 		}));
 
 		thisEditor.tabs = tabs;

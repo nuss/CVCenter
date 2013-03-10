@@ -254,7 +254,7 @@ CVWidgetMS : CVWidget {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 1);
 					guiEnv.msEditor = editor.msEditor;
 				}, {
-					editor.msEditor.front(0)
+					editor.msEditor.front(1)
 				})
 			})
 		;
@@ -282,7 +282,7 @@ CVWidgetMS : CVWidget {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 2);
 					guiEnv.msEditor = editor.msEditor;
 				}, {
-					editor.msEditor.front(1)
+					editor.msEditor.front(2)
 				});
 				if(midiOscEnv.select({ |slot| slot.oscResponder.notNil }).size > 0, {
 					editor.msEditor.oscTabs.focus(1)
@@ -326,7 +326,7 @@ CVWidgetMS : CVWidget {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 0);
 					guiEnv.msEditor = editor.msEditor;
 				}, {
-					editor.msEditor.front(2)
+					editor.msEditor.front(0)
 				})
 			})
 		;
