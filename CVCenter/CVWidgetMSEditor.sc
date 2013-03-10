@@ -21,7 +21,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 	var <extCtrlArrayField, <intStartIndexField;
 	var <oscEditBtns, <oscCalibBtns;
 	var <oscTabs, <midiTabs;
-	var oscFlow0, oscFlow1;
+	var oscFlow0, oscFlow1, midiFlow0, midiFlow1;
 
 	*new { |widget, widgetName, tab|
 		^super.new.init(widget, widgetName, tab);
@@ -86,7 +86,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		allEditors ?? { allEditors = IdentityDictionary() };
 
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
-			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-200, Window.screenBounds.height/2-150, 400, 300));
+			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-200, Window.screenBounds.height/2-150, 400, 265));
 
 			allEditors.put((name.asString++"MS").asSymbol, (window: window, name: widgetName));
 			thisEditor = allEditors[(name.asString++"MS").asSymbol];
@@ -108,14 +108,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		tabs.unfocusedColors_(labelColors);
 		tabs.stringColor_(Color.white);
 		tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-		tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
+		tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 0@0, 0@0);
 		tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 0@0, 0@0);
 		tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 		tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
 		tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
 			{
 				tabs.stringFocusedColor_(labelStringColors[t]);
-				{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+				{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
 			}
 		}));
 		tabs.stringFocusedColor_(labelStringColors[tab]);
@@ -139,6 +139,25 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			}
 		}));
 
+		midiTabs = TabbedView(tabs.views[1], Rect(0, 1, tabs.views[1].bounds.width-4, tabs.views[1].bounds.height-4), ["Batch Connection", "Individual Sliders"], scroll: true);
+		midiTabs.view.resize_(tabs.view.resize);
+		midiLabelColor = labelColors[1];
+		midiLabelStringColor = labelStringColors[1];
+		midiTabs.tabCurve_(4)
+			.labelColors_(Color.white!2)
+			.unfocusedColors_([midiLabelColor])
+			.stringColor_(Color.white)
+			.stringFocusedColor_(midiLabelStringColor)
+		;
+		midiTabs.views[0].decorator = midiFlow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
+		midiTabs.views[1].decorator = midiFlow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
+		midiTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
+		midiTabs.focusActions_((0..midiTabs.views.size-1).collect({ |t|
+			{
+				{ midiTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+			}
+		}));
+
 		thisEditor.tabs = tabs;
 		thisEditor.oscTabs = oscTabs;
 		thisEditor.midiTabs = midiTabs;
@@ -158,7 +177,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@50)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq \nor [[20, 20, 20, 20, 20], [20000, 20000, 20000, 20000, 20000], \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
+			.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\") or \\freq or [[20, 20, 20, 20, 20], [20000, 20000, 20000, 20000, 20000], \\exp].asSpec. Or select a suitable ControlSpec from the List below. If you don't know what this all means have a look at the ControlSpec-helpfile.")
 		;
 
 		flow0.shift(0, 5);
@@ -180,7 +199,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		flow0.shift(0, 5);
 
 		cvString = widget.getSpec.asCompileString;
-		specField = TextView(thisEditor.tabs.views[0], flow0.bounds.width-20@105)
+		specField = TextView(thisEditor.tabs.views[0], flow0.bounds.width-20@70)
 			.font_(staticTextFont)
 			.string_(cvString)
 			.keyDownAction_({ |tf, char, modifiers, unicode, keycode|

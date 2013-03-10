@@ -857,7 +857,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
 				{
 					tabs.stringFocusedColor_(labelStringColors[t]);
-					{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+					{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
 				}
 			}));
 		});
