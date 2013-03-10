@@ -257,6 +257,92 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			specsList.items = List["custom:"+widget.getSpec.asString]++specsList.items;
 		});
 
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-20@20)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("The following options will apply to all MIDI-responders that get connected within this widget. However you may override these settings within the MIDI-options for any particular slider.")
+		;
+
+		midiFlow0.shift(0, 7);
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("\nMIDI-mode: 0-127\nor in/decremental")
+		// .background_(Color.white)
+		;
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("MIDI-mean (in/decremen-\ntal mode only)")
+		// .background_(Color.white)
+		;
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("minimum distance for the sliders (0-127 only)")
+		// .background_(Color.white)
+		;
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("MIDI-resolution (in/decre-\nmental mode only)")
+		// .background_(Color.white)
+		;
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("\nnumber of sliders per bank")
+		// .background_(Color.white)
+		;
+
+		midiFlow0.shift(0, 0);
+
+		midiModes = ["0-127", "+/-"];
+
+
+		midiModeSelect = PopUpMenu(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+			.font_(staticTextFont)
+			.items_(midiModes)
+		// .value_(thisMidiMode)
+			.action_({ |ms|
+				widget.msSize.do({ |sl|
+					if(ms.value != 2, {
+						widget.setMidiMode(ms.value, sl);
+					})
+				})
+			})
+		;
+
+		if(thisMidiMode.minItem == thisMidiMode.maxItem, {
+			midiModeSelect.value_(thisMidiMode[0])
+		}, {
+			midiModeSelect.items = midiModeSelect.items.add("--");
+			midiModeSelect.value_(midiModeSelect.items.last);
+		});
+
+		if(GUI.id !== \cocoa, {
+			midiModeSelect.toolTip_("Set the mode according to the output\nof your MIDI-device: 0-127 if it outputs\nabsolute values or +/- for in- resp.\ndecremental values")
+		});
+
+		midiMeanNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+			.font_(staticTextFont)
+		// .value_(thisMidiMean)
+			.action_({ |mb|
+			// widget.setMidiMean(mb.value.asInt, slot);
+			})
+		// .step_(1.0)
+		// .clipLo_(0.0)
+		;
+
+		if(GUI.id !== \cocoa, {
+			midiMeanNB.toolTip_("If your device outputs in-/decremental\nvalues often a slider's output in neutral\nposition will not be 0. E.g. it could be 64")
+		});
+
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
