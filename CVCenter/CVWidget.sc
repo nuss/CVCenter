@@ -1231,7 +1231,7 @@ CVWidget {
 		};
 
 		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitSpecControl: %\n".postf(theChanger.value);
+			"prInitSpecControl: %\n".postf(theChanger.value);
 
 			switch(this.class,
 				CVWidgetMS, {
@@ -1251,6 +1251,7 @@ CVWidget {
 					}, {
 						this.setOscMapping(\linlin, slot);
 					});
+
 					if(specEditor.notNil and:{
 						specEditor.isClosed.not
 					}, {
@@ -1335,6 +1336,20 @@ CVWidget {
 			});
 
 			argWidgetCV.spec_(thisSpec);
+
+			if(theChanger.value.hasZeroCrossing, {
+				tmp = [];
+
+				this.msSize.do({ |sl|
+					if(argWidgetCV.spec.minval[sl].isNegative, {
+						tmp = tmp.add(0-argWidgetCV.spec.minval[sl]/(argWidgetCV.spec.maxval[sl]-argWidgetCV.spec.minval[sl]))
+					}, {
+						tmp = tmp.add(0-argWidgetCV.spec.maxval[sl]/(argWidgetCV.spec.minval[sl]-argWidgetCV.spec.maxval[sl]))
+					})
+				})
+			});
+
+			this.mSlider.reference_(tmp);
 
 			if(this.specBut.class == Event, {
 				this.specBut[slot].toolTip_(
