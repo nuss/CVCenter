@@ -288,6 +288,11 @@ CVWidget {
 
 	setMidiMode { |mode, slot|
 		var thisSlot;
+
+		if(mode.asInt != 0 and:{ mode.asInt != 1 }, {
+			Error("setMidiMode: 'mode' must either be 0 or 1!").throw;
+		});
+
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
 			CVWidgetMS, { thisSlot = slot.asInt }
@@ -327,6 +332,7 @@ CVWidget {
 
 	getMidiMode { |slot|
 		var thisSlot;
+
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
 			CVWidgetMS, { thisSlot = slot.asInt }
@@ -341,6 +347,11 @@ CVWidget {
 
 	setMidiMean { |meanval, slot|
 		var thisSlot;
+
+		if(meanval.isInteger.not, {
+			Error("setMidiMean: 'meanval' must be an Integer!").throw;
+		});
+
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
 			CVWidgetMS, { thisSlot = slot.asInt }
@@ -393,6 +404,11 @@ CVWidget {
 
 	setSoftWithin { |threshold, slot|
 		var thisSlot;
+
+		if(threshold.isNumber.not, {
+			Error("setSoftWithin: 'threshold' must be an Integer or a Float!").throw;
+		});
+
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
 			CVWidgetMS, { thisSlot = slot.asInt }
@@ -445,6 +461,11 @@ CVWidget {
 
 	setCtrlButtonBank { |numSliders, slot|
 		var thisSlot;
+
+		if(numSliders.isInteger.not and:{ numSliders.notNil }, {
+			Error("setCtrlButtonBank: 'numSliders' must either be an Integer or nil!").throw;
+		});
+
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
 			CVWidgetMS, { thisSlot = slot.asInt }

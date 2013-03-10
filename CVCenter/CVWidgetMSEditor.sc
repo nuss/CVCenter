@@ -304,7 +304,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		midiModes = ["0-127", "+/-"];
 
-
 		midiModeSelect = PopUpMenu(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
 			.font_(staticTextFont)
 			.items_(midiModes)
@@ -318,7 +317,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			})
 		;
 
-		if(thisMidiMode.minItem == thisMidiMode.maxItem, {
+		if(thisMidiMode.minItem(_.()) == thisMidiMode.maxItem(_.()), {
 			midiModeSelect.value_(thisMidiMode[0])
 		}, {
 			midiModeSelect.items = midiModeSelect.items.add("--");
@@ -331,16 +330,108 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		midiMeanNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
 			.font_(staticTextFont)
-		// .value_(thisMidiMean)
 			.action_({ |mb|
-			// widget.setMidiMean(mb.value.asInt, slot);
+				// string for possible compilation to an int
+				if("^[-+]?[0-9]*$".matchRegexp(mb.string), {
+					widget.msSize.do({ |sl|
+						widget.setMidiMean(mb.string.asInt, sl);
+					})
+				}, {
+					Error("MIDI-mean must be an integer value!").throw;
+				})
 			})
-		// .step_(1.0)
-		// .clipLo_(0.0)
 		;
 
 		if(GUI.id !== \cocoa, {
 			midiMeanNB.toolTip_("If your device outputs in-/decremental\nvalues often a slider's output in neutral\nposition will not be 0. E.g. it could be 64")
+		});
+
+		if(thisMidiMean.select(_.isInteger).size == widget.msSize and:{
+			thisMidiMean.minItem(_.()) == thisMidiMean.maxItem(_.());
+		}, {
+			midiMeanNB.string_(thisMidiMean[0].asString);
+		}, {
+			midiMeanNB.string_("--");
+		});
+
+		softWithinNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+			.font_(staticTextFont)
+			.action_({ |mb|
+				// string must be a valid float or integer
+				if("^[0-9]*\.?[0-9]*$".matchRegexp(mb.string), {
+					widget.msSize.do({ |sl|
+						widget.setSoftWithin(mb.string.asFloat, sl);
+					})
+				})
+			})
+		;
+
+		if(GUI.id !== \cocoa, {
+			softWithinNB.toolTip_("If your device outputs absolute values\nyou can set here a threshold to the\ncurrent CV-value within which a slider\nwill react and set a new value. This avoids\njumps if a new value set by a slider\nis far away from the previous value")
+		});
+
+		if(thisSoftWithin.select(_.isNumber).size == widget.msSize and:{
+			thisSoftWithin.minItem(_.()) == thisSoftWithin.maxItem(_.());
+		}, {
+			softWithinNB.string_(thisSoftWithin[0].asString);
+		}, {
+			softWithinNB.string_("--");
+		});
+
+		midiResolutionNB = NumberBox(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+			.font_(staticTextFont)
+			.action_({ |mb|
+				if("^[0-9]*\.?[0-9]*$".matchRegexp(mb.string), {
+					widget.msSize.do({ |sl|
+						widget.setMidiResolution(mb.string.asFloat, sl);
+					})
+				})
+			})
+		;
+
+		if(GUI.id !== \cocoa, {
+			midiResolutionNB.toolTip_("Higher values mean lower\nresolution and vice versa.")
+		});
+
+		if(thisMidiResolution.select(_.isNumber).size == widget.msSize and:{
+			thisMidiResolution.minItem(_.()) == thisMidiResolution.maxItem(_.());
+		}, {
+			midiResolutionNB.string_(thisMidiResolution[0].asString);
+		}, {
+			midiResolutionNB.string_("--");
+		});
+
+		ctrlButtonBankField = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+			.font_(staticTextFont)
+			.action_({ |mb|
+				if("^[0-9]*$".matchRegexp(mb.string) or:{ mb.string == "nil" }, {
+					if(mb.string != "nil", {
+						widget.msSize.do({ |sl|
+							widget.setCtrlButtonBank(mb.string.asInt, sl);
+						})
+					}, {
+						widget.msSize.do({ |sl|
+							widget.setCtrlButtonBank(nil);
+						})
+					})
+				})
+			})
+		;
+
+		if(GUI.id !== \cocoa, {
+			ctrlButtonBankField.toolTip_("Set the number of sliders on in one bank of your MIDI-device.\nSetting this number will display the selected slider in a widget not as\na single number but rather as combination of the selected bank and\nthe slider number (e.g.: 4:3 means bank nr. 4, slider nr. 3)")
+		});
+
+		if(thisCtrlButtonBank.select(_.isNil).size == widget.msSize, {
+			ctrlButtonBankField.string_("nil");
+		}, {
+			if(thisCtrlButtonBank.select(_.isInteger).size == widget.msSize and:{
+				thisCtrlButtonBank.minItem(_.()) == thisCtrlButtonBank.maxItem(_.());
+			}, {
+				ctrlButtonBankField.string_(thisMidiResolution[0].asString);
+			}, {
+				ctrlButtonBankField.string_("--");
+			})
 		});
 
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
