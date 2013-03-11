@@ -24,6 +24,7 @@ CVCenterPreferences {
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
 		var saveClassVars, removeResponders;
+		var initMidiOnStartUp, initMidiText;
 		var saveMidiMode, saveMidiResolution, saveCtrlButtonBank, saveMidiMean, saveSoftWithin;
 		var textMidiMode, textMidiResolution, textCtrlButtonBank, textMidiMean, textSoftWithin;
 		var prefSaveGuiProps, buildCheckbox, buildNumTextBox, uView, vHeight;
@@ -80,8 +81,8 @@ CVCenterPreferences {
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter: preferences", Rect(
 				Window.screenBounds.width/2-249,
-				Window.screenBounds.height/2-180,
-				498, 360
+				Window.screenBounds.height/2-193,
+				498, 385
 			)).front;
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
@@ -181,7 +182,7 @@ CVCenterPreferences {
 
 			flow.nextLine.shift(0, 6);
 
-			if(GUI.id ===\cocoa, { vHeight = 226 }, { vHeight = 220 });
+			if(GUI.id ===\cocoa, { vHeight = 251 }, { vHeight = 245 });
 
 			UserView(window.view, flow.bounds.width-20@vHeight)
 				.background_(Color(0.95, 0.95, 0.95))
@@ -189,6 +190,28 @@ CVCenterPreferences {
 			;
 
 			flow.nextLine.shift(5, vHeight.neg);
+
+			if(prefs.notNil, {
+				initMidiOnStartUp = buildCheckbox.(prefs[\initMidiOnStartUp]);
+			}, {
+				initMidiOnStartUp = buildCheckbox.(false);
+			});
+
+			flow.shift(5, 1);
+
+			initMidiText = StaticText(window.view, flow.bounds.width-100@20)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("Initialize MIDI on startup.")
+			;
+
+			if(GUI.id !== \cocoa, {
+				[initMidiOnStartUp, initMidiText].do(_.toolTip_(
+					"Select this option to initialize\nMIDI upon SuperCollider-startup."
+				));
+			});
+
+			flow.nextLine.shift(5, -5);
 
 			if(prefs.notNil, {
 				saveClassVars = buildCheckbox.(prefs[\saveClassVars]);
@@ -201,7 +224,7 @@ CVCenterPreferences {
 			classVarsText = StaticText(window.view, flow.bounds.width-100@20)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("Remember CVCenter's classvar-values on shutdown.")
+				.string_("Remember CVCenter's MIDI-classvar-values on shutdown:")
 			;
 
 			if(GUI.id !== \cocoa, {
@@ -348,7 +371,7 @@ CVCenterPreferences {
 				)
 			});
 
-			flow.nextLine.shift(0, 8);
+			flow.nextLine.shift(0, 14);
 
 			UserView(window.view, flow.bounds.width-20@25)
 				.background_(Color(0.95, 0.95, 0.95))
@@ -411,7 +434,8 @@ CVCenterPreferences {
 							saveMidiMean.string.interpret,
 							saveSoftWithin.string.interpret,
 							saveCtrlButtonBank.string.interpret,
-							removeResponders.value
+							removeResponders.value,
+							initMidiOnStartUp.value
 						);
 						window.close;
 					})
@@ -421,11 +445,12 @@ CVCenterPreferences {
 		window.front;
 	}
 
-	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, informString|
-		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders, thisInformString;
+	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, informString|
+		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders, thisInformString, thisInitMidi;
 
 		thisSaveClassVars = saveClassVars.asBoolean;
 		thisRemoveResponders = removeResponders.asBoolean;
+		thisInitMidi = initMidiOnStartUp.asBoolean;
 
 		guiProperties !? {
 			if(guiProperties.isArray, {
@@ -451,6 +476,7 @@ CVCenterPreferences {
 		if(saveGuiProperties == 2 or:{ saveGuiProperties == 1 }, {
 			prefs.put(\guiProperties, thisGuiProperties)
 		}, { prefs.removeAt(\guiProperties) });
+		prefs.put(\initMidiOnStartUp, thisInitMidi);
 		if(thisSaveClassVars, {
 			prefs.put(\saveClassVars, true);
 			midiMode.notNil.if({ prefs.put(\midiMode, midiMode.asInteger) }, { prefs.removeAt(\midiMode) });

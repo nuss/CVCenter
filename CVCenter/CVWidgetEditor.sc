@@ -299,7 +299,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			StaticText(thisEditor[\tabs].views[1], flow1.bounds.width/2+60@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("minimum distance for the slider (0-127 only)")
+				.string_("min. snap-distance for the slider (0-127 only)")
 			;
 
 			flow1.shift(5, 0);

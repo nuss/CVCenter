@@ -1,4 +1,4 @@
-/* (c) Stefan Nussbaumer */
+/* (c) 2010-2013 Stefan Nussbaumer */
 /*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -55,11 +55,19 @@ CVCenter {
 							newPrefs[\midiMean],
 							newPrefs[\softWithin],
 							newPrefs[\ctrlButtonBank],
-							newPrefs[\removeResponders]
+							newPrefs[\removeResponders],
+							newPrefs[\initMidiOnStartUp]
 						)
 					})
 				})
 			};
+			if(prefs[\initMidiOnStartUp], {
+				if(MIDIClient.initialized.not, {
+					Class.initClassTree(MIDIClient);
+					Class.initClassTree(MIDIEndPoint);
+					MIDIClient.init;
+				});
+			});
 			if(prefs[\saveClassVars], {
 				prefs[\midiMode] !? { this.midiMode_(prefs[\midiMode]) };
 				prefs[\midiResolution] !? { this.midiResolution_(prefs[\midiResolution]) };

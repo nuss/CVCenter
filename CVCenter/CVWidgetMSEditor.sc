@@ -275,21 +275,21 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("MIDI-mean (in/decremen-\ntal mode only)")
+			.string_("MIDI-mean (in/decremental mode only)")
 		// .background_(Color.white)
 		;
 
 		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("minimum distance for the sliders (0-127 only)")
+			.string_("minimum snap-distance for sli-ders (0-127 only)")
 		// .background_(Color.white)
 		;
 
 		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("MIDI-resolution (in/decre-\nmental mode only)")
+			.string_("MIDI-resolution (in/decremental mode only)")
 		// .background_(Color.white)
 		;
 
@@ -307,7 +307,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		midiModeSelect = PopUpMenu(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
 			.font_(staticTextFont)
 			.items_(midiModes)
-		// .value_(thisMidiMode)
 			.action_({ |ms|
 				widget.msSize.do({ |sl|
 					if(ms.value != 2, {
