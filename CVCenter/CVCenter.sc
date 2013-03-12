@@ -78,20 +78,20 @@ CVCenter {
 			CVWidget.removeResponders_(prefs[\removeResponders]);
 		};
 
-		// all = IdentityDictionary.new;
-		// cvWidgets = IdentityDictionary.new;
-		// widgetStates = IdentityDictionary.new;
-		// removeButs = IdentityDictionary.new;
+		all = IdentityDictionary.new;
+		cvWidgets = IdentityDictionary.new;
+		widgetStates = IdentityDictionary.new;
+		removeButs = IdentityDictionary.new;
 	}
 
 	*new { |cvs...setUpArgs|
 		var r, g, b;
 
-		if(all.isNil, {
-			all = IdentityDictionary.new;
-			cvWidgets = IdentityDictionary.new;
-			widgetStates ?? { widgetStates = IdentityDictionary.new };
-			removeButs = IdentityDictionary.new;
+		if(all.size == 0, {
+			// all = IdentityDictionary.new;
+			// cvWidgets = IdentityDictionary.new;
+			// widgetStates ?? { widgetStates = IdentityDictionary.new };
+			// removeButs = IdentityDictionary.new;
 			r = g = b = (0.6, 0.65 .. 0.75);
 			colors = List();
 			tabProperties = [];
