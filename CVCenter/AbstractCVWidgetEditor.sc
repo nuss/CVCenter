@@ -21,7 +21,7 @@ AbstractCVWidgetEditor {
 	var thisEditor, <window, <tabs, editorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
-	var <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
+	var <midiInitBut, <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut;
 	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 	var <ipField, <portField, <nameField, <indexField;
@@ -30,6 +30,10 @@ AbstractCVWidgetEditor {
 	var actionName, enterAction, enterActionBut, <actionsList;
 	var name;
 	var flow0, flow1, flow2, flow3;
+
+	*initClass {
+		allEditors = IdentityDictionary.new;
+	}
 
 	front { |tab|
 		thisEditor.window.front;

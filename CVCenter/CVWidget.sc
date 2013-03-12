@@ -1508,6 +1508,11 @@ CVWidget {
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitMidiDisplay: %\n".postf(theChanger.value);
 
+			AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
+				"% is closed: %, is nil: %\n".postf(k, v.editor.isClosed, v.editor.isNil);
+				// if(MIDIClient.initialized, { midiInitBut.value_(1) }, { midiInitBut.value_(0) });
+			});
+
 			if(this.class != CVWidgetMS, {
 				theChanger.value.learn.switch(
 					"X", {

@@ -83,12 +83,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
-		allEditors ?? { allEditors = IdentityDictionary() };
+		// allEditors ?? { allEditors = IdentityDictionary() };
 
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-200, Window.screenBounds.height/2-150, 400, 265));
 
-			allEditors.put((name.asString++"MS").asSymbol, (window: window, name: widgetName));
+			allEditors.put((name.asString++"MS").asSymbol, (editor: this, window: window, name: widgetName));
 			thisEditor = allEditors[(name.asString++"MS").asSymbol];
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
@@ -432,6 +432,28 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				ctrlButtonBankField.string_("--");
 			})
 		});
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-20@20)
+			.font_(staticTextFontBold)
+			.string_("batch-connect a range of MIDI-sliders")
+		;
+
+		midiInitBut = Button(thisEditor.midiTabs.views[0], 50@15)
+			.font_(staticTextFont)
+			.states_([
+				["init MIDI", Color.white, Color.red],
+				["restart MIDI", Color.black, Color.green]
+			])
+			.action_({ |mb|
+				switch(mb.value,
+					0, { MIDIClient.init },
+					1, { if(MIDIClient.initialized, { MIDIClient.restart }) }
+				);
+				wcmMS.slots.do({ |sl|
+					sl.midiDisplay.model.value_(sl.midiDisplay.model).changed(widget.synchKeys);
+				})
+			})
+		;
 
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
 			.font_(staticTextFont)

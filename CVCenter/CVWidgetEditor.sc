@@ -95,7 +95,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			slotHiLo = "";
 		});
 
-		allEditors ?? { allEditors = IdentityDictionary() };
+		// allEditors ?? { allEditors = IdentityDictionary() };
 
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
 
@@ -124,7 +124,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			});
 
 			if(slot.isNil, {
-				allEditors.put(name, (window: window, name: widgetName))
+				allEditors.put(name, (editor: this, window: window, name: widgetName))
 			}, {
 				tmp = (); tmp.put(slot, (window: window, name: widgetName));
 				if(allEditors[name].isNil, {

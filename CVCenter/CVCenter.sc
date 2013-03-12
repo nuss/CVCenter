@@ -61,21 +61,25 @@ CVCenter {
 					})
 				})
 			};
-			if(prefs[\initMidiOnStartUp], {
-				if(MIDIClient.initialized.not, {
-					Class.initClassTree(MIDIClient);
-					Class.initClassTree(MIDIEndPoint);
-					MIDIClient.init;
-				});
-			});
-			if(prefs[\saveClassVars], {
-				prefs[\midiMode] !? { this.midiMode_(prefs[\midiMode]) };
-				prefs[\midiResolution] !? { this.midiResolution_(prefs[\midiResolution]) };
-				prefs[\midiMean] !? { this.midiMean_(prefs[\midiMean]) };
-				prefs[\softWithin] !? { this.softWithin_(prefs[\softWithin]) };
-				prefs[\ctrlButtonBank] !? { this.ctrlButtonBank_(prefs[\ctrlButtonBank]) };
-			});
-			CVWidget.removeResponders_(prefs[\removeResponders]);
+			prefs[\initMidiOnStartUp] !? {
+				if(prefs[\initMidiOnStartUp], {
+					if(MIDIClient.initialized.not, {
+						Class.initClassTree(MIDIClient);
+						Class.initClassTree(MIDIEndPoint);
+						MIDIClient.init;
+					})
+				})
+			};
+			prefs[\saveClassVars] !? {
+				if(prefs[\saveClassVars], {
+					prefs[\midiMode] !? { this.midiMode_(prefs[\midiMode]) };
+					prefs[\midiResolution] !? { this.midiResolution_(prefs[\midiResolution]) };
+					prefs[\midiMean] !? { this.midiMean_(prefs[\midiMean]) };
+					prefs[\softWithin] !? { this.softWithin_(prefs[\softWithin]) };
+					prefs[\ctrlButtonBank] !? { this.ctrlButtonBank_(prefs[\ctrlButtonBank]) };
+				})
+			};
+			prefs[\removeResponders] !? { CVWidget.removeResponders_(prefs[\removeResponders]) };
 		};
 
 		all = IdentityDictionary.new;
