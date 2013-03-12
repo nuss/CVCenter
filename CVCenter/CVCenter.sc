@@ -184,7 +184,7 @@ CVCenter {
 			tabs.labelPadding_(7);
 			tabs.tabHeight_(15);
 			tabs.unfocusedColors_(unfocusedColors);
-			tabs.font_(GUI.font.new("Helvetica", 10, true));
+			tabs.font_(GUI.font.new("Arial", 10, true));
 			tabs.tabCurve_(3);
 			tabs.stringColor_(Color.black);
 			tabs.stringFocusedColor_(Color(0.0, 0.0, 0.5, 1.0));
@@ -281,7 +281,7 @@ CVCenter {
 			});
 
 			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
-				.font_(Font("Helvetica", 10))
+				.font_(Font("Arial", 10))
 				.states_([["preferences", Color.white, Color(0.3, 0.3, 0.3)]])
 				.action_({ |pb| CVCenterPreferences.dialog })
 			;
@@ -293,7 +293,7 @@ CVCenter {
 			swFlow.shift(1, 0);
 
 			saveBut = Button(prefPane, Rect(0, 0, 70, 20))
-				.font_(Font("Helvetica", 10))
+				.font_(Font("Arial", 10))
 				.states_([["save setup", Color.white, Color(0.15, 0.15, 0.15)]])
 				.action_({ |sb| this.saveSetup })
 			;
@@ -305,7 +305,7 @@ CVCenter {
 			swFlow.shift(1, 0);
 
 			loadBut = Button(prefPane, Rect(0, 0, 70, 20))
-				.font_(Font("Helvetica", 10))
+				.font_(Font("Arial", 10))
 				.states_([["load setup", Color.white, Color(0.15, 0.15, 0.15)]])
 				.action_({ |pb|
 					if(loadActionsRadio.value.asBoolean, { loadFlag = true }, { loadFlag = false });
@@ -323,7 +323,7 @@ CVCenter {
 
 			if(GUI.id === \cocoa, {
 				loadActionsRadio = Button(prefPane, Rect(0, 0, 15, 15))
-					.font_(Font("Helvetica", 10))
+					.font_(Font("Arial", 10))
 					.states_([
 						["", Color.red, Color.white],
 						["X", Color.red, Color.white]
@@ -337,7 +337,7 @@ CVCenter {
 			swFlow.shift(0, -2);
 
 			StaticText(prefPane, Rect(0, 0, 60, 20))
-				.font_(Font("Helvetica", 10))
+				.font_(Font("Arial", 10))
 				.stringColor_(Color.white)
 				.string_("load actions")
 				.align_(\right)
@@ -347,7 +347,7 @@ CVCenter {
 
 			if(GUI.id === \cocoa, {
 				autoConnectMIDIRadio = Button(prefPane, Rect(0, 0, 15, 15))
-					.font_(Font("Helvetica", 10))
+					.font_(Font("Arial", 10))
 					.states_([
 						["", Color.red, Color.white],
 						["X", Color.red, Color.white]
@@ -361,7 +361,7 @@ CVCenter {
 			swFlow.shift(0, -2);
 
 			StaticText(prefPane, Rect(0, 0, 90, 20))
-				.font_(Font("Helvetica", 10))
+				.font_(Font("Arial", 10))
 				.stringColor_(Color.white)
 				.string_("auto-connect MIDI")
 				.align_(\right)
@@ -371,7 +371,7 @@ CVCenter {
 
 			if(GUI.id === \cocoa, {
 				autoConnectOSCRadio = Button(prefPane, Rect(0, 0, 15, 15))
-					.font_(Font("Helvetica", 10))
+					.font_(Font("Arial", 10))
 					.states_([
 						["", Color.red, Color.white],
 						["X", Color.red, Color.white]
@@ -385,7 +385,7 @@ CVCenter {
 			swFlow.shift(0, -2);
 
 			StaticText(prefPane, Rect(5, 0, 90, 20))
-				.font_(Font("Helvetica", 10))
+				.font_(Font("Arial", 10))
 				.stringColor_(Color.white)
 				.string_("auto-connect OSC")
 				.align_(\right)
@@ -470,7 +470,10 @@ CVCenter {
 							cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value
 						}
 					);
-					cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
+					wdgtActions = nil;
+					cvWidgets[k] !? { cvWidgets[k].wdgtActions !? {
+						wdgtActions = cvWidgets[k].wdgtActions
+					}};
 					cvWidgets[k] = CVWidget2D(
 						tabs.views[cvTabIndex],
 						[orderedCVs[i].lo, orderedCVs[i].hi],
@@ -486,7 +489,7 @@ CVCenter {
 						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0, 0.15)]])
 							.action_({ |b| this.removeAt(k) })
-							.font_(Font("Helvetica", 9))
+							.font_(Font("Arial", 9))
 						;
 					);
 					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
@@ -513,6 +516,7 @@ CVCenter {
 					tmp = this.setup.calibrate = cvWidgets[k] !? {
 						cvWidgets[k].wdgtControllersAndModels.calibration.model.value;
 					};
+					wdgtActions = nil;
 					cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex],
@@ -527,7 +531,7 @@ CVCenter {
 						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0.0, 0.15)]])
 							.action_({ |b| this.removeAt(k) })
-							.font_(Font("Helvetica", 9))
+							.font_(Font("Arial", 9))
 						;
 					);
 					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
@@ -611,7 +615,9 @@ CVCenter {
 				};
 				if(all.size != lastUpdate, {
 					if(all.size > lastUpdate and:{ cvWidgets.size <= lastUpdate }, {
+						// "now: prAddToGui".postln;
 						this.prAddToGui;
+						// "prAddToGui done".postln;
 					});
 					if(all.size < lastUpdate, {
 						removedKeys = cvWidgets.keys.difference(all.keys);
@@ -1196,8 +1202,8 @@ CVCenter {
 					tabs.add(tab).keyDownAction_({ |view, char, modifiers, unicode, keycode|
 //						[view, char, modifiers, unicode, keycode].postcs;
 						switch(keycode,
-							16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-							16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
+							114, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+							113, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
 							// when and why have the keycodes been changed??
 							124, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
 							123, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
@@ -1244,21 +1250,21 @@ CVCenter {
 			}, {
 				tmp = (
 					lo: this.setup.calibrate = cvWidgets[k] !? {
-						cvWidgets[k].wdgtControllersAndModels.lo.calibration.model.value
+						cvWidgets[k].wdgtControllersAndModels[\lo].calibration.model.value
 					},
 					hi: this.setup.calibrate = cvWidgets[k] !? {
-						cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value
+						cvWidgets[k].wdgtControllersAndModels[\hi].calibration.model.value
 					},
 					wdgtActions: cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions }};
 				);
 				cvWidgets[k] = CVWidget2D(
 					tabs.views[cvTabIndex],
-					[all[k].lo, all[k].hi],
+					[all[k][\lo], all[k][\hi]],
 					k,
 					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight),
 					setup: tmp,
 					controllersAndModels: cvWidgets[k] !? {
-						(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi)
+						(lo: cvWidgets[k].wdgtControllersAndModels[\lo], hi: cvWidgets[k].wdgtControllersAndModels[\hi])
 					},
 					cvcGui: cvcArgs
 				);
@@ -1266,7 +1272,7 @@ CVCenter {
 					Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 						.states_([["remove", Color.white, Color(0.0, 0.15)]])
 						.action_({ |b| this.removeAt(k) })
-						.font_(Font("Helvetica", 9))
+						.font_(Font("Arial", 9))
 					;
 				);
 				if(widgetStates[k].isNil, {
@@ -1311,7 +1317,7 @@ CVCenter {
 					Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 						.states_([["remove", Color.white, Color(0.0, 0.15)]])
 						.action_({ |b| this.removeAt(k) })
-						.font_(Font("Helvetica", 9))
+						.font_(Font("Arial", 9))
 					;
 				);
 				if(widgetStates[k].isNil, {
