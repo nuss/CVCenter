@@ -484,6 +484,7 @@ CVCenter {
 							cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value
 						}
 					);
+					wdgtActions = nil;
 					cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
 					cvWidgets[k] = CVWidget2D(
 						tabs.views[cvTabIndex],
@@ -500,7 +501,7 @@ CVCenter {
 						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0, 0.15)]])
 							.action_({ |b| this.removeAt(k) })
-							.font_(Font("Helvetica", 9))
+							.font_(Font("Arial", 10))
 						;
 					);
 					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
@@ -527,6 +528,7 @@ CVCenter {
 					tmp = this.setup.calibrate = cvWidgets[k] !? {
 						cvWidgets[k].wdgtControllersAndModels.calibration.model.value;
 					};
+					wdgtActions = nil;
 					cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
 					cvWidgets[k] = CVWidgetKnob(
 						tabs.views[cvTabIndex],
@@ -541,7 +543,7 @@ CVCenter {
 						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0.0, 0.15)]])
 							.action_({ |b| this.removeAt(k) })
-							.font_(Font("Helvetica", 9))
+							.font_(Font("Arial", 10))
 						;
 					);
 					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
@@ -1210,8 +1212,8 @@ CVCenter {
 					tabs.add(tab).keyDownAction_({ |view, char, modifiers, unicode, keycode|
 //						[view, char, modifiers, unicode, keycode].postcs;
 						switch(keycode,
-							16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-							16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
+							114, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+							113, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
 							// when and why have the keycodes been changed??
 							124, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
 							123, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
@@ -1280,7 +1282,7 @@ CVCenter {
 					Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 						.states_([["remove", Color.white, Color(0.0, 0.15)]])
 						.action_({ |b| this.removeAt(k) })
-						.font_(Font("Helvetica", 9))
+						.font_(Font("Arial", 10))
 					;
 				);
 				if(widgetStates[k].isNil, {
@@ -1325,7 +1327,7 @@ CVCenter {
 					Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 						.states_([["remove", Color.white, Color(0.0, 0.15)]])
 						.action_({ |b| this.removeAt(k) })
-						.font_(Font("Helvetica", 9))
+						.font_(Font("Arial", 10))
 					;
 				);
 				if(widgetStates[k].isNil, {
