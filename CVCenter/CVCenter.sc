@@ -76,7 +76,12 @@ CVCenter {
 				prefs[\ctrlButtonBank] !? { this.ctrlButtonBank_(prefs[\ctrlButtonBank]) };
 			});
 			CVWidget.removeResponders_(prefs[\removeResponders]);
-		}
+		};
+
+		// all = IdentityDictionary.new;
+		// cvWidgets = IdentityDictionary.new;
+		// widgetStates = IdentityDictionary.new;
+		// removeButs = IdentityDictionary.new;
 	}
 
 	*new { |cvs...setUpArgs|
@@ -433,6 +438,7 @@ CVCenter {
 							newPrefs[\softWithin],
 							newPrefs[\ctrlButtonBank],
 							newPrefs[\removeResponders],
+							newPrefs[\initMidiOnStartUp],
 							"Your CVCenter-preferences have successfully been written to disk."
 						)
 					});

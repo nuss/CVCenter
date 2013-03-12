@@ -1358,18 +1358,19 @@ CVWidget {
 
 			argWidgetCV.spec_(thisSpec);
 
-			if(theChanger.value.hasZeroCrossing, {
-				tmp = [];
-				this.msSize.do({ |sl|
-					if(argWidgetCV.spec.minval[sl].isNegative, {
-						tmp = tmp.add(0-argWidgetCV.spec.minval[sl]/(argWidgetCV.spec.maxval[sl]-argWidgetCV.spec.minval[sl]))
-					}, {
-						tmp = tmp.add(0-argWidgetCV.spec.maxval[sl]/(argWidgetCV.spec.minval[sl]-argWidgetCV.spec.maxval[sl]))
+			if(this.class == CVWidgetMS, {
+				if(theChanger.value.hasZeroCrossing, {
+					tmp = [];
+					this.msSize.do({ |sl|
+						if(argWidgetCV.spec.minval[sl].isNegative, {
+							tmp = tmp.add(0-argWidgetCV.spec.minval[sl]/(argWidgetCV.spec.maxval[sl]-argWidgetCV.spec.minval[sl]))
+						}, {
+							tmp = tmp.add(0-argWidgetCV.spec.maxval[sl]/(argWidgetCV.spec.minval[sl]-argWidgetCV.spec.maxval[sl]))
+						})
 					})
-				})
+				});
+				this.mSlider.reference_(tmp);
 			});
-
-			this.mSlider.reference_(tmp);
 
 			if(this.specBut.class == Event, {
 				this.specBut[slot].toolTip_(
