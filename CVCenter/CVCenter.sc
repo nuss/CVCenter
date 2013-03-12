@@ -489,7 +489,7 @@ CVCenter {
 						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0, 0.15)]])
 							.action_({ |b| this.removeAt(k) })
-							.font_(Font("Arial", 9))
+							.font_(Font("Arial", 10))
 						;
 					);
 					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
@@ -531,7 +531,7 @@ CVCenter {
 						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0.0, 0.15)]])
 							.action_({ |b| this.removeAt(k) })
-							.font_(Font("Arial", 9))
+							.font_(Font("Arial", 10))
 						;
 					);
 					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
@@ -1272,7 +1272,7 @@ CVCenter {
 					Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 						.states_([["remove", Color.white, Color(0.0, 0.15)]])
 						.action_({ |b| this.removeAt(k) })
-						.font_(Font("Arial", 9))
+						.font_(Font("Arial", 10))
 					;
 				);
 				if(widgetStates[k].isNil, {
@@ -1317,7 +1317,7 @@ CVCenter {
 					Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 						.states_([["remove", Color.white, Color(0.0, 0.15)]])
 						.action_({ |b| this.removeAt(k) })
-						.font_(Font("Arial", 9))
+						.font_(Font("Arial", 10))
 					;
 				);
 				if(widgetStates[k].isNil, {
