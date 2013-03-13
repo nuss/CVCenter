@@ -440,20 +440,19 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		midiInitBut = Button(thisEditor.midiTabs.views[0], 50@15)
 			.font_(staticTextFont)
-			.states_([
-				["init MIDI", Color.white, Color.red],
-				["restart MIDI", Color.black, Color.green]
-			])
 			.action_({ |mb|
-				switch(mb.value,
-					0, { MIDIClient.init },
-					1, { if(MIDIClient.initialized, { MIDIClient.restart }) }
-				);
-				wcmMS.slots.do({ |sl|
-					sl.midiDisplay.model.value_(sl.midiDisplay.model).changed(widget.synchKeys);
-				})
+				if(MIDIClient.initialized, { MIDIClient.restart }, { MIDIClient.init });
+				wcmMS.slots[0].midiDisplay.model.value_(
+					wcmMS.slots[0].midiDisplay.model
+				).changedKeys(widget.synchKeys);
 			})
 		;
+
+		if(MIDIClient.initialized, {
+			midiInitBut.states_([["restart MIDI", Color.black, Color.green]]);
+		}, {
+			midiInitBut.states_([["init MIDI", Color.white, Color.red]]);
+		});
 
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
 			.font_(staticTextFont)

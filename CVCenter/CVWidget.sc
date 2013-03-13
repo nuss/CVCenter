@@ -1509,7 +1509,19 @@ CVWidget {
 			// "prInitMidiDisplay: %\n".postf(theChanger.value);
 
 			AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
-				"% is closed: %, is nil: %\n".postf(k, v.editor.isClosed, v.editor.isNil);
+				// "widget: % editor: %\n".postf(k, v);
+				if(v.keys.includes(\editor), { [v.name, v.editor].postln });
+				if(v.editor.notNil and:{ v.editor.isClosed.not }, {
+					if(MIDIClient.initialized, {
+						v.editor.midiInitBut.states_([
+							["restart MIDI", Color.black, Color.green]
+						])
+					}, {
+						v.editor.midiInitBut.states_([
+							["init MIDI", Color.white, Color.red]
+						])
+					})
+				});
 				// if(MIDIClient.initialized, { midiInitBut.value_(1) }, { midiInitBut.value_(0) });
 			});
 

@@ -126,11 +126,11 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			if(slot.isNil, {
 				allEditors.put(name, (editor: this, window: window, name: widgetName))
 			}, {
-				tmp = (); tmp.put(slot, (window: window, name: widgetName));
+				tmp = (); tmp.put(slot, (editor: this, window: window, name: widgetName));
 				if(allEditors[name].isNil, {
 					allEditors.put(name, tmp);
 				}, {
-					allEditors[name].put(slot, (window: window, name: widgetName));
+					allEditors[name].put(slot, (editor: this, window: window, name: widgetName));
 				});
 			});
 
