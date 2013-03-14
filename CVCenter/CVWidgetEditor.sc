@@ -364,7 +364,9 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			midiInitBut = Button(thisEditor[\tabs].views[1], 60@15)
 				.font_(staticTextFont)
 				.action_({ |mb|
-					if(MIDIClient.initialized, { MIDIClient.restart }, { MIDIClient.init });
+					if(MIDIClient.initialized, {
+						MIDIClient.restart; MIDIIn.connectAll
+					}, { MIDIClient.init; MIDIIn.connectAll });
 				// "wcm.midiDisplay.model: %\n".postf(wcm.midiDisplay.model);
 					wcm.midiDisplay.model.value_(
 						wcm.midiDisplay.model.value

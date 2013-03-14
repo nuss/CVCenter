@@ -441,7 +441,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		midiInitBut = Button(thisEditor.midiTabs.views[0], 60@15)
 			.font_(staticTextFont)
 			.action_({ |mb|
-				if(MIDIClient.initialized, { MIDIClient.restart }, { MIDIClient.init });
+				if(MIDIClient.initialized, {
+					MIDIClient.restart; MIDIIn.connectAll
+				}, { MIDIClient.init; MIDIIn.connectAll });
 				wcmMS.slots[0].midiDisplay.model.value_(
 					wcmMS.slots[0].midiDisplay.model.value
 				).changedKeys(widget.synchKeys);

@@ -67,6 +67,7 @@ CVCenter {
 						Class.initClassTree(MIDIClient);
 						Class.initClassTree(MIDIEndPoint);
 						MIDIClient.init;
+						MIDIIn.connectAll;
 					})
 				})
 			};
