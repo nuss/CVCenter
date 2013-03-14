@@ -663,7 +663,7 @@ CVWidget {
 					wdgtControllersAndModels.midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
 					).changedKeys(synchKeys);
-					CmdPeriod.add({ this !? { this.midiDisconnect } });
+					CmdPeriod.add({ if(this.class.removeResponders, { this.midiDisconnect }) });
 				}, {
 					"Already connected!".warn;
 				})
@@ -676,7 +676,7 @@ CVWidget {
 					wdgtControllersAndModels[slot.asSymbol].midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
 					).changedKeys(synchKeys);
-					CmdPeriod.add({this !? { this.midiDisconnect(slot) } });
+					CmdPeriod.add({ if(this.class.removeResponders, { this.midiDisconnect(slot) }) });
 				}, {
 					"Already connected!".warn;
 				})
