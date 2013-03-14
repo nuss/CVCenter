@@ -17,11 +17,11 @@
 
 AbstractCVWidgetEditor {
 
-	classvar <allEditors, xySlots, nextX, nextY, shiftXY;
+	classvar <allEditors, <>midiSources, xySlots, nextX, nextY, shiftXY;
 	var thisEditor, <window, <tabs, editorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
-	var <midiInitBut, <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
+	var <midiInitBut, <midiSourceSelect, <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut;
 	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
 	var <ipField, <portField, <nameField, <indexField;

@@ -438,12 +438,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.string_("batch-connect a range of MIDI-sliders")
 		;
 
-		midiInitBut = Button(thisEditor.midiTabs.views[0], 50@15)
+		midiInitBut = Button(thisEditor.midiTabs.views[0], 60@15)
 			.font_(staticTextFont)
 			.action_({ |mb|
 				if(MIDIClient.initialized, { MIDIClient.restart }, { MIDIClient.init });
 				wcmMS.slots[0].midiDisplay.model.value_(
-					wcmMS.slots[0].midiDisplay.model
+					wcmMS.slots[0].midiDisplay.model.value
 				).changedKeys(widget.synchKeys);
 			})
 		;
@@ -453,6 +453,16 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		}, {
 			midiInitBut.states_([["init MIDI", Color.white, Color.red]]);
 		});
+
+		midiSourceSelect = PopUpMenu(thisEditor.midiTabs.views[0], midiFlow0.indentedRemaining.width-10@15)
+			.items_(["select device port..."])
+			.font_(staticTextFont)
+			.action_({ |ms|
+				if(ms.value != 0, {
+
+				})
+			})
+		;
 
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
 			.font_(staticTextFont)

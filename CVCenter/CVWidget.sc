@@ -17,7 +17,7 @@
 
 CVWidget {
 
-	classvar <>removeResponders;
+	classvar <>removeResponders, midiStateObserver;
 	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
@@ -40,7 +40,7 @@ CVWidget {
 			if(Quarks.isInstalled("cruciallib"), {
 				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
 			})
-		})
+		});
 	}
 
 	setup {
@@ -918,6 +918,7 @@ CVWidget {
 
 	initControllersAndModels { |controllersAndModels, slot|
 		var wcm, tmp;
+		var midiStateObserver;
 
 		if(controllersAndModels.notNil, {
 			wdgtControllersAndModels = controllersAndModels;
@@ -1071,7 +1072,21 @@ CVWidget {
 			{ wcm.actions.model ?? {
 				wcm.actions.model = Ref((numActions: 0, activeActions: 0))
 			}}
-		)
+		);
+
+		// midiStateObserver ?? {
+		// 	midiStateObserver = SimpleController(MIDIClient).put(\initialized, { |theChanger, what, moreArgs|
+		// 		"midi inited".postln;
+		// 		wcm.midiDisplay.model.value_(wcm.midiDisplay.model).changedKeys(synchKeys);
+		// 	});
+		// 	MIDIClient.addDependant(midiStateObserver);
+		// 	midiStateObserver.update;
+		//
+		// 	ShutDown.add({
+		// 		midiStateObserver.remove;
+		// 	});
+		// }
+
 
 	}
 
@@ -1500,26 +1515,48 @@ CVWidget {
 
 	prInitMidiDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var ctrlToolTip,typeText, r, p;
+		var midiInitFunc;
+
+		midiInitFunc = { |val|
+			if(val.editor.notNil and:{ val.editor.isClosed.not }, {
+				if(MIDIClient.initialized, {
+					val.editor.midiInitBut.states_([
+						["restart MIDI", Color.black, Color.green]
+					]);
+					AbstractCVWidgetEditor.midiSources ?? { AbstractCVWidgetEditor.midiSources = [] };
+					MIDIClient.sources.do({ |source|
+						if(AbstractCVWidgetEditor.midiSources.includes(source.uid.asInt).not, {
+							val.editor.midiSourceSelect.items = val.editor.midiSourceSelect.items.add(
+								source.device.asString
+							);
+							AbstractCVWidgetEditor.midiSources = AbstractCVWidgetEditor.midiSources.add(
+								source.uid.asInt
+							)
+						})
+					})
+					}, {
+						val.editor.midiInitBut.states_([
+							["init MIDI", Color.white, Color.red]
+						])
+				})
+			})
+		};
 
 		wcm.midiDisplay.controller ?? {
 			wcm.midiDisplay.controller = SimpleController(wcm.midiDisplay.model);
 		};
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitMidiDisplay: %\n".postf(theChanger.value);
+			"prInitMidiDisplay: %\n".postf(theChanger.value);
 
 			AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
 				// "widget: % editor: %\n".postf(k, v);
-				if(v.keys.includes(\editor), { [v.name, v.editor].postln });
-				if(v.editor.notNil and:{ v.editor.isClosed.not }, {
-					if(MIDIClient.initialized, {
-						v.editor.midiInitBut.states_([
-							["restart MIDI", Color.black, Color.green]
-						])
-					}, {
-						v.editor.midiInitBut.states_([
-							["init MIDI", Color.white, Color.red]
-						])
+				if(v.keys.includes(\editor), {
+					// [v.name, v.editor].postln;
+					midiInitFunc.(v)
+				}, {
+					v.pairsDo({ |vk, vv|
+						midiInitFunc.(vv)
 					})
 				});
 				// if(MIDIClient.initialized, { midiInitBut.value_(1) }, { midiInitBut.value_(0) });

@@ -155,13 +155,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
-			// tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
-			// 	"i'm part of the focusAction. tabs now: %\n".postf(tabs.views);
-			// 	tabs.stringFocusedColor_(labelStringColors[t]);
-			// 	{ "deferred action taking place".postln; tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
-			// 	"after focusing tabs[%]".postf(t);
-			// }));
-			// tabs.stringFocusedColor_(labelStringColors[tab]);
 
 			thisEditor[\tabs] = tabs;
 
@@ -367,6 +360,33 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			});
 
 			flow1.shift(0, 10);
+
+			midiInitBut = Button(thisEditor[\tabs].views[1], 60@15)
+				.font_(staticTextFont)
+				.action_({ |mb|
+					if(MIDIClient.initialized, { MIDIClient.restart }, { MIDIClient.init });
+				// "wcm.midiDisplay.model: %\n".postf(wcm.midiDisplay.model);
+					wcm.midiDisplay.model.value_(
+						wcm.midiDisplay.model.value
+					).changedKeys(widget.synchKeys);
+				})
+			;
+
+			if(MIDIClient.initialized, {
+				midiInitBut.states_([["restart MIDI", Color.black, Color.green]]);
+			}, {
+				midiInitBut.states_([["init MIDI", Color.white, Color.red]]);
+			});
+
+			midiSourceSelect = PopUpMenu(thisEditor[\tabs].views[1], flow1.indentedRemaining.width-10@15)
+				.items_(["select device port..."])
+				.font_(staticTextFont)
+				.action_({ |ms|
+					if(ms.value != 0, {
+
+					})
+				})
+			;
 
 			StaticText(thisEditor[\tabs].views[1], flow1.bounds.width-20@15)
 				.font_(staticTextFont)
