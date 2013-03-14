@@ -180,11 +180,11 @@ CVWidget2D : CVWidget {
 				[thisName.asString, Color.white, Color.blue],
 				[thisName.asString, Color.black, Color.yellow],
 			])
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 		;
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.string_("Add some notes if you like")
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
@@ -229,7 +229,7 @@ CVWidget2D : CVWidget {
 				this.rangeSlider.bounds.width/2,
 				15
 			));
-			k.value_(v[1].value).font_(Font("Helvetica", 9.5));
+			k.value_(v[1].value).font_(Font("Arial", 9.5));
 		});
 
 		specBut.lo = Button(window)
@@ -311,7 +311,7 @@ CVWidget2D : CVWidget {
 
 		[specBut.hi, [nextY, \hi], specBut.lo, [nextY+52, \lo]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX, v[0], 40, 13))
-			.font_(Font("Helvetica", 8))
+			.font_(Font("Arial", 8))
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 		});
 
@@ -325,7 +325,7 @@ CVWidget2D : CVWidget {
 
 		[midiHead.hi, nextY, midiHead.lo, nextY+52].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX, v, 28, 13))
-			.font_(Font("Helvetica", 7))
+			.font_(Font("Arial", 7))
 			.states_([["MIDI", Color.black, this.bgColor]]);
 
 			if(GUI.id === \qt, {
@@ -345,7 +345,7 @@ CVWidget2D : CVWidget {
 
 		[midiLearn.hi, [\hi, nextY], midiLearn.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX+midiHead.lo.bounds.width, v[1], 12, 13))
-			.font_(Font("Helvetica", 7))
+			.font_(Font("Arial", 7))
 			.states_([
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
@@ -379,7 +379,7 @@ CVWidget2D : CVWidget {
 
 		[midiSrc.hi, [\hi, nextY], midiSrc.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX, v[1], 40, 13))
-			.font_(Font("Helvetica", 8.5))
+			.font_(Font("Arial", 8.5))
 			.string_("source")
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -413,7 +413,7 @@ CVWidget2D : CVWidget {
 
 		[midiChan.hi, [\hi, nextY], midiChan.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX, v[1], 15, 13))
-			.font_(Font("Helvetica", 8.5))
+			.font_(Font("Arial", 8.5))
 			.string_("chan")
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -445,7 +445,7 @@ CVWidget2D : CVWidget {
 
 		[midiCtrl.hi, [\hi, nextY], midiCtrl.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightBarX+15, v[1], 25, 13))
-			.font_(Font("Helvetica", 8.5))
+			.font_(Font("Arial", 8.5))
 			.string_("ctrl")
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -507,7 +507,7 @@ CVWidget2D : CVWidget {
 
 		[oscEditBut.lo, [\lo, thisXY.x+1], oscEditBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, oscEditButHeight))
-			.font_(Font("Helvetica", 8.5))
+			.font_(Font("Arial", 8.5))
 			.states_([
 				["edit OSC", Color.black, this.bgColor]
 			])
@@ -555,7 +555,7 @@ CVWidget2D : CVWidget {
 
 		[calibBut.lo, [\lo, thisXY.x+1], calibBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.states_([
 				["calibrating", Color.black, Color.green],
 				["calibrate", Color.white, Color.red]
@@ -584,7 +584,7 @@ CVWidget2D : CVWidget {
 		[actionsBut.lo, [\lo, thisXY.x+1], actionsBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.states_([
 				["actions ("++this.wdgtActions[v[0]].select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions[v[0]].size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])

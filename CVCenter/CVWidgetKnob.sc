@@ -136,14 +136,14 @@ CVWidgetKnob : CVWidget {
 				[""+thisName.asString, Color.white, Color.blue],
 				[""+thisName.asString, Color.black, Color.yellow],
 			])
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.action_({ |b|
 				this.toggleComment(b.value.asBoolean);
 			})
 		;
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.string_("Add some notes if you like")
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
@@ -175,11 +175,11 @@ CVWidgetKnob : CVWidget {
 		if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
 		nextY = thisXY.y+thisHeight-132;
 		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.value_(widgetCV.value).font_(Font("Helvetica", 9.5))
+			.value_(widgetCV.value).font_(Font("Arial", 9.5))
 		;
 		nextY = nextY+numVal.bounds.height;
 		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 			.action_({ |btn|
 				if(editor.isNil or:{ editor.isClosed }, {
@@ -200,7 +200,7 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+specBut.bounds.height+1;
 		midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.states_([["MIDI", Color.black, this.bgColor]])
 			.action_({ |ms|
 				if(editor.isNil or:{ editor.isClosed }, {
@@ -228,7 +228,7 @@ CVWidgetKnob : CVWidget {
 		});
 
 		midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.states_([
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
@@ -255,7 +255,7 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+midiLearn.bounds.height;
 		midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.string_(msrc)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -282,7 +282,7 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+midiSrc.bounds.height;
 		midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.string_(mchan)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -308,7 +308,7 @@ CVWidgetKnob : CVWidget {
 		if(GUI.id !== \cocoa, { midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget") });
 
 		midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.string_(mctrl)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -336,7 +336,7 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+midiCtrl.bounds.height+1;
 
 		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.states_([
 				["edit OSC", Color.black, this.bgColor]
 			])
@@ -377,7 +377,7 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+oscEditBut.bounds.height;
 		calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.states_([
 				["calibrating", Color.black, Color.green],
 				["calibrate", Color.white, Color.red]
@@ -400,7 +400,7 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+calibBut.bounds.height;
 		actionsBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.states_([
 				["actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)],
 			])

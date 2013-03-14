@@ -815,7 +815,9 @@ CVWidget {
 					wdgtControllersAndModels.midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
 					).changedKeys(synchKeys);
-					CmdPeriod.add({ this !? { this.midiDisconnect } });
+					CmdPeriod.add({ if(this.class.removeResponders, {
+						this !? { this.midiDisconnect(thisSlot) }
+					}) });
 				}, {
 					"Already connected!".warn;
 				})
@@ -828,7 +830,9 @@ CVWidget {
 					wdgtControllersAndModels[thisSlot].midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
 					).changedKeys(synchKeys);
-					CmdPeriod.add({ this !? { this.midiDisconnect(slot) } });
+					CmdPeriod.add({ if(this.class.removeResponders, {
+						this !? { this.midiDisconnect(thisSlot) }
+					}) });
 				}, {
 					"Already connected!".warn;
 				})
@@ -1432,7 +1436,7 @@ CVWidget {
 		};
 
 		wcm.midiConnection.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitMidiConnect: %\n".postf(theChanger.value);
+			"prInitMidiConnect: %\n".postf(theChanger.value);
 
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
@@ -1526,18 +1530,20 @@ CVWidget {
 					AbstractCVWidgetEditor.midiSources ?? { AbstractCVWidgetEditor.midiSources = [] };
 					MIDIClient.sources.do({ |source|
 						if(AbstractCVWidgetEditor.midiSources.includes(source.uid.asInt).not, {
-							val.editor.midiSourceSelect.items = val.editor.midiSourceSelect.items.add(
-								source.device.asString
-							);
 							AbstractCVWidgetEditor.midiSources = AbstractCVWidgetEditor.midiSources.add(
 								source.uid.asInt
 							)
+						});
+						if(val.editor.midiSourceSelect.items.includesEqual(source.device.asString).not, {
+							val.editor.midiSourceSelect.items = val.editor.midiSourceSelect.items.add(
+								source.device.asString
+							)
 						})
 					})
-					}, {
-						val.editor.midiInitBut.states_([
-							["init MIDI", Color.white, Color.red]
-						])
+				}, {
+					val.editor.midiInitBut.states_([
+						["init MIDI", Color.white, Color.red]
+					])
 				})
 			})
 		};

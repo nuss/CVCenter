@@ -190,14 +190,14 @@ CVWidgetMS : CVWidget {
 				[""+thisName.asString, Color.white, Color.blue],
 				[""+thisName.asString, Color.black, Color.yellow],
 			])
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.action_({ |b|
 				this.toggleComment(b.value.asBoolean);
 			})
 		;
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.string_(wdgtInfo)
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
@@ -232,7 +232,7 @@ CVWidgetMS : CVWidget {
 		nextY = nextY+2+1;
 
 		numVal = TextView(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
-			.string_(widgetCV.value.asCompileString).font_(Font("Helvetica", 9.5))
+			.string_(widgetCV.value.asCompileString).font_(Font("Arial", 9.5))
 			.keyDownAction_({ |nv, char, modifiers, unicode, keycode|
 				if(char == $\r and:{ modifiers == 131072 }, {
 					if(nv.string.interpret.class == Array and:{
@@ -248,7 +248,7 @@ CVWidgetMS : CVWidget {
 			.states_([
 				["MIDI"+"("++numMidiResponders++"/"++msSize++")", Color.black, this.bgColor]
 			])
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.action_({ |mb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 1);
@@ -276,7 +276,7 @@ CVWidgetMS : CVWidget {
 			.states_([
 				["OSC"+"("++numOscResponders++"/"++msSize++")", Color.black, this.bgColor]
 			])
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.action_({ |oscb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 2);
@@ -320,7 +320,7 @@ CVWidgetMS : CVWidget {
 			.states_([
 				["Spec", Color.white, Color(1.0, 0.3)]
 			])
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.action_({ |spb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 0);
@@ -335,7 +335,7 @@ CVWidgetMS : CVWidget {
 			.states_([
 				["Actions", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])
-			.font_(Font("Helvetica", 9))
+			.font_(Font("Arial", 9))
 			.action_({ |spb|
 				if(msEditor.isNil or:{ msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 3);
