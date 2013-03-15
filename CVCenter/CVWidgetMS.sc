@@ -255,6 +255,14 @@ CVWidgetMS : CVWidget {
 					guiEnv.msEditor = editor.msEditor;
 				}, {
 					editor.msEditor.front(1)
+				});
+				msSize.do({ |i|
+					wdgtControllersAndModels.slots[i].oscDisplay.model.value_(
+						wdgtControllersAndModels.slots[i].oscDisplay.model.value;
+					).changedKeys(synchKeys);
+					wdgtControllersAndModels.slots[i].midiDisplay.model.value_(
+						wdgtControllersAndModels.slots[i].midiDisplay.model.value
+					).changedKeys(synchKeys);
 				})
 			})
 		;

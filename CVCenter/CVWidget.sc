@@ -805,15 +805,28 @@ CVWidget {
 
 	// if all arguments besides 'slot' are nil .learn should be triggered
 	midiConnect { |uid, chan, num, slot|
-		var thisSlot;
+		var thisSlot, wcm;
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidgetKnob, { wcm = wdgtControllersAndModels },
+			CVWidget2D, {
+				slot ?? {
+					Error("Missing 'slot'-argument. Maybe you forgot to explicitely provide the slot: e.g. <wdgt>.midiConnect(slot: \lo)").throw;
+				};
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot]
+			},
+			CVWidgetMS, {
+				slot ?? {
+					Error("Missing 'slot'-argument. Maybe you forgot to explicitely provide the slot: e.g. <wdgt>.midiConnect(slot: \lo)").throw;
+				};
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[thisSlot];
+			}
 		);
 		switch(this.class,
 			CVWidgetKnob, {
 				if(midiOscEnv.cc.isNil, {
-					wdgtControllersAndModels.midiConnection.model.value_(
+					wcm.midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
 					).changedKeys(synchKeys);
 					CmdPeriod.add({ if(this.class.removeResponders, {
@@ -824,11 +837,8 @@ CVWidget {
 				})
 			},
 			{
-				slot ?? {
-					Error("Missing 'slot'-argument. Maybe you forgot to explicitely provide the slot: e.g. <wdgt>.midiConnect(slot: \lo)").throw;
-				};
 				if(midiOscEnv[slot].cc.isNil, {
-					wdgtControllersAndModels[thisSlot].midiConnection.model.value_(
+					wcm.midiConnection.model.value_(
 						(src: uid, chan: chan, num: num)
 					).changedKeys(synchKeys);
 					CmdPeriod.add({ if(this.class.removeResponders, {
@@ -1440,7 +1450,6 @@ CVWidget {
 		};
 
 		wcm.midiConnection.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitMidiConnect: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' midiConnection.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			if(theChanger.value.isKindOf(Event), {
@@ -1459,17 +1468,42 @@ CVWidget {
 
 					this.getMidiMode(slot).switch(
 						0, {
-							if(val/127 < (argWidgetCV.input+(this.getSoftWithin(slot)/2)) and: {
-								val/127 > (argWidgetCV.input-(this.getSoftWithin(slot)/2));
+							if(val/127 < (argWidgetCV.input[slot]+(this.getSoftWithin(slot)/2)) and: {
+								val/127 > (argWidgetCV.input[slot]-(this.getSoftWithin(slot)/2));
 							}, {
-								argWidgetCV.input_(val/127);
+								switch(this.class,
+									CVWidgetMS, {
+										argWidgetCV.input_(argWidgetCV.input.collect({ |it, i|
+											if(i == slot, { val/127 }, { it })
+										}));
+									},
+									{ argWidgetCV.input_(val/127) }
+								)
 							})
 						},
 						1, {
 							meanVal = this.getMidiMean(slot);
-							argWidgetCV.input_(argWidgetCV.input+((val-meanVal)/127*this.getMidiResolution(slot)))
+							switch(this.class,
+								CVWidgetMS, {
+									argWidgetCV.input_(
+										argWidgetCV.input.collect({ |it, i|
+											if(i == slot, {
+												argWidgetCV.input[slot]+(
+													(val-meanVal)/127*this.getMidiResolution(slot)
+												)
+											}, { it })
+										})
+									)
+								},
+								{
+									argWidgetCV.input_(
+										argWidgetCV.input+((val-meanVal)/127*this.getMidiResolution(slot))
+									)
+								}
+							)
 						}
 					);
+
 					src !? { midiOscEnv.midisrc = src };
 					chan !? { midiOscEnv.midichan = chan };
 					num !? { midiOscEnv.midinum = ctrlString; midiOscEnv.midiRawNum = num };
@@ -1523,7 +1557,7 @@ CVWidget {
 	}
 
 	prInitMidiDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		var ctrlToolTip,typeText, r, p;
+		var ctrlToolTip,typeText, r, p, sourceNames;
 		var midiInitFunc;
 
 		midiInitFunc = { |val|
@@ -1531,25 +1565,16 @@ CVWidget {
 				if(MIDIClient.initialized, {
 					val.editor.midiInitBut.states_([
 						["restart MIDI", Color.black, Color.green]
-					]);
-					AbstractCVWidgetEditor.midiSources ?? { AbstractCVWidgetEditor.midiSources = [] };
-					MIDIClient.sources.do({ |source|
-						if(AbstractCVWidgetEditor.midiSources.includes(source.uid.asInt).not, {
-							AbstractCVWidgetEditor.midiSources = AbstractCVWidgetEditor.midiSources.add(
-								source.uid.asInt
-							)
-						});
-						if(val.editor.midiSourceSelect.items.includesEqual(source.device.asString).not, {
-							val.editor.midiSourceSelect.items = val.editor.midiSourceSelect.items.add(
-								source.device.asString
-							)
-						})
-					})
+					])
 				}, {
 					val.editor.midiInitBut.states_([
 						["init MIDI", Color.white, Color.red]
 					])
-				})
+				});
+				sourceNames = AbstractCVWidgetEditor.midiSources.keys.asArray.sort;
+				val.editor.midiSourceSelect.items_(
+					[val.editor.midiSourceSelect.items[0]]++sourceNames
+				);
 			})
 		};
 
@@ -1558,21 +1583,28 @@ CVWidget {
 		};
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitMidiDisplay: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' midiDisplay.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+
+			AbstractCVWidgetEditor.midiSources ?? { AbstractCVWidgetEditor.midiSources = () };
+			MIDIClient.sources.do({ |source|
+				if(AbstractCVWidgetEditor.midiSources.keys.includes(source.uid.asInt).not, {
+					AbstractCVWidgetEditor.midiSources.put(source.name.asSymbol, source.uid.asInt)
+				});
+			});
 
 			AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
 				// "widget: % editor: %\n".postf(k, v);
 				if(v.keys.includes(\editor), {
 					// [v.name, v.editor].postln;
-					midiInitFunc.(v)
+					midiInitFunc.(v);
 				}, {
 					v.pairsDo({ |vk, vv|
+						// [vv.name, vv.editor].postln;
 						midiInitFunc.(vv)
 					})
-				});
-				// if(MIDIClient.initialized, { midiInitBut.value_(1) }, { midiInitBut.value_(0) });
+				})
 			});
+
 
 			if(this.class != CVWidgetMS, {
 				theChanger.value.learn.switch(
@@ -1746,7 +1778,6 @@ CVWidget {
 		};
 
 		wcm.midiOptions.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitMidiOptions: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' midiOptions.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			if(thisGuiEnv.editor.notNil and:{
@@ -1776,10 +1807,7 @@ CVWidget {
 		};
 
 		wcm.oscConnection.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitOscConnect: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' oscConnection.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
-
-			// "oscConnect: %\n".postf([theChanger, what, moreArgs]);
 
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
@@ -1989,7 +2017,7 @@ CVWidget {
 							thisGuiEnv.msEditor.connectorBut.value_(0);
 						});
 						[
-							thisGuiEnv.msEditor.extCtrlArrayField,
+							thisGuiEnv.msEditor.extOscCtrlArrayField,
 							thisGuiEnv.msEditor.intStartIndexField,
 							thisGuiEnv.msEditor.ipField,
 							thisGuiEnv.msEditor.portField,

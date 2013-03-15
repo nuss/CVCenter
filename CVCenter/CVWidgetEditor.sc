@@ -385,7 +385,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.font_(staticTextFont)
 				.action_({ |ms|
 					if(ms.value != 0, {
-
+						wcm.midiDisplay.model.value_(wcm.midiDisplay.model.value).changedKeys(widget.synchKeys);
 					})
 				})
 			;

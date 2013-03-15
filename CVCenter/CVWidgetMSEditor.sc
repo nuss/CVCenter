@@ -18,7 +18,8 @@
 CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 	var msEditorEnv;
-	var <extCtrlArrayField, <intStartIndexField;
+	var <extMidiCtrlArrayField;
+	var <extOscCtrlArrayField, <intStartIndexField;
 	var <oscEditBtns, <oscCalibBtns;
 	var <oscTabs, <midiTabs;
 	var oscFlow0, oscFlow1, midiFlow0, midiFlow1;
@@ -33,6 +34,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var maxNum, msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var addr, wcmMS, thisGuiEnv, labelColors;
+		var midiUid, midiChan;
 		var oscLabelColor, midiLabelColor, oscLabelStringColor, midiLabelStringColor;
 		var oscConnectCondition = 0;
 		var oscConnectWarning = "Couldn't connect OSC-controllers:";
@@ -174,6 +176,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			)
 		});
 
+		maxNum = [
+			widget.getSpec.minval.size,
+			widget.getSpec.maxval.size,
+			widget.getSpec.default.size
+		].maxItem;
+
 		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@50)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
@@ -264,43 +272,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		;
 
 		midiFlow0.shift(0, 7);
-
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("\nMIDI-mode: 0-127\nor in/decremental")
-		// .background_(Color.white)
-		;
-
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("MIDI-mean (in/decremental mode only)")
-		// .background_(Color.white)
-		;
-
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("minimum snap-distance for sli-ders (0-127 only)")
-		// .background_(Color.white)
-		;
-
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("MIDI-resolution (in/decremental mode only)")
-		// .background_(Color.white)
-		;
-
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("\nnumber of sliders per bank")
-		// .background_(Color.white)
-		;
-
-		midiFlow0.shift(0, 0);
 
 		midiModes = ["0-127", "+/-"];
 
@@ -433,10 +404,51 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			})
 		});
 
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-20@20)
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("MIDI-mode: 0-127 or in-/decremental")
+		// .background_(Color.white)
+		;
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("MIDI-mean (in-/decremental mode only)")
+		// .background_(Color.white)
+		;
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("minimum snap-distance for sli-ders (0-127 only)")
+		// .background_(Color.white)
+		;
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("MIDI-resolution (in-/decremental mode only)")
+		// .background_(Color.white)
+		;
+
+		midiFlow0.shift(0, -5);
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("number of sliders per bank")
+		// .background_(Color.white)
+		;
+
+		midiFlow0.shift(0, 10);
+
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-20@15)
 			.font_(staticTextFontBold)
 			.string_("batch-connect a range of MIDI-sliders")
 		;
+
+		// midiFlow0.shift(0, 7);
 
 		midiInitBut = Button(thisEditor.midiTabs.views[0], 60@15)
 			.font_(staticTextFont)
@@ -450,6 +462,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			})
 		;
 
+		if(GUI.id !== \cocoa, {
+			midiInitBut.toolTip_(
+				"MIDI must only be inititialized before\nconnecting if you want the responders\nto listen to a specific source only (e.g.\nif you have more than one interface\nconnected to your computer)."
+			)
+		});
+
 		if(MIDIClient.initialized, {
 			midiInitBut.states_([["restart MIDI", Color.black, Color.green]]);
 		}, {
@@ -462,6 +480,69 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.action_({ |ms|
 				if(ms.value != 0, {
 
+				})
+			})
+		;
+
+		if(GUI.id !== \cocoa, {
+			midiSourceSelect.toolTip_(
+				"Select a source from the list of possible\nsources (MIDI must be initialized). The uid\nof the selected source will be inserted into\nthe source-field below and responders will only\nlisten to messages coming from that source."
+			)
+		});
+
+		midiSrcField = TextField(thisEditor.midiTabs.views[0], 120@15)
+			.font_(textFieldFont)
+			.stringColor_(textFieldFontColor)
+			.background_(textFieldBg)
+			.string_("source")
+		;
+
+		if(GUI.id !== \cocoa, {
+			midiSrcField.toolTip_(
+				"Enter a numeric source-uid or select from the\ndrop-down menu above (MIDI must be initialized.\nIf this field is left empty resulting responders\nwill listen to any source."
+			)
+		});
+
+		midiChanField = TextField(thisEditor.midiTabs.views[0], 40@15)
+			.font_(textFieldFont)
+			.stringColor_(textFieldFontColor)
+			.background_(textFieldBg)
+			.string_("chan")
+		;
+
+		if(GUI.id !== \cocoa, {
+			midiChanField.toolTip_(
+				"Enter the channel-number to which the resulting\nresponders shall listen. If this field is left\nresulting responders will listen to any channel."
+			)
+		});
+
+		extMidiCtrlArrayField = TextField(thisEditor.midiTabs.views[0], midiFlow0.indentedRemaining.width-10@15)
+			.font_(textFieldFont)
+			.stringColor_(textFieldFontColor)
+			.background_(textFieldBg)
+			.string_("(0.."++(maxNum-1)++")")
+		;
+
+		if(GUI.id !== \cocoa, {
+			extMidiCtrlArrayField.toolTip_(
+				"Enter an array, representing the range of sliders\nyou want to connect. 0 corresponds to slider nr. 1.\nBy default the field displays an array that connects\nall slots of the multi-slider to midi-fader 1 to the\nnumber of slots of the multi-slider."
+			)
+		});
+
+		connectorBut = Button(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-21@25)
+			.font_(staticTextFont)
+			.states_([
+				["connect MIDI-sliders", Color.white, Color.red],
+			])
+			.action_({ |cb|
+				if("^[-+]?[0-9]*$".matchRegexp(midiSrcField.string), {
+					midiUid = midiSrcField.string.interpret
+				});
+				if("^[0-9]*$".matchRegexp(midiChanField.string), {
+					midiChan = midiChanField.string.interpret
+				});
+				extMidiCtrlArrayField.string.interpret.do({ |sl, i|
+					widget.midiConnect(midiUid, midiChan, sl, i)
 				})
 			})
 		;
@@ -580,13 +661,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		oscFlow0.shift(0, 0);
 
-		maxNum = [
-			widget.getSpec.minval.size,
-			widget.getSpec.maxval.size,
-			widget.getSpec.default.size
-		].maxItem;
-
-		extCtrlArrayField = TextField(thisEditor.oscTabs.views[0], 65@15)
+		extOscCtrlArrayField = TextField(thisEditor.oscTabs.views[0], 65@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
@@ -694,7 +769,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			])
 			.action_({ |cb|
 				// user-input:
-				// 	extCtrlArrayField -> external controllers
+				// 	extOscCtrlArrayField -> external controllers
 				//	ipField -> IP-address
 				//	portField -> port
 				//	nameField -> osc-cmds, ext. controllers as placeholders
@@ -702,9 +777,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				//	indexField -> msg-slot, an integer or a placeholder, starting at 1
 				cb.value.switch(
 					1, {
-						if(extCtrlArrayField.string.interpret.isArray and:{
-							extCtrlArrayField.string.interpret.collect(_.isInteger).size ==
-							extCtrlArrayField.string.interpret.size
+						if(extOscCtrlArrayField.string.interpret.isArray and:{
+							extOscCtrlArrayField.string.interpret.collect(_.isInteger).size ==
+							extOscCtrlArrayField.string.interpret.size
 						}, {
 							oscConnectCondition = oscConnectCondition+1;
 						}, {
@@ -716,8 +791,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 							oscConnectCondition = oscConnectCondition+1;
 						});
 						if(oscConnectCondition >= 2, {
-						// "ok, we're ready to rock: %".postf(extCtrlArrayField.string.interpret);
-							extCtrlArrayField.string.interpret.do({ |ext, i|
+						// "ok, we're ready to rock: %".postf(extOscCtrlArrayField.string.interpret);
+							extOscCtrlArrayField.string.interpret.do({ |ext, i|
 								if(ipField.string.size > 0, { connectIP = ipField.string }, { connectIP = "nil" });
 								if(portField.string.size > 0, {
 									connectPort = portField.string;
