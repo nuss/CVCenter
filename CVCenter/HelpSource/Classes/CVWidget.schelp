@@ -9,6 +9,15 @@ CVWidget is the abstract superclass of all CVWidgets (currently: link::Classes/C
 
 CLASSMETHODS::
 
+METHOD:: removeResponders
+A link::Classes/Boolean::, indicating wether MIDI- and OSC-responders shall be removed upon hitting Cmd/Ctrl-period. If it is set to code::false:: unreferenced ghost-responders are left that may be hard to remove.
+
+returns:: code::this.class:: (CVWidget)
+
+METHOD:: debug
+A link::Classes/Boolean::, allowing (or disallowing) introspection of the internal working of a CVWidget. This is e.g. useful if the user wants to extend the widget's API
+
+returns:: code::this.class:: (CVWidget)
 
 INSTANCEMETHODS::
 

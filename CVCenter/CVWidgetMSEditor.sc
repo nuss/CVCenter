@@ -316,7 +316,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			})
 		;
 
-		if(thisMidiMode.minItem(_.()) == thisMidiMode.maxItem(_.()), {
+		if(thisMidiMode.minItem == thisMidiMode.maxItem, {
 			midiModeSelect.value_(thisMidiMode[0])
 		}, {
 			midiModeSelect.items = midiModeSelect.items.add("--");
@@ -346,7 +346,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		});
 
 		if(thisMidiMean.select(_.isInteger).size == widget.msSize and:{
-			thisMidiMean.minItem(_.()) == thisMidiMean.maxItem(_.());
+			thisMidiMean.minItem == thisMidiMean.maxItem;
 		}, {
 			midiMeanNB.string_(thisMidiMean[0].asString);
 		}, {
@@ -370,7 +370,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		});
 
 		if(thisSoftWithin.select(_.isNumber).size == widget.msSize and:{
-			thisSoftWithin.minItem(_.()) == thisSoftWithin.maxItem(_.());
+			thisSoftWithin.minItem == thisSoftWithin.maxItem;
 		}, {
 			softWithinNB.string_(thisSoftWithin[0].asString);
 		}, {
@@ -393,7 +393,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		});
 
 		if(thisMidiResolution.select(_.isNumber).size == widget.msSize and:{
-			thisMidiResolution.minItem(_.()) == thisMidiResolution.maxItem(_.());
+			thisMidiResolution.minItem == thisMidiResolution.maxItem;
 		}, {
 			midiResolutionNB.string_(thisMidiResolution[0].asString);
 		}, {
@@ -425,7 +425,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			ctrlButtonBankField.string_("nil");
 		}, {
 			if(thisCtrlButtonBank.select(_.isInteger).size == widget.msSize and:{
-				thisCtrlButtonBank.minItem(_.()) == thisCtrlButtonBank.maxItem(_.());
+				thisCtrlButtonBank.minItem == thisCtrlButtonBank.maxItem;
 			}, {
 				ctrlButtonBankField.string_(thisMidiResolution[0].asString);
 			}, {

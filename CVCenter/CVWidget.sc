@@ -18,6 +18,7 @@
 CVWidget {
 
 	classvar <>removeResponders, midiStateObserver;
+	classvar <>debug = false;
 	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
@@ -1158,6 +1159,8 @@ CVWidget {
 
 		wcm.calibration.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitCalibration: %\n".postf(theChanger.value);
+			if(debug, { "widget '%' (%) at slot '%' calibration.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv[\editor][slot];
 			}, {
@@ -1272,6 +1275,7 @@ CVWidget {
 
 		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitSpecControl: %\n".postf(theChanger.value);
+			if(debug, { "widget '%' (%) at slot '%' cvSpec.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			switch(this.class,
 				CVWidgetMS, {
@@ -1436,7 +1440,8 @@ CVWidget {
 		};
 
 		wcm.midiConnection.controller.put(\default, { |theChanger, what, moreArgs|
-			"prInitMidiConnect: %\n".postf(theChanger.value);
+			// "prInitMidiConnect: %\n".postf(theChanger.value);
+			if(debug, { "widget '%' (%) at slot '%' midiConnection.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
@@ -1553,7 +1558,8 @@ CVWidget {
 		};
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
-			"prInitMidiDisplay: %\n".postf(theChanger.value);
+			// "prInitMidiDisplay: %\n".postf(theChanger.value);
+			if(debug, { "widget '%' (%) at slot '%' midiDisplay.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
 				// "widget: % editor: %\n".postf(k, v);
@@ -1741,6 +1747,8 @@ CVWidget {
 
 		wcm.midiOptions.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitMidiOptions: %\n".postf(theChanger.value);
+			if(debug, { "widget '%' (%) at slot '%' midiOptions.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+
 			if(thisGuiEnv.editor.notNil and:{
 				thisGuiEnv.editor.isClosed.not
 			}, {
@@ -1769,6 +1777,7 @@ CVWidget {
 
 		wcm.oscConnection.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscConnect: %\n".postf(theChanger.value);
+			if(debug, { "widget '%' (%) at slot '%' oscConnection.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			// "oscConnect: %\n".postf([theChanger, what, moreArgs]);
 
@@ -1905,6 +1914,7 @@ CVWidget {
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscDisplay: %\n".postf(theChanger.value);
+			if(debug, { "widget '%' (%) at slot '%' oscDisplay.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
@@ -2041,6 +2051,7 @@ CVWidget {
 
 		wcm.oscInputRange.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscInputRange: %\n".postf(theChanger.value);
+			if(debug, { "widget '%' (%) at slot '%' oscInputRange.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
@@ -2126,6 +2137,8 @@ CVWidget {
 
 		wcm.actions.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitActionsControl: %\n".postf(theChanger.value);
+			if(debug, { "widget '%' (%) at slot '%' actions.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+
 			if(window.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[
 					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
