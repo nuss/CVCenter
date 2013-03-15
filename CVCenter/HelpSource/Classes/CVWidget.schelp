@@ -6,11 +6,23 @@ related:: Classes/CVCenter, Classes/CV, Classes/CVWidgetKnob, Classes/CVWidget2D
 DESCRIPTION::
 CVWidget is the abstract superclass of all CVWidgets (currently: link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D::). However, it implements a couple of useful methods that are common to all its subclasses.
 
-
 CLASSMETHODS::
 
 METHOD:: removeResponders
 A link::Classes/Boolean::, indicating wether MIDI- and OSC-responders shall be removed upon hitting Cmd/Ctrl-period. If it is set to code::false:: unreferenced ghost-responders are left that may be hard to remove.
+
+returns:: code::this:: (CVWidget)
+
+METHOD:: debug
+A link::Classes/Boolean::, allowing (or disallowing) introspection of the internal working of a CVWidget. This is e.g. useful if the user wants to extend the widget's API. Whenever a the content of a model changes the corresponding controller gets triggered and executes its actions. So, if a message like
+
+code::widget 'freq' (CVWidget2D) at slot 'lo' midiDisplay.model: `(( 'learn': L, 'src': source, 'chan': chan, 'ctrl': ctrl ))::
+
+gets posted, it means the midiDisplay.controller has just executed its actions using the model's values.
+
+Also see link::#Models and Controllers, internal bookkeeping:: and link::#Extending the API::.
+
+returns:: code::this:: (CVWidget)
 
 INSTANCEMETHODS::
 
