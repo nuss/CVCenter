@@ -32,7 +32,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var cvString;
 		// var oscTabs, midiTabs;
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
-		var maxNum, msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
+		var maxNum, msrc = "source", mchan = "channel", mctrl = "ctrl", margs;
 		var addr, wcmMS, thisGuiEnv, labelColors;
 		var midiUid, midiChan;
 		var oscLabelColor, midiLabelColor, oscLabelStringColor, midiLabelStringColor;
@@ -161,7 +161,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		oscTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
 		oscTabs.focusActions_((0..oscTabs.views.size-1).collect({ |t|
 			{
-				{ oscTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+				{ oscTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
 			}
 		}));
 
@@ -180,7 +180,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		midiTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
 		midiTabs.focusActions_((0..midiTabs.views.size-1).collect({ |t|
 			{
-				{ midiTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.1);
+				{ midiTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
 			}
 		}));
 
@@ -518,7 +518,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
-			.string_("source")
+			.string_(msrc)
 		;
 
 		if(GUI.id !== \cocoa, {
@@ -531,7 +531,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
-			.string_("channel")
+			.string_(mchan)
 		;
 
 		if(GUI.id !== \cocoa, {

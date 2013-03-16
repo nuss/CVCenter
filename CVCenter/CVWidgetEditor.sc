@@ -27,7 +27,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 	init { |widget, widgetName, tab, slot|
 		var cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
-		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
+		var msrc = "source", mchan = "channel", mctrl = "ctrl", margs;
 		var addr, wcm, thisGuiEnv, labelColors;
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
@@ -367,7 +367,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					if(MIDIClient.initialized, {
 						MIDIClient.restart; MIDIIn.connectAll
 					}, { MIDIClient.init; MIDIIn.connectAll });
-				// "wcm.midiDisplay.model: %\n".postf(wcm.midiDisplay.model);
 					wcm.midiDisplay.model.value_(
 						wcm.midiDisplay.model.value
 					).changedKeys(widget.synchKeys);
