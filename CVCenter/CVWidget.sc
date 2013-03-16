@@ -779,10 +779,16 @@ CVWidget {
 	}
 
 	oscDisconnect { |slot|
-		var thisSlot;
+		var thisSlot, wcm;
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidget2D, {
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot];
+			},
+			CVWidgetMS, {
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[thisSlot];
+			}
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -790,14 +796,9 @@ CVWidget {
 				wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changedKeys(synchKeys);
 				CmdPeriod.remove({ this.oscDisconnect });
 			},
-			CVWidget2D, {
-				wdgtControllersAndModels[thisSlot].oscConnection.model.value_(false).changedKeys(synchKeys);
-				wdgtControllersAndModels[thisSlot].oscInputRange.model.value_([0.00001, 0.00001]).changedKeys(synchKeys);
-				CmdPeriod.remove({ this.oscDisconnect(slot) });
-			},
-			CVWidgetMS, {
-				wdgtControllersAndModels.slots[thisSlot].oscConnection.model.value_(false).changedKeys(synchKeys);
-				wdgtControllersAndModels.slots[thisSlot].oscInputRange.model.value_([0.00001, 0.00001]).changedKeys(synchKeys);
+			{
+				wcm.oscConnection.model.value_(false).changedKeys(synchKeys);
+				wcm.oscInputRange.model.value_([0.00001, 0.00001]).changedKeys(synchKeys);
 				CmdPeriod.remove({ this.oscDisconnect(slot) });
 			}
 		)
@@ -852,10 +853,16 @@ CVWidget {
 	}
 
 	midiDisconnect { |slot|
-		var thisSlot;
+		var thisSlot, wcm;
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidget2D, {
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot];
+			},
+			CVWidgetMS, {
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[thisSlot]
+			}
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -863,7 +870,7 @@ CVWidget {
 				CmdPeriod.remove({ this.midiDisconnect });
 			},
 			{
-				wdgtControllersAndModels[thisSlot].midiConnection.model.value_(nil).changedKeys(synchKeys);
+				wcm.midiConnection.model.value_(nil).changedKeys(synchKeys);
 				CmdPeriod.remove({ this.midiDisconnect(slot) });
 			}
 		)

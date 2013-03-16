@@ -348,7 +348,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			softWithinNB.string_("--");
 		});
 
-		midiResolutionNB = NumberBox(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+		midiResolutionNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
 			.font_(staticTextFont)
 			.action_({ |mb|
 				if("^[0-9]*\.?[0-9]*$".matchRegexp(mb.string), {
@@ -450,7 +450,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		// midiFlow0.shift(0, 7);
 
-		midiInitBut = Button(thisEditor.midiTabs.views[0], 60@15)
+		midiInitBut = Button(thisEditor.midiTabs.views[0], 60@25)
 			.font_(staticTextFont)
 			.action_({ |mb|
 				if(MIDIClient.initialized, {
@@ -474,7 +474,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			midiInitBut.states_([["init MIDI", Color.white, Color.red]]);
 		});
 
-		midiSourceSelect = PopUpMenu(thisEditor.midiTabs.views[0], midiFlow0.indentedRemaining.width-10@15)
+		midiSourceSelect = PopUpMenu(thisEditor.midiTabs.views[0], midiFlow0.indentedRemaining.width-10@25)
 			.items_(["select device port..."])
 			.font_(staticTextFont)
 			.action_({ |ms|
@@ -503,11 +503,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			)
 		});
 
-		midiChanField = TextField(thisEditor.midiTabs.views[0], 40@15)
+		midiChanField = TextField(thisEditor.midiTabs.views[0], 45@15)
 			.font_(textFieldFont)
 			.stringColor_(textFieldFontColor)
 			.background_(textFieldBg)
-			.string_("chan")
+			.string_("channel")
 		;
 
 		if(GUI.id !== \cocoa, {
@@ -532,18 +532,24 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		connectorBut = Button(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-21@25)
 			.font_(staticTextFont)
 			.states_([
-				["connect MIDI-sliders", Color.white, Color.red],
+				["connect MIDI-sliders", Color.white, Color.blue],
+				["disconnect MIDI-sliders", Color.white, Color.red],
 			])
 			.action_({ |cb|
-				if("^[-+]?[0-9]*$".matchRegexp(midiSrcField.string), {
-					midiUid = midiSrcField.string.interpret
-				});
-				if("^[0-9]*$".matchRegexp(midiChanField.string), {
-					midiChan = midiChanField.string.interpret
-				});
-				extMidiCtrlArrayField.string.interpret.do({ |sl, i|
-					widget.midiConnect(midiUid, midiChan, sl, i)
-				})
+				switch(cb.value,
+					1, {
+						if("^[-+]?[0-9]*$".matchRegexp(midiSrcField.string), {
+							midiUid = midiSrcField.string.interpret
+						});
+						if("^[0-9]*$".matchRegexp(midiChanField.string), {
+							midiChan = midiChanField.string.interpret
+						});
+						extMidiCtrlArrayField.string.interpret.do({ |ctrlNum, sl|
+							widget.midiConnect(midiUid, midiChan, ctrlNum, sl)
+						})
+					},
+					0, { widget.msSize.do(widget.midiDisconnect(_)) }
+				)
 			})
 		;
 
@@ -581,7 +587,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		deviceListMenu = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-46@15)
 			.items_(["select device..."])
-			.font_(Font("Helvetica", 10))
+			.font_(Font("Arial", 10))
 			.action_({ |m|
 				cmdListMenu.items_(["command-names..."]);
 				thisCmdNames = [nil];
@@ -607,7 +613,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		cmdListMenu = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-11@15)
 			.items_(["command-names..."])
-			.font_(Font("Helvetica", 10))
+			.font_(Font("Arial", 10))
 			.action_({ |m|
 				if(nameField.enabled, {
 					nameField.string_(thisCmdNames[m.value]);
@@ -706,7 +712,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		mappingSelectItems = ["set global mapping...", "linlin", "linexp", "explin", "expexp"];
 
 		mappingSelect = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-12@20)
-			.font_(Font("Helvetica", 12))
+			.font_(Font("Arial", 12))
 			.items_(mappingSelectItems)
 			.action_({ |ms|
 				if(ms.value != 0, {
