@@ -45,15 +45,17 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var mappingSelectItems, mappingDiffers;
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
-		var tmp; // multipurpose short-term var
+		var tmp, gapNextX, gapNextY;
 
 		widget ?? {
-			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
+			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
 		};
 
 		#oscEditBtns, oscCalibBtns = []!2;
 
-		name = widgetName.asSymbol;
+		name = (widgetName.asString++"MS").asSymbol;
+		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
+		xySlots ?? { xySlots = [] };
 		msEditorEnv = ();
 
 //		"widget: %\n".postf(widget.msSize);
@@ -88,10 +90,32 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		// allEditors ?? { allEditors = IdentityDictionary() };
 
 		if(thisEditor.isNil or:{ thisEditor.window.isClosed }, {
-			window = Window("Widget Editor:"+widgetName, Rect(Window.screenBounds.width/2-200, Window.screenBounds.height/2-150, 400, 265));
 
-			allEditors.put((name.asString++"MS").asSymbol, (editor: this, window: window, name: widgetName));
-			thisEditor = allEditors[(name.asString++"MS").asSymbol];
+			// any seats left empty?
+			block { |break|
+				xySlots.do({ |p, i|
+					if(p[1] == 0, {
+						break.value(
+							#gapNextX, gapNextY = p[0].asArray;
+							xySlots[i][1] = name;
+						);
+					})
+				})
+			};
+
+			window = Window("Widget Editor:"+widgetName, Rect(
+				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 400, 265
+			));
+
+			xySlots = xySlots.add([nextX@nextY, name]);
+			if(nextX+275 > Window.screenBounds.width, {
+				nextX = shiftXY ?? { 0 }; nextY = xySlots.last[0].y+295;
+			}, {
+				nextX = xySlots.last[0].x+405; nextY = xySlots.last[0].y;
+			});
+
+			allEditors.put(name, (editor: this, window: window, name: widgetName));
+			thisEditor = allEditors[name];
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 		});
@@ -924,7 +948,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 	close {
 		thisEditor.window.close;
-		allEditors.removeAt((name.asString++"MS").asSymbol);
+		allEditors.removeAt(name);
 	}
 
 }

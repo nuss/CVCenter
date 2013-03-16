@@ -34,7 +34,11 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var mappingSelectItems;
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
-		var tmp, gapNextX, gapNextY; // multipurpose short-term var
+		var tmp, gapNextX, gapNextY;
+
+		widget ?? {
+			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
+		};
 
 		name = widgetName.asSymbol;
 		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
@@ -48,10 +52,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		actionsList ?? { actionsList = () };
 
 		if(slot.isNil, { thisGuiEnv = widget.guiEnv }, { thisGuiEnv = widget.guiEnv[slot] });
-
-		widget ?? {
-			Error("CVWidgetEditor is a utility-GUI-class that should only be used in connection with an existing CVWidget").throw;
-		};
 
 		if(slot.notNil, {
 			switch(widget.class,
