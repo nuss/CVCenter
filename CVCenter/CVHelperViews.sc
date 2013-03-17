@@ -17,16 +17,23 @@
 
 CVMidiEditGroup {
 
+	var uview;
 	var <midiLearn, <midiHead, <midiSrc, <midiChan, <midiCtrl;
 
 	*new { |parent, bounds, widget, slot|
-		^super.new.init(parent, bounds, widget, slot)
+		// ^super.newCopyArgs(bounds).init(parent, bounds, widget, slot)
+		^super.new.init(parent, bounds, widget, slot);
 	}
 
 	init { |parentView, bounds, widget, slot|
-		var flow, thisSlot;
-		var margs, msrc, mchan, mctrl;
+		var flow, thisBounds, thisSlot;
+		var margs, msrc="source", mchan="chan", mctrl="ctrl";
 		var wcm, editor, tabIndex;
+		var staticTextFont = Font("Arial", 8.5);
+		var textFieldFont = Font("Andale Mono", 7);
+
+		if(bounds.class == Rect, { thisBounds = bounds });
+		if(bounds.class == Point, { thisBounds = Rect(0, 0, bounds.x, bounds.y) });
 
 		switch(widget.class,
 			CVWidget2D, {
@@ -53,14 +60,18 @@ CVMidiEditGroup {
 			Error("CVMidiEditGroup is a utility-class to be used with CVWidgets only.").throw
 		});
 
-		flow = parentView.addFlowLayout(0, 0);
+		uview = UserView(parentView, thisBounds);
+		uview.decorator = flow = FlowLayout(thisBounds, 0@0, 0@0);
+		// "parentView, bounds, flow.bounds: %, %, %\n".postf(parentView, bounds, flow.bounds);
 
-		midiHead = Button(parentView, bounds.width-(bounds.height.div(3))@bounds.height.div(3))
-			.font_("Arial", 8)
+		// "flow, bounds: %, %\n".postf(flow, bounds);
+
+		midiHead = Button(uview, flow.bounds.width-(flow.bounds.height/3*1.1)@(flow.bounds.height/3*1.1))
+			.font_(staticTextFont)
 			.action_({ |mh|
-				if(editor.isNil, {
-				if(widget.class = CVWidgetMS, { tabIndex = 0 }, { tabIndex = 1 });
-					editor = CVWidgetEditor(this, widget.label.states[0][0], tabIndex, thisSlot);
+				if(editor.isNil or:{ editor.isClosed }, {
+					if(widget.class == CVWidgetMS, { tabIndex = 0 }, { tabIndex = 1 });
+					editor = CVWidgetEditor(widget, widget.label.states[0][0], tabIndex, thisSlot);
 					switch(widget.class,
 						CVWidget2D, {
 							widget.editor.put(thisSlot, editor);
@@ -109,8 +120,8 @@ CVMidiEditGroup {
 			})
 		});
 
-		midiLearn = Button(parentView, bounds.height.div(3)@bounds.height.div(3))
-			.font_("Arial", 8)
+		midiLearn = Button(uview, flow.bounds.height/3*1.1@(flow.bounds.height/3*1.1))
+			.font_(staticTextFont)
 			.states_([
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
@@ -134,8 +145,8 @@ CVMidiEditGroup {
 			})
 		;
 
-		midiSrc = TextField(parentView, bounds.width@bounds.height.div(3))
-			.font_("Andale Mono", 8)
+		midiSrc = TextField(uview, flow.bounds.width@(flow.bounds.height/3*0.9))
+			.font_(textFieldFont)
 			.string_(msrc)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -158,6 +169,60 @@ CVMidiEditGroup {
 				})
 			})
 		;
+
+		midiChan = TextField(uview, flow.bounds.width/2@(flow.bounds.height/3*0.9))
+			.font_(textFieldFont)
+			.string_(mchan)
+			.background_(Color.white)
+			.stringColor_(Color.black)
+			.action_({ |mch|
+				if("^[0-9]*$".matchRegexp(mch.string), {
+					wcm.midiDisplay.model.value_((
+						learn: "C",
+						src: wcm.midiDisplay.model.value.src,
+						chan: mch.string,
+						ctrl: wcm.midiDisplay.model.value.ctrl
+					)).changedKeys(widget.synchKeys)
+				})
+			})
+			.mouseDownAction_({ |mch|
+				mch.stringColor_(Color.red)
+			})
+			.keyDownAction_({ |mch, char, modifiers, unicode, keycode|
+				if(unicode == 13, {
+					mch.stringColor_(Color.black);
+				})
+			})
+		;
+
+		midiCtrl = TextField(uview, flow.bounds.width/2@(flow.bounds.height/3*0.9))
+			.font_(textFieldFont)
+			.string_(mctrl)
+			.background_(Color.white)
+			.stringColor_(Color.black)
+			.action_({ |mctrl|
+				if("^[0-9]*$".matchRegexp(mctrl.string), {
+					wcm.midiDisplay.model.value_((
+						learn: "C",
+						src: wcm.midiDisplay.model.value.src,
+						chan: wcm.midiDisplay.model.value.chan,
+						ctrl: mctrl.string
+					)).changedKeys(widget.synchKeys)
+				})
+			})
+			.mouseDownAction_({ |mctrl|
+				mctrl.stringColor_(Color.red)
+			})
+			.keyDownAction_({ |mctrl, char, modifiers, unicode, keycode|
+				if(unicode == 13, {
+					mctrl.stringColor_(Color.black);
+				})
+			})
+		;
+	}
+
+	bounds {
+		^uview.bounds;
 	}
 
 }

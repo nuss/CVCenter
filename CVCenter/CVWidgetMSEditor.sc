@@ -21,6 +21,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 	var <extMidiCtrlArrayField;
 	var <extOscCtrlArrayField, <intStartIndexField;
 	var <oscEditBtns, <oscCalibBtns;
+	var <midiEditGroups;
 	var <oscTabs, <midiTabs;
 	var oscFlow0, oscFlow1, midiFlow0, midiFlow1;
 
@@ -40,7 +41,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var oscConnectWarning = "Couldn't connect OSC-controllers:";
 		var connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart;
 		var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
-		var midiModes;
+		var midiModes, nextMidiX, nextMidiY;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
 		var mappingSelectItems, mappingDiffers;
 		var wdgtActions;
@@ -51,7 +52,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
 		};
 
-		#oscEditBtns, oscCalibBtns = []!2;
+		#oscEditBtns, oscCalibBtns, midiEditGroups = []!3;
 
 		name = (widgetName.asString++"MS").asSymbol;
 		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
@@ -576,6 +577,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			})
 		;
+
+		widget.msSize.do({ |sl|
+			CVMidiEditGroup(thisEditor.midiTabs.views[1], midiFlow1.bounds.width/5-10@39, widget, sl)
+		});
 
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
 			.font_(staticTextFont)

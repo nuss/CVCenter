@@ -51,7 +51,16 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 		actionsList ?? { actionsList = () };
 
-		if(slot.isNil, { thisGuiEnv = widget.guiEnv }, { thisGuiEnv = widget.guiEnv[slot] });
+		if(slot.isNil, { thisGuiEnv = widget.guiEnv }, {
+			switch(widget.class,
+				CVWidget2D, {
+					thisGuiEnv = widget.guiEnv[slot]
+				},
+				CVWidgetMS, {
+					thisGuiEnv = widget.guiEnv.editor[slot]
+				}
+			)
+		});
 
 		if(slot.notNil, {
 			switch(widget.class,
@@ -885,6 +894,10 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 		tab !? {
 			thisEditor[\tabs].focus(tab);
+			if(widget.class == CVWidgetMS, {
+				tabs.stringFocusedColor_(labelStringColors[tab]);
+				tabs.views[tab].background_(Color(0.8, 0.8, 0.8, 1.0));
+			})
 		};
 		thisEditor.window.front;
 	}
@@ -893,7 +906,8 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 	amendActionsList { |widget, addRemove, name, action, slot, active|
 
-		var staticTextFont = Font(Font.defaultSansFace, 10);
+		var staticTextFont = Font(Font("Arial", 9.4));
+		var textFieldFont = Font("Andale Mono", 9);
 
 		if(widget.class != CVWidgetMS, {
 			switch(addRemove,
@@ -949,7 +963,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					actionsList[name].actionView = TextView(thisEditor[\tabs].views[3], flow3.bounds.width-35@50)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
-						.font_(Font("Helvetica", 9))
+						.font_(textFieldFont)
 						.string_(action.asArray[0][0])
 						.syntaxColorize
 						.editable_(false)
