@@ -436,7 +436,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.string_(msrc)
 				.background_(Color.white)
 				.action_({ |tf|
-					if(tf.string != msrc, {
+					if("^[-+]?[0-9]*$".matchRegexp(tf.string), {
 						wcm.midiDisplay.model.value_((
 							learn: "C",
 							src: tf.string,
@@ -462,7 +462,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.string_(mchan)
 				.background_(Color.white)
 				.action_({ |tf|
-					if(tf.string != mchan, {
+					if("^[0-9]*$".matchRegexp(tf.string), {
 						wcm.midiDisplay.model.value_((
 							learn: "C",
 							src: wcm.midiDisplay.model.value.src,
@@ -488,7 +488,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.string_(mctrl)
 				.background_(Color.white)
 				.action_({ |tf|
-					if(tf.string != mctrl, {
+					if("^[0-9]*$".matchRegexp(tf.string), {
 						wcm.midiDisplay.model.value_((
 							learn: "C",
 							src: wcm.midiDisplay.model.value.src,

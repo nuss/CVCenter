@@ -818,7 +818,7 @@ CVWidget {
 			},
 			CVWidgetMS, {
 				slot ?? {
-					Error("Missing 'slot'-argument. Maybe you forgot to explicitely provide the slot: e.g. <wdgt>.midiConnect(slot: \lo)").throw;
+					Error("Missing 'slot'-argument. Maybe you forgot to explicitely provide the slot: e.g. <wdgt>.midiConnect(slot: 0)").throw;
 				};
 				thisSlot = slot.asInt;
 				wcm = wdgtControllersAndModels.slots[thisSlot];

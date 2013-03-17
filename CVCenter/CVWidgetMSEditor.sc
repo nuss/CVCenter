@@ -579,7 +579,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		;
 
 		widget.msSize.do({ |sl|
-			CVMidiEditGroup(thisEditor.midiTabs.views[1], midiFlow1.bounds.width/5-10@39, widget, sl)
+			midiEditGroups = midiEditGroups.add(
+				CVMidiEditGroup(thisEditor.midiTabs.views[1], midiFlow1.bounds.width/5-10@39, widget, sl);
+			)
 		});
 
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)

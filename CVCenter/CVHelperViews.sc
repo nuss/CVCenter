@@ -31,6 +31,7 @@ CVMidiEditGroup {
 		var wcm, editor, tabIndex;
 		var staticTextFont = Font("Arial", 8.5);
 		var textFieldFont = Font("Andale Mono", 7);
+		var slotText = "";
 
 		if(bounds.class == Rect, { thisBounds = bounds });
 		if(bounds.class == Point, { thisBounds = Rect(0, 0, bounds.x, bounds.y) });
@@ -69,8 +70,8 @@ CVMidiEditGroup {
 		midiHead = Button(uview, flow.bounds.width-(flow.bounds.height/3*1.1)@(flow.bounds.height/3*1.1))
 			.font_(staticTextFont)
 			.action_({ |mh|
+				if(widget.class == CVWidgetMS, { tabIndex = 0 }, { tabIndex = 1 });
 				if(editor.isNil or:{ editor.isClosed }, {
-					if(widget.class == CVWidgetMS, { tabIndex = 0 }, { tabIndex = 1 });
 					editor = CVWidgetEditor(widget, widget.label.states[0][0], tabIndex, thisSlot);
 					switch(widget.class,
 						CVWidget2D, {
@@ -87,7 +88,7 @@ CVMidiEditGroup {
 						}
 					)
 				}, {
-					editor.front(1)
+					editor.front(tabIndex)
 				});
 				wcm.oscDisplay.model.value_(
 					wcm.oscDisplay.model.value;
@@ -145,6 +146,10 @@ CVMidiEditGroup {
 			})
 		;
 
+		slot !? { slotText = "at slot % ".format(slot) };
+
+		if(GUI.id !== \cocoa, { midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget %to that slider.".format(slotText)) });
+
 		midiSrc = TextField(uview, flow.bounds.width@(flow.bounds.height/3*0.9))
 			.font_(textFieldFont)
 			.string_(msrc)
@@ -169,6 +174,10 @@ CVMidiEditGroup {
 				})
 			})
 		;
+
+		slot !? { slotText = " at slot %".format(slot) };
+
+		if(GUI.id !== \cocoa, { midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%.".format(slotText)) });
 
 		midiChan = TextField(uview, flow.bounds.width/2@(flow.bounds.height/3*0.9))
 			.font_(textFieldFont)
@@ -195,6 +204,10 @@ CVMidiEditGroup {
 			})
 		;
 
+		slot !? { slotText = " at slot %".format(slot) };
+
+		if(GUI.id !== \cocoa, { midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%.".format(slotText)) });
+
 		midiCtrl = TextField(uview, flow.bounds.width/2@(flow.bounds.height/3*0.9))
 			.font_(textFieldFont)
 			.string_(mctrl)
@@ -219,6 +232,9 @@ CVMidiEditGroup {
 				})
 			})
 		;
+		slot !? { slotText = " at slot %".format(slot) };
+
+		if(GUI.id !== \cocoa, { midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%.".format(slotText)) });
 	}
 
 	bounds {

@@ -260,7 +260,7 @@ CVWidgetKnob : CVWidget {
 			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
-				if(tf.string != msrc, {
+				if("^[-+]?[0-9]*$".matchRegexp(tf.string), {
 					wdgtControllersAndModels.midiDisplay.model.value_((
 						learn: "C",
 						src: tf.string,
@@ -287,7 +287,7 @@ CVWidgetKnob : CVWidget {
 			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
-				if(tf.string != mchan, {
+				if("^[0-9]*$".matchRegexp(tf.string), {
 					wdgtControllersAndModels.midiDisplay.model.value_((
 						learn: "C",
 						src: wdgtControllersAndModels.midiDisplay.model.value.src,
@@ -313,7 +313,7 @@ CVWidgetKnob : CVWidget {
 			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
-				if(tf.string != mctrl, {
+				if("^[0-9]*$".matchRegexp(tf.string), {
 					wdgtControllersAndModels.midiDisplay.model.value_((
 						learn: "C",
 						src: wdgtControllersAndModels.midiDisplay.model.value.src,

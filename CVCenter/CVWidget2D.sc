@@ -384,7 +384,7 @@ CVWidget2D : CVWidget {
 			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
-				if(tf.string != msrc, {
+				if("^[-+]?[0-9]*$".matchRegexp(tf.string), {
 					wdgtControllersAndModels[v[0]].midiDisplay.model.value_((
 						learn: "C",
 						src: tf.string,
@@ -418,7 +418,7 @@ CVWidget2D : CVWidget {
 			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
-				if(tf.string != msrc, {
+				if("^[0-9]*$".matchRegexp(tf.string), {
 					wdgtControllersAndModels[v[0]].midiDisplay.model.value_((
 						learn: "C",
 						src: wdgtControllersAndModels[v[0]].midiDisplay.model.value.src,
@@ -450,7 +450,7 @@ CVWidget2D : CVWidget {
 			.background_(Color.white)
 			.stringColor_(Color.black)
 			.action_({ |tf|
-				if(tf.string != msrc, {
+				if("^[0-9]*$".matchRegexp(tf.string), {
 					wdgtControllersAndModels[v[0]].midiDisplay.model.value_((
 						learn: "C",
 						src: wdgtControllersAndModels[v[0]].midiDisplay.model.value.src,
