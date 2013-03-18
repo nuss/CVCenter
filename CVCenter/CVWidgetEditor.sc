@@ -544,7 +544,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-20@40)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("OSC command-name, e.g.: /my/cmd/name / OSC message slot: Either choose from a list of command-names (as set by the selected device) or add your custom one ")
+				.string_("OSC command-name, e.g.: /my/cmd/name / OSC\nmessage slot: Either choose from a list of command-names\n(as set by the selected device) or add your custom one ")
 			;
 
 			flow2.shift(0, 0);

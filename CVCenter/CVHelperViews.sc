@@ -61,13 +61,14 @@ CVMidiEditGroup {
 			Error("CVMidiEditGroup is a utility-class to be used with CVWidgets only.").throw
 		});
 
-		uview = UserView(parentView, thisBounds);
+		uview = CompositeView(parentView, thisBounds);
 		uview.decorator = flow = FlowLayout(thisBounds, 0@0, 0@0);
+				
 		// "parentView, bounds, flow.bounds: %, %, %\n".postf(parentView, bounds, flow.bounds);
 
 		// "flow, bounds: %, %\n".postf(flow, bounds);
 
-		midiHead = Button(uview, flow.bounds.width-(flow.bounds.height/3*1.1)@(flow.bounds.height/3*1.1))
+		midiHead = Button(uview, flow.bounds.width-(flow.bounds.height/3*1.1)-1@(flow.bounds.height/3*1.1))
 			.font_(staticTextFont)
 			.action_({ |mh|
 				if(widget.class == CVWidgetMS, { tabIndex = 0 }, { tabIndex = 1 });

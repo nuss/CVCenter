@@ -207,23 +207,27 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			widget.getSpec.default.size
 		].maxItem;
 
-		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@50)
+		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@56)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\") or \\freq or [[20, 20, 20, 20, 20], [20000, 20000, 20000, 20000, 20000], \\exp].asSpec. Or select a suitable ControlSpec from the List below. If you don't know what this all means have a look at the ControlSpec-helpfile.")
+//			.background_(Color.white)
+			.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\") or \\freq or [[20, 20, 20, 20, 20], [20000,\n20000, 20000, 20000, 20000], \\exp].asSpec. Or select a suitable ControlSpec from the List\nbelow. If you don't know what this all means have a look at the ControlSpec-helpfile.")
 		;
 
-		flow0.shift(0, 5);
+		flow0.shift(0, 2);
+		
+		if(GUI.id == \cocoa, { tmp = "\n" }, { tmp = " " });
 
 		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@45)
 			.font_(staticTextFontBold)
 			.stringColor_(staticTextColor)
-			.string_("NOTE: CVWidgetMS expects a Spec whose minvals, maxvals, step-sizes and/or default-values are arrays of the size of the number of sliders in the multislider. However, you may provide a spec like 'freq' and its parameters will internally expanded to arrays of the required size.")
+//			.background_(Color.white)
+			.string_("NOTE: CVWidgetMS expects a Spec whose minvals, maxvals, step-sizes and/or default-%values are arrays of the size of the number of sliders in the multislider. However, you may%provide a spec like 'freq' and its parameters will internally expanded to arrays of the required size.".format(tmp, tmp))
 		;
 
-		flow0.shift(0, 5);
+		flow0.shift(0, 2);
 
-		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@10)
+		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@14)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
 			.string_("Enter the desired Spec and execute it by hitting shift+return.")
@@ -429,44 +433,44 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			})
 		});
 
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@42)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("MIDI-mode: 0-127 or in-/decremental")
-		// .background_(Color.white)
+			.string_("MIDI-mode:\n0-127 or in-/\ndecremental")
+//			.background_(Color.white)
 		;
 
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@42)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("MIDI-mean (in-/decremental mode only)")
-		// .background_(Color.white)
+			.string_("MIDI-mean (in-/\ndecremental\nmode only)")
+//			.background_(Color.white)
 		;
 
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@42)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("minimum snap-distance for sli-ders (0-127 only)")
-		// .background_(Color.white)
+			.string_("minimum snap-\ndistance for sli-\nders (0-127 only)")
+//			.background_(Color.white)
 		;
 
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@42)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("MIDI-resolution (in-/decremental mode only)")
-		// .background_(Color.white)
+			.string_("MIDI-resolution\n(in-/decremental\nmode only)")
+//			.background_(Color.white)
 		;
 
-		midiFlow0.shift(0, -5);
+//		midiFlow0.shift(0, 0);
 
-		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@32)
+		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@30)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("number of sliders per bank")
-		// .background_(Color.white)
+			.string_("number of sliders\nper bank")
+//			.background_(Color.white)
 		;
 
-		midiFlow0.shift(0, 10);
+		midiFlow0.shift(0, 3);
 
 		StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-20@15)
 			.font_(staticTextFontBold)
@@ -588,6 +592,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
 			.string_("IP-address (optional)")
+//			.background_(Color.white)
 		;
 
 		oscFlow0.shift(0, 0);
@@ -596,6 +601,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
 			.string_("port (usually not necessary)")
+//			.background_(Color.white)
 		;
 
 		ipField = TextField(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
@@ -666,36 +672,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.action_({ OSCCommands.makeWindow })
 		;
 
-		StaticText(thisEditor.oscTabs.views[0], 65@40)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("placeholder values (numeric array)")
-		;
-
-		oscFlow0.shift(0, 10);
-
-		StaticText(thisEditor.oscTabs.views[0], 185@40)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("OSC-command (use % as placeholder)")
-		;
-
-		oscFlow0.shift(0, -5);
-
-		StaticText(thisEditor.oscTabs.views[0], 60@40)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("Multislider start-index")
-		;
-
-		oscFlow0.shift(0, -5);
-
-		StaticText(thisEditor.oscTabs.views[0], 60@40)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("msg.-slot (use % as placeholder)")
-		;
-
 		oscFlow0.shift(0, 0);
 
 		extOscCtrlArrayField = TextField(thisEditor.oscTabs.views[0], 65@15)
@@ -728,16 +704,44 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.string_("int or %")
 		;
 
-		oscFlow0.shift(0, 0);
+		StaticText(thisEditor.oscTabs.views[0], 65@42)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("placeholder\nvalues (numeric\narray)")
+//			.background_(Color.white)
+		;
+
+		StaticText(thisEditor.oscTabs.views[0], 185@20)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("OSC-command (use % as placeholder)")
+//			.background_(Color.white)
+		;
+
+		StaticText(thisEditor.oscTabs.views[0], 60@30)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("Multislider\nstart-index")
+//			.background_(Color.white)
+		;
+
+		StaticText(thisEditor.oscTabs.views[0], 60@42)
+			.font_(staticTextFont)
+			.stringColor_(staticTextColor)
+			.string_("msg.-slot (use\n% as\nplaceholder)")
+//			.background_(Color.white)
+		;
 
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-10@15)
 			.font_(staticTextFont)
 			.string_("Input to Output mapping")
+//			.background_(Color.white)
 		;
 
 		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-10@15)
 			.font_(staticTextFont)
 			.string_("Global Calibration")
+//			.background_(Color.white)
 		;
 
 		mappingSelectItems = ["set global mapping...", "linlin", "linexp", "explin", "expexp"];
