@@ -1595,8 +1595,15 @@ CVWidget {
 			AbstractCVWidgetEditor.midiSources ?? { AbstractCVWidgetEditor.midiSources = () };
 			MIDIClient.sources.do({ |source|
 				if(AbstractCVWidgetEditor.midiSources.keys.includes(source.uid.asInt).not, {
-					AbstractCVWidgetEditor.midiSources.put(source.name.asSymbol, source.uid.asInt)
-				});
+					// OSX/Linux specific tweek
+					if(source.name == source.device, {
+						AbstractCVWidgetEditor.midiSources.put(source.name.asSymbol, source.uid.asInt)
+					}, {
+						AbstractCVWidgetEditor.midiSources.put(
+							(source.device++":"+source.name).asSymbol, source.uid.asInt
+						)
+					})
+				})
 			});
 
 			AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
