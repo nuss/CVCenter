@@ -345,7 +345,7 @@ CVWidgetEditor {
 					if(mb.string != "nil", {
 						widget.setCtrlButtonBank(mb.string.asInt, slot);
 					}, {
-						widget.setCtrlButtonBank(nil);
+						widget.setCtrlButtonBank(nil, slot);
 					})
 				})
 			;
