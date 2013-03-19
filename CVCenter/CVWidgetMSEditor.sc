@@ -215,7 +215,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		;
 
 		flow0.shift(0, 2);
-		
+
 		if(GUI.id == \cocoa, { tmp = "\n" }, { tmp = " " });
 
 		StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@45)
@@ -320,7 +320,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			midiModeSelect.value_(thisMidiMode[0])
 		}, {
 			midiModeSelect.items = midiModeSelect.items.add("--");
-			midiModeSelect.value_(midiModeSelect.items.last);
+			midiModeSelect.value_(
+				midiModeSelect.items.indexOf(midiModeSelect.items.last)
+			);
 		});
 
 		if(GUI.id !== \cocoa, {
