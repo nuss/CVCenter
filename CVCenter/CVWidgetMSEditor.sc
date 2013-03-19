@@ -332,6 +332,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		midiMeanNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
 			.font_(staticTextFont)
 			.action_({ |mb|
+				"fire!!!".postln;
 				// string for possible compilation to an int
 				if("^[-+]?[0-9]*$".matchRegexp(mb.string), {
 					widget.msSize.do({ |sl|
@@ -405,15 +406,15 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		ctrlButtonBankField = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
 			.font_(staticTextFont)
 			.action_({ |mb|
-				if("^[0-9]*$".matchRegexp(mb.string) or:{ mb.string == "nil" }, {
-					if(mb.string != "nil", {
+				if(mb.string != "nil", {
+					if("^[0-9]*$".matchRegexp(mb.string), {
 						widget.msSize.do({ |sl|
 							widget.setCtrlButtonBank(mb.string.asInt, sl);
 						})
-					}, {
-						widget.msSize.do({ |sl|
-							widget.setCtrlButtonBank(nil);
-						})
+					})
+				}, {
+					widget.msSize.do({ |sl|
+						widget.setCtrlButtonBank(nil, sl);
 					})
 				})
 			})

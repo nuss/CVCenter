@@ -288,22 +288,29 @@ CVWidget {
 	}
 
 	setMidiMode { |mode, slot|
-		var thisSlot;
+		var thisSlot, wcm;
 
 		if(mode.asInt != 0 and:{ mode.asInt != 1 }, {
 			Error("setMidiMode: 'mode' must either be 0 or 1!").throw;
 		});
 
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidget2D, {
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot];
+			},
+			CVWidgetMS, {
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[slot];
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
 
 		switch(this.class,
 			CVWidgetKnob, {
 				prMidiMode = mode;
-				wdgtControllersAndModels !? {
-					wdgtControllersAndModels.midiOptions.model.value_(
+				// wdgtControllersAndModels !? {
+					wcm.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode,
 							midiMean: prMidiMean,
@@ -312,12 +319,12 @@ CVWidget {
 							softWithin: prSoftWithin
 						)
 					).changedKeys(synchKeys);
-				}
+			// }
 			},
 			{
 				prMidiMode[thisSlot] = mode;
-				wdgtControllersAndModels[thisSlot] !? {
-					wdgtControllersAndModels[thisSlot].midiOptions.model.value_(
+				// wdgtControllersAndModels[thisSlot] !? {
+					wcm.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode[thisSlot],
 							midiMean: prMidiMean[thisSlot],
@@ -326,7 +333,7 @@ CVWidget {
 							softWithin: prSoftWithin[thisSlot]
 						)
 					).changedKeys(synchKeys);
-				}
+			// }
 			}
 		);
 	}
@@ -347,21 +354,26 @@ CVWidget {
 	}
 
 	setMidiMean { |meanval, slot|
-		var thisSlot;
+		var thisSlot, thisMeanVal, wcm;
 
-		if(meanval.isInteger.not, {
-			Error("setMidiMean: 'meanval' must be an Integer!").throw;
-		});
+		thisMeanVal = meanval.asInt;
 
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidget2D, {
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot];
+			},
+			CVWidgetMS, {
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[thisSlot];
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
-				prMidiMean = meanval;
-				wdgtControllersAndModels !? {
-					wdgtControllersAndModels.midiOptions.model.value_(
+				prMidiMean = thisMeanVal;
+				// wdgtControllersAndModels !? {
+					wcm.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode,
 							midiMean: prMidiMean,
@@ -370,12 +382,12 @@ CVWidget {
 							softWithin: prSoftWithin
 						)
 					).changedKeys(synchKeys);
-				}
+			// }
 			},
 			{
-				prMidiMean[thisSlot] = meanval;
-				wdgtControllersAndModels[thisSlot] !? {
-					wdgtControllersAndModels[thisSlot].midiOptions.model.value_(
+				prMidiMean[thisSlot] = thisMeanVal;
+				// wdgtControllersAndModels[thisSlot] !? {
+					wcm.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode[thisSlot],
 							midiMean: prMidiMean[thisSlot],
@@ -384,7 +396,7 @@ CVWidget {
 							softWithin: prSoftWithin[thisSlot]
 						)
 					).changedKeys(synchKeys);
-				}
+			// }
 			}
 		)
 	}
@@ -404,21 +416,26 @@ CVWidget {
 	}
 
 	setSoftWithin { |threshold, slot|
-		var thisSlot;
+		var thisSlot, thisThresh, wcm;
 
-		if(threshold.isNumber.not, {
-			Error("setSoftWithin: 'threshold' must be an Integer or a Float!").throw;
-		});
+		thisThresh = threshold.asFloat;
 
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidget2D, {
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot];
+			},
+			CVWidgetMS, {
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[thisSlot];
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
-				prSoftWithin = threshold;
-				wdgtControllersAndModels !? {
-					wdgtControllersAndModels.midiOptions.model.value_(
+				prSoftWithin = thisThresh;
+				// wdgtControllersAndModels !? {
+					wcm.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode,
 							midiMean: prMidiMean,
@@ -427,12 +444,12 @@ CVWidget {
 							softWithin: prSoftWithin
 						)
 					).changedKeys(synchKeys);
-				}
+			// }
 			},
 			{
-				prSoftWithin[thisSlot] = threshold;
-				wdgtControllersAndModels[thisSlot] !? {
-					wdgtControllersAndModels[thisSlot].midiOptions.model.value_(
+				prSoftWithin[thisSlot] = thisThresh;
+				// wdgtControllersAndModels[thisSlot] !? {
+					wcm.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode[thisSlot],
 							midiMean: prMidiMean[thisSlot],
@@ -441,7 +458,7 @@ CVWidget {
 							softWithin: prSoftWithin[thisSlot]
 						)
 					).changedKeys(synchKeys);
-				}
+			// }
 			}
 		)
 	}
@@ -461,15 +478,22 @@ CVWidget {
 	}
 
 	setCtrlButtonBank { |numSliders, slot|
-		var thisSlot;
+		var thisSlot, wcm;
 
 		if(numSliders.isInteger.not and:{ numSliders.notNil }, {
 			Error("setCtrlButtonBank: 'numSliders' must either be an Integer or nil!").throw;
 		});
 
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidget2D, {
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot];
+			},
+			CVWidgetMS, {
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[thisSlot];
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -478,8 +502,8 @@ CVWidget {
 				}, {
 					prCtrlButtonBank = numSliders.asInt;
 				});
-				wdgtControllersAndModels !? {
-					wdgtControllersAndModels.midiOptions.model.value_(
+				// wdgtControllersAndModels !? {
+					wcm.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode,
 							midiMean: prMidiMean,
@@ -488,12 +512,12 @@ CVWidget {
 							softWithin: prSoftWithin
 						)
 					).changedKeys(synchKeys);
-				}
+				// }
 			},
 			{
 				prCtrlButtonBank.put(thisSlot, numSliders);
-				wdgtControllersAndModels[thisSlot] !? {
-					wdgtControllersAndModels[thisSlot].midiOptions.model.value_(
+				// wdgtControllersAndModels[thisSlot] !? {
+					wcm.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode[thisSlot],
 							midiMean: prMidiMean[thisSlot],
@@ -502,7 +526,7 @@ CVWidget {
 							softWithin: prSoftWithin[thisSlot]
 						)
 					).changedKeys(synchKeys);
-				}
+				// }
 			}
 		)
 	}
@@ -522,16 +546,24 @@ CVWidget {
 	}
 
 	setMidiResolution { |resolution, slot|
-		var thisSlot;
+		var thisSlot, wcm;
+
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidget2D, {
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot];
+			},
+			CVWidgetMS, {
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[thisSlot];
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
 				prMidiResolution = resolution;
-				wdgtControllersAndModels !? {
-					wdgtControllersAndModels.midiOptions.model.value_(
+				// wdgtControllersAndModels !? {
+					wcm.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode,
 							midiMean: prMidiMean,
@@ -540,12 +572,12 @@ CVWidget {
 							softWithin: prSoftWithin
 						)
 					).changedKeys(synchKeys);
-				}
+				// }
 			},
 			{
 				prMidiResolution[thisSlot] = resolution;
-				wdgtControllersAndModels[thisSlot] !? {
-					wdgtControllersAndModels[thisSlot].midiOptions.model.value_(
+				// wdgtControllersAndModels[thisSlot] !? {
+					wcm.midiOptions.model.value_(
 						(
 							midiMode: prMidiMode[thisSlot],
 							midiMean: prMidiMean[thisSlot],
@@ -554,7 +586,7 @@ CVWidget {
 							softWithin: prSoftWithin[thisSlot]
 						)
 					).changedKeys(synchKeys);
-				}
+				// }
 			}
 		)
 	}
@@ -574,10 +606,18 @@ CVWidget {
 	}
 
 	setCalibrate { |bool, slot|
-		var thisSlot;
+		var thisSlot, wcm;
+
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidget2D, {
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot];
+			},
+			CVWidgetMS, {
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[thisSlot];
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
 		if(bool.isKindOf(Boolean).not, {
 			Error("calibration can only be set to true or false!").throw;
@@ -585,26 +625,15 @@ CVWidget {
 		switch(this.class,
 			CVWidgetKnob, {
 				prCalibrate = bool;
-				wdgtControllersAndModels.oscConnection.model.value_(
-					wdgtControllersAndModels.oscConnection.model.value
-				).changedKeys(synchKeys);
-				wdgtControllersAndModels.calibration.model.value_(bool).changedKeys(synchKeys);
-			},
-			CVWidgetMS, {
-				prCalibrate[thisSlot] = bool;
-				wdgtControllersAndModels.slots[thisSlot].oscConnection.model.value_(
-					wdgtControllersAndModels.slots[thisSlot].oscConnection.model.value
-				).changedKeys(synchKeys);
-				wdgtControllersAndModels.slots[thisSlot].calibration.model.value_(bool).changedKeys(synchKeys);
 			},
 			{
 				prCalibrate[thisSlot] = bool;
-				wdgtControllersAndModels[thisSlot].oscConnection.model.value_(
-					wdgtControllersAndModels[thisSlot].oscConnection.model.value
-				).changedKeys(synchKeys);
-				wdgtControllersAndModels[thisSlot].calibration.model.value_(bool).changedKeys(synchKeys);
 			}
-		)
+		);
+		wcm.oscConnection.model.value_(
+			wcm.oscConnection.model.value
+		).changedKeys(synchKeys);
+		wcm.calibration.model.value_(bool).changedKeys(synchKeys);
 	}
 
 	getCalibrate { |slot|
@@ -623,11 +652,9 @@ CVWidget {
 
 	setSpec { |spec, slot|
 		var thisSpec;
-		if(spec.class == String, { thisSpec = spec.asSymbol }, { thisSpec = spec });
-		if(thisSpec.asSpec.isKindOf(ControlSpec).not, {
+		if((thisSpec = spec.asSpec).isKindOf(ControlSpec).not, {
 			Error("Please provide a valid spec! (its class must inherit from ControlSpec)").throw;
 		});
-		thisSpec = thisSpec.asSpec;
 		switch(this.class,
 			CVWidget2D, {
 				wdgtControllersAndModels[slot.asSymbol].cvSpec.model.value_(thisSpec).changedKeys(synchKeys);
@@ -673,7 +700,8 @@ CVWidget {
 			CVWidgetMS, {
 				thisSlot = slot.asInt;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
-			}
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
 
 		// "mapping: %\n".postf(mapping);
@@ -695,8 +723,8 @@ CVWidget {
 		switch(this.class,
 			CVWidgetKnob, {
 				midiOscEnv.oscMapping = thisMapping;
-				wdgtControllersAndModels.oscInputRange.model.value_(
-					wdgtControllersAndModels.oscInputRange.model.value;
+				wcm.oscInputRange.model.value_(
+					wcm.oscInputRange.model.value;
 				).changedKeys(synchKeys);
 			},
 			{
@@ -725,12 +753,19 @@ CVWidget {
 	}
 
 	oscConnect { |ip, port, name, oscMsgIndex=1, slot|
-		var thisSlot;
+		var thisSlot, wcm;
 		var thisIP, intPort;
 
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidget2D, {
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot];
+			},
+			CVWidgetMS, {
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[thisSlot];
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
 
 		if(ip.size > 0 and:{
@@ -762,17 +797,12 @@ CVWidget {
 			Error("You have to supply an integer as forth argument to oscConnect").throw;
 		});
 
+		wcm.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
 		switch(this.class,
 			CVWidgetKnob, {
-				wdgtControllersAndModels.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
 				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect }) });
 			},
 			CVWidget2D, {
-				wdgtControllersAndModels[thisSlot].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
-				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect(thisSlot) }) });
-			},
-			CVWidgetMS, {
-				wdgtControllersAndModels.slots[thisSlot].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
 				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect(thisSlot) }) });
 			}
 		)
@@ -788,17 +818,16 @@ CVWidget {
 			CVWidgetMS, {
 				thisSlot = slot.asInt;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
-			}
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
+		wcm.oscConnection.model.value_(false).changedKeys(synchKeys);
+		wcm.oscInputRange.model.value_([0.00001, 0.00001]).changedKeys(synchKeys);
 		switch(this.class,
 			CVWidgetKnob, {
-				wdgtControllersAndModels.oscConnection.model.value_(false).changedKeys(synchKeys);
-				wdgtControllersAndModels.oscInputRange.model.value_([0.00001, 0.00001]).changedKeys(synchKeys);
 				CmdPeriod.remove({ this.oscDisconnect });
 			},
 			{
-				wcm.oscConnection.model.value_(false).changedKeys(synchKeys);
-				wcm.oscInputRange.model.value_([0.00001, 0.00001]).changedKeys(synchKeys);
 				CmdPeriod.remove({ this.oscDisconnect(slot) });
 			}
 		)
@@ -808,7 +837,6 @@ CVWidget {
 	midiConnect { |uid, chan, num, slot|
 		var thisSlot, wcm;
 		switch(this.class,
-			CVWidgetKnob, { wcm = wdgtControllersAndModels },
 			CVWidget2D, {
 				slot ?? {
 					Error("Missing 'slot'-argument. Maybe you forgot to explicitely provide the slot: e.g. <wdgt>.midiConnect(slot: \lo)").throw;
@@ -822,7 +850,8 @@ CVWidget {
 				};
 				thisSlot = slot.asInt;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
-			}
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -862,46 +891,56 @@ CVWidget {
 			CVWidgetMS, {
 				thisSlot = slot.asInt;
 				wcm = wdgtControllersAndModels.slots[thisSlot]
-			}
+			},
+			{ wcm = wdgtControllersAndModels }
 		);
+		wcm.midiConnection.model.value_(nil).changedKeys(synchKeys);
 		switch(this.class,
 			CVWidgetKnob, {
-				wdgtControllersAndModels.midiConnection.model.value_(nil).changedKeys(synchKeys);
 				CmdPeriod.remove({ this.midiDisconnect });
 			},
 			{
-				wcm.midiConnection.model.value_(nil).changedKeys(synchKeys);
 				CmdPeriod.remove({ this.midiDisconnect(slot) });
 			}
 		)
 	}
 
 	setOscInputConstraints { |constraintsHiLo, slot|
-		var thisSlot;
+		var thisSlot, thisEditor,wcm;
+
 		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidget2D, {
+				thisSlot = slot.asSymbol;
+				wcm = wdgtControllersAndModels[thisSlot];
+				thisEditor = editor[thisSlot];
+			},
+			CVWidgetMS, {
+				thisSlot = slot.asInt;
+				wcm = wdgtControllersAndModels.slots[thisSlot];
+				this.editor = editor.editors[thisSlot];
+			},
+			{
+				wcm = wdgtControllersAndModels;
+				thisEditor = editor;
+			}
 		);
+
 		if(constraintsHiLo.isKindOf(Point).not, {
-			Error("setOSCInputConstraints expects a Point in the form of lo@hi").throw;
+			Error("setOSCInputConstraints expects a Point in the form of Point(lo, hi) or lo@hi").throw;
 		}, {
 			this.setCalibrate(false, slot);
 			switch(this.class,
 				CVWidgetKnob, {
 					midiOscEnv.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
-					if(editor.notNil and:{ editor.isClosed.not }, {
-						wdgtControllersAndModels.mapConstrainterLo.value_(constraintsHiLo.x);
-						wdgtControllersAndModels.mapConstrainterHi.value_(constraintsHiLo.y);
-					})
 				},
 				{
 					midiOscEnv[thisSlot].calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
-					if(editor[thisSlot].notNil and:{ editor[thisSlot].isClosed.not }, {
-						wdgtControllersAndModels[thisSlot].mapConstrainterLo.value_(constraintsHiLo.x);
-						wdgtControllersAndModels[thisSlot].mapConstrainterHi.value_(constraintsHiLo.y);
-					})
 				}
-			)
+			);
+			if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
+				wcm.mapConstrainterLo.value_(constraintsHiLo.x);
+				wcm.mapConstrainterHi.value_(constraintsHiLo.y);
+			})
 		})
 	}
 
@@ -1785,7 +1824,7 @@ CVWidget {
 	}
 
 	prInitMidiOptions { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
-		var typeText;
+		var thisEditor, typeText, tmp;
 
 		wcm.midiOptions.controller ?? {
 			wcm.midiOptions.controller = SimpleController(wcm.midiOptions.model);
@@ -1794,20 +1833,51 @@ CVWidget {
 		wcm.midiOptions.controller.put(\default, { |theChanger, what, moreArgs|
 			if(debug, { "widget '%' (%) at slot '%' midiOptions.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
-			if(thisGuiEnv.editor.notNil and:{
-				thisGuiEnv.editor.isClosed.not
-			}, {
-				thisGuiEnv.editor.midiModeSelect.value_(theChanger.value.midiMode);
-				thisGuiEnv.editor.midiMeanNB.value_(theChanger.value.midiMean);
-				thisGuiEnv.editor.softWithinNB.value_(theChanger.value.softWithin);
-				thisGuiEnv.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
-				thisGuiEnv.editor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
-			});
+			// "thisGuiEnv: %\n".postf(thisGuiEnv);
 
-			// thisGuiEnv.postln;
-			if(window.notNil and:{ window.isClosed.not }, {
-				if(slot.notNil, { typeText = "'s '"++slot++"' slot" }, { typeText = "" });
-				thisGuiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
+			if(this.class != CVWidgetMS, {
+				if(thisGuiEnv.editor.notNil and:{
+					thisGuiEnv.editor.isClosed.not
+				}, {
+					thisGuiEnv.editor.midiModeSelect.value_(theChanger.value.midiMode);
+					thisGuiEnv.editor.midiMeanNB.value_(theChanger.value.midiMean);
+					thisGuiEnv.editor.softWithinNB.value_(theChanger.value.softWithin);
+					thisGuiEnv.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
+					thisGuiEnv.editor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
+				});
+
+				// thisGuiEnv.postln;
+				if(window.notNil and:{ window.isClosed.not }, {
+					if(slot.notNil, { typeText = "'s '"++slot++"' slot" }, { typeText = "" });
+					thisGuiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
+				})
+			}, {
+				thisGuiEnv.editor.do({ |ed, sl|
+					if(ed.notNil and:{ ed.isClosed.not }, {
+						ed.midiModeSelect.value_(prMidiMode[sl]);
+						ed.midiMeanNB.value_(prMidiMean[sl]);
+						ed.softWithinNB.value_(prSoftWithin[sl]);
+						ed.midiResolutionNB.value_(prMidiResolution[sl]);
+						ed.ctrlButtonBankField.string_(prCtrlButtonBank[sl]);
+					})
+				});
+					// thisGuiEnv.msEditor.postln;
+				if(thisGuiEnv.msEditor.notNil and:{ thisGuiEnv.msEditor.isClosed.not }, {
+					tmp = this.msSize.collect({ |sl| prMidiMode[sl] });
+					if(tmp.minItem != tmp.maxItem, {
+						if(thisGuiEnv.msEditor.midiModeSelect.items.size == 2, {
+							thisGuiEnv.msEditor.midiModeSelect.items = thisGuiEnv.msEditor.midiModeSelect.items.add("--");
+						});
+						thisGuiEnv.msEditor.midiModeSelect.value_(2)
+					}, {
+						if(thisGuiEnv.msEditor.midiModeSelect.items.size == 3, {
+							thisGuiEnv.msEditor.midiModeSelect.items.remove(
+								thisGuiEnv.msEditor.midiModeSelect.items.last
+							)
+						});
+						thisGuiEnv.msEditor.midiModeSelect.value_(prMidiMode[slot])
+					})
+				})
 			})
 		})
 	}

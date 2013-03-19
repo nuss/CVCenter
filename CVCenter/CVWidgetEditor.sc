@@ -357,9 +357,11 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.string_(thisCtrlButtonBank)
 				.action_({ |mb|
 					if(mb.string != "nil", {
-						widget.setCtrlButtonBank(mb.string.asInt, slot);
+						if("^[0-9]*$".matchRegexp(mb.string), {
+							widget.setCtrlButtonBank(mb.string.asInt, slot);
+						})
 					}, {
-						widget.setCtrlButtonBank(nil);
+						widget.setCtrlButtonBank(nil, slot);
 					})
 				})
 			;
