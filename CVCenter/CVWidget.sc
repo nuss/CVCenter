@@ -1861,26 +1861,45 @@ CVWidget {
 				// thisGuiEnv.msEditor.postln;
 				if(thisGuiEnv.msEditor.notNil and:{ thisGuiEnv.msEditor.isClosed.not }, {
 						// [prMidiMode[slot], this.getMidiMode(slot)].postln;
-					tmp = this.msSize.collect({ |sl| prMidiMode[sl] });
-					if(tmp.minItem != tmp.maxItem, {
-						if(thisGuiEnv.msEditor.midiModeSelect.items.size == 2, {
+					[prMidiMode, prMidiMean, prMidiResolution, prSoftWithin, prCtrlButtonBank].do({ |prVal, i|
+						tmp = this.msSize.collect({ |sl| prVal[sl] });
+						switch(i,
+							0, {
+								if(tmp.minItem != tmp.maxItem, {
+									if(thisGuiEnv.msEditor.midiModeSelect.items.size == 2, {
 								// "midiModeSelect.items.size == 2, midiMode differs: %\n".postf(thisGuiEnv.msEditor.midiModeSelect.items.size);
-							thisGuiEnv.msEditor.midiModeSelect.items = thisGuiEnv.msEditor.midiModeSelect.items.add("--");
-						});
-						thisGuiEnv.msEditor.midiModeSelect.value_(2)
-					}, {
-						if(thisGuiEnv.msEditor.midiModeSelect.items.size == 3, {
+										thisGuiEnv.msEditor.midiModeSelect.items = thisGuiEnv.msEditor.midiModeSelect.items.add("--");
+									});
+									thisGuiEnv.msEditor.midiModeSelect.value_(2)
+								}, {
+									if(thisGuiEnv.msEditor.midiModeSelect.items.size == 3, {
 									// "midiModeSelect.items.size == 3, midiMode differs not: %\n".postf(thisGuiEnv.msEditor.midiModeSelect.items.last);
-							thisGuiEnv.msEditor.midiModeSelect.items.remove(
-								thisGuiEnv.msEditor.midiModeSelect.items.last
-							);
-							thisGuiEnv.msEditor.midiModeSelect.items.postln;
-							thisGuiEnv.msEditor.midiModeSelect.items_(
-								thisGuiEnv.msEditor.midiModeSelect.items
-							)
-						});
+										thisGuiEnv.msEditor.midiModeSelect.items.remove(
+											thisGuiEnv.msEditor.midiModeSelect.items.last
+										);
+										thisGuiEnv.msEditor.midiModeSelect.items_(
+											thisGuiEnv.msEditor.midiModeSelect.items
+										)
+									});
 								// "und jetzt: % (midiMode: %)".postf(thisGuiEnv.msEditor.midiModeSelect.value, prMidiMode[slot]);
-						thisGuiEnv.msEditor.midiModeSelect.value_(prMidiMode[slot]);
+									thisGuiEnv.msEditor.midiModeSelect.value_(prVal[slot]);
+								})
+							},
+							4, {
+								if((try { tmp.minItem == tmp.maxItem } ?? { tmp.select(_.isNumber).size == tmp.size }), {
+									thisGuiEnv.msEditor.ctrlButtonBankField.string_(prVal[slot]);
+								}, {
+									thisGuiEnv.msEditor.ctrlButtonBankField.string_("--")
+								})
+							},
+							{
+								if(tmp.minItem == tmp.maxItem, {
+									thisGuiEnv.msEditor.ctrlButtonBankField.string_(prVal[slot]);
+								}, {
+									thisGuiEnv.msEditor.ctrlButtonBankField.string_("--");
+								})
+							}
+						)
 					})
 				})
 			})
