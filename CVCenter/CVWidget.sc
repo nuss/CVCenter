@@ -419,6 +419,9 @@ CVWidget {
 		var thisSlot, thisThresh, wcm;
 
 		thisThresh = threshold.asFloat;
+		if(thisThresh > 0.5 or:{ thisThresh < 0.01 }, {
+			Error("threshold must be between 0.01 and 0.5").throw;
+		});
 
 		switch(this.class,
 			CVWidget2D, {
@@ -1860,11 +1863,17 @@ CVWidget {
 			}, {
 				// thisGuiEnv.msEditor.postln;
 				if(thisGuiEnv.msEditor.notNil and:{ thisGuiEnv.msEditor.isClosed.not }, {
-						// [prMidiMode[slot], this.getMidiMode(slot)].postln;
-					[prMidiMode, prMidiMean, prMidiResolution, prSoftWithin, prCtrlButtonBank].do({ |prVal, i|
+					// [prMidiMode[slot], this.getMidiMode(slot)].postln;
+					(
+						midiModeSelect: prMidiMode,
+						midiMeanNB: prMidiMean,
+						midiResolutionNB: prMidiResolution,
+						softWithinNB: prSoftWithin,
+						ctrlButtonBankField: prCtrlButtonBank
+					).pairsDo({ |field, prVal|
 						tmp = this.msSize.collect({ |sl| prVal[sl] });
-						switch(i,
-							0, {
+						switch(field,
+							\midiModeSelect, {
 								if(tmp.minItem != tmp.maxItem, {
 									if(thisGuiEnv.msEditor.midiModeSelect.items.size == 2, {
 								// "midiModeSelect.items.size == 2, midiMode differs: %\n".postf(thisGuiEnv.msEditor.midiModeSelect.items.size);
@@ -1885,8 +1894,10 @@ CVWidget {
 									thisGuiEnv.msEditor.midiModeSelect.value_(prVal[slot]);
 								})
 							},
-							4, {
-								if((try { tmp.minItem == tmp.maxItem } ?? { tmp.select(_.isNumber).size == tmp.size }), {
+							\ctrlButtonBankField, {
+								if((try { tmp.minItem == tmp.maxItem } ?? {
+									tmp.select(_.isNumber).size == tmp.size
+								}), {
 									thisGuiEnv.msEditor.ctrlButtonBankField.string_(prVal[slot]);
 								}, {
 									thisGuiEnv.msEditor.ctrlButtonBankField.string_("--")
@@ -1894,9 +1905,9 @@ CVWidget {
 							},
 							{
 								if(tmp.minItem == tmp.maxItem, {
-									thisGuiEnv.msEditor.ctrlButtonBankField.string_(prVal[slot]);
+									thisGuiEnv.msEditor.perform(field).string_(prVal[slot]);
 								}, {
-									thisGuiEnv.msEditor.ctrlButtonBankField.string_("--");
+									thisGuiEnv.msEditor.perform(field).string_("--");
 								})
 							}
 						)

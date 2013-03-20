@@ -333,11 +333,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		midiMeanNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
 			.font_(staticTextFont)
 			.action_({ |mb|
-				"fire!!!".postln;
+				tmp = mb.string;
 				// string for possible compilation to an int
-				if("^[-+]?[0-9]*$".matchRegexp(mb.string), {
+				if("^[-+]?[0-9]*$".matchRegexp(tmp), {
 					widget.msSize.do({ |sl|
-						widget.setMidiMean(mb.string.asInt, sl);
+						widget.setMidiMean(tmp.asInt, sl);
 					})
 				}, {
 					Error("MIDI-mean must be an integer value!").throw;
@@ -360,10 +360,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		softWithinNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
 			.font_(staticTextFont)
 			.action_({ |mb|
+				tmp = mb.string;
 				// string must be a valid float or integer
-				if("^[0-9]*\.?[0-9]*$".matchRegexp(mb.string), {
+				if("^[0-9]*\.?[0-9]*$".matchRegexp(tmp), {
 					widget.msSize.do({ |sl|
-						widget.setSoftWithin(mb.string.asFloat, sl);
+						widget.setSoftWithin(tmp.asFloat, sl);
 					})
 				})
 			})
@@ -384,9 +385,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		midiResolutionNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
 			.font_(staticTextFont)
 			.action_({ |mb|
-				if("^[0-9]*\.?[0-9]*$".matchRegexp(mb.string), {
+				tmp = mb.string;
+				if("^[0-9]*\.?[0-9]*$".matchRegexp(tmp), {
 					widget.msSize.do({ |sl|
-						widget.setMidiResolution(mb.string.asFloat, sl);
+						widget.setMidiResolution(tmp.asFloat, sl);
 					})
 				})
 			})
@@ -407,10 +409,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		ctrlButtonBankField = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
 			.font_(staticTextFont)
 			.action_({ |mb|
+				tmp = mb.string;
 				if(mb.string != "nil", {
+					tmp = mb.string;
 					if("^[0-9]*$".matchRegexp(mb.string), {
 						widget.msSize.do({ |sl|
-							widget.setCtrlButtonBank(mb.string.asInt, sl);
+							widget.setCtrlButtonBank(tmp.asInt, sl);
 						})
 					})
 				}, {
