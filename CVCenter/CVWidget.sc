@@ -1834,48 +1834,53 @@ CVWidget {
 			if(debug, { "widget '%' (%) at slot '%' midiOptions.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			// "thisGuiEnv: %\n".postf(thisGuiEnv);
+			switch(this.class,
+				CVWidgetMS, {
+					thisEditor = thisGuiEnv.editor[slot];
+				},
+				{ thisEditor = thisGuiEnv.editor }
+			);
 
-			if(this.class != CVWidgetMS, {
-				if(thisGuiEnv.editor.notNil and:{
-					thisGuiEnv.editor.isClosed.not
-				}, {
-					thisGuiEnv.editor.midiModeSelect.value_(theChanger.value.midiMode);
-					thisGuiEnv.editor.midiMeanNB.value_(theChanger.value.midiMean);
-					thisGuiEnv.editor.softWithinNB.value_(theChanger.value.softWithin);
-					thisGuiEnv.editor.midiResolutionNB.value_(theChanger.value.midiResolution);
-					thisGuiEnv.editor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
-				});
+			if(thisEditor.notNil and:{
+				thisEditor.isClosed.not
+			}, {
+				thisEditor.midiModeSelect.value_(theChanger.value.midiMode);
+				thisEditor.midiMeanNB.value_(theChanger.value.midiMean);
+				thisEditor.softWithinNB.value_(theChanger.value.softWithin);
+				thisEditor.midiResolutionNB.value_(theChanger.value.midiResolution);
+				thisEditor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
+			});
 
 				// thisGuiEnv.postln;
+			if(this.class != CVWidgetMS, {
 				if(window.notNil and:{ window.isClosed.not }, {
 					if(slot.notNil, { typeText = "'s '"++slot++"' slot" }, { typeText = "" });
 					thisGuiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
 				})
 			}, {
-				thisGuiEnv.editor.do({ |ed, sl|
-					if(ed.notNil and:{ ed.isClosed.not }, {
-						ed.midiModeSelect.value_(prMidiMode[sl]);
-						ed.midiMeanNB.value_(prMidiMean[sl]);
-						ed.softWithinNB.value_(prSoftWithin[sl]);
-						ed.midiResolutionNB.value_(prMidiResolution[sl]);
-						ed.ctrlButtonBankField.string_(prCtrlButtonBank[sl]);
-					})
-				});
-					// thisGuiEnv.msEditor.postln;
+				// thisGuiEnv.msEditor.postln;
 				if(thisGuiEnv.msEditor.notNil and:{ thisGuiEnv.msEditor.isClosed.not }, {
+						// [prMidiMode[slot], this.getMidiMode(slot)].postln;
 					tmp = this.msSize.collect({ |sl| prMidiMode[sl] });
 					if(tmp.minItem != tmp.maxItem, {
 						if(thisGuiEnv.msEditor.midiModeSelect.items.size == 2, {
+								// "midiModeSelect.items.size == 2, midiMode differs: %\n".postf(thisGuiEnv.msEditor.midiModeSelect.items.size);
 							thisGuiEnv.msEditor.midiModeSelect.items = thisGuiEnv.msEditor.midiModeSelect.items.add("--");
 						});
 						thisGuiEnv.msEditor.midiModeSelect.value_(2)
 					}, {
 						if(thisGuiEnv.msEditor.midiModeSelect.items.size == 3, {
+									// "midiModeSelect.items.size == 3, midiMode differs not: %\n".postf(thisGuiEnv.msEditor.midiModeSelect.items.last);
 							thisGuiEnv.msEditor.midiModeSelect.items.remove(
 								thisGuiEnv.msEditor.midiModeSelect.items.last
+							);
+							thisGuiEnv.msEditor.midiModeSelect.items.postln;
+							thisGuiEnv.msEditor.midiModeSelect.items_(
+								thisGuiEnv.msEditor.midiModeSelect.items
 							)
 						});
-						thisGuiEnv.msEditor.midiModeSelect.value_(prMidiMode[slot])
+								// "und jetzt: % (midiMode: %)".postf(thisGuiEnv.msEditor.midiModeSelect.value, prMidiMode[slot]);
+						thisGuiEnv.msEditor.midiModeSelect.value_(prMidiMode[slot]);
 					})
 				})
 			})

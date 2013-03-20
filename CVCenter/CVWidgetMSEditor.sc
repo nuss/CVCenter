@@ -308,9 +308,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.font_(staticTextFont)
 			.items_(midiModes)
 			.action_({ |ms|
+				tmp = ms.value;
 				widget.msSize.do({ |sl|
-					if(ms.value != 2, {
-						widget.setMidiMode(ms.value, sl);
+					if(tmp != 2, {
+						widget.setMidiMode(tmp, sl);
 					})
 				})
 			})
