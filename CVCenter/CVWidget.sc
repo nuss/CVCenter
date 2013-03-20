@@ -356,6 +356,10 @@ CVWidget {
 	setMidiMean { |meanval, slot|
 		var thisSlot, thisMeanVal, wcm;
 
+		if("^[-+]?[0-9]*$".matchRegexp(meanval).not, {
+			Error("meanval must be an Integer!").throw;
+		});
+
 		thisMeanVal = meanval.asInt;
 
 		switch(this.class,
@@ -483,7 +487,7 @@ CVWidget {
 	setCtrlButtonBank { |numSliders, slot|
 		var thisSlot, wcm;
 
-		if(numSliders.isInteger.not and:{ numSliders.notNil }, {
+		if("^[0-9]*$".matchRegexp(numSliders).not and:{ numSliders.notNil }, {
 			Error("setCtrlButtonBank: 'numSliders' must either be an Integer or nil!").throw;
 		});
 
@@ -550,6 +554,10 @@ CVWidget {
 
 	setMidiResolution { |resolution, slot|
 		var thisSlot, wcm;
+
+		if("^[0-9]*\.?[0-9]*$*$".matchRegexp(resolution).not, {
+			Error("resolution must be a positive Float or Integer!").throw;
+		});
 
 		switch(this.class,
 			CVWidget2D, {
