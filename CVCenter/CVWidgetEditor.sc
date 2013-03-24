@@ -28,7 +28,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "channel", mctrl = "ctrl", margs;
-		var addr, wcm, thisGuiEnv, labelColors;
+		var addr, wcm, labelColors;
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
 		var mappingSelectItems;
@@ -50,17 +50,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		thisCmdNames ?? { thisCmdNames = [nil] };
 
 		actionsList ?? { actionsList = () };
-
-		if(slot.isNil, { thisGuiEnv = widget.guiEnv }, {
-			switch(widget.class,
-				CVWidget2D, {
-					thisGuiEnv = widget.guiEnv[slot]
-				},
-				CVWidgetMS, {
-					thisGuiEnv = widget.guiEnv.editor[slot]
-				}
-			)
-		});
 
 		if(slot.notNil, {
 			switch(widget.class,
@@ -416,9 +405,9 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					ml.value.switch(
 						1, {
 							margs = [
-								[thisGuiEnv.midiSrc.string, msrc],
-								[thisGuiEnv.midiChan.string, mchan],
-								[thisGuiEnv.midiCtrl.string, mctrl]
+								[midiSrcField.string, msrc],
+								[midiChanField.string, mchan],
+								[midiCtrlField.string, mctrl]
 							].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
 							if(margs.select({ |i| i.notNil }).size > 0, {
 								widget.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], slot: slot)

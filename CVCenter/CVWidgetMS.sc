@@ -256,6 +256,11 @@ CVWidgetMS : CVWidget {
 				}, {
 					editor.msEditor.front(1)
 				});
+				if(midiOscEnv.select({ |slot| slot.cc.notNil }).size > 0, {
+					editor.msEditor.midiTabs.focus(1)
+				}, {
+					editor.msEditor.midiTabs.focus(0)
+				});
 				msSize.do({ |i|
 					wdgtControllersAndModels.slots[i].oscDisplay.model.value_(
 						wdgtControllersAndModels.slots[i].oscDisplay.model.value;

@@ -34,7 +34,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		// var oscTabs, midiTabs;
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var maxNum, msrc = "source", mchan = "channel", mctrl = "ctrl", margs;
-		var addr, wcmMS, thisGuiEnv, labelColors;
+		var addr, wcmMS, labelColors;
 		var midiUid, midiChan;
 		var oscLabelColor, midiLabelColor, oscLabelStringColor, midiLabelStringColor;
 		var oscConnectCondition = 0;
@@ -67,8 +67,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		thisCmdNames ?? { thisCmdNames = [nil] };
 
 		actionsList ?? { actionsList = () };
-
-		thisGuiEnv = widget.guiEnv;
 
 		widget.wdgtControllersAndModels !? {
 			wcmMS = widget.wdgtControllersAndModels;
@@ -515,8 +513,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.items_(["select device port..."])
 			.font_(staticTextFont)
 			.action_({ |ms|
-				if(ms.value != 0, {
-
+				if(ms.value != 0 and:{ MIDIClient.initialized }, {
+					midiSrcField.string_(midiSources[ms.items[ms.value]]);
 				})
 			})
 		;

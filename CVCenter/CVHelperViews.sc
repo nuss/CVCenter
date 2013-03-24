@@ -17,7 +17,7 @@
 
 CVMidiEditGroup {
 
-	var uview;
+	var cview;
 	var <midiLearn, <midiHead, <midiSrc, <midiChan, <midiCtrl;
 
 	*new { |parent, bounds, widget, slot|
@@ -61,14 +61,14 @@ CVMidiEditGroup {
 			Error("CVMidiEditGroup is a utility-class to be used with CVWidgets only.").throw
 		});
 
-		uview = CompositeView(parentView, thisBounds);
-		uview.decorator = flow = FlowLayout(thisBounds, 0@0, 0@0);
-				
+		cview = CompositeView(parentView, thisBounds);
+		cview.decorator = flow = FlowLayout(thisBounds, 0@0, 0@0);
+
 		// "parentView, bounds, flow.bounds: %, %, %\n".postf(parentView, bounds, flow.bounds);
 
 		// "flow, bounds: %, %\n".postf(flow, bounds);
 
-		midiHead = Button(uview, flow.bounds.width-(flow.bounds.height/3*1.1)-1@(flow.bounds.height/3*1.1))
+		midiHead = Button(cview, flow.bounds.width-(flow.bounds.height/3*1.1)-1@(flow.bounds.height/3*1.1))
 			.font_(staticTextFont)
 			.action_({ |mh|
 				if(widget.class == CVWidgetMS, { tabIndex = 0 }, { tabIndex = 1 });
@@ -122,7 +122,7 @@ CVMidiEditGroup {
 			})
 		});
 
-		midiLearn = Button(uview, flow.bounds.height/3*1.1@(flow.bounds.height/3*1.1))
+		midiLearn = Button(cview, flow.bounds.height/3*1.1@(flow.bounds.height/3*1.1))
 			.font_(staticTextFont)
 			.states_([
 				["L", Color.white, Color.blue],
@@ -151,7 +151,7 @@ CVMidiEditGroup {
 
 		if(GUI.id !== \cocoa, { midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget %to that slider.".format(slotText)) });
 
-		midiSrc = TextField(uview, flow.bounds.width@(flow.bounds.height/3*0.9))
+		midiSrc = TextField(cview, flow.bounds.width@(flow.bounds.height/3*0.9))
 			.font_(textFieldFont)
 			.string_(msrc)
 			.background_(Color.white)
@@ -180,7 +180,7 @@ CVMidiEditGroup {
 
 		if(GUI.id !== \cocoa, { midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%.".format(slotText)) });
 
-		midiChan = TextField(uview, flow.bounds.width/2@(flow.bounds.height/3*0.9))
+		midiChan = TextField(cview, flow.bounds.width/2@(flow.bounds.height/3*0.9))
 			.font_(textFieldFont)
 			.string_(mchan)
 			.background_(Color.white)
@@ -209,7 +209,7 @@ CVMidiEditGroup {
 
 		if(GUI.id !== \cocoa, { midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%.".format(slotText)) });
 
-		midiCtrl = TextField(uview, flow.bounds.width/2@(flow.bounds.height/3*0.9))
+		midiCtrl = TextField(cview, flow.bounds.width/2@(flow.bounds.height/3*0.9))
 			.font_(textFieldFont)
 			.string_(mctrl)
 			.background_(Color.white)
@@ -239,7 +239,7 @@ CVMidiEditGroup {
 	}
 
 	bounds {
-		^uview.bounds;
+		^cview.bounds;
 	}
 
 }

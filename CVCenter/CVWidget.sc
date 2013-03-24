@@ -1607,7 +1607,9 @@ CVWidget {
 
 	prInitMidiDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var ctrlToolTip,typeText, r, p, sourceNames;
-		var midiInitFunc;
+		var midiInitFunc, thisEditor;
+		// CVWidgetMS
+		var numMidiResponders, numMidiString, midiButBg, midiButTextColor;
 
 		midiInitFunc = { |val|
 			if(val.editor.notNil and:{ val.editor.isClosed.not }, {
@@ -1633,6 +1635,13 @@ CVWidget {
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			if(debug, { "widget '%' (%) at slot '%' midiDisplay.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+
+			// "thisGuiEnv: %\n".postf(thisGuiEnv);
+			if(this.class == CVWidgetMS, {
+				thisEditor = thisGuiEnv.editor[slot];
+			}, {
+				thisEditor = thisGuiEnv.editor;
+			});
 
 			AbstractCVWidgetEditor.midiSources ?? { AbstractCVWidgetEditor.midiSources = () };
 			MIDIClient.sources.do({ |source|
@@ -1662,9 +1671,10 @@ CVWidget {
 			});
 
 
-			if(this.class != CVWidgetMS, {
-				theChanger.value.learn.switch(
-					"X", {
+			// if(this.class != CVWidgetMS, {
+			theChanger.value.learn.switch(
+				"X", {
+					if(this.class != CVWidgetMS, {
 						defer {
 							if(window.isClosed.not, {
 								thisGuiEnv.midiSrc.string_(theChanger.value.src.asString)
@@ -1687,7 +1697,9 @@ CVWidget {
 								if(GUI.id !== \cocoa, {
 									thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
 									[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do({ |elem|
-										if(theChanger.value.ctrl.class == String and:{ theChanger.value.ctrl.includes($:) }, {
+										if(theChanger.value.ctrl.class == String and:{
+											theChanger.value.ctrl.includes($:)
+										}, {
 											ctrlToolTip = theChanger.value.ctrl.split($:);
 											ctrlToolTip = ctrlToolTip[1]++" in bank "++ctrlToolTip[0];
 										}, { ctrlToolTip = theChanger.value.ctrl });
@@ -1696,65 +1708,108 @@ CVWidget {
 										)
 									})
 								})
-							});
-
-							if(thisGuiEnv.editor.notNil and:{
-								thisGuiEnv.editor.isClosed.not
-							}, {
-								thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src.asString)
-									.background_(Color.red)
-									.stringColor_(Color.white)
-									.canFocus_(false)
-								;
-								thisGuiEnv.editor.midiChanField.string_((theChanger.value.chan+1).asString)
-									.background_(Color.red)
-									.stringColor_(Color.white)
-									.canFocus_(false)
-								;
-								thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
-									.background_(Color.red)
-									.stringColor_(Color.white)
-									.canFocus_(false)
-								;
-								thisGuiEnv.editor.midiLearnBut.value_(1)
 							})
 						}
-					},
-					"C", {
-						if(window.isClosed.not, {
-							thisGuiEnv.midiLearn.states_([
+					});
+
+					if(thisEditor.notNil and:{
+						thisEditor.isClosed.not
+					}, {
+						thisEditor.midiSrcField.string_(theChanger.value.src.asString)
+							.background_(Color.red)
+							.stringColor_(Color.white)
+							.canFocus_(false)
+						;
+						thisEditor.midiChanField.string_((theChanger.value.chan+1).asString)
+							.background_(Color.red)
+							.stringColor_(Color.white)
+							.canFocus_(false)
+						;
+						thisEditor.midiCtrlField.string_(theChanger.value.ctrl)
+							.background_(Color.red)
+							.stringColor_(Color.white)
+							.canFocus_(false)
+						;
+						thisEditor.midiLearnBut.value_(1)
+					});
+
+					if(this.class == CVWidgetMS, {
+						if(thisGuiEnv.msEditor.notNil and:{
+							thisGuiEnv.msEditor.isClosed.not
+						}, {
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.string_(
+								theChanger.value.src.asString
+							);
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.string_(
+								(theChanger.value.chan+1).asString
+							);
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.string_(
+								theChanger.value.ctrl
+							);
+							#[midiSrc, midiChan, midiCtrl].do({ |el|
+								thisGuiEnv.msEditor.midiEditGroups[slot].perform(el)
+									.background_(Color.red)
+									.stringColor_(Color.white)
+									.canFocus_(false)
+								;
+							});
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiLearn.value_(1);
+						})
+					})
+				},
+				"C", {
+					if(this.class != CVWidgetMS, {
+						defer {
+							if(window.isClosed.not, {
+								thisGuiEnv.midiLearn.states_([
+									["C", Color.white, Color(0.11, 0.38, 0.2)],
+									["X", Color.white, Color.red]
+								]).refresh;
+								if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
+								thisGuiEnv.midiLearn.value_(0);
+								thisGuiEnv.midiLearn.toolTip_("Click to connect the widget% to\nthe slider(s) as given in the fields below.".format(typeText));
+								r = [
+									thisGuiEnv.midiSrc.string != "source" and:{
+										try{ thisGuiEnv.midiSrc.string.interpret.isInteger }
+									},
+									thisGuiEnv.midiChan.string != "chan" and:{
+										try{ thisGuiEnv.midiChan.string.interpret.isInteger }
+									},
+									thisGuiEnv.midiCtrl.string != "ctrl"
+								].collect({ |r| r });
+
+								if(GUI.id !== \cocoa, {
+									p = "Use ";
+									if(r[0], { p = p++" MIDI-device ID "++theChanger.value.src++",\n" });
+									if(r[1], { p = p++"channel nr. "++theChanger.value.chan++",\n" });
+									if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
+									p = p++"\nto connect widget%to MIDI";
+
+									[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
+										_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
+									)
+								})
+							})
+						}
+					});
+
+					if(thisEditor.notNil and:{
+						thisEditor.isClosed.not
+					}, {
+						thisEditor.midiLearnBut
+							.states_([
 								["C", Color.white, Color(0.11, 0.38, 0.2)],
 								["X", Color.white, Color.red]
-							]).refresh;
-							if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
-							thisGuiEnv.midiLearn.value_(0);
-							thisGuiEnv.midiLearn.toolTip_("Click to connect the widget% to\nthe slider(s) as given in the fields below.".format(typeText));
-							r = [
-								thisGuiEnv.midiSrc.string != "source" and:{
-									try{ thisGuiEnv.midiSrc.string.interpret.isInteger }
-								},
-								thisGuiEnv.midiChan.string != "chan" and:{
-									try{ thisGuiEnv.midiChan.string.interpret.isInteger }
-								},
-								thisGuiEnv.midiCtrl.string != "ctrl"
-							].collect({ |r| r });
+							])
+							.value_(0)
+						;
+					});
 
-							if(GUI.id !== \cocoa, {
-								p = "Use ";
-								if(r[0], { p = p++" MIDI-device ID "++theChanger.value.src++",\n" });
-								if(r[1], { p = p++"channel nr. "++theChanger.value.chan++",\n" });
-								if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
-								p = p++"\nto connect widget%to MIDI";
-
-								[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
-									_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
-								)
-							})
-						});
-						if(thisGuiEnv.editor.notNil and:{
-							thisGuiEnv.editor.isClosed.not
+					if(this.class == CVWidgetMS, {
+						if(thisGuiEnv.msEditor.notNil and:{
+							thisGuiEnv.msEditor.isClosed.not
 						}, {
-							thisGuiEnv.editor.midiLearnBut
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiLearn
 								.states_([
 									["C", Color.white, Color(0.11, 0.38, 0.2)],
 									["X", Color.white, Color.red]
@@ -1762,8 +1817,10 @@ CVWidget {
 								.value_(0)
 							;
 						})
-					},
-					"L", {
+					})
+				},
+				"L", {
+					if(this.class != CVWidgetMS, {
 						defer {
 							if(window.isClosed.not, {
 								thisGuiEnv.midiSrc.string_(theChanger.value.src)
@@ -1793,35 +1850,85 @@ CVWidget {
 									thisGuiEnv.midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%".format(typeText));
 									thisGuiEnv.midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%".format(typeText));
 								})
-							});
+							})
+						}
+					});
 
-							if(thisGuiEnv.editor.notNil and:{
-								thisGuiEnv.editor.isClosed.not
-							}, {
-								thisGuiEnv.editor.midiSrcField.string_(theChanger.value.src)
+					if(thisEditor.notNil and:{
+						thisEditor.isClosed.not
+					}, {
+						thisEditor.midiSrcField.string_(theChanger.value.src)
+							.background_(Color.white)
+							.stringColor_(Color.black)
+							.canFocus_(true)
+						;
+						thisEditor.midiChanField.string_(theChanger.value.chan)
+							.background_(Color.white)
+							.stringColor_(Color.black)
+							.canFocus_(true)
+						;
+						thisEditor.midiCtrlField.string_(theChanger.value.ctrl)
+							.background_(Color.white)
+							.stringColor_(Color.black)
+							.canFocus_(true)
+						;
+						thisEditor.midiLearnBut.states_([
+							["L", Color.white, Color.blue],
+							["X", Color.white, Color.red]
+						])
+						.value_(0);
+					});
+
+					if(this.class == CVWidgetMS, {
+						if(thisGuiEnv.msEditor.notNil and:{
+							thisGuiEnv.msEditor.isClosed.not
+						}, {
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.string_(
+								theChanger.value.src
+							);
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.string_(
+								theChanger.value.chan
+							);
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.string_(
+								theChanger.value.ctrl
+							);
+							#[midiSrc, midiChan, midiCtrl].do({ |el|
+								thisGuiEnv.msEditor.midiEditGroups[slot].perform(el)
 									.background_(Color.white)
 									.stringColor_(Color.black)
 									.canFocus_(true)
 								;
-								thisGuiEnv.editor.midiChanField.string_(theChanger.value.chan)
-									.background_(Color.white)
-									.stringColor_(Color.black)
-									.canFocus_(true)
-								;
-								thisGuiEnv.editor.midiCtrlField.string_(theChanger.value.ctrl)
-									.background_(Color.white)
-									.stringColor_(Color.black)
-									.canFocus_(true)
-								;
-								thisGuiEnv.editor.midiLearnBut.states_([
+							});
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiLearn
+								.states_([
 									["L", Color.white, Color.blue],
 									["X", Color.white, Color.red]
 								])
-								.value_(0);
-							})
-						}
-					}
-				)
+								.value_(0)
+							;
+						})
+					})
+				}
+			);
+
+			if(this.class == CVWidgetMS, {
+				if(window.notNil and:{ window.isClosed.not }, {
+					numMidiResponders = this.midiOscEnv.select({ |it| it.cc.notNil }).size;
+					numMidiString = "MIDI ("++numMidiResponders++"/"++this.msSize++")";
+					if(numMidiResponders > 0, {
+						midiButBg = Color.red;
+						midiButTextColor = Color.white;
+					}, {
+						midiButBg = this.bgColor;
+						midiButTextColor = Color.black;
+					});
+					this.guiEnv[\midiBut].states_([[
+						numMidiString,
+						midiButTextColor, // text
+						midiButBg // background
+					]]);
+
+				})
 			})
 		})
 	}
