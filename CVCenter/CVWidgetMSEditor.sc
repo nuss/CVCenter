@@ -419,7 +419,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					})
 				}, {
 					widget.msSize.do({ |sl|
-						widget.setCtrlButtonBank(nil, sl);
+						widget.setCtrlButtonBank(slot: sl);
 					})
 				})
 			})
