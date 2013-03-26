@@ -160,7 +160,7 @@ CVMidiEditGroup {
 				if("^[-+]?[0-9]*$".matchRegexp(ms.string), {
 					wcm.midiDisplay.model.value_((
 						learn: "C",
-						src: ms.string,
+						src: ms.string.asInt,
 						chan: wcm.midiDisplay.model.value.chan,
 						ctrl: wcm.midiDisplay.model.value.ctrl
 					)).changedKeys(widget.synchKeys)
@@ -190,7 +190,7 @@ CVMidiEditGroup {
 					wcm.midiDisplay.model.value_((
 						learn: "C",
 						src: wcm.midiDisplay.model.value.src,
-						chan: mch.string,
+						chan: mch.string.asInt,
 						ctrl: wcm.midiDisplay.model.value.ctrl
 					)).changedKeys(widget.synchKeys)
 				})
@@ -220,7 +220,7 @@ CVMidiEditGroup {
 						learn: "C",
 						src: wcm.midiDisplay.model.value.src,
 						chan: wcm.midiDisplay.model.value.chan,
-						ctrl: mctrl.string
+						ctrl: mctrl.string.asInt
 					)).changedKeys(widget.synchKeys)
 				})
 			})

@@ -384,8 +384,13 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.font_(staticTextFont)
 				.action_({ |ms|
 					if(ms.value != 0, {
-						wcm.midiDisplay.model.value_(wcm.midiDisplay.model.value).changedKeys(widget.synchKeys);
-					})
+						wcm.midiDisplay.model.value_((
+							learn: "C",
+							src: this.class.midiSources[ms.items[ms.value].asSymbol],
+							chan: wcm.midiDisplay.model.value.chan,
+							ctrl: wcm.midiDisplay.model.value.ctrl
+						)).changedKeys(widget.synchKeys);
+					});
 				})
 			;
 
@@ -415,7 +420,13 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 								widget.midiConnect(slot: slot)
 							})
 						},
-						0, { widget.midiDisconnect(slot) }
+						0, { widget.midiDisconnect(slot) };
+					// wcm.midiDisplay.model.value_((
+					// 	learn: ml.states[ml.value][0],
+					// 	src: wcm.midiDisplay.model.value.src,
+					// 	chan: wcm.midiDisplay.model.value.chan,
+					// 	ctrl: wcm.midiDisplay.model.value.ctrl
+					// )).changedKeys(widget.synchKeys)
 					)
 				})
 			;
@@ -430,7 +441,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					if("^[-+]?[0-9]*$".matchRegexp(tf.string), {
 						wcm.midiDisplay.model.value_((
 							learn: "C",
-							src: tf.string,
+							src: tf.string.asInt,
 							chan: wcm.midiDisplay.model.value.chan,
 							ctrl: wcm.midiDisplay.model.value.ctrl
 						)).changedKeys(widget.synchKeys)
@@ -457,7 +468,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 						wcm.midiDisplay.model.value_((
 							learn: "C",
 							src: wcm.midiDisplay.model.value.src,
-							chan: tf.string,
+							chan: tf.string.asInt,
 							ctrl: wcm.midiDisplay.model.value.ctrl
 						)).changedKeys(widget.synchKeys)
 					})
@@ -484,7 +495,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 							learn: "C",
 							src: wcm.midiDisplay.model.value.src,
 							chan: wcm.midiDisplay.model.value.chan,
-							ctrl: tf.string
+							ctrl: tf.string.asInt
 						)).changedKeys(widget.synchKeys)
 					})
 				})

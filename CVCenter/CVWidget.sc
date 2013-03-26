@@ -1671,6 +1671,16 @@ CVWidget {
 			});
 
 
+			if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
+				if(AbstractCVWidgetEditor.midiSources.values.includes(theChanger.value.src), {
+					thisEditor.midiSourceSelect.value_(
+						thisEditor.midiSourceSelect.items.indexOfEqual(
+							AbstractCVWidgetEditor.midiSources.findKeyForValue(theChanger.value.src)
+						)
+					)
+				})
+			});
+
 			// if(this.class != CVWidgetMS, {
 			theChanger.value.learn.switch(
 				"X", {
@@ -1715,22 +1725,26 @@ CVWidget {
 					if(thisEditor.notNil and:{
 						thisEditor.isClosed.not
 					}, {
-						thisEditor.midiSrcField.string_(theChanger.value.src.asString)
+						thisEditor.midiSrcField
+							.string_(theChanger.value.src.asString)
 							.background_(Color.red)
 							.stringColor_(Color.white)
 							.canFocus_(false)
 						;
-						thisEditor.midiChanField.string_((theChanger.value.chan+1).asString)
+						thisEditor.midiChanField
+							.string_((theChanger.value.chan+1).asString)
 							.background_(Color.red)
 							.stringColor_(Color.white)
 							.canFocus_(false)
 						;
-						thisEditor.midiCtrlField.string_(theChanger.value.ctrl)
+						thisEditor.midiCtrlField
+							.string_(theChanger.value.ctrl)
 							.background_(Color.red)
 							.stringColor_(Color.white)
 							.canFocus_(false)
 						;
-						thisEditor.midiLearnBut.value_(1)
+						thisEditor.midiLearnBut.value_(1);
+						thisEditor.midiSourceSelect.enabled_(false);
 					});
 
 					if(this.class == CVWidgetMS, {
@@ -1803,6 +1817,25 @@ CVWidget {
 							])
 							.value_(0)
 						;
+						thisEditor.midiSrcField
+							.string_(theChanger.value.src)
+							.background_(Color.white)
+							.stringColor_(Color.black)
+							.canFocus_(true)
+						;
+						thisEditor.midiChanField
+							.string_(theChanger.value.chan)
+							.background_(Color.white)
+							.stringColor_(Color.black)
+							.canFocus_(true)
+						;
+						thisEditor.midiCtrlField
+							.string_(theChanger.value.ctrl)
+							.background_(Color.white)
+							.stringColor_(Color.black)
+							.canFocus_(true)
+						;
+						thisEditor.midiSourceSelect.enabled_(true);
 					});
 
 					if(this.class == CVWidgetMS, {
@@ -1816,6 +1849,15 @@ CVWidget {
 								])
 								.value_(0)
 							;
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.string_(
+								theChanger.value.src
+							);
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.string_(
+								theChanger.value.chan
+							);
+							thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.string_(
+								theChanger.value.ctrl
+							);
 						})
 					})
 				},
@@ -1823,17 +1865,20 @@ CVWidget {
 					if(this.class != CVWidgetMS, {
 						defer {
 							if(window.isClosed.not, {
-								thisGuiEnv.midiSrc.string_(theChanger.value.src)
+								thisGuiEnv.midiSrc
+									.string_(theChanger.value.src)
 									.background_(Color.white)
 									.stringColor_(Color.black)
 									.canFocus_(true)
 								;
-								thisGuiEnv.midiChan.string_(theChanger.value.chan)
+								thisGuiEnv.midiChan
+									.string_(theChanger.value.chan)
 									.background_(Color.white)
 									.stringColor_(Color.black)
 									.canFocus_(true)
 								;
-								thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
+								thisGuiEnv.midiCtrl
+									.string_(theChanger.value.ctrl)
 									.background_(Color.white)
 									.stringColor_(Color.black)
 									.canFocus_(true)
@@ -1877,6 +1922,7 @@ CVWidget {
 							["X", Color.white, Color.red]
 						])
 						.value_(0);
+						thisEditor.midiSourceSelect.enabled_(true);
 					});
 
 					if(this.class == CVWidgetMS, {
