@@ -408,6 +408,12 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				])
 				.action_({ |ml|
 					ml.value.switch(
+					// wcm.midiDisplay.model.value_((
+					// 	learn: ml.states[ml.value][0],
+					// 	src: wcm.midiDisplay.model.value.src,
+					// 	chan: wcm.midiDisplay.model.value.chan,
+					// 	ctrl: wcm.midiDisplay.model.value.ctrl
+					// )).changedKeys(widget.synchKeys);
 						1, {
 							margs = [
 								[midiSrcField.string, msrc],
@@ -421,12 +427,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 							})
 						},
 						0, { widget.midiDisconnect(slot) };
-					// wcm.midiDisplay.model.value_((
-					// 	learn: ml.states[ml.value][0],
-					// 	src: wcm.midiDisplay.model.value.src,
-					// 	chan: wcm.midiDisplay.model.value.chan,
-					// 	ctrl: wcm.midiDisplay.model.value.ctrl
-					// )).changedKeys(widget.synchKeys)
 					)
 				})
 			;

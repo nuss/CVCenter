@@ -1025,25 +1025,21 @@ CVWidget {
 				wcm.calibration.model = Ref(prCalibrate);
 			})
 		};
-		wcm.cvSpec ?? {
-			switch(this.class,
-				CVWidgetMS, {
-					wdgtControllersAndModels.cvSpec ?? {
-						wdgtControllersAndModels.cvSpec = ();
-					}
-				},
-				{ wcm.cvSpec = () }
-			)
-		};
 		switch(this.class,
 			CVWidgetMS, {
+				wdgtControllersAndModels.cvSpec ?? {
+					wdgtControllersAndModels.cvSpec = ();
+				};
 				wdgtControllersAndModels.cvSpec.model ?? {
 					wdgtControllersAndModels.cvSpec.model = Ref(this.getSpec);
 				}
 			},
-			{ wcm.cvSpec.model ?? {
-				wcm.cvSpec.model = Ref(this.getSpec(slot));
-			}}
+			{
+				wcm.cvSpec ?? { wcm.cvSpec = () };
+				wcm.cvSpec.model ?? {
+					wcm.cvSpec.model = Ref(this.getSpec(slot));
+				}
+			}
 		);
 		wcm.oscInputRange ?? {
 			wcm.oscInputRange = ();
@@ -1121,21 +1117,19 @@ CVWidget {
 			CVWidgetMS, {
 				wdgtControllersAndModels.actions ?? {
 					wdgtControllersAndModels.actions = ()
-				}
-			},
-			{ wcm.actions ?? {
-				wcm.actions = ();
-			}}
-		);
-		switch(this.class,
-			CVWidgetMS, {
+				};
 				wdgtControllersAndModels.actions.model ?? {
 					wdgtControllersAndModels.actions.model = Ref((numActions: 0, activeActions: 0))
 				}
 			},
-			{ wcm.actions.model ?? {
-				wcm.actions.model = Ref((numActions: 0, activeActions: 0))
-			}}
+			{
+				wcm.actions ?? {
+					wcm.actions = ();
+				};
+				wcm.actions.model ?? {
+					wcm.actions.model = Ref((numActions: 0, activeActions: 0))
+				}
+			}
 		);
 
 		// midiStateObserver ?? {
@@ -1172,8 +1166,12 @@ CVWidget {
 				CVWidget2D, { wcm = wdgtControllersAndModels[slot] },
 				CVWidgetMS, {
 					wcm = wdgtControllersAndModels.slots[slot];
+					[wdgtControllersAndModels.cvSpec, wdgtControllersAndModels.actions].postcs;
 					wcm.cvSpec = wdgtControllersAndModels.cvSpec;
 					wcm.actions = wdgtControllersAndModels.actions;
+					wdgtControllersAndModels.slots.do({ |sl|
+						[sl.cvSpec, sl.actions].postln;
+					})
 				};
 			);
 			midiOscEnv = this.midiOscEnv[slot];
@@ -1206,7 +1204,9 @@ CVWidget {
 			prInitOscDisplay,
 			prInitOscInputRange,
 			prInitActionsControl
-		].do({ |method| this.perform(method, wcm, thisGuiEnv, midiOscEnv, thisWidgetCV, thisCalib, slot) });
+		].do({ |method|
+			this.perform(method, wcm, thisGuiEnv, midiOscEnv, thisWidgetCV, thisCalib, slot);
+		});
 	}
 
 	prInitCalibration { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
@@ -1438,6 +1438,7 @@ CVWidget {
 				})
 			});
 
+			// "argWidgetCV: %\nthisSpec: %\n".postf(argWidgetCV, thisSpec);
 			argWidgetCV.spec_(thisSpec);
 
 			if(this.class == CVWidgetMS, {
