@@ -28,12 +28,28 @@ CVCenter {
 
 	*initClass {
 		var newPrefs, newBounds;
+		var shutDownFunc;
 		Class.initClassTree(CVCenterPreferences);
 		Class.initClassTree(CVWidget);
 		prefs = CVCenterPreferences.readPreferences;
 
 		prefs !? {
 			prefs[\saveGuiProperties] !? {
+				shutDownFunc = {
+					// "shutdown action triggered".postln;
+					newPrefs = CVCenterPreferences.readPreferences;
+					CVCenterPreferences.writePreferences(
+						newPrefs[\saveGuiProperties],
+						boundsOnShutDown ?? { newPrefs[\guiProperties] },
+						newPrefs[\saveClassVars],
+						newPrefs[\midiMode],
+						newPrefs[\midiResolution],
+						newPrefs[\midiMean],
+						newPrefs[\softWithin],
+						newPrefs[\ctrlButtonBank],
+						newPrefs[\removeResponders]
+					)
+				};
 				if(prefs[\saveGuiProperties] == 1 or:{
 					prefs[\saveGuiProperties] == 2
 				}, {
@@ -43,20 +59,10 @@ CVCenter {
 					this.guiheight_(prefs[\guiProperties] !? { prefs[\guiProperties].height });
 				});
 				if(prefs[\saveGuiProperties] == 1, {
-					ShutDown.add({
-						// "shutdown action triggered".postln;
-						newPrefs = CVCenterPreferences.readPreferences;
-						CVCenterPreferences.writePreferences(
-							newPrefs[\saveGuiProperties],
-							boundsOnShutDown ?? { newPrefs[\guiProperties] },
-							newPrefs[\saveClassVars],
-							newPrefs[\midiMode],
-							newPrefs[\midiResolution],
-							newPrefs[\midiMean],
-							newPrefs[\softWithin],
-							newPrefs[\ctrlButtonBank],
-							newPrefs[\removeResponders]
-						)
+					if(Main.versionAtLeast(3, 5), {
+						ShutDown.add(shutDownFunc);
+					}, {
+						UI.registerForShutdown(shutDownFunc);
 					})
 				})
 			};
