@@ -1167,12 +1167,13 @@ CVWidget {
 				CVWidget2D, { wcm = wdgtControllersAndModels[slot] },
 				CVWidgetMS, {
 					wcm = wdgtControllersAndModels.slots[slot];
-					[wdgtControllersAndModels.cvSpec, wdgtControllersAndModels.actions].postcs;
-					wcm.cvSpec = wdgtControllersAndModels.cvSpec;
-					wcm.actions = wdgtControllersAndModels.actions;
-					wdgtControllersAndModels.slots.do({ |sl|
-						[sl.cvSpec, sl.actions].postln;
-					})
+					// [wdgtControllersAndModels.cvSpec, wdgtControllersAndModels.actions].postcs;
+					wcm.cvSpec = ();
+					wcm.actions = ();
+					// [wcm.actions, wcm.cvSpec].postln;
+					// wdgtControllersAndModels.slots.do({ |sl|
+					// 	[sl.cvSpec, sl.actions].postln;
+					// })
 				};
 			);
 			midiOscEnv = this.midiOscEnv[slot];
@@ -1330,7 +1331,12 @@ CVWidget {
 		var thisSpec, customName;
 
 		wcm.cvSpec.controller ?? {
-			wcm.cvSpec.controller = SimpleController(wcm.cvSpec.model);
+			switch(this.class,
+				CVWidgetMS, {
+					wcm.cvSpec.controller = SimpleController(wdgtControllersAndModels.cvSpec.model);
+				},
+				{ wcm.cvSpec.controller = SimpleController(wcm.cvSpec.model) }
+			)
 		};
 
 		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
@@ -2434,8 +2440,13 @@ CVWidget {
 	prInitActionsControl { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 
 		wcm.actions.controller ?? {
-			wcm.actions.controller = SimpleController(wcm.actions.model);
-		};
+			switch(this.class,
+				CVWidgetMS, {
+					wcm.actions.controller = SimpleController(wdgtControllersAndModels.actions.model);
+				},
+				{ wcm.actions.controller = SimpleController(wcm.actions.model) }
+			)
+ 		};
 
 		wcm.actions.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitActionsControl: %\n".postf(theChanger.value);
