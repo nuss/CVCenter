@@ -59,7 +59,7 @@ CVCenter {
 					this.guiheight_(prefs[\guiProperties] !? { prefs[\guiProperties].height });
 				});
 				if(prefs[\saveGuiProperties] == 1, {
-					if(Main.versionAtLeast(3, 5), {
+					if(\UI.asClass.isNil, {
 						ShutDown.add(shutDownFunc);
 					}, {
 						UI.registerForShutdown(shutDownFunc);
