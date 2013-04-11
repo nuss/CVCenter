@@ -951,6 +951,100 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			oscFlow1.shift(0, (oscEditBtns[sindex].bounds.height-10).neg);
 		});
 
+		actionName = TextField(thisEditor.tabs.views[3], flow3.bounds.width-100@20)
+			.string_("action-name")
+			.font_(textFieldFont)
+		;
+
+		if(GUI.id !== \cocoa, {
+			actionName.toolTip_("Mandatory: each action must\nbe saved under a unique name")
+		});
+
+		enterActionBut = Button(thisEditor.tabs.views[3], 57@20)
+			.font_(staticTextFont)
+			.states_([
+				["add Action", Color.white, Color.blue],
+			])
+			.action_({ |ab|
+				if(actionName.string != "action-name" and:{
+					enterAction.string != "{ |cv| /* do something */ }"
+				}, {
+					widget.addAction(actionName.string.asSymbol, enterAction.string.replace("\t", "    "));
+				})
+			})
+		;
+
+		enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+			.background_(Color.white)
+			.font_(textFieldFont)
+			.string_("{ |cv| /* do something */ }")
+			.syntaxColorize
+		;
+
+		if(GUI.id !== \cocoa, {
+			enterAction.tabWidth_("    ".bounds.width);
+			enterAction.toolTip_("The variable 'cv' holds the widget's CV resp.\n'cv.value' its current value. You may enter an\narbitrary function using this variable (or not).")
+		});
+
+		wdgtActions.pairsDo({ |name, action|
+
+			actionsList = actionsList.put(name, ());
+
+			flow3.shift(0, 5);
+
+			actionsList[name].nameField = StaticText(thisEditor[\tabs].views[3], flow3.bounds.width-173@15)
+				.font_(staticTextFont)
+				.background_(Color(1.0, 1.0, 1.0, 0.5))
+				.string_(""+name.asString)
+			;
+
+			flow3.shift(5, 0);
+
+			actionsList[name].activate = Button(thisEditor[\tabs].views[3], 60@15)
+				.font_(staticTextFont)
+				.states_([
+					["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+					["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
+				])
+				.action_({ |rb|
+					switch(rb.value,
+						0, { widget.activateAction(name, false) },
+						1, { widget.activateAction(name, true) }
+					)
+				})
+			;
+
+			switch(action.asArray[0][1],
+				true, {
+					actionsList[name].activate.value_(1);
+				},
+				false, {
+					actionsList[name].activate.value_(0);
+				}
+			);
+
+			flow3.shift(5, 0);
+
+			actionsList[name].removeBut = Button(thisEditor[\tabs].views[3], 60@15)
+				.font_(staticTextFont)
+				.states_([
+					["remove", Color.white, Color.red],
+				])
+				.action_({ |rb|
+				widget.removeAction(name.asSymbol)
+				})
+			;
+
+			flow3.shift(0, 0);
+
+			actionsList[name].actionView = TextView(thisEditor[\tabs].views[3], flow3.bounds.width-35@50)
+				.background_(Color(1.0, 1.0, 1.0, 0.5))
+				.font_(textFieldFont)
+				.string_(action.asArray[0][0].replace("\t", "    "))
+				.syntaxColorize
+				.editable_(false)
+			;
+		});
 
 		window.onClose_({
 			msEditorEnv.specsListSpecs = specsListSpecs;

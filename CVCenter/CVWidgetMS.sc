@@ -154,7 +154,7 @@ CVWidgetMS : CVWidget {
 						editor.msEditor.close;
 					}, {
 						if(CVWidgetMSEditor.allEditors.notNil and:{
-								CVWidgetMSEditor.allEditors[(thisName.asString++"MS").asSymbol].notNil
+							CVWidgetMSEditor.allEditors[(thisName.asString++"MS").asSymbol].notNil
 						}, {
 							if(CVWidgetMSEditor.allEditors[(thisName.asString++"MS").asSymbol].isEmpty, {
 								CVWidgetMSEditor.allEditors.removeAt((thisName.asString++"MS").asSymbol);
@@ -350,7 +350,7 @@ CVWidgetMS : CVWidget {
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |spb|
-				if(msEditor.isNil or:{ msEditor.isClosed }, {
+				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, thisName, 3);
 					guiEnv.msEditor = editor.msEditor;
 				}, {
