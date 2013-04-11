@@ -514,7 +514,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			.font_(staticTextFont)
 			.action_({ |ms|
 				if(ms.value != 0 and:{ MIDIClient.initialized }, {
-					midiSrcField.string_(midiSources[ms.items[ms.value]]);
+					midiSrcField.string_(CVWidget.midiSources[ms.items[ms.value]]);
 				})
 			})
 		;

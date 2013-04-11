@@ -17,7 +17,7 @@
 
 CVWidget {
 
-	classvar <>removeResponders, midiStateObserver;
+	classvar <>removeResponders, <>midiSources, midiStateObserver;
 	classvar <>debug = false;
 	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
@@ -38,6 +38,7 @@ CVWidget {
 
 	*initClass {
 		StartUp.add({
+			midiSources = ();
 			if(Quarks.isInstalled("cruciallib"), {
 				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
 			})
@@ -1623,7 +1624,7 @@ CVWidget {
 						["init MIDI", Color.white, Color.red]
 					])
 				});
-				sourceNames = AbstractCVWidgetEditor.midiSources.keys.asArray.sort;
+				sourceNames = midiSources.keys.asArray.sort;
 				val.editor.midiSourceSelect.items_(
 					[val.editor.midiSourceSelect.items[0]]++sourceNames
 				);
@@ -1644,14 +1645,14 @@ CVWidget {
 				thisEditor = thisGuiEnv.editor;
 			});
 
-			AbstractCVWidgetEditor.midiSources ?? { AbstractCVWidgetEditor.midiSources = () };
+			// this.midiSources ?? { AbstractCVWidgetEditor.midiSources = () };
 			MIDIClient.sources.do({ |source|
-				if(AbstractCVWidgetEditor.midiSources.values.includes(source.uid.asInt).not, {
+				if(midiSources.values.includes(source.uid.asInt).not, {
 					// OSX/Linux specific tweek
 					if(source.name == source.device, {
-						AbstractCVWidgetEditor.midiSources.put(source.name.asSymbol, source.uid.asInt)
+						midiSources.put(source.name.asSymbol, source.uid.asInt)
 					}, {
-						AbstractCVWidgetEditor.midiSources.put(
+						midiSources.put(
 							(source.device++":"+source.name).asSymbol, source.uid.asInt
 						)
 					})
@@ -1673,10 +1674,10 @@ CVWidget {
 
 
 			if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
-				if(AbstractCVWidgetEditor.midiSources.values.includes(theChanger.value.src), {
+				if(midiSources.values.includes(theChanger.value.src), {
 					thisEditor.midiSourceSelect.value_(
 						thisEditor.midiSourceSelect.items.indexOfEqual(
-							AbstractCVWidgetEditor.midiSources.findKeyForValue(theChanger.value.src)
+							midiSources.findKeyForValue(theChanger.value.src)
 						)
 					)
 				})

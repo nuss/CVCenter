@@ -386,7 +386,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					if(ms.value != 0, {
 						wcm.midiDisplay.model.value_((
 							learn: "C",
-							src: this.class.midiSources[ms.items[ms.value].asSymbol],
+							src: CVWidget.midiSources[ms.items[ms.value].asSymbol],
 							chan: wcm.midiDisplay.model.value.chan,
 							ctrl: wcm.midiDisplay.model.value.ctrl
 						)).changedKeys(widget.synchKeys);
