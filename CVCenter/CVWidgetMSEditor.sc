@@ -959,6 +959,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		tab !? {
 			thisEditor.tabs.focus(tab);
+			tabs.views[tab].background_(Color(0.8, 0.8, 0.8, 1.0));
 		};
 		thisEditor.window.front;
 	}
