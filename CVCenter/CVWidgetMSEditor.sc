@@ -882,17 +882,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					])
 					.font_(staticTextFont)
 					.action_({ |bt|
-						// "widget, widget.label.states[0][0], sindex: %, %, %\n".postf(widget, widget.label.states[0][0], sindex);
 						if(widget.editor.editors[sindex].isNil or:{ widget.editor.editors[sindex].isClosed }, {
 							widget.editor.editors[sindex] = CVWidgetEditor(
 								widget, widget.label.states[0][0], 1, sindex
 							);
-						// if(widget.guiEnv.editor.notNil, {
-						// 	"widget.guiEnv.editor: %\n".postf(widget.guiEnv.editor);
-						// 	}, {
-						// 		"no widget.guiEnv.editor yet - create it first".postln;
-						// });
-						// widget.guiEnv.editor[sindex] = widget.editor.editors[sindex];
 						}, {
 							widget.editor.editors[sindex].front(1)
 						});
@@ -960,6 +953,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			actionName.toolTip_("Mandatory: each action must\nbe saved under a unique name")
 		});
 
+		flow3.shift(5, 0);
+
 		enterActionBut = Button(thisEditor.tabs.views[3], 57@20)
 			.font_(staticTextFont)
 			.states_([
@@ -985,6 +980,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			enterAction.tabWidth_("    ".bounds.width);
 			enterAction.toolTip_("The variable 'cv' holds the widget's CV resp.\n'cv.value' its current value. You may enter an\narbitrary function using this variable (or not).")
 		});
+
+		wdgtActions = widget.wdgtActions;
 
 		wdgtActions.pairsDo({ |name, action|
 
@@ -1062,7 +1059,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 	amendActionsList { |widget, addRemove, name, action, slot, active|
 
-		var staticTextFont = Font(Font("Arial", 9.4));
+		var staticTextFont = Font("Arial", 9.4);
 		var textFieldFont = Font("Andale Mono", 9);
 
 		switch(addRemove,

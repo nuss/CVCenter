@@ -908,7 +908,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 	amendActionsList { |widget, addRemove, name, action, slot, active|
 
-		var staticTextFont = Font(Font("Arial", 9.4));
+		var staticTextFont = Font("Arial", 9.4);
 		var textFieldFont = Font("Andale Mono", 9);
 
 		if(widget.class != CVWidgetMS, {

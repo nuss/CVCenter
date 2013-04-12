@@ -114,9 +114,9 @@ CVWidget {
 	}
 
 	addAction { |name, action, slot, active=true|
-		var act, controller/*, thisGuiEnv*/, thisEditor;
+		var act, controller, thisEditor;
 
-		"this.guiEnv: %\n".postf(this.guiEnv.asCompileString);
+		// "this.guiEnv: %\n".postf(this.guiEnv.asCompileString);
 
 		switch(this.class,
 			CVWidgetKnob, { thisEditor = this.guiEnv.editor },
@@ -190,7 +190,7 @@ CVWidget {
 	}
 
 	removeAction { |name, slot|
-		var controller/*, thisGuiEnv*/, thisEditor;
+		var controller, thisEditor;
 
 		switch(this.class,
 			CVWidgetKnob, { thisEditor = this.guiEnv.editor },
@@ -247,7 +247,7 @@ CVWidget {
 	}
 
 	activateAction { |name, activate=true, slot|
-		var action, actions, cv, /*thisGuiEnv, */thisEditor, wcm, controller, thisAction;
+		var action, actions, cv, thisEditor, wcm, controller, thisAction;
 
 		switch(this.class,
 			CVWidget2D, {

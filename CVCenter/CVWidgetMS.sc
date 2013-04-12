@@ -346,7 +346,7 @@ CVWidgetMS : CVWidget {
 		nextX = nextX+specBut.bounds.width;
 		actionsBut = Button(window, Rect(thisXY.x+1+specBut.bounds.width, nextY, thisWidth-2/2, 15))
 			.states_([
-				["Actions", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
+				["Actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |spb|
