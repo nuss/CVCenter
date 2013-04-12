@@ -114,7 +114,16 @@ CVWidget {
 	}
 
 	addAction { |name, action, slot, active=true|
-		var act, controller, thisGuiEnv;
+		var act, controller/*, thisGuiEnv*/, thisEditor;
+
+		"this.guiEnv: %\n".postf(this.guiEnv.asCompileString);
+
+		switch(this.class,
+			CVWidgetKnob, { thisEditor = this.guiEnv.editor },
+			CVWidget2D, { thisEditor = this.guiEnv[slot.asSymbol].editor },
+			CVWidgetMS, { thisEditor = this.guiEnv.msEditor }
+		);
+
 		name ?? { Error("Please provide a name under which the action will be added to the widget").throw };
 		action ?? { Error("Please provide an action!").throw };
 		if(action.isFunction.not and:{
@@ -142,11 +151,11 @@ CVWidget {
 						numActions: this.wdgtActions[slot.asSymbol].size,
 						activeActions: this.wdgtActions[slot.asSymbol].select({ |v| v.asArray[0][1] == true }).size
 					)).changedKeys(synchKeys);
-					thisGuiEnv = this.guiEnv[slot.asSymbol];
-					if(thisGuiEnv.editor.notNil and: {
-						thisGuiEnv.editor.isClosed.not;
+					// thisGuiEnv = this.guiEnv[slot.asSymbol];
+					if(thisEditor.notNil and: {
+						thisEditor.isClosed.not;
 					}, {
-						thisGuiEnv.editor.amendActionsList(
+						thisEditor.amendActionsList(
 							this, \add, name.asSymbol, this.wdgtActions[slot.asSymbol][name.asSymbol], slot.asSymbol, active;
 						)
 					})
@@ -167,11 +176,12 @@ CVWidget {
 						activeActions: this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size
 					)).changedKeys(synchKeys);
 				};
-				thisGuiEnv = this.guiEnv;
-				if(thisGuiEnv.editor.notNil and: {
-					thisGuiEnv.editor.isClosed.not;
+				// thisGuiEnv = this.guiEnv;
+				// "thisGuiEnv: %\n".postf(thisGuiEnv);
+				if(thisEditor.notNil and: {
+					thisEditor.isClosed.not;
 				}, {
-					thisGuiEnv.editor.amendActionsList(
+					thisEditor.amendActionsList(
 						this, \add, name.asSymbol, this.wdgtActions[name.asSymbol], active: active;
 					)
 				})
@@ -180,12 +190,19 @@ CVWidget {
 	}
 
 	removeAction { |name, slot|
-		var controller, thisGuiEnv;
+		var controller/*, thisGuiEnv*/, thisEditor;
+
+		switch(this.class,
+			CVWidgetKnob, { thisEditor = this.guiEnv.editor },
+			CVWidget2D, { thisEditor = this.guiEnv[slot.asSymbol].editor },
+			CVWidgetMS, { thisEditor = this.guiEnv.msEditor }
+		);
+
 		name ?? { Error("Please provide the action's name!").throw };
 		switch(this.class,
 			CVWidget2D, {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as second argument to removeAction!").throw };
-				thisGuiEnv = this.guiEnv[slot.asSymbol];
+				// thisGuiEnv = this.guiEnv[slot.asSymbol];
 				this.wdgtActions[slot.asSymbol][name.asSymbol] !? {
 					this.wdgtActions[slot.asSymbol][name.asSymbol].keys.do({ |c|
 						if(c.class === SimpleController, { c.remove });
@@ -196,17 +213,17 @@ CVWidget {
 						numActions: this.wdgtActions[slot.asSymbol].size,
 						activeActions: this.wdgtActions[slot.asSymbol].select({ |v| v.asArray[0][1] == true }).size
 					)).changedKeys(synchKeys);
-					if(thisGuiEnv.editor.notNil and: {
-						thisGuiEnv.editor.isClosed.not;
+					if(thisEditor.notNil and: {
+						thisEditor.isClosed.not;
 					}, {
-						thisGuiEnv.editor.amendActionsList(
+						thisEditor.amendActionsList(
 							this, \remove, name.asSymbol;
 						)
 					})
 				}
 			},
 			{
-				thisGuiEnv = this.guiEnv;
+				// thisGuiEnv = this.guiEnv;
 				this.wdgtActions[name.asSymbol] !? {
 					this.wdgtActions[name.asSymbol].keys.do({ |c|
 						if(c.class === SimpleController, { c.remove });
@@ -216,10 +233,10 @@ CVWidget {
 						numActions: this.wdgtActions.size,
 						activeActions: this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size
 					)).changedKeys(synchKeys);
-					if(thisGuiEnv.editor.notNil and: {
-						thisGuiEnv.editor.isClosed.not;
+					if(thisEditor.notNil and: {
+						thisEditor.isClosed.not;
 					}, {
-						thisGuiEnv.editor.amendActionsList(
+						thisEditor.amendActionsList(
 							this, \remove, name.asSymbol;
 						)
 					})
@@ -230,21 +247,28 @@ CVWidget {
 	}
 
 	activateAction { |name, activate=true, slot|
-		var action, actions, cv, thisGuiEnv, wcm, controller, thisAction;
+		var action, actions, cv, /*thisGuiEnv, */thisEditor, wcm, controller, thisAction;
 
-		if(slot.notNil, {
-			cv = widgetCV[slot.asSymbol];
-			actions = this.wdgtActions[slot.asSymbol];
-			action = this.wdgtActions[slot.asSymbol][name.asSymbol];
-			thisGuiEnv = this.guiEnv[slot.asSymbol];
-			wcm = wdgtControllersAndModels[slot.asSymbol];
-		}, {
-			cv = widgetCV;
-			actions = this.wdgtActions;
-			action = this.wdgtActions[name.asSymbol];
-			thisGuiEnv = this.guiEnv;
-			wcm = wdgtControllersAndModels;
-		});
+		switch(this.class,
+			CVWidget2D, {
+				cv = widgetCV[slot.asSymbol];
+				actions = this.wdgtActions[slot.asSymbol];
+				action = this.wdgtActions[slot.asSymbol][name.asSymbol];
+				wcm = wdgtControllersAndModels[slot.asSymbol];
+			},
+			{
+				cv = widgetCV;
+				actions = this.wdgtActions;
+				action = this.wdgtActions[name.asSymbol];
+				wcm = wdgtControllersAndModels;
+			}
+		);
+
+		switch(this.class,
+			CVWidgetKnob, { thisEditor = this.guiEnv.editor },
+			CVWidget2D, { thisEditor = this.guiEnv[slot.asSymbol].editor },
+			CVWidgetMS, { thisEditor = this.guiEnv.msEditor }
+		);
 
 		if(action.notNil, {
 			switch(activate,
@@ -273,15 +297,15 @@ CVWidget {
 				numActions: actions.size,
 				activeActions: actions.select({ |v| v.asArray[0][1] == true }).size
 			)).changedKeys(synchKeys);
-			if(thisGuiEnv.editor.notNil and: {
-				thisGuiEnv.editor.isClosed.not;
+			if(thisEditor.notNil and: {
+				thisEditor.isClosed.not;
 			}, {
 				switch(activate,
 					true, {
-						thisGuiEnv.editor.actionsList[name.asSymbol].activate.value_(1);
+						thisEditor.actionsList[name.asSymbol].activate.value_(1);
 					},
 					false, {
-						thisGuiEnv.editor.actionsList[name.asSymbol].activate.value_(0);
+						thisEditor.actionsList[name.asSymbol].activate.value_(0);
 					}
 				)
 			})

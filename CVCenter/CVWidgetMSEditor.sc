@@ -1058,6 +1058,84 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		thisEditor.window.front;
 	}
 
+	// not to be used directly!
+
+	amendActionsList { |widget, addRemove, name, action, slot, active|
+
+		var staticTextFont = Font(Font("Arial", 9.4));
+		var textFieldFont = Font("Andale Mono", 9);
+
+		switch(addRemove,
+			\add, {
+				actionsList.put(name, ());
+				flow3.shift(0, 5);
+
+				actionsList[name].nameField = StaticText(thisEditor[\tabs].views[3], flow3.bounds.width-173@15)
+					.font_(staticTextFont)
+					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.string_(""+name.asString)
+				;
+
+				flow3.shift(5, 0);
+
+				actionsList[name].activate = Button(thisEditor[\tabs].views[3], 60@15)
+					.font_(staticTextFont)
+					.states_([
+						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+						["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
+					])
+					.action_({ |rb|
+						switch(rb.value,
+							0, { widget.activateAction(name, false, slot) },
+							1, { widget.activateAction(name, true, slot) }
+						)
+					})
+				;
+
+				switch(active,
+					true, {
+						actionsList[name].activate.value_(1);
+					},
+					false, {
+						actionsList[name].activate.value_(0);
+					}
+				);
+
+				flow3.shift(5, 0);
+
+				actionsList[name].removeBut = Button(thisEditor[\tabs].views[3], 60@15)
+					.font_(staticTextFont)
+					.states_([
+						["remove", Color.white, Color.red],
+					])
+					.action_({ |ab|
+						widget.removeAction(name.asSymbol, slot.asSymbol);
+					})
+				;
+
+				flow3.shift(0, 0);
+
+				actionsList[name].actionView = TextView(thisEditor[\tabs].views[3], flow3.bounds.width-35@50)
+					.background_(Color(1.0, 1.0, 1.0, 0.5))
+					.font_(textFieldFont)
+					.string_(action.asArray[0][0])
+					.syntaxColorize
+					.editable_(false)
+				;
+			},
+			\remove, {
+				[
+					actionsList[name].nameField,
+					actionsList[name].activate,
+					actionsList[name].removeBut,
+					actionsList[name].actionView
+				].do(_.remove);
+				flow3.reFlow(thisEditor[\tabs].views[3]);
+			}
+		)
+
+	}
+
 	close {
 		thisEditor.window.close;
 		allEditors.removeAt(name);
