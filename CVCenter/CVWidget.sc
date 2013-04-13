@@ -2337,21 +2337,21 @@ CVWidget {
 			}, {
 				defer {
 					thisEditor.connectorBut.value_(theChanger.value.connectorButVal);
-					if(theChanger.value.ipField.isNil or:{ theChanger.value.ipField == "nil" }, {
-						thisEditor.ipField.string_("");
-					}, {
-						thisEditor.ipField.string_(theChanger.value.ipField);
-					});
-						// "theChanger.value.portField (Editor): %\n".postf(theChanger.value.portField);
-					if(theChanger.value.portField.isNil or:{
-						theChanger.value.portField == "nil" or:{
-							theChanger.value.portField == "0"
-						}
-					}, {
-						thisEditor.portField.string_("");
-					}, {
-						thisEditor.portField.string_(theChanger.value.portField);
-					});
+						// if(theChanger.value.ipField.isNil or:{ theChanger.value.ipField == "nil" }, {
+						// 	thisEditor.ipField.string_("");
+						// 	}, {
+						// 		thisEditor.ipField.string_(theChanger.value.ipField);
+						// });
+						// // "theChanger.value.portField (Editor): %\n".postf(theChanger.value.portField);
+						// if(theChanger.value.portField.isNil or:{
+						// 	theChanger.value.portField == "nil" or:{
+						// 		theChanger.value.portField == "0"
+						// 	}
+						// 	}, {
+						// 		thisEditor.portField.string_("");
+						// 	}, {
+						// 		thisEditor.portField.string_(theChanger.value.portField);
+						// });
 					thisEditor.nameField.string_(theChanger.value.nameField);
 					if(thisCalib, {
 						[
@@ -2363,8 +2363,8 @@ CVWidget {
 					});
 					thisEditor.indexField.value_(theChanger.value.index);
 					[
-						thisEditor.ipField,
-						thisEditor.portField,
+							// thisEditor.ipField,
+							// thisEditor.portField,
 						thisEditor.nameField,
 						thisEditor.indexField
 					].do(_.enabled_(theChanger.value.editEnabled))

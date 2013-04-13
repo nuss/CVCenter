@@ -36,6 +36,24 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var cmdNames, orderedCmds, orderedCmdSlots;
 		var dropDownIPs;
 		var tmp, gapNextX, gapNextY;
+		var buildCheckbox, ddIPsItems, cmdPairs;
+
+		buildCheckbox = { |active, view, props, font|
+			var cBox;
+			if(GUI.id === \cocoa, {
+				cBox = Button(view, props)
+					.states_([
+						["", Color.white, Color.white],
+						["X", Color.black, Color.white],
+					])
+					.font_(font)
+				;
+				if(active, { cBox.value_(1) }, { cBox.value_(0) });
+			}, {
+				cBox = \CheckBox.asClass.new(view, props).value_(active);
+			});
+			cBox;
+		};
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
@@ -238,6 +256,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					editorEnv.specsListItems = specsList.items;
 					tmp = xySlots.detectIndex({ |n| n[1] == (name.asString++slotHiLo) });
 					xySlots[tmp][1] = 0;
+					OSCCommands.tempIPsAndCmds.removeAll;
 					if(allEditors.collect(_.isClosed).size == 0, { OSCCommands.collectTempIPsAndCmds(false) });
 				})
 			});
@@ -513,46 +532,67 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			// OSC editting
 
-			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-20@12)
-				.font_(staticTextFont)
-				.stringColor_(staticTextColor)
-				.string_("device-IP/port")
-			;
+			// StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-20@12)
+			// .font_(staticTextFont)
+			// .stringColor_(staticTextColor)
+			// .string_("device-IP/port")
+			// ;
 
-			deviceDropDown = PopUpMenu(thisEditor[\tabs].views[2], 126@15)
-				.items_(["select IP-address..."])
+			deviceDropDown = PopUpMenu(thisEditor[\tabs].views[2], flow2.bounds.width-95@15)
+				.items_(["select IP-address... (optional)"])
 				.font_(Font("Arial", 10))
 			;
 
-
-
-			flow2.shift(-2, 0);
-
-			ipField = TextField(thisEditor[\tabs].views[2], flow2.bounds.width-180@15)
-				.font_(textFieldFont)
-				.stringColor_(textFieldFontColor)
-				.background_(textFieldBg)
-				.string_("")
+			StaticText(thisEditor[\tabs].views[2], 60@15)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("restrict to port ")
+				.align_(\right)
 			;
 
-			if(GUI.id !== \cocoa, {
-				ipField.toolTip_("Optional: the device's IP-address\nCan be used to restrict listening to\nthis address only.")
+			portRestrictor = buildCheckbox.(false, thisEditor[\tabs].views[2], 15@15, Font("Arial", 10, true));
+			portRestrictor.action_({ |bt|
+				switch(bt.value.asBoolean,
+					true, {
+						deviceDropDown.items_(
+							["select IP-address:port... (optional)"] ++ deviceDropDown.items[1..];
+						)
+					},
+					false, {
+						deviceDropDown.items_(
+							["select IP-address... (optional)"] ++  deviceDropDown.items[1..];
+						)
+					}
+				)
 			});
 
-			flow2.shift(-2, 0);
-
-			portField = TextField(thisEditor[\tabs].views[2], 36@15)
-				.font_(textFieldFont)
-				.stringColor_(textFieldFontColor)
-				.background_(textFieldBg)
-				.string_("")
-			;
-
-			if(GUI.id !== \cocoa, {
-				portField.toolTip_("Optional: the device's port\nCan be used to restrict listening to\nthis port only.")
-			});
-
-			flow2.shift(0, 0);
+			// flow2.shift(-2, 0);
+			//
+			// ipField = TextField(thisEditor[\tabs].views[2], flow2.bounds.width-180@15)
+			// .font_(textFieldFont)
+			// .stringColor_(textFieldFontColor)
+			// .background_(textFieldBg)
+			// .string_("")
+			// ;
+			//
+			// if(GUI.id !== \cocoa, {
+			// 	ipField.toolTip_("Optional: the device's IP-address\nCan be used to restrict listening to\nthis address only.")
+			// });
+			//
+			// flow2.shift(-2, 0);
+			//
+			// portField = TextField(thisEditor[\tabs].views[2], 36@15)
+			// .font_(textFieldFont)
+			// .stringColor_(textFieldFontColor)
+			// .background_(textFieldBg)
+			// .string_("")
+			// ;
+			//
+			// if(GUI.id !== \cocoa, {
+			// 	portField.toolTip_("Optional: the device's port\nCan be used to restrict listening to\nthis port only.")
+			// });
+			//
+			// flow2.shift(0, 0);
 
 			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-20@40)
 				.font_(staticTextFont)
@@ -575,6 +615,8 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 							cmdListMenu.items_(cmdListMenu.items.add(cmd.asString+"("++orderedCmdSlots[i]++")"));
 							thisCmdNames = thisCmdNames.add(cmd.asString);
 						})
+					}, {
+						cmdListMenu.items_(["command-names..."]);
 					})
 				})
 				.mouseDownAction_({ |m|
@@ -593,8 +635,8 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.font_(Font("Arial", 10))
 				.action_({ |m|
 					if(nameField.enabled, {
-						nameField.string_(thisCmdNames[m.value]);
-						indexField.clipHi_(orderedCmdSlots[m.value-1]);
+						nameField.string_(m.items[m.value].asString.split($ )[0]);
+						indexField.clipHi_(m.items[m.value].asString.split($ )[1].interpret);
 					})
 				})
 			;
@@ -908,19 +950,37 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			deviceDropDown
 				.mouseDownAction_({ |dd|
 					dropDownIPs = OSCCommands.tempIPsAndCmds.keys.asArray;
-					dropDownIPs.do({ |it|
+					if(portRestrictor.value.asBoolean, {
+						ddIPsItems = dropDownIPs;
+					}, {
+						ddIPsItems = dropDownIPs.collect({ |addr| addr.asString.split($:)[0].asSymbol });
+					});
+					dd.items_([dd.items[0]]);
+					ddIPsItems.do({ |it|
 						if(dd.items.includesEqual(it).not, {
 							dd.items_(dd.items.add(it));
 						})
 					})
 				})
 				.action_({ |dd|
-					if(dd.value == 0, {
-						ipField.string_(""); portField.string_("");
+					if(dd.value != 0, { deviceListMenu.value_(0) });
+					cmdPairs = [];
+					if(portRestrictor.value.asBoolean, {
+						OSCCommands.tempIPsAndCmds[dd.items[dd.value]].pairsDo({ |cmd, size|
+							cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
+						})
 					}, {
-						ipField.string_(dd.items[dd.value].asString.split($:)[0]);
-						portField.string_(dd.items[dd.value].asString.split($:)[1]);
-					})
+						OSCCommands.tempIPsAndCmds.pairsDo({ |k, v|
+							if(k.asString.contains(dd.items[dd.value].asString), {
+								v.pairsDo({ |cmd, size|
+									cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
+								})
+							})
+						})
+					});
+					cmdListMenu.items_(
+						[cmdListMenu.items[0]] ++ cmdPairs.sort;
+					)
 				})
 			;
 		});
