@@ -34,9 +34,9 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var mappingSelectItems;
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
-		var dropDownIPs;
 		var tmp, gapNextX, gapNextY;
-		var buildCheckbox, ddIPsItems, cmdPairs;
+		var buildCheckbox, ddIPsItems, cmdPairs, dropDownIPs;
+		var connectIP, connectPort;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -791,9 +791,15 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.action_({ |cb|
 					cb.value.switch(
 						1, {
+							if(deviceDropDown.value > 0, {
+								connectIP = deviceDropDown.items[deviceDropDown.value].asString.split($:)[0];
+								if(portRestrictor.value.asBoolean, {
+									connectPort = deviceDropDown.items[deviceDropDown.value].asString.split($:)[1];
+								})
+							});
 							widget.oscConnect(
-								ipField.string,
-								portField.value,
+								connectIP,
+								connectPort,
 								nameField.string,
 								indexField.value.asInt,
 								slot
