@@ -2300,20 +2300,20 @@ CVWidget {
 						thisGuiEnv.msEditor.isClosed.not
 					}, {
 						thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
-						if(theChanger.value.ipField.isNil or:{ theChanger.value.ipField == "nil" }, {
-							thisGuiEnv.msEditor.ipField.string_("");
-						}, {
-							thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
-						});
-						if(theChanger.value.portField.isNil or:{
-							theChanger.value.portField == "nil" or:{
-								theChanger.value.portField == "0"
-							}
-						}, {
-							thisGuiEnv.msEditor.portField.string_("");
-						}, {
-							thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
-						});
+							// if(theChanger.value.ipField.isNil or:{ theChanger.value.ipField == "nil" }, {
+							// 	thisGuiEnv.msEditor.ipField.string_("");
+							// 	}, {
+							// 		thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
+							// });
+							// if(theChanger.value.portField.isNil or:{
+							// 	theChanger.value.portField == "nil" or:{
+							// 		theChanger.value.portField == "0"
+							// 	}
+							// 	}, {
+							// 		thisGuiEnv.msEditor.portField.string_("");
+							// 	}, {
+							// 		thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
+							// });
 						thisOscEditBut.states_([theChanger.value.but]);
 							if(this.midiOscEnv.select({ |sl| sl[\oscResponder].notNil }).size > 0, {
 							thisGuiEnv.msEditor.connectorBut.value_(1);
@@ -2323,8 +2323,8 @@ CVWidget {
 						[
 							thisGuiEnv.msEditor.extOscCtrlArrayField,
 							thisGuiEnv.msEditor.intStartIndexField,
-							thisGuiEnv.msEditor.ipField,
-							thisGuiEnv.msEditor.portField,
+								// thisGuiEnv.msEditor.ipField,
+								// thisGuiEnv.msEditor.portField,
 							thisGuiEnv.msEditor.nameField,
 							thisGuiEnv.msEditor.indexField
 						].do(_.enabled_(theChanger.value.editEnabled));

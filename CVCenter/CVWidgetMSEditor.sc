@@ -47,6 +47,24 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
 		var tmp, gapNextX, gapNextY;
+		var buildCheckbox, ddIPsItems, cmdPairs;
+
+		buildCheckbox = { |active, view, props, font|
+			var cBox;
+			if(GUI.id === \cocoa, {
+				cBox = Button(view, props)
+					.states_([
+						["", Color.white, Color.white],
+						["X", Color.black, Color.white],
+					])
+					.font_(font)
+				;
+				if(active, { cBox.value_(1) }, { cBox.value_(0) });
+			}, {
+				cBox = \CheckBox.asClass.new(view, props).value_(active);
+			});
+			cBox;
+		};
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
@@ -594,37 +612,65 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			)
 		});
 
-		StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
+		// StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
+		// .font_(staticTextFont)
+		// .stringColor_(staticTextColor)
+		// .string_("IP-address (optional)")
+		// //			.background_(Color.white)
+		// ;
+		//
+		// oscFlow0.shift(0, 0);
+		//
+		// StaticText(thisEditor.oscTabs.views[0], 130@15)
+		// .font_(staticTextFont)
+		// .stringColor_(staticTextColor)
+		// .string_("port (usually not necessary)")
+		// //			.background_(Color.white)
+		// ;
+
+		// ipField = TextField(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
+		// .font_(textFieldFont)
+		// .stringColor_(textFieldFontColor)
+		// .background_(textFieldBg)
+		// .string_("")
+		// ;
+		//
+		// oscFlow0.shift(0, 0);
+		//
+		// portField = TextField(thisEditor.oscTabs.views[0], 130@15)
+		// .font_(textFieldFont)
+		// .stringColor_(textFieldFontColor)
+		// .background_(textFieldBg)
+		// .string_("")
+		// ;
+
+		deviceDropDown = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-110@15)
+			.items_(["select IP-address... (optional)"])
+			.font_(Font("Arial", 10))
+		;
+
+		StaticText(thisEditor.oscTabs.views[0], 70@15)
 			.font_(staticTextFont)
 			.stringColor_(staticTextColor)
-			.string_("IP-address (optional)")
-//			.background_(Color.white)
+			.string_("restrict to port ")
+			.align_(\right)
 		;
 
-		oscFlow0.shift(0, 0);
-
-		StaticText(thisEditor.oscTabs.views[0], 130@15)
-			.font_(staticTextFont)
-			.stringColor_(staticTextColor)
-			.string_("port (usually not necessary)")
-//			.background_(Color.white)
-		;
-
-		ipField = TextField(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
-			.font_(textFieldFont)
-			.stringColor_(textFieldFontColor)
-			.background_(textFieldBg)
-			.string_("")
-		;
-
-		oscFlow0.shift(0, 0);
-
-		portField = TextField(thisEditor.oscTabs.views[0], 130@15)
-			.font_(textFieldFont)
-			.stringColor_(textFieldFontColor)
-			.background_(textFieldBg)
-			.string_("")
-		;
+		portRestrictor = buildCheckbox.(false, thisEditor.oscTabs.views[0], 15@15, Font("Arial", 10, true));
+		portRestrictor.action_({ |bt|
+			switch(bt.value.asBoolean,
+				true, {
+					deviceDropDown.items_(
+						["select IP-address:port... (optional)"] ++ deviceDropDown.items[1..];
+					)
+				},
+				false, {
+					deviceDropDown.items_(
+						["select IP-address... (optional)"] ++  deviceDropDown.items[1..];
+					)
+				}
+			)
+		});
 
 		oscFlow0.shift(0, 0);
 
