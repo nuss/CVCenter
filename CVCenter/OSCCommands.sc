@@ -18,7 +18,7 @@
 OSCCommands {
 
 	classvar collectFunc, collectRunning = false, cmdList;
-	classvar <>tempIPsAndCmds, oscFunc, <tempCollectRunning = false;
+	classvar <tempIPsAndCmds, oscFunc, <tempCollectRunning = false;
 
 	*initClass {
 		var localOscFunc;
@@ -38,22 +38,22 @@ OSCCommands {
 			}
 		});
 
-		this.tempIPsAndCmds = ();
+		tempIPsAndCmds = ();
 
 		localOscFunc = { |argAddr, argMsg|
-			if(this.tempIPsAndCmds.keys.includes(
+			if(tempIPsAndCmds.keys.includes(
 				(argAddr.ip.asString++":"++argAddr.port.asString).asSymbol
 			).not and:{
 				Server.all.collect(_.addr).includesEqual(argAddr).not
 			}, {
-				this.tempIPsAndCmds.put(
+				tempIPsAndCmds.put(
 					(argAddr.ip.asString++":"++argAddr.port.asString).asSymbol, ()
 				)
 			});
-			if(this.tempIPsAndCmds.keys.includes(
+			if(tempIPsAndCmds.keys.includes(
 				(argAddr.ip.asString++":"++argAddr.port.asString).asSymbol
 			), {
-				this.tempIPsAndCmds[(argAddr.ip.asString++":"++argAddr.port.asString).asSymbol].put(
+				tempIPsAndCmds[(argAddr.ip.asString++":"++argAddr.port.asString).asSymbol].put(
 					argMsg[0], argMsg[1..].size
 				)
 			});

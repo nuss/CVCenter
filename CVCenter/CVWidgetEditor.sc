@@ -256,7 +256,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					editorEnv.specsListItems = specsList.items;
 					tmp = xySlots.detectIndex({ |n| n[1] == (name.asString++slotHiLo) });
 					xySlots[tmp][1] = 0;
-					OSCCommands.tempIPsAndCmds.removeAll;
+					OSCCommands.tempIPsAndCmds.keysDo(OSCCommands.tempIPsAndCmds[_] = nil);
 					if(allEditors.collect(_.isClosed).size == 0, { OSCCommands.collectTempIPsAndCmds(false) });
 				})
 			});
