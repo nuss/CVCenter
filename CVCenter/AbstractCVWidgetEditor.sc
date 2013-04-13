@@ -24,7 +24,7 @@ AbstractCVWidgetEditor {
 	var <midiInitBut, <midiSourceSelect, <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
 	var <calibBut;
 	var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
-	var <ipField, <portField, <nameField, <indexField;
+	var <deviceDropDown, <ipField, <portField, <nameField, <indexField;
 	var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
 	var <mappingSelect, <connectorBut;
 	var actionName, enterAction, enterActionBut, <actionsList;
@@ -32,6 +32,8 @@ AbstractCVWidgetEditor {
 	var flow0, flow1, flow2, flow3;
 
 	*initClass {
+		var localOscFunc;
+
 		allEditors = IdentityDictionary.new;
 	}
 

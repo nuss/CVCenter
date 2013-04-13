@@ -34,6 +34,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var mappingSelectItems;
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
+		var dropDownIPs;
 		var tmp, gapNextX, gapNextY;
 
 		widget ?? {
@@ -237,6 +238,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					editorEnv.specsListItems = specsList.items;
 					tmp = xySlots.detectIndex({ |n| n[1] == (name.asString++slotHiLo) });
 					xySlots[tmp][1] = 0;
+					if(allEditors.collect(_.isClosed).size == 0, { OSCCommands.collectTempIPsAndCmds(false) });
 				})
 			});
 
@@ -517,7 +519,16 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.string_("device-IP/port")
 			;
 
-			ipField = TextField(thisEditor[\tabs].views[2], flow2.bounds.width-60@15)
+			deviceDropDown = PopUpMenu(thisEditor[\tabs].views[2], 126@15)
+				.items_(["select IP-address..."])
+				.font_(Font("Arial", 10))
+			;
+
+
+
+			flow2.shift(-2, 0);
+
+			ipField = TextField(thisEditor[\tabs].views[2], flow2.bounds.width-180@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -528,7 +539,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				ipField.toolTip_("Optional: the device's IP-address\nCan be used to restrict listening to\nthis address only.")
 			});
 
-			flow2.shift(5, 0);
+			flow2.shift(-2, 0);
 
 			portField = TextField(thisEditor[\tabs].views[2], 36@15)
 				.font_(textFieldFont)
@@ -553,7 +564,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			deviceListMenu = PopUpMenu(thisEditor[\tabs].views[2], flow2.bounds.width/2-40@15)
 				.items_(["select device..."])
-				.font_(Font("Helvetica", 10))
+				.font_(Font("Arial", 10))
 				.action_({ |m|
 					cmdListMenu.items_(["command-names..."]);
 					thisCmdNames = [nil];
@@ -579,7 +590,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			cmdListMenu = PopUpMenu(thisEditor[\tabs].views[2], flow2.bounds.width/2-11@15)
 				.items_(["command-names..."])
-				.font_(Font("Helvetica", 10))
+				.font_(Font("Arial", 10))
 				.action_({ |m|
 					if(nameField.enabled, {
 						nameField.string_(thisCmdNames[m.value]);
@@ -710,7 +721,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 
 			mappingSelect = PopUpMenu(thisEditor[\tabs].views[2], flow2.bounds.width-15@20)
-				.font_(Font("Helvetica", 12))
+				.font_(Font("Arial", 12))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
 					widget.setOscMapping(ms.item, slot);
@@ -892,6 +903,26 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
 				}
 			}));
+
+			OSCCommands.collectTempIPsAndCmds;
+			deviceDropDown
+				.mouseDownAction_({ |dd|
+					dropDownIPs = OSCCommands.tempIPsAndCmds.keys.asArray;
+					dropDownIPs.do({ |it|
+						if(dd.items.includesEqual(it).not, {
+							dd.items_(dd.items.add(it));
+						})
+					})
+				})
+				.action_({ |dd|
+					if(dd.value == 0, {
+						ipField.string_(""); portField.string_("");
+					}, {
+						ipField.string_(dd.items[dd.value].asString.split($:)[0]);
+						portField.string_(dd.items[dd.value].asString.split($:)[1]);
+					})
+				})
+			;
 		});
 
 		tab !? {
@@ -993,7 +1024,8 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				if(allEditors[name].isEmpty, { allEditors.removeAt(name) });
 			},
 			{ allEditors.removeAt(name) };
-		)
+		);
+		// if(allEditors.size == 0, { OSCCommands.collectTempIPsAndCmds(false) });
 	}
 
 }
