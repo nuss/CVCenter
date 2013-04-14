@@ -46,7 +46,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var mappingSelectItems, mappingDiffers;
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
-		var tmp, gapNextX, gapNextY;
+		var tmp, tmpIP, tmpPortRestrictor, gapNextX, gapNextY;
 		var buildCheckbox, ddIPsItems, cmdPairs, dropDownIPs;
 
 		buildCheckbox = { |active, view, props, font|
@@ -894,6 +894,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					//	indexField -> msg-slot, an integer or a placeholder, starting at 1
 					cb.value.switch(
 						1, {
+							tmpIP = deviceDropDown.items[deviceDropDown.value];
+							tmpPortRestrictor = portRestrictor.value.asBoolean;
 							if(extOscCtrlArrayField.string.interpret.isArray and:{
 								extOscCtrlArrayField.string.interpret.collect(_.isInteger).size ==
 								extOscCtrlArrayField.string.interpret.size
@@ -911,9 +913,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 							// "ok, we're ready to rock: %".postf(extOscCtrlArrayField.string.interpret);
 								extOscCtrlArrayField.string.interpret.do({ |ext, i|
 									if(deviceDropDown.value > 0, {
-										connectIP = deviceDropDown.items[deviceDropDown.value].asString.split($:)[0];
-										if(portRestrictor.value.asBoolean, {
-											connectPort = deviceDropDown.items[deviceDropDown.value].asString.split($:)[1];
+										connectIP = tmpIP.asString.split($:)[0];
+										if(tmpPortRestrictor, {
+											connectPort = tmpIP.asString.split($:)[1];
 										})
 									}, { #connectIP, connectPort = nil!2 });
 									if(nameField.string.includes($%), {

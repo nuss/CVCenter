@@ -2313,6 +2313,7 @@ CVWidget {
 						if(theChanger.value.ipField.notNil, {
 							if(theChanger.value.portField.notNil, {
 								thisGuiEnv.msEditor.portRestrictor
+							})
 							// 	thisGuiEnv.msEditor.ipField.string_("");
 							// 	}, {
 							// 		thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
