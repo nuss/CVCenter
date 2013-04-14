@@ -604,13 +604,17 @@ CVWidget {
 	oscConnect { |ip, port, name, oscMsgIndex=1, slot|
 		var thisIP, intPort;
 
-		if(ip.size > 0 and:{
-			"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not and:{
-				ip != "nil"
+		ip !? { thisIP = ip.asString.replace(" ", "") };
+
+		if(thisIP.size > 0 and:{
+			"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(thisIP).not and:{
+				thisIP != "nil"
 			}
 		}, {
-			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
+			Error("Please provide a valid IP-address or leave the it empty").throw;
 		});
+
+		if(thisIP.size == 0 or:{ thisIP == "nil" }, { thisIP = nil });
 
 		intPort = port.asString;
 
@@ -620,10 +624,9 @@ CVWidget {
 			}, {
 				intPort = intPort.asInt;
 			})
-		});
+		}, { intPort = nil });
 
-		if(ip == "nil", { thisIP = "" }, { thisIP = ip });
-		if(port == "nil", { intPort = nil });
+		if(port == "nil" or:{ port  == nil }, { intPort = nil });
 
 		if("^\/".matchRegexp(name.asString).not, {
 			Error("You have to supply a valid OSC-typetag (command-name), beginning with an \"/\" as third argument to oscConnect").throw;
@@ -631,12 +634,16 @@ CVWidget {
 
 		switch(this.class,
 			CVWidgetKnob, {
-				wdgtControllersAndModels.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex.asInteger]).changedKeys(synchKeys);
-				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect }) });
+				if(midiOscEnv.oscResponder.isNil, {
+					wdgtControllersAndModels.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex.asInteger]).changedKeys(synchKeys);
+					CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect }) });
+				}, { "Already connected!".warn })
 			},
 			{
-				wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex.asInteger]).changedKeys(synchKeys);
-				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect(slot.asSymbol) }) });
+				if(midiOscEnv[slot].oscResponder.isNil, {
+					wdgtControllersAndModels[slot.asSymbol].oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex.asInteger]).changedKeys(synchKeys);
+					CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect(slot.asSymbol) }) });
+				}, { "Already connected!".warn })
 			}
 		)
 	}
@@ -1361,6 +1368,8 @@ CVWidget {
 						)
 					)
 				};
+
+				// "IP, IP.class: %, %\nport, port.class: %, %\n".postf(theChanger.value[0], theChanger.value[0].class, theChanger.value[1], theChanger.value[1].class);
 
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
 
