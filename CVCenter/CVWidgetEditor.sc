@@ -633,6 +633,27 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			cmdListMenu = PopUpMenu(thisEditor[\tabs].views[2], flow2.bounds.width/2-11@15)
 				.items_(["command-names..."])
 				.font_(Font("Arial", 10))
+				.mouseDownAction_({ |m|
+					if(deviceDropDown.value > 0 and:{ deviceListMenu.value == 0 }, {
+						cmdPairs = [];
+						if(portRestrictor.value.asBoolean, {
+							OSCCommands.tempIPsAndCmds[deviceDropDown.items[deviceDropDown.value]].pairsDo({ |cmd, size|
+								cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
+							})
+						}, {
+							OSCCommands.tempIPsAndCmds.pairsDo({ |k, v|
+								if(k.asString.contains(deviceDropDown.items[deviceDropDown.value].asString), {
+									v.pairsDo({ |cmd, size|
+										cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
+									})
+								})
+							})
+						});
+						m.items_(
+							[m.items[0]] ++ cmdPairs.sort;
+						)
+					})
+				})
 				.action_({ |m|
 					if(nameField.enabled, {
 						nameField.string_(m.items[m.value].asString.split($ )[0]);

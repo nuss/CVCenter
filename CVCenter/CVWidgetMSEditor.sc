@@ -704,6 +704,27 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			cmdListMenu = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-11@15)
 				.items_(["command-names..."])
 				.font_(Font("Arial", 10))
+				.mouseDownAction_({ |m|
+					if(deviceDropDown.value > 0 and:{ deviceListMenu.value == 0 }, {
+						cmdPairs = [];
+						if(portRestrictor.value.asBoolean, {
+							OSCCommands.tempIPsAndCmds[deviceDropDown.items[deviceDropDown.value]].pairsDo({ |cmd, size|
+								cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
+							})
+						}, {
+							OSCCommands.tempIPsAndCmds.pairsDo({ |k, v|
+								if(k.asString.contains(deviceDropDown.items[deviceDropDown.value].asString), {
+									v.pairsDo({ |cmd, size|
+										cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
+									})
+								})
+							})
+						});
+						m.items_(
+							[m.items[0]] ++ cmdPairs.sort;
+						)
+					})
+				})
 				.action_({ |m|
 					if(nameField.enabled, {
 						nameField.string_(m.items[m.value].asString.split($ )[0]);
@@ -889,18 +910,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 							if(oscConnectCondition >= 2, {
 							// "ok, we're ready to rock: %".postf(extOscCtrlArrayField.string.interpret);
 								extOscCtrlArrayField.string.interpret.do({ |ext, i|
-								// if(ipField.string.size > 0, { connectIP = ipField.string }, { connectIP = "nil" });
-								// if(portField.string.size > 0, {
-								// 	connectPort = portField.string;
-								// 	}, {
-								// 		connectPort = "nil";
-								// });
 									if(deviceDropDown.value > 0, {
 										connectIP = deviceDropDown.items[deviceDropDown.value].asString.split($:)[0];
 										if(portRestrictor.value.asBoolean, {
 											connectPort = deviceDropDown.items[deviceDropDown.value].asString.split($:)[1];
 										})
-									});
+									}, { #connectIP, connectPort = nil!2 });
 									if(nameField.string.includes($%), {
 										connectName = nameField.string.format(ext);
 									}, {
@@ -912,6 +927,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 										connectOscMsgIndex = indexField.string.asInt;
 									});
 									connectIndexStart = intStartIndexField.value+(ext-1);
+								// [connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart].postln;
 									if(connectIndexStart >= 0 and:{ connectIndexStart < widget.msSize }, {
 										widget.oscConnect(
 											ip: connectIP,

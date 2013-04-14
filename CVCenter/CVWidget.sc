@@ -796,13 +796,17 @@ CVWidget {
 			{ wcm = wdgtControllersAndModels }
 		);
 
-		if(ip.size > 0 and:{
-			"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(ip).not and:{
-				ip != "nil"
+		ip !? { thisIP = ip.asString.replace(" ", "") };
+
+		if(thisIP.size > 0 and:{
+			"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$".matchRegexp(thisIP).not and:{
+				thisIP != "nil"
 			}
 		}, {
 			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
 		});
+
+		if(thisIP.size == 0 or:{ thisIP == "nil" }, { thisIP = nil });
 
 		intPort = port.asString;
 
@@ -814,8 +818,7 @@ CVWidget {
 			})
 		});
 
-		if(ip == "nil", { thisIP = "" }, { thisIP = ip });
-		if(port == "nil", { intPort = nil });
+		if(port == "nil" or:{ port == nil }, { intPort = nil });
 
 		if("^\/".matchRegexp(name.asString).not, {
 			Error("You have to supply a valid OSC-typetag (command-name), beginning with an \"/\" as third argument to oscConnect").throw;
@@ -823,6 +826,12 @@ CVWidget {
 
 		if(oscMsgIndex.isKindOf(Integer).not, {
 			Error("You have to supply an integer as forth argument to oscConnect").throw;
+		});
+
+		if(slot.notNil, {
+			if(midiOscEnv[thisSlot].oscResponder.notNil, { "Already connected!".warn });
+		}, {
+			if(midiOscEnv.oscResponder.notNil, { "Already connected!".warn });
 		});
 
 		wcm.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
@@ -2183,6 +2192,8 @@ CVWidget {
 					})
 				};
 
+				"IP, IP.class: %, %\nport, port.class: %, %\n".postf(theChanger.value[0], theChanger.value[0].class, theChanger.value[1], theChanger.value[1].class);
+
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
 
 				if(midiOscEnv.oscResponder.isNil, {
@@ -2245,7 +2256,6 @@ CVWidget {
 		};
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitOscDisplay: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' oscDisplay.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			switch(prCalibrate.class,
@@ -2300,7 +2310,9 @@ CVWidget {
 						thisGuiEnv.msEditor.isClosed.not
 					}, {
 						thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
-							// if(theChanger.value.ipField.isNil or:{ theChanger.value.ipField == "nil" }, {
+						if(theChanger.value.ipField.notNil, {
+							if(theChanger.value.portField.notNil, {
+								thisGuiEnv.msEditor.portRestrictor
 							// 	thisGuiEnv.msEditor.ipField.string_("");
 							// 	}, {
 							// 		thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
@@ -2313,7 +2325,7 @@ CVWidget {
 							// 		thisGuiEnv.msEditor.portField.string_("");
 							// 	}, {
 							// 		thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
-							// });
+						});
 						thisOscEditBut.states_([theChanger.value.but]);
 							if(this.midiOscEnv.select({ |sl| sl[\oscResponder].notNil }).size > 0, {
 							thisGuiEnv.msEditor.connectorBut.value_(1);
