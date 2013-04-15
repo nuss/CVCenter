@@ -18,7 +18,8 @@
 CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 	var msEditorEnv;
-	var <extMidiCtrlArrayField;
+	var <extMidiCtrlArrayField, <midiConnectorBut, <midiDisconnectorBut;
+	var <oscDisconnectorBut;
 	var <extOscCtrlArrayField, <intStartIndexField;
 	var <oscEditBtns, <oscCalibBtns;
 	var <midiEditGroups;
@@ -581,67 +582,51 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			connectorBut = Button(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-21@25)
+			midiConnectorBut = Button(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-24/2@25)
 				.font_(staticTextFont)
 				.states_([
-					["connect MIDI-sliders", Color.white, Color.blue],
-					["disconnect MIDI-sliders", Color.white, Color.red],
+					["connect MIDI-sliders", Color.white, Color.red],
+				// ["disconnect MIDI-sliders", Color.white, Color.red],
 				])
 				.action_({ |cb|
-					switch(cb.value,
-						1, {
-							if("^[-+]?[0-9]*$".matchRegexp(midiSrcField.string), {
-								midiUid = midiSrcField.string.interpret
-							});
-							if("^[0-9]*$".matchRegexp(midiChanField.string), {
-								midiChan = midiChanField.string.interpret
-							});
-							extMidiCtrlArrayField.string.interpret.do({ |ctrlNum, sl|
-								widget.midiConnect(midiUid, midiChan, ctrlNum, sl)
-							})
-						},
-						0, { widget.msSize.do(widget.midiDisconnect(_)) }
-					)
+				// switch(cb.value,
+				// 	1, {
+					if("^[-+]?[0-9]*$".matchRegexp(midiSrcField.string), {
+						midiUid = midiSrcField.string.interpret
+					});
+					if("^[0-9]*$".matchRegexp(midiChanField.string), {
+						midiChan = midiChanField.string.interpret
+					});
+					extMidiCtrlArrayField.string.interpret.do({ |ctrlNum, sl|
+						widget.midiConnect(midiUid, midiChan, ctrlNum, sl)
+					})
+				// },
+				// 0, { widget.msSize.do(widget.midiDisconnect(_)) }
+				// )
 				})
 			;
+
+			if(widget.midiOscEnv.collect(_.cc).takeThese(_.isNil).size < widget.msSize, {
+				midiConnectorBut.enabled_(true)
+			}, { midiConnectorBut.enabled_(false) });
+
+			midiDisconnectorBut = Button(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-29/2@25)
+				.font_(staticTextFont)
+				.states_([
+					["disconnect all Midi-sliders", Color.white, Color.blue]
+				])
+				.action_({ |dcb| widget.msSize.do(widget.midiDisconnect(_)) })
+			;
+
+			if(widget.midiOscEnv.collect(_.cc).takeThese(_.isNil).size > 0, {
+				midiDisconnectorBut.enabled_(true)
+			}, { midiDisconnectorBut.enabled_(false) });
 
 			widget.msSize.do({ |sl|
 				midiEditGroups = midiEditGroups.add(
 					CVMidiEditGroup(thisEditor.midiTabs.views[1], midiFlow1.bounds.width/5-10@39, widget, sl);
 				)
 			});
-
-			// StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
-			// .font_(staticTextFont)
-			// .stringColor_(staticTextColor)
-			// .string_("IP-address (optional)")
-			// //			.background_(Color.white)
-			// ;
-			//
-			// oscFlow0.shift(0, 0);
-			//
-			// StaticText(thisEditor.oscTabs.views[0], 130@15)
-			// .font_(staticTextFont)
-			// .stringColor_(staticTextColor)
-			// .string_("port (usually not necessary)")
-			// //			.background_(Color.white)
-			// ;
-
-			// ipField = TextField(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-154@15)
-			// .font_(textFieldFont)
-			// .stringColor_(textFieldFontColor)
-			// .background_(textFieldBg)
-			// .string_("")
-			// ;
-			//
-			// oscFlow0.shift(0, 0);
-			//
-			// portField = TextField(thisEditor.oscTabs.views[0], 130@15)
-			// .font_(textFieldFont)
-			// .stringColor_(textFieldFontColor)
-			// .background_(textFieldBg)
-			// .string_("")
-			// ;
 
 			deviceDropDown = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-110@15)
 				.items_(["select IP-address... (optional)"])
@@ -878,11 +863,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			oscFlow0.shift(0, 0);
 
-			connectorBut = Button(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-21@25)
+			connectorBut = Button(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-24/2@25)
 				.font_(staticTextFont)
 				.states_([
-					["connect OSC-controllers", Color.white, Color.blue],
-					["disconnect OSC-controllers", Color.white, Color.red]
+					["connect OSC-controllers", Color.white, Color.red],
+				// ["disconnect OSC-controllers", Color.white, Color.red]
 				])
 				.action_({ |cb|
 					// user-input:
@@ -892,8 +877,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					//	nameField -> osc-cmds, ext. controllers as placeholders
 					//	intStartIndexField -> multislider-index to start connecting at
 					//	indexField -> msg-slot, an integer or a placeholder, starting at 1
-					cb.value.switch(
-						1, {
+				// cb.value.switch(
+				// 	1, {
 							tmpIP = deviceDropDown.items[deviceDropDown.value];
 							tmpPortRestrictor = portRestrictor.value.asBoolean;
 							if(extOscCtrlArrayField.string.interpret.isArray and:{
@@ -941,11 +926,28 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 									})
 								})
 							})
-						},
-						0, { widget.msSize.do(widget.oscDisconnect(_)) }
-					)
+				// },
+				// 0, { widget.msSize.do(widget.oscDisconnect(_)) }
+				// )
 				})
 			;
+
+			if(widget.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size < widget.msSize, {
+				connectorBut.enabled_(true);
+			}, { connectorBut.enabled_(false) });
+
+			oscDisconnectorBut = Button(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-24/2@25)
+				.font_(staticTextFont)
+				.states_([
+					["disconnect all OSC-controllers", Color.white, Color.blue],
+				// ["disconnect OSC-controllers", Color.white, Color.red]
+				])
+				.action_({ |dcb| widget.msSize.do(widget.oscDisconnect(_)) })
+			;
+
+			if(widget.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size > 0, {
+				oscDisconnectorBut.enabled_(true);
+			}, { oscDisconnectorBut.enabled_(false) });
 
 			widget.msSize.do({ |sindex|
 				oscEditBtns = oscEditBtns.add(

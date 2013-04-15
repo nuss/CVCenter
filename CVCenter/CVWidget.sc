@@ -1722,7 +1722,6 @@ CVWidget {
 				})
 			});
 
-			// if(this.class != CVWidgetMS, {
 			theChanger.value.learn.switch(
 				"X", {
 					if(this.class != CVWidgetMS, {
@@ -2015,6 +2014,17 @@ CVWidget {
 						midiButBg // background
 					]]);
 
+				});
+				if(thisGuiEnv.msEditor.notNil and:{
+					thisGuiEnv.msEditor.isClosed.not
+				}, {
+						// midiOscEnv.postln;
+					if(this.midiOscEnv.collect({ |it| it[\cc] }).takeThese(_.isNil).size < this.msSize, {
+						thisGuiEnv.msEditor.midiConnectorBut.enabled_(true)
+					}, { thisGuiEnv.msEditor.midiConnectorBut.enabled_(false) });
+					if(this.midiOscEnv.collect({ |it| it[\cc] }).takeThese(_.isNil).size > 0, {
+						thisGuiEnv.msEditor.midiDisconnectorBut.enabled_(true)
+					}, { thisGuiEnv.msEditor.midiDisconnectorBut.enabled_(false) });
 				})
 			})
 		})
@@ -2309,10 +2319,19 @@ CVWidget {
 					if(thisGuiEnv.msEditor.notNil and:{
 						thisGuiEnv.msEditor.isClosed.not
 					}, {
-						thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
+						if(this.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size < this.msSize, {
+							thisGuiEnv.msEditor.connectorBut.enabled_(true);
+						}, { thisGuiEnv.msEditor.connectorBut.enabled_(false) });
+						if(this.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size > 0, {
+							thisGuiEnv.msEditor.oscDisconnectorBut.enabled_(true);
+						}, { thisGuiEnv.msEditor.oscDisconnectorBut.enabled_(false) });
+						// thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 						if(theChanger.value.ipField.notNil, {
 							if(theChanger.value.portField.notNil, {
-								thisGuiEnv.msEditor.portRestrictor
+								thisGuiEnv.msEditor.portRestrictor.value_(1);
+								this.midiOscEnv.collect({ |it|
+									it.oscResponder !? { it.oscResponder.addr }
+								}).takeThese(_.isNil).asBag.contents.postln
 							})
 							// 	thisGuiEnv.msEditor.ipField.string_("");
 							// 	}, {
@@ -2323,7 +2342,7 @@ CVWidget {
 							// 		theChanger.value.portField == "0"
 							// 	}
 							// 	}, {
-							// 		thisGuiEnv.msEditor.portField.string_("");
+							// 		thisGuiEnv.msEditorconnectorBut.portField.string_("");
 							// 	}, {
 							// 		thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
 						});
