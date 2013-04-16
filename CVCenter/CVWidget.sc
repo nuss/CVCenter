@@ -1094,8 +1094,8 @@ CVWidget {
 			if(this.class == CVWidgetMS, { tmp = slot.asString++": edit OSC" }, { tmp = "edit OSC" });
 			wcm.oscDisplay.model = Ref((
 				but: [tmp, Color.black, this.bgColor],
-				ipField: "",
-				portField: "",
+				ipField: nil,
+				portField: nil,
 				nameField: "/my/cmd/name",
 				index: 1,
 				connectorButVal: 0,
@@ -2020,11 +2020,19 @@ CVWidget {
 				}, {
 						// midiOscEnv.postln;
 					if(this.midiOscEnv.collect({ |it| it[\cc] }).takeThese(_.isNil).size < this.msSize, {
-						thisGuiEnv.msEditor.midiConnectorBut.enabled_(true)
-					}, { thisGuiEnv.msEditor.midiConnectorBut.enabled_(false) });
+						thisGuiEnv.msEditor.midiConnectorBut.enabled_(true).states_([
+							[thisGuiEnv.msEditor.midiConnectorBut.states[0][0], thisGuiEnv.msEditor.midiConnectorBut.states[0][1], Color.red]
+						])
+					}, { thisGuiEnv.msEditor.midiConnectorBut.enabled_(false).states_([
+						[thisGuiEnv.msEditor.midiConnectorBut.states[0][0], thisGuiEnv.msEditor.midiConnectorBut.states[0][1], Color.red(0.5)]
+					]) });
 					if(this.midiOscEnv.collect({ |it| it[\cc] }).takeThese(_.isNil).size > 0, {
-						thisGuiEnv.msEditor.midiDisconnectorBut.enabled_(true)
-					}, { thisGuiEnv.msEditor.midiDisconnectorBut.enabled_(false) });
+						thisGuiEnv.msEditor.midiDisconnectorBut.enabled_(true).states_([
+							[thisGuiEnv.msEditor.midiDisconnectorBut.states[0][0], thisGuiEnv.msEditor.midiDisconnectorBut.states[0][1], Color.blue]
+						])
+					}, { thisGuiEnv.msEditor.midiDisconnectorBut.enabled_(false).states_([
+						[thisGuiEnv.msEditor.midiDisconnectorBut.states[0][0], thisGuiEnv.msEditor.midiDisconnectorBut.states[0][1], Color.blue(alpha: 0.5)]
+					]) })
 				})
 			})
 		})
@@ -2222,8 +2230,8 @@ CVWidget {
 				wcm.oscDisplay.model.value_(
 					(
 						but: [tmp, Color.white, Color.cyan(0.5)],
-						ipField: theChanger.value[0].asString,
-						portField: theChanger.value[1].asString,
+						ipField: theChanger.value[0] !? { theChanger.value[0].asString },
+						portField: theChanger.value[1] !? { theChanger.value[1].asString },
 						nameField: theChanger.value[2].asString,
 						index: theChanger.value[3],
 						connectorButVal: 1,
@@ -2320,14 +2328,24 @@ CVWidget {
 						thisGuiEnv.msEditor.isClosed.not
 					}, {
 						if(this.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size < this.msSize, {
-							thisGuiEnv.msEditor.connectorBut.enabled_(true);
-						}, { thisGuiEnv.msEditor.connectorBut.enabled_(false) });
+							thisGuiEnv.msEditor.connectorBut.enabled_(true).states_([
+								[thisGuiEnv.msEditor.connectorBut.states[0][0], thisGuiEnv.msEditor.connectorBut.states[0][1], Color.red]
+							]);
+						}, { thisGuiEnv.msEditor.connectorBut.enabled_(false).states_([
+							[thisGuiEnv.msEditor.connectorBut.states[0][0], thisGuiEnv.msEditor.connectorBut.states[0][1], Color.red(alpha: 0.5)]
+						]) });
 						if(this.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size > 0, {
-							thisGuiEnv.msEditor.oscDisconnectorBut.enabled_(true);
-						}, { thisGuiEnv.msEditor.oscDisconnectorBut.enabled_(false) });
+							thisGuiEnv.msEditor.oscDisconnectorBut.enabled_(true).states_([
+								[thisGuiEnv.msEditor.oscDisconnectorBut.states[0][0], thisGuiEnv.msEditor.oscDisconnectorBut.states[0][1], Color.blue]
+							])
+						}, { thisGuiEnv.msEditor.oscDisconnectorBut.enabled_(false).states_([
+							[thisGuiEnv.msEditor.oscDisconnectorBut.states[0][0], thisGuiEnv.msEditor.oscDisconnectorBut.states[0][1], Color.blue(alpha: 0.5)]
+						]) });
 						// thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 						if(theChanger.value.ipField.notNil, {
-							if(theChanger.value.portField.notNil, {
+							if(theChanger.value.portField.notNil or:{
+								theChanger.value.portField.size > 0
+							}, {
 								thisGuiEnv.msEditor.portRestrictor.value_(1);
 								this.midiOscEnv.collect({ |it|
 									it.oscResponder !? { it.oscResponder.addr }

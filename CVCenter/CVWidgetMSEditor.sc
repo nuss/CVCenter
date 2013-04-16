@@ -586,11 +586,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(staticTextFont)
 				.states_([
 					["connect MIDI-sliders", Color.white, Color.red],
-				// ["disconnect MIDI-sliders", Color.white, Color.red],
 				])
 				.action_({ |cb|
-				// switch(cb.value,
-				// 	1, {
 					if("^[-+]?[0-9]*$".matchRegexp(midiSrcField.string), {
 						midiUid = midiSrcField.string.interpret
 					});
@@ -600,15 +597,16 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					extMidiCtrlArrayField.string.interpret.do({ |ctrlNum, sl|
 						widget.midiConnect(midiUid, midiChan, ctrlNum, sl)
 					})
-				// },
-				// 0, { widget.msSize.do(widget.midiDisconnect(_)) }
-				// )
 				})
 			;
 
 			if(widget.midiOscEnv.collect(_.cc).takeThese(_.isNil).size < widget.msSize, {
-				midiConnectorBut.enabled_(true)
-			}, { midiConnectorBut.enabled_(false) });
+				midiConnectorBut.enabled_(true).states_([
+					[midiConnectorBut.states[0][0], midiConnectorBut.states[0][1], Color.red]
+				])
+			}, { midiConnectorBut.enabled_(false).states_([
+				[midiConnectorBut.states[0][0], midiConnectorBut.states[0][1], Color.red(alpha: 0.5)]
+			]) });
 
 			midiDisconnectorBut = Button(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-29/2@25)
 				.font_(staticTextFont)
@@ -619,8 +617,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			;
 
 			if(widget.midiOscEnv.collect(_.cc).takeThese(_.isNil).size > 0, {
-				midiDisconnectorBut.enabled_(true)
-			}, { midiDisconnectorBut.enabled_(false) });
+				midiDisconnectorBut.enabled_(true).states_([
+					[midiDisconnectorBut.states[0][0], midiDisconnectorBut.states[0][1], Color.blue(alpha: 0.5)]
+				])
+			}, { midiDisconnectorBut.enabled_(false).states_([
+				[midiDisconnectorBut.states[0][0], midiDisconnectorBut.states[0][1], Color.blue]
+			]) });
 
 			widget.msSize.do({ |sl|
 				midiEditGroups = midiEditGroups.add(
@@ -867,87 +869,83 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(staticTextFont)
 				.states_([
 					["connect OSC-controllers", Color.white, Color.red],
-				// ["disconnect OSC-controllers", Color.white, Color.red]
 				])
 				.action_({ |cb|
-					// user-input:
-					// 	extOscCtrlArrayField -> external controllers
-					//	ipField -> IP-address
-					//	portField -> port
-					//	nameField -> osc-cmds, ext. controllers as placeholders
-					//	intStartIndexField -> multislider-index to start connecting at
-					//	indexField -> msg-slot, an integer or a placeholder, starting at 1
-				// cb.value.switch(
-				// 	1, {
-							tmpIP = deviceDropDown.items[deviceDropDown.value];
-							tmpPortRestrictor = portRestrictor.value.asBoolean;
-							if(extOscCtrlArrayField.string.interpret.isArray and:{
-								extOscCtrlArrayField.string.interpret.collect(_.isInteger).size ==
-								extOscCtrlArrayField.string.interpret.size
-							}, {
-								oscConnectCondition = oscConnectCondition+1;
-							}, {
-								oscConnectWarning = oscConnectWarning++"\n\t- 'ext. sliders' must be an array of integers";
-							});
-							if(indexField.string != "%" and:{ indexField.string.interpret.isInteger.not }, {
-								oscConnectWarning = oscConnectWarning++"\n\t- msg. slot must either contain '%' (a placeholder) or an integer";
-							}, {
-								oscConnectCondition = oscConnectCondition+1;
-							});
-							if(oscConnectCondition >= 2, {
-							// "ok, we're ready to rock: %".postf(extOscCtrlArrayField.string.interpret);
-								extOscCtrlArrayField.string.interpret.do({ |ext, i|
-									if(deviceDropDown.value > 0, {
-										connectIP = tmpIP.asString.split($:)[0];
-										if(tmpPortRestrictor, {
-											connectPort = tmpIP.asString.split($:)[1];
-										})
-									}, { #connectIP, connectPort = nil!2 });
-									if(nameField.string.includes($%), {
-										connectName = nameField.string.format(ext);
-									}, {
-										connectName = nameField.string;
-									});
-									if(indexField.string.includes($%), {
-										connectOscMsgIndex = indexField.string.format(ext).asInt;
-									}, {
-										connectOscMsgIndex = indexField.string.asInt;
-									});
-									connectIndexStart = intStartIndexField.value+(ext-1);
-								// [connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart].postln;
-									if(connectIndexStart >= 0 and:{ connectIndexStart < widget.msSize }, {
-										widget.oscConnect(
-											ip: connectIP,
-											port: connectPort,
-											name: connectName,
-											oscMsgIndex: connectOscMsgIndex,
-											slot: connectIndexStart
-										)
-									})
+					tmpIP = deviceDropDown.items[deviceDropDown.value];
+					tmpPortRestrictor = portRestrictor.value.asBoolean;
+					if(extOscCtrlArrayField.string.interpret.isArray and:{
+						extOscCtrlArrayField.string.interpret.collect(_.isInteger).size ==
+						extOscCtrlArrayField.string.interpret.size
+					}, {
+						oscConnectCondition = oscConnectCondition+1;
+					}, {
+						oscConnectWarning = oscConnectWarning++"\n\t- 'ext. sliders' must be an array of integers";
+					});
+					if(indexField.string != "%" and:{ indexField.string.interpret.isInteger.not }, {
+						oscConnectWarning = oscConnectWarning++"\n\t- msg. slot must either contain '%' (a placeholder) or an integer";
+					}, {
+						oscConnectCondition = oscConnectCondition+1;
+					});
+					if(oscConnectCondition >= 2, {
+						// "ok, we're ready to rock: %".postf(extOscCtrlArrayField.string.interpret);
+						extOscCtrlArrayField.string.interpret.do({ |ext, i|
+							if(deviceDropDown.value > 0, {
+								connectIP = tmpIP.asString.split($:)[0];
+								if(tmpPortRestrictor, {
+									connectPort = tmpIP.asString.split($:)[1];
 								})
+							}, { #connectIP, connectPort = nil!2 });
+							if(nameField.string.includes($%), {
+								connectName = nameField.string.format(ext);
+							}, {
+								connectName = nameField.string;
+							});
+							if(indexField.string.includes($%), {
+								connectOscMsgIndex = indexField.string.format(ext).asInt;
+							}, {
+								connectOscMsgIndex = indexField.string.asInt;
+							});
+							connectIndexStart = intStartIndexField.value+(ext-1);
+							// [connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart].postln;
+							if(connectIndexStart >= 0 and:{ connectIndexStart < widget.msSize }, {
+								widget.oscConnect(
+									ip: connectIP,
+									port: connectPort,
+									name: connectName,
+									oscMsgIndex: connectOscMsgIndex,
+									slot: connectIndexStart
+								)
 							})
-				// },
-				// 0, { widget.msSize.do(widget.oscDisconnect(_)) }
-				// )
+						})
+					})
 				})
 			;
 
+			[connectorBut.states[0][0], connectorBut.states[0][1], Color.red].postln;
+
 			if(widget.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size < widget.msSize, {
-				connectorBut.enabled_(true);
-			}, { connectorBut.enabled_(false) });
+				connectorBut.enabled_(true).states_([
+					[connectorBut.states[0][0], connectorBut.states[0][1], Color.red]
+				])
+			}, { connectorBut.enabled_(false).states_([
+				[connectorBut.states[0][0], connectorBut.states[0][1], Color.red(alpha: 0.5)]
+			]) });
 
 			oscDisconnectorBut = Button(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-24/2@25)
 				.font_(staticTextFont)
 				.states_([
 					["disconnect all OSC-controllers", Color.white, Color.blue],
-				// ["disconnect OSC-controllers", Color.white, Color.red]
 				])
 				.action_({ |dcb| widget.msSize.do(widget.oscDisconnect(_)) })
 			;
 
 			if(widget.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size > 0, {
-				oscDisconnectorBut.enabled_(true);
-			}, { oscDisconnectorBut.enabled_(false) });
+				oscDisconnectorBut.enabled_(true).states_([
+					[oscDisconnectorBut.states[0][0], oscDisconnectorBut.states[0][1], Color.blue]
+				])
+			}, { oscDisconnectorBut.enabled_(false).states_([
+				[oscDisconnectorBut.states[0][0], oscDisconnectorBut.states[0][1], Color.blue(alpha: 0.5)]
+			]) });
 
 			widget.msSize.do({ |sindex|
 				oscEditBtns = oscEditBtns.add(
