@@ -1200,14 +1200,9 @@ CVWidget {
 				CVWidget2D, { wcm = wdgtControllersAndModels[slot] },
 				CVWidgetMS, {
 					wcm = wdgtControllersAndModels.slots[slot];
-					// [wdgtControllersAndModels.cvSpec, wdgtControllersAndModels.actions].postcs;
 					wcm.cvSpec = ();
 					wcm.actions = ();
-					// [wcm.actions, wcm.cvSpec].postln;
-					// wdgtControllersAndModels.slots.do({ |sl|
-					// 	[sl.cvSpec, sl.actions].postln;
-					// })
-				};
+				}
 			);
 			midiOscEnv = this.midiOscEnv[slot];
 			switch(this.class,
@@ -2210,7 +2205,7 @@ CVWidget {
 					})
 				};
 
-				"IP, IP.class: %, %\nport, port.class: %, %\n".postf(theChanger.value[0], theChanger.value[0].class, theChanger.value[1], theChanger.value[1].class);
+				// "IP, IP.class: %, %\nport, port.class: %, %\n".postf(theChanger.value[0], theChanger.value[0].class, theChanger.value[1], theChanger.value[1].class);
 
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
 
@@ -2268,6 +2263,7 @@ CVWidget {
 	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var thisEditor, thisOscEditBut, p, tmp;
 		var numOscString, numOscResponders, oscButBg, oscButTextColor;
+		var msEditEnabled;
 
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
@@ -2343,41 +2339,43 @@ CVWidget {
 						]) });
 						// thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 						if(theChanger.value.ipField.notNil, {
-							if(theChanger.value.portField.notNil or:{
-								theChanger.value.portField.size > 0
-							}, {
+							if(theChanger.value.portField.notNil, {
 								thisGuiEnv.msEditor.portRestrictor.value_(1);
-								this.midiOscEnv.collect({ |it|
+								if(this.midiOscEnv.collect({ |it|
 									it.oscResponder !? { it.oscResponder.addr }
-								}).takeThese(_.isNil).asBag.contents.postln
+								}).takeThese(_.isNil).asBag.contents.size > 1, {
+									thisGuiEnv.msEditor.deviceDropDown.items_(
+										["receiving OSC-messages from various addresses..."]++thisGuiEnv.msEditor.deviceDropDown.items[1..]
+									)
+								}, {
+									if(theChanger.value.portField.notNil, {
+										thisGuiEnv.msEditor.deviceDropDown.items_(
+											["select IP-address:port... (optional)"]++thisGuiEnv.msEditor.deviceDropDown.items[1..]
+										)
+									}, {
+										thisGuiEnv.msEditor.deviceDropDown.items_(
+											["select IP-address... (optional)"]++thisGuiEnv.msEditor.deviceDropDown.items[1..]
+										)
+									})
+								})
 							})
-							// 	thisGuiEnv.msEditor.ipField.string_("");
-							// 	}, {
-							// 		thisGuiEnv.msEditor.ipField.string_(theChanger.value.ipField);
-							// });
-							// if(theChanger.value.portField.isNil or:{
-							// 	theChanger.value.portField == "nil" or:{
-							// 		theChanger.value.portField == "0"
-							// 	}
-							// 	}, {
-							// 		thisGuiEnv.msEditorconnectorBut.portField.string_("");
-							// 	}, {
-							// 		thisGuiEnv.msEditor.portField.string_(theChanger.value.portField);
 						});
 						thisOscEditBut.states_([theChanger.value.but]);
-							if(this.midiOscEnv.select({ |sl| sl[\oscResponder].notNil }).size > 0, {
-							thisGuiEnv.msEditor.connectorBut.value_(1);
+						if(this.midiOscEnv.select({ |sl| sl[\oscResponder].notNil }).size < this.msSize, {
+							msEditEnabled = true;
 						}, {
-							thisGuiEnv.msEditor.connectorBut.value_(0);
+							msEditEnabled = false;
 						});
 						[
+							thisGuiEnv.msEditor.deviceDropDown,
+							thisGuiEnv.msEditor.portRestrictor,
+							thisGuiEnv.msEditor.deviceListMenu,
+							thisGuiEnv.msEditor.cmdListMenu,
 							thisGuiEnv.msEditor.extOscCtrlArrayField,
 							thisGuiEnv.msEditor.intStartIndexField,
-								// thisGuiEnv.msEditor.ipField,
-								// thisGuiEnv.msEditor.portField,
 							thisGuiEnv.msEditor.nameField,
 							thisGuiEnv.msEditor.indexField
-						].do(_.enabled_(theChanger.value.editEnabled));
+						].do(_.enabled_(msEditEnabled));
 					})
 				}
 			});
@@ -2387,37 +2385,22 @@ CVWidget {
 			}, {
 				defer {
 					thisEditor.connectorBut.value_(theChanger.value.connectorButVal);
-						// if(theChanger.value.ipField.isNil or:{ theChanger.value.ipField == "nil" }, {
-						// 	thisEditor.ipField.string_("");
-						// 	}, {
-						// 		thisEditor.ipField.string_(theChanger.value.ipField);
-						// });
-						// // "theChanger.value.portField (Editor): %\n".postf(theChanger.value.portField);
-						// if(theChanger.value.portField.isNil or:{
-						// 	theChanger.value.portField == "nil" or:{
-						// 		theChanger.value.portField == "0"
-						// 	}
-						// 	}, {
-						// 		thisEditor.portField.string_("");
-						// 	}, {
-						// 		thisEditor.portField.string_(theChanger.value.portField);
-						// });
 					thisEditor.nameField.string_(theChanger.value.nameField);
 					if(thisCalib, {
 						[
-							// thisEditor.inputConstraintLoField,
-							// thisEditor.inputConstraintHiField,
 							thisEditor.calibNumBoxes.lo,
 							thisEditor.calibNumBoxes.hi
 						].do(_.enabled_(theChanger.value.editEnabled));
 					});
 					thisEditor.indexField.value_(theChanger.value.index);
 					[
-							// thisEditor.ipField,
-							// thisEditor.portField,
+						thisEditor.deviceDropDown,
+						thisEditor.portRestrictor,
+						thisEditor.cmdListMenu,
+						thisEditor.deviceListMenu,
 						thisEditor.nameField,
 						thisEditor.indexField
-					].do(_.enabled_(theChanger.value.editEnabled))
+					].do(_.enabled_(theChanger.value.editEnabled));
 				}
 			})
 		})

@@ -41,7 +41,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var oscConnectCondition = 0;
 		var oscConnectWarning = "Couldn't connect OSC-controllers:";
 		var connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart;
-		var deviceListMenu, cmdListMenu, addDeviceBut, thisCmdNames;
+		var addDeviceBut, thisCmdNames;
 		var midiModes, nextMidiX, nextMidiY;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
 		var mappingSelectItems, mappingDiffers;
@@ -920,8 +920,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					})
 				})
 			;
-
-			[connectorBut.states[0][0], connectorBut.states[0][1], Color.red].postln;
 
 			if(widget.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size < widget.msSize, {
 				connectorBut.enabled_(true).states_([

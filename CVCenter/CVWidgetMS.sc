@@ -384,7 +384,7 @@ CVWidgetMS : CVWidget {
 
 //		msSize.do({ |slot|
 			guiEnv = (
-			// msEditor: editor.msEditor,
+				msEditor: editor.msEditor,
 				editor: editor.editors,
 				mSlider: mSlider,
 				calibViews: calibViews,
