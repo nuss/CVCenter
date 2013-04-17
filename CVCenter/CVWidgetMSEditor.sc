@@ -49,6 +49,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var cmdNames, orderedCmds, orderedCmdSlots;
 		var tmp, tmpIP, tmpPortRestrictor, gapNextX, gapNextY;
 		var buildCheckbox, ddIPsItems, cmdPairs, dropDownIPs;
+		var connectWarning;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -256,7 +257,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(staticTextFont)
 				.string_(cvString)
 				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
-//				[tf, char, modifiers, unicode, keycode].postcs;
+	//				[tf, char, modifiers, unicode, keycode].postcs;
 					if(char == $\r and:{ modifiers == 131072 }, {
 						widget.setSpec(tf.string.interpret);
 						widget.mSlider.refresh;
@@ -895,26 +896,37 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 									connectPort = tmpIP.asString.split($:)[1];
 								})
 							}, { #connectIP, connectPort = nil!2 });
-							if(nameField.string.includes($%), {
-								connectName = nameField.string.format(ext);
-							}, {
-								connectName = nameField.string;
+							if(indexField.string.includes($%), { indexField.string = "%" });
+							if(nameField.string.includes($%) and:{ indexField.string.includes($%) }, {
+								connectWarning = "There can only be one placeholder '%', either in the OSC-command or the msg-slot!";
 							});
-							if(indexField.string.includes($%), {
-								connectOscMsgIndex = indexField.string.format(ext).asInt;
-							}, {
-								connectOscMsgIndex = indexField.string.asInt;
+							if(nameField.string.includes($%).noy and:{ indexField.string.includes($%).not }, {
+								connectWarning = "There has to be at least one placeholder '%', either in the OSC-command or the msg-slot";
 							});
-							connectIndexStart = intStartIndexField.value+(ext-1);
-							// [connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart].postln;
-							if(connectIndexStart >= 0 and:{ connectIndexStart < widget.msSize }, {
-								widget.oscConnect(
-									ip: connectIP,
-									port: connectPort,
-									name: connectName,
-									oscMsgIndex: connectOscMsgIndex,
-									slot: connectIndexStart
-								)
+							if(connectWarning.notNil, {
+								connectWarning.warn;
+							}, {
+								if(nameField.string.includes($%), {
+									connectName = nameField.string.format(ext);
+								}, {
+									connectName = nameField.string;
+								});
+								if(indexField.string.includes($%), {
+									connectOscMsgIndex = indexField.string.format(ext).asInt;
+								}, {
+									connectOscMsgIndex = indexField.string.asInt;
+								});
+								connectIndexStart = intStartIndexField.value+(ext-1);
+								// [connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart].postln;
+								if(connectIndexStart >= 0 and:{ connectIndexStart < widget.msSize }, {
+									widget.oscConnect(
+										ip: connectIP,
+										port: connectPort,
+										name: connectName,
+										oscMsgIndex: connectOscMsgIndex,
+										slot: connectIndexStart
+									)
+								})
 							})
 						})
 					})

@@ -1357,6 +1357,7 @@ CVWidget {
 		var tmp, tmpMapping;
 		var specEditor, msEditors;
 		var thisSpec, customName;
+		var reference;
 
 		wcm.cvSpec.controller ?? {
 			switch(this.class,
@@ -1451,10 +1452,10 @@ CVWidget {
 					if(tmp < this.msSize, { this.mSlider.indexThumbSize_(this.mSlider.bounds.width/tmp) });
 
 					if(Spec.findKeyForSpec(theChanger.value).notNil, {
-						customName = Spec.findKeyForSpec(theChanger.value).asString++tmp;
+						customName = Spec.findKeyForSpec(theChanger.value).asString++"_"++tmp;
 					}, {
-						customName = "custom"++tmp;
-					});
+						customName = "custom_"++tmp;
+					})
 				}, {
 					thisSpec = theChanger.value;
 				});
@@ -1477,27 +1478,31 @@ CVWidget {
 			argWidgetCV.spec_(thisSpec);
 
 			if(this.class == CVWidgetMS, {
-				if(theChanger.value.hasZeroCrossing, {
-					tmp = [];
-					this.msSize.do({ |sl|
-						if(argWidgetCV.spec.minval[sl].isNegative, {
-							tmp = tmp.add(0-argWidgetCV.spec.minval[sl]/(argWidgetCV.spec.maxval[sl]-argWidgetCV.spec.minval[sl]))
-						}, {
-							tmp = tmp.add(0-argWidgetCV.spec.maxval[sl]/(argWidgetCV.spec.minval[sl]-argWidgetCV.spec.maxval[sl]))
-						})
-					})
+				reference = [];
+				this.msSize.do({ |sl|
+					tmp = ControlSpec(thisSpec.minval.wrapAt(sl), thisSpec.maxval.wrapAt(sl));
+					if(tmp.excludingZeroCrossing, {
+						if(tmp.minval < tmp.maxval, { reference = reference.add(tmp.minval.abs/(tmp.maxval-tmp.minval)) });
+						if(tmp.minval > tmp.maxval, { reference = reference.add(tmp.maxval.abs/(tmp.maxval-tmp.minval).abs) });
+					});
+					if(tmp.minval.isNegative and:{ tmp.maxval.isNegative }, { reference = reference.add(1) });
+					if(tmp.minval.isPositive and:{ tmp.maxval.isPositive }, { reference = reference.add(0) });
 				});
-				this.mSlider.reference_(tmp);
+				// "reference: %\n".postf(reference);
+				this.mSlider.reference_(reference);
 			});
 
-			if(this.specBut.class == Event, {
-				this.specBut[slot].toolTip_(
-					"Edit the CV's ControlSpec in '"++slot++"':\n"++(this.getSpec(slot).asCompileString)
-				)
-			}, {
-				this.specBut.toolTip_(
-					"Edit the CV's ControlSpec:\n"++(this.getSpec.asCompileString)
-				)
+
+			if(GUI.id !== \cocoa, {
+				if(this.specBut.class == Event, {
+					this.specBut[slot].toolTip_(
+						"Edit the CV's ControlSpec in '"++slot++"':\n"++(this.getSpec(slot).asCompileString)
+					)
+				}, {
+					this.specBut.toolTip_(
+						"Edit the CV's ControlSpec:\n"++(this.getSpec.asCompileString)
+					)
+				})
 			});
 
 			if(this.class === CVWidgetKnob, {
