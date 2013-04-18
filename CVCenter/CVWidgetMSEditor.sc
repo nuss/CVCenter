@@ -123,12 +123,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			};
 
 			window = Window("Widget Editor:"+widgetName, Rect(
-				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 400, 265
+				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 400, 253
 			));
 
 			xySlots = xySlots.add([nextX@nextY, name]);
 			if(nextX+275 > Window.screenBounds.width, {
-				nextX = shiftXY ?? { 0 }; nextY = xySlots.last[0].y+295;
+				nextX = shiftXY ?? { 0 }; nextY = xySlots.last[0].y+280;
 			}, {
 				nextX = xySlots.last[0].x+405; nextY = xySlots.last[0].y;
 			});
@@ -231,7 +231,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\") or \\freq or [[20, 20, 20, 20, 20], [20000,\n20000, 20000, 20000, 20000], \\exp].asSpec. Or select a suitable ControlSpec from the List\nbelow. If you don't know what this all means have a look at the ControlSpec-helpfile.")
 			;
 
-			flow0.shift(0, 2);
+			// flow0.shift(0, 2);
 
 			if(GUI.id == \cocoa, { tmp = "\n" }, { tmp = " " });
 
@@ -242,7 +242,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.string_("NOTE: CVWidgetMS expects a Spec whose minvals, maxvals, step-sizes and/or default-%values are arrays of the size of the number of sliders in the multislider. However, you may%provide a spec like 'freq' and its parameters will internally expanded to arrays of the required size.".format(tmp, tmp))
 			;
 
-			flow0.shift(0, 2);
+			// flow0.shift(0, 2);
 
 			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@14)
 				.font_(staticTextFont)
@@ -250,7 +250,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.string_("Enter the desired Spec and execute it by hitting shift+return.")
 			;
 
-			flow0.shift(0, 5);
+			// flow0.shift(0, 5);
 
 			cvString = widget.getSpec.asCompileString;
 			specField = TextView(thisEditor.tabs.views[0], flow0.bounds.width-20@70)
@@ -265,7 +265,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			;
 
-			flow0.shift(0, 5);
+			// flow0.shift(0, 5);
 
 			specsList = PopUpMenu(thisEditor.tabs.views[0], flow0.bounds.width-20@20)
 				.action_({ |sl|
@@ -518,7 +518,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			if(GUI.id !== \cocoa, {
 				midiInitBut.toolTip_(
-					"MIDI must only be inititialized before\nconnecting if you want the responders\nto listen to a specific source only (e.g.\nif you have more than one interface\nconnected to your computer)."
+					"MIDI only needs to be inititialized before\nconnecting if you want the responders\nto listen to a specific source only (e.g.\nif you have more than one interface\nconnected to your computer)."
 				)
 			});
 
@@ -566,7 +566,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			if(GUI.id !== \cocoa, {
 				midiChanField.toolTip_(
-					"Enter the channel-number to which the resulting\nresponders shall listen. If this field is left\nresulting responders will listen to any channel."
+					"Enter the channel-number to which the resulting\nresponders shall listen. If this field is left empty\nresulting responders will listen to any channel."
 				)
 			});
 
@@ -595,8 +595,13 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					if("^[0-9]*$".matchRegexp(midiChanField.string), {
 						midiChan = midiChanField.string.interpret
 					});
-					extMidiCtrlArrayField.string.interpret.do({ |ctrlNum, sl|
-						widget.midiConnect(midiUid, midiChan, ctrlNum, sl)
+					if(extMidiCtrlArrayField.string.interpret.class == Array and:{
+						extMidiCtrlArrayField.string.interpret.select(_.isNumber).size ==
+						extMidiCtrlArrayField.string.interpret.size
+					}, {
+						extMidiCtrlArrayField.string.interpret.do({ |ctrlNum, sl|
+							widget.midiConnect(midiUid, midiChan, ctrlNum.asInt, sl)
+						})
 					})
 				})
 			;
@@ -900,7 +905,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 							if(nameField.string.includes($%) and:{ indexField.string.includes($%) }, {
 								connectWarning = "There can only be one placeholder '%', either in the OSC-command or the msg-slot!";
 							});
-							if(nameField.string.includes($%).noy and:{ indexField.string.includes($%).not }, {
+							if(nameField.string.includes($%).not and:{ indexField.string.includes($%).not }, {
 								connectWarning = "There has to be at least one placeholder '%', either in the OSC-command or the msg-slot";
 							});
 							if(connectWarning.notNil, {

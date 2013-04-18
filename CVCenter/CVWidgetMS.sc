@@ -27,7 +27,7 @@ CVWidgetMS : CVWidget {
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextX, nextY, knobX, knobY;
 		var calibViewsWidth, calibViewsNextX;
-		var text;
+		var text, tActions;
 
 		this.bgColor ?? { this.bgColor = Color.white };
 		synchKeys ?? { synchKeys = [\default] };
@@ -191,17 +191,25 @@ CVWidgetMS : CVWidget {
 				[""+thisName.asString, Color.black, Color.yellow],
 			])
 			.font_(Font("Arial", 9))
-			.action_({ |b|
-				this.toggleComment(b.value.asBoolean);
-			})
 		;
 		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Arial", 9))
-			.string_(wdgtInfo)
+			.string_("Add some notes if you like")
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
+
+		if(GUI.id !== \cocoa, {
+			label.toolTip_(nameField.string);
+		});
+
+		label.action_({ |lbl|
+			this.toggleComment(lbl.value.asBoolean);
+			if(GUI.id !== \cocoa, {
+				lbl.toolTip_(nameField.string)
+			})
+		});
 
 		mSlider = MultiSliderView(window, Rect(thisXY.x+1, thisXY.y+16, thisWidth-2, thisHeight-2-79-1))
 			.drawRects_(true)
@@ -272,6 +280,20 @@ CVWidgetMS : CVWidget {
 			})
 		;
 
+		if(GUI.id !== \cocoa, { midiBut.toolTip_(
+			"Edit all MIDI-options\nof this widget.\nmidiMode:"+(
+				(0..msSize-1).collect(this.getMidiMode(_))
+			)++"\nmidiMean:"+(
+				(0..msSize-1).collect(this.getMidiMean(_))
+			)++"\nmidiResolution:"+(
+				(0..msSize-1).collect(this.getMidiResolution(_))
+			)++"\nsoftWithin:"+(
+				(0..msSize-1).collect(this.getSoftWithin(_))
+			)++"\nctrlButtonBank:"+(
+				(0..msSize-1).collect(this.getCtrlButtonBank(_))
+			))
+		});
+
 		if(GUI.id === \qt, {
 			midiBut.mouseEnterAction_({ |mb|
 				if(wdgtControllersAndModels.slots.select({ |slot| slot.midiConnection.model.value.isNil }).size == msSize, {
@@ -328,6 +350,8 @@ CVWidgetMS : CVWidget {
 			})
 		});
 
+		if(GUI.id !== \cocoa, { oscBut.toolTip_("no OSC-responders present.\nClick to edit.") });
+
 		nextY = nextY+oscBut.bounds.height;
 		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
@@ -343,6 +367,9 @@ CVWidgetMS : CVWidget {
 				})
 			})
 		;
+
+		if(GUI.id !== \cocoa, { specBut.toolTip_("Edit the CV's ControlSpec:\n"++(this.getSpec.asCompileString)) });
+
 		nextX = nextX+specBut.bounds.width;
 		actionsBut = Button(window, Rect(thisXY.x+1+specBut.bounds.width, nextY, thisWidth-2/2, 15))
 			.states_([
@@ -358,6 +385,14 @@ CVWidgetMS : CVWidget {
 				})
 			})
 		;
+
+		if(GUI.id !== \cocoa, {
+			text = [];
+			text = text.add(this.wdgtActions.size);
+			text = text.add(this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size);
+			if(text[0] == 1, { tActions = "action" }, { tActions = "actions" });
+			actionsBut.toolTip_("% of % % active.\nClick to edit.".format(text[1], text[0], tActions));
+		});
 
 		visibleGuiEls = [
 			mSlider,

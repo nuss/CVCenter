@@ -84,7 +84,7 @@ CVWidgetKnob : CVWidget {
 			thisXY = 7@0;
 			thisX = 50; thisY = 50;
 			thisWidth = 52;
-			thisHeight = 181;
+			thisHeight = 164;
 		}, {
 			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
 			thisX = bounds.left; thisY = bounds.top;
@@ -155,16 +155,18 @@ CVWidgetKnob : CVWidget {
 
 		label.action_({ |lbl|
 			this.toggleComment(lbl.value.asBoolean);
-			lbl.toolTip_(nameField.string)
+			if(GUI.id !== \cocoa, {
+				lbl.toolTip_(nameField.string)
+			})
 		});
 
-		knobsize = thisHeight-2-145;
+		knobsize = thisHeight-2-130;
 		if(knobsize >= thisWidth, {
 			knobsize = thisWidth;
-			knobY = thisXY.y+16+(thisHeight-143-knobsize/2);
+			knobY = thisXY.y+16+(thisHeight-128-knobsize/2);
 			knobX = thisXY.x;
 		}, {
-			knobsize = thisHeight-143;
+			knobsize = thisHeight-128;
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = thisXY.y+16;
 		});
@@ -173,7 +175,7 @@ CVWidgetKnob : CVWidget {
 			.mode_(\vert)
 		;
 		if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
-		nextY = thisXY.y+thisHeight-132;
+		nextY = thisXY.y+thisHeight-117;
 		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(widgetCV.value).font_(Font("Arial", 9.5))
 		;
@@ -375,12 +377,15 @@ CVWidgetKnob : CVWidget {
 		});
 		if(GUI.id !== \cocoa, { oscEditBut.toolTip_("no OSC-responders present.\nClick to edit.") });
 
-		nextY = nextY+oscEditBut.bounds.height;
-		calibBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		calibBut = Button(window, Rect(
+			thisXY.x+oscEditBut.bounds.width-9,
+			nextY+oscEditBut.bounds.height-10,
+			10, 10
+		))
 			.font_(Font("Arial", 9))
 			.states_([
-				["calibrating", Color.black, Color.green],
-				["calibrate", Color.white, Color.red]
+				["", Color.black, Color.green],
+				["", Color.white, Color.red]
 			])
 			.action_({ |cb|
 				switch(cb.value,
@@ -398,7 +403,8 @@ CVWidgetKnob : CVWidget {
 			calibBut.toolTip_(text);
 		});
 
-		nextY = nextY+calibBut.bounds.height;
+		nextY = nextY+oscEditBut.bounds.height;
+		// nextY = nextY+calibBut.bounds.height;
 		actionsBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Arial", 9))
 			.states_([

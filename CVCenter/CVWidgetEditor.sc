@@ -129,13 +129,13 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			};
 
 			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(
-				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 270, 265
+				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 270, 253
 			));
 
 			xySlots = xySlots.add([nextX@nextY, name++slotHiLo]);
 			// [xySlots, nextX, nextY].postln;
 			if(nextX+275 > Window.screenBounds.width, {
-				nextX = shiftXY ?? { 0 }; nextY = xySlots.last[0].y+295;
+				nextX = shiftXY ?? { 0 }; nextY = xySlots.last[0].y+280;
 			}, {
 				nextX = xySlots.last[0].x+275; nextY = xySlots.last[0].y;
 			});

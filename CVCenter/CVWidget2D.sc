@@ -38,7 +38,7 @@ CVWidget2D : CVWidget {
 	init { |parentView, cvs, name, bounds, actions, setupArgs, controllersAndModels, cvcGui, persistent, server|
 		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
-		var nextY, rightBarX, oscEditButHeight, right, left;
+		var nextY, rightColumnX, oscEditButHeight, right, left;
 		var text, tActions;
 
 		this.bgColor ?? { this.bgColor_(Color.white) };
@@ -121,7 +121,7 @@ CVWidget2D : CVWidget {
 			thisXY = 7@0;
 			thisX = 50; thisY = 50;
 			thisWidth = 122;
-			thisHeight = 196;
+			thisHeight = 166;
 		}, {
 			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
 			thisX = bounds.left; thisY = bounds.top;
@@ -201,7 +201,7 @@ CVWidget2D : CVWidget {
 
 		nextY = thisXY.y+1+label.bounds.height;
 
-		slider2d = Slider2D(window, Rect(thisXY.x+1, nextY, thisWidth-42, thisWidth-47))
+		slider2d = Slider2D(window, Rect(thisXY.x+1, nextY, thisWidth-57, thisWidth-62))
 			.canFocus_(false)
 			.background_(Color.white)
 			.knobColor_(Color.red)
@@ -212,7 +212,7 @@ CVWidget2D : CVWidget {
 		rangeSlider = RangeSlider(window, Rect(
 			thisXY.x+1,
 			nextY,
-			thisWidth-42,
+			thisWidth-57,
 			15
 		))
 		.canFocus_(false)
@@ -222,7 +222,7 @@ CVWidget2D : CVWidget {
 		numVal.lo = NumberBox(window);
 		numVal.hi = NumberBox(window);
 
-		[numVal.lo, [thisXY.x+1, widgetCV.lo], numVal.hi, [thisXY.x+(thisWidth-42/2), widgetCV.hi]].pairsDo({ |k, v|
+		[numVal.lo, [thisXY.x+1, widgetCV.lo], numVal.hi, [thisXY.x+(thisWidth-57/2), widgetCV.hi]].pairsDo({ |k, v|
 			k.bounds_(Rect(
 				v[0],
 				nextY,
@@ -307,10 +307,10 @@ CVWidget2D : CVWidget {
 		midiCtrl.hi = TextField(window);
 
 		nextY = thisXY.y+1+label.bounds.height;
-		rightBarX = thisXY.x+slider2d.bounds.width+1;
+		rightColumnX = thisXY.x+slider2d.bounds.width+1;
 
 		[specBut.hi, [nextY, \hi], specBut.lo, [nextY+52, \lo]].pairsDo({ |k, v|
-			k.bounds_(Rect(rightBarX, v[0], 40, 13))
+			k.bounds_(Rect(rightColumnX, v[0], thisWidth-slider2d.bounds.width-2, 13))
 			.font_(Font("Arial", 8))
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 		});
@@ -324,7 +324,7 @@ CVWidget2D : CVWidget {
 		nextY = nextY+14;
 
 		[midiHead.hi, nextY, midiHead.lo, nextY+52].pairsDo({ |k, v|
-			k.bounds_(Rect(rightBarX, v, 28, 13))
+			k.bounds_(Rect(rightColumnX, v, thisWidth-slider2d.bounds.width-2-12, 13))
 			.font_(Font("Arial", 7))
 			.states_([["MIDI", Color.black, this.bgColor]]);
 
@@ -344,7 +344,7 @@ CVWidget2D : CVWidget {
 		});
 
 		[midiLearn.hi, [\hi, nextY], midiLearn.lo, [\lo, nextY+52]].pairsDo({ |k, v|
-			k.bounds_(Rect(rightBarX+midiHead.lo.bounds.width, v[1], 12, 13))
+			k.bounds_(Rect(rightColumnX+midiHead.lo.bounds.width, v[1], 12, 13))
 			.font_(Font("Arial", 7))
 			.states_([
 				["L", Color.white, Color.blue],
@@ -378,7 +378,7 @@ CVWidget2D : CVWidget {
 		nextY = nextY+13;
 
 		[midiSrc.hi, [\hi, nextY], midiSrc.lo, [\lo, nextY+52]].pairsDo({ |k, v|
-			k.bounds_(Rect(rightBarX, v[1], 40, 13))
+			k.bounds_(Rect(rightColumnX, v[1], thisWidth-slider2d.bounds.width-2, 13))
 			.font_(Font("Arial", 8.5))
 			.string_("source")
 			.background_(Color.white)
@@ -412,7 +412,7 @@ CVWidget2D : CVWidget {
 		nextY = nextY+13;
 
 		[midiChan.hi, [\hi, nextY], midiChan.lo, [\lo, nextY+52]].pairsDo({ |k, v|
-			k.bounds_(Rect(rightBarX, v[1], 15, 13))
+			k.bounds_(Rect(rightColumnX, v[1], thisWidth-slider2d.bounds.width-2-25, 13))
 			.font_(Font("Arial", 8.5))
 			.string_("chan")
 			.background_(Color.white)
@@ -444,7 +444,7 @@ CVWidget2D : CVWidget {
 		});
 
 		[midiCtrl.hi, [\hi, nextY], midiCtrl.lo, [\lo, nextY+52]].pairsDo({ |k, v|
-			k.bounds_(Rect(rightBarX+15, v[1], 25, 13))
+			k.bounds_(Rect(rightColumnX+midiChan[v[0]].bounds.width, v[1], 25, 13))
 			.font_(Font("Arial", 8.5))
 			.string_("ctrl")
 			.background_(Color.white)
@@ -489,13 +489,13 @@ CVWidget2D : CVWidget {
 			label.bounds.top
 			+label.bounds.height
 			+left;
-			oscEditButHeight = thisHeight-left-47;
+			oscEditButHeight = thisHeight-left-32;
 		}, {
 			nextY =
 			label.bounds.top
 			+label.bounds.height
 			+right;
-			oscEditButHeight = thisHeight-right-47;
+			oscEditButHeight = thisHeight-right-32;
 		});
 
 		oscEditBut.lo = Button(window);
@@ -551,14 +551,12 @@ CVWidget2D : CVWidget {
 			})
 		});
 
-		nextY = nextY+oscEditBut.lo.bounds.height;
-
 		[calibBut.lo, [\lo, thisXY.x+1], calibBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
-			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
+			k.bounds_(Rect(v[1]+oscEditBut[v[0]].bounds.width-10, nextY+oscEditBut.lo.bounds.height-10, 10, 10))
 			.font_(Font("Arial", 9))
 			.states_([
-				["calibrating", Color.black, Color.green],
-				["calibrate", Color.white, Color.red]
+				["", Color.black, Color.green],
+				["", Color.white, Color.red]
 			])
 			.action_({ |cb|
 				switch(cb.value,
@@ -579,7 +577,8 @@ CVWidget2D : CVWidget {
 			})
 		});
 
-		nextY = nextY+calibBut.lo.bounds.height;
+		nextY = nextY+oscEditBut.lo.bounds.height;
+		// nextY = nextY+calibBut.lo.bounds.height;
 
 		[actionsBut.lo, [\lo, thisXY.x+1], actionsBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 

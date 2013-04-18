@@ -2022,10 +2022,24 @@ CVWidget {
 					if(this.midiOscEnv.collect({ |it| it[\cc] }).takeThese(_.isNil).size < this.msSize, {
 						thisGuiEnv.msEditor.midiConnectorBut.enabled_(true).states_([
 							[thisGuiEnv.msEditor.midiConnectorBut.states[0][0], thisGuiEnv.msEditor.midiConnectorBut.states[0][1], Color.red]
-						])
-					}, { thisGuiEnv.msEditor.midiConnectorBut.enabled_(false).states_([
-						[thisGuiEnv.msEditor.midiConnectorBut.states[0][0], thisGuiEnv.msEditor.midiConnectorBut.states[0][1], Color.red(0.5)]
-					]) });
+						]);
+						[
+							thisGuiEnv.msEditor.midiSourceSelect,
+							thisGuiEnv.msEditor.midiSrcField,
+							thisGuiEnv.msEditor.midiChanField,
+							thisGuiEnv.msEditor.extMidiCtrlArrayField
+						].do(_.enabled_(true));
+					}, {
+						thisGuiEnv.msEditor.midiConnectorBut.enabled_(false).states_([
+							[thisGuiEnv.msEditor.midiConnectorBut.states[0][0], thisGuiEnv.msEditor.midiConnectorBut.states[0][1], Color.red(alpha: 0.5)]
+						]);
+						[
+							thisGuiEnv.msEditor.midiSourceSelect,
+							thisGuiEnv.msEditor.midiSrcField,
+							thisGuiEnv.msEditor.midiChanField,
+							thisGuiEnv.msEditor.extMidiCtrlArrayField
+						].do(_.enabled_(false));
+					});
 					if(this.midiOscEnv.collect({ |it| it[\cc] }).takeThese(_.isNil).size > 0, {
 						thisGuiEnv.msEditor.midiDisconnectorBut.enabled_(true).states_([
 							[thisGuiEnv.msEditor.midiDisconnectorBut.states[0][0], thisGuiEnv.msEditor.midiDisconnectorBut.states[0][1], Color.blue]
@@ -2123,6 +2137,19 @@ CVWidget {
 								})
 							}
 						)
+					});
+					if(GUI.id !== \cocoa, { thisGuiEnv.midiBut.toolTip_(
+						"Edit all MIDI-options\nof this widget.\nmidiMode:"+(
+							(0..this.msSize-1).collect(this.getMidiMode(_))
+						)++"\nmidiMean:"+(
+							(0..this.msSize-1).collect(this.getMidiMean(_))
+						)++"\nmidiResolution:"+(
+							(0..this.msSize-1).collect(this.getMidiResolution(_))
+						)++"\nsoftWithin:"+(
+							(0..this.msSize-1).collect(this.getSoftWithin(_))
+						)++"\nctrlButtonBank:"+(
+							(0..this.msSize-1).collect(this.getCtrlButtonBank(_))
+						))
 					})
 				})
 			})
@@ -2287,7 +2314,30 @@ CVWidget {
 				thisEditor = thisGuiEnv.editor[slot];
 				thisGuiEnv[\msEditor] !? {
 					thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot];
+					if(GUI.id !== \cocoa, {
+						if(theChanger.value.but[0] == "edit OSC", {
+							if(slot.notNil, { p =  " in '"++slot++"'" }, { p = "" });
+							thisOscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
+						}, {
+							thisOscEditBut.toolTip_("Connected, listening to\n%, msg-slot %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
+						})
+					});
 				};
+				if(GUI.id !== \cocoa, {
+					case
+						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size > 0 and:{
+							this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size < this.msSize
+						}} {
+						thisGuiEnv.oscBut.toolTip_("partially connected - connected slots:\n"++this.midiOscEnv.selectIndex({ |it| it.oscResponder.notNil }))
+						}
+						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == this.msSize } {
+							thisGuiEnv.oscBut.toolTip_("all slots connected.\nClick to edit.")
+						}
+						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == 0 } {
+							thisGuiEnv.toolTip_("no OSC-responders present.\nClick to edit.")
+						}
+					;
+				})
 			}, {
 				thisEditor = thisGuiEnv.editor;
 				if(GUI.id !== \cocoa, {
