@@ -201,7 +201,7 @@ CVWidget2D : CVWidget {
 
 		nextY = thisXY.y+1+label.bounds.height;
 
-		slider2d = Slider2D(window, Rect(thisXY.x+1, nextY, thisWidth-57, thisWidth-62))
+		slider2d = Slider2D(window, Rect(thisXY.x+1, nextY, thisWidth-42, thisWidth-42))
 			.canFocus_(false)
 			.background_(Color.white)
 			.knobColor_(Color.red)
@@ -212,7 +212,7 @@ CVWidget2D : CVWidget {
 		rangeSlider = RangeSlider(window, Rect(
 			thisXY.x+1,
 			nextY,
-			thisWidth-57,
+			thisWidth-42,
 			15
 		))
 		.canFocus_(false)
@@ -222,7 +222,7 @@ CVWidget2D : CVWidget {
 		numVal.lo = NumberBox(window);
 		numVal.hi = NumberBox(window);
 
-		[numVal.lo, [thisXY.x+1, widgetCV.lo], numVal.hi, [thisXY.x+(thisWidth-57/2), widgetCV.hi]].pairsDo({ |k, v|
+		[numVal.lo, [thisXY.x+1, widgetCV.lo], numVal.hi, [thisXY.x+(thisWidth-44/2), widgetCV.hi]].pairsDo({ |k, v|
 			k.bounds_(Rect(
 				v[0],
 				nextY,

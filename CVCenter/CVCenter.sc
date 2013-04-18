@@ -22,7 +22,7 @@ CVCenter {
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight;
 	classvar widgetStates;
 	classvar tabProperties, colors, nextColor;
-	classvar widgetwidth, widgetheight=181, colwidth, rowheight;
+	classvar widgetwidth, widgetheight=160, colwidth, rowheight;
 	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin, eqWin;
 	classvar prefs, boundsOnShutDown;
 
@@ -47,7 +47,8 @@ CVCenter {
 						newPrefs[\midiMean],
 						newPrefs[\softWithin],
 						newPrefs[\ctrlButtonBank],
-						newPrefs[\removeResponders]
+						newPrefs[\removeResponders],
+						newPrefs[\initMidiOnStartUp]
 					)
 				};
 				if(prefs[\saveGuiProperties] == 1 or:{
@@ -1386,7 +1387,7 @@ CVCenter {
 
 	*prRegroupWidgets { |tabIndex|
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets, orderedRemoveButs;
-		var widgetwidth, widgetheight=181;
+		var widgetwidth, widgetheight=164;
 
 		rowheight = widgetheight+1+15;
 		thisNextPos = 0@0;
