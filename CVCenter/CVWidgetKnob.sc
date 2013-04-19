@@ -398,7 +398,7 @@ CVWidgetKnob : CVWidget {
 		;
 		if(GUI.id !== \cocoa, {
 			if(this.getCalibrate, {
-				text = "Calibration is active.\nClick to dectivate.";
+				text = "Calibration is active.\nClick to deactivate.";
 			}, {
 				text = "Calibration is inactive.\nClick to activate.";
 			});

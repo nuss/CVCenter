@@ -1261,7 +1261,12 @@ CVWidget {
 			theChanger.value.switch(
 				true, {
 					if(this.class != CVWidgetMS, {
-						window.isClosed.not.if { thisGuiEnv.calibBut.value_(0) };
+						window.isClosed.not.if {
+							thisGuiEnv.calibBut.value_(0);
+							if(GUI.id !== \cocoa, {
+								thisGuiEnv.calibBut.toolTip_("Calibration is active.\nClick to deactivate.");
+							})
+						};
 					}, {
 						window.isClosed.not.if { this.calibViews[slot].background_(Color.green) };
 					});
@@ -1292,6 +1297,9 @@ CVWidget {
 									["calibrate all", Color.white, Color.red]
 								]).value_(0);
 								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(0);
+								if(GUI.id !== \cocoa, {
+									thisGuiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is active.\nClick to deactivate.");
+								})
 							})
 						}, {
 							if(thisGuiEnv.msEditor.notNil and:{
@@ -1302,15 +1310,23 @@ CVWidget {
 									["calibrate all", Color.white, Color.red]
 								]).value_(0);
 								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(0);
+								if(GUI.id !== \cocoa, {
+									thisGuiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is active.\nClick to deactivate.");
+								})
 							})
 						})
 					})
 				},
 				false, {
 					if(this.class != CVWidgetMS, {
-						window.isClosed.not.if { thisGuiEnv.calibBut.value_(1) };
+						window.isClosed.not.if {
+							thisGuiEnv.calibBut.value_(1);
+							if(GUI.id !== \cocoa, {
+								thisGuiEnv.calibBut.toolTip_("Calibration is inactive.\nClick to activate.");
+							})
+						};
 					}, {
-							window.isClosed.not.if { this.calibViews[slot].background_(Color.red) };
+						window.isClosed.not.if { this.calibViews[slot].background_(Color.red) };
 					});
 					if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
 						thisEditor.calibBut.value_(1);
@@ -1335,6 +1351,9 @@ CVWidget {
 									["calibrate all", Color.white, Color.red]
 								]).value_(1);
 								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(1);
+								if(GUI.id !== \cocoa, {
+									thisGuiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is inactive.\nClick to activate.");
+								})
 							})
 						}, {
 							if(thisGuiEnv.msEditor.notNil and:{
@@ -1345,6 +1364,9 @@ CVWidget {
 									["calibrate all", Color.white, Color.red]
 								]).value_(0);
 								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(1);
+								if(GUI.id !== \cocoa, {
+									thisGuiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is inactive.\nClick to activate.");
+								})
 							})
 						})
 					})
@@ -1898,6 +1920,31 @@ CVWidget {
 							thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.string_(
 								theChanger.value.ctrl
 							);
+
+							r = [
+								thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.string != "source" and:{
+									try{ thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.string.interpret.isInteger }
+								},
+								thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.string != "chan" and:{
+									try{ thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.string.interpret.isInteger }
+								},
+								thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.string != "ctrl"
+							].collect({ |r| r });
+
+							if(GUI.id !== \cocoa, {
+								p = "Use ";
+								if(r[0], { p = p++" MIDI-device ID "++theChanger.value.src++",\n" });
+								if(r[1], { p = p++"channel nr. "++theChanger.value.chan++",\n" });
+								if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
+								p = p++"\nto connect widget%to MIDI";
+								[
+									thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc,
+									thisGuiEnv.msEditor.midiEditGroups[slot].midiChan,
+									thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl
+								].do(
+									_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
+								)
+							})
 						})
 					})
 				},
@@ -2150,6 +2197,13 @@ CVWidget {
 						)++"\nctrlButtonBank:"+(
 							(0..this.msSize-1).collect(this.getCtrlButtonBank(_))
 						))
+					});
+					this.msSize.do({ |sl|
+						thisGuiEnv.msEditor.midiEditGroups[sl].midiHead.toolTip_(
+							"Edit all MIDI-options for slot %:\nmidiMode: %\nmidiMean: %\nmidiResolution: %\nsoftWithin: %\nctrlButtonBank: %".format(
+								sl, this.getMidiMode(sl), this.getMidiMean(sl), this.getMidiResolution(sl), this.getSoftWithin(sl), this.getCtrlButtonBank(sl)
+							)
+						)
 					})
 				})
 			})

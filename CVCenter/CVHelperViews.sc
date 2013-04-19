@@ -112,15 +112,20 @@ CVMidiEditGroup {
 					mh.states_([[thisSlot.asString++": MIDI", Color.white, Color.red]])
 				}).mouseLeaveAction_({ |mh|
 					mh.states_([[thisSlot.asString++": MIDI", Color.black, Color.white]])
-				})
+				}).toolTip_("Edit all MIDI-options for slot %:\nmidiMode: %\nmidiMean: %\nmidiResolution: %\nsoftWithin: %\nctrlButtonBank: %".format(
+					thisSlot, widget.getMidiMode(thisSlot), widget.getMidiMean(thisSlot), widget.getMidiResolution(thisSlot), widget.getSoftWithin(thisSlot), widget.getCtrlButtonBank(thisSlot)
+				))
 			}, {
 				midiHead.mouseEnterAction_({ |mh|
 					mh.states_([["MIDI", Color.white, Color.red]])
 				}).mouseLeaveAction_({ |mh|
 					mh.states_([["MIDI", Color.black, Color.white]])
-				})
+				}).toolTip_("Edit all MIDI-options for this widget:\nmidiMode: %\nmidiMean: %\nmidiResolution: %\nsoftWithin: %\nctrlButtonBank: %".format(
+					thisSlot, widget.getMidiMode, widget.getMidiMean, widget.getMidiResolution, widget.getSoftWithin, widget.getCtrlButtonBank
+				))
 			})
 		});
+
 
 		midiLearn = Button(cview, flow.bounds.height/3*1.1@(flow.bounds.height/3*1.1))
 			.font_(staticTextFont)
