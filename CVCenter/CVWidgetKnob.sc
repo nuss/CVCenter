@@ -160,13 +160,15 @@ CVWidgetKnob : CVWidget {
 			})
 		});
 
-		knobsize = thisHeight-2-130;
+		knobsize = thisHeight-2-120;
 		if(knobsize >= thisWidth, {
+			"knobsize greater than or equal width".postln;
 			knobsize = thisWidth;
-			knobY = thisXY.y+16+(thisHeight-128-knobsize/2);
+			knobY = thisXY.y+16+(thisHeight-124-knobsize/2);
 			knobX = thisXY.x;
 		}, {
-			knobsize = thisHeight-128;
+			"knobsize smaller than width".postln;
+			knobsize = thisHeight-124;
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = thisXY.y+16;
 		});
@@ -175,7 +177,7 @@ CVWidgetKnob : CVWidget {
 			.mode_(\vert)
 		;
 		if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
-		nextY = thisXY.y+thisHeight-117;
+		nextY = thisXY.y+thisHeight-112;
 		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(widgetCV.value).font_(Font("Arial", 9.5))
 		;
@@ -337,7 +339,7 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+midiCtrl.bounds.height+1;
 
-		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
+		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 25))
 			.font_(Font("Arial", 9))
 			.states_([
 				["edit OSC", Color.black, this.bgColor]
