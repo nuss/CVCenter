@@ -35,6 +35,8 @@ CVWidget {
 	var msCmds, msSlots;
 	var slotCmdName, lastIntSlots, msSlotsChecked = false;
 	var lastMsgIndex, msMsgIndexDiffers = false, count = 0;
+	// CVWidgetMS
+	var <msSize;
 
 	*initClass {
 		StartUp.add({
@@ -691,11 +693,11 @@ CVWidget {
 				// if(this.class == CVWidgetMS, {
 				// 	if([thisSpec.minval, thisSpec.maxval, thisSpec.warp, thisSpec.step, thisSpec.default].select(_.isArray).size == 0, {
 				// 		thisSpec = ControlSpec(
-				// 			thisSpec.minval!this.msSize,
-				// 			thisSpec.maxval!this.msSize,
+				// 			thisSpec.minval!msSize,
+				// 			thisSpec.maxval!msSize,
 				// 			thisSpec.warp,
-				// 			thisSpec.step!this.msSize,
-				// 			thisSpec.default!this.msSize,
+				// 			thisSpec.step!msSize,
+				// 			thisSpec.default!msSize,
 				// 			thisSpec.units,
 				// 		)
 				// 	})
@@ -1023,7 +1025,7 @@ CVWidget {
 		}, {
 			wdgtControllersAndModels ?? {
 				switch(this.class,
-					CVWidgetMS, { wdgtControllersAndModels = (slots: Array.newClear(this.msSize)) },
+					CVWidgetMS, { wdgtControllersAndModels = (slots: Array.newClear(msSize)) },
 					{ wdgtControllersAndModels = () }
 				)
 			}
@@ -1286,9 +1288,9 @@ CVWidget {
 						})
 					});
 					if(this.class == CVWidgetMS, {
-						numCalib = this.msSize.collect(this.getCalibrate(_)).select(_ == true).size;
+						numCalib = msSize.collect(this.getCalibrate(_)).select(_ == true).size;
 						// "numCalib on true: %\n".postf(numCalib);
-						if(numCalib == this.msSize, {
+						if(numCalib == msSize, {
 							if(thisGuiEnv.msEditor.notNil and:{
 								thisGuiEnv.msEditor.isClosed.not
 							}, {
@@ -1341,7 +1343,7 @@ CVWidget {
 						})
 					});
 					if(this.class == CVWidgetMS, {
-						numCalib = this.msSize.collect(this.getCalibrate(_)).select(_ == true).size;
+						numCalib = msSize.collect(this.getCalibrate(_)).select(_ == true).size;
 						if(numCalib == 0, {
 							if(thisGuiEnv.msEditor.notNil and:{
 								thisGuiEnv.msEditor.isClosed.not
@@ -1377,6 +1379,7 @@ CVWidget {
 
 	prInitSpecControl { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var tmp, tmpMapping;
+		var specSize, calibViewsWidth;
 		var specEditor, msEditors;
 		var thisSpec, customName;
 		var reference;
@@ -1391,7 +1394,6 @@ CVWidget {
 		};
 
 		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitSpecControl: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' cvSpec.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			switch(this.class,
@@ -1408,7 +1410,7 @@ CVWidget {
 					midiOscEnv.oscMapping === \expexp
 				}, {
 					if(this.class == CVWidgetMS, {
-						this.msSize.do({ |sl| this.setOscMapping(\linlin, sl) });
+						msSize.do({ |sl| this.setOscMapping(\linlin, sl) });
 					}, {
 						this.setOscMapping(\linlin, slot);
 					});
@@ -1453,30 +1455,62 @@ CVWidget {
 						theChanger.value.default
 					].select(_.isArray).size == 0, {
 						thisSpec = ControlSpec(
-							theChanger.value.minval!this.msSize,
-							theChanger.value.maxval!this.msSize,
+							theChanger.value.minval!msSize,
+							theChanger.value.maxval!msSize,
 							theChanger.value.warp,
-							theChanger.value.step!this.msSize,
-							theChanger.value.default!this.msSize,
+							theChanger.value.step!msSize,
+							theChanger.value.default!msSize,
 							theChanger.value.units,
 						)
 					}, {
 						thisSpec = theChanger.value;
 					});
 
-					tmp = [
+					specSize = [
 						thisSpec.minval.size,
 						thisSpec.maxval.size,
 						thisSpec.step.size,
 						thisSpec.default.size
 					].maxItem;
 
-					if(tmp < this.msSize, { this.mSlider.indexThumbSize_(this.mSlider.bounds.width/tmp) });
+					if(specSize < msSize, {
+						this.mSlider.indexThumbSize_(this.mSlider.bounds.width/specSize);
+						(specSize..msSize-1).do({ |sl|
+							this.oscDisconnect(sl);
+							this.midiDisconnect(sl);
+							if(specEditor.notNil and:{
+								specEditor.isClosed.not
+							}, {
+								[
+									specEditor.oscEditBtns[sl],
+									specEditor.oscCalibBtns[sl],
+									specEditor.midiEditGroups[sl]
+								].do({ |ed|
+									ed.remove;
+									specEditor.midiFlow1.reset;
+									specEditor.oscFlow1.reset;
+								})
+							});
+							if(msEditors[sl].notNil and:{
+								msEditors[sl].isClosed.not
+							}, {
+								msEditors[sl].close;
+							});
+							if(window.notNil and:{ window.isClosed.not }, { this.calibViews[sl].remove });
+						});
+						calibViewsWidth = this.mSlider.bounds.width/specSize;
+						this.calibViews.do({ |cv, i|
+							if(i > 0, { tmp = calibViewsWidth }, { tmp = 0 });
+							cv.bounds_(Rect(cv.bounds.left+tmp, cv.bounds.top, calibViewsWidth, cv.bounds.height));
+						})
+					});
+
+					msSize = specSize;
 
 					if(Spec.findKeyForSpec(theChanger.value).notNil, {
-						customName = Spec.findKeyForSpec(theChanger.value).asString++"_"++tmp;
+						customName = Spec.findKeyForSpec(theChanger.value).asString++"_"++specSize;
 					}, {
-						customName = "custom_"++tmp;
+						customName = "custom_"++specSize;
 					})
 				}, {
 					thisSpec = theChanger.value;
@@ -1501,7 +1535,7 @@ CVWidget {
 
 			if(this.class == CVWidgetMS, {
 				reference = [];
-				this.msSize.do({ |sl|
+				msSize.do({ |sl|
 					tmp = ControlSpec(thisSpec.minval.wrapAt(sl), thisSpec.maxval.wrapAt(sl));
 					if(tmp.excludingZeroCrossing, {
 						if(tmp.minval < tmp.maxval, { reference = reference.add(tmp.minval.abs/(tmp.maxval-tmp.minval)) });
@@ -2047,7 +2081,7 @@ CVWidget {
 			if(this.class == CVWidgetMS, {
 				if(window.notNil and:{ window.isClosed.not }, {
 					numMidiResponders = this.midiOscEnv.select({ |it| it.cc.notNil }).size;
-					numMidiString = "MIDI ("++numMidiResponders++"/"++this.msSize++")";
+					numMidiString = "MIDI ("++numMidiResponders++"/"++msSize++")";
 					if(numMidiResponders > 0, {
 						midiButBg = Color.red;
 						midiButTextColor = Color.white;
@@ -2066,7 +2100,7 @@ CVWidget {
 					thisGuiEnv.msEditor.isClosed.not
 				}, {
 						// midiOscEnv.postln;
-					if(this.midiOscEnv.collect({ |it| it[\cc] }).takeThese(_.isNil).size < this.msSize, {
+					if(this.midiOscEnv.collect({ |it| it[\cc] }).takeThese(_.isNil).size < msSize, {
 						thisGuiEnv.msEditor.midiConnectorBut.enabled_(true).states_([
 							[thisGuiEnv.msEditor.midiConnectorBut.states[0][0], thisGuiEnv.msEditor.midiConnectorBut.states[0][1], Color.red]
 						]);
@@ -2144,7 +2178,7 @@ CVWidget {
 						softWithinNB: prSoftWithin,
 						ctrlButtonBankField: prCtrlButtonBank
 					).pairsDo({ |field, prVal|
-						tmp = this.msSize.collect({ |sl| prVal[sl] });
+						tmp = msSize.collect({ |sl| prVal[sl] });
 						switch(field,
 							\midiModeSelect, {
 								if(tmp.minItem != tmp.maxItem, {
@@ -2187,18 +2221,18 @@ CVWidget {
 					});
 					if(GUI.id !== \cocoa, { thisGuiEnv.midiBut.toolTip_(
 						"Edit all MIDI-options\nof this widget.\nmidiMode:"+(
-							(0..this.msSize-1).collect(this.getMidiMode(_))
+							(0..msSize-1).collect(this.getMidiMode(_))
 						)++"\nmidiMean:"+(
-							(0..this.msSize-1).collect(this.getMidiMean(_))
+							(0..msSize-1).collect(this.getMidiMean(_))
 						)++"\nmidiResolution:"+(
-							(0..this.msSize-1).collect(this.getMidiResolution(_))
+							(0..msSize-1).collect(this.getMidiResolution(_))
 						)++"\nsoftWithin:"+(
-							(0..this.msSize-1).collect(this.getSoftWithin(_))
+							(0..msSize-1).collect(this.getSoftWithin(_))
 						)++"\nctrlButtonBank:"+(
-							(0..this.msSize-1).collect(this.getCtrlButtonBank(_))
+							(0..msSize-1).collect(this.getCtrlButtonBank(_))
 						))
 					});
-					this.msSize.do({ |sl|
+					msSize.do({ |sl|
 						thisGuiEnv.msEditor.midiEditGroups[sl].midiHead.toolTip_(
 							"Edit all MIDI-options for slot %:\nmidiMode: %\nmidiMean: %\nmidiResolution: %\nsoftWithin: %\nctrlButtonBank: %".format(
 								sl, this.getMidiMode(sl), this.getMidiMean(sl), this.getMidiResolution(sl), this.getSoftWithin(sl), this.getCtrlButtonBank(sl)
@@ -2380,11 +2414,11 @@ CVWidget {
 				if(GUI.id !== \cocoa, {
 					case
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size > 0 and:{
-							this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size < this.msSize
+							this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size < msSize
 						}} {
 						thisGuiEnv.oscBut.toolTip_("partially connected - connected slots:\n"++this.midiOscEnv.selectIndex({ |it| it.oscResponder.notNil }))
 						}
-						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == this.msSize } {
+						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == msSize } {
 							thisGuiEnv.oscBut.toolTip_("all slots connected.\nClick to edit.")
 						}
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == 0 } {
@@ -2411,7 +2445,7 @@ CVWidget {
 					thisGuiEnv.oscEditBut.refresh;
 				}, {
 					numOscResponders = this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size;
-					numOscString = "OSC ("++numOscResponders++"/"++this.msSize++")";
+					numOscString = "OSC ("++numOscResponders++"/"++msSize++")";
 					if(numOscResponders > 0, {
 						oscButBg = Color.cyan(0.5);
 						oscButTextColor = Color.white;
@@ -2432,7 +2466,7 @@ CVWidget {
 					if(thisGuiEnv.msEditor.notNil and:{
 						thisGuiEnv.msEditor.isClosed.not
 					}, {
-						if(this.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size < this.msSize, {
+						if(this.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size < msSize, {
 							thisGuiEnv.msEditor.connectorBut.enabled_(true).states_([
 								[thisGuiEnv.msEditor.connectorBut.states[0][0], thisGuiEnv.msEditor.connectorBut.states[0][1], Color.red]
 							]);
@@ -2470,7 +2504,7 @@ CVWidget {
 							})
 						});
 						thisOscEditBut.states_([theChanger.value.but]);
-						if(this.midiOscEnv.select({ |sl| sl[\oscResponder].notNil }).size < this.msSize, {
+						if(this.midiOscEnv.select({ |sl| sl[\oscResponder].notNil }).size < msSize, {
 							msEditEnabled = true;
 						}, {
 							msEditEnabled = false;
@@ -2553,9 +2587,9 @@ CVWidget {
 					if(thisGuiEnv.msEditor.notNil and:{
 						thisGuiEnv.msEditor.isClosed.not
 					}, {
-						tmp = this.msSize.collect({ |sl| this.getOscMapping(sl) });
+						tmp = msSize.collect({ |sl| this.getOscMapping(sl) });
 						block { |break|
-							(1..this.msSize-1).do({ |sl|
+							(1..msSize-1).do({ |sl|
 								if(tmp[0] != tmp[sl], { break.value(mappingsDiffer = true) }, { mappingsDiffer = false });
 							})
 						};

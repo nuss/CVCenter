@@ -1,5 +1,5 @@
 CVWidgetMS : CVWidget {
-	var <msSize, <mSlider, <calibViews, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
+	var <mSlider, <calibViews, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
 	var numOscResponders, numMidiResponders;
 	var <msEditor;
 	// persistent widgets
@@ -224,7 +224,7 @@ CVWidgetMS : CVWidget {
 		calibViewsNextX = thisXY.x+1;
 		msSize.do({ |sl|
 			calibViews = calibViews.add(
-				UserView(window, Rect(calibViewsNextX, nextY, calibViewsWidth, 2)).background_(Color.green);
+				CompositeView(window, Rect(calibViewsNextX, nextY, calibViewsWidth, 2)).background_(Color.green);
 			);
 			calibViewsNextX = calibViewsNextX+calibViewsWidth;
 			if(GUI.id !== \cocoa, {

@@ -24,7 +24,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 	var <oscEditBtns, <oscCalibBtns;
 	var <midiEditGroups;
 	var <oscTabs, <midiTabs;
-	var oscFlow0, oscFlow1, midiFlow0, midiFlow1;
+	var oscFlow0, <oscFlow1, midiFlow0, <midiFlow1;
 
 	*new { |widget, widgetName, tab|
 		^super.new.init(widget, widgetName, tab);
