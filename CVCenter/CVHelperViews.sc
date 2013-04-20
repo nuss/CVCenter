@@ -247,4 +247,8 @@ CVMidiEditGroup {
 		^cview.bounds;
 	}
 
+	remove {
+		cview.remove;
+	}
+
 }

@@ -550,6 +550,12 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.align_(\right)
 			;
 
+			if(GUI.id !== \cocoa, {
+				deviceDropDown.toolTip_(
+					"Select from a list of IP-addresses which\nare currently sending OSC messages to\ncreate responders that will listen to\nthe selected address only."
+				)
+			});
+
 			portRestrictor = buildCheckbox.(false, thisEditor[\tabs].views[2], 15@15, Font("Arial", 10, true));
 			portRestrictor.action_({ |bt|
 				switch(bt.value.asBoolean,
@@ -565,34 +571,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					}
 				)
 			});
-
-			// flow2.shift(-2, 0);
-			//
-			// ipField = TextField(thisEditor[\tabs].views[2], flow2.bounds.width-180@15)
-			// .font_(textFieldFont)
-			// .stringColor_(textFieldFontColor)
-			// .background_(textFieldBg)
-			// .string_("")
-			// ;
-			//
-			// if(GUI.id !== \cocoa, {
-			// 	ipField.toolTip_("Optional: the device's IP-address\nCan be used to restrict listening to\nthis address only.")
-			// });
-			//
-			// flow2.shift(-2, 0);
-			//
-			// portField = TextField(thisEditor[\tabs].views[2], 36@15)
-			// .font_(textFieldFont)
-			// .stringColor_(textFieldFontColor)
-			// .background_(textFieldBg)
-			// .string_("")
-			// ;
-			//
-			// if(GUI.id !== \cocoa, {
-			// 	portField.toolTip_("Optional: the device's port\nCan be used to restrict listening to\nthis port only.")
-			// });
-			//
-			// flow2.shift(0, 0);
 
 			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-20@40)
 				.font_(staticTextFont)
