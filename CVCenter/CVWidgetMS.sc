@@ -33,7 +33,7 @@ CVWidgetMS : CVWidget {
 		synchKeys ?? { synchKeys = [\default] };
 		#numOscResponders, numMidiResponders = 0!2;
 
-		calibViews = [];
+		calibViews = List();
 
 		if(cv.isNil, {
 			widgetCV = CV([0 ! numSliders, 1 ! numSliders]);
@@ -223,7 +223,7 @@ CVWidgetMS : CVWidget {
 		calibViewsWidth = (thisWidth-2).div(msSize);
 		calibViewsNextX = thisXY.x+1;
 		msSize.do({ |sl|
-			calibViews = calibViews.add(
+			calibViews.add(
 				CompositeView(window, Rect(calibViewsNextX, nextY, calibViewsWidth, 2)).background_(Color.green);
 			);
 			calibViewsNextX = calibViewsNextX+calibViewsWidth;

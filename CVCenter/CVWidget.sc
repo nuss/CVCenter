@@ -1372,6 +1372,7 @@ CVWidget {
 		// var calibViewLeft;
 		var thisSpec, customName, thisMidiOscEnv;
 		var reference;
+		var calibViewsNextX, btnIndex;
 
 		wcm.cvSpec.controller ?? {
 			switch(this.class,
@@ -1496,7 +1497,7 @@ CVWidget {
 							specEditor.midiEditGroups.removeAt(sl);
 						});
 
-						"msEditors: %\n".postf(msEditors);
+						// "msEditors: %\n".postf(msEditors);
 
 						if(msEditors[sl].notNil and:{
 							msEditors[sl].isClosed.not
@@ -1510,8 +1511,12 @@ CVWidget {
 							this.calibViews.removeAt(sl);
 							calibViewsWidth = this.mSlider.bounds.width/specSize;
 							this.calibViews.do({ |cv, i|
-								if(i == 0, { tmp = cv.bounds.left }, { tmp = tmp+calibViewsWidth });
-								cv.bounds_(Rect(tmp, cv.bounds.top, calibViewsWidth, cv.bounds.height));
+								if(i == 0, {
+									calibViewsNextX = cv.bounds.left
+								}, {
+									calibViewsNextX = calibViewsNextX+calibViewsWidth
+								});
+								cv.bounds_(Rect(calibViewsNextX, cv.bounds.top, calibViewsWidth, cv.bounds.height));
 							})
 						})
 					});
@@ -1524,59 +1529,31 @@ CVWidget {
 				});
 
 				if(specSize > msSize, {
-				// tmp = [];
-				// (msSize-1..specSize-1).do({ |i| tmp = tmp.add(thisSpec.default.wrapAt(i)) });
-				// widgetCV.value_(thisSpec.default++tmp);
-				// "widgetCV.value: %\n".postf(widgetCV.value);
 					this.mSlider.indexThumbSize_(this.mSlider.bounds.width/specSize);
+					calibViewsWidth = this.mSlider.bounds.width/specSize;
+					this.calibViews.do({ |cv, i|
+						if(i == 0, { calibViewsNextX = cv.bounds.left });
+						cv.bounds_(Rect(calibViewsNextX, cv.bounds.top, calibViewsWidth, cv.bounds.height));
+						calibViewsNextX = calibViewsNextX+calibViewsWidth;
+					});
+					btnIndex = (msSize..specSize-1);
 					(specSize-msSize).do({ |i|
+						this.calibViews.add(
+							CompositeView(
+								window, Rect(calibViewsNextX, this.calibViews[0].bounds.top, calibViewsWidth, 2)
+							).background_(Color.green)
+						);
+						calibViewsNextX = calibViewsNextX+calibViewsWidth;
 						msEditors = msEditors.add(nil);
-						// this.midiOscEnv.asList.add((oscMapping: \linlin)).asArray;
 						thisMidiOscEnv = thisMidiOscEnv.add((oscMapping: \linlin));
-						// [this.midiOscEnv.class, this.midiOscEnv.size].postln;
-						wdgtControllersAndModels.slots = wdgtControllersAndModels.slots.add((
-							midiOptions: wdgtControllersAndModels.slots[msSize-1][\midiOptions],
-							midiDisplay: (
-								model: `((learn: "L", src: "source", chan: "chan", ctrl: "ctrl")),
-								controller: SimpleController.new
-							),
-							oscDisplay: (
-								model: `((
-									editEnabled: true,
-									connectorButVal: 0,
-									nameField: "/my/cmd/name",
-									index: 1,
-									but: [(msSize+i).asString++": edit OSC", Color.black, this.bgColor ]
-								)),
-								controller: SimpleController.new
-							),
-							midiConnection: (model: `(nil), controller: SimpleController.new),
-							oscConnection: (model: `(false), controller: SimpleController.new),
-							oscInputRange: (model: `([0.0001, 0.0001]), controller: SimpleController.new),
-							calibration: (model: `(true), controller: SimpleController.new),
-							mapConstrainterLo: CV([-inf, inf].asSpec, 0.0001),
-							mapConstrainterHi: CV([-inf, inf].asSpec, 0.0001),
-							actions: (controller: SimpleController.new),
-							cvSpec: (controller: SimpleController.new)
-						));
-						prMidiMode = prMidiMode.add(
-							wdgtControllersAndModels.slots[msSize+i][\midiOptions].model.value[\midiMode]
-						);
-						prMidiMean = prMidiMean.add(
-							wdgtControllersAndModels.slots[msSize+i][\midiOptions].model.value[\midiMean]
-						);
-						prMidiResolution = prMidiResolution.add(
-							wdgtControllersAndModels.slots[msSize+i][\midiOptions].model.value[\midiResolution]
-						);
-						prSoftWithin = prSoftWithin.add(
-							wdgtControllersAndModels.slots[msSize+i][\midiOptions].model.value[\softWithin]
-						);
-						prCtrlButtonBank = prCtrlButtonBank.add(
-							wdgtControllersAndModels.slots[msSize+i][\midiOptions].model.value[\ctrlButtonBank]
-						);
-						prCalibrate = prCalibrate.add(
-							wdgtControllersAndModels.slots[msSize+i][\calibration].model.value
-						);
+						wdgtControllersAndModels.slots = wdgtControllersAndModels.slots.add(nil);
+						this.initControllersAndModels(slot: msSize+i);
+						prMidiMode = prMidiMode.add(this.getMidiMode(msSize-1));
+						prMidiMean = prMidiMean.add(this.getMidiMean(msSize-1));
+						prMidiResolution = prMidiResolution.add(this.getMidiResolution(msSize-1));
+						prSoftWithin = prSoftWithin.add(this.getSoftWithin(msSize-1));
+						prCtrlButtonBank = prCtrlButtonBank.add(this.getCtrlButtonBank(msSize-1));
+						prCalibrate = prCalibrate.add(true);
 						if(specEditor.notNil and:{ specEditor.isClosed.not }, {
 							specEditor.midiEditGroups.add(
 								CVMidiEditGroup(specEditor.midiTabs.views[1], specEditor.midiFlow1.bounds.width/5-10@39, this, msSize+i);
@@ -1589,34 +1566,35 @@ CVWidget {
 									])
 									.font_(Font("Arial", 9.4))
 									.action_({ |bt|
-										if(msEditors[oscIndex].isNil or:{
-											msEditors[oscIndex].isClosed
+										// (btnIndex[i]).postln;
+										if(msEditors[btnIndex[i]].isNil or:{
+											msEditors[btnIndex[i]].isClosed
 										}, {
-											msEditors[oscIndex] = CVWidgetEditor(
-												this, this.label.states[0][0], 1, oscIndex
+											msEditors[btnIndex[i]] = CVWidgetEditor(
+												this, this.label.states[0][0], 1, btnIndex[i]
 											);
 										}, {
-											msEditors[oscIndex].front(1)
+											msEditors[btnIndex[i]].front(1)
 										});
-										msEditors[oscIndex].calibNumBoxes !? {
-											wdgtControllersAndModels.slots[oscIndex].mapConstrainterLo.connect(
-												msEditors[oscIndex].calibNumBoxes.lo;
+										msEditors[btnIndex[i]].calibNumBoxes !? {
+											wdgtControllersAndModels.slots[btnIndex[i]].mapConstrainterLo.connect(
+												msEditors[btnIndex[i]].calibNumBoxes.lo;
 											);
-											msEditors[oscIndex].calibNumBoxes.lo.value_(
-												wdgtControllersAndModels.slots[oscIndex].oscInputRange.model.value[0];
+											msEditors[btnIndex[i]].calibNumBoxes.lo.value_(
+												wdgtControllersAndModels.slots[btnIndex[i]].oscInputRange.model.value[0];
 											);
-											wdgtControllersAndModels.slots[oscIndex].mapConstrainterHi.connect(
-												msEditors[oscIndex].calibNumBoxes.hi;
+											wdgtControllersAndModels.slots[btnIndex[i]].mapConstrainterHi.connect(
+												msEditors[btnIndex[i]].calibNumBoxes.hi;
 											);
-											msEditors[oscIndex].calibNumBoxes.hi.value_(
-												wdgtControllersAndModels.slots[oscIndex].oscInputRange.model.value[1];
+											msEditors[btnIndex[i]].calibNumBoxes.hi.value_(
+												wdgtControllersAndModels.slots[btnIndex[i]].oscInputRange.model.value[1];
 											)
 										};
-										wdgtControllersAndModels.slots[oscIndex].oscDisplay.model.value_(
-											wdgtControllersAndModels.slots[oscIndex].oscDisplay.model.value;
+										wdgtControllersAndModels.slots[btnIndex[i]].oscDisplay.model.value_(
+											wdgtControllersAndModels.slots[btnIndex[i]].oscDisplay.model.value;
 										).changedKeys(this.synchKeys);
-										wdgtControllersAndModels.slots[oscIndex].midiDisplay.model.value_(
-											wdgtControllersAndModels.slots[oscIndex].midiDisplay.model.value
+										wdgtControllersAndModels.slots[btnIndex[i]].midiDisplay.model.value_(
+											wdgtControllersAndModels.slots[btnIndex[i]].midiDisplay.model.value
 										).changedKeys(this.synchKeys);
 									})
 								;
@@ -1633,12 +1611,12 @@ CVWidget {
 									.action_({ |cb|
 										cb.value.switch(
 											0, {
-												this.setCalibrate(true, oscIndex);
-												wdgtControllersAndModels.slots[oscIndex].calibration.model.value_(true).changedKeys(this.synchKeys);
+											this.setCalibrate(true, btnIndex[i]);
+												wdgtControllersAndModels.slots[btnIndex[i]].calibration.model.value_(true).changedKeys(this.synchKeys);
 											},
 											1, {
-												this.setCalibrate(false, oscIndex);
-												wdgtControllersAndModels.slots[oscIndex].calibration.model.value_(false).changedKeys(this.synchKeys);
+											this.setCalibrate(false, btnIndex[i]);
+												wdgtControllersAndModels.slots[btnIndex[i]].calibration.model.value_(false).changedKeys(this.synchKeys);
 											}
 										)
 									})
@@ -1646,8 +1624,11 @@ CVWidget {
 							);
 
 							specEditor.oscFlow1.shift(0, (specEditor.oscEditBtns[oscIndex].bounds.height-10).neg);
+
+							this.initControllerActions(msSize+i);
 						})
-					})
+					});
+
 				});
 
 				if(specSize != msSize, {
