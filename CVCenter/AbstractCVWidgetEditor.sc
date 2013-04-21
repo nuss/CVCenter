@@ -33,7 +33,6 @@ AbstractCVWidgetEditor {
 
 	*initClass {
 		var localOscFunc;
-
 		allEditors = IdentityDictionary.new;
 	}
 

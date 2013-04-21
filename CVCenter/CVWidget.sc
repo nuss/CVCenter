@@ -1370,7 +1370,7 @@ CVWidget {
 		var specSize, calibViewsWidth;
 		var specEditor, msEditors;
 		// var calibViewLeft;
-		var thisSpec, customName;
+		var thisSpec, customName, thisMidiOscEnv;
 		var reference;
 
 		wcm.cvSpec.controller ?? {
@@ -1389,6 +1389,7 @@ CVWidget {
 				CVWidgetMS, {
 					specEditor = thisGuiEnv.msEditor;
 					msEditors = thisGuiEnv.editor;
+					thisMidiOscEnv = this.midiOscEnv;
 				},
 				{ specEditor = thisGuiEnv.editor }
 			);
@@ -1432,108 +1433,172 @@ CVWidget {
 				})
 			});
 
-			if(specEditor.notNil and:{
-				specEditor.isClosed.not
-			}, {
-				if(this.class == CVWidgetMS, {
-					if([
-						theChanger.value.minval,
-						theChanger.value.maxval,
+			// if(specEditor.notNil and:{
+			// 	specEditor.isClosed.not
+			// 	}, {
+			if(this.class == CVWidgetMS, {
+				if([
+					theChanger.value.minval,
+					theChanger.value.maxval,
+					theChanger.value.warp,
+					theChanger.value.step,
+					theChanger.value.default
+				].select(_.isArray).size == 0, {
+					thisSpec = ControlSpec(
+						theChanger.value.minval!msSize,
+						theChanger.value.maxval!msSize,
 						theChanger.value.warp,
-						theChanger.value.step,
-						theChanger.value.default
-					].select(_.isArray).size == 0, {
-						thisSpec = ControlSpec(
-							theChanger.value.minval!msSize,
-							theChanger.value.maxval!msSize,
-							theChanger.value.warp,
-							theChanger.value.step!msSize,
-							theChanger.value.default!msSize,
-							theChanger.value.units,
-						)
-					}, {
-						thisSpec = ControlSpec(
-							theChanger.value.minval.asArray,
-							theChanger.value.maxval.asArray,
-							theChanger.value.warp,
-							theChanger.value.step.asArray,
-							theChanger.value.default.asArray,
-							theChanger.value.units
-						)
-					});
+						theChanger.value.step!msSize,
+						theChanger.value.default!msSize,
+						theChanger.value.units,
+					)
+				}, {
+					thisSpec = ControlSpec(
+						theChanger.value.minval.asArray,
+						theChanger.value.maxval.asArray,
+						theChanger.value.warp,
+						theChanger.value.step.asArray,
+						theChanger.value.default.asArray,
+						theChanger.value.units
+					)
+				});
 
-					specSize = [
-						thisSpec.minval.size,
-						thisSpec.maxval.size,
-						thisSpec.step.size,
-						thisSpec.default.size
-					].maxItem;
+						// "do I get here?".postln;
 
-					if(specSize < msSize, {
-						this.mSlider.indexThumbSize_(this.mSlider.bounds.width/specSize);
-						(specSize..msSize-1).do({ |sl|
-							this.oscDisconnect(sl);
-							this.midiDisconnect(sl);
-							if(specEditor.notNil and:{
-								specEditor.isClosed.not
-							}, {
-								[
-									specEditor.oscEditBtns[sl],
-									specEditor.oscCalibBtns[sl],
-									specEditor.midiEditGroups[sl]
-								].do({ |ed|
-									ed.remove;
-									specEditor.midiFlow1.reset;
-									specEditor.oscFlow1.reset;
-								});
-								specEditor.oscEditBtns.removeAt(sl);
-								specEditor.midiEditGroups.removeAt(sl);
-										// specEditor.specListSpecs.do({ |spec|
-										// 	if((tmp = [spec.minval, spec.maxval, spec.step, spec.default].select(_.isArray)).size > 0, {
-										// 		if(tmp.collect(_.size).includes(specSize).not, {
-										//
-										// 		})
-										// 	})
-										// })
+				specSize = [
+					thisSpec.minval.size,
+					thisSpec.maxval.size,
+					thisSpec.step.size,
+					thisSpec.default.size
+				].maxItem;
+
+				if(specSize < msSize, {
+					this.mSlider.indexThumbSize_(this.mSlider.bounds.width/specSize);
+					(msSize-1..specSize).do({ |sl|
+						this.oscDisconnect(sl);
+						this.midiDisconnect(sl);
+						if(specEditor.notNil and:{
+							specEditor.isClosed.not
+						}, {
+							[
+								specEditor.oscEditBtns[sl],
+								specEditor.oscCalibBtns[sl],
+								specEditor.midiEditGroups[sl]
+							].do({ |ed|
+								ed.remove;
+								specEditor.midiFlow1.reset;
+								specEditor.oscFlow1.reset;
 							});
-
-							if(msEditors[sl].notNil and:{
-								msEditors[sl].isClosed.not
-							}, {
-								msEditors[sl].close;
-							});
-							if(window.notNil and:{ window.isClosed.not }, {
-								this.calibViews[sl].remove
-								this.calibViews.removeAt(sl);
-								calibViewsWidth = this.mSlider.bounds.width/specSize;
-								this.calibViews.do({ |cv, i|
-									if(i == 0, { tmp = cv.bounds.left }, { tmp = tmp+calibViewsWidth });
-									cv.bounds_(Rect(tmp, cv.bounds.top, calibViewsWidth, cv.bounds.height));
-								})
-							})
+							specEditor.oscEditBtns.removeAt(sl);
+							specEditor.midiEditGroups.removeAt(sl);
 						});
 
-						(msSize-1..specSize).do({ |sl|
-							midiOscEnv.removeAt(sl);
-							wdgtControllersAndModels.slots.removeAt(sl);
+						if(msEditors[sl].notNil and:{
+							msEditors[sl].isClosed.not
+						}, {
+							msEditors[sl].close;
+							msEditors.removeAt(sl);
+						});
+						if(window.notNil and:{ window.isClosed.not }, {
+							this.calibViews[sl].remove;
+							this.calibViews.removeAt(sl);
+							calibViewsWidth = this.mSlider.bounds.width/specSize;
+							this.calibViews.do({ |cv, i|
+								if(i == 0, { tmp = cv.bounds.left }, { tmp = tmp+calibViewsWidth });
+								cv.bounds_(Rect(tmp, cv.bounds.top, calibViewsWidth, cv.bounds.height));
+
+							})
 						})
 					});
 
-					if(specSize > msSize, {
-
-					});
-
-					msSize = specSize;
-
-					if(Spec.findKeyForSpec(theChanger.value).notNil, {
-						customName = Spec.findKeyForSpec(theChanger.value).asString++"_"++specSize;
-					}, {
-						customName = "custom_"++specSize;
+					(msSize-1..specSize).do({ |sl|
+						this.midiOscEnv.removeAt(sl);
+						wdgtControllersAndModels.slots.removeAt(sl);
+						[prMidiMode, prMidiMean, prMidiResolution, prSoftWithin, prCtrlButtonBank, prCalibrate].do(_.removeAt(sl));
 					})
-				}, {
-					thisSpec = theChanger.value;
 				});
 
+				if(specSize > msSize, {
+				// tmp = [];
+				// (msSize-1..specSize-1).do({ |i| tmp = tmp.add(thisSpec.default.wrapAt(i)) });
+				// widgetCV.value_(thisSpec.default++tmp);
+				// "widgetCV.value: %\n".postf(widgetCV.value);
+					this.mSlider.indexThumbSize_(this.mSlider.bounds.width/specSize);
+					(specSize-msSize).do({ |i|
+						// this.midiOscEnv.asList.add((oscMapping: \linlin)).asArray;
+						thisMidiOscEnv = thisMidiOscEnv.add((oscMapping: \linlin));
+						[this.midiOscEnv.class, this.midiOscEnv.size].postln;
+						wdgtControllersAndModels.slots = wdgtControllersAndModels.slots.add((
+							midiOptions: wdgtControllersAndModels.slots[msSize-1][\midiOptions],
+							midiDisplay: (
+								model: `((learn: "L", src: "source", chan: "chan", ctrl: "ctrl")),
+								controller: SimpleController.new
+							),
+							oscDisplay: (
+								model: `((
+									editEnabled: true,
+									connectorButVal: 0,
+									nameField: "/my/cmd/name",
+									index: 1,
+									but: [(msSize+i).asString++": edit OSC", Color.black, this.bgColor ]
+								)),
+								controller: SimpleController.new
+							),
+							midiConnection: (model: `(nil), controller: SimpleController.new),
+							oscConnection: (model: `(false), controller: SimpleController.new),
+							oscInputRange: (model: `([0.0001, 0.0001]), controller: SimpleController.new),
+							calibration: (model: `(true), controller: SimpleController.new),
+							mapConstrainterLo: CV([-inf, inf].asSpec, 0.0001),
+							mapConstrainterHi: CV([-inf, inf].asSpec, 0.0001),
+							actions: (controller: SimpleController.new),
+							cvSpec: (controller: SimpleController.new)
+						));
+						prMidiMode = prMidiMode.add(
+							wdgtControllersAndModels.slots[msSize+i][\midiOptions].model.value[\midiMode]
+						);
+						prMidiMean = prMidiMean.add(
+							wdgtControllersAndModels.slots[msSize+i][\midiOptions].model.value[\midiMean]
+						);
+						prMidiResolution = prMidiResolution.add(
+							wdgtControllersAndModels.slots[msSize+i][\midiOptions].model.value[\midiResolution]
+						);
+						prSoftWithin = prSoftWithin.add(
+							wdgtControllersAndModels.slots[msSize+i][\midiOptions].model.value[\softWithin]
+						);
+						prCtrlButtonBank = prCtrlButtonBank.add(
+							wdgtControllersAndModels.slots[msSize+i][\midiOptions].model.value[\ctrlButtonBank]
+						);
+						prCalibrate = prCalibrate.add(
+							wdgtControllersAndModels.slots[msSize+i][\calibration].model.value
+						);
+					})
+				});
+
+				if(specEditor.notNil and:{ specEditor.isClosed.not }, {
+					specEditor.specsListSpecs.do({ |spec, i|
+						if((tmp = [spec.minval, spec.maxval, spec.step, spec.default].select(_.isArray)).size > 0, {
+							if(tmp.collect(_.size).includes(specSize).not, {
+								// "spec not matching: %\n".postf([i, spec]);
+								specEditor.specsListSpecs.removeAt(i);
+								specEditor.specsList.items.removeAt(i);
+							})
+						})
+					})
+				});
+
+				msSize = specSize;
+				"msSize: %\n".postf(msSize);
+
+				if(Spec.findKeyForSpec(theChanger.value).notNil, {
+					customName = Spec.findKeyForSpec(theChanger.value).asString++"_"++specSize;
+				}, {
+					customName = "custom_"++specSize;
+				})
+			}, {
+				thisSpec = theChanger.value;
+			});
+
+			if(specEditor.notNil and:{ specEditor.isClosed.not }, {
 				specEditor.specField.string_(thisSpec.asCompileString);
 				tmp = specEditor.specsListSpecs.detectIndex({ |item, i| item == thisSpec });
 				if(tmp.notNil, {

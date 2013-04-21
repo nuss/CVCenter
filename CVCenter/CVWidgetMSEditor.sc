@@ -91,6 +91,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		widget.wdgtControllersAndModels !? {
 			wcmMS = widget.wdgtControllersAndModels;
 		};
+
 		widget.msSize.do({ |i|
 			thisMidiMode[i] = widget.getMidiMode(i);
 			thisMidiMean[i] = widget.getMidiMean(i);
