@@ -690,18 +690,6 @@ CVWidget {
 				wdgtControllersAndModels[slot.asSymbol].cvSpec.model.value_(thisSpec).changedKeys(synchKeys);
 			},
 			{
-				// if(this.class == CVWidgetMS, {
-				// 	if([thisSpec.minval, thisSpec.maxval, thisSpec.warp, thisSpec.step, thisSpec.default].select(_.isArray).size == 0, {
-				// 		thisSpec = ControlSpec(
-				// 			thisSpec.minval!msSize,
-				// 			thisSpec.maxval!msSize,
-				// 			thisSpec.warp,
-				// 			thisSpec.step!msSize,
-				// 			thisSpec.default!msSize,
-				// 			thisSpec.units,
-				// 		)
-				// 	})
-				// });
 				wdgtControllersAndModels.cvSpec.model.value_(thisSpec).changedKeys(synchKeys);
 			}
 		)
@@ -1381,6 +1369,7 @@ CVWidget {
 		var tmp, tmpMapping;
 		var specSize, calibViewsWidth;
 		var specEditor, msEditors;
+		// var calibViewLeft;
 		var thisSpec, customName;
 		var reference;
 
@@ -1463,7 +1452,14 @@ CVWidget {
 							theChanger.value.units,
 						)
 					}, {
-						thisSpec = theChanger.value;
+						thisSpec = ControlSpec(
+							theChanger.value.minval.asArray,
+							theChanger.value.maxval.asArray,
+							theChanger.value.warp,
+							theChanger.value.step.asArray,
+							theChanger.value.default.asArray,
+							theChanger.value.units
+						)
 					});
 
 					specSize = [
@@ -1489,20 +1485,42 @@ CVWidget {
 									ed.remove;
 									specEditor.midiFlow1.reset;
 									specEditor.oscFlow1.reset;
-								})
+								});
+								specEditor.oscEditBtns.removeAt(sl);
+								specEditor.midiEditGroups.removeAt(sl);
+										// specEditor.specListSpecs.do({ |spec|
+										// 	if((tmp = [spec.minval, spec.maxval, spec.step, spec.default].select(_.isArray)).size > 0, {
+										// 		if(tmp.collect(_.size).includes(specSize).not, {
+										//
+										// 		})
+										// 	})
+										// })
 							});
+
 							if(msEditors[sl].notNil and:{
 								msEditors[sl].isClosed.not
 							}, {
 								msEditors[sl].close;
 							});
-							if(window.notNil and:{ window.isClosed.not }, { this.calibViews[sl].remove });
+							if(window.notNil and:{ window.isClosed.not }, {
+								this.calibViews[sl].remove
+								this.calibViews.removeAt(sl);
+								calibViewsWidth = this.mSlider.bounds.width/specSize;
+								this.calibViews.do({ |cv, i|
+									if(i == 0, { tmp = cv.bounds.left }, { tmp = tmp+calibViewsWidth });
+									cv.bounds_(Rect(tmp, cv.bounds.top, calibViewsWidth, cv.bounds.height));
+								})
+							})
 						});
-						calibViewsWidth = this.mSlider.bounds.width/specSize;
-						this.calibViews.do({ |cv, i|
-							if(i > 0, { tmp = calibViewsWidth }, { tmp = 0 });
-							cv.bounds_(Rect(cv.bounds.left+tmp, cv.bounds.top, calibViewsWidth, cv.bounds.height));
+
+						(msSize-1..specSize).do({ |sl|
+							midiOscEnv.removeAt(sl);
+							wdgtControllersAndModels.slots.removeAt(sl);
 						})
+					});
+
+					if(specSize > msSize, {
+
 					});
 
 					msSize = specSize;
