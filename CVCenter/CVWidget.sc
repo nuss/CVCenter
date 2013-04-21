@@ -1368,7 +1368,7 @@ CVWidget {
 	prInitSpecControl { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var tmp, tmpMapping;
 		var specSize, calibViewsWidth;
-		var specEditor, msEditors;
+		var specEditor, msEditors, oscIndex;
 		// var calibViewLeft;
 		var thisSpec, customName, thisMidiOscEnv;
 		var reference;
@@ -1480,25 +1480,31 @@ CVWidget {
 						if(specEditor.notNil and:{
 							specEditor.isClosed.not
 						}, {
-							[
-								specEditor.oscEditBtns[sl],
-								specEditor.oscCalibBtns[sl],
-								specEditor.midiEditGroups[sl]
-							].do({ |ed|
-								ed.remove;
-								specEditor.midiFlow1.reset;
-								specEditor.oscFlow1.reset;
+							if(sl == specSize, {
+								specEditor.oscFlow1.left_(
+									specEditor.oscEditBtns[sl].bounds.left
+								).top_(specEditor.oscEditBtns[sl].bounds.top);
+								specEditor.midiFlow1.left_(
+									specEditor.midiEditGroups[sl].bounds.left
+								).top_(specEditor.midiEditGroups[sl].bounds.top);
 							});
+							specEditor.oscEditBtns[sl].remove;
+							specEditor.oscCalibBtns[sl].remove;
+							specEditor.midiEditGroups[sl].remove;
 							specEditor.oscEditBtns.removeAt(sl);
+							specEditor.oscCalibBtns.removeAt(sl);
 							specEditor.midiEditGroups.removeAt(sl);
 						});
+
+						"msEditors: %\n".postf(msEditors);
 
 						if(msEditors[sl].notNil and:{
 							msEditors[sl].isClosed.not
 						}, {
 							msEditors[sl].close;
-							msEditors.removeAt(sl);
 						});
+						msEditors.removeAt(sl);
+
 						if(window.notNil and:{ window.isClosed.not }, {
 							this.calibViews[sl].remove;
 							this.calibViews.removeAt(sl);
@@ -1506,7 +1512,6 @@ CVWidget {
 							this.calibViews.do({ |cv, i|
 								if(i == 0, { tmp = cv.bounds.left }, { tmp = tmp+calibViewsWidth });
 								cv.bounds_(Rect(tmp, cv.bounds.top, calibViewsWidth, cv.bounds.height));
-
 							})
 						})
 					});
@@ -1525,9 +1530,10 @@ CVWidget {
 				// "widgetCV.value: %\n".postf(widgetCV.value);
 					this.mSlider.indexThumbSize_(this.mSlider.bounds.width/specSize);
 					(specSize-msSize).do({ |i|
+						msEditors = msEditors.add(nil);
 						// this.midiOscEnv.asList.add((oscMapping: \linlin)).asArray;
 						thisMidiOscEnv = thisMidiOscEnv.add((oscMapping: \linlin));
-						[this.midiOscEnv.class, this.midiOscEnv.size].postln;
+						// [this.midiOscEnv.class, this.midiOscEnv.size].postln;
 						wdgtControllersAndModels.slots = wdgtControllersAndModels.slots.add((
 							midiOptions: wdgtControllersAndModels.slots[msSize-1][\midiOptions],
 							midiDisplay: (
@@ -1571,23 +1577,112 @@ CVWidget {
 						prCalibrate = prCalibrate.add(
 							wdgtControllersAndModels.slots[msSize+i][\calibration].model.value
 						);
-					})
-				});
+						if(specEditor.notNil and:{ specEditor.isClosed.not }, {
+							specEditor.midiEditGroups.add(
+								CVMidiEditGroup(specEditor.midiTabs.views[1], specEditor.midiFlow1.bounds.width/5-10@39, this, msSize+i);
+							);
+							oscIndex = msSize+i;
+							specEditor.oscEditBtns.add(
+								Button(specEditor.oscTabs.views[1], specEditor.oscFlow1.bounds.width/5-10@25)
+									.states_([
+										[oscIndex.asString++": edit OSC", Color.black, Color.white(0.2)]
+									])
+									.font_(Font("Arial", 9.4))
+									.action_({ |bt|
+										if(msEditors[oscIndex].isNil or:{
+											msEditors[oscIndex].isClosed
+										}, {
+											msEditors[oscIndex] = CVWidgetEditor(
+												this, this.label.states[0][0], 1, oscIndex
+											);
+										}, {
+											msEditors[oscIndex].front(1)
+										});
+										msEditors[oscIndex].calibNumBoxes !? {
+											wdgtControllersAndModels.slots[oscIndex].mapConstrainterLo.connect(
+												msEditors[oscIndex].calibNumBoxes.lo;
+											);
+											msEditors[oscIndex].calibNumBoxes.lo.value_(
+												wdgtControllersAndModels.slots[oscIndex].oscInputRange.model.value[0];
+											);
+											wdgtControllersAndModels.slots[oscIndex].mapConstrainterHi.connect(
+												msEditors[oscIndex].calibNumBoxes.hi;
+											);
+											msEditors[oscIndex].calibNumBoxes.hi.value_(
+												wdgtControllersAndModels.slots[oscIndex].oscInputRange.model.value[1];
+											)
+										};
+										wdgtControllersAndModels.slots[oscIndex].oscDisplay.model.value_(
+											wdgtControllersAndModels.slots[oscIndex].oscDisplay.model.value;
+										).changedKeys(this.synchKeys);
+										wdgtControllersAndModels.slots[oscIndex].midiDisplay.model.value_(
+											wdgtControllersAndModels.slots[oscIndex].midiDisplay.model.value
+										).changedKeys(this.synchKeys);
+									})
+								;
+							);
 
-				if(specEditor.notNil and:{ specEditor.isClosed.not }, {
-					specEditor.specsListSpecs.do({ |spec, i|
-						if((tmp = [spec.minval, spec.maxval, spec.step, spec.default].select(_.isArray)).size > 0, {
-							if(tmp.collect(_.size).includes(specSize).not, {
-								// "spec not matching: %\n".postf([i, spec]);
-								specEditor.specsListSpecs.removeAt(i);
-								specEditor.specsList.items.removeAt(i);
-							})
+							specEditor.oscFlow1.shift(-13, specEditor.oscEditBtns[oscIndex].bounds.height-10);
+
+							specEditor.oscCalibBtns.add(
+								Button(specEditor.oscTabs.views[1], 10@10)
+									.states_([
+										["", Color.black, Color.green],
+										["", Color.white, Color.red]
+									])
+									.action_({ |cb|
+										cb.value.switch(
+											0, {
+												this.setCalibrate(true, oscIndex);
+												wdgtControllersAndModels.slots[oscIndex].calibration.model.value_(true).changedKeys(this.synchKeys);
+											},
+											1, {
+												this.setCalibrate(false, oscIndex);
+												wdgtControllersAndModels.slots[oscIndex].calibration.model.value_(false).changedKeys(this.synchKeys);
+											}
+										)
+									})
+								;
+							);
+
+							specEditor.oscFlow1.shift(0, (specEditor.oscEditBtns[oscIndex].bounds.height-10).neg);
 						})
 					})
 				});
 
+				if(specSize != msSize, {
+					if(window.notNil and:{ window.isClosed.not }, {
+						this.oscBut.states_([
+							[
+								"OSC ("++this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size++"/"++specSize++")",
+								this.oscBut.states[0][1], this.oscBut.states[0][2]
+							]
+						]);
+						this.midiBut.states_([
+							[
+								"MIDI ("++this.midiOscEnv.select({ |it| it.cc.notNil }).size++"/"++specSize++")",
+								this.midiBut.states[0][1], this.midiBut.states[0][2]
+							]
+						]);
+					});
+
+					if(specEditor.notNil and:{ specEditor.isClosed.not }, {
+						specEditor.specsListSpecs.do({ |spec, i|
+							if((tmp = [spec.minval, spec.maxval, spec.step, spec.default].select(_.isArray)).size > 0, {
+								if(tmp.collect(_.size).includes(specSize).not, {
+									// "spec not matching: %\n".postf([i, spec]);
+									specEditor.specsListSpecs.removeAt(i);
+									specEditor.specsList.items.removeAt(i);
+								})
+							})
+						});
+						specEditor.extMidiCtrlArrayField.string_("(0.."++(specSize-1)++")");
+						specEditor.extOscCtrlArrayField.string_("(1.."++specSize++")");
+					})
+				});
+
 				msSize = specSize;
-				"msSize: %\n".postf(msSize);
+				// "msSize: %\n".postf(msSize);
 
 				if(Spec.findKeyForSpec(theChanger.value).notNil, {
 					customName = Spec.findKeyForSpec(theChanger.value).asString++"_"++specSize;

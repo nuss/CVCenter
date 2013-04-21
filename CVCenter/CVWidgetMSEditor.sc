@@ -72,7 +72,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
 		};
 
-		#oscEditBtns, oscCalibBtns, midiEditGroups = []!3;
+		#oscEditBtns, oscCalibBtns, midiEditGroups = List()!3;
 
 		name = (widgetName.asString++"MS").asSymbol;
 		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
@@ -632,7 +632,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			]) });
 
 			widget.msSize.do({ |sl|
-				midiEditGroups = midiEditGroups.add(
+				midiEditGroups.add(
 					CVMidiEditGroup(thisEditor.midiTabs.views[1], midiFlow1.bounds.width/5-10@39, widget, sl);
 				)
 			});
@@ -964,7 +964,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			]) });
 
 			widget.msSize.do({ |sindex|
-				oscEditBtns = oscEditBtns.add(
+				oscEditBtns.add(
 					Button(thisEditor.oscTabs.views[1], oscFlow1.bounds.width/5-10@25)
 						.states_([
 							[sindex.asString++": edit OSC", Color.black, Color.white(0.2)]
@@ -1006,7 +1006,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				oscFlow1.shift(-13, oscEditBtns[sindex].bounds.height-10);
 
-				oscCalibBtns = oscCalibBtns.add(
+				oscCalibBtns.add(
 					Button(thisEditor.oscTabs.views[1], 10@10)
 						.states_([
 							["", Color.black, Color.green],
