@@ -225,7 +225,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				widget.getSpec.default.size
 			].maxItem;
 
-			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@56)
+			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@40)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 //				.background_(Color.white)
@@ -236,11 +236,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			if(GUI.id == \cocoa, { tmp = "\n" }, { tmp = " " });
 
-			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@45)
+			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@60)
 				.font_(staticTextFontBold)
 				.stringColor_(staticTextColor)
 //				.background_(Color.white)
-				.string_("NOTE: CVWidgetMS expects a Spec whose minvals, maxvals, step-sizes and/or default-%values are arrays of the size of the number of sliders in the multislider. However, you may%provide a spec like 'freq' and its parameters will internally expanded to arrays of the required size.".format(tmp, tmp))
+				.string_("NOTE: You may enter a Spec whose minvals, maxvals, step-sizes and/or default %values are arrays of the size of the number of sliders in the multislider. However, you may%provide a spec like 'freq' and its parameters will internally expanded to arrays of the required size. If you enter a Spec whose minvals, maxvals, step-sizes and/or default values are arrays of a different size than in the current spec the widget will get redimensioned to the size of the largest of these arrays.".format(tmp, tmp))
 			;
 
 			// flow0.shift(0, 2);
@@ -642,6 +642,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(Font("Arial", 10))
 			;
 
+			if(GUI.id !== \cocoa, {
+				deviceDropDown.toolTip_("Selecting one of the addresses will restrict listening within\nthe responder to messages coming from that address only.\nHowever, an IP-address will only be listed if the program is\nalready receiving OSC messages from that address.");
+			});
+
 			StaticText(thisEditor.oscTabs.views[0], 70@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
@@ -663,6 +667,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						)
 					}
 				)
+			});
+
+			if(GUI.id !== \cocoa, {
+				portRestrictor.toolTip_("If clicked listening within in responders that get\ncreated after selecting an IP-address from the\ndrop-down on the left will also be restricted to\nthe port from which messages are sent.")
 			});
 
 			oscFlow0.shift(0, 0);
@@ -692,6 +700,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					})
 				})
 			;
+
+			if(GUI.id !== \cocoa, {
+				deviceListMenu.toolTip_(
+					"Select from the list of stored devices (e.g. a mobile controller).\nAfterwards you may select a command-name from the drop-\ndown on the right. If there are no devices listed you may add\nnew ones by clicking the green 'new' button on the right."
+				)
+			});
 
 			oscFlow0.shift(0, 0);
 
@@ -730,6 +744,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				deviceListMenu.items = deviceListMenu.items ++ dev;
 			});
 
+			if(GUI.id !== \cocoa, {
+				cmdListMenu.toolTip_("If an IP-address has been selected in the drop-down above\nthis menu will list command-names coming in from that address.\nOtherwise select a device from the drop-down to the right and\nthis menu will list commands available for the selected device."
+				)
+			});
+
 			oscFlow0.shift(0, 0);
 
 			addDeviceBut = Button(thisEditor.oscTabs.views[0], 29@15)
@@ -740,6 +759,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.action_({ OSCCommands.makeWindow })
 			;
 
+			if(GUI.id !== \cocoa, {
+				addDeviceBut.toolTip_("Scan for incoming OSC-messages\nresp. their commandnames. These\ncan be saved to disk together with a\ndevice-name. You may then quickly\nselect from devices + commandnames\nfrom the dropdowns on the left.")
+			});
+
 			oscFlow0.shift(0, 0);
 
 			extOscCtrlArrayField = TextField(thisEditor.oscTabs.views[0], 65@15)
@@ -749,12 +772,24 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.string_("(1.."++maxNum++")")
 			;
 
+			if(GUI.id !== \cocoa, {
+				extOscCtrlArrayField.toolTip_(
+					"An array of placeholder-values, supposed to replace occurrencies\nof % in the textfields to the right. When batch-connecting with\nexternal controllers the program will iterate over these values\nand insert them in appropriate places within oscConnect(). Please\nhave a look at the CVWidgetMSEditor-help for more information\nabout batch-connecting within a CVWidgetMS."
+				)
+			});
+
 			nameField = TextField(thisEditor.oscTabs.views[0], 185@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
 				.string_("/my/cmd/name/%")
 			;
+
+			if(GUI.id !== \cocoa, {
+				nameField.toolTip_(
+					"An OSC command-name. If you want to connect with several command-\nnames which differ only within a number (e.g. \"/my/cmd/name/1\" to\n\"/my/cmd/name/10) that number may be replaced by a placeholder %\nand the program will replace them with the values specified in the\ntextfield on the left. Please have a look at the CVWidgetMSEditor-help\nfor more information about batch-connecting within a CVWidgetMS."
+				)
+			});
 
 			intStartIndexField = NumberBox(thisEditor.oscTabs.views[0], 60@15)
 				.font_(textFieldFont)
@@ -767,10 +802,22 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.value_(0)
 			;
 
+			if(GUI.id !== \cocoa, {
+				intStartIndexField.toolTip_(
+					"The slider-index at which the connection shall begin.\n0 means the connection will begin at the first slider\nof the MultiSlider within a CVWidgetMS."
+				)
+			});
+
 			indexField = TextField(thisEditor.oscTabs.views[0], 60@15)
 				.font_(textFieldFont)
 				.string_("int or %")
 			;
+
+			if(GUI.id !== \cocoa, {
+				indexField.toolTip_(
+					"The index of the OSC message that shall be connected. OSC messages may contain\none or more message slots. E.g. [\"/cmd/name/\", <slot 1>, <slot 2>,..<slot N>]. These\nslots may be addressed by a placeholder-value % for which the values are defined\nin the textfield on the right. The first message-slot will always be 1 (as 0 refers to the\ncommand-name itself). If only one message-slot exists for the given command-name\nsimply enter 1. Please have a look at the CVWidgetMSEditor-help for more infor-\nmation about batch-connecting within a CVWidgetMS."
+				)
+			});
 
 			StaticText(thisEditor.oscTabs.views[0], 65@42)
 				.font_(staticTextFont)

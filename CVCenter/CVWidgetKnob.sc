@@ -162,12 +162,12 @@ CVWidgetKnob : CVWidget {
 
 		knobsize = thisHeight-2-120;
 		if(knobsize >= thisWidth, {
-			"knobsize greater than or equal width".postln;
+			// "knobsize greater than or equal width".postln;
 			knobsize = thisWidth;
 			knobY = thisXY.y+16+(thisHeight-124-knobsize/2);
 			knobX = thisXY.x;
 		}, {
-			"knobsize smaller than width".postln;
+			// "knobsize smaller than width".postln;
 			knobsize = thisHeight-124;
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = thisXY.y+16;

@@ -552,7 +552,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			if(GUI.id !== \cocoa, {
 				deviceDropDown.toolTip_(
-					"Select from a list of IP-addresses which\nare currently sending OSC messages to\ncreate responders that will listen to\nthe selected address only."
+					"Selecting one of the addresses will restrict listening within\nthe responder to messages coming from that address only.\nHowever, an IP-address will only be listed if the program is\nalready receiving OSC messages from that address."
 				)
 			});
 
@@ -570,6 +570,10 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 						)
 					}
 				)
+			});
+
+			if(GUI.id !== \cocoa, {
+				portRestrictor.toolTip_("If clicked listening within in responders that get\ncreated after selecting an IP-address from the\ndrop-down on the left will also be restricted to\nthe port from which messages are sent.")
 			});
 
 			StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-20@40)
@@ -605,6 +609,12 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					})
 				})
 			;
+
+			if(GUI.id !== \cocoa, {
+				deviceListMenu.toolTip_(
+					"Select from the list of stored devices (e.g. a mobile controller).\nAfterwards you may select a command-name from the drop-\ndown on the right. If there are no devices listed you may add\nnew ones by clicking the green 'new' button on the right."
+				)
+			});
 
 			flow2.shift(0, 0);
 
@@ -642,6 +652,11 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			cmdNames.pairsDo({ |dev, cmds|
 				deviceListMenu.items = deviceListMenu.items ++ dev;
+			});
+
+			if(GUI.id !== \cocoa, {
+				cmdListMenu.toolTip_("If an IP-address has been selected in the drop-down above\nthis menu will list command-names coming in from that address.\nOtherwise select a device from the drop-down to the right and\nthis menu will list commands available for the selected device."
+				)
 			});
 
 			flow2.shift(0, 0);
