@@ -867,6 +867,7 @@ CVWidgetEditor {
 	amendActionsList { |widget, addRemove, name, action, slot, active|
 
 		var staticTextFont = Font("Arial", 10);
+		var actTop;
 
 		switch(addRemove,
 			\add, {
@@ -928,13 +929,27 @@ CVWidgetEditor {
 				;
 			},
 			\remove, {
+				actTop = actionsList[name].nameField.bounds.top;
 				[
 					actionsList[name].nameField,
 					actionsList[name].activate,
 					actionsList[name].removeBut,
 					actionsList[name].actionView
 				].do(_.remove);
-				flow3.reFlow(thisEditor[\tabs].views[3]);
+				actionsList.removeAt(name);
+				actionsList.pairsDo({ |actName, it|
+					if(it.nameField.bounds.top > actTop, {
+						#[nameField, activate, removeBut, actionView].do({ |name|
+							it[name].bounds_(Rect(
+								it[name].bounds.left,
+								it[name].bounds.top-76,
+								it[name].bounds.width,
+								it[name].bounds.height
+							))
+						})
+					})
+				});
+				flow3.top_(flow3.top-76);
 			}
 		)
 
