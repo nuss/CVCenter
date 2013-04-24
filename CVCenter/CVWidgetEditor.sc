@@ -670,7 +670,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			;
 
 			if(GUI.id !== \cocoa, {
-				addDeviceBut.toolTip_("Scan for incoming OSC-messages\nresp. their commandnames. These\ncan be saved to disk together with a\ndevice-name. You may then quickly\nselect from devices + commandnames\nfrom the dropdowns on the left.")
+				addDeviceBut.toolTip_("Scan for incoming OSC-messages\nresp. their command-names. These\ncan be saved to disk together with a\ndevice-name. You may then quickly\nselect devices + command-names\nfrom the dropdowns on the left.")
 			});
 
 			nameField = TextField(thisEditor[\tabs].views[2], flow2.bounds.width-60@15)
@@ -681,7 +681,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			;
 
 			if(GUI.id !== \cocoa, {
-				nameField.toolTip_("Enter a commandname manualy or first\nselect the device in the dropdown-\nmenu above and then a commandname.\nThe commandname will automatically\nbe filled in here");
+				nameField.toolTip_("Enter a command-name manualy or first\nselect the device in the dropdown-\nmenu above and then a command-name.\nThe command-name will automatically\nbe filled in here");
 			});
 
 			flow2.shift(5, 0);
@@ -751,6 +751,10 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					["calibrate", Color.white, Color.red]
 				])
 			;
+
+			if(GUI.id !== \cocoa, {
+				calibBut.toolTip_("As the range of incoming values may be unknown the\ncalibration provides a way to detect the constraints\nof incoming values. It may be useful in some cases\nto deactivate the mechanismand restrict the input to\na limited range.")
+			});
 
 			flow2.shift(0, 0);
 
@@ -1021,6 +1025,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 		var staticTextFont = Font("Arial", 9.4);
 		var textFieldFont = Font("Andale Mono", 9);
+		var actTop;
 
 		if(widget.class != CVWidgetMS, {
 			switch(addRemove,
@@ -1083,13 +1088,27 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					;
 				},
 				\remove, {
+					actTop = actionsList[name].nameField.bounds.top;
 					[
 						actionsList[name].nameField,
 						actionsList[name].activate,
 						actionsList[name].removeBut,
 						actionsList[name].actionView
 					].do(_.remove);
-					flow3.reFlow(thisEditor[\tabs].views[3]);
+					actionsList.removeAt(name);
+					actionsList.pairsDo({ |actName, it|
+						if(it.nameField.bounds.top > actTop, {
+							#[nameField, activate, removeBut, actionView].do({ |name|
+								it[name].bounds_(Rect(
+									it[name].bounds.left,
+									it[name].bounds.top-76,
+									it[name].bounds.width,
+									it[name].bounds.height
+								))
+							})
+						})
+					});
+					flow3.top_(flow3.top-76);
 				}
 			)
 		})

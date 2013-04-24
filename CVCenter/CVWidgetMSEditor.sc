@@ -761,7 +761,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			;
 
 			if(GUI.id !== \cocoa, {
-				addDeviceBut.toolTip_("Scan for incoming OSC-messages\nresp. their commandnames. These\ncan be saved to disk together with a\ndevice-name. You may then quickly\nselect from devices + commandnames\nfrom the dropdowns on the left.")
+				addDeviceBut.toolTip_("Scan for incoming OSC-messages\nresp. their command-names. These\ncan be saved to disk together with a\ndevice-name. You may then quickly\nselect devices + command-names\nfrom the dropdowns on the left.")
 			});
 
 			oscFlow0.shift(0, 0);
@@ -917,6 +917,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					)
 				})
 			;
+
+			if(GUI.id !== \cocoa, {
+				calibBut.toolTip_("As the range of incoming values may be unknown the\ncalibration provides a way to detect the constraints\nof incoming values. It may be useful in some cases\nto deactivate the mechanismand restrict the input to\na limited range.")
+			});
 
 			oscFlow0.shift(0, 0);
 
@@ -1239,6 +1243,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		var staticTextFont = Font("Arial", 9.4);
 		var textFieldFont = Font("Andale Mono", 9);
+		var actTop;
 
 		switch(addRemove,
 			\add, {
@@ -1297,15 +1302,30 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					.syntaxColorize
 					.editable_(false)
 				;
+
 			},
 			\remove, {
+				actTop = actionsList[name].nameField.bounds.top;
 				[
 					actionsList[name].nameField,
 					actionsList[name].activate,
 					actionsList[name].removeBut,
 					actionsList[name].actionView
 				].do(_.remove);
-				flow3.reFlow(thisEditor[\tabs].views[3]);
+				actionsList.removeAt(name);
+				actionsList.pairsDo({ |actName, it|
+					if(it.nameField.bounds.top > actTop, {
+						#[nameField, activate, removeBut, actionView].do({ |name|
+							it[name].bounds_(Rect(
+								it[name].bounds.left,
+								it[name].bounds.top-76,
+								it[name].bounds.width,
+								it[name].bounds.height
+							))
+						})
+					})
+				});
+				flow3.top_(flow3.top-76);
 			}
 		)
 
