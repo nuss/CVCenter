@@ -225,22 +225,22 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				widget.getSpec.default.size
 			].maxItem;
 
-			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@40)
+			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@43)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 //				.background_(Color.white)
-				.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\") or \\freq or [[20, 20, 20, 20, 20], [20000,\n20000, 20000, 20000, 20000], \\exp].asSpec. Or select a suitable ControlSpec from the List\nbelow. If you don't know what this all means have a look at the ControlSpec-helpfile.")
+				.string_("Enter a ControlSpec in the textfield: e.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\") or\n\\freq or[[20, 20, 20, 20, 20], [20000, 20000, 20000, 20000, 20000], \\exp].asSpec. Or select\na suitable ControlSpec from the List below.")
 			;
 
 			// flow0.shift(0, 2);
 
 			if(GUI.id == \cocoa, { tmp = "\n" }, { tmp = " " });
 
-			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@60)
+			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@85/*60*/)
 				.font_(staticTextFontBold)
 				.stringColor_(staticTextColor)
 //				.background_(Color.white)
-				.string_("NOTE: You may enter a Spec whose minvals, maxvals, step-sizes and/or default %values are arrays of the size of the number of sliders in the multislider. However, you may%provide a spec like 'freq' and its parameters will internally expanded to arrays of the required size. If you enter a Spec whose minvals, maxvals, step-sizes and/or default values are arrays of a different size than in the current spec the widget will get redimensioned to the size of the largest of these arrays.".format(tmp, tmp))
+				.string_("NOTE: You may enter a Spec whose minvals, maxvals, step-sizes and/or default values%are arrays of the size of the number of sliders in the multislider. However, a spec%may also be provided by its name, e.g. 'freq' and its parameters will internally%expanded to arrays of the required size. If you enter a Spec whose minvals, maxvals,%step-sizes and/or default values are arrays of a different size than in the current%spec the widget will get redimensioned to the size of the largest of these arrays.".format(tmp, tmp, tmp, tmp, tmp))
 			;
 
 			// flow0.shift(0, 2);
@@ -249,12 +249,13 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Enter the desired Spec and execute it by hitting shift+return.")
+//				.background_(Color.white)
 			;
 
 			// flow0.shift(0, 5);
 
 			cvString = widget.getSpec.asCompileString;
-			specField = TextView(thisEditor.tabs.views[0], flow0.bounds.width-20@70)
+			specField = TextView(thisEditor.tabs.views[0], flow0.bounds.width-20@48)
 				.font_(staticTextFont)
 				.string_(cvString)
 				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
