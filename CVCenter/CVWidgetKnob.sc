@@ -104,10 +104,10 @@ CVWidgetKnob : CVWidget {
 					if(editor.isClosed.not, {
 						editor.close;
 					}, {
-						if(CVWidgetEditor.allEditors.notNil and:{
-							CVWidgetEditor.allEditors[thisName.asSymbol].notNil;
+						if(AbstractCVWidgetEditor.allEditors.notNil and:{
+							AbstractCVWidgetEditor.allEditors[thisName.asSymbol].notNil;
 						}, {
-							CVWidgetEditor.allEditors.removeAt(thisName.asSymbol)
+							AbstractCVWidgetEditor.allEditors.removeAt(thisName.asSymbol)
 						})
 					})
 				})

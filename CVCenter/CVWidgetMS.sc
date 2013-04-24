@@ -138,12 +138,12 @@ CVWidgetMS : CVWidget {
 						if(editor.editors[slot].isClosed.not, {
 							editor.editors[slot].close(slot);
 						}, {
-							if(CVWidgetEditor.allEditors.notNil and:{
-								CVWidgetEditor.allEditors[thisName.asSymbol].notNil
+							if(AbstractCVWidgetEditor.allEditors.notNil and:{
+								AbstractCVWidgetEditor.allEditors[thisName.asSymbol].notNil
 							}, {
-								CVWidgetEditor.allEditors[thisName.asSymbol].removeAt(slot);
-								if(CVWidgetEditor.allEditors[thisName.asSymbol].isEmpty, {
-									CVWidgetEditor.allEditors.removeAt(thisName.asSymbol);
+								AbstractCVWidgetEditor.allEditors[thisName.asSymbol].removeAt(slot);
+								if(AbstractCVWidgetEditor.allEditors[thisName.asSymbol].isEmpty, {
+									AbstractCVWidgetEditor.allEditors.removeAt(thisName.asSymbol);
 								})
 							})
 						})
@@ -153,11 +153,11 @@ CVWidgetMS : CVWidget {
 					if(editor.msEditor.isClosed.not, {
 						editor.msEditor.close;
 					}, {
-						if(CVWidgetMSEditor.allEditors.notNil and:{
-							CVWidgetMSEditor.allEditors[(thisName.asString++"MS").asSymbol].notNil
+						if(AbstractCVWidgetEditor.allEditors.notNil and:{
+							AbstractCVWidgetEditor.allEditors[(thisName.asString++"MS").asSymbol].notNil
 						}, {
-							if(CVWidgetMSEditor.allEditors[(thisName.asString++"MS").asSymbol].isEmpty, {
-								CVWidgetMSEditor.allEditors.removeAt((thisName.asString++"MS").asSymbol);
+							if(AbstractCVWidgetEditor.allEditors[(thisName.asString++"MS").asSymbol].isEmpty, {
+								AbstractCVWidgetEditor.allEditors.removeAt((thisName.asString++"MS").asSymbol);
 							})
 						})
 					})
@@ -417,20 +417,17 @@ CVWidgetMS : CVWidget {
 			actionsBut
 		];
 
-//		msSize.do({ |slot|
-			guiEnv = (
-				msEditor: editor.msEditor,
-				editor: editor.editors,
-				mSlider: mSlider,
-				calibViews: calibViews,
-				numVal: numVal,
-				midiBut: midiBut,
-				oscBut: oscBut,
-				specBut: specBut,
-				actionsBut: actionsBut
-			);
-//			this.initControllerActions(slot);
-//		});
+		guiEnv = (
+			msEditor: editor.msEditor,
+			editor: editor.editors,
+			mSlider: mSlider,
+			calibViews: calibViews,
+			numVal: numVal,
+			midiBut: midiBut,
+			oscBut: oscBut,
+			specBut: specBut,
+			actionsBut: actionsBut
+		);
 
 		msSize.do({ |slot| this.initControllerActions(slot) });
 
@@ -440,4 +437,62 @@ CVWidgetMS : CVWidget {
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
 	}
+
+
+	open { |parent, wdgtBounds|
+		var thisWdgt, thisBounds;
+
+		if(parent.isNil, {
+			thisBounds = Rect(oldBounds.left, oldBounds.top, oldBounds.width-14, oldBounds.height-7);
+		}, {
+			if(wdgtBounds.isNil, { thisBounds = oldBounds });
+		});
+
+		if(this.notNil and:{ this.isClosed and:{ isPersistent }}, {
+			thisWdgt = this.class.new(
+				parent: parent,
+				cv: widgetCV,
+				name: oldName,
+				bounds: thisBounds,
+				setup: this.setup,
+				controllersAndModels: wdgtControllersAndModels,
+				cvcGui: (midiOscEnv: midiOscEnv),
+				numSliders: msSize,
+				persistent: true
+			).front;
+			msSize.do({ |slot|
+				thisWdgt.wdgtControllersAndModels.slots[slot].oscDisplay.model.value_(
+					wdgtControllersAndModels.slots[slot].oscDisplay.model.value
+				).changedKeys(synchKeys);
+				thisWdgt.wdgtControllersAndModels.slots[slot].midiOptions.model.value_(
+					wdgtControllersAndModels.slots[slot].midiOptions.model.value
+				).changedKeys(synchKeys);
+				thisWdgt.wdgtControllersAndModels.slots[slot].midiDisplay.model.value_(
+					wdgtControllersAndModels.slots[slot].midiDisplay.model.value
+				).changedKeys(synchKeys);
+				thisWdgt.wdgtControllersAndModels.actions.model.value_(
+					wdgtControllersAndModels.actions.model.value
+				).changedKeys(synchKeys);
+				thisWdgt.wdgtControllersAndModels.slots[slot].calibration.model.value_(
+					wdgtControllersAndModels.slots[slot].calibration.model.value
+				).changedKeys(synchKeys);
+			});
+			thisWdgt.window.onClose_(thisWdgt.window.onClose.addFunc({
+				msSize.do({ |slot|
+					// "thisWdgt.editor.editors[%]: %\n".postf(slot, thisWdgt.editor.editors[slot]);
+					thisWdgt.editor.editors[slot] !? {
+						if(thisWdgt.editor.editors[slot].isClosed.not, { thisWdgt.editor.editors[slot].close });
+					}
+				});
+				// "thisWdgt.editor.msEditor: %\n".postf(thisWdgt.editor.msEditor);
+				thisWdgt.editor.msEditor !? {
+					if(thisWdgt.editor.msEditor.isClosed.not, { thisWdgt.editor.msEditor.close });
+				}
+			}));
+			^thisWdgt;
+		}, {
+			"Either the widget you're trying to reopen hasn't been closed yet or it doesn't even exist.".warn;
+		})
+	}
+
 }

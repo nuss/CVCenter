@@ -142,12 +142,12 @@ CVWidget2D : CVWidget {
 						if(editor[hilo].isClosed.not, {
 							editor[hilo].close(hilo);
 						}, {
-							if(CVWidgetEditor.allEditors.notNil and:{
-								CVWidgetEditor.allEditors[thisName.asSymbol].notNil
+							if(AbstractCVWidgetEditor.allEditors.notNil and:{
+								AbstractCVWidgetEditor.allEditors[thisName.asSymbol].notNil
 							}, {
-								CVWidgetEditor.allEditors[thisName.asSymbol].removeAt(hilo);
-								if(CVWidgetEditor.allEditors[thisName.asSymbol].isEmpty, {
-									CVWidgetEditor.allEditors.removeAt(thisName.asSymbol);
+								AbstractCVWidgetEditor.allEditors[thisName.asSymbol].removeAt(hilo);
+								if(AbstractCVWidgetEditor.allEditors[thisName.asSymbol].isEmpty, {
+									AbstractCVWidgetEditor.allEditors.removeAt(thisName.asSymbol);
 								})
 							})
 						})

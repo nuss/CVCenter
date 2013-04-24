@@ -995,7 +995,11 @@ CVWidget {
 		if(isCVCWidget, {
 			// we're within a CVCenter-gui or some other gui
 			// -> a widget 'is closed' if its elements have been removed
-			if(allGuiEls.select({ |el| el.isClosed.not }).size == 0, { ^true }, { ^false });
+			if(allGuiEls.select({ |el|
+				if(el.class == List, {
+					el.select(_.isClosed).size == 0
+				}, { el.isClosed.not })
+			}).size == 0, { ^true }, { ^false });
 		}, {
 			// we just want to check for a single widget resp. its parent window
 			^window.isClosed;
