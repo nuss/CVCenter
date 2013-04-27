@@ -846,10 +846,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 //				.background_(Color.white)
 			;
 
-			StaticText(thisEditor.oscTabs.views[0], 60@30)
+			StaticText(thisEditor.oscTabs.views[0], 60@42)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("Multislider\nstart-index")
+				.string_("Multislider\nstart-index\n(offset)")
 //				.background_(Color.white)
 			;
 
@@ -1026,6 +1026,18 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			}, { oscDisconnectorBut.enabled_(false).states_([
 				[oscDisconnectorBut.states[0][0], oscDisconnectorBut.states[0][1], Color.blue(alpha: 0.5)]
 			]) });
+
+			if(GUI.id !== \cocoa, {
+				[connectorBut, oscDisconnectorBut].do({ |b|
+					if(b.enabled, {
+						b.toolTip_(
+							"Currently connected to external OSC-controllers: %".format(
+								if((tmp = widget.midiOscEnv.selectIndex({ |sl| sl.oscResponder.notNil })).size > 0, { tmp }, { "none" })
+							)
+						)
+					})
+				})
+			});
 
 			widget.msSize.do({ |sindex|
 				oscEditBtns.add(

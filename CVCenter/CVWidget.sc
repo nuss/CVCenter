@@ -2586,7 +2586,7 @@ CVWidget {
 						editEnabled: true
 					)
 				).changedKeys(synchKeys);
-			})
+			});
 		})
 	}
 
@@ -2729,6 +2729,20 @@ CVWidget {
 							thisGuiEnv.msEditor.nameField,
 							thisGuiEnv.msEditor.indexField
 						].do(_.enabled_(msEditEnabled));
+					});
+					if(GUI.id !== \cocoa, {
+						[
+							thisGuiEnv.msEditor.connectorBut,
+							thisGuiEnv.msEditor.oscDisconnectorBut
+						].do({ |b|
+							if(b.enabled, {
+								b.toolTip_(
+									"Currently connected to external OSC-controllers: %".format(
+										if((tmp = this.midiOscEnv.selectIndex({ |sl| sl.oscResponder.notNil })).size > 0, { tmp }, { "none" })
+									)
+								)
+							})
+						})
 					})
 				}
 			});
