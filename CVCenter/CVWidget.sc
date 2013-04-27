@@ -1870,6 +1870,7 @@ CVWidget {
 		var midiInitFunc, thisEditor;
 		// CVWidgetMS
 		var numMidiResponders, numMidiString, midiButBg, midiButTextColor;
+		var tmp;
 
 		midiInitFunc = { |val|
 			if(val.editor.notNil and:{ val.editor.isClosed.not }, {
@@ -2025,8 +2026,33 @@ CVWidget {
 									.stringColor_(Color.white)
 									.canFocus_(false)
 								;
+								if(theChanger.value.ctrl.class == String and:{
+									theChanger.value.ctrl.includes($:)
+								}, {
+									ctrlToolTip = theChanger.value.ctrl.split($:);
+									ctrlToolTip = ctrlToolTip[1]++" in bank "++ctrlToolTip[0];
+								}, { ctrlToolTip = theChanger.value.ctrl });
+								if(GUI.id !== \cocoa, {
+									thisGuiEnv.msEditor.midiEditGroups[slot].perform(el).toolTip_(
+										"currently connected to\ndevice-ID %,\non channel %,\ncontroller %".format(theChanger.value.src.asString, (theChanger.value.chan+1).asString, ctrlToolTip)
+									)
+								})
 							});
 							thisGuiEnv.msEditor.midiEditGroups[slot].midiLearn.value_(1);
+							if(GUI.id !== \cocoa, {
+								[
+									thisGuiEnv.msEditor.midiConnectorBut,
+									thisGuiEnv.msEditor.midiDisconnectorBut
+								].do({ |b|
+									if(b.enabled, {
+										b.toolTip_(
+											"Currently connected to external MIDI-controllers: %".format(
+												this.midiOscEnv.selectIndex({ |sl| sl.cc.notNil })
+											)
+										)
+									})
+								})
+							})
 						})
 					})
 				},
@@ -2236,6 +2262,27 @@ CVWidget {
 								])
 								.value_(0)
 							;
+							if(GUI.id !== \cocoa, {
+								if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
+								thisGuiEnv.msEditor.midiEditGroups[slot].midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
+								thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%".format(typeText));
+								thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%".format(typeText));
+								thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%".format(typeText));
+							});
+							if(GUI.id !== \cocoa, {
+								[
+									thisGuiEnv.msEditor.midiConnectorBut,
+									thisGuiEnv.msEditor.midiDisconnectorBut
+								].do({ |b|
+									if(b.enabled, {
+										b.toolTip_(
+											"Currently connected to external MIDI-controllers: %".format(
+												if((tmp = this.midiOscEnv.selectIndex({ |sl| sl.cc.notNil })).size > 0, { tmp }, { "none" })
+											)
+										)
+									})
+								})
+							})
 						})
 					})
 				}

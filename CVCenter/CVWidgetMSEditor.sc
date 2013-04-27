@@ -632,6 +632,18 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				[midiDisconnectorBut.states[0][0], midiDisconnectorBut.states[0][1], Color.blue]
 			]) });
 
+			if(GUI.id !== \cocoa, {
+				[midiConnectorBut, midiDisconnectorBut].do({ |b|
+					if(b.enabled, {
+						b.toolTip_(
+							"Currently connected to external MIDI-controllers: %".format(
+								if((tmp = widget.midiOscEnv.selectIndex({ |sl| sl.cc.notNil })).size > 0, { tmp }, { "none" })
+							)
+						)
+					})
+				})
+			});
+
 			widget.msSize.do({ |sl|
 				midiEditGroups.add(
 					CVMidiEditGroup(thisEditor.midiTabs.views[1], midiFlow1.bounds.width/5-10@39, widget, sl);

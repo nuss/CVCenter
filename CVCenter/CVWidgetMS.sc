@@ -130,6 +130,7 @@ CVWidgetMS : CVWidget {
 		}, {
 			window = parentView;
 		});
+		// window.acceptsMouseOver_(true);
 
 		cvcGui ?? {
 			window.onClose_({
@@ -436,6 +437,8 @@ CVWidgetMS : CVWidget {
 
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
+
+		// window.view.children.do(_.mouseOverAction_({ window.view.front.focus(true) }));
 	}
 
 
