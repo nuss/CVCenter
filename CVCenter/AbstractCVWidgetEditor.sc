@@ -17,7 +17,7 @@
 
 AbstractCVWidgetEditor {
 
-	classvar <allEditors, xySlots, nextX, nextY, shiftXY;
+	classvar <allEditors, xySlots, nextX, nextY, shiftXY, <>mouseOverToFront = false;
 	var thisEditor, <window, <tabs, editorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;

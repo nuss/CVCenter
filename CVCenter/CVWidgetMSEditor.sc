@@ -18,7 +18,7 @@
 CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 	var msEditorEnv;
-	var <extMidiCtrlArrayField, <midiConnectorBut, <midiDisconnectorBut;
+	var <extMidiCtrlArrayField, <msMidiIndexStartField, <midiConnectorBut, <midiDisconnectorBut;
 	var <oscDisconnectorBut;
 	var <extOscCtrlArrayField, <intStartIndexField;
 	var <oscEditBtns, <oscCalibBtns;
@@ -50,6 +50,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var tmp, tmpIP, tmpPortRestrictor, gapNextX, gapNextY;
 		var buildCheckbox, ddIPsItems, cmdPairs, dropDownIPs;
 		var connectWarning;
+		var mouseOverFunc;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -126,6 +127,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			window = Window("Widget Editor:"+widgetName, Rect(
 				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 400, 253
 			));
+
+			window.acceptsMouseOver_(true);
 
 			xySlots = xySlots.add([nextX@nextY, name]);
 			if(nextX+275 > Window.screenBounds.width, {
@@ -572,6 +575,24 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
+			msMidiIndexStartField = NumberBox(thisEditor.midiTabs.views[0], 25@15)
+				.font_(textFieldFont)
+				.background_(textFieldBg)
+				.stringColor_(textFieldFontColor)
+				.value_(0)
+				.clipLo_(0)
+				.clipHi_(widget.msSize-1)
+				.shift_scale_(1)
+				.ctrl_scale_(1)
+				.alt_scale_(1)
+				.step_(1.0)
+				.scroll_step_(1.0)
+			;
+
+			if(GUI.id !== \cocoa, {
+				msMidiIndexStartField.toolTip_("The (multi-)slider index at which to start connecting");
+			});
+
 			extMidiCtrlArrayField = TextField(thisEditor.midiTabs.views[0], midiFlow0.indentedRemaining.width-10@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
@@ -602,7 +623,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						extMidiCtrlArrayField.string.interpret.size
 					}, {
 						extMidiCtrlArrayField.string.interpret.do({ |ctrlNum, sl|
-							widget.midiConnect(midiUid, midiChan, ctrlNum.asInt, sl)
+							widget.midiConnect(midiUid, midiChan, ctrlNum.asInt, sl+msMidiIndexStartField.value)
 						})
 					})
 				})
@@ -812,6 +833,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.shift_scale_(1)
 				.ctrl_scale_(1)
 				.alt_scale_(1)
+				.step_(1.0)
+				.scroll_step_(1)
 				.value_(0)
 			;
 
@@ -1259,6 +1282,17 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			tabs.views[tab].background_(Color(0.8, 0.8, 0.8, 1.0));
 		};
 		thisEditor.window.front;
+
+		mouseOverFunc = { |view|
+			if(view.respondsTo(\mouseOverAction_), {
+				view.mouseOverAction_({ view.front.focus(true) });
+			});
+			if(view.children.size > 0, {
+				view.children.do({ |child| mouseOverFunc.(child) })
+			})
+		};
+
+		mouseOverFunc.(window.view);
 	}
 
 	// not to be used directly!

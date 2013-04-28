@@ -22,7 +22,7 @@ CVWidgetMS : CVWidget {
 	}
 
 	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, numSliders, server|
-		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
+		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize;
 		// hmmm...
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextX, nextY, knobX, knobY;
@@ -130,7 +130,7 @@ CVWidgetMS : CVWidget {
 		}, {
 			window = parentView;
 		});
-		// window.acceptsMouseOver_(true);
+		window.acceptsMouseOver_(true);
 
 		cvcGui ?? {
 			window.onClose_({
@@ -282,7 +282,7 @@ CVWidgetMS : CVWidget {
 		;
 
 		if(GUI.id !== \cocoa, { midiBut.toolTip_(
-			"Edit all MIDI-options\nof this widget.\nmidiMode:"+(
+			"Edit all MIDI-options of this widget.\nmidiMode:"+(
 				(0..msSize-1).collect(this.getMidiMode(_))
 			)++"\nmidiMean:"+(
 				(0..msSize-1).collect(this.getMidiMean(_))
@@ -438,9 +438,10 @@ CVWidgetMS : CVWidget {
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
 
-		// window.view.children.do(_.mouseOverAction_({ window.view.front.focus(true) }));
+		([window.view]++window.view.children).do(_.mouseOverAction_({
+			if(mouseOverToFront, { window.view.front.focus(true) })
+		}));
 	}
-
 
 	open { |parent, wdgtBounds|
 		var thisWdgt, thisBounds;

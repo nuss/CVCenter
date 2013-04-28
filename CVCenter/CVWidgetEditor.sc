@@ -37,6 +37,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var tmp, gapNextX, gapNextY;
 		var buildCheckbox, ddIPsItems, cmdPairs, dropDownIPs;
 		var connectIP, connectPort;
+		var mouseOverFunc;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -131,6 +132,8 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(
 				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 270, 253
 			));
+
+			window.acceptsMouseOver_(true);
 
 			xySlots = xySlots.add([nextX@nextY, name++slotHiLo]);
 			// [xySlots, nextX, nextY].postln;
@@ -529,14 +532,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					})
 				})
 			;
-
-			// OSC editting
-
-			// StaticText(thisEditor[\tabs].views[2], flow2.bounds.width-20@12)
-			// .font_(staticTextFont)
-			// .stringColor_(staticTextColor)
-			// .string_("device-IP/port")
-			// ;
 
 			deviceDropDown = PopUpMenu(thisEditor[\tabs].views[2], flow2.bounds.width-95@15)
 				.items_(["select IP-address... (optional)"])
@@ -1017,6 +1012,17 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			})
 		};
 		thisEditor.window.front;
+
+		mouseOverFunc = { |view|
+			if(view.respondsTo(\mouseOverAction_), {
+				view.mouseOverAction_({ view.front.focus(true) });
+			});
+			if(view.children.size > 0, {
+				view.children.do({ |child| mouseOverFunc.(child) })
+			})
+		};
+
+		mouseOverFunc.(window.view);
 	}
 
 	// not to be used directly!

@@ -18,7 +18,7 @@
 CVWidget {
 
 	classvar <>removeResponders, <>midiSources, midiStateObserver;
-	classvar <>debug = false;
+	classvar <>debug = false, <>mouseOverToFront = false;
 	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
@@ -62,7 +62,7 @@ CVWidget {
 		visible.switch(
 			false, {
 				visibleGuiEls.do({ |el|
-					if(el.isArray, {
+					if(el.isKindOf(Collection), {
 						el.do(_.visible_(true))
 					}, {
 						el.visible_(true)
@@ -72,7 +72,7 @@ CVWidget {
 			},
 			true, {
 				visibleGuiEls.do({ |el|
-					if(el.isArray, {
+					if(el.isKindOf(Collection), {
 						el.do(_.visible_(false))
 					}, {
 						el.visible_(false)
@@ -2304,7 +2304,29 @@ CVWidget {
 						midiButTextColor, // text
 						midiButBg // background
 					]]);
-
+					if((tmp = this.midiOscEnv.selectIndex({ |sl| sl.cc.notNil })).size > 0, {
+						if(GUI.id !== \cocoa, {
+							this.midiBut.toolTip_(
+								"Currently connected to external MIDI-controllers: %".format(tmp)
+							)
+						})
+					}, {
+						if(GUI.id !== \cocoa, {
+							this.midiBut.toolTip_(
+								"Edit all MIDI-options of this widget.\nmidiMode:"+(
+									(0..msSize-1).collect(this.getMidiMode(_))
+								)++"\nmidiMean:"+(
+									(0..msSize-1).collect(this.getMidiMean(_))
+								)++"\nmidiResolution:"+(
+									(0..msSize-1).collect(this.getMidiResolution(_))
+								)++"\nsoftWithin:"+(
+									(0..msSize-1).collect(this.getSoftWithin(_))
+								)++"\nctrlButtonBank:"+(
+									(0..msSize-1).collect(this.getCtrlButtonBank(_))
+								)
+							)
+						})
+					})
 				});
 				if(thisGuiEnv.msEditor.notNil and:{
 					thisGuiEnv.msEditor.isClosed.not
@@ -2430,7 +2452,7 @@ CVWidget {
 						)
 					});
 					if(GUI.id !== \cocoa, { thisGuiEnv.midiBut.toolTip_(
-						"Edit all MIDI-options\nof this widget.\nmidiMode:"+(
+						"Edit all MIDI-options of this widget.\nmidiMode:"+(
 							(0..msSize-1).collect(this.getMidiMode(_))
 						)++"\nmidiMean:"+(
 							(0..msSize-1).collect(this.getMidiMean(_))
