@@ -722,4 +722,19 @@ CVWidget2D : CVWidget {
 		})
 	}
 
+	background_ { |color|
+		this.bgColor = color;
+		widgetBg.background_(this.bgColor);
+		#[lo, hi].do({ |slot|
+			midiHead[slot].states_([
+				[midiHead[slot].states[0][0], midiHead[slot].states[0][1], this.bgColor]
+			]);
+			if(midiOscEnv[slot].oscResponder.isNil, {
+				oscEditBut[slot].states_([
+					[oscEditBut[slot].states[0][0], oscEditBut[slot].states[0][1], this.bgColor]
+				])
+			})
+		})
+	}
+
 }

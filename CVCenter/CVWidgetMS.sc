@@ -495,4 +495,19 @@ CVWidgetMS : CVWidget {
 		})
 	}
 
+	background_ { |color|
+		this.bgColor = color;
+		widgetBg.background_(this.bgColor);
+		if(midiOscEnv.select({ |wcm| wcm.cc.notNil }).size < 1, {
+			midiBut.states_([
+				[midiBut.states[0][0], midiBut.states[0][1], this.bgColor];
+			])
+		});
+		if(midiOscEnv.select({ |wcm| wcm.oscResponder.notNil }).size < 1, {
+			oscBut.states_([
+				[oscBut.states[0][0], oscBut.states[0][1], this.bgColor]
+			])
+		})
+	}
+
 }

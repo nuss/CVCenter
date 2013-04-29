@@ -107,6 +107,10 @@ CVWidget {
 		^Rect(this.widgetXY.x, this.widgetXY.y, this.widgetProps.x, this.widgetProps.y);
 	}
 
+	background {
+		^this.bgColor;
+	}
+
 	remove {
 		allGuiEls.do(_.remove);
 	}

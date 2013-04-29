@@ -516,7 +516,7 @@ CVCenter {
 								.font_(Font("Arial", 10))
 							;
 						);
-						cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+						cvWidgets[k].background_(tabProperties[cvTabIndex].tabColor);
 					// #[lo, hi].do({ |sl|
 					// 	[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b|
 					// 		{
@@ -567,7 +567,7 @@ CVCenter {
 							;
 						);
 						widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
-						cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+						cvWidgets[k].background_(tabProperties[cvTabIndex].tabColor);
 					// [cvWidgets[k].midiBut, cvWidgets[k].oscBut].do({ |b|
 					// 	{
 					// 		if(cvWidgets[k].wdgtControllersAndModels.slots.select({ |wcm| wcm.oscConnection.model.value !== false }).size > 0 and:{
@@ -608,7 +608,7 @@ CVCenter {
 							;
 						);
 						widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
-						cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+						cvWidgets[k].background_(tabProperties[cvTabIndex].tabColor);
 					// [cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b|
 					// 	{
 					// 		if(cvWidgets[k].wdgtControllersAndModels.oscConnection.model.value !== false and:{
