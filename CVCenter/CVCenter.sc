@@ -517,24 +517,6 @@ CVCenter {
 							;
 						);
 						cvWidgets[k].background_(tabProperties[cvTabIndex].tabColor);
-					// #[lo, hi].do({ |sl|
-					// 	[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b|
-					// 		{
-					// 			if(cvWidgets[k].wdgtControllersAndModels[sl].notNil and:{
-					// 				cvWidgets[k].wdgtControllersAndModels[sl].oscConnection.model.value !== false and:{
-					// 					b === cvWidgets[k].oscEditBut[sl]
-					// 				}
-					// 				}, {
-					// 					btnColor = Color.cyan(0.5);
-					// 				}, {
-					// 					btnColor = tabProperties[cvTabIndex].tabColor;
-					// 			});
-					// 			b.states_([
-					// 				[b.states[0][0], b.states[0][1], btnColor]
-					// 			])
-					// 		}.defer(0.1);
-					// 	})
-					// });
 						wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
 					}
 					{ #[minval, maxval, step, default].select({ |prop| orderedCVs[i].spec.perform(prop).isArray }).size > 0} {
@@ -568,20 +550,6 @@ CVCenter {
 						);
 						widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 						cvWidgets[k].background_(tabProperties[cvTabIndex].tabColor);
-					// [cvWidgets[k].midiBut, cvWidgets[k].oscBut].do({ |b|
-					// 	{
-					// 		if(cvWidgets[k].wdgtControllersAndModels.slots.select({ |wcm| wcm.oscConnection.model.value !== false }).size > 0 and:{
-					// 			b === cvWidgets[k].oscBut;
-					// 			}, {
-					// 				btnColor = Color.cyan(0.5);
-					// 			}, {
-					// 				btnColor = tabProperties[cvTabIndex].tabColor;
-					// 		});
-					// 		b.states_([
-					// 			[b.states[0][0], b.states[0][1], btnColor]
-					// 		])
-					// 	}.defer(0.1);
-					// });
 						wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
 					}
 					{
@@ -609,20 +577,6 @@ CVCenter {
 						);
 						widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 						cvWidgets[k].background_(tabProperties[cvTabIndex].tabColor);
-					// [cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b|
-					// 	{
-					// 		if(cvWidgets[k].wdgtControllersAndModels.oscConnection.model.value !== false and:{
-					// 			b === cvWidgets[k].oscEditBut;
-					// 			}, {
-					// 				btnColor = Color.cyan(0.5);
-					// 			}, {
-					// 				btnColor = tabProperties[cvTabIndex].tabColor;
-					// 		});
-					// 		b.states_([
-					// 			[b.states[0][0], b.states[0][1], btnColor]
-					// 		])
-					// 	}.defer(0.1);
-					// });
 						wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
 					}
 				;
