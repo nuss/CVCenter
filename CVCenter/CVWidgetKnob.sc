@@ -478,10 +478,6 @@ CVWidgetKnob : CVWidget {
 		this.initControllerActions;
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
-
-		([window.view]++window.view.children).do(_.mouseOverAction_({
-			if(mouseOverToFront, { window.view.front.focus(true) })
-		}));
 	}
 
 	open { |parent, wdgtBounds|

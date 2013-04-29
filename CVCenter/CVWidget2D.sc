@@ -40,6 +40,7 @@ CVWidget2D : CVWidget {
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, rightColumnX, oscEditButHeight, right, left;
 		var text, tActions;
+		var tmpWin;
 
 		this.bgColor ?? { this.bgColor_(Color.white) };
 		synchKeys ?? { synchKeys = [\default] };
@@ -669,10 +670,6 @@ CVWidget2D : CVWidget {
 
 		oldBounds = window.bounds;
 		if(window.respondsTo(\name), { oldName = window.name });
-
-		([window.view]++window.view.children).do(_.mouseOverAction_({
-			if(mouseOverToFront, { window.view.front.focus(true) })
-		}));
 	}
 
 	open { |parent, wdgtBounds|

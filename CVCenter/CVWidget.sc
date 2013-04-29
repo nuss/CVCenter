@@ -18,7 +18,7 @@
 CVWidget {
 
 	classvar <>removeResponders, <>midiSources, midiStateObserver;
-	classvar <>debug = false, <>mouseOverToFront = false;
+	classvar <>debug = false;
 	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;

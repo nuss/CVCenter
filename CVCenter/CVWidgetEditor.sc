@@ -1012,17 +1012,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			})
 		};
 		thisEditor.window.front;
-
-		mouseOverFunc = { |view|
-			if(view.respondsTo(\mouseOverAction_), {
-				view.mouseOverAction_({ view.front.focus(true) });
-			});
-			if(view.children.size > 0, {
-				view.children.do({ |child| mouseOverFunc.(child) })
-			})
-		};
-
-		mouseOverFunc.(window.view);
 	}
 
 	// not to be used directly!

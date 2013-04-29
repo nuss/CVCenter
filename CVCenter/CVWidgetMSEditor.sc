@@ -1282,17 +1282,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			tabs.views[tab].background_(Color(0.8, 0.8, 0.8, 1.0));
 		};
 		thisEditor.window.front;
-
-		mouseOverFunc = { |view|
-			if(view.respondsTo(\mouseOverAction_), {
-				view.mouseOverAction_({ view.front.focus(true) });
-			});
-			if(view.children.size > 0, {
-				view.children.do({ |child| mouseOverFunc.(child) })
-			})
-		};
-
-		mouseOverFunc.(window.view);
 	}
 
 	// not to be used directly!

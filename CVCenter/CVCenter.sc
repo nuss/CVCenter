@@ -539,6 +539,7 @@ CVCenter {
 					tmp = this.setup.calibrate = cvWidgets[k] !? {
 						cvWidgets[k].wdgtControllersAndModels.calibration.model.value;
 					};
+
 					wdgtActions = nil;
 					cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
 					cvWidgets[k] = CVWidgetKnob(
