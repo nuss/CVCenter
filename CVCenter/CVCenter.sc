@@ -145,7 +145,7 @@ CVCenter {
 
 	*makeWindow { |tab...cvs|
 		var flow, rowwidth, colcount;
-		var cvTabIndex, order, orderedCVs;
+		var cvTabIndex, order, orderedCVs, msSize;
 		var updateRoutine, lastUpdate, lastUpdateBounds, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
 		var lastCtrlBtnsMode, swFlow;
 		var thisNextPos, tabLabels, labelColors, unfocusedColors;
@@ -484,98 +484,148 @@ CVCenter {
 					thisNextPos = tabProperties[cvTabIndex].nextPos;
 				});
 
-				if(orderedCVs[i].class === Event and:{
-					orderedCVs[i].keys.includesAny(#[lo, hi])
-				}, {
-					tmp = (
-						lo: this.setup.calibrate = cvWidgets[k] !? {
-							cvWidgets[k].wdgtControllersAndModels.lo.calibration.model.value
-						},
-						hi: this.setup.calibrate = cvWidgets[k] !? {
-							cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value
-						}
-					);
-					wdgtActions = nil;
-					cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
-					cvWidgets[k] = CVWidget2D(
-						tabs.views[cvTabIndex],
-						[orderedCVs[i].lo, orderedCVs[i].hi],
-						k,
-						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight),
-						setup: tmp,
-						controllersAndModels: cvWidgets[k] !? {
-							(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi)
-						},
-						cvcGui: cvcArgs
-					);
-					removeButs.put(k,
-						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-							.states_([["remove", Color.white, Color(0, 0.15)]])
-							.action_({ |b| this.removeAt(k) })
-							.font_(Font("Arial", 10))
-						;
-					);
-					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
-					#[lo, hi].do({ |sl|
-						[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b|
-							{
-								if(cvWidgets[k].wdgtControllersAndModels[sl].notNil and:{
-									cvWidgets[k].wdgtControllersAndModels[sl].oscConnection.model.value !== false and:{
-										b === cvWidgets[k].oscEditBut[sl]
-									}
-								}, {
-									btnColor = Color.cyan(0.5);
-								}, {
-									btnColor = tabProperties[cvTabIndex].tabColor;
-								});
-								b.states_([
-									[b.states[0][0], b.states[0][1], btnColor]
-								])
-							}.defer(0.1);
-						})
-					});
-					wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
-				}, {
-					tmp = this.setup.calibrate = cvWidgets[k] !? {
-						cvWidgets[k].wdgtControllersAndModels.calibration.model.value;
-					};
+				case
+					{ orderedCVs[i].class === Event and:{
+						orderedCVs[i].keys.includesAny(#[lo, hi])
+					}} {
+						tmp = (
+							lo: this.setup.calibrate = cvWidgets[k] !? {
+								cvWidgets[k].wdgtControllersAndModels.lo.calibration.model.value
+							},
+							hi: this.setup.calibrate = cvWidgets[k] !? {
+								cvWidgets[k].wdgtControllersAndModels.hi.calibration.model.value
+							}
+						);
+						wdgtActions = nil;
+						cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
+						cvWidgets[k] = CVWidget2D(
+							tabs.views[cvTabIndex],
+							[orderedCVs[i].lo, orderedCVs[i].hi],
+							k,
+							Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight),
+							setup: tmp,
+							controllersAndModels: cvWidgets[k] !? {
+								(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi)
+							},
+							cvcGui: cvcArgs
+						);
+						removeButs.put(k,
+							Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+								.states_([["remove", Color.white, Color(0, 0.15)]])
+								.action_({ |b| this.removeAt(k) })
+								.font_(Font("Arial", 10))
+							;
+						);
+						cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+					// #[lo, hi].do({ |sl|
+					// 	[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b|
+					// 		{
+					// 			if(cvWidgets[k].wdgtControllersAndModels[sl].notNil and:{
+					// 				cvWidgets[k].wdgtControllersAndModels[sl].oscConnection.model.value !== false and:{
+					// 					b === cvWidgets[k].oscEditBut[sl]
+					// 				}
+					// 				}, {
+					// 					btnColor = Color.cyan(0.5);
+					// 				}, {
+					// 					btnColor = tabProperties[cvTabIndex].tabColor;
+					// 			});
+					// 			b.states_([
+					// 				[b.states[0][0], b.states[0][1], btnColor]
+					// 			])
+					// 		}.defer(0.1);
+					// 	})
+					// });
+						wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
+					}
+					{ #[minval, maxval, step, default].select({ |prop| orderedCVs[i].spec.perform(prop).isArray }).size > 0} {
+						"we have a CVWidgetMS".postln;
+						msSize = #[minval, maxval, step, default].collect({ |prop| orderedCVs[i].spec.perform(prop).size }).maxItem;
+						tmp = [];
+						msSize.do({ |sl|
+							tmp = tmp.add(
+								this.setup.calibrate = cvWidgets[k] !? {
+									cvWidgets[k].wdgtControllersAndModels.slots[sl].calibration.model.value;
+								}
+							)
+						});
+						wdgtActions = nil;
+						cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
+						cvWidgets[k] = CVWidgetMS(
+							tabs.views[cvTabIndex],
+							orderedCVs[i],
+							k,
+							Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52 * (msSize/15).ceil, widgetheight),
+							setup: tmp,
+							controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
+							cvcGui: cvcArgs
+						);
+						removeButs.put(k,
+							Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+								.states_([["remove", Color.white, Color(0.0, 0.15)]])
+								.action_({ |b| this.removeAt(k) })
+								.font_(Font("Arial", 10))
+							;
+						);
+						widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
+						cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+					// [cvWidgets[k].midiBut, cvWidgets[k].oscBut].do({ |b|
+					// 	{
+					// 		if(cvWidgets[k].wdgtControllersAndModels.slots.select({ |wcm| wcm.oscConnection.model.value !== false }).size > 0 and:{
+					// 			b === cvWidgets[k].oscBut;
+					// 			}, {
+					// 				btnColor = Color.cyan(0.5);
+					// 			}, {
+					// 				btnColor = tabProperties[cvTabIndex].tabColor;
+					// 		});
+					// 		b.states_([
+					// 			[b.states[0][0], b.states[0][1], btnColor]
+					// 		])
+					// 	}.defer(0.1);
+					// });
+						wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
+					}
+					{
+						tmp = this.setup.calibrate = cvWidgets[k] !? {
+							cvWidgets[k].wdgtControllersAndModels.calibration.model.value;
+						};
 
-					wdgtActions = nil;
-					cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
-					cvWidgets[k] = CVWidgetKnob(
-						tabs.views[cvTabIndex],
-						orderedCVs[i],
-						k,
-						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
-						setup: tmp,
-						controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
-						cvcGui: cvcArgs
-					);
-					removeButs.put(k,
-						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-							.states_([["remove", Color.white, Color(0.0, 0.15)]])
-							.action_({ |b| this.removeAt(k) })
-							.font_(Font("Arial", 10))
-						;
-					);
-					widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
-					cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
-					[cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b|
-						{
-							if(cvWidgets[k].wdgtControllersAndModels.oscConnection.model.value !== false and:{
-								b === cvWidgets[k].oscEditBut;
-							}, {
-								btnColor = Color.cyan(0.5);
-							}, {
-								btnColor = tabProperties[cvTabIndex].tabColor;
-							});
-							b.states_([
-								[b.states[0][0], b.states[0][1], btnColor]
-							])
-						}.defer(0.1);
-					});
-					wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
-				});
+						wdgtActions = nil;
+						cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
+						cvWidgets[k] = CVWidgetKnob(
+							tabs.views[cvTabIndex],
+							orderedCVs[i],
+							k,
+							Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
+							setup: tmp,
+							controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
+							cvcGui: cvcArgs
+						);
+						removeButs.put(k,
+							Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+								.states_([["remove", Color.white, Color(0.0, 0.15)]])
+								.action_({ |b| this.removeAt(k) })
+								.font_(Font("Arial", 10))
+							;
+						);
+						widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
+						cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
+					// [cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b|
+					// 	{
+					// 		if(cvWidgets[k].wdgtControllersAndModels.oscConnection.model.value !== false and:{
+					// 			b === cvWidgets[k].oscEditBut;
+					// 			}, {
+					// 				btnColor = Color.cyan(0.5);
+					// 			}, {
+					// 				btnColor = tabProperties[cvTabIndex].tabColor;
+					// 		});
+					// 		b.states_([
+					// 			[b.states[0][0], b.states[0][1], btnColor]
+					// 		])
+					// 	}.defer(0.1);
+					// });
+						wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
+					}
+				;
 
 				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 
