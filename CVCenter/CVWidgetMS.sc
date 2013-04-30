@@ -29,7 +29,7 @@ CVWidgetMS : CVWidget {
 		var calibViewsWidth, calibViewsNextX;
 		var text, tActions;
 
-		this.bgColor ?? { this.bgColor = Color.white };
+		background ?? { background = Color.white };
 		synchKeys ?? { synchKeys = [\default] };
 		#numOscResponders, numMidiResponders = 0!2;
 
@@ -184,7 +184,7 @@ CVWidgetMS : CVWidget {
 
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 //			.focusColor_(Color(alpha: 1.0))
-			.background_(this.bgColor)
+			.background_(background)
 		;
 		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
 			.states_([
@@ -255,7 +255,7 @@ CVWidgetMS : CVWidget {
 
 		midiBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
-				["MIDI"+"("++numMidiResponders++"/"++msSize++")", Color.black, this.bgColor]
+				["MIDI"+"("++numMidiResponders++"/"++msSize++")", Color.black, background]
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |mb|
@@ -302,7 +302,7 @@ CVWidgetMS : CVWidget {
 				})
 			}).mouseLeaveAction_({ |mb|
 				if(wdgtControllersAndModels.slots.select({ |slot| slot.midiConnection.model.value.isNil }).size == msSize, {
-					mb.states_([[mb.states[0][0], Color.black, this.bgColor]])
+					mb.states_([[mb.states[0][0], Color.black, background]])
 				})
 			})
 		});
@@ -310,7 +310,7 @@ CVWidgetMS : CVWidget {
 		nextX = thisXY.x+1+midiBut.bounds.width;
 		oscBut = Button(window, Rect(nextX, nextY, thisWidth-2/2, 15))
 			.states_([
-				["OSC"+"("++numOscResponders++"/"++msSize++")", Color.black, this.bgColor]
+				["OSC"+"("++numOscResponders++"/"++msSize++")", Color.black, background]
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |oscb|
@@ -346,7 +346,7 @@ CVWidgetMS : CVWidget {
 			}).mouseLeaveAction_({ |oscb|
 				// "oscb.states[0][0] on leave: %\n".postf(oscb.states[0][0]);
 				if(wdgtControllersAndModels.slots.select({ |slot| slot.oscConnection.model.value == false }).size == msSize, {
-					oscb.states_([[oscb.states[0][0], Color.black, this.bgColor]])
+					oscb.states_([[oscb.states[0][0], Color.black, background]])
 				})
 			})
 		});
@@ -496,16 +496,16 @@ CVWidgetMS : CVWidget {
 	}
 
 	background_ { |color|
-		this.bgColor = color;
-		widgetBg.background_(this.bgColor);
-		if(midiOscEnv.select({ |wcm| wcm.cc.notNil }).size < 1, {
+		background = color;
+		widgetBg.background_(background);
+		if(midiOscEnv.select({ |slot| slot.cc.notNil }).size < 1, {
 			midiBut.states_([
-				[midiBut.states[0][0], midiBut.states[0][1], this.bgColor];
+				[midiBut.states[0][0], midiBut.states[0][1], background]
 			])
 		});
-		if(midiOscEnv.select({ |wcm| wcm.oscResponder.notNil }).size < 1, {
+		if(midiOscEnv.select({ |slot| slot.oscResponder.notNil }).size < 1, {
 			oscBut.states_([
-				[oscBut.states[0][0], oscBut.states[0][1], this.bgColor]
+				[oscBut.states[0][0], oscBut.states[0][1], background]
 			])
 		})
 	}

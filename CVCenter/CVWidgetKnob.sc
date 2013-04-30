@@ -42,7 +42,7 @@ CVWidgetKnob : CVWidget {
 		var nextY, knobX, knobY;
 		var text, tActions;
 
-		this.bgColor ?? { this.bgColor = Color.white };
+		background ?? { background = Color.white };
 		synchKeys ?? { synchKeys = [\default] };
 
 		prCalibrate = true;
@@ -130,7 +130,7 @@ CVWidgetKnob : CVWidget {
 		persistent !? { if(persistent, { isPersistent = true }) };
 
 		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
-			.background_(this.bgColor)
+			.background_(background)
 		;
 		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
 			.states_([
@@ -206,7 +206,7 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+specBut.bounds.height+1;
 		midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
 			.font_(Font("Arial", 9))
-			.states_([["MIDI", Color.black, this.bgColor]])
+			.states_([["MIDI", Color.black, background]])
 			.action_({ |ms|
 				if(editor.isNil or:{ editor.isClosed }, {
 					editor = CVWidgetEditor(this, thisName, 1);
@@ -228,7 +228,7 @@ CVWidgetKnob : CVWidget {
 			midiHead.mouseEnterAction_({ |mb|
 				mb.states_([["MIDI", Color.white, Color.red]])
 			}).mouseLeaveAction_({ |mb|
-				mb.states_([["MIDI", Color.black, this.bgColor]])
+				mb.states_([["MIDI", Color.black, background]])
 			})
 		});
 
@@ -343,7 +343,7 @@ CVWidgetKnob : CVWidget {
 		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 25))
 			.font_(Font("Arial", 9))
 			.states_([
-				["edit OSC", Color.black, this.bgColor]
+				["edit OSC", Color.black, background]
 			])
 			.action_({ |oscb|
 				if(editor.isNil or:{ editor.isClosed }, {
@@ -374,7 +374,7 @@ CVWidgetKnob : CVWidget {
 				})
 			}).mouseLeaveAction_({ |oscb|
 				if(wdgtControllersAndModels.oscConnection.model.value === false, {
-					oscb.states_([["edit OSC", Color.black, this.bgColor]])
+					oscb.states_([["edit OSC", Color.black, background]])
 				})
 			})
 		});
@@ -527,14 +527,14 @@ CVWidgetKnob : CVWidget {
 	}
 
 	background_ { |color|
-		this.bgColor = color;
-		widgetBg.background_(this.bgColor);
+		background = color;
+		widgetBg.background_(background);
 		midiHead.states_([
-			[midiHead.states[0][0], midiHead.states[0][1], this.bgColor]
+			[midiHead.states[0][0], midiHead.states[0][1], background]
 		]);
 		if(midiOscEnv.oscResponder.isNil, {
 			oscEditBut.states_([
-				[oscEditBut.states[0][0], oscEditBut.states[0][1], this.bgColor]
+				[oscEditBut.states[0][0], oscEditBut.states[0][1], background]
 			])
 		})
 	}

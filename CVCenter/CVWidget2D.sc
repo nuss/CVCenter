@@ -42,7 +42,7 @@ CVWidget2D : CVWidget {
 		var text, tActions;
 		var tmpWin;
 
-		this.bgColor ?? { this.bgColor_(Color.white) };
+		background ?? { background_(Color.white) };
 		synchKeys ?? { synchKeys = [\default] };
 
 		if(GUI.id === \qt, {
@@ -328,13 +328,13 @@ CVWidget2D : CVWidget {
 		[midiHead.hi, nextY, midiHead.lo, nextY+52].pairsDo({ |k, v|
 			k.bounds_(Rect(rightColumnX, v, thisWidth-slider2d.bounds.width-2-12, 13))
 			.font_(Font("Arial", 7))
-			.states_([["MIDI", Color.black, this.bgColor]]);
+			.states_([["MIDI", Color.black, background]]);
 
 			if(GUI.id === \qt, {
 				k.mouseEnterAction_({ |mb|
 					mb.states_([["MIDI", Color.white, Color.red]])
 				}).mouseLeaveAction_({ |mb|
-					mb.states_([["MIDI", Color.black, this.bgColor]])
+					mb.states_([["MIDI", Color.black, background]])
 				})
 			})
 		});
@@ -511,7 +511,7 @@ CVWidget2D : CVWidget {
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, oscEditButHeight))
 			.font_(Font("Arial", 8.5))
 			.states_([
-				["edit OSC", Color.black, this.bgColor]
+				["edit OSC", Color.black, background]
 			])
 			.action_({ |oscb|
 				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {
@@ -541,7 +541,7 @@ CVWidget2D : CVWidget {
 					})
 				}).mouseLeaveAction_({ |oscb|
 					if(wdgtControllersAndModels[v[0]].oscConnection.model.value === false, {
-						oscb.states_([["edit OSC", Color.black, this.bgColor]])
+						oscb.states_([["edit OSC", Color.black, background]])
 					})
 				})
 			})
@@ -723,15 +723,15 @@ CVWidget2D : CVWidget {
 	}
 
 	background_ { |color|
-		this.bgColor = color;
-		widgetBg.background_(this.bgColor);
+		background = color;
+		widgetBg.background_(background);
 		#[lo, hi].do({ |slot|
 			midiHead[slot].states_([
-				[midiHead[slot].states[0][0], midiHead[slot].states[0][1], this.bgColor]
+				[midiHead[slot].states[0][0], midiHead[slot].states[0][1], background]
 			]);
 			if(midiOscEnv[slot].oscResponder.isNil, {
 				oscEditBut[slot].states_([
-					[oscEditBut[slot].states[0][0], oscEditBut[slot].states[0][1], this.bgColor]
+					[oscEditBut[slot].states[0][0], oscEditBut[slot].states[0][1], background]
 				])
 			})
 		})

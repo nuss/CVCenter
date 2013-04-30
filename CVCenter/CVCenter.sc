@@ -1306,25 +1306,7 @@ CVCenter {
 				}, {
 					widgetStates[k].tabIndex = cvTabIndex;
 				});
-				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
-				#[lo, hi].do({ |sl|
-					[cvWidgets[k].midiHead[sl], cvWidgets[k].oscEditBut[sl]].do({ |b|
-						{
-							if(cvWidgets[k].wdgtControllersAndModels[sl].notNil and:{
-								cvWidgets[k].wdgtControllersAndModels[sl].oscConnection.model.value !== false and:{
-									b === cvWidgets[k].oscEditBut[sl]
-								}
-							}, {
-								btnColor = Color.cyan(0.5);
-							}, {
-								btnColor = tabProperties[cvTabIndex].tabColor;
-							});
-							b.states_([
-								[b.states[0][0], b.states[0][1], btnColor]
-							])
-						}.defer(0.1);
-					})
-				});
+				cvWidgets[k].background_(tabProperties[cvTabIndex].tabColor);
 				tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 			}, {
 				tmp = this.setup.calibrate = cvWidgets[k] !? {
@@ -1353,21 +1335,7 @@ CVCenter {
 				});
 				cvWidgets[k].widgetCV !? { cvWidgets[k].widgetCV.value_(cvWidgets[k].widgetCV.value) };
 				widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
-				cvWidgets[k].bgColor_(tabProperties[cvTabIndex].tabColor);
-				[cvWidgets[k].midiHead, cvWidgets[k].oscEditBut].do({ |b|
-					{
-						if(cvWidgets[k].wdgtControllersAndModels.oscConnection.model.value !== false and:{
-							b === cvWidgets[k].oscEditBut;
-						}, {
-							btnColor = Color.cyan(0.5);
-						}, {
-							btnColor = tabProperties[cvTabIndex].tabColor;
-						});
-						b.states_([
-							[b.states[0][0], b.states[0][1], btnColor]
-						])
-					}.defer(0.1);
-				})
+				cvWidgets[k].background_(tabProperties[cvTabIndex].tabColor);
 			});
 			cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
 			colwidth = widgetwidth+1; // add a small gap between widgets
