@@ -42,7 +42,7 @@ CVWidget2D : CVWidget {
 		var text, tActions;
 		var tmpWin;
 
-		background ?? { background_(Color.white) };
+		background ?? { background = Color.white };
 		synchKeys ?? { synchKeys = [\default] };
 
 		if(GUI.id === \qt, {
