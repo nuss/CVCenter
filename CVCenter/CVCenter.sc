@@ -587,8 +587,6 @@ CVCenter {
 					}
 				;
 
-				cvWidgets[k].widgetBg.background_(tabProperties[cvTabIndex].tabColor);
-
 				switch(cvWidgets[k].class,
 					CVWidgetKnob, {
 						cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value_(

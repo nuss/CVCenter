@@ -1066,7 +1066,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				oscEditBtns.add(
 					Button(thisEditor.oscTabs.views[1], oscFlow1.bounds.width/5-10@25)
 						.states_([
-							[sindex.asString++": edit OSC", Color.black, Color.white(0.2)]
+							[sindex.asString++": edit OSC", Color.black, Color.white]
 						])
 						.font_(staticTextFont)
 						.action_({ |bt|

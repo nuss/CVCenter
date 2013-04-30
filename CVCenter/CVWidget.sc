@@ -2601,7 +2601,7 @@ CVWidget {
 				if(this.class == CVWidgetMS, { tmp = slot.asString++":"+tmp });
 				wcm.oscDisplay.model.value_(
 					(
-						but: [tmp, Color.black, background],
+						but: [tmp, Color.black, Color.white],
 						ipField: wcm.oscDisplay.model.value.ipField,
 						portField: wcm.oscDisplay.model.value.portField,
 						nameField: wcm.oscDisplay.model.value.nameField,
@@ -2675,7 +2675,10 @@ CVWidget {
 
 			if(window.isClosed.not, {
 				if(this.class != CVWidgetMS, {
-					thisGuiEnv.oscEditBut.states_([theChanger.value.but]);
+					if(midiOscEnv.oscResponder.isNil, { tmp = background }, { tmp = Color.cyan(0.5) });
+					thisGuiEnv.oscEditBut.states_([
+						[theChanger.value.but[0], theChanger.value.but[1], tmp]
+					]);
 					thisGuiEnv.oscEditBut.refresh;
 				}, {
 					numOscResponders = this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size;
@@ -2700,14 +2703,14 @@ CVWidget {
 					if(thisGuiEnv.msEditor.notNil and:{
 						thisGuiEnv.msEditor.isClosed.not
 					}, {
-						if(this.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size < msSize, {
+						if(this.midiOscEnv.select({ |sl| sl.oscResponder.notNil }).size < msSize, {
 							thisGuiEnv.msEditor.connectorBut.enabled_(true).states_([
 								[thisGuiEnv.msEditor.connectorBut.states[0][0], thisGuiEnv.msEditor.connectorBut.states[0][1], Color.red]
 							]);
 						}, { thisGuiEnv.msEditor.connectorBut.enabled_(false).states_([
 							[thisGuiEnv.msEditor.connectorBut.states[0][0], thisGuiEnv.msEditor.connectorBut.states[0][1], Color.red(alpha: 0.5)]
 						]) });
-						if(this.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size > 0, {
+						if(this.midiOscEnv.select({ |sl| sl.oscResponder.notNil }).size > 0, {
 							thisGuiEnv.msEditor.oscDisconnectorBut.enabled_(true).states_([
 								[thisGuiEnv.msEditor.oscDisconnectorBut.states[0][0], thisGuiEnv.msEditor.oscDisconnectorBut.states[0][1], Color.blue]
 							])
@@ -2738,7 +2741,7 @@ CVWidget {
 							})
 						});
 						thisOscEditBut.states_([theChanger.value.but]);
-						if(this.midiOscEnv.select({ |sl| sl[\oscResponder].notNil }).size < msSize, {
+						if(this.midiOscEnv.select({ |sl| sl.oscResponder.notNil }).size < msSize, {
 							msEditEnabled = true;
 						}, {
 							msEditEnabled = false;

@@ -535,7 +535,7 @@ CVWidgetKnob : CVWidget {
 		if(midiOscEnv.oscResponder.isNil, {
 			oscEditBut.states_([
 				[oscEditBut.states[0][0], oscEditBut.states[0][1], background]
-			])
+			]);
 		})
 	}
 
