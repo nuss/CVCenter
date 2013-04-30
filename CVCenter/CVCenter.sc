@@ -520,7 +520,6 @@ CVCenter {
 						wdgtActions !? { cvWidgets[k].wdgtActions = wdgtActions };
 					}
 					{ #[minval, maxval, step, default].select({ |prop| orderedCVs[i].spec.perform(prop).isArray }).size > 0} {
-						"we have a CVWidgetMS".postln;
 						msSize = #[minval, maxval, step, default].collect({ |prop| orderedCVs[i].spec.perform(prop).size }).maxItem;
 						tmp = [];
 						msSize.do({ |sl|
@@ -609,6 +608,20 @@ CVCenter {
 								activeActions: cvWidgets[k].wdgtActions[hilo].select({ |v| v.asArray[0][1] == true }).size
 							)).changedKeys(cvWidgets[k].synchKeys);
 						})
+					},
+					CVWidgetMS, {
+						cvWidgets[k].msSize.do({ |sl|
+							cvWidgets[k].wdgtControllersAndModels.slots[sl].midiDisplay.model.value_(
+								cvWidgets[k].wdgtControllersAndModels.slots[sl].midiDisplay.model.value
+							).changedKeys(cvWidgets[k].synchKeys);
+							cvWidgets[k].wdgtControllersAndModels.slots[sl].oscDisplay.model.value_(
+								cvWidgets[k].wdgtControllersAndModels.slots[sl].oscDisplay.model.value
+							).changedKeys(cvWidgets[k].synchKeys);
+						});
+						cvWidgets[k].wdgtControllersAndModels.actions.model.value_((
+							numActions: cvWidgets[k].wdgtActions.size,
+							activeActions: cvWidgets[k].wdgtActions.select({ |v| v.asArray[0][1] == true }).size
+						)).changedKeys(cvWidgets[k].synchKeys);
 					}
 				);
 
@@ -740,6 +753,12 @@ CVCenter {
 						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder.remove;
 						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder = nil;
 					}
+				})
+			},
+			CVWidgetMS, {
+				// if(cvWidgets[thisKey].editor
+				cvWidgets[thisKey].msSize.do({ |sl|
+
 				})
 			}
 		);

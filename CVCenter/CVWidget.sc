@@ -1087,7 +1087,7 @@ CVWidget {
 		wcm.oscDisplay.model ?? {
 			if(this.class == CVWidgetMS, { tmp = slot.asString++": edit OSC" }, { tmp = "edit OSC" });
 			wcm.oscDisplay.model = Ref((
-				but: [tmp, Color.black, this.bgColor],
+				but: [tmp, Color.black, background],
 				ipField: nil,
 				portField: nil,
 				nameField: "/my/cmd/name",
@@ -2296,7 +2296,7 @@ CVWidget {
 						midiButBg = Color.red;
 						midiButTextColor = Color.white;
 					}, {
-						midiButBg = this.bgColor;
+						midiButBg = background;
 						midiButTextColor = Color.black;
 					});
 					this.guiEnv[\midiBut].states_([[
@@ -2599,7 +2599,7 @@ CVWidget {
 				if(this.class == CVWidgetMS, { tmp = slot.asString++":"+tmp });
 				wcm.oscDisplay.model.value_(
 					(
-						but: [tmp, Color.black, this.bgColor],
+						but: [tmp, Color.black, background],
 						ipField: wcm.oscDisplay.model.value.ipField,
 						portField: wcm.oscDisplay.model.value.portField,
 						nameField: wcm.oscDisplay.model.value.nameField,
@@ -2682,7 +2682,7 @@ CVWidget {
 						oscButBg = Color.cyan(0.5);
 						oscButTextColor = Color.white;
 					}, {
-						oscButBg = this.bgColor;
+						oscButBg = background;
 						oscButTextColor = Color.black;
 					});
 					this.guiEnv[\oscBut].states_([[
