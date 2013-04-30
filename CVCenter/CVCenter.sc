@@ -416,8 +416,7 @@ CVCenter {
 			;
 
 			window.onClose_({
-				// "now closing".postln;
-				CVWidgetEditor.allEditors.pairsDo({ |editor, val|
+				AbstractCVWidgetEditor.allEditors.pairsDo({ |editor, val|
 					switch(cvWidgets[editor].class,
 						CVWidgetKnob, {
 							val.window.close;
@@ -426,6 +425,14 @@ CVCenter {
 							#[lo, hi].do({ |hilo|
 								val[hilo] !? { val[hilo].window.close };
 							})
+						},
+						CVWidgetMS, {
+							cvWidgets[editor].msSize.do({ |sl|
+								val[sl] !? { val[sl].window.close };
+							});
+							cvWidgets[editor].editor.msEditor !? {
+								cvWidgets[editor].editor.msEditor.window.close;
+							}
 						}
 					)
 				});

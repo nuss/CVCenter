@@ -188,8 +188,8 @@ CVWidgetMS : CVWidget {
 		;
 		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
 			.states_([
-				[""+thisName.asString, Color.white, Color.blue],
-				[""+thisName.asString, Color.black, Color.yellow],
+				[thisName.asString, Color.white, Color.blue],
+				[thisName.asString, Color.black, Color.yellow],
 			])
 			.font_(Font("Arial", 9))
 		;
