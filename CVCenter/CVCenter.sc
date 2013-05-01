@@ -25,6 +25,8 @@ CVCenter {
 	classvar widgetwidth, widgetheight=160, colwidth, rowheight;
 	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin, eqWin;
 	classvar prefs, boundsOnShutDown;
+	// CVWidgetMS: how many slots at max for one column
+	classvar <>numMsSlotsPerColumn = 15;
 
 	*initClass {
 		var newPrefs, newBounds;
@@ -538,11 +540,14 @@ CVCenter {
 						});
 						wdgtActions = nil;
 						cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { wdgtActions = cvWidgets[k].wdgtActions }};
+						if(msSize <= numMsSlotsPerColumn, { widgetwidth = 106 }, {
+							widgetwidth = (52*(msSize/numMsSlotsPerColumn).ceil)+1
+						});
 						cvWidgets[k] = CVWidgetMS(
 							tabs.views[cvTabIndex],
 							orderedCVs[i],
 							k,
-							Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52 * (msSize/15).ceil, widgetheight),
+							Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight),
 							setup: tmp,
 							controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 							cvcGui: cvcArgs
@@ -1371,11 +1376,14 @@ CVCenter {
 							}
 						)
 					});
+					if(msSize <= numMsSlotsPerColumn, { widgetwidth = 106 }, {
+						widgetwidth = (52*(msSize/numMsSlotsPerColumn).ceil)+1
+					});
 					cvWidgets[k] = CVWidgetMS(
 						tabs.views[cvTabIndex],
 						all[k],
 						k,
-						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52 * (msSize/15).ceil, widgetheight),
+						Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight),
 						setup: tmp.setup,
 						controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 						cvcGui: cvcArgs
@@ -1452,6 +1460,9 @@ CVCenter {
 	*prRegroupWidgets { |tabIndex|
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets, orderedRemoveButs;
 		var widgetwidth, widgetheight=160;
+		var wdgtMaxWidth;
+
+		wdgtMaxWidth = this.cvWidgets.collect({ |wdgt| wdgt.widgetProps.x+1 }).maxItem;
 
 		rowheight = widgetheight+1+15;
 		thisNextPos = 0@0;
@@ -1473,6 +1484,7 @@ CVCenter {
 						orderedRemoveButs[i].bounds.height
 					));
 					colwidth = orderedWidgets[i].widgetProps.x+1; // add a small gap to the right
+					"colwidth: %, name: %\n".postf(colwidth, k);
 					rowwidth = tabs.views[widgetStates[k].tabIndex].bounds.width/*-15*/;
 					if(thisNextPos.x+colwidth >= (rowwidth-colwidth/*-15*/), {
 						// jump to next row
