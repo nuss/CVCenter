@@ -241,17 +241,18 @@ CVWidgetMS : CVWidget {
 		nextY = nextY+2+1;
 
 		numVal = TextView(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
-		.string_(widgetCV.value.asCompileString).font_(Font("Arial", 9.5))
-		.keyDownAction_({ |nv, char, modifiers, unicode, keycode|
-			if(char == $\r and:{ modifiers == 131072 }, {
-				if(nv.string.interpret.class == Array and:{
-					nv.string.interpret.select(_.isNumber).size == mSlider.size
-				}, { nv.doAction })
+			.string_(widgetCV.value.asCompileString).font_(Font("Arial", 9.5))
+			.keyDownAction_({ |nv, char, modifiers, unicode, keycode|
+				if(char == $\r and:{ modifiers == 131072 }, {
+					if(nv.string.interpret.class == Array and:{
+						nv.string.interpret.select(_.isNumber).size == mSlider.size
+					}, { nv.doAction })
+				})
 			})
-		})
 		;
 
-		nextY = thisXY.y+numVal.bounds.top+numVal.bounds.height+1;
+		// nextY = thisXY.y+numVal.bounds.top+numVal.bounds.height+1;
+		nextY = numVal.bounds.top+numVal.bounds.height+1;
 
 		midiBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
