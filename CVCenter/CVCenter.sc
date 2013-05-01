@@ -448,7 +448,7 @@ CVCenter {
 						newPrefs.put(\guiProperties, prefs[\guiProperties]);
 						CVCenterPreferences.writePreferences(
 							newPrefs[\saveGuiProperties],
-							prefs[\guiProperties],
+							newPrefs[\guiProperties],
 							newPrefs[\saveClassVars],
 							newPrefs[\midiMode],
 							newPrefs[\midiResolution],
@@ -1407,7 +1407,9 @@ CVCenter {
 						cvcGui: cvcArgs
 					);
 					removeButs.put(k,
-						Button(tabs.views[cvTabIndex], Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+						Button(tabs.views[cvTabIndex], Rect(
+							thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15)
+						)
 							.states_([["remove", Color.white, Color(0.0, 0.15)]])
 							.action_({ |b| this.removeAt(k) })
 							.font_(Font("Arial", 10))
@@ -1447,7 +1449,7 @@ CVCenter {
 
 	*prRegroupWidgets { |tabIndex|
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets, orderedRemoveButs;
-		var widgetwidth, widgetheight=164;
+		var widgetwidth, widgetheight=160;
 
 		rowheight = widgetheight+1+15;
 		thisNextPos = 0@0;

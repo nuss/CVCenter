@@ -142,7 +142,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 
-			tabs = TabbedView(window, Rect(0, 1, window.bounds.width, window.bounds.height), ["Specs", "MIDI", "OSC", "Actions"], scroll: true);
+			tabs = TabbedView(window, Rect(0, 1, window.bounds.width, window.bounds.height), ["Spec", "MIDI", "OSC", "Actions"], scroll: true);
 			tabs.view.resize_(5);
 			tabs.tabCurve_(4);
 			tabs.labelColors_(Color.white!4);
