@@ -85,13 +85,39 @@ CVWidget {
 
 	widgetXY_ { |point|
 		var originXZero, originYZero;
-		originXZero = allGuiEls.collect({ |view| view.bounds.left });
-		originXZero = originXZero-originXZero.minItem;
-		originYZero = allGuiEls.collect({ |view| view.bounds.top });
-		originYZero = originYZero-originYZero.minItem;
+		originXZero = allGuiEls.collect({ |view|
+			if(view.class == List, {
+				view.collect({ |el| el.bounds.left })
+			}, { view.bounds.left });
+		});
+		originXZero = originXZero-originXZero.copy.takeThese({ |it| it.isArray }).minItem;
+		originYZero = allGuiEls.collect({ |view|
+			if(view.class == List, {
+				view.collect({ |el| el.bounds.top })
+			}, { view.bounds.top });
+		});
+		originYZero = originYZero-originYZero.copy.takeThese({ |it| it.isArray }).minItem;
 
 		allGuiEls.do({ |view, i|
-			view.bounds_(Rect(originXZero[i]+point.x, originYZero[i]+point.y, view.bounds.width, view.bounds.height));
+			if(view.class == List, {
+				view.do({ |el, j|
+					el.bounds_(
+						Rect(
+							originXZero[i][j]+point.x,
+							originYZero[i][j]+point.y,
+							el.bounds.width,
+							el.bounds.height
+						)
+					)
+				});
+			}, {
+				view.bounds_(Rect(
+					originXZero[i]+point.x,
+					originYZero[i]+point.y,
+					view.bounds.width,
+					view.bounds.height
+				))
+			})
 		})
 	}
 

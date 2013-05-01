@@ -1361,9 +1361,11 @@ CVCenter {
 				}
 				{ #[minval, maxval, step, default].select({ |prop| all[k].spec.perform(prop).isArray }).size > 0} {
 					msSize = #[minval, maxval, step, default].collect({ |prop| all[k].spec.perform(prop).size }).maxItem;
-					tmp = [];
+					tmp = (setup: [], wdgtActions: cvWidgets[k] !? {
+						cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions }
+					});
 					msSize.do({ |sl|
-						tmp = tmp.add(
+						tmp.setup = tmp.setup.add(
 							this.setup.calibrate = cvWidgets[k] !? {
 								cvWidgets[k].wdgtControllersAndModels.slots[sl].calibration.model.value;
 							}
@@ -1374,7 +1376,7 @@ CVCenter {
 						all[k],
 						k,
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52 * (msSize/15).ceil, widgetheight),
-						setup: tmp,
+						setup: tmp.setup,
 						controllersAndModels: cvWidgets[k] !? { cvWidgets[k].wdgtControllersAndModels },
 						cvcGui: cvcArgs
 					);
