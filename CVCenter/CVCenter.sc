@@ -193,6 +193,8 @@ CVCenter {
 				})
 			});
 
+			"tabProperties[0].nextPos: %\n".postf(tabProperties[0].nextPos);
+
 			tabLabels = tabProperties.collect(_.tabLabel);
 			labelColors = tabProperties.collect(_.tabColor);
 			unfocusedColors = tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) });
@@ -488,7 +490,7 @@ CVCenter {
 				});
 
 				if(tabProperties[cvTabIndex].nextPos.isNil, {
-					thisNextPos = 0@0;
+					tabProperties[cvTabIndex].nextPos = thisNextPos = 0@0;
 				}, {
 					thisNextPos = tabProperties[cvTabIndex].nextPos;
 				});
@@ -893,7 +895,7 @@ CVCenter {
 			})
 		};
 
-		all ? this.new;
+		this.new;
 
 		thisSlot !? {
 			widgetStates[thisKey] ?? { widgetStates.put(thisKey, ()) };
@@ -1325,6 +1327,7 @@ CVCenter {
 		tabs.unfocusedColors_(tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) }));
 
 		if(tabProperties[cvTabIndex].nextPos.notNil, {
+			"tabProperties[cvTabIndex].notNil".postln;
 			thisNextPos = tabProperties[cvTabIndex].nextPos;
 		}, {
 			thisNextPos = 0@0;
