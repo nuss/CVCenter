@@ -284,15 +284,15 @@ CVWidgetMS : CVWidget {
 
 		if(GUI.id !== \cocoa, { midiBut.toolTip_(
 			"Edit all MIDI-options of this widget.\nmidiMode:"+(
-				(0..msSize-1).collect(this.getMidiMode(_))
+				msSize.collect(this.getMidiMode(_))
 			)++"\nmidiMean:"+(
-				(0..msSize-1).collect(this.getMidiMean(_))
+				msSize.collect(this.getMidiMean(_))
 			)++"\nmidiResolution:"+(
-				(0..msSize-1).collect(this.getMidiResolution(_))
+				msSize.collect(this.getMidiResolution(_))
 			)++"\nsoftWithin:"+(
-				(0..msSize-1).collect(this.getSoftWithin(_))
+				msSize.collect(this.getSoftWithin(_))
 			)++"\nctrlButtonBank:"+(
-				(0..msSize-1).collect(this.getCtrlButtonBank(_))
+				msSize.collect(this.getCtrlButtonBank(_))
 			))
 		});
 

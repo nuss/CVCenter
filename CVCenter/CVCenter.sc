@@ -831,6 +831,7 @@ CVCenter {
 
 	*add { |key, spec, value, tab, slot|
 		var thisKey, thisSpec, thisVal, thisSlot, thisTab, widget2DKey;
+		var specName;
 
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		thisKey = key.asSymbol;
@@ -860,6 +861,25 @@ CVCenter {
 			})
 		});
 
+		// CVWidgetMS
+		if(spec.isArray.not, { thisSpec = spec.asSpec }, {
+			if(spec.select({ |sp| sp.asSpec.class == ControlSpec }).size > 0, {
+				thisSpec = ControlSpec(
+					spec.collect({ |sp| sp.asSpec.minval }),
+					spec.collect({ |sp| sp.asSpec.maxval }),
+					spec[0].asSpec.warp,
+					spec.collect({ |sp| sp.asSpec.step }),
+					spec.collect({ |sp| sp.asSpec.default })
+				);
+				if(thisSpec.hasZeroCrossing, { thisSpec.warp_(\lin) });
+				if(spec.asBag.contents.size == 1, {
+					if((specName = Spec.specs.findKeyForValue(spec[0].asSpec)).notNil, {
+						Spec.add((specName++"_"++spec.size).asSymbol, thisSpec);
+					})
+				})
+			})
+		});
+
 		tab !? {
 			if(widgetStates.notNil and:{
 				widgetStates[thisKey].notNil and:{
@@ -879,8 +899,6 @@ CVCenter {
 			widgetStates[thisKey] ?? { widgetStates.put(thisKey, ()) };
 			widgetStates[thisKey][thisSlot] ?? { widgetStates[thisKey].put(thisSlot, ()) };
 		};
-
-		thisSpec = spec.asSpec;
 
 		if(value.notNil and:{ value.isNumber }, {
 			thisVal = value;
