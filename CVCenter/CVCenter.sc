@@ -200,7 +200,7 @@ CVCenter {
 				})
 			});
 
-			"tabProperties: %\n".postf(tabProperties);
+			// "tabProperties: %\n".postf(tabProperties);
 
 			tabLabels = tabProperties.collect(_.tabLabel);
 			labelColors = tabProperties.collect(_.tabColor);
@@ -1090,6 +1090,35 @@ CVCenter {
 							),
 							wdgtClass: CVWidgetKnob
 						)
+					},
+					CVWidgetMS, {
+						lib[\all][k] = (
+							spec: cvWidgets[k].widgetCV.spec,
+							val: cvWidgets[k].widgetCV.value,
+							actions: cvWidgets[k].wdgtActions,
+							wdgtClass: CVWidgetMS
+							osc: ()!cvWidgets.msSize,
+							midi: ()!cvWidgets.msSize
+						);
+						cvWidgets[k].msSize.do({ |sl|
+							// osc
+							cvWidgets[k].midiOscEnv[sl].oscResponder !? {
+								lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.addr;
+								lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.cmdName;
+							};
+							lib[\all][k].osc[sl].msgIndex = cvWidgets[k].midiOscEnv[sl].oscMsgIndex;
+							lib[\all][k].osc[sl].calibConstraints = cvWidgets[k].getOscInputConstraints(sl);
+							lib[\all][k].osc[sl].oscMapping = cvWidgets[k].getOscMapping(sl);
+							// midi
+							lib[\all][k].midi[sl].src = cvWidgets[k].midiOscEnv[sl].midisrc;
+							lib[\all][k].midi[sl].chan = cvWidgets[k].midiOscEnv[sl].midichan;
+							lib[\all][k].midi[sl].num = cvWidgets[k].midiOscEnv[sl].midiRawNum;
+							lib[\all][k].midi[sl].midiMode = cvWidgets[k].getMidiMode(sl);
+							lib[\all][k].midi[sl].midiMean = cvWidgets[k].getMidiMean(sl);
+							lib[\all][k].midi[sl].softWithin = cvWidgets[k].getSoftWithin(sl);
+							lib[\all][k].midi[sl].midiResolution = cvWidgets[k].getMidiResolution(sl);
+							lib[\all][k].midi[sl].ctrlButtonBank = cvWidgets[k].getCtrlButtonBank(sl);
+						})
 					}
 				);
 				lib[\all][k].notes = cvWidgets[k].nameField.string;
@@ -1224,6 +1253,59 @@ CVCenter {
 									)
 								}
 							}
+						})
+					},
+					CVWidgetMS, {
+						this.add(key, v.spec, v.val, v.tabLabel);
+						cvWidgets[key].msSize.do({ |sl|
+							cvWidgets[key].setMidiMode(v.midi.midiMode, sl)
+								.setMidiMean(v.midi.midiMean, sl)
+								.setSoftWithin(v.midi.softWithin, sl)
+								.setMidiResolution(v.midi.midiResolution, sl)
+								.setCtrlButtonBank(v.midi.ctrlButtonBank, sl)
+							;
+						});
+						if(loadActions, {
+							v.actions !? {
+								v.actions.pairsDo({ |ak, av|
+									this.addActionAt(key, ak, av.asArray[0][0], active: av.asArray[0][1]);
+								})
+							}
+						});
+						if(autoConnectOSC, {
+							cvWidgets[key].msSize.do({ |sl|
+								v.osc[sl].cmdName !? {
+									cvWidgets[key].oscConnect(
+										v.osc.addr !? { v.osc.addr.ip },
+										v.osc.addr !? { v.osc.addr.port },
+										v.osc.cmdName,
+										v.osc.msgIndex,
+										sl
+									)
+								};
+								cvWidgets[key].setOscInputConstraints(
+									v.osc[sl].calibConstraints.lo @ v.osc[sl].calibConstraints.hi, sl
+								);
+								cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
+									[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
+								).changedKeys(cvWidgets[key].synchKeys);
+								cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl)
+							})
+						});
+						if(autoConnectMIDI, {
+							cvWidgets[key].msSize.do({ |sl|
+								v.midi[sl].num !? {
+									try {
+										cvWidgets[key].midiConnect(
+											// v.midi.src,
+											nil,
+											v.midi.chan,
+											v.midi.num,
+											slot:sl
+										)
+									}
+								}
+							})
 						})
 					}
 				);
@@ -1516,7 +1598,6 @@ CVCenter {
 						orderedRemoveButs[i].bounds.height
 					));
 					colwidth = orderedWidgets[i].widgetProps.x+1; // add a small gap to the right
-					"colwidth: %, name: %\n".postf(colwidth, k);
 					rowwidth = tabs.views[widgetStates[k].tabIndex].bounds.width/*-15*/;
 					if(thisNextPos.x+colwidth >= (rowwidth-colwidth/*-15*/), {
 						// jump to next row
