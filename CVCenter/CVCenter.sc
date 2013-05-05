@@ -95,6 +95,7 @@ CVCenter {
 		cvWidgets = IdentityDictionary.new;
 		widgetStates = IdentityDictionary.new;
 		removeButs = IdentityDictionary.new;
+		tabProperties = [];
 	}
 
 	*new { |cvs...setUpArgs|
@@ -107,7 +108,7 @@ CVCenter {
 			// removeButs = IdentityDictionary.new;
 			r = g = b = (0.6, 0.65 .. 0.75);
 			colors = List();
-			tabProperties = [];
+			// tabProperties = [];
 
 			if(setUpArgs.size > 0, {
 				this.prSetup(setUpArgs);
@@ -178,8 +179,14 @@ CVCenter {
 
 			if(tabProperties.size < 1, {
 				tabProperties = tabProperties.add(());
-				if(tab.isNil, { tabProperties[0].tabLabel = "default" }, { tabProperties[0].tabLabel = tab.asString });
+				if(tab.isNil, {
+					tabProperties[0].tabLabel = "default"
+				}, {
+					tabProperties[0].tabLabel = tab.asString
+				});
 				tabProperties[0].tabColor = nextColor.next;
+				// next position;
+				tabProperties[0].nextPos = (0@0);
 			}, {
 				if(tabProperties.size == 1 and:{
 					tabProperties[0].tabLabel == "default" and:{
@@ -193,7 +200,7 @@ CVCenter {
 				})
 			});
 
-			"tabProperties[0].nextPos: %\n".postf(tabProperties[0].nextPos);
+			"tabProperties: %\n".postf(tabProperties);
 
 			tabLabels = tabProperties.collect(_.tabLabel);
 			labelColors = tabProperties.collect(_.tabColor);
@@ -1326,10 +1333,12 @@ CVCenter {
 		tabs.labelColors_(tabProperties.collect(_.tabColor));
 		tabs.unfocusedColors_(tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) }));
 
-		if(tabProperties[cvTabIndex].nextPos.notNil, {
-			"tabProperties[cvTabIndex].notNil".postln;
+		// "tabProperties in *prAddToGui: %\n".postf(tabProperties);
+		if(tabProperties[cvTabIndex][\nextPos].notNil, {
+			// "tabProperties[cvTabIndex].notNil".postln;
 			thisNextPos = tabProperties[cvTabIndex].nextPos;
 		}, {
+				// "tabProperties[%].nextPos is nil?".postf(cvTabIndex);
 			thisNextPos = 0@0;
 		});
 
@@ -1462,7 +1471,8 @@ CVCenter {
 			rowwidth = tabs.views[cvTabIndex].bounds.width-15;
 			if(thisNextPos.x+colwidth >= (rowwidth-colwidth-15), {
 				// jump to next row
-				tabProperties[cvTabIndex].nextPos = thisNextPos = 0@(thisNextPos.y+rowheight);
+				thisNextPos = tabProperties[cvTabIndex].nextPos; //old
+				// tabProperties[cvTabIndex].nextPos = thisNextPos = 0@(thisNextPos.y+rowheight);
 			}, {
 				// add next widget to the right
 				tabProperties[cvTabIndex].nextPos = thisNextPos = thisNextPos.x+colwidth@(thisNextPos.y);
@@ -1472,6 +1482,7 @@ CVCenter {
 		});
 
 		widget2DKey !? {
+			// cvWidgets[k].background_(tabProperties[cvTabIndex].tabColor);
 			cvWidgets[widget2DKey.key].setSpec(widget2DKey.spec, widget2DKey.slot);
 		};
 		this.prRegroupWidgets(cvTabIndex);
