@@ -1368,6 +1368,7 @@ CVWidget {
 							if(thisGuiEnv.msEditor.notNil and:{
 								thisGuiEnv.msEditor.isClosed.not
 							}, {
+								"calibration for all slots deactivated".postln;
 								thisGuiEnv.msEditor.calibBut.states_([
 									["calibrating all", Color.black, Color.green],
 									["calibrate all", Color.white, Color.red]

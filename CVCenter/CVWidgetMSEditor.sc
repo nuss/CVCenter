@@ -954,7 +954,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			;
 
 			if(GUI.id !== \cocoa, {
-				calibBut.toolTip_("As the range of incoming values may be unknown the\ncalibration provides a way to detect the constraints\nof incoming values. It may be useful in some cases\nto deactivate the mechanismand restrict the input to\na limited range.")
+				calibBut.toolTip_("As the range of incoming values may be unknown the\ncalibration provides a way to detect the constraints\nof incoming values. It may be useful in some cases\nto deactivate the mechanism and restrict the input to\na limited range.")
 			});
 
 			oscFlow0.shift(0, 0);

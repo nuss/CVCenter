@@ -923,6 +923,7 @@ CVCenter {
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 			})
 		}, {
+			thisVal.postln;
 			all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) };
 		});
 
@@ -1259,10 +1260,10 @@ CVCenter {
 						this.add(key, v.spec, v.val, v.tabLabel);
 						cvWidgets[key].msSize.do({ |sl|
 							cvWidgets[key].setMidiMode(v.midi[sl].midiMode, sl)
-							.setMidiMean(v.midi[sl].midiMean, sl)
-							.setSoftWithin(v.midi[sl].softWithin, sl)
-							.setMidiResolution(v.midi[sl].midiResolution, sl)
-							.setCtrlButtonBank(v.midi[sl].ctrlButtonBank, sl)
+								.setMidiMean(v.midi[sl].midiMean, sl)
+								.setSoftWithin(v.midi[sl].softWithin, sl)
+								.setMidiResolution(v.midi[sl].midiResolution, sl)
+								.setCtrlButtonBank(v.midi[sl].ctrlButtonBank, sl)
 							;
 						});
 						if(loadActions, {
