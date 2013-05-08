@@ -1096,9 +1096,9 @@ CVCenter {
 							spec: cvWidgets[k].widgetCV.spec,
 							val: cvWidgets[k].widgetCV.value,
 							actions: cvWidgets[k].wdgtActions,
-							wdgtClass: CVWidgetMS
-							osc: ()!cvWidgets.msSize,
-							midi: ()!cvWidgets.msSize
+							wdgtClass: CVWidgetMS,
+							osc: ()!cvWidgets[k].msSize,
+							midi: ()!cvWidgets[k].msSize
 						);
 						cvWidgets[k].msSize.do({ |sl|
 							// osc
@@ -1258,11 +1258,11 @@ CVCenter {
 					CVWidgetMS, {
 						this.add(key, v.spec, v.val, v.tabLabel);
 						cvWidgets[key].msSize.do({ |sl|
-							cvWidgets[key].setMidiMode(v.midi.midiMode, sl)
-								.setMidiMean(v.midi.midiMean, sl)
-								.setSoftWithin(v.midi.softWithin, sl)
-								.setMidiResolution(v.midi.midiResolution, sl)
-								.setCtrlButtonBank(v.midi.ctrlButtonBank, sl)
+							cvWidgets[key].setMidiMode(v.midi[sl].midiMode, sl)
+							.setMidiMean(v.midi[sl].midiMean, sl)
+							.setSoftWithin(v.midi[sl].softWithin, sl)
+							.setMidiResolution(v.midi[sl].midiResolution, sl)
+							.setCtrlButtonBank(v.midi[sl].ctrlButtonBank, sl)
 							;
 						});
 						if(loadActions, {
@@ -1276,20 +1276,20 @@ CVCenter {
 							cvWidgets[key].msSize.do({ |sl|
 								v.osc[sl].cmdName !? {
 									cvWidgets[key].oscConnect(
-										v.osc.addr !? { v.osc.addr.ip },
-										v.osc.addr !? { v.osc.addr.port },
-										v.osc.cmdName,
-										v.osc.msgIndex,
+										v.osc[sl].addr !? { v.osc[sl].addr.ip },
+										v.osc[sl].addr !? { v.osc[sl].addr.port },
+										v.osc[sl].cmdName,
+										v.osc[sl].msgIndex,
 										sl
-									)
-								};
-								cvWidgets[key].setOscInputConstraints(
-									v.osc[sl].calibConstraints.lo @ v.osc[sl].calibConstraints.hi, sl
-								);
-								cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
-									[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
-								).changedKeys(cvWidgets[key].synchKeys);
-								cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl)
+									);
+									cvWidgets[key].setOscInputConstraints(
+										v.osc[sl].calibConstraints.lo @ v.osc[sl].calibConstraints.hi, sl
+									);
+									cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
+										[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
+									).changedKeys(cvWidgets[key].synchKeys);
+									cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl);
+								}
 							})
 						});
 						if(autoConnectMIDI, {
@@ -1299,9 +1299,9 @@ CVCenter {
 										cvWidgets[key].midiConnect(
 											// v.midi.src,
 											nil,
-											v.midi.chan,
-											v.midi.num,
-											slot:sl
+											v.midi[sl].chan,
+											v.midi[sl].num,
+											slot: sl
 										)
 									}
 								}

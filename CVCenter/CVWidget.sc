@@ -972,7 +972,7 @@ CVWidget {
 			CVWidgetMS, {
 				thisSlot = slot.asInt;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
-				this.editor = editor.editors[thisSlot];
+				thisEditor = editor.editors[thisSlot];
 			},
 			{
 				wcm = wdgtControllersAndModels;
