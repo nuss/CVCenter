@@ -909,8 +909,12 @@ CVCenter {
 			widgetStates[thisKey][thisSlot] ?? { widgetStates[thisKey].put(thisSlot, ()) };
 		};
 
-		if(value.notNil and:{ value.isNumber }, {
-			thisVal = value;
+		if(value.notNil, {
+			case
+				{ value.isNumber } { thisVal = value }
+				{ value.isArray and:{ value.select(_.isNumber).size == value.size }} { thisVal = value }
+				{ thisVal = thisSpec.default }
+			;
 		}, {
 			thisVal = thisSpec.default;
 		});
