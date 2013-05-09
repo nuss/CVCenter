@@ -2342,15 +2342,15 @@ CVWidget {
 						if(GUI.id !== \cocoa, {
 							this.midiBut.toolTip_(
 								"Edit all MIDI-options of this widget.\nmidiMode:"+(
-									(0..msSize-1).collect(this.getMidiMode(_))
+									msSize.collect(this.getMidiMode(_))
 								)++"\nmidiMean:"+(
-									(0..msSize-1).collect(this.getMidiMean(_))
+									msSize.collect(this.getMidiMean(_))
 								)++"\nmidiResolution:"+(
-									(0..msSize-1).collect(this.getMidiResolution(_))
+									msSize.collect(this.getMidiResolution(_))
 								)++"\nsoftWithin:"+(
-									(0..msSize-1).collect(this.getSoftWithin(_))
+									msSize.collect(this.getSoftWithin(_))
 								)++"\nctrlButtonBank:"+(
-									(0..msSize-1).collect(this.getCtrlButtonBank(_))
+									msSize.collect(this.getCtrlButtonBank(_))
 								)
 							)
 						})
@@ -2443,13 +2443,11 @@ CVWidget {
 							\midiModeSelect, {
 								if(tmp.minItem != tmp.maxItem, {
 									if(thisGuiEnv.msEditor.midiModeSelect.items.size == 2, {
-								// "midiModeSelect.items.size == 2, midiMode differs: %\n".postf(thisGuiEnv.msEditor.midiModeSelect.items.size);
 										thisGuiEnv.msEditor.midiModeSelect.items = thisGuiEnv.msEditor.midiModeSelect.items.add("--");
 									});
 									thisGuiEnv.msEditor.midiModeSelect.value_(2)
 								}, {
 									if(thisGuiEnv.msEditor.midiModeSelect.items.size == 3, {
-									// "midiModeSelect.items.size == 3, midiMode differs not: %\n".postf(thisGuiEnv.msEditor.midiModeSelect.items.last);
 										thisGuiEnv.msEditor.midiModeSelect.items.remove(
 											thisGuiEnv.msEditor.midiModeSelect.items.last
 										);
@@ -2457,7 +2455,6 @@ CVWidget {
 											thisGuiEnv.msEditor.midiModeSelect.items
 										)
 									});
-								// "und jetzt: % (midiMode: %)".postf(thisGuiEnv.msEditor.midiModeSelect.value, prMidiMode[slot]);
 									thisGuiEnv.msEditor.midiModeSelect.value_(prVal[slot]);
 								})
 							},
@@ -2481,15 +2478,15 @@ CVWidget {
 					});
 					if(GUI.id !== \cocoa, { thisGuiEnv.midiBut.toolTip_(
 						"Edit all MIDI-options of this widget.\nmidiMode:"+(
-							(0..msSize-1).collect(this.getMidiMode(_))
+							msSize.collect(this.getMidiMode(_))
 						)++"\nmidiMean:"+(
-							(0..msSize-1).collect(this.getMidiMean(_))
+							msSize.collect(this.getMidiMean(_))
 						)++"\nmidiResolution:"+(
-							(0..msSize-1).collect(this.getMidiResolution(_))
+							msSize.collect(this.getMidiResolution(_))
 						)++"\nsoftWithin:"+(
-							(0..msSize-1).collect(this.getSoftWithin(_))
+							msSize.collect(this.getSoftWithin(_))
 						)++"\nctrlButtonBank:"+(
-							(0..msSize-1).collect(this.getCtrlButtonBank(_))
+							msSize.collect(this.getCtrlButtonBank(_))
 						))
 					});
 					msSize.do({ |sl|
@@ -2513,6 +2510,7 @@ CVWidget {
 		};
 
 		wcm.oscConnection.controller.put(\default, { |theChanger, what, moreArgs|
+			// "prInitOscConnect: %\n".postf(theChanger);
 			if(debug, { "widget '%' (%) at slot '%' oscConnection.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			switch(prCalibrate.class,
@@ -2650,6 +2648,7 @@ CVWidget {
 		};
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
+			// "prInitOscDisplay: %\n".postf(theChanger);
 			if(debug, { "widget '%' (%) at slot '%' oscDisplay.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
 			switch(prCalibrate.class,
@@ -2676,7 +2675,7 @@ CVWidget {
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size > 0 and:{
 							this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size < msSize
 						}} {
-						thisGuiEnv.oscBut.toolTip_("partially connected - connected slots:\n"++this.midiOscEnv.selectIndex({ |it| it.oscResponder.notNil }))
+							thisGuiEnv.oscBut.toolTip_("partially connected - connected slots:\n"++this.midiOscEnv.selectIndex({ |it| it.oscResponder.notNil }))
 						}
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == msSize } {
 							thisGuiEnv.oscBut.toolTip_("all slots connected.\nClick to edit.")

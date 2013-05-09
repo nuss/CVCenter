@@ -72,6 +72,7 @@ CVWidget2D : CVWidget {
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
 		#[lo, hi].do({ |hilo|
 			midiOscEnv[hilo] ?? { midiOscEnv.put(hilo, ()) };
+			"midiOscEnv[%]: %\n".postf(hilo, midiOscEnv[hilo]);
 			midiOscEnv[hilo].oscMapping ?? { midiOscEnv[hilo].oscMapping = \linlin };
 		});
 

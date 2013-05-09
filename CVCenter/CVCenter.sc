@@ -932,7 +932,6 @@ CVCenter {
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 			})
 		}, {
-			thisVal.postln;
 			all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) };
 		});
 
@@ -1196,13 +1195,13 @@ CVCenter {
 										v[hilo].osc.msgIndex,
 										hilo
 									);
+									cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo);
 									cvWidgets[key].setOscInputConstraints(
 										v[hilo].osc.calibConstraints.lo @ v[hilo].osc.calibConstraints.hi, hilo
 									);
 									cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
 										[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
 									).changedKeys(cvWidgets[key].synchKeys);
-									cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo)
 								})
 							});
 							if(autoConnectMIDI, {
@@ -1243,13 +1242,13 @@ CVCenter {
 									v.osc.cmdName,
 									v.osc.msgIndex
 								);
+								cvWidgets[key].setOscMapping(v.osc.oscMapping);
 								cvWidgets[key].setOscInputConstraints(
 									v.osc.calibConstraints.lo @ v.osc.calibConstraints.hi
 								);
 								cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
 									[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
 								).changedKeys(cvWidgets[key].synchKeys);
-								cvWidgets[key].setOscMapping(v.osc.oscMapping)
 							}
 						});
 						if(autoConnectMIDI, {
@@ -1292,13 +1291,13 @@ CVCenter {
 										v.osc[sl].msgIndex,
 										sl
 									);
+									cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl);
 									cvWidgets[key].setOscInputConstraints(
 										v.osc[sl].calibConstraints.lo @ v.osc[sl].calibConstraints.hi, sl
 									);
 									cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
 										[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
 									).changedKeys(cvWidgets[key].synchKeys);
-									cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl);
 								}
 							})
 						});
