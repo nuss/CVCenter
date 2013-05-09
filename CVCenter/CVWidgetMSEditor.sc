@@ -51,6 +51,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var buildCheckbox, ddIPsItems, cmdPairs, dropDownIPs;
 		var connectWarning;
 		var mouseOverFunc;
+		var numCalibActive;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -951,6 +952,19 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						}
 					)
 				})
+			;
+
+			numCalibActive = widget.msSize.collect(widget.getCalibrate(_)).select(_ == true).size;
+
+			case
+				{ numCalibActive == 0 } { calibBut.value_(1) }
+				{ numCalibActive > 0 and:{ numCalibActive < widget.msSize-1 }} {
+					calibBut.states_([
+						["partially calibrating", calibBut.states[0][1], Color.yellow],
+						calibBut.states[1]
+					]).value_(0);
+				}
+				{ numCalibActive == widget.msSize } { calibBut.value_(0) }
 			;
 
 			if(GUI.id !== \cocoa, {

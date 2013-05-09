@@ -919,6 +919,11 @@ CVCenter {
 			thisVal = thisSpec.default;
 		});
 
+		// make sure the default value is suitable for multidimensional ControlSpecs
+		if([thisSpec.minval, thisSpec.maxval, thisSpec.step, thisSpec.default].select(_.isArray).size > 0, {
+			thisVal = thisVal.asArray;
+		});
+
 		if(thisSlot.notNil and:{ widgetStates[thisKey][thisSlot][\made] != true }, {
 			widgetStates[thisKey][thisSlot].made = true;
 			if(thisSlot === \lo or: { thisSlot === \hi }, {
