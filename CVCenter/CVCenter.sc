@@ -1033,7 +1033,7 @@ CVCenter {
 	}
 
 	*saveSetup { |path|
-		var lib, midiOscEnvs = (), successFunc;
+		var lib, successFunc;
 		successFunc = { |f|
 			lib = Library();
 			lib.put( \all, ());
@@ -1155,7 +1155,7 @@ CVCenter {
 	}
 
 	*loadSetup { |path, addToExisting=false, autoConnectOSC=true, autoConnectMIDI=true, loadActions=true|
-		var lib, midiOscEnvs, successFunc;
+		var lib, successFunc;
 
 		successFunc = { |f|
 			if(GUI.id === \qt, {

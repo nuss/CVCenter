@@ -458,7 +458,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				if(thisCtrlButtonBank.select(_.isInteger).size == widget.msSize and:{
 					thisCtrlButtonBank.minItem == thisCtrlButtonBank.maxItem;
 				}, {
-					ctrlButtonBankField.string_(thisMidiResolution[0].asString);
+					ctrlButtonBankField.string_(thisCtrlButtonBank[0].asString);
 				}, {
 					ctrlButtonBankField.string_("--");
 				})
