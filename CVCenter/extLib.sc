@@ -146,3 +146,23 @@
 	}
 
 }
+
++String {
+
+	findSpec {
+		var spec = this.asSymbol.asSpec;
+		spec ?? { spec = this.select(_.isAlpha).asSymbol.asSpec };
+		^spec;
+	}
+
+}
+
++Symbol {
+
+	findSpec {
+		var spec = this.asSpec;
+		spec ?? { spec = this.asString.select(_.isAlpha).asSymbol.asSpec };
+		^spec;
+	}
+
+}

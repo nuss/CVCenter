@@ -25,25 +25,28 @@ CVWidgetSpecsEditor {
 	init { |displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment|
 		var object;
 		var wdgtName, windowTitle;
-		var specsList, specsListSpecs, selectMatch;
-		var cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect, enterTabRect;
+		var specsList, specsListSpecs, selectMatch, thisSpec;
+		var cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect, wdgtTypeRect, enterTabRect;
 		var staticTextFont, staticTextColor, textFieldFont, selectFont, textFieldFontColor, textFieldBg;
 		var formEls, nameStr, makeLine, sendBut, cancelBut;
 		var flow, lines, allEls, allWidth;
 		var cMatrix, specName, prefSpecName, made;
 
+		"args passed in: %\n".postf([displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment]);
+
 		object = obj;
 
-		#cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect, enterTabRect = Rect.new!5;
-		[cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect, enterTabRect].do({ |e|
+		#cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect, wdgtTypeRect, enterTabRect = Rect.new!6;
+		[cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect, wdgtTypeRect, enterTabRect].do({ |e|
 			e.height_(20).left_(0).top_(0);
 		});
 		[cNameRect, cNameEnterTextRect, enterTabRect].do({ |e| e.width_(70) });
 
 		specSelectRect.width_(240);
 		specEnterTextRect.width_(160);
+		wdgtTypeRect.width_(100);
 
-		allEls = [cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect];
+		// allEls = [cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect];
 
 		staticTextFont = Font("Arial", 10);
 		staticTextColor = Color(0.2, 0.2, 0.2);
@@ -75,15 +78,15 @@ CVWidgetSpecsEditor {
 		);
 
 		window = Window("Specs:"+windowTitle, Rect(
-			(Window.screenBounds.width-650).div(2),
+			(Window.screenBounds.width-745).div(2),
 			(Window.screenBounds.height-(lines * 25 + 65)).div(2),
-			650,
+			745,
 			lines * 25 + 65
-		), scroll: true).userCanClose_(false);
+		), scroll: true);
 
 		window.view.decorator = flow = FlowLayout(window.bounds.insetBy(5));
 		flow.margin_(4@0);
-		flow.gap_(0@4);
+		flow.gap_(2@2);
 
 		flow.shift(0, 0);
 		StaticText(window, cNameRect)
@@ -91,25 +94,31 @@ CVWidgetSpecsEditor {
 			.string_(" argname(s)")
 		;
 
-		flow.shift(5, 0);
+		// flow.shift(2, 0);
 		StaticText(window, cNameEnterTextRect)
 			.font_(staticTextFont)
 			.string_(" widget-key")
 		;
 
-		flow.shift(5, 0);
+		// flow.shift(2, 0);
 		StaticText(window, specEnterTextRect)
 			.font_(staticTextFont)
 			.string_(" enter a ControlSpec")
 		;
 
-		flow.shift(5, 0);
+		// flow.shift(2, 0);
 		StaticText(window, specSelectRect)
 			.font_(staticTextFont)
 			.string_(" or select an existing one")
 		;
 
-		flow.shift(5, 0);
+		// flow.shift(2, 0);
+		StaticText(window, wdgtTypeRect)
+			.font_(staticTextFont)
+			.string_(" widget-type")
+		;
+
+		// flow.shift(2, 0);
 		StaticText(window, enterTabRect)
 			.font_(staticTextFont)
 			.string_(" tab-name")
@@ -127,6 +136,9 @@ CVWidgetSpecsEditor {
 		#formEls, cMatrix = ()!2;
 
 		makeLine = { |elem, cname, size, pairs2D, prefix|
+
+			"cname: %\n".postf(cname);
+
 			if(elem.type.notNil, {
 				switch(elem.type,
 					\w2d, {
@@ -161,26 +173,24 @@ CVWidgetSpecsEditor {
 				.string_(nameStr)
 			;
 
-			flow.shift(5, 0);
+			// flow.shift(2, 0);
 			elem.cName = TextField(window, cNameEnterTextRect)
 				.font_(textFieldFont)
 				.string_(prefSpecName ? specName)
 				.background_(textFieldBg)
 			;
 
-			flow.shift(5, 0);
+			// flow.shift(2, 0);
 			elem.specEnterText = TextField(window, specEnterTextRect)
 				.font_(textFieldFont)
 				.background_(textFieldBg)
 			;
 
-			if(cname.asSymbol.asSpec.notNil and:{
-				cname.asSymbol.asSpec.isKindOf(ControlSpec)
-			}, {
-				elem.specEnterText.string_(cname.asSymbol.asSpec.asCompileString)
-			});
+			cname.findSpec !? {
+				elem.specEnterText.string_(cname.findSpec.asCompileString)
+			};
 
-			flow.shift(5, 0);
+			// flow.shift(2, 0);
 			elem.specSelect = PopUpMenu(window, specSelectRect)
 				.items_(specsList)
 				.font_(selectFont)
@@ -189,7 +199,7 @@ CVWidgetSpecsEditor {
 				})
 			;
 
-			selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == cname.asSymbol.asSpec });
+			selectMatch = specsListSpecs.detectIndex({ |ispec, i| ispec == cname.findSpec });
 			selectMatch !? { elem.specSelect.value_(selectMatch) };
 
 			metadata !? {
@@ -246,7 +256,25 @@ CVWidgetSpecsEditor {
 				}
 			};
 
-			flow.shift(5, 0);
+			// flow.shift(2, 0);
+			elem.wdgtType = PopUpMenu(window, wdgtTypeRect)
+				.items_(["CVWidgetKnob"])
+				.font_(selectFont)
+			// .action_({ |dd|
+			//
+			// })
+			;
+
+			case
+				{ controls[cname].size == 2 } {
+					elem.wdgtType.items_(elem.wdgtType.items.add("CVWidget2D")).value_(1)
+				}
+				{ controls[cname].size > 2 } {
+					elem.wdgtType.items_(elem.wdgtType.items.add("CVWidgetMS")).value_(1)
+				}
+			;
+
+			// flow.shift(2, 0);
 			elem.enterTab = TextField(window, enterTabRect)
 				.font_(textFieldFont)
 				.background_(textFieldBg)
@@ -285,6 +313,7 @@ CVWidgetSpecsEditor {
 
 			pairs2D !? {
 				pairs2D.pairsDo({ |k, pair|
+					"pair: %, val: %, made: %\n".postf(pair, val, made);
 					if(pair.includes(cname) and:{
 						val.class !== Array and:{
 							made.includes(cname).not
@@ -295,6 +324,9 @@ CVWidgetSpecsEditor {
 						formEls[cname].slots = [controls[pair[0]], controls[pair[1]]];
 						formEls[cname].controls = pair;
 						makeLine.(formEls[cname], pair[0]++"/"++pair[1], pairs2D: pairs2D, prefix: prefix);
+						formEls[cname].wdgtType.items_(
+							formEls[cname].wdgtType.items.add("CVWidget2D")
+						).value_(1);
 						made = made.add(pair[0]);
 						made = made.add(pair[1]);
 					})
@@ -312,7 +344,7 @@ CVWidgetSpecsEditor {
 
 //		cMatrix.postln;
 
-		allWidth = allEls.collect({ |e| e.width }).sum + (allEls.size-1*5);
+		// allWidth = allEls.collect({ |e| e.width }).sum + (allEls.size-1*5);
 
 		flow.shift(20, 10);
 		cancelBut = Button(window, Rect(0, 0, 65, 20))
@@ -320,12 +352,14 @@ CVWidgetSpecsEditor {
 			.action_({ |cb|  window.close })
 		;
 
-		flow.shift(5, 0);
+		// flow.shift(2, 0);
 		sendBut = Button(window, Rect(0, 0, 65, 20))
 			.states_([[ "gui", Color.white, Color.red ]])
 			.action_({ |sb|
 				formEls.pairsDo({ |el, vals|
 					vals = vals.collect(_.value);
+					if(vals.wdgtType == 0, { vals.type = nil });
+				// "vals: %\n".postf(vals);
 					vals.specSelect = specsListSpecs[vals.specSelect];
 					vals = vals.collect({ |val| if(val == "", { nil }, { val }) });
 					CVCenter.finishGui(obj, el, environment, vals);
