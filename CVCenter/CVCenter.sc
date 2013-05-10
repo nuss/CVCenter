@@ -1737,31 +1737,11 @@ CVCenter {
 						})
 					}, {
 						this.addActionAt(more.cName, \default, "{ |cv| Server('"++obj.server++"').sendBundle("++obj.server.latency++", ['/n_setn', "++obj.nodeID++", '"++ctrlName++"', "++more.slots.size++", cv.value]) }");
-					});
-						// more.slots.do({ |sl, i|
-						// 	this.add(more.cName.asString++(i+1), thisSpec, sl, more.enterTab);
-						// 	wms = [];
-						// 	more.slots.size.do({ |j|
-						// 		if(this.at((more.cName.asString++(j+1)).asSymbol) === this.at((more.cName.asString++(i+1)).asSymbol), {
-						// 			wms = wms.add("cv.value");
-						// 		}, {
-						// 			wms = wms.add("CVCenter.at('"++more.cName.asString++(j+1)++"').value")
-						// 		})
-						// 	});
-						// 	if(varNames.size > 0, {
-						// 		varNames.do({ |v, j|
-						// 			actionName = "default"++(j+1);
-						// 			if(j == 0, { activate = true }, { activate = false });
-						// 			this.addActionAt(more.cName.asString++(i+1), actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', ["++(wms.join(", "))++"]) }}", active: activate);
-						// 		})
-						// 		}, {
-						// 			this.addActionAt(more.cName.asString++(i+1), actionName, "{ |cv| Server('"++obj.server++"').sendBundle("++obj.server.latency++", ['/n_setn', "++obj.nodeID++", '"++ctrlName++"', "++wms.size++", "++wms.join(", ")++"]) }");
-						// 	})
-						// })
+					})
 				})
 			})
 		}, {
-				// "varNames: %, more: %\n".postf(varNames, more);
+			// "varNames: %, more: %\n".postf(varNames, more);
 			addActionFunc = {
 				if(varNames.size > 0, {
 					varNames.do({ |v, j|
@@ -1804,56 +1784,12 @@ CVCenter {
 						this.add(more.cName++sl, thisSpec, more.slots[k], more.enterTab);
 					});
 					addActionFunc.value;
-					// if(varNames.size > 0, {
-					// 	varNames.do({ |v, j|
-					// 		// "varNames: %\n".postf(v);
-					// 		actionName = "default"++(j+1);
-					// 		if(j == 0, { activate = true }, { activate = false });
-					// 		if(more.controls.notNil and:{ more.controls.size > 1 }, {
-					// 			this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".set('"++ctrlName++"', cv.value) }}", active: activate);
-					// 			}, {
-					// 				wms = [];
-					// 				more.slots.size.do({ |i|
-					// 					if(this.at((more.cName.asString++(i+1)).asSymbol) === this.at((more.cName.asString++(i+1)).asSymbol), {
-					// 						wms = wms.add("cv.value");
-					// 						}, {
-					// 							wms = wms.add("CVCenter.at('"++more.cName.asString++(i+1)++"').value")
-					// 					})
-					// 				});
-					// 				this.addActionAt(more.cName.asString++(j+1), actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', ["++(wms.join(", "))++"]) }}", active: activate);
-					// 		})
-					// 		}, {
-					// 			this.addActionAt(more.cName, actionName, "{ |cv| Server('"++obj.server++"').sendBundle("++obj.server.latency++", ['/n_setn', "++obj.nodeID++", '"++ctrlName++"', 1, cv.value]) }");
-					// 	})
-					// })
 				}
 				{ more.slots.size > 2 } {
 					more.slots.size.do({ |sl|
 						this.add(more.cName++sl, thisSpec, more.slots[sl], more.enterTab);
 					});
 					addActionFunc.value;
-					// if(varNames.size > 0, {
-					// 	varNames.do({ |v, j|
-					// 		// "varNames: %\n".postf(v);
-					// 		actionName = "default"++(j+1);
-					// 		if(j == 0, { activate = true }, { activate = false });
-					// 		if(more.controls.notNil and:{ more.controls.size > 1 }, {
-					// 			this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".set('"++ctrlName++"', cv.value) }}", active: activate);
-					// 			}, {
-					// 				wms = [];
-					// 				more.slots.size.do({ |i|
-					// 					if(this.at((more.cName.asString++(j+1)).asSymbol) === this.at((more.cName.asString++(i+1)).asSymbol), {
-					// 						wms = wms.add("cv.value");
-					// 						}, {
-					// 							wms = wms.add("CVCenter.at('"++more.cName.asString++(i+1)++"').value")
-					// 					})
-					// 				});
-					// 				this.addActionAt(more.cName.asString++(j+1), actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', ["++(wms.join(", "))++"]) }}", active: activate);
-					// 		})
-					// 		}, {
-					// 			this.addActionAt(more.cName, actionName, "{ |cv| Server('"++obj.server++"').sendBundle("++obj.server.latency++", ['/n_setn', "++obj.nodeID++", '"++ctrlName++"', 1, cv.value]) }");
-					// 	})
-					// })
 				}
 			;
 		});

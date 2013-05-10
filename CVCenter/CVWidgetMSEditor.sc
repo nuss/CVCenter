@@ -958,7 +958,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			case
 				{ numCalibActive == 0 } { calibBut.value_(1) }
-				{ numCalibActive > 0 and:{ numCalibActive < widget.msSize-1 }} {
+				{ numCalibActive > 0 and:{ numCalibActive < widget.msSize }} {
 					calibBut.states_([
 						["partially calibrating", calibBut.states[0][1], Color.yellow],
 						calibBut.states[1]
