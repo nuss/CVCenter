@@ -1727,7 +1727,7 @@ CVCenter {
 				})
 			}, {
 				if(more.type === \wms, {
-					"varNames: %, more: %\n".postf(varNames, more);
+					// "varNames: %, more: %\n".postf(varNames, more);
 					this.add(more.cName, thisSpec!more.slots.size, more.slots, more.enterTab);
 					if(varNames.size > 0, {
 						varNames.do({ |v, j|
@@ -1780,6 +1780,7 @@ CVCenter {
 					})
 				}
 				{ more.slots.size == 2 } {
+					more.slots.postln;
 					[\Lo, \Hi].do({ |sl, k|
 						this.add(more.cName++sl, thisSpec, more.slots[k], more.enterTab);
 					});

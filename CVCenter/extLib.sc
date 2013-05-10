@@ -61,17 +61,25 @@
 												))
 											})
 										}, {
-											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
-												"{ |cv| "++node+"!? {"+node++".setn('"++label++"', [cv.value, CVCenter.at('"++wdgtKey++"').hi.value]) }}", \lo
+											cvLinks.add(CVCenter.addActionAt(wdgtKey,
+												"default_"++node.asString.replace(34.asAscii, ""),
+												"{ |cv| "++node+"!? {"+node++".setn('"++label++"', [cv.value,
+												CVCenter.at('"++wdgtKey++"').hi.value]) }}", \lo
 											));
-											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
-												"{ |cv| "++node+"!? {"+node++".setn('"++label++"', [CVCenter.at('"++wdgtKey++"').lo.value, cv.value]) }}", \hi
+											cvLinks.add(CVCenter.addActionAt(wdgtKey,
+												"default_"++node.asString.replace(34.asAscii, ""),
+												"{ |cv| "++node+"!? {"+node++".setn('"++label++"',
+												[CVCenter.at('"++wdgtKey++"').lo.value, cv.value]) }}", \hi
 											));
 										})
 									},
-									// CVWidgetMS, {
-									//
-									// },
+									CVWidgetMS, {
+										cvLinks.add(CVCenter.addActionAt(
+											wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
+											"{ |cv| "++node+"!? {"+node++".setn('"++label++"', cv.value) }}",
+											active: setActive
+										))
+									},
 									{
 										cvLinks.add(CVCenter.addActionAt(
 											wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),

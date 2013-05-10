@@ -36,6 +36,7 @@
 		varNames = varNames ++ interpreterVars.select({ |n|
 			thisProcess.interpreter.perform(n) === this;
 		});
+
 		if(currentEnvironment.class !== ProxySpace, {
 			currentEnvironment.pairsDo({ |k, v|
 				if(v === this, { varNames = varNames.add("~"++(k.asString)) });
