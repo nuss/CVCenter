@@ -56,8 +56,10 @@
 									CVWidget2D, {
 										if(label.isArray, {
 											(label++[\lo, \hi]).clump(2).flop.do({ |pair|
-												cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
-													"{ |cv| "++node+"!? {"+node++".set('"++pair[0]++"', cv.value) }}", pair[1]
+												cvLinks.add(CVCenter.addActionAt(wdgtKey,
+													"default_"++node.asString.replace(34.asAscii, ""),
+													"{ |cv| "++node+"!? {"+node++".set('"++pair[0]++"', cv.value) }}",
+													pair[1]
 												))
 											})
 										}, {
@@ -94,33 +96,49 @@
 								CVCenter.cvWidgets[wdgtKey].class.postln;
 								cvLinks.add(CVCenter.addActionAt(
 									wdgtKey, \default,
-									"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', "++cv.size++", "++cvValues.join(", ")++"]) }"
-
+									"{ |cv| Server('"++server++"').sendBundle("++server.latency++",
+									['/n_setn', "++nodeID++", '"++label++"', "++cv.size++",
+									"++cvValues.join(", ")++"]) }"
 								))
 							}, {
 								switch(CVCenter.cvWidgets[wdgtKey].class,
 									CVWidget2D, {
 										if(label.isArray, {
 											(label++[\lo, \hi]).clump(2).flop.do({ |pair|
-												cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
-													"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++pair[0]++"', 1, cv.value]) }", pair[1]
+												cvLinks.add(CVCenter.addActionAt(wdgtKey,
+													"default_"++node.asString.replace(34.asAscii, ""),
+													"{ |cv| Server('"++server++"').sendBundle("++server.latency++",
+													['/n_setn', "++nodeID++", '"++pair[0]++"', 1, cv.value]) }",
+													pair[1]
 												))
 											})
 										}, {
-											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
-												"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', 2, cv.value, CVCenter.at('"++wdgtKey++"').hi.value]) }", \lo
+											cvLinks.add(CVCenter.addActionAt(wdgtKey,
+												"default_"++node.asString.replace(34.asAscii, ""),
+												"{ |cv| Server('"++server++"').sendBundle("++server.latency++",
+												['/n_setn', "++nodeID++", '"++label++"', 2, cv.value,
+												CVCenter.at('"++wdgtKey++"').hi.value]) }", \lo
 											));
-											cvLinks.add(CVCenter.addActionAt(wdgtKey, "default_"++node.asString.replace(34.asAscii, ""),
-												"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', 2, CVCenter.at('"++wdgtKey++"').lo.value, cv.value]) }", \hi
+											cvLinks.add(CVCenter.addActionAt(wdgtKey,
+												"default_"++node.asString.replace(34.asAscii, ""),
+												"{ |cv| Server('"++server++"').sendBundle("++server.latency++",
+												['/n_setn', "++nodeID++", '"++label++"', 2,
+												CVCenter.at('"++wdgtKey++"').lo.value, cv.value]) }", \hi
 											));
 										})
 									},
-									// CVWidgetMS, {
-									//
-									// },
+									CVWidgetMS, {
+										cvLinks.add(CVCenter.addActionsAt(wdgtKey,
+											"default_"++node.asString.replace(34.asAscii, ""),
+											"{ |cv| Server('"++server++"').sendBundle("++server.latency++",
+											['/n_setn', "++nodeID++", '"++label++"',
+											"++CVCenter.cvWidgets[wdgtKey].msSize++", cv.value]) }"
+										))
+									},
 									{
 										cvLinks.add(CVCenter.addActionAt(wdgtKey, \default,
-											"{ |cv| Server('"++server++"').sendBundle("++server.latency++", ['/n_setn', "++nodeID++", '"++label++"', 1, cv.value]) }"
+											"{ |cv| Server('"++server++"').sendBundle("++server.latency++",
+											['/n_setn', "++nodeID++", '"++label++"', 1, cv.value]) }"
 										))
 									}
 								)
