@@ -260,9 +260,6 @@ CVWidgetSpecsEditor {
 			elem.wdgtType = PopUpMenu(window, wdgtTypeRect)
 				.items_(["CVWidgetKnob"])
 				.font_(selectFont)
-			// .action_({ |dd|
-			//
-			// })
 			;
 
 			case

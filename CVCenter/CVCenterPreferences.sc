@@ -87,9 +87,8 @@ CVCenterPreferences {
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
 
-			uView = UserView(window.view, flow.bounds.width-20@50)
+			uView = CompositeView(window.view, flow.bounds.width-20@50)
 				.background_(Color(0.95, 0.95, 0.95))
-				.enabled_(false)
 			;
 
 			flow.nextLine.shift(5, -50);
@@ -100,7 +99,7 @@ CVCenterPreferences {
 					"Remember GUI-properties on shutdown / window-close",
 					"Remember GUI-properties as set below"
 				])
-			.value_(prefs !? { prefs[\saveGuiProperties] } ?? { 0 })
+				.value_(prefs !? { prefs[\saveGuiProperties] } ?? { 0 })
 				.font_(staticTextFont)
 			;
 
@@ -184,9 +183,8 @@ CVCenterPreferences {
 
 			if(GUI.id ===\cocoa, { vHeight = 251 }, { vHeight = 245 });
 
-			UserView(window.view, flow.bounds.width-20@vHeight)
+			CompositeView(window.view, flow.bounds.width-20@vHeight)
 				.background_(Color(0.95, 0.95, 0.95))
-				.enabled_(false)
 			;
 
 			flow.nextLine.shift(5, vHeight.neg);
@@ -373,9 +371,8 @@ CVCenterPreferences {
 
 			flow.nextLine.shift(0, 14);
 
-			UserView(window.view, flow.bounds.width-20@25)
+			CompositeView(window.view, flow.bounds.width-20@25)
 				.background_(Color(0.95, 0.95, 0.95))
-				.enabled_(false)
 			;
 
 			flow.nextLine.shift(5, -25);
