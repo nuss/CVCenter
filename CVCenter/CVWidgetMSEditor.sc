@@ -129,7 +129,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 400, 253
 			));
 
-			window.acceptsMouseOver_(true);
+			// window.acceptsMouseOver_(true);
 
 			xySlots = xySlots.add([nextX@nextY, name]);
 			if(nextX+275 > Window.screenBounds.width, {

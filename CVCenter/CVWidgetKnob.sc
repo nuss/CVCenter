@@ -43,6 +43,8 @@ CVWidgetKnob : CVWidget {
 		var text, tActions;
 
 		background ?? { background = Color.white };
+		stringColor ?? { stringColor = Color.black };
+
 		synchKeys ?? { synchKeys = [\default] };
 
 		prCalibrate = true;
@@ -97,7 +99,7 @@ CVWidgetKnob : CVWidget {
 		}, {
 			window = parentView;
 		});
-		window.acceptsMouseOver_(true);
+		// window.acceptsMouseOver_(true);
 
 		cvcGui ?? {
 			window.onClose_({
@@ -206,7 +208,7 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+specBut.bounds.height+1;
 		midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
 			.font_(Font("Arial", 9))
-			.states_([["MIDI", Color.black, background]])
+			.states_([["MIDI", stringColor, background]])
 			.action_({ |ms|
 				if(editor.isNil or:{ editor.isClosed }, {
 					editor = CVWidgetEditor(this, thisName, 1);
@@ -228,7 +230,7 @@ CVWidgetKnob : CVWidget {
 			midiHead.mouseEnterAction_({ |mb|
 				mb.states_([["MIDI", Color.white, Color.red]])
 			}).mouseLeaveAction_({ |mb|
-				mb.states_([["MIDI", Color.black, background]])
+				mb.states_([["MIDI", stringColor, background]])
 			})
 		});
 
@@ -343,7 +345,7 @@ CVWidgetKnob : CVWidget {
 		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 25))
 			.font_(Font("Arial", 9))
 			.states_([
-				["edit OSC", Color.black, background]
+				["edit OSC", stringColor, background]
 			])
 			.action_({ |oscb|
 				if(editor.isNil or:{ editor.isClosed }, {
@@ -374,7 +376,7 @@ CVWidgetKnob : CVWidget {
 				})
 			}).mouseLeaveAction_({ |oscb|
 				if(wdgtControllersAndModels.oscConnection.model.value === false, {
-					oscb.states_([["edit OSC", Color.black, background]])
+					oscb.states_([["edit OSC", stringColor, background]])
 				})
 			})
 		});

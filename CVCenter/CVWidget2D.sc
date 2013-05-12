@@ -43,6 +43,8 @@ CVWidget2D : CVWidget {
 		var tmpWin;
 
 		background ?? { background = Color.white };
+		stringColor ?? { stringColor = Color.black };
+
 		synchKeys ?? { synchKeys = [\default] };
 
 		if(GUI.id === \qt, {
@@ -135,7 +137,7 @@ CVWidget2D : CVWidget {
 		}, {
 			window = parentView;
 		});
-		window.acceptsMouseOver_(true);
+		// window.acceptsMouseOver_(true);
 
 		cvcGui ?? {
 			window.onClose_({
@@ -198,7 +200,7 @@ CVWidget2D : CVWidget {
 
 		label.action_({ |lbl|
 			this.toggleComment(lbl.value.asBoolean);
-			lbl.toolTip_(nameField.string)
+			// if(GUI.id !== \cocoa, { lbl.toolTip_(nameField.string) });
 		});
 
 		nextY = thisXY.y+1+label.bounds.height;
@@ -327,14 +329,15 @@ CVWidget2D : CVWidget {
 
 		[midiHead.hi, nextY, midiHead.lo, nextY+52].pairsDo({ |k, v|
 			k.bounds_(Rect(rightColumnX, v, thisWidth-slider2d.bounds.width-2-12, 13))
-			.font_(Font("Arial", 7))
-			.states_([["MIDI", Color.black, background]]);
+				.font_(Font("Arial", 7))
+				.states_([["MIDI", stringColor, background]])
+			;
 
 			if(GUI.id === \qt, {
 				k.mouseEnterAction_({ |mb|
 					mb.states_([["MIDI", Color.white, Color.red]])
 				}).mouseLeaveAction_({ |mb|
-					mb.states_([["MIDI", Color.black, background]])
+					mb.states_([["MIDI", stringColor, background]])
 				})
 			})
 		});
@@ -511,7 +514,7 @@ CVWidget2D : CVWidget {
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, oscEditButHeight))
 			.font_(Font("Arial", 8.5))
 			.states_([
-				["edit OSC", Color.black, background]
+				["edit OSC", stringColor, background]
 			])
 			.action_({ |oscb|
 				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {
@@ -541,7 +544,7 @@ CVWidget2D : CVWidget {
 					})
 				}).mouseLeaveAction_({ |oscb|
 					if(wdgtControllersAndModels[v[0]].oscConnection.model.value === false, {
-						oscb.states_([["edit OSC", Color.black, background]])
+						oscb.states_([["edit OSC", stringColor, background]])
 					})
 				})
 			})

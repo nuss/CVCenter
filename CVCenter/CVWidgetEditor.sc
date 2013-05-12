@@ -133,7 +133,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 270, 253
 			));
 
-			window.acceptsMouseOver_(true);
+			// window.acceptsMouseOver_(true);
 
 			xySlots = xySlots.add([nextX@nextY, name++slotHiLo]);
 			// [xySlots, nextX, nextY].postln;

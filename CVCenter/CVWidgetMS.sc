@@ -30,6 +30,8 @@ CVWidgetMS : CVWidget {
 		var text, tActions;
 
 		background ?? { background = Color.white };
+		stringColor ?? { stringColor = Color.black };
+
 		synchKeys ?? { synchKeys = [\default] };
 		#numOscResponders, numMidiResponders = 0!2;
 
@@ -130,7 +132,7 @@ CVWidgetMS : CVWidget {
 		}, {
 			window = parentView;
 		});
-		window.acceptsMouseOver_(true);
+		// window.acceptsMouseOver_(true);
 
 		cvcGui ?? {
 			window.onClose_({
@@ -216,6 +218,7 @@ CVWidgetMS : CVWidget {
 			.drawRects_(true)
 			.isFilled_(true)
 			.colors_(Color.clear, Color.blue)
+			.background_(Color.white)
 			.elasticMode_(1)
 		;
 
@@ -256,7 +259,7 @@ CVWidgetMS : CVWidget {
 
 		midiBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
-				["MIDI"+"("++numMidiResponders++"/"++msSize++")", Color.black, background]
+				["MIDI"+"("++numMidiResponders++"/"++msSize++")", stringColor, background]
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |mb|
@@ -303,7 +306,7 @@ CVWidgetMS : CVWidget {
 				})
 			}).mouseLeaveAction_({ |mb|
 				if(wdgtControllersAndModels.slots.select({ |slot| slot.midiConnection.model.value.isNil }).size == msSize, {
-					mb.states_([[mb.states[0][0], Color.black, background]])
+					mb.states_([[mb.states[0][0], stringColor, background]])
 				})
 			})
 		});
@@ -311,7 +314,7 @@ CVWidgetMS : CVWidget {
 		nextX = thisXY.x+1+midiBut.bounds.width;
 		oscBut = Button(window, Rect(nextX, nextY, thisWidth-2/2, 15))
 			.states_([
-				["OSC"+"("++numOscResponders++"/"++msSize++")", Color.black, background]
+				["OSC"+"("++numOscResponders++"/"++msSize++")", stringColor, background]
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |oscb|
@@ -346,7 +349,7 @@ CVWidgetMS : CVWidget {
 			}).mouseLeaveAction_({ |oscb|
 				// "oscb.states[0][0] on leave: %\n".postf(oscb.states[0][0]);
 				if(wdgtControllersAndModels.slots.select({ |slot| slot.oscConnection.model.value == false }).size == msSize, {
-					oscb.states_([[oscb.states[0][0], Color.black, background]])
+					oscb.states_([[oscb.states[0][0], stringColor, background]])
 				})
 			})
 		});

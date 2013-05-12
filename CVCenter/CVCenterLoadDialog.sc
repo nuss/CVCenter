@@ -53,7 +53,7 @@ CVCenterLoadDialog {
 				(Window.screenBounds.width-500).div(2),
 				(Window.screenBounds.height-260).div(2),
 				500, 260
-			));
+			), false);
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
 

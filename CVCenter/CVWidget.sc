@@ -1115,7 +1115,7 @@ CVWidget {
 		wcm.oscDisplay.model ?? {
 			if(this.class == CVWidgetMS, { tmp = slot.asString++": edit OSC" }, { tmp = "edit OSC" });
 			wcm.oscDisplay.model = Ref((
-				but: [tmp, Color.black, background],
+				but: [tmp, stringColor, background],
 				ipField: nil,
 				portField: nil,
 				nameField: "/my/cmd/name",
@@ -2094,7 +2094,9 @@ CVWidget {
 								]).refresh;
 								if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
 								thisGuiEnv.midiLearn.value_(0);
-								thisGuiEnv.midiLearn.toolTip_("Click to connect the widget% to\nthe slider(s) as given in the fields below.".format(typeText));
+								if(GUI.id !== \cocoa, {
+									thisGuiEnv.midiLearn.toolTip_("Click to connect the widget% to\nthe slider(s) as given in the fields below.".format(typeText));
+								});
 								r = [
 									thisGuiEnv.midiSrc.string != "source" and:{
 										try{ thisGuiEnv.midiSrc.string.interpret.isInteger }
@@ -2325,7 +2327,7 @@ CVWidget {
 						midiButTextColor = Color.white;
 					}, {
 						midiButBg = background;
-						midiButTextColor = Color.black;
+						midiButTextColor = stringColor;
 					});
 					this.guiEnv[\midiBut].states_([[
 						numMidiString,
@@ -2425,7 +2427,9 @@ CVWidget {
 			if(this.class != CVWidgetMS, {
 				if(window.notNil and:{ window.isClosed.not }, {
 					if(slot.notNil, { typeText = "'s '"++slot++"' slot" }, { typeText = "" });
-					thisGuiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
+					if(GUI.id !== \cocoa, {
+						thisGuiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
+					})
 				})
 			}, {
 				// thisGuiEnv.msEditor.postln;
@@ -2489,12 +2493,14 @@ CVWidget {
 							msSize.collect(this.getCtrlButtonBank(_))
 						))
 					});
-					msSize.do({ |sl|
-						thisGuiEnv.msEditor.midiEditGroups[sl].midiHead.toolTip_(
-							"Edit all MIDI-options for slot %:\nmidiMode: %\nmidiMean: %\nmidiResolution: %\nsoftWithin: %\nctrlButtonBank: %".format(
-								sl, this.getMidiMode(sl), this.getMidiMean(sl), this.getMidiResolution(sl), this.getSoftWithin(sl), this.getCtrlButtonBank(sl)
+					if(GUI.id !== \cocoa, {
+						msSize.do({ |sl|
+							thisGuiEnv.msEditor.midiEditGroups[sl].midiHead.toolTip_(
+								"Edit all MIDI-options for slot %:\nmidiMode: %\nmidiMean: %\nmidiResolution: %\nsoftWithin: %\nctrlButtonBank: %".format(
+									sl, this.getMidiMode(sl), this.getMidiMean(sl), this.getMidiResolution(sl), this.getSoftWithin(sl), this.getCtrlButtonBank(sl)
+								)
 							)
-						)
+						})
 					})
 				})
 			})
@@ -2625,7 +2631,7 @@ CVWidget {
 				if(this.class == CVWidgetMS, { tmp = slot.asString++":"+tmp });
 				wcm.oscDisplay.model.value_(
 					(
-						but: [tmp, Color.black, Color.white],
+						but: [tmp, stringColor, background],
 						ipField: wcm.oscDisplay.model.value.ipField,
 						portField: wcm.oscDisplay.model.value.portField,
 						nameField: wcm.oscDisplay.model.value.nameField,
@@ -2713,7 +2719,7 @@ CVWidget {
 						oscButTextColor = Color.white;
 					}, {
 						oscButBg = background;
-						oscButTextColor = Color.black;
+						oscButTextColor = stringColor;
 					});
 					this.guiEnv[\oscBut].states_([[
 						numOscString,
