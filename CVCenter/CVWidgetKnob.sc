@@ -539,4 +539,16 @@ CVWidgetKnob : CVWidget {
 		})
 	}
 
+	stringColor_ { |color|
+		stringColor = color;
+		midiHead.states_([
+			[midiHead.states[0][0], stringColor, midiHead.states[0][2]]
+		]);
+		if(midiOscEnv.oscResponder.isNil, {
+			oscEditBut.states_([
+				[oscEditBut.states[0][0], stringColor, oscEditBut.states[0][2]]
+			])
+		})
+	}
+
 }

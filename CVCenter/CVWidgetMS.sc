@@ -510,4 +510,18 @@ CVWidgetMS : CVWidget {
 		})
 	}
 
+	stringColor_ { |color|
+		stringColor = color;
+		if(midiOscEnv.select({ |slot| slot.cc.notNil }).size < 1, {
+			midiBut.states_([
+				[midiBut.states[0][0], stringColor, midiBut.states[0][2]]
+			])
+		});
+		if(midiOscEnv.select({ |slot| slot.oscResponder.notNil }).size < 1, {
+			oscBut.states_([
+				[oscBut.states[0][0], stringColor, oscBut.states[0][2]]
+			])
+		})
+	}
+
 }

@@ -737,4 +737,18 @@ CVWidget2D : CVWidget {
 		})
 	}
 
+	stringColor_ { |color|
+		stringColor = color;
+		#[lo, hi].do({ |slot|
+			midiHead[slot].states_([
+				[midiHead[slot].states[0][0], stringColor, midiHead[slot].states[0][2]]
+			]);
+			if(midiOscEnv[slot].oscResponder.isNil, {
+				oscEditBut[slot].states_([
+					[oscEditBut[slot].states[0][0], stringColor, oscEditBut[slot].states[0][2]]
+				])
+			})
+		})
+	}
+
 }
