@@ -192,3 +192,14 @@
 	}
 
 }
+
++IdentityDictionary {
+
+	findKeyForEqualValue { arg argValue;
+		this.keysValuesArrayDo(array, { arg key, val, i;
+			if (argValue == val, { ^key })
+		});
+		^nil
+	}
+
+}
