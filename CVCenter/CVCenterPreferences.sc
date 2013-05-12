@@ -395,7 +395,7 @@ CVCenterPreferences {
 
 			Button(window.view, flow.bounds.width/2-10@25)
 				.states_([["Cancel", Color.black, Color.white]])
-				.font_(Font(Font.defaultSansFace, 14, true))
+				.font_(Font("Arial", 14, true))
 				.action_({ window.close })
 			;
 
@@ -403,7 +403,7 @@ CVCenterPreferences {
 
 			Button(window.view, flow.bounds.width/2-10@25)
 				.states_([["Save", Color.white, Color.red]])
-				.font_(Font(Font.defaultSansFace, 14, true))
+				.font_(Font("Arial", 14, true))
 				.action_({
 					if(saveGuiPosition.value == 2 and:{
 						[left, top, width, height].select({ |field|

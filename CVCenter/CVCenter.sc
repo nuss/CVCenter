@@ -343,88 +343,13 @@ CVCenter {
 				.font_(Font("Helvetica", 10))
 				.states_([["load setup", Color.white, Color(0.15, 0.15, 0.15)]])
 				.action_({ |pb|
-					if(loadActionsRadio.value.asBoolean, { loadFlag = true }, { loadFlag = false });
-					if(autoConnectMIDIRadio.value.asBoolean, { midiFlag = true }, { midiFlag = false });
-					if(autoConnectOSCRadio.value.asBoolean, { oscFlag = true }, { oscFlag = false });
-					this.loadSetup(autoConnectMIDI: midiFlag, autoConnectOSC: oscFlag, loadActions: loadFlag);
+					CVCenterLoadDialog.new;
 				})
 			;
 
 			if(GUI.id !== \cocoa, {
 				loadBut.toolTip_("Load a CVCenter-setup from disk. You\nmay load OSC-/MIDI-responders and\nactions if the corresponding checkboxes\nto the right are checked accordingly.")
 			});
-
-			swFlow.shift(10, 2);
-
-			if(GUI.id === \cocoa, {
-				loadActionsRadio = Button(prefPane, Rect(0, 0, 15, 15))
-					.font_(Font("Helvetica", 10))
-					.states_([
-						["", Color.red, Color.white],
-						["X", Color.red, Color.white]
-					])
-					.value_(1)
-				;
-			}, {
-				loadActionsRadio = \CheckBox.asClass.new(prefPane, Rect(0, 0, 15, 15)).value_(true)
-			});
-
-			swFlow.shift(0, -2);
-
-			StaticText(prefPane, Rect(0, 0, 60, 20))
-				.font_(Font("Helvetica", 10))
-				.stringColor_(Color.white)
-				.string_("load actions")
-				.align_(\right)
-			;
-
-			swFlow.shift(10, 2);
-
-			if(GUI.id === \cocoa, {
-				autoConnectMIDIRadio = Button(prefPane, Rect(0, 0, 15, 15))
-					.font_(Font("Helvetica", 10))
-					.states_([
-						["", Color.red, Color.white],
-						["X", Color.red, Color.white]
-					])
-					.value_(1)
-				;
-			}, {
-				autoConnectMIDIRadio = \CheckBox.asClass.new(prefPane, Rect(0, 0, 15, 15)).value_(true)
-			});
-
-			swFlow.shift(0, -2);
-
-			StaticText(prefPane, Rect(0, 0, 90, 20))
-				.font_(Font("Helvetica", 10))
-				.stringColor_(Color.white)
-				.string_("auto-connect MIDI")
-				.align_(\right)
-			;
-
-			swFlow.shift(10, 2);
-
-			if(GUI.id === \cocoa, {
-				autoConnectOSCRadio = Button(prefPane, Rect(0, 0, 15, 15))
-					.font_(Font("Helvetica", 10))
-					.states_([
-						["", Color.red, Color.white],
-						["X", Color.red, Color.white]
-					])
-					.value_(1)
-				;
-			}, {
-				autoConnectOSCRadio = CheckBox(prefPane, Rect(0, 0, 15, 15)).value_(true)
-			});
-
-			swFlow.shift(0, -2);
-
-			StaticText(prefPane, Rect(5, 0, 90, 20))
-				.font_(Font("Helvetica", 10))
-				.stringColor_(Color.white)
-				.string_("auto-connect OSC")
-				.align_(\right)
-			;
 
 			window.onClose_({
 				AbstractCVWidgetEditor.allEditors.pairsDo({ |editor, val|
@@ -1154,7 +1079,13 @@ CVCenter {
 		});
 	}
 
-	*loadSetup { |path, addToExisting=false, autoConnectOSC=true, autoConnectMIDI=true, loadActions=true|
+	*loadSetup {
+		|
+			path, addToExisting=false,
+			autoConnectOSC=true, oscConnectToIP=true, oscRestrictToPort=false, activateCalibration=false, resetCalibration=false,
+			autoConnectMIDI=true, midiConnectSrc=false, midiConnectChannel=false, midiConnectCtrl=true,
+			loadActions=true
+		|
 		var lib, successFunc;
 
 		successFunc = { |f|
@@ -1189,29 +1120,43 @@ CVCenter {
 							if(autoConnectOSC, {
 								if(v[hilo].osc.notNil and:{ v[hilo].osc.cmdName.notNil }, {
 									cvWidgets[key].oscConnect(
-										v[hilo].osc.addr !? { v[hilo].osc.addr.ip },
-										v[hilo].osc.addr !? { v[hilo].osc.addr.port },
+										oscConnectToIP !? {
+											if(oscConnectToIP, { v[hilo].osc.addr !? { v[hilo].osc.addr.ip }})
+										},
+										oscRestrictToPort !? {
+											if(oscConnectToIP and:{ oscRestrictToPort }, {
+												v[hilo].osc.addr !? { v[hilo].osc.addr.port }
+											})
+										},
 										v[hilo].osc.cmdName,
 										v[hilo].osc.msgIndex,
 										hilo
 									);
+
 									cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo);
-									cvWidgets[key].setOscInputConstraints(
-										v[hilo].osc.calibConstraints.lo @ v[hilo].osc.calibConstraints.hi, hilo
-									);
-									cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
-										[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
-									).changedKeys(cvWidgets[key].synchKeys);
+									if(activateCalibration and:{ resetCalibration }, {
+										cvWidgets[key].setOscInputConstraints(0.0001 @ 0.0001, hilo);
+										cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
+											[0.0001, 0.0001]
+										).changedKeys(cvWidgets[key].synchKeys);
+									}, {
+										cvWidgets[key].setOscInputConstraints(
+											v[hilo].osc.calibConstraints.lo @ v[hilo].osc.calibConstraints.hi, hilo
+										);
+										cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
+											[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
+										).changedKeys(cvWidgets[key].synchKeys)
+									});
+									if(activateCalibration, { cvWidgets[key].setCalibrate(true, hilo) });
 								})
 							});
 							if(autoConnectMIDI, {
 								if(v[hilo].midi.notNil and:{ v[hilo].midi.num.notNil }, {
 									try {
 										cvWidgets[key].midiConnect(
-											// v[hilo].midi.src,
-											nil,
-											v[hilo].midi.chan,
-											v[hilo].midi.num,
+											if(midiConnectSrc, { v[hilo].midi.src }),
+											if(midiConnectChannel, { v[hilo].midi.chan }),
+											if(midiConnectCtrl, { v[hilo].midi.num }),
 											hilo
 										)
 									}
@@ -1237,28 +1182,43 @@ CVCenter {
 						if(autoConnectOSC, {
 							v.osc.cmdName !? {
 								cvWidgets[key].oscConnect(
-									v.osc.addr !? { v.osc.addr.ip },
-									v.osc.addr !? { v.osc.addr.port },
+									oscConnectToIP !? {
+										if(oscConnectToIP, { v.osc.addr !? { v.osc.addr.ip }})
+									},
+									oscRestrictToPort !? {
+										if(oscConnectToIP and:{ oscRestrictToPort }, {
+											v.osc.addr !? { v.osc.addr.port }
+										})
+									},
 									v.osc.cmdName,
 									v.osc.msgIndex
 								);
 								cvWidgets[key].setOscMapping(v.osc.oscMapping);
-								cvWidgets[key].setOscInputConstraints(
-									v.osc.calibConstraints.lo @ v.osc.calibConstraints.hi
-								);
-								cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
-									[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
-								).changedKeys(cvWidgets[key].synchKeys);
+								if(activateCalibration and:{ resetCalibration }, {
+									cvWidgets[key].setOscInputConstraints(
+										0.0001 @ 0.0001
+									);
+									cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
+										[0.0001, 0.0001]
+									).changedKeys(cvWidgets[key].synchKeys);
+								}, {
+									cvWidgets[key].setOscInputConstraints(
+										v.osc.calibConstraints.lo @ v.osc.calibConstraints.hi
+									);
+									cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
+										[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
+									).changedKeys(cvWidgets[key].synchKeys);
+								});
+								if(activateCalibration, { cvWidgets[key].setCalibrate(true) });
 							}
 						});
 						if(autoConnectMIDI, {
 							v.midi.num !? {
 								try {
 									cvWidgets[key].midiConnect(
-										// v.midi.src,
-										nil,
-										v.midi.chan,
-										v.midi.num
+										if(midiConnectSrc, { v.midi.src }),
+										if(midiConnectChannel, { v.midi.chan }),
+										if(midiConnectCtrl, { v.midi.num }),
 									)
 								}
 							}
@@ -1285,19 +1245,35 @@ CVCenter {
 							cvWidgets[key].msSize.do({ |sl|
 								v.osc[sl].cmdName !? {
 									cvWidgets[key].oscConnect(
-										v.osc[sl].addr !? { v.osc[sl].addr.ip },
-										v.osc[sl].addr !? { v.osc[sl].addr.port },
+										oscConnectToIP !? {
+											if(oscConnectToIP, { v.osc[sl].addr !? { v.osc[sl].addr.ip }})
+										},
+										oscRestrictToPort !? {
+											if(oscConnectToIP and:{ oscRestrictToPort }, {
+												v.osc[sl].addr !? { v.osc[sl].addr.port }
+											})
+										},
 										v.osc[sl].cmdName,
 										v.osc[sl].msgIndex,
 										sl
 									);
 									cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl);
-									cvWidgets[key].setOscInputConstraints(
-										v.osc[sl].calibConstraints.lo @ v.osc[sl].calibConstraints.hi, sl
-									);
-									cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
-										[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
-									).changedKeys(cvWidgets[key].synchKeys);
+									if(activateCalibration and:{ resetCalibration }, {
+										cvWidgets[key].setOscInputConstraints(
+											0.0001 @ 0.0001, sl
+										);
+										cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
+											[0.0001, 0.0001]
+										).changedKeys(cvWidgets[key].synchKeys);
+									}, {
+										cvWidgets[key].setOscInputConstraints(
+											v.osc[sl].calibConstraints.lo @ v.osc[sl].calibConstraints.hi, sl
+										);
+										cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
+											[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
+										).changedKeys(cvWidgets[key].synchKeys);
+									});
+									if(activateCalibration, { cvWidgets[key].setCalibrate(true, sl) });
 								}
 							})
 						});
@@ -1306,10 +1282,9 @@ CVCenter {
 								v.midi[sl].num !? {
 									try {
 										cvWidgets[key].midiConnect(
-											// v.midi.src,
-											nil,
-											v.midi[sl].chan,
-											v.midi[sl].num,
+											if(midiConnectSrc, { v.midi[sl].src }),
+											if(midiConnectChannel, { v.midi[sl].chan }),
+											if(midiConnectCtrl, { v.midi[sl].num }),
 											slot: sl
 										)
 									}
@@ -1320,6 +1295,9 @@ CVCenter {
 				);
 				cvWidgets[key].nameField.string_(v.notes);
 				if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes); });
+				if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
+					CVCenterLoadDialog.window.close;
+				})
 			})
 		};
 
