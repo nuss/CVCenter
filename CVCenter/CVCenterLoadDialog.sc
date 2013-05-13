@@ -14,21 +14,25 @@ CVCenterLoadDialog {
 		var textOscIP, textOscPort, textActivateCalibration, textResetCalibration;
 		var activateActions, textActivateActions;
 		var cancelBut, loadBut;
-		var lineheight;
+		var lineheight, linebreak, fFact;
 		var initCCSrc, initCCChan, initCCCtrl;
 		var initOscIP, initOscPort, initCalib, initCalibReset;
 
-		staticTextFont = Font("Arial", 9.4);
-		staticTextFontBold = Font("Arial", 9.4, true);
+		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
+
+		staticTextFont = Font("Arial", 12 * fFact);
+		staticTextFontBold = Font("Arial", 12 * fFact, true);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font("Andale Mono", 9);
+		textFieldFont = Font("Andale Mono", 12);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
 		if(GUI.id == \cocoa, {
-			lineheight = { |lines| if(lines > 1, { (15 * lines)-3 }, { 15 }) }
+			lineheight = { |lines| if(lines > 1, { (18 * lines)-3 }, { 18 }) };
+			linebreak = "\n";
 		}, {
-			lineheight = { |lines| if(lines > 1, { (15 * lines)-5 }, { 15 }) }
+			lineheight = { |lines| if(lines > 1, { (18 * lines)-5 }, { 18 }) };
+			linebreak = " ";
 		});
 
 		buildCheckbox = { |active, view, props, font|
@@ -51,16 +55,16 @@ CVCenterLoadDialog {
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("load a new setup from disk", Rect(
 				(Window.screenBounds.width-500).div(2),
-				(Window.screenBounds.height-260).div(2),
-				500, 260
+				(Window.screenBounds.height-280).div(2),
+				500, 280
 			), false);
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
 
 			replaceBg = CompositeView(window.view, flow.indentedRemaining.width@29);
 			flow.nextLine;
-			midiBg = CompositeView(window.view, flow.bounds.width.div(2)-8@150);
-			oscBg = CompositeView(window.view, flow.indentedRemaining.width@150);
+			midiBg = CompositeView(window.view, flow.bounds.width.div(2)-8@170);
+			oscBg = CompositeView(window.view, flow.indentedRemaining.width@170);
 			flow.nextLine;
 			actionsBg = CompositeView(window.view, flow.indentedRemaining.width@29);
 			[replaceBg, midiBg, oscBg, actionsBg].do({ |el| el.background_(Color(0.95, 0.95, 0.95)) });
@@ -114,7 +118,7 @@ CVCenterLoadDialog {
 			textMidiCtrl = StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("initialize CCResponders with ctrl-nr. stored in\nthe setup")
+				.string_("initialize CCResponders with ctrl-nr.%stored in the setup".format(linebreak))
 			;
 
 			midiFlow.nextLine.shift(15, 0);
@@ -124,7 +128,7 @@ CVCenterLoadDialog {
 			textMidiChan = StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("initialize CCResponders with channel-nr.\nstored in the setup")
+				.string_("initialize CCResponders with channel-nr.%stored in the setup".format(linebreak))
 			;
 
 			midiFlow.nextLine.shift(15, 0);
@@ -134,7 +138,7 @@ CVCenterLoadDialog {
 			textMidiSrc = StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("initialize CCResponders with source-ID stored\nin the setup")
+				.string_("initialize CCResponders with source-ID%stored in the setup".format(linebreak))
 			;
 
 			// osc
@@ -177,7 +181,7 @@ CVCenterLoadDialog {
 				})
 			;
 
-			StaticText(oscBg, oscFlow.indentedRemaining.width@15)
+			StaticText(oscBg, oscFlow.indentedRemaining.width@18)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("load OSCresponders")
@@ -206,7 +210,7 @@ CVCenterLoadDialog {
 			textOscIP = StaticText(oscBg, oscFlow.indentedRemaining.width@lineheight.(2))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("initialize OSCresponders with IP-addresses\nstored in the setup")
+				.string_("initialize OSCresponders with IP-%addresses stored in the setup".format(linebreak))
 			;
 
 			oscFlow.nextLine.shift(15, 0);
@@ -216,7 +220,7 @@ CVCenterLoadDialog {
 			textOscPort = StaticText(oscBg, oscFlow.indentedRemaining.width@lineheight.(2))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("initialize OSCresponders with the port stored\nin the setup")
+				.string_("initialize OSCresponders with the port%stored in the setup".format(linebreak))
 			;
 
 			oscFlow.nextLine.shift(15, 0);
