@@ -1,6 +1,6 @@
 CVCenterLoadDialog {
 
-	classvar <window;
+	classvar <window, midiSources;
 
 	*new {
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
@@ -17,6 +17,10 @@ CVCenterLoadDialog {
 		var lineheight, linebreak, fFact;
 		var initCCSrc, initCCChan, initCCCtrl;
 		var initOscIP, initOscPort, initCalib, initCalibReset;
+		var midiInitBut, midiSourceSelect, sourceNames;
+		var oscIPSelect, restrictToPort;
+
+		OSCCommands.collectTempIPsAndCmds;
 
 		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
 
@@ -55,16 +59,16 @@ CVCenterLoadDialog {
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("load a new setup from disk", Rect(
 				(Window.screenBounds.width-500).div(2),
-				(Window.screenBounds.height-280).div(2),
-				500, 280
+				(Window.screenBounds.height-320).div(2),
+				500, 320
 			), false);
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
 
 			replaceBg = CompositeView(window.view, flow.indentedRemaining.width@29);
 			flow.nextLine;
-			midiBg = CompositeView(window.view, flow.bounds.width.div(2)-8@170);
-			oscBg = CompositeView(window.view, flow.indentedRemaining.width@170);
+			midiBg = CompositeView(window.view, flow.bounds.width.div(2)-8@210);
+			oscBg = CompositeView(window.view, flow.indentedRemaining.width@210);
 			flow.nextLine;
 			actionsBg = CompositeView(window.view, flow.indentedRemaining.width@29);
 			[replaceBg, midiBg, oscBg, actionsBg].do({ |el| el.background_(Color(0.95, 0.95, 0.95)) });
@@ -141,6 +145,85 @@ CVCenterLoadDialog {
 				.string_("initialize CCResponders with source-ID%stored in the setup".format(linebreak))
 			;
 
+			midiFlow.nextLine.shift(15, 0);
+
+			StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("... or select from a list of currently available sources")
+			;
+
+			midiFlow.nextLine.shift(15, 0);
+
+			midiInitBut = Button(midiBg, 60@15).font_(Font("Arial", 9, true));
+
+			if(MIDIClient.initialized, {
+				midiInitBut.states_([
+					["restart MIDI", Color.black, Color.green]
+				])
+			}, {
+				midiInitBut.states_([
+					["init MIDI", Color.white, Color.red]
+				]).action_({ |b|
+					midiSources = ();
+					if(MIDIClient.initialized, {
+						MIDIClient.restart; MIDIIn.connectAll;
+					}, { MIDIClient.init; MIDIIn.connectAll });
+					if(MIDIClient.initialized, {
+						b.states_([
+							["restart MIDI", Color.black, Color.green]
+						]);
+						MIDIClient.sources.do({ |source|
+							if(midiSources.values.includes(source.uid.asInt).not, {
+								// OSX/Linux specific tweek
+								if(source.name == source.device, {
+									midiSources.put(source.name.asSymbol, source.uid.asInt)
+								}, {
+									midiSources.put(
+										(source.device++":"+source.name).asSymbol, source.uid.asInt
+									)
+								})
+							})
+						});
+						sourceNames = midiSources.keys.asArray.sort;
+						midiSourceSelect.items_(
+							[midiSourceSelect.items[0]]++sourceNames;
+						);
+					})
+				})
+			});
+
+			midiSourceSelect = PopUpMenu(midiBg, midiFlow.indentedRemaining.width@15)
+				.font_(Font("Arial", 9))
+				.items_(["select device port..."])
+				.action_({ |dd|
+					if(dd.value != 0, {
+						loadMidiSrc.enabled_(false); textMidiSrc.stringColor_(Color(0.7, 0.7, 0.7));
+					}, {
+						loadMidiSrc.enabled_(true); textMidiSrc.stringColor_(staticTextColor);
+					})
+				})
+			;
+
+			if(MIDIClient.initialized, {
+				MIDIClient.sources.do({ |source|
+					if(midiSources.values.includes(source.uid.asInt).not, {
+						// OSX/Linux specific tweek
+						if(source.name == source.device, {
+							midiSources.put(source.name.asSymbol, source.uid.asInt)
+						}, {
+							midiSources.put(
+								(source.device++":"+source.name).asSymbol, source.uid.asInt
+							)
+						})
+					})
+				});
+				sourceNames = midiSources.keys.asArray.sort;
+				midiSourceSelect.items_(
+					[midiSourceSelect.items[0]]++sourceNames
+				);
+			});
+
 			// osc
 
 			StaticText(oscBg, oscFlow.indentedRemaining.width@20)
@@ -189,6 +272,42 @@ CVCenterLoadDialog {
 
 			oscFlow.nextLine.shift(15, 0);
 
+			activateCalibration = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold)
+				.action_({ |cb|
+					switch(cb.value.asBoolean,
+						true, {
+							resetCalibration.enabled_(true);
+							textResetCalibration.stringColor_(staticTextColor);
+						},
+						false, {
+							resetCalibration.enabled_(false);
+							textResetCalibration.stringColor_(Color(0.7, 0.7, 0.7));
+							if(GUI.id == \cocoa, {
+								resetCalibration.value_(0)
+							}, { resetCalibration.value_(false) });
+						}
+					)
+				})
+			;
+
+			textActivateCalibration = StaticText(oscBg, oscFlow.indentedRemaining.width@15)
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("activate calibration")
+			;
+
+			oscFlow.nextLine.shift(15, 0);
+
+			resetCalibration = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold).enabled_(false);
+
+			textResetCalibration = StaticText(oscBg, oscFlow.indentedRemaining.width@15)
+				.font_(staticTextFont)
+				.stringColor_(Color(0.7, 0.7, 0.7))
+				.string_("reset calibration")
+			;
+
+			oscFlow.nextLine.shift(15, 0);
+
 			loadOscIP = buildCheckbox.(true, oscBg, 15@15, staticTextFontBold)
 				.action_({ |cb|
 					switch(cb.value.asBoolean,
@@ -225,39 +344,33 @@ CVCenterLoadDialog {
 
 			oscFlow.nextLine.shift(15, 0);
 
-			activateCalibration = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold)
-				.action_({ |cb|
-					switch(cb.value.asBoolean,
-						true, {
-							resetCalibration.enabled_(true);
-							textResetCalibration.stringColor_(staticTextColor);
-						},
-						false, {
-							resetCalibration.enabled_(false);
-							textResetCalibration.stringColor_(Color(0.7, 0.7, 0.7));
-							if(GUI.id == \cocoa, {
-								resetCalibration.value_(0)
-							}, { resetCalibration.value_(false) });
-						}
-					)
-				})
-			;
-
-			textActivateCalibration = StaticText(oscBg, oscFlow.indentedRemaining.width@15)
+			StaticText(oscBg, oscFlow.indentedRemaining.width@lineheight.(2))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("activate calibration")
+				.string_("... or select from a list of currently available addresses")
 			;
 
 			oscFlow.nextLine.shift(15, 0);
 
-			resetCalibration = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold).enabled_(false);
-
-			textResetCalibration = StaticText(oscBg, oscFlow.indentedRemaining.width@15)
-				.font_(staticTextFont)
-				.stringColor_(Color(0.7, 0.7, 0.7))
-				.string_("reset calibration")
+			oscIPSelect = PopUpMenu(oscBg, 130@15)
+				.font_(Font("Arial", 9))
+				.items_(["select IP-address..."])
+			// .mouseDownAction_({ |m|
+			// 	OSCCommands.tempIPsAndCmds[deviceDropDown.items[deviceDropDown.value]].pairsDo({ |cmd, size|
+			// 		cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
+			// 	})
+			// })
 			;
+
+			StaticText(oscBg, 60@15)
+				.string_("restrict to port")
+				.font_(Font("Arial", 9))
+				.align_(\right)
+			;
+
+			restrictToPort = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold);
+
+			{ OSCCommands.tempIPsAndCmds.postcs }.defer(0.2);
 
 			// actions
 

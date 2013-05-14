@@ -780,7 +780,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			});
 
 			if(GUI.id !== \cocoa, {
-				cmdListMenu.toolTip_("If an IP-address has been selected in the drop-down above\nthis menu will list command-names coming in from that address.\nOtherwise select a device from the drop-down to the right and\nthis menu will list commands available for the selected device."
+				cmdListMenu.toolTip_(
+					"If an IP-address has been selected in the drop-down above\nthis menu will list command-names coming in from that address.\nOtherwise select a device from the drop-down to the right and\nthis menu will list commands available for the selected device."
 				)
 			});
 
