@@ -435,7 +435,7 @@ CVCenterLoadDialog {
 							initOscIP = loadOscIP.value.asBoolean;
 							if(initOscIP, { initOscPort = loadOscPort.value.asBoolean });
 						}, {
-							oscIPAddress = oscIPSelect.value
+							oscIPAddress = oscIPSelect.item;
 						});
 						initCalib = activateCalibration.value.asBoolean;
 						if(initCalib, { initCalibReset = resetCalibration.value.asBoolean });
@@ -444,7 +444,7 @@ CVCenterLoadDialog {
 						if(midiSourceSelect.value == 0, {
 							initCCSrc = loadMidiSrc.value.asBoolean;
 						}, {
-							midiSrcID = midiSources[midiSourceSelect.value.asSymbol].asInt;
+							midiSrcID = midiSources[midiSourceSelect.item.asSymbol];
 						});
 						initCCChan = loadMidiChan.value.asBoolean;
 						initCCCtrl = loadMidiCtrl.value.asBoolean;
