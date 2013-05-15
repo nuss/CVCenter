@@ -457,9 +457,9 @@ CVCenterLoadDialog {
 						activateCalibration: initCalib,
 						resetCalibration: initCalibReset,
 						autoConnectMIDI: loadMidiCC.value.asBoolean,
-						loadActions: activateActions.value.asBoolean
+						loadActions: activateActions.value.asBoolean,
 						midiSrcID: midiSrcID,
-						oscIPAddress: oscIPAddress;
+						oscIPAddress: oscIPAddress
 					)
 				})
 			;

@@ -998,7 +998,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						oscConnectCondition = oscConnectCondition+1;
 					});
 					if(oscConnectCondition >= 2, {
-						// "ok, we're ready to rock: %".postf(extOscCtrlArrayField.string.interpret);
+					// "ok, we're ready to rock: %".postf(extOscCtrlArrayField.string.interpret);
 						extOscCtrlArrayField.string.interpret.do({ |ext, i|
 							if(deviceDropDown.value > 0, {
 								connectIP = tmpIP.asString.split($:)[0];
@@ -1026,7 +1026,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 								}, {
 									connectOscMsgIndex = indexField.string.asInt;
 								});
-								connectIndexStart = intStartIndexField.value+(ext-1);
+								connectIndexStart = intStartIndexField.value+i;
 								// [connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart].postln;
 								if(connectIndexStart >= 0 and:{ connectIndexStart < widget.msSize }, {
 									widget.oscConnect(
