@@ -672,6 +672,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
+			// osc
+
 			deviceDropDown = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-110@15)
 				.items_(["select IP-address... (optional)"])
 				.font_(Font("Arial", 10))

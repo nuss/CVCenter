@@ -150,7 +150,7 @@ CVCenterLoadDialog {
 			StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("... or select from a list of currently available sources")
+				.string_("... or select from a list of currently%available sources".format(linebreak))
 			;
 
 			midiFlow.nextLine.shift(15, 0);
@@ -347,7 +347,7 @@ CVCenterLoadDialog {
 			StaticText(oscBg, oscFlow.indentedRemaining.width@lineheight.(2))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("... or select from a list of currently available addresses")
+				.string_("... or select from a list of currently%available addresses".format(linebreak))
 			;
 
 			oscFlow.nextLine.shift(15, 0);
