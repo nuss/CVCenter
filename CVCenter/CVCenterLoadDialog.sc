@@ -59,16 +59,16 @@ CVCenterLoadDialog {
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("load a new setup from disk", Rect(
 				(Window.screenBounds.width-500).div(2),
-				(Window.screenBounds.height-320).div(2),
-				500, 320
+				(Window.screenBounds.height-328).div(2),
+				500, 328
 			), false);
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
 
 			replaceBg = CompositeView(window.view, flow.indentedRemaining.width@29);
 			flow.nextLine;
-			midiBg = CompositeView(window.view, flow.bounds.width.div(2)-8@210);
-			oscBg = CompositeView(window.view, flow.indentedRemaining.width@210);
+			midiBg = CompositeView(window.view, flow.bounds.width.div(2)-8@218);
+			oscBg = CompositeView(window.view, flow.indentedRemaining.width@218);
 			flow.nextLine;
 			actionsBg = CompositeView(window.view, flow.indentedRemaining.width@29);
 			[replaceBg, midiBg, oscBg, actionsBg].do({ |el| el.background_(Color(0.95, 0.95, 0.95)) });
@@ -355,11 +355,19 @@ CVCenterLoadDialog {
 			oscIPSelect = PopUpMenu(oscBg, 130@15)
 				.font_(Font("Arial", 9))
 				.items_(["select IP-address..."])
-			// .mouseDownAction_({ |m|
-			// 	OSCCommands.tempIPsAndCmds[deviceDropDown.items[deviceDropDown.value]].pairsDo({ |cmd, size|
-			// 		cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
-			// 	})
-			// })
+				.mouseDownAction_({ |m|
+					if(restrictToPort.value.asBoolean, {
+						OSCCommands.tempIPsAndCmds.keys.asArray.sort;
+					}, {
+						OSCCommands.tempIPsAndCmds.keys.collect({ |it| it.asString.split($:)[0] }).asBag.contents.keys.asArray.sort;
+					});
+					m.items_(
+						[m.items[0]]++OSCCommands.tempIPsAndCmds.keys.asArray.sort;
+					)
+				// OSCCommands.tempIPsAndCmds[deviceDropDown.items[deviceDropDown.value]].pairsDo({ |cmd, size|
+				// 	cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
+				// })
+				})
 			;
 
 			StaticText(oscBg, 60@15)
@@ -370,7 +378,7 @@ CVCenterLoadDialog {
 
 			restrictToPort = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold);
 
-			{ OSCCommands.tempIPsAndCmds.postcs }.defer(0.2);
+			// { OSCCommands.tempIPsAndCmds.postcs }.defer(0.2);
 
 			// actions
 
