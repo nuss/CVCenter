@@ -18,7 +18,7 @@ CVCenterLoadDialog {
 		var initCCSrc, initCCChan, initCCCtrl;
 		var initOscIP, initOscPort, initCalib, initCalibReset;
 		var midiInitBut, midiSourceSelect, sourceNames;
-		var oscIPSelect, restrictToPort;
+		var oscIPSelect, restrictToPort, oscAddrList;
 
 		OSCCommands.collectTempIPsAndCmds;
 
@@ -357,16 +357,13 @@ CVCenterLoadDialog {
 				.items_(["select IP-address..."])
 				.mouseDownAction_({ |m|
 					if(restrictToPort.value.asBoolean, {
-						OSCCommands.tempIPsAndCmds.keys.asArray.sort;
+						oscAddrList = OSCCommands.tempIPsAndCmds.keys.asArray.sort;
 					}, {
-						OSCCommands.tempIPsAndCmds.keys.collect({ |it| it.asString.split($:)[0] }).asBag.contents.keys.asArray.sort;
+						oscAddrList = OSCCommands.tempIPsAndCmds.keys.collect({ |it| it.asString.split($:)[0] }).asBag.contents.keys.asArray.sort;
 					});
 					m.items_(
-						[m.items[0]]++OSCCommands.tempIPsAndCmds.keys.asArray.sort;
+						[m.items[0]]++oscAddrList;
 					)
-				// OSCCommands.tempIPsAndCmds[deviceDropDown.items[deviceDropDown.value]].pairsDo({ |cmd, size|
-				// 	cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
-				// })
 				})
 			;
 
@@ -376,7 +373,14 @@ CVCenterLoadDialog {
 				.align_(\right)
 			;
 
-			restrictToPort = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold);
+			restrictToPort = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold)
+				.action_({ |cb|
+					switch(cb.value.asBoolean,
+						true, { },
+						false, { }
+					)
+				})
+			;
 
 			// { OSCCommands.tempIPsAndCmds.postcs }.defer(0.2);
 
