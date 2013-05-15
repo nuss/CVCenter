@@ -56,8 +56,7 @@ OSCCommands {
 				tempIPsAndCmds[(argAddr.ip.asString++":"++argAddr.port.asString).asSymbol].put(
 					argMsg[0], argMsg[1..].size
 				)
-			});
-			// tempIPsAndCmds.postln;
+			})
 		};
 
 		if(Main.versionAtLeast(3, 5), {

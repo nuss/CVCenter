@@ -1090,7 +1090,7 @@ CVCenter {
 			path, addToExisting=false,
 			autoConnectOSC=true, oscConnectToIP=true, oscRestrictToPort=false, activateCalibration=false, resetCalibration=false,
 			autoConnectMIDI=true, midiConnectSrc=false, midiConnectChannel=false, midiConnectCtrl=true,
-			loadActions=true
+			loadActions=true, midiSrcID, oscIPAddress
 		|
 		var lib, successFunc;
 
@@ -1126,14 +1126,22 @@ CVCenter {
 							if(autoConnectOSC, {
 								if(v[hilo].osc.notNil and:{ v[hilo].osc.cmdName.notNil }, {
 									cvWidgets[key].oscConnect(
-										oscConnectToIP !? {
-											if(oscConnectToIP, { v[hilo].osc.addr !? { v[hilo].osc.addr.ip }})
-										},
-										oscRestrictToPort !? {
-											if(oscConnectToIP and:{ oscRestrictToPort }, {
-												v[hilo].osc.addr !? { v[hilo].osc.addr.port }
-											})
-										},
+										if(oscIPAddress.isNil, {
+											oscConnectToIP !? {
+												if(oscConnectToIP, { v[hilo].osc.addr !? { v[hilo].osc.addr.ip }})
+											}
+										}, {
+											oscIPAddress.asString.split($:)[0]
+										}),
+										if(oscIPAddress.isNil, {
+											oscRestrictToPort !? {
+												if(oscConnectToIP and:{ oscRestrictToPort }, {
+													v[hilo].osc.addr !? { v[hilo].osc.addr.port }
+												})
+											}
+										}, {
+											oscIPAddress.asString.split($:)[1]
+										}),
 										v[hilo].osc.cmdName,
 										v[hilo].osc.msgIndex,
 										hilo
@@ -1160,7 +1168,11 @@ CVCenter {
 								if(v[hilo].midi.notNil and:{ v[hilo].midi.num.notNil }, {
 									try {
 										cvWidgets[key].midiConnect(
-											if(midiConnectSrc, { v[hilo].midi.src }),
+											if(midiSrcID.isNil, {
+												if(midiConnectSrc, { v[hilo].midi.src })
+											}, {
+												midiSrcID.asInt
+											}),
 											if(midiConnectChannel, { v[hilo].midi.chan }),
 											if(midiConnectCtrl, { v[hilo].midi.num }),
 											hilo
@@ -1188,14 +1200,22 @@ CVCenter {
 						if(autoConnectOSC, {
 							v.osc.cmdName !? {
 								cvWidgets[key].oscConnect(
-									oscConnectToIP !? {
-										if(oscConnectToIP, { v.osc.addr !? { v.osc.addr.ip }})
-									},
-									oscRestrictToPort !? {
-										if(oscConnectToIP and:{ oscRestrictToPort }, {
-											v.osc.addr !? { v.osc.addr.port }
-										})
-									},
+									if(oscIPAddress.isNil, {
+										oscConnectToIP !? {
+											if(oscConnectToIP, { v.osc.addr !? { v.osc.addr.ip }})
+										}
+									}, {
+										oscIPAddress.asString.split($:)[0]
+									}),
+									if(oscIPAddress.isNil, {
+										oscRestrictToPort !? {
+											if(oscConnectToIP and:{ oscRestrictToPort }, {
+												v.osc.addr !? { v.osc.addr.port }
+											})
+										}
+									}, {
+										oscIPAddress.asString.split($:)[1]
+									}),
 									v.osc.cmdName,
 									v.osc.msgIndex
 								);
@@ -1222,7 +1242,11 @@ CVCenter {
 							v.midi.num !? {
 								try {
 									cvWidgets[key].midiConnect(
-										if(midiConnectSrc, { v.midi.src }),
+										if(midiSrcID.isNil, {
+											if(midiConnectSrc, { v.midi.src })
+										}, {
+											midiSrcID.asInt
+										}),
 										if(midiConnectChannel, { v.midi.chan }),
 										if(midiConnectCtrl, { v.midi.num }),
 									)
@@ -1251,14 +1275,22 @@ CVCenter {
 							cvWidgets[key].msSize.do({ |sl|
 								v.osc[sl].cmdName !? {
 									cvWidgets[key].oscConnect(
-										oscConnectToIP !? {
-											if(oscConnectToIP, { v.osc[sl].addr !? { v.osc[sl].addr.ip }})
-										},
-										oscRestrictToPort !? {
-											if(oscConnectToIP and:{ oscRestrictToPort }, {
-												v.osc[sl].addr !? { v.osc[sl].addr.port }
-											})
-										},
+										if(oscIPAddress.isNil, {
+											oscConnectToIP !? {
+												if(oscConnectToIP, { v.osc[sl].addr !? { v.osc[sl].addr.ip }})
+											}
+										}, {
+											oscIPAddress.asString.split($:)[0]
+										}),
+										if(oscIPAddress.isNil, {
+											oscRestrictToPort !? {
+												if(oscConnectToIP and:{ oscRestrictToPort }, {
+													v.osc[sl].addr !? { v.osc[sl].addr.port }
+												})
+											}
+										}, {
+											oscIPAddress.asString.split($:)[1]
+										}),
 										v.osc[sl].cmdName,
 										v.osc[sl].msgIndex,
 										sl
@@ -1288,7 +1320,11 @@ CVCenter {
 								v.midi[sl].num !? {
 									try {
 										cvWidgets[key].midiConnect(
-											if(midiConnectSrc, { v.midi[sl].src }),
+											if(midiSrcID.isNil, {
+												if(midiConnectSrc, { v.midi[sl].src })
+											}, {
+												midiSrcID.asInt
+											}),
 											if(midiConnectChannel, { v.midi[sl].chan }),
 											if(midiConnectCtrl, { v.midi[sl].num }),
 											slot: sl

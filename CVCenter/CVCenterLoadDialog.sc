@@ -17,8 +17,10 @@ CVCenterLoadDialog {
 		var lineheight, linebreak, fFact;
 		var initCCSrc, initCCChan, initCCCtrl;
 		var initOscIP, initOscPort, initCalib, initCalibReset;
+		var textOscSelect, textRestrictToPort, textMidiSelect;
 		var midiInitBut, midiSourceSelect, sourceNames;
 		var oscIPSelect, restrictToPort, oscAddrList;
+		var midiSrcID, oscIPAddress;
 
 		OSCCommands.collectTempIPsAndCmds;
 
@@ -98,12 +100,12 @@ CVCenterLoadDialog {
 				.action_({ |cb|
 					switch(cb.value.asBoolean,
 						true, {
-							[loadMidiSrc, loadMidiChan, loadMidiCtrl].do(_.enabled_(true));
-							[textMidiSrc, textMidiChan, textMidiCtrl].do(_.stringColor_(staticTextColor));
+							[loadMidiSrc, loadMidiChan, loadMidiCtrl, midiInitBut, midiSourceSelect].do(_.enabled_(true));
+							[textMidiSrc, textMidiChan, textMidiCtrl, textMidiSelect].do(_.stringColor_(staticTextColor));
 						},
 						false, {
-							[loadMidiSrc, loadMidiChan, loadMidiCtrl].do(_.enabled_(false));
-							[textMidiSrc, textMidiChan, textMidiCtrl].do(_.stringColor_(Color(0.7, 0.7, 0.7)));
+							[loadMidiSrc, loadMidiChan, loadMidiCtrl, midiInitBut, midiSourceSelect].do(_.enabled_(false));
+							[textMidiSrc, textMidiChan, textMidiCtrl, textMidiSelect].do(_.stringColor_(Color(0.7, 0.7, 0.7)));
 						}
 					)
 				})
@@ -147,7 +149,7 @@ CVCenterLoadDialog {
 
 			midiFlow.nextLine.shift(15, 0);
 
-			StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
+			textMidiSelect = StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("... or select from a list of currently%available sources".format(linebreak))
@@ -235,7 +237,7 @@ CVCenterLoadDialog {
 				.action_({ |cb|
 					switch(cb.value.asBoolean,
 						true, {
-							[loadOscIP, activateCalibration].do(_.enabled_(true));
+							[loadOscIP, activateCalibration, oscIPSelect, restrictToPort].do(_.enabled_(true));
 							if(loadOscIP.value.asBoolean, {
 								loadOscPort.enabled_(true);
 								textOscPort.stringColor_(staticTextColor);
@@ -244,13 +246,13 @@ CVCenterLoadDialog {
 								resetCalibration.enabled_(true);
 								textResetCalibration.stringColor_(staticTextColor);
 							});
-							[textOscIP, textActivateCalibration].do(_.stringColor_(staticTextColor));
+							[textOscIP, textActivateCalibration, textOscSelect, textRestrictToPort].do(_.stringColor_(staticTextColor));
 						},
 						false, {
-							[loadOscIP, loadOscPort, activateCalibration, resetCalibration].do(
+							[loadOscIP, loadOscPort, activateCalibration, resetCalibration, oscIPSelect, restrictToPort].do(
 								_.enabled_(false)
 							);
-							[textOscIP, textOscPort, textActivateCalibration, textResetCalibration].do(
+							[textOscIP, textOscPort, textActivateCalibration, textResetCalibration, textOscSelect, textRestrictToPort].do(
 								_.stringColor_(Color(0.7, 0.7, 0.7))
 							);
 							if(GUI.id == \cocoa, {
@@ -344,7 +346,7 @@ CVCenterLoadDialog {
 
 			oscFlow.nextLine.shift(15, 0);
 
-			StaticText(oscBg, oscFlow.indentedRemaining.width@lineheight.(2))
+			textOscSelect = StaticText(oscBg, oscFlow.indentedRemaining.width@lineheight.(2))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("... or select from a list of currently%available addresses".format(linebreak))
@@ -363,11 +365,19 @@ CVCenterLoadDialog {
 					});
 					m.items_(
 						[m.items[0]]++oscAddrList;
-					)
+					);
+					[loadOscIP, loadOscPort].do(_.enabled_(true));
+					[textOscIP, textOscPort].do(_.stringColor_(staticTextColor));
+				})
+				.action_({ |dd|
+					if(dd.value != 0, {
+						[loadOscIP, loadOscPort].do(_.enabled_(false));
+						[textOscIP, textOscPort].do(_.stringColor_(Color(0.7, 0.7, 0.7)));
+					})
 				})
 			;
 
-			StaticText(oscBg, 60@15)
+			textRestrictToPort = StaticText(oscBg, 60@15)
 				.string_("restrict to port")
 				.font_(Font("Arial", 9))
 				.align_(\right)
@@ -376,9 +386,21 @@ CVCenterLoadDialog {
 			restrictToPort = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold)
 				.action_({ |cb|
 					switch(cb.value.asBoolean,
-						true, { },
-						false, { }
-					)
+						true, {
+							oscIPSelect.items_(
+								["select IP-address:port..."]++OSCCommands.tempIPsAndCmds.keys.collect({ |it|
+									it.asString.split($:)[0]
+								}).asBag.contents.keys.asArray.sort
+							)
+						},
+						false, {
+							oscIPSelect.items_(
+								["select IP-address..."]++OSCCommands.tempIPsAndCmds.keys.asArray.sort
+							)
+						}
+					);
+					[loadOscIP, loadOscPort].do(_.enabled_(true));
+					[textOscIP, textOscPort].do(_.stringColor_(staticTextColor));
 				})
 			;
 
@@ -409,13 +431,21 @@ CVCenterLoadDialog {
 				.font_(Font("Arial", 14, true))
 				.action_({ |b|
 					if(loadOscResponders.value.asBoolean, {
-						initOscIP = loadOscIP.value.asBoolean;
-						if(initOscIP, { initOscPort = loadOscPort.value.asBoolean });
+						if(oscIPSelect.value == 0, {
+							initOscIP = loadOscIP.value.asBoolean;
+							if(initOscIP, { initOscPort = loadOscPort.value.asBoolean });
+						}, {
+							oscIPAddress = oscIPSelect.value
+						});
 						initCalib = activateCalibration.value.asBoolean;
 						if(initCalib, { initCalibReset = resetCalibration.value.asBoolean });
 					});
 					if(loadMidiCC.value.asBoolean, {
-						initCCSrc = loadMidiSrc.value.asBoolean;
+						if(midiSourceSelect.value == 0, {
+							initCCSrc = loadMidiSrc.value.asBoolean;
+						}, {
+							midiSrcID = midiSources[midiSourceSelect.value.asSymbol].asInt;
+						});
 						initCCChan = loadMidiChan.value.asBoolean;
 						initCCCtrl = loadMidiCtrl.value.asBoolean;
 					});
@@ -428,6 +458,8 @@ CVCenterLoadDialog {
 						resetCalibration: initCalibReset,
 						autoConnectMIDI: loadMidiCC.value.asBoolean,
 						loadActions: activateActions.value.asBoolean
+						midiSrcID: midiSrcID,
+						oscIPAddress: oscIPAddress;
 					)
 				})
 			;
