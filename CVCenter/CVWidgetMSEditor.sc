@@ -39,6 +39,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var midiUid, midiChan;
 		var oscLabelColor, midiLabelColor, oscLabelStringColor, midiLabelStringColor;
 		var oscConnectCondition = 0;
+		var oscResetCalibBut;
 		var oscConnectWarning = "Couldn't connect OSC-controllers:";
 		var connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart;
 		var addDeviceBut, thisCmdNames;
@@ -890,13 +891,18 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-10@15)
 				.font_(staticTextFont)
 				.string_("Input to Output mapping")
-//				.background_(Color.white)
+			// .background_(Color.white)
 			;
 
-			StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-10@15)
+			StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/4@15)
 				.font_(staticTextFont)
 				.string_("Global Calibration")
-//				.background_(Color.white)
+			// .background_(Color.white)
+			;
+
+			StaticText(thisEditor.oscTabs.views[0], oscFlow0.indentedRemaining.width-7@15)
+				.font_(staticTextFont)
+				.string_("Reset Calibration")
 			;
 
 			mappingSelectItems = ["set global mapping...", "linlin", "linexp", "explin", "expexp"];
@@ -933,7 +939,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			});
 
-			calibBut = Button(thisEditor.oscTabs.views[0],  oscFlow0.bounds.width/2-12@20)
+			calibBut = Button(thisEditor.oscTabs.views[0],  oscFlow0.bounds.width/4@20)
 				.font_(staticTextFont)
 				.states_([
 					["calibrating all", Color.black, Color.green],
@@ -972,6 +978,24 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			if(GUI.id !== \cocoa, {
 				calibBut.toolTip_("As the range of incoming values may be unknown the\ncalibration provides a way to detect the constraints\nof incoming values. It may be useful in some cases\nto deactivate the mechanism and restrict the input to\na limited range.")
+			});
+
+			oscResetCalibBut = Button(thisEditor.oscTabs.views[0], oscFlow0.indentedRemaining.width-7@20)
+				.font_(staticTextFont)
+				.states_([
+					["reset all", Color.black, Color(0.9, 0.7, 0.14)],
+				])
+				.action_({ |rb|
+					widget.msSize.do({ |sl|
+						// to do check setOscInputConstraints so constraints
+						// are displayed correctly when an editor gets opened
+						widget.setOscInputConstraints(0.0001@0.0001, sl).setCalibrate(true, sl);
+					})
+				})
+			;
+
+			if(GUI.id !== \cocoa, {
+				oscResetCalibBut.toolTip_("Reset input-constraints for all slots\nto [0, 0] and restart calibration.")
 			});
 
 			oscFlow0.shift(0, 0);
@@ -1051,7 +1075,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				[connectorBut.states[0][0], connectorBut.states[0][1], Color.red(alpha: 0.5)]
 			]) });
 
-			oscDisconnectorBut = Button(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-24/2@25)
+			oscDisconnectorBut = Button(thisEditor.oscTabs.views[0], oscFlow0.indentedRemaining.width-7@25)
 				.font_(staticTextFont)
 				.states_([
 					["disconnect all OSC-controllers", Color.white, Color.blue],

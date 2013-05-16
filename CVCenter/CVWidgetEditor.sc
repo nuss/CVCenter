@@ -28,7 +28,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "channel", mctrl = "ctrl", margs;
-		var addr, wcm, labelColors;
+		var addr, wcm, labelColors, oscResetCalibBut;
 		var midiModes;
 		var thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank;
 		var mappingSelectItems;
@@ -704,16 +704,16 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.string_("OSC-input constraints + compensation")
 			;
 
-			inputConstraintLoField = NumberBox(thisEditor[\tabs].views[2], flow2.bounds.width/2-66@15)
+			inputConstraintLoField = NumberBox(thisEditor[\tabs].views[2], flow2.bounds.width/2-76@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(wcm.oscInputRange.model.value[0])
 				.enabled_(false)
 			;
 
-			flow2.shift(5, 0);
+			// flow2.shift(5, 0);
 
-			inputConstraintHiField = NumberBox(thisEditor[\tabs].views[2], flow2.bounds.width/2-66@15)
+			inputConstraintHiField = NumberBox(thisEditor[\tabs].views[2], flow2.bounds.width/2-76@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(wcm.oscInputRange.model.value[1])
@@ -724,7 +724,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				[inputConstraintLoField, inputConstraintHiField].do(_.toolTip_("The constraints for incoming values - either\ndetermined automatically if calibration is on\nor set them manualy if calibration is off"))
 			});
 
-			flow2.shift(5, 0);
+			// flow2.shift(5, 0);
 
 			alwaysPosField = StaticText(thisEditor[\tabs].views[2], 32@15)
 				.font_(staticTextFont)
@@ -737,7 +737,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				alwaysPosField.toolTip_("Make all input same-signed.\nAvoid NaN-results in calculations.")
 			});
 
-			flow2.shift(5, 0);
+			// flow2.shift(5, 0);
 
 			calibBut = Button(thisEditor[\tabs].views[2], 60@15)
 				.font_(staticTextFont)
@@ -749,6 +749,20 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			if(GUI.id !== \cocoa, {
 				calibBut.toolTip_("As the range of incoming values may be unknown the\ncalibration provides a way to detect the constraints\nof incoming values. It may be useful in some cases\nto deactivate the mechanismand restrict the input to\na limited range.")
+			});
+
+			oscResetCalibBut = Button(thisEditor[\tabs].views[2], flow2.indentedRemaining.width@15)
+				.font_(staticTextFont)
+				.states_([
+					["reset", Color.black, Color(0.9, 0.7, 0.14)],
+				])
+				.action_({ |rb|
+					widget.setOscInputConstraints(0.0001@0.0001, slot).setCalibrate(true, slot)
+				})
+			;
+
+			if(GUI.id !== \cocoa, {
+				oscResetCalibBut.toolTip_("Reset input-constraints to [0, 0] and restart calibration.")
 			});
 
 			flow2.shift(0, 0);
