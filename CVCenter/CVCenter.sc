@@ -1338,7 +1338,7 @@ CVCenter {
 				cvWidgets[key].nameField.string_(v.notes);
 				v.background !? { cvWidgets[key].background_(v.background) };
 				v.stringColor !? { cvWidgets[key].stringColor_(v.stringColor) };
-				if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes); });
+				if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
 				if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
 					CVCenterLoadDialog.window.close;
 				})

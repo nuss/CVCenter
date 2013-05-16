@@ -857,7 +857,7 @@ CVWidget {
 			CVWidgetKnob, {
 				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect }) });
 			},
-			CVWidget2D, {
+			{
 				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect(thisSlot) }) });
 			}
 		)
