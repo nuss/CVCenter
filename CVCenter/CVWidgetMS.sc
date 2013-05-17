@@ -184,8 +184,7 @@ CVWidgetMS : CVWidget {
 
 		persistent !? { if(persistent, { isPersistent = true }) };
 
-		widgetBg = UserView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
-//			.focusColor_(Color(alpha: 1.0))
+		widgetBg = CompositeView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 			.background_(background)
 		;
 		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))

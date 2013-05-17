@@ -328,7 +328,7 @@ CVCenterPreferences {
 			;
 
 			saveClassVars.action_({ |b|
-				if(b.value == false or:{ b.value == 0 }, {
+				if(b.value.asBoolean.not, {
 					[saveMidiMode, saveMidiMean, saveMidiResolution, saveSoftWithin, saveCtrlButtonBank].do(
 						_.enabled_(false)
 					);
@@ -336,7 +336,7 @@ CVCenterPreferences {
 						_.stringColor_(Color(0.7, 0.7, 0.7))
 					)
 				});
-				if(b.value == true or:{ b.value == 1 }, {
+				if(b.value.asBoolean, {
 					[saveMidiMode, saveMidiMean, saveMidiResolution, saveSoftWithin, saveCtrlButtonBank].do(
 						_.enabled_(true)
 					);
@@ -346,7 +346,7 @@ CVCenterPreferences {
 				})
 			});
 
-			if(saveClassVars.value == false or:{ saveClassVars.value == 0 }, {
+			if(saveClassVars.value.asBoolean.not, {
 				[saveMidiMode, saveMidiMean, saveMidiResolution, saveSoftWithin, saveCtrlButtonBank].do(
 					_.enabled_(false)
 				);
@@ -354,7 +354,7 @@ CVCenterPreferences {
 					_.stringColor_(Color(0.7, 0.7, 0.7))
 				)
 			});
-			if(saveClassVars.value == true or:{ saveClassVars.value == 1 }, {
+			if(saveClassVars.value.asBoolean, {
 				[saveMidiMode, saveMidiMean, saveMidiResolution, saveSoftWithin, saveCtrlButtonBank].do(
 					_.enabled_(true)
 				);
