@@ -364,31 +364,27 @@ CVWidget {
 		switch(this.class,
 			CVWidgetKnob, {
 				prMidiMode = mode;
-				// wdgtControllersAndModels !? {
-					wcm.midiOptions.model.value_(
-						(
-							midiMode: prMidiMode,
-							midiMean: prMidiMean,
-							ctrlButtonBank: prCtrlButtonBank,
-							midiResolution: prMidiResolution,
-							softWithin: prSoftWithin
-						)
-					).changedKeys(synchKeys);
-			// }
+				wcm.midiOptions.model.value_(
+					(
+						midiMode: prMidiMode,
+						midiMean: prMidiMean,
+						ctrlButtonBank: prCtrlButtonBank,
+						midiResolution: prMidiResolution,
+						softWithin: prSoftWithin
+					)
+				).changedKeys(synchKeys);
 			},
 			{
 				prMidiMode[thisSlot] = mode;
-				// wdgtControllersAndModels[thisSlot] !? {
-					wcm.midiOptions.model.value_(
-						(
-							midiMode: prMidiMode[thisSlot],
-							midiMean: prMidiMean[thisSlot],
-							ctrlButtonBank: prCtrlButtonBank[thisSlot],
-							midiResolution: prMidiResolution[thisSlot],
-							softWithin: prSoftWithin[thisSlot]
-						)
-					).changedKeys(synchKeys);
-			// }
+				wcm.midiOptions.model.value_(
+					(
+						midiMode: prMidiMode[thisSlot],
+						midiMean: prMidiMean[thisSlot],
+						ctrlButtonBank: prCtrlButtonBank[thisSlot],
+						midiResolution: prMidiResolution[thisSlot],
+						softWithin: prSoftWithin[thisSlot]
+					)
+				).changedKeys(synchKeys);
 			}
 		);
 	}
@@ -427,31 +423,27 @@ CVWidget {
 		switch(this.class,
 			CVWidgetKnob, {
 				prMidiMean = thisMeanVal;
-				// wdgtControllersAndModels !? {
-					wcm.midiOptions.model.value_(
-						(
-							midiMode: prMidiMode,
-							midiMean: prMidiMean,
-							ctrlButtonBank: prCtrlButtonBank,
-							midiResolution: prMidiResolution,
-							softWithin: prSoftWithin
-						)
-					).changedKeys(synchKeys);
-			// }
+				wcm.midiOptions.model.value_(
+					(
+						midiMode: prMidiMode,
+						midiMean: prMidiMean,
+						ctrlButtonBank: prCtrlButtonBank,
+						midiResolution: prMidiResolution,
+						softWithin: prSoftWithin
+					)
+				).changedKeys(synchKeys);
 			},
 			{
 				prMidiMean[thisSlot] = thisMeanVal;
-				// wdgtControllersAndModels[thisSlot] !? {
-					wcm.midiOptions.model.value_(
-						(
-							midiMode: prMidiMode[thisSlot],
-							midiMean: prMidiMean[thisSlot],
-							ctrlButtonBank: prCtrlButtonBank[thisSlot],
-							midiResolution: prMidiResolution[thisSlot],
-							softWithin: prSoftWithin[thisSlot]
-						)
-					).changedKeys(synchKeys);
-			// }
+				wcm.midiOptions.model.value_(
+					(
+						midiMode: prMidiMode[thisSlot],
+						midiMean: prMidiMean[thisSlot],
+						ctrlButtonBank: prCtrlButtonBank[thisSlot],
+						midiResolution: prMidiResolution[thisSlot],
+						softWithin: prSoftWithin[thisSlot]
+					)
+				).changedKeys(synchKeys);
 			}
 		)
 	}
@@ -492,31 +484,27 @@ CVWidget {
 		switch(this.class,
 			CVWidgetKnob, {
 				prSoftWithin = thisThresh;
-				// wdgtControllersAndModels !? {
-					wcm.midiOptions.model.value_(
-						(
-							midiMode: prMidiMode,
-							midiMean: prMidiMean,
-							ctrlButtonBank: prCtrlButtonBank,
-							midiResolution: prMidiResolution,
-							softWithin: prSoftWithin
-						)
-					).changedKeys(synchKeys);
-			// }
+				wcm.midiOptions.model.value_(
+					(
+						midiMode: prMidiMode,
+						midiMean: prMidiMean,
+						ctrlButtonBank: prCtrlButtonBank,
+						midiResolution: prMidiResolution,
+						softWithin: prSoftWithin
+					)
+				).changedKeys(synchKeys);
 			},
 			{
 				prSoftWithin[thisSlot] = thisThresh;
-				// wdgtControllersAndModels[thisSlot] !? {
-					wcm.midiOptions.model.value_(
-						(
-							midiMode: prMidiMode[thisSlot],
-							midiMean: prMidiMean[thisSlot],
-							ctrlButtonBank: prCtrlButtonBank[thisSlot],
-							midiResolution: prMidiResolution[thisSlot],
-							softWithin: prSoftWithin[thisSlot]
-						)
-					).changedKeys(synchKeys);
-			// }
+				wcm.midiOptions.model.value_(
+					(
+						midiMode: prMidiMode[thisSlot],
+						midiMean: prMidiMean[thisSlot],
+						ctrlButtonBank: prCtrlButtonBank[thisSlot],
+						midiResolution: prMidiResolution[thisSlot],
+						softWithin: prSoftWithin[thisSlot]
+					)
+				).changedKeys(synchKeys);
 			}
 		)
 	}
@@ -560,31 +548,27 @@ CVWidget {
 				}, {
 					prCtrlButtonBank = numSliders.asInt;
 				});
-				// wdgtControllersAndModels !? {
-					wcm.midiOptions.model.value_(
-						(
-							midiMode: prMidiMode,
-							midiMean: prMidiMean,
-							ctrlButtonBank: prCtrlButtonBank,
-							midiResolution: prMidiResolution,
-							softWithin: prSoftWithin
-						)
-					).changedKeys(synchKeys);
-				// }
+				wcm.midiOptions.model.value_(
+					(
+						midiMode: prMidiMode,
+						midiMean: prMidiMean,
+						ctrlButtonBank: prCtrlButtonBank,
+						midiResolution: prMidiResolution,
+						softWithin: prSoftWithin
+					)
+				).changedKeys(synchKeys);
 			},
 			{
 				prCtrlButtonBank.put(thisSlot, numSliders);
-				// wdgtControllersAndModels[thisSlot] !? {
-					wcm.midiOptions.model.value_(
-						(
-							midiMode: prMidiMode[thisSlot],
-							midiMean: prMidiMean[thisSlot],
-							ctrlButtonBank: prCtrlButtonBank[thisSlot],
-							midiResolution: prMidiResolution[thisSlot],
-							softWithin: prSoftWithin[thisSlot]
-						)
-					).changedKeys(synchKeys);
-				// }
+				wcm.midiOptions.model.value_(
+					(
+						midiMode: prMidiMode[thisSlot],
+						midiMean: prMidiMean[thisSlot],
+						ctrlButtonBank: prCtrlButtonBank[thisSlot],
+						midiResolution: prMidiResolution[thisSlot],
+						softWithin: prSoftWithin[thisSlot]
+					)
+				).changedKeys(synchKeys);
 			}
 		)
 	}
@@ -620,31 +604,27 @@ CVWidget {
 		switch(this.class,
 			CVWidgetKnob, {
 				prMidiResolution = resolution;
-				// wdgtControllersAndModels !? {
-					wcm.midiOptions.model.value_(
-						(
-							midiMode: prMidiMode,
-							midiMean: prMidiMean,
-							ctrlButtonBank: prCtrlButtonBank,
-							midiResolution: prMidiResolution,
-							softWithin: prSoftWithin
-						)
-					).changedKeys(synchKeys);
-				// }
+				wcm.midiOptions.model.value_(
+					(
+						midiMode: prMidiMode,
+						midiMean: prMidiMean,
+						ctrlButtonBank: prCtrlButtonBank,
+						midiResolution: prMidiResolution,
+						softWithin: prSoftWithin
+					)
+				).changedKeys(synchKeys);
 			},
 			{
 				prMidiResolution[thisSlot] = resolution;
-				// wdgtControllersAndModels[thisSlot] !? {
-					wcm.midiOptions.model.value_(
-						(
-							midiMode: prMidiMode[thisSlot],
-							midiMean: prMidiMean[thisSlot],
-							ctrlButtonBank: prCtrlButtonBank[thisSlot],
-							midiResolution: prMidiResolution[thisSlot],
-							softWithin: prSoftWithin[thisSlot]
-						)
-					).changedKeys(synchKeys);
-				// }
+				wcm.midiOptions.model.value_(
+					(
+						midiMode: prMidiMode[thisSlot],
+						midiMean: prMidiMean[thisSlot],
+						ctrlButtonBank: prCtrlButtonBank[thisSlot],
+						midiResolution: prMidiResolution[thisSlot],
+						softWithin: prSoftWithin[thisSlot]
+					)
+				).changedKeys(synchKeys);
 			}
 		)
 	}
@@ -984,18 +964,19 @@ CVWidget {
 			Error("setOSCInputConstraints expects a Point in the form of Point(lo, hi) or lo@hi").throw;
 		}, {
 			this.setCalibrate(false, slot);
-			switch(this.class,
-				CVWidgetKnob, {
-					midiOscEnv.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
-				},
-				{
-					midiOscEnv[thisSlot].calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
-				}
-			);
-			if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
-				wcm.mapConstrainterLo.value_(constraintsHiLo.x);
-				wcm.mapConstrainterHi.value_(constraintsHiLo.y);
-			})
+			wcm.oscInputRange.model.value_([constraintsHiLo.x, constraintsHiLo.y]).changedKeys(synchKeys);
+				// switch(this.class,
+				// 	CVWidgetKnob, {
+				// 		midiOscEnv.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
+				// 	},
+				// 	{
+				// 		midiOscEnv[thisSlot].calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
+				// 	}
+				// );
+				// if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
+				// 	wcm.mapConstrainterLo.value_(constraintsHiLo.x);
+				// 	wcm.mapConstrainterHi.value_(constraintsHiLo.y);
+				// })
 		})
 	}
 
@@ -1068,8 +1049,6 @@ CVWidget {
 		}, {
 			wcm = wdgtControllersAndModels;
 		});
-
-//		"wcm: %\n".postf(wcm);
 
 		wcm.calibration ?? {
 			wcm.calibration = ();
@@ -2844,6 +2823,9 @@ CVWidget {
 			// "prInitOscInputRange: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' oscInputRange.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
+			// "midiOscEnv: %\n".postf(midiOscEnv);
+			midiOscEnv.calibConstraints = (lo: theChanger.value[0], hi: theChanger.value[1]);
+
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
 				thisGuiEnv.msEditor !? {
@@ -2863,6 +2845,8 @@ CVWidget {
 							thisEditor.mappingSelect.value_(i)
 						})
 					});
+					wcm.mapConstrainterLo.value_(theChanger.value[0]);
+					wcm.mapConstrainterHi.value_(theChanger.value[1]);
 					thisEditor.alwaysPosField.string_(" +"++(alwaysPositive.trunc(0.1)));
 				});
 
