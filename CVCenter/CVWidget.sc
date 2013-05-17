@@ -965,18 +965,6 @@ CVWidget {
 		}, {
 			this.setCalibrate(false, slot);
 			wcm.oscInputRange.model.value_([constraintsHiLo.x, constraintsHiLo.y]).changedKeys(synchKeys);
-				// switch(this.class,
-				// 	CVWidgetKnob, {
-				// 		midiOscEnv.calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
-				// 	},
-				// 	{
-				// 		midiOscEnv[thisSlot].calibConstraints = (lo: constraintsHiLo.x, hi: constraintsHiLo.y);
-				// 	}
-				// );
-				// if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
-				// 	wcm.mapConstrainterLo.value_(constraintsHiLo.x);
-				// 	wcm.mapConstrainterHi.value_(constraintsHiLo.y);
-				// })
 		})
 	}
 
@@ -1768,6 +1756,8 @@ CVWidget {
 		wcm.midiConnection.controller.put(\default, { |theChanger, what, moreArgs|
 			if(debug, { "widget '%' (%) at slot '%' midiConnection.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
+			// "midiConnection.model: %\n".postf(theChanger);
+
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
 					ctrlString ? ctrlString = num+1;
@@ -1826,7 +1816,7 @@ CVWidget {
 				};
 				makeCCResponder = { |argSrc, argChan, argNum|
 					if(midiOscEnv.cc.isNil, {
-						CCResponder(ccResponderAction, argSrc, argChan, argNum, nil);
+						CCResponder(ccResponderAction, argSrc, argChan, argNum);
 					}, {
 						midiOscEnv.cc.function_(ccResponderAction);
 					})
@@ -1911,7 +1901,6 @@ CVWidget {
 				thisEditor = thisGuiEnv.editor;
 			});
 
-			// this.midiSources ?? { AbstractCVWidgetEditor.midiSources = () };
 			MIDIClient.sources.do({ |source|
 				if(midiSources.values.includes(source.uid.asInt).not, {
 					// OSX/Linux specific tweek
