@@ -14,12 +14,13 @@ KeyDownActions {
 			'cmd + ctrl + shift' ->			1441792,
 			'cmd + ctrl + alt + shift' ->	1966080,
 			\shift ->						131072,
+			\alt ->							524288,
+			'alt + shift' ->				655360,
+			'alt + ctrl' ->  				786432,
+			// rather don't use under linux
 			\ctrl ->						262144,
 			'ctrl + shift' ->				393216,
 			'ctrl + alt + shift' ->			917504,
-			\alt ->							524288,
-			'alt + shift' ->				655360,
-			'alt + ctrl' ->  				786432
 		];
 
 		arrowsOSX = IdentityDictionary[
