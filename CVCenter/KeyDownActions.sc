@@ -13,20 +13,20 @@ KeyDownActions {
 		];
 
 		arrowsOSX = IdentityDictionary[
-			'arrow up' ->							(mod: 2097152, keycode: 126, key: 16777235),
-			'arrow down' ->							(mod: 2097152, keycode: 125, key: 16777237),
-			'arrow right' ->						(mod: 2097152, keycode: 124, key: 16777236),
-			'arrow left' ->							(mod: 2097152, keycode: 123, key: 16777234),
+			'arrow up' ->						(mod: 2097152, keycode: 126, key: 16777235),
+			'arrow down' ->						(mod: 2097152, keycode: 125, key: 16777237),
+			'arrow right' ->					(mod: 2097152, keycode: 124, key: 16777236),
+			'arrow left' ->						(mod: 2097152, keycode: 123, key: 16777234),
 
-			'alt + arrow up' ->						(mod: 2621440, keycode: 126, key: 16777235),
-			'alt + arrow down' ->					(mod: 2621440, keycode: 125, key: 16777237),
-			'alt + arrow right' ->					(mod: 2621440, keycode: 124, key: 16777236),
-			'alt + arrow left' ->					(mod: 2621440, keycode: 123, key: 16777234),
+			'alt + arrow up' ->					(mod: 2621440, keycode: 126, key: 16777235),
+			'alt + arrow down' ->				(mod: 2621440, keycode: 125, key: 16777237),
+			'alt + arrow right' ->				(mod: 2621440, keycode: 124, key: 16777236),
+			'alt + arrow left' ->				(mod: 2621440, keycode: 123, key: 16777234),
 
-			'alt + shift + arrow up' ->				(mod: 2752512, keycode: 126, key: 16777235),
-			'alt + shift + arrow down' ->			(mod: 2752512, keycode: 125, key: 16777237),
-			'alt + shift + arrow right' ->			(mod: 2752512, keycode: 124, key: 16777236),
-			'alt + shift + arrow left' ->			(mod: 2752512, keycode: 123, key: 16777234),
+			'alt + shift + arrow up' ->			(mod: 2752512, keycode: 126, key: 16777235),
+			'alt + shift + arrow down' ->		(mod: 2752512, keycode: 125, key: 16777237),
+			'alt + shift + arrow right' ->		(mod: 2752512, keycode: 124, key: 16777236),
+			'alt + shift + arrow left' ->		(mod: 2752512, keycode: 123, key: 16777234),
 
 			'shift + arrow up' ->				(mod: 2228224, keycode: 126, key: 16777235),
 			'shift + arrow down' ->				(mod: 2228224, keycode: 125, key: 16777237),
