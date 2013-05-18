@@ -2,6 +2,10 @@ CVCenterLoadDialog {
 
 	classvar <window, midiSources;
 
+	*initClass {
+		midiSources = ();
+	}
+
 	*new {
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var buildCheckbox;
