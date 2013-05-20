@@ -74,14 +74,10 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		if(slot.notNil, {
 			switch(widget.class,
 				CVWidget2D, {
-//					widget.wdgtControllersAndModels[slot] !? {
-						wcm = widget.wdgtControllersAndModels[slot];
-//					}
+					wcm = widget.wdgtControllersAndModels[slot];
 				},
 				CVWidgetMS, {
-//					widget.wdgtControllersAndModels.slots[slot] !? {
-						wcm = widget.wdgtControllersAndModels.slots[slot];
-//					}
+					wcm = widget.wdgtControllersAndModels.slots[slot];
 				}
 			);
 			thisMidiMode = widget.getMidiMode(slot);
@@ -90,9 +86,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			thisSoftWithin = widget.getSoftWithin(slot);
 			thisCtrlButtonBank = widget.getCtrlButtonBank(slot);
 		}, {
-			widget.wdgtControllersAndModels !? {
-				wcm = widget.wdgtControllersAndModels;
-			};
+			wcm = widget.wdgtControllersAndModels;
 			thisMidiMode = widget.getMidiMode;
 			thisMidiMean = widget.getMidiMean;
 			thisMidiResolution = widget.getMidiResolution;
