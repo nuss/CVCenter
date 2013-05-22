@@ -1,4 +1,4 @@
-CVCenterKeyDownActionEditor {
+CVCenterKeyDownActions {
 
 	// classvar <allEditors;
 	classvar <viewActions;
@@ -68,6 +68,8 @@ CVCenterKeyDownActionEditor {
 					'arrow left' ->		113,
 					'arrow right' ->	114,
 				];
+
+				arrowsModifiers = IdentityDictionary[];
 
 				modifiers = IdentityDictionary[
 					\shift ->			131072,
@@ -166,11 +168,12 @@ CVCenterKeyDownActionEditor {
 
 			\windows, {
 				"KeyDownActions has not yet been implemented for Windows".warn;
+				#keyCodes, arrowsModifiers, modifiers = IdentityDictionary[]!3;
 			}
 		)
 	}
 
-	*new { |view, parent, bounds, name, save=true|
+	*editor { |view, parent, bounds, name, save=true|
 		^super.new.init(view, parent, bounds, name, save);
 	}
 
@@ -255,7 +258,8 @@ CVCenterKeyDownActionEditor {
 					editAreas[count],
 					tmpEditFlow.indentedRemaining.width@tmpEditFlow.indentedRemaining.height
 				).string_(funcString)
-			)
+			);
+			"editArea.bounds: %\nshortcutFields.bounds: %\neditBut.bounds: %\nremoveBut: %\nfuncField.bounds: %\n".postf(editAreas[count].bounds, shortcutFields[count].bounds, editButs[count].bounds, editButs[count].bounds, removeButs[count].bounds, funcFields[count].bounds);
 		};
 
 		viewActions[view] !? {

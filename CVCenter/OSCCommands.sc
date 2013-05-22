@@ -17,6 +17,7 @@
 
 OSCCommands {
 
+	classvar <window;
 	classvar collectFunc, collectRunning = false, cmdList;
 	classvar <tempIPsAndCmds, oscFunc, <tempCollectRunning = false;
 
@@ -132,7 +133,7 @@ OSCCommands {
 	}
 
 	*makeWindow {
-		var window, flow, fields = (), deviceNameField, saveBut;
+		var flow, fields = (), deviceNameField, saveBut;
 		var progress, progressStates, progressRoutine, collectRoutine, stopFunc;
 		var makeField, nextFields;
 		var staticTextFont = Font(Font.defaultSansFace, 10);

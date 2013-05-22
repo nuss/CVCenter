@@ -486,6 +486,8 @@ CVCenterPreferences {
 			#[midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].do(prefs.removeAt(_));
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);
+		// shortcuts dummy
+		prefs.put(\shortcuts, ());
 		prefs.writeArchive(prefsPath);
 		if(informString.isNil, {
 			thisInformString = "Your CVCenter-preferences have successfully been written to disk and will become active after library-recompilation.";
