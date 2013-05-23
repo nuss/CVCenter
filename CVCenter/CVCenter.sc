@@ -187,7 +187,7 @@ CVCenter {
 			);
 			// PdefAllGui
 			scFunc = "{
-				if(CVCenter.scv.pDefWin.isNil or{ CVCenter.scv.pDefWin.isClosed }) {
+				if(CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
 					CVCenter.scv.pDefGui = PdefAllGui();
 					CVCenter.scv.pDefWin = CVCenter.scv.pDefGui.parent
 				};
@@ -203,14 +203,14 @@ CVCenter {
 			);
 			// PdefnAllGui
 			scFunc = "{
-				if(CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
-					CVCenter.scv.pDefGui = PdefnAllGui();
-					CVCenter.scv.pDefWin = CVCenter.scv.pDefGui.parent
+				if(CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
+					CVCenter.scv.pDefnGui = PdefnAllGui();
+					CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent
 				};
-				if(CVCenter.scv.pDefWin.notNil and:{
-					CVCenter.scv.pDefWin.isClosed.not
+				if(CVCenter.scv.pDefnWin.notNil and:{
+					CVCenter.scv.pDefnWin.isClosed.not
 				}) {
-					CVCenter.scv.pDefWin.front
+					CVCenter.scv.pDefnWin.front
 				}
 			}";
 			shortcuts.put(
@@ -251,7 +251,7 @@ CVCenter {
 			}";
 			shortcuts.put(
 				\a,
-				(keyCode: CVCenterKeyDownActions.keyCodes[$a])
+				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$a])
 			);
 			// MasterEQ
 			scFunc = "{
@@ -269,7 +269,7 @@ CVCenter {
 			}";
 			shortcuts.put(
 				\e,
-				(keyCode: CVCenterKeyDownActions.keyCodes[$e])
+				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$e])
 			);
 			// focus tabs 0-9
 			(0..9).do({ |i|
@@ -437,121 +437,27 @@ CVCenter {
 				shortcuts.values.do({ |keyDowns|
 					v.keyDownAction_(
 						v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-							// [view, char, modifiers, unicode, keycode].postcs;
-							// [keyDowns.keyCode, keyDowns.modifiers, keyDowns.arrowModifiers].postln;
-							// [keycode, modifiers].postln;
-								// [keycode == keyDowns.keyCode, modifiers == keyDowns.modifiers, modifiers == keyDowns.arrowModifiers].postln;
-							// [keyDowns.keyCode, keyDowns.modifiers, keyDowns.arrowModifiers].postln;
-							// if(keyDowns.keyCode == keycode, { keycode.postln });
-							if((keycode == keyDowns.keyCode and:{ modifiers.notNil }).and(
-								(modifiers == keyDowns.modifiers).or(modifiers == keyDowns.arrowModifiers)
-							), {
-								"hot!! %\n".postf([char, modifiers, keycode]);
-								keyDowns.func.interpret.value
-							}, {
-								if(keycode == keyDowns.keyCode, {
-									"hut!! %\n".postf(keycode);
-									keyDowns.func.interpret.value
-								})
-							});
-							// if(keyDowns.modifiers.notNil or:{ keyDowns.arrowModifiers.notNil }, {
-							// 	if((keycode == keyDowns.keyCode).and(
-							// 		(modifiers == keyDowns.modifiers).or(modifiers == keyDowns.arrowModifiers)
-							// 		), {
-							// 			"hot!! %\n".postf([char, modifiers, keycode]);
-							// 			keyDowns.func.interpret.value
-							// 	});
-							// 	}, {
-							// 		if(keycode == keyDowns.keyCode, {
-							// 			"hut!! %\n".postf(keycode);
-							// 			keyDowns.func.interpret.value
-							// 		})
-							// })
+							case
+								{ keyDowns.modifiers.notNil } {
+									if(keycode == keyDowns.keyCode and:{ modifiers == keyDowns.modifiers }, {
+										// "hot!! %\n".postf([char, modifiers, keycode]);
+										keyDowns.func.interpret.value;
+									})
+								}
+								{ keyDowns.modifiers.isNil } {
+									if(keycode == keyDowns.keyCode and:{
+										(modifiers == CVCenterKeyDownActions.modifiers[\none]).or(
+											modifiers == CVCenterKeyDownActions.arrowsModifiers[\none]
+										)
+									}, {
+										// "hut!! %\n".postf([char, modifiers, modifiers.class, keycode]);
+										keyDowns.func.interpret.value;
+									})
+								}
+							;
 						})
 					)
 				});
-
-
-					// // [view, char, modifiers, unicode, keycode].postcs;
-					// switch(keycode,
-					// 	// 16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-					// 	// 16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
-					// 	114, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-					// 	113, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
-					// 	// when and why have the keycodes been changed??
-					// 	124, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-					// 	123, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
-					// );
-					// switch(unicode,
-					// 	99, { OSCCommands.gui }, // "c" -> collect OSC-commands resp. open the collector's GUI
-					// 	111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
-					// 	109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
-					// 	120, { // key "x" -> close window
-					// 		if(CVCenterControllersMonitor.window.notNil and:{
-					// 			CVCenterControllersMonitor.window.isClosed.not;
-					// 			}, {
-					// 				CVCenterControllersMonitor.window.close;
-					// 		})
-					// 	},
-					// 	104, { // key "h" -> start History and open History window
-					// 		if(History.started === false, { History.start });
-					// 		if(historyWin.isNil or:{ historyWin.isClosed }, {
-					// 			historyGui = History.makeWin(
-					// 				Window.screenBounds.width-300 @ Window.screenBounds.height
-					// 			);
-					// 			historyWin = historyGui.w;
-					// 		});
-					// 		if(historyWin.notNil and:{ historyWin.isClosed.not }, { historyWin.front })
-					// 	},
-					// 	110, {
-					// 		if(nDefWin.isNil or:{ nDefWin.isClosed }, {
-					// 			nDefGui = NdefMixer(Server.default); nDefWin = nDefGui.parent;
-					// 		});
-					// 		if(nDefWin.notNil and:{ nDefWin.isClosed.not }, { nDefWin.front });
-					// 	}, // key "n" -> the NdefMixer for the default server
-					// 	112, {
-					// 		if(pDefWin.isNil or: { pDefWin.isClosed }, {
-					// 			pDefGui = PdefAllGui(); pDefWin = pDefGui.parent;
-					// 		});
-					// 		if(pDefWin.notNil and:{ pDefWin.isClosed.not }, { pDefWin.front });
-					// 	}, // key "p"
-					// 	80, {
-					// 		if(pDefnWin.isNil or: { pDefnWin.isClosed }, {
-					// 			pDefnGui = PdefnAllGui(); pDefnWin = pDefnGui.parent;
-					// 		});
-					// 		if(pDefnWin.notNil and:{ pDefnWin.isClosed.not }, { pDefnWin.front });
-					// 	}, // key shift+"p"
-					// 	116, {
-					// 		if(tDefWin.isNil or:{ tDefWin.isClosed }, {
-					// 			tDefGui = TdefAllGui(); tDefWin = tDefGui.parent;
-					// 		});
-					// 		if(tDefWin.notNil and:{ tDefWin.isClosed.not }, { tDefWin.front });
-					// 	}, // key "t"
-					// 	97, {
-					// 		if(\AllGui.asClass.notNil, {
-					// 			if(allWin.isNil or:{ allWin.isClosed }, {
-					// 				allGui = \AllGui.asClass.new; allWin = allGui.parent;
-					// 			});
-					// 			if(allWin.notNil and:{ allWin.isClosed.not }, { allWin.front })
-					// 		})
-					// 	}, // key "a"
-					// 	101, {
-					// 		if(\MasterEQ.asClass.notNil, {
-					// 			if(eqWin.isNil or:{ eqWin.isClosed }, {
-					// 				eqGui = \MasterEQ.asClass.new(Server.default.options.firstPrivateBus, Server.default);
-					// 				eqWin = eqGui.window;
-					// 			});
-					// 			if(eqWin.notNil and: { eqWin.isClosed.not }, { eqWin.front });
-					// 		})
-					// 	} // key "e"
-					// );
-					// if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }});
-					// if(modifiers == 131072 and:{ unicode == 72 and:{ History.started }}, {
-					// 	// keys <shift> + "h" -> end History and open History in a new document
-					// 	History.end;
-					// 	if(Platform.ideName != "scqt", { History.document });
-					// })
-			// })
 			});
 
 			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
@@ -1663,49 +1569,27 @@ CVCenter {
 					shortcuts.values.do({ |keyDowns|
 						thisTab.keyDownAction_(
 							thisTab.keyDownAction.add({ |view, char, modifiers, unicode, keycode|
-										// if((keyDowns.keyCode == keycode).and(
-										// 	(keyDowns.modifiers == modifiers).or(keyDowns.arrowModifiers == modifiers)
-										// 	), {
-										// 		keyDowns.func.interpret
-										// })
-										// if(keyDowns.modifiers.notNil or:{ keyDowns.arrowModifiers.notNil }, {
-									if((keycode == keyDowns.keyCode and:{ modifiers.notNil }).and(
-										(modifiers == keyDowns.modifiers).or(
-											modifiers == keyDowns.arrowModifiers
-										)
-									), {
-										"hot!! %\n".postf([char, modifiers, keycode]);
-										keyDowns.func.interpret.value
-									}, {
-										if(keycode == keyDowns.keyCode, {
-											"hut!! %\n".postf(keycode);
-											keyDowns.func.interpret.value
+								case
+									{ keyDowns.modifiers.notNil } {
+										if(keycode == keyDowns.keyCode and:{ modifiers == keyDowns.modifiers }, {
+											// "hot!! %\n".postf([char, modifiers, keycode]);
+											keyDowns.func.interpret.value;
 										})
-									});
-										// }, {
-										// 	if(keycode == keyDowns.keyCode, {
-										// 		"hut!! %\n".postf(keycode);
-										// 		keyDowns.func.interpret.value
-										// 	})
-										// })
+									}
+									{ keyDowns.modifiers.isNil } {
+										if(keycode == keyDowns.keyCode and:{
+											(modifiers == CVCenterKeyDownActions.modifiers[\none]).or(
+												modifiers == CVCenterKeyDownActions.arrowsModifiers[\none]
+											)
+										}, {
+											// "hut!! %\n".postf([char, modifiers, modifiers.class, keycode]);
+											keyDowns.func.interpret.value;
+										})
+									}
+								;
 							})
 						)
 					});
-								// //						[view, char, modifiers, unicode, keycode].postcs;
-								// switch(keycode,
-								// 	114, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-								// 	113, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
-								// 	// when and why have the keycodes been changed??
-								// 	124, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
-								// 	123, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
-								// );
-								// switch(unicode,
-								// 	111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
-								// 	109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
-								// 	120, { CVCenterControllersMonitor.window.close } // key "x" -> close window
-								// );
-								// if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }})
-					// });
 					cvTabIndex = tabLabels.size;
 					tabProperties = tabProperties.add((tabLabel: tab.asString, tabColor: nextColor.next));
 				})
@@ -1844,8 +1728,6 @@ CVCenter {
 					}, {
 						widgetStates[k].tabIndex = cvTabIndex;
 					});
-				// cvWidgets[k].widgetCV !? { cvWidgets[k].widgetCV.value_(cvWidgets[k].widgetCV.value) };
-				// widgetStates[k] !? { widgetStates[k].actions !? { cvWidgets[k].wdgtActions = widgetStates[k].actions }};
 					cvWidgets[k].background_(tabProperties[cvTabIndex].tabColor);
 					tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 				}

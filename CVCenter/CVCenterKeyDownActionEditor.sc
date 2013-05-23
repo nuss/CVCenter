@@ -69,9 +69,10 @@ CVCenterKeyDownActions {
 					'arrow right' ->	114,
 				];
 
-				arrowsModifiers = IdentityDictionary[];
+				// arrowsModifiers = IdentityDictionary[];
 
-				modifiers = IdentityDictionary[
+				modifiers = arrowsModifiers = IdentityDictionary[
+					\none ->			0,
 					\shift ->			131072,
 					\alt ->				524288,
 					'alt + shift' ->	655360,
@@ -137,13 +138,14 @@ CVCenterKeyDownActions {
 				switch(GUI.id,
 					\cocoa, {
 						arrowsModifiers = IdentityDictionary[
-							// 'none' ->			10486016,
+							'none' ->			10486016,
 							'alt' ->			11010336,
 							'shift' ->			10617090,
 							'alt + shift' ->	11141410
 						];
 
 						modifiers = IdentityDictionary[
+							\none ->			0,
 							\alt ->				524576,
 							\shift ->			131330,
 							'alt + shift' ->	655650,
@@ -151,13 +153,14 @@ CVCenterKeyDownActions {
 					},
 					\qt, {
 						arrowsModifiers = IdentityDictionary[
-							// 'none' ->			2097152,
+							\none ->			2097152,
 							'alt' ->			2621440,
 							'shift' ->			2228224,
 							'alt + shift' ->	2752512
 						];
 
 						modifiers = IdentityDictionary[
+							\none ->			'???',
 							\shift ->			131072,
 							\alt ->				524288,
 							'alt + shift' ->	655360,
