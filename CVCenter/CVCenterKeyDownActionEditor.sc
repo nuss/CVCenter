@@ -160,7 +160,7 @@ CVCenterKeyDownActions {
 						];
 
 						modifiers = IdentityDictionary[
-							\none ->			'???',
+							\none ->			0,
 							\shift ->			131072,
 							\alt ->				524288,
 							'alt + shift' ->	655360,
