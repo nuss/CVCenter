@@ -236,14 +236,14 @@ CVCenterKeyDownActions {
 		)
 	}
 
-	*editor { |view, parent, bounds, name, save=true|
-		^super.new.init(view, parent, bounds, name, save);
+	*editor { |parent, bounds, shortcutsDict, save=true|
+		^super.new.init(parent, bounds, shortcutsDict, save);
 	}
 
-	init { |view, parent, bounds, name, save|
-		var thisName, thisView, viewName;
+	init { |parent, bounds, shortcutsDict, save|
+		var thisName, viewName;
 		var scrollArea, scrollView, editAreas, editButs, removeButs, butArea, newBut, saveBut;
-		var makeEditAreas, shortcutFields, funcFields;
+		var makeEditArea, shortcutFields, funcFields;
 		var scrollFlow, editFlows, butFlow;
 		var editAreasBg, shortCutColor, shortCutFont, textFieldFont;
 		var tmpEditFlow;
@@ -253,13 +253,7 @@ CVCenterKeyDownActions {
 		shortCutFont = Font("Arial", 14, true);
 		textFieldFont = Font("Andale Mono", 10);
 
-		view ?? {
-			Error("KeyDownActions.editor expects a view as first argument").throw;
-		};
-
-		thisView = view.asView;
-
-		if(name.isNil) { thisName = view.class } { thisName = name };
+		// if(name.isNil) { thisName = view.class } { thisName = name };
 
 		if(parent.isNil) {
 			window = Window("shortcut editor:"+thisName, bounds ?? { Rect(
@@ -267,7 +261,7 @@ CVCenterKeyDownActions {
 				Window.screenBounds.height-600/2,
 				600, 600
 			) });
-			view.onClose_({ window.close });
+			// view.onClose_({ window.close });
 		} { window = parent };
 
 		#editAreas, editFlows, editButs, removeButs = []!4;
@@ -285,7 +279,7 @@ CVCenterKeyDownActions {
 
 		scrollView.decorator = scrollFlow = FlowLayout(scrollView.bounds, 0@0, 1@0);
 
-		makeEditAreas = { |shortcut, funcString|
+		makeEditArea = { |shortcut, funcString|
 			var count;
 			editAreas = editAreas.add(
 				CompositeView(scrollView, scrollFlow.bounds.width-20@100).background_(Color(0.8, 0.8, 0.8));
@@ -294,10 +288,10 @@ CVCenterKeyDownActions {
 			editAreas[count].decorator = tmpEditFlow = FlowLayout(editAreas[count].bounds, 7@7, 2@2);
 			shortcutFields = shortcutFields.add(
 				StaticText(editAreas[count], tmpEditFlow.indentedRemaining.width-126@15);
-				shortcut !? {
-					shortcutFields[count].string_(shortcut);
-				}
 			);
+			shortcut !? {
+				shortcutFields[count].string_(shortcut);
+			};
 			editButs = editButs.add(
 				Button(editAreas[count], 60@15)
 					.states_([["edit", shortCutColor]])
@@ -322,14 +316,20 @@ CVCenterKeyDownActions {
 					tmpEditFlow.indentedRemaining.width@tmpEditFlow.indentedRemaining.height
 				).string_(funcString)
 			);
-			"editArea.bounds: %\nshortcutFields.bounds: %\neditBut.bounds: %\nremoveBut: %\nfuncField.bounds: %\n".postf(editAreas[count].bounds, shortcutFields[count].bounds, editButs[count].bounds, editButs[count].bounds, removeButs[count].bounds, funcFields[count].bounds);
+			// "editArea.bounds: %\nshortcutFields.bounds: %\neditBut.bounds: %\nremoveBut: %\nfuncField.bounds: %\n".postf(editAreas[count].bounds, shortcutFields[count].bounds, editButs[count].bounds, editButs[count].bounds, removeButs[count].bounds, funcFields[count].bounds);
 		};
 
-		viewActions[view] !? {
-			viewActions[view].pairsDo({ |shortcut, funcString|
-				makeEditAreas.(shortcut, funcString);
-			})
-		};
+		// viewActions[view] !? {
+		// 	viewActions[view].pairsDo({ |shortcut, funcString|
+		// 		makeEditArea.(shortcut, funcString);
+		// 	})
+		// };
+		shortcutsDict.pairsDo({ |shortcut, value|
+			[shortcut, value[\func]].postln;
+			makeEditArea.(shortcut, value[\func])
+		});
+
+		"editAreas.size: %\n".postf(editAreas.size);
 
 		parent ?? { window.front };
 	}
