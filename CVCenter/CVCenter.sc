@@ -103,21 +103,19 @@ CVCenter {
 		// next tab
 		"prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
 		if(prefs[\shortcuts].isEmpty, {
-			scFunc = "{
-				CVCenter.tabs.focus(
-					(CVCenter.tabs.activeTab+1).wrap(0, CVCenter.tabs.views.size-1)
-				)
-			}";
+			scFunc =
+			"{ CVCenter.tabs.focus(
+				(CVCenter.tabs.activeTab+1).wrap(0, CVCenter.tabs.views.size-1)
+			)}";
 			shortcuts.put(
 				'arrow right',
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes['arrow right'])
 			);
 			// previous tab
-			scFunc = "{
-				CVCenter.tabs.focus(
-					(CVCenter.tabs.activeTab-1).wrap(0, CVCenter.tabs.views.size-1)
-				)
-			}";
+			scFunc =
+			"{ CVCenter.tabs.focus(
+				(CVCenter.tabs.activeTab-1).wrap(0, CVCenter.tabs.views.size-1)
+			)}";
 			shortcuts.put(
 				'arrow left',
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes['arrow left'])
@@ -141,78 +139,73 @@ CVCenter {
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$m])
 			);
 			// close CVCenterControllersMonitor
-			scFunc = "{
-				if(CVCenterControllersMonitor.window.notNil.and(
-					CVCenterControllersMonitor.window.isClosed.not)
-				) {CVCenterControllersMonitor.window.close}
-			}";
+			scFunc =
+			"{ if(CVCenterControllersMonitor.window.notNil.and(
+				CVCenterControllersMonitor.window.isClosed.not)
+			) { CVCenterControllersMonitor.window.close }}";
 			shortcuts.put(
 				\esc,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[\esc])
 			);
 			// History GUI: start History and open History window
-			scFunc = "{
-				if(History.started === false) { History.start };
-				if(CVCenter.scv.historyWin.isNil or:{
-					CVCenter.scv.historyWin.isClosed
-				}) {
-					CVCenter.scv.historyGui = History.makeWin(
-						Window.screenBounds.width-300@Window.screenBounds.height
-					);
-					CVCenter.scv.historyWin = CVCenter.scv.historyGui.w
-				};
-				if(CVCenter.scv.historyWin.notNil and:{
-					CVCenter.scv.historyWin.isClosed.not
-				}) { CVCenter.scv.historyWin.front }
-			}";
+			scFunc =
+			"{ if(History.started === false) { History.start };
+			if(CVCenter.scv.historyWin.isNil or:{
+				CVCenter.scv.historyWin.isClosed
+			}) {
+				CVCenter.scv.historyGui = History.makeWin(
+					Window.screenBounds.width-300@Window.screenBounds.height
+				);
+				CVCenter.scv.historyWin = CVCenter.scv.historyGui.w
+			};
+			if(CVCenter.scv.historyWin.notNil and:{
+				CVCenter.scv.historyWin.isClosed.not
+			}) { CVCenter.scv.historyWin.front }}";
 			shortcuts.put(
 				\h,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$h])
 			);
 			// NdefMixer
-			scFunc = "{
-				if(CVCenter.scv.nDefWin.isNil or:{ CVCenter.scv.nDefWin.isClosed }) {
-					CVCenter.scv.nDefGui = NdefMixer(Server.default);
-					CVCenter.scv.nDefWin = CVCenter.scv.nDefGui.parent
-				};
-				if(CVCenter.scv.nDefWin.notNil and:{
-					CVCenter.scv.nDefWin.isClosed.not
-				}) {
-					CVCenter.scv.nDefWin.front
-				}
-			}";
+			scFunc =
+			"{ if(CVCenter.scv.nDefWin.isNil or:{ CVCenter.scv.nDefWin.isClosed }) {
+				CVCenter.scv.nDefGui = NdefMixer(Server.default);
+				CVCenter.scv.nDefWin = CVCenter.scv.nDefGui.parent
+			};
+			if(CVCenter.scv.nDefWin.notNil and:{
+				CVCenter.scv.nDefWin.isClosed.not
+			}) {
+				CVCenter.scv.nDefWin.front
+			}}";
 			shortcuts.put(
 				\n,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$n])
 			);
 			// PdefAllGui
-			scFunc = "{
-				if(CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
-					CVCenter.scv.pDefGui = PdefAllGui();
-					CVCenter.scv.pDefWin = CVCenter.scv.pDefGui.parent
-				};
-				if(CVCenter.scv.pDefWin.notNil and:{
-					CVCenter.scv.pDefWin.isClosed.not
-				}) {
-					CVCenter.scv.pDefWin.front
-				}
-			}";
+			scFunc =
+			"{ if(CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
+				CVCenter.scv.pDefGui = PdefAllGui();
+				CVCenter.scv.pDefWin = CVCenter.scv.pDefGui.parent
+			};
+			if(CVCenter.scv.pDefWin.notNil and:{
+				CVCenter.scv.pDefWin.isClosed.not
+			}) {
+				CVCenter.scv.pDefWin.front
+			}}";
 			shortcuts.put(
 				\p,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$p])
 			);
 			// PdefnAllGui
-			scFunc = "{
-				if(CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
-					CVCenter.scv.pDefnGui = PdefnAllGui();
-					CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent
-				};
-				if(CVCenter.scv.pDefnWin.notNil and:{
-					CVCenter.scv.pDefnWin.isClosed.not
-				}) {
-					CVCenter.scv.pDefnWin.front
-				}
-			}";
+			scFunc =
+			"{ if(CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
+				CVCenter.scv.pDefnGui = PdefnAllGui();
+				CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent
+			};
+			if(CVCenter.scv.pDefnWin.notNil and:{
+				CVCenter.scv.pDefnWin.isClosed.not
+			}) {
+				CVCenter.scv.pDefnWin.front
+			}}";
 			shortcuts.put(
 				'shift + p',
 				(
@@ -222,51 +215,48 @@ CVCenter {
 				)
 			);
 			// TdefAllGui
-			scFunc = "{
-				if(CVCenter.scv.tDefWin.isNil or:{ CVCenter.scv.tDefWin.isClosed }) {
-					CVCenter.scv.tDefGui = TdefAllGui();
-					CVCenter.scv.tDefWin = CVCenter.scv.tDefGui.parent
-				};
-				if(CVCenter.scv.tDefWin.notNil and:{
-					CVCenter.scv.tDefWin.isClosed.not
-				}) {
-					CVCenter.scv.tDefWin.front
-				}
-			}";
+			scFunc =
+			"{ if(CVCenter.scv.tDefWin.isNil or:{ CVCenter.scv.tDefWin.isClosed }) {
+				CVCenter.scv.tDefGui = TdefAllGui();
+				CVCenter.scv.tDefWin = CVCenter.scv.tDefGui.parent
+			};
+			if(CVCenter.scv.tDefWin.notNil and:{
+				CVCenter.scv.tDefWin.isClosed.not
+			}) {
+				CVCenter.scv.tDefWin.front
+			}}";
 			shortcuts.put(
 				\t,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$t])
 			);
 			// AllGui
-			scFunc = "{
-				if(\AllGui.asClass.notNil) {
-					if(CVCenter.scv.allWin.isNil or:{ CVCenter.scv.allWin.isClosed }) {
-						CVCenter.scv.allGui = \AllGui.asClass.new;
-						CVCenter.scv.allWin = CVCenter.scv.allGui.parent;
-					};
-					if(CVCenter.scv.allWin.notNil and:{
-						CVCenter.scv.allWin.isClosed.not
-					}) { CVCenter.scv.allWin.front };
-				}
-			}";
+			scFunc =
+			"{ if(\AllGui.asClass.notNil) {
+				if(CVCenter.scv.allWin.isNil or:{ CVCenter.scv.allWin.isClosed }) {
+					CVCenter.scv.allGui = \AllGui.asClass.new;
+					CVCenter.scv.allWin = CVCenter.scv.allGui.parent;
+				};
+				if(CVCenter.scv.allWin.notNil and:{
+					CVCenter.scv.allWin.isClosed.not
+				}) { CVCenter.scv.allWin.front };
+			}}";
 			shortcuts.put(
 				\a,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$a])
 			);
 			// MasterEQ
-			scFunc = "{
-				if(\MasterEQ.asClass.notNil) {
-					if(CVCenter.scv.eqWin.isNil or:{ CVCenter.scv.eqWin.isClosed }){
-						CVCenter.scv.eqGui = \MasterEQ.asClass.new(
-							Server.default.options.firstPrivateBus, Server.default
-						);
-						CVCenter.scv.eqWin = CVCenter.scv.eqGui.window;
-					};
-					if(CVCenter.scv.eqWin.notNil and:{
-						CVCenter.scv.eqWin.isClosed.not
-					}) { CVCenter.scv.eqWin.front };
-				}
-			}";
+			scFunc =
+			"{ if(\MasterEQ.asClass.notNil) {
+				if(CVCenter.scv.eqWin.isNil or:{ CVCenter.scv.eqWin.isClosed }){
+					CVCenter.scv.eqGui = \MasterEQ.asClass.new(
+						Server.default.options.firstPrivateBus, Server.default
+					);
+					CVCenter.scv.eqWin = CVCenter.scv.eqGui.window;
+				};
+				if(CVCenter.scv.eqWin.notNil and:{
+					CVCenter.scv.eqWin.isClosed.not
+				}) { CVCenter.scv.eqWin.front };
+			}}";
 			shortcuts.put(
 				\e,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$e])
@@ -280,15 +270,14 @@ CVCenter {
 				) });
 			});
 			// end History and open in new Document (cocoa only)
-			scFunc = "{
-				History.end;
-				if(Platform.ideName != \"scqt\") { History.document };
-				if(CVCenter.scv.historyWin.notNil and:{
-					CVCenter.scv.historyWin.isClosed.not
-				}, {
-					CVCenter.scv.historyWin.close;
-				})
-			}";
+			scFunc =
+			"{ History.end;
+			if(Platform.ideName != \"scqt\") { History.document };
+			if(CVCenter.scv.historyWin.notNil and:{
+				CVCenter.scv.historyWin.isClosed.not
+			}, {
+				CVCenter.scv.historyWin.close;
+			})}";
 			shortcuts.put(
 				'shift + h',
 				(

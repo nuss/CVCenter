@@ -246,6 +246,7 @@ CVCenterKeyDownActions {
 		var makeEditArea, shortcutFields, funcFields;
 		var scrollFlow, editFlows, butFlow;
 		var editAreasBg, shortCutColor, shortCutFont, textFieldFont;
+		var order, orderedShortcuts;
 		var tmpEditFlow;
 
 		editAreasBg = Color(0.8, 0.8, 0.8);
@@ -285,6 +286,12 @@ CVCenterKeyDownActions {
 				CompositeView(scrollView, scrollFlow.bounds.width-20@100).background_(Color(0.8, 0.8, 0.8));
 			);
 			count = editAreas.size-1;
+			scrollView.bounds_(Rect(
+				scrollView.bounds.left,
+				scrollView.bounds.top,
+				scrollView.bounds.width,
+				count * 100
+			));
 			editAreas[count].decorator = tmpEditFlow = FlowLayout(editAreas[count].bounds, 7@7, 2@2);
 			shortcutFields = shortcutFields.add(
 				StaticText(editAreas[count], tmpEditFlow.indentedRemaining.width-126@15);
@@ -314,7 +321,7 @@ CVCenterKeyDownActions {
 				TextView(
 					editAreas[count],
 					tmpEditFlow.indentedRemaining.width@tmpEditFlow.indentedRemaining.height
-				).string_(funcString)
+				).string_(funcString).font_(textFieldFont);
 			);
 			// "editArea.bounds: %\nshortcutFields.bounds: %\neditBut.bounds: %\nremoveBut: %\nfuncField.bounds: %\n".postf(editAreas[count].bounds, shortcutFields[count].bounds, editButs[count].bounds, editButs[count].bounds, removeButs[count].bounds, funcFields[count].bounds);
 		};
@@ -324,9 +331,11 @@ CVCenterKeyDownActions {
 		// 		makeEditArea.(shortcut, funcString);
 		// 	})
 		// };
-		shortcutsDict.pairsDo({ |shortcut, value|
-			[shortcut, value[\func]].postln;
-			makeEditArea.(shortcut, value[\func])
+		order = shortcutsDict.order;
+
+		order.do({ |shortcut, i|
+			[shortcut, shortcutsDict[shortcut][\func]].postln;
+			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", "    "))
 		});
 
 		"editAreas.size: %\n".postf(editAreas.size);
