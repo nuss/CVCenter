@@ -1,15 +1,15 @@
 CVCenterKeyDownActions {
 
 	// classvar <allEditors;
-	classvar <viewActions;
+	// classvar <viewActions;
 	classvar <keyCodes, <modifiers, <arrowsModifiers;
-	var <window, <>actions;
+	// var <window, <>actions;
 
 	*initClass {
 		Class.initClassTree(Platform);
 		Class.initClassTree(GUI);
 
-		viewActions = IdentityDictionary.new;
+		// viewActions = IdentityDictionary.new;
 
 		Platform.case(
 			\linux, {
@@ -236,22 +236,32 @@ CVCenterKeyDownActions {
 		)
 	}
 
-	*editor { |parent, bounds, shortcutsDict, save=true|
-		^super.new.init(parent, bounds, shortcutsDict, save);
+}
+
+CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
+
+	var <window;
+
+	*new { |parent, bounds, shortcutsDict, save=true, closeOnSave=false|
+		^super.new.init(parent, bounds, shortcutsDict, save, closeOnSave);
 	}
 
-	init { |parent, bounds, shortcutsDict, save|
+	init { |parent, bounds, shortcutsDict, save, closeOnSave|
 		var thisName, viewName;
-		var scrollArea, scrollView, editAreas, editButs, removeButs, butArea, newBut, saveBut;
-		var makeEditArea, shortcutFields, funcFields;
+		var scrollArea, scrollView, editAreas, editArea, butArea, newBut, saveBut;
+		var editButs, editBut, removeButs, removeBut;
+		var makeEditArea, shortcutFields, shortcutField, funcFields, funcField;
 		var scrollFlow, editFlows, butFlow;
-		var editAreasBg, shortCutColor, shortCutFont, textFieldFont;
+		var editAreasBg, shortCutColor, staticTextFont, shortCutFont, textFieldFont;
 		var order, orderedShortcuts;
-		var tmpEditFlow;
+		var tmpEditFlow, tmpIndex, join = " + ", mods;
+		// vars for makeEditArea
+		var count, rmBounds;
 
 		editAreasBg = Color(0.8, 0.8, 0.8);
 		shortCutColor = Color(0.1, 0.1, 0.1);
-		shortCutFont = Font("Arial", 14, true);
+		staticTextFont = Font("Arial", 10);
+		shortCutFont = Font("Arial", 12, true);
 		textFieldFont = Font("Andale Mono", 10);
 
 		// if(name.isNil) { thisName = view.class } { thisName = name };
@@ -268,10 +278,10 @@ CVCenterKeyDownActions {
 		#editAreas, editFlows, editButs, removeButs = []!4;
 
 		scrollArea = ScrollView(window.asView, Rect(
-			0, 0, window.asView.bounds.width, window.asView.bounds.height-31
+			0, 0, window.asView.bounds.width, window.asView.bounds.height-29
 		)).hasHorizontalScroller_(false);
-		butArea = CompositeView(parent.asView, Rect(
-			0, window.asView.bounds.height-31, window.asView.bounds.width, 31
+		butArea = CompositeView(window.asView, Rect(
+			0, window.asView.bounds.height-29, window.asView.bounds.width, 29
 		));
 
 		scrollView = CompositeView(scrollArea, Rect(
@@ -281,9 +291,10 @@ CVCenterKeyDownActions {
 		scrollView.decorator = scrollFlow = FlowLayout(scrollView.bounds, 0@0, 1@0);
 
 		makeEditArea = { |shortcut, funcString|
-			var count;
 			editAreas = editAreas.add(
-				CompositeView(scrollView, scrollFlow.bounds.width-20@100).background_(Color(0.8, 0.8, 0.8));
+				editArea = CompositeView(
+					scrollView, scrollFlow.bounds.width-20@100).background_(Color(0.8, 0.8, 0.8)
+				);
 			);
 			count = editAreas.size-1;
 			scrollView.bounds_(Rect(
@@ -292,54 +303,132 @@ CVCenterKeyDownActions {
 				scrollView.bounds.width,
 				count * 100
 			));
-			editAreas[count].decorator = tmpEditFlow = FlowLayout(editAreas[count].bounds, 7@7, 2@2);
+			editArea.decorator = tmpEditFlow = FlowLayout(editArea.bounds, 7@7, 2@2);
+			StaticText(editArea, 40@15).string_("shortcut:").font_(staticTextFont);
 			shortcutFields = shortcutFields.add(
-				StaticText(editAreas[count], tmpEditFlow.indentedRemaining.width-126@15);
+				shortcutField = StaticText(editArea, tmpEditFlow.indentedRemaining.width-125@15)
+					.background_(Color.white)
+					.font_(shortCutFont)
+				;
 			);
 			shortcut !? {
-				shortcutFields[count].string_(shortcut);
+				shortcutField.string_(" "++shortcut);
 			};
 			editButs = editButs.add(
-				Button(editAreas[count], 60@15)
+				editBut = Button(editArea, 60@15)
 					.states_([["edit", shortCutColor]])
 					.action_({ |bt|
-						editAreas.do(_.background_(editAreasBg));
-						editAreas[count].background_(Color.red);
+						editAreas.do({ |eArea, i|
+							eArea.background_(editAreasBg);
+							funcFields[i].enabled_(false);
+							scrollView.keyDownAction_({ |view, char, mod, unicode, keycode, key|
+								if(CVCenterKeyDownActions.keyCodes.findKeyForEqualValue(keycode).notNil, {
+									char !? {
+										if(CVCenterKeyDownActions.modifiers.includes(mod) and:{
+											CVCenterKeyDownActions.modifiers.findKeyForValue(mod) != \none
+										}, {
+											mods = CVCenterKeyDownActions.modifiers.findKeyForValue(mod);
+										}, {
+											if(CVCenterKeyDownActions.arrowsModifiers.includes(mod) and:{
+												CVCenterKeyDownActions.arrowsModifiers.findKeyForValue(mod) != \none
+											}, {
+												mods = CVCenterKeyDownActions.arrowsModifiers.findKeyForValue(mod);
+											})
+										});
+										if(mod.notNil and:{
+											mod != CVCenterKeyDownActions.modifiers[\none] and:{
+												mod != CVCenterKeyDownActions.arrowsModifiers[\none]
+											}
+										}, {
+											shortcutField.string_(
+												" "++ mods ++ join ++
+												CVCenterKeyDownActions.keyCodes.findKeyForValue(keycode)
+											);
+										}, {
+											shortcutField.string_(
+												" "++
+												CVCenterKeyDownActions.keyCodes.findKeyForValue(keycode)
+											)
+										})
+									}
+								})
+							})
+						});
+						funcField.enabled_(true);
+						editArea.background_(Color.red);
 					})
+					.font_(staticTextFont)
 				;
 			);
 			removeButs = removeButs.add(
-				Button(editAreas[count], 60@15)
+				Button(editArea, 60@15)
 					.states_([["remove", shortCutColor]])
 					.action_({ |bt|
-
+						tmpIndex = editAreas.detectIndex({ |it| it == bt.parent });
+						rmBounds = bt.parent.bounds;
+						bt.parent.remove;
+						editAreas.removeAt(tmpIndex);
+					// editAreas[tmpIndex] !? {
+					// editAreas[tmpIndex..].do({ |it, i|
+						editAreas.do({ |it|
+							if(it.bounds.top > rmBounds.top, {
+								it.bounds_(Rect(
+									it.bounds.left,
+									it.bounds.top-100,
+									it.bounds.width,
+									it.bounds.height
+								))
+							})
+						});
+					scrollView.bounds_(Rect(
+						scrollView.bounds.left,
+						scrollView.bounds.top,
+						scrollView.bounds.width,
+						scrollView.bounds.height-100
+					));
+			// };
 					})
+					.font_(staticTextFont)
 				;
 			);
 			tmpEditFlow.nextLine;
 			funcFields = funcFields.add(
-				TextView(
-					editAreas[count],
+				funcField = TextView(
+					editArea,
 					tmpEditFlow.indentedRemaining.width@tmpEditFlow.indentedRemaining.height
-				).string_(funcString).font_(textFieldFont);
+				).font_(textFieldFont).enabled_(false);
 			);
-			// "editArea.bounds: %\nshortcutFields.bounds: %\neditBut.bounds: %\nremoveBut: %\nfuncField.bounds: %\n".postf(editAreas[count].bounds, shortcutFields[count].bounds, editButs[count].bounds, editButs[count].bounds, removeButs[count].bounds, funcFields[count].bounds);
+			funcString !? { funcFields[count].string_(funcString) }
+			// "editArea.bounds: %\nshortcutFields.bounds: %\neditBut.bounds: %\nremoveBut: %\nfuncField.bounds: %\n".postf(editArea.bounds, shortcutFields[count].bounds, editButs[count].bounds, editButs[count].bounds, removeButs[count].bounds, funcFields[count].bounds);
 		};
 
-		// viewActions[view] !? {
-		// 	viewActions[view].pairsDo({ |shortcut, funcString|
-		// 		makeEditArea.(shortcut, funcString);
-		// 	})
-		// };
 		order = shortcutsDict.order;
 
 		order.do({ |shortcut, i|
-			[shortcut, shortcutsDict[shortcut][\func]].postln;
+			// [shortcut, shortcutsDict[shortcut][\func]].postln;
 			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", "    "))
 		});
 
-		"editAreas.size: %\n".postf(editAreas.size);
+		// "editAreas.size: %\n".postf(editAreas.size);
 
+		butArea.decorator = butFlow = FlowLayout(butArea.bounds, 7@7, 3@0);
+
+		newBut = Button(butArea, 70@15)
+			.font_(staticTextFont)
+			.states_([["new action", shortCutColor]])
+			.action_({ |bt|
+				editAreas.do({ |cview|
+					cview.bounds_(Rect(
+						cview.bounds.left,
+						cview.bounds.top+100,
+						cview.bounds.width,
+						cview.bounds.height
+					));
+				});
+				scrollFlow.reset;
+				makeEditArea.(funcString: "{ /*do something */ }");
+			})
+		;
 		parent ?? { window.front };
 	}
 

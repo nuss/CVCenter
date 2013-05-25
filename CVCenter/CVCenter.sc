@@ -19,7 +19,7 @@ CVCenter {
 
 	classvar <all, nextCVKey, <cvWidgets, <window, <tabs, prefPane, removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
-	classvar <shortcuts, <tabShortcuts, <scv;
+	classvar <>shortcuts, <tabShortcuts, <scv;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight;
 	classvar widgetStates;
 	classvar tabProperties, colors, nextColor;
@@ -95,61 +95,66 @@ CVCenter {
 			prefs[\removeResponders] !? { CVWidget.removeResponders_(prefs[\removeResponders]) };
 		};
 
-		#all, cvWidgets, widgetStates, removeButs, shortcuts, tabShortcuts = IdentityDictionary.new!6;
+		this.shortcuts = IdentityDictionary.new;
+		#all, cvWidgets, widgetStates, removeButs, tabShortcuts = IdentityDictionary.new!5;
 		tabProperties = [];
 
 		// shortcuts
 		scv = (); // environment holding various variables used in shortcut-functions;
-		// next tab
+
 		"prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
 		if(prefs[\shortcuts].isEmpty, {
 			scFunc =
-			"{ CVCenter.tabs.focus(
+			"// next tab
+			{ CVCenter.tabs.focus(
 				(CVCenter.tabs.activeTab+1).wrap(0, CVCenter.tabs.views.size-1)
 			)}";
-			shortcuts.put(
+			this.shortcuts.put(
 				'arrow right',
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes['arrow right'])
 			);
-			// previous tab
 			scFunc =
-			"{ CVCenter.tabs.focus(
+			"// previous tab
+			{ CVCenter.tabs.focus(
 				(CVCenter.tabs.activeTab-1).wrap(0, CVCenter.tabs.views.size-1)
 			)}";
-			shortcuts.put(
+			this.shortcuts.put(
 				'arrow left',
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes['arrow left'])
 			);
-			//  OSCCommands gui
-			scFunc = "{ OSCCommands.makeWindow }";
-			shortcuts.put(
+			scFunc =
+			"// OSCCommands gui
+			{ OSCCommands.makeWindow }";
+			this.shortcuts.put(
 				\d,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$d])
 			);
-			// CVCenterControllersMonitor OSC
-			scFunc = "{ CVCenterControllersMonitor(1) }";
-			shortcuts.put(
+			scFunc =
+			"// CVCenterControllersMonitor OSC
+			{ CVCenterControllersMonitor(1) }";
+			this.shortcuts.put(
 				\o,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$o])
 			);
-			// CVCenterControllersMonitor MIDI
-			scFunc = "{ CVCenterControllersMonitor(0) }";
-			shortcuts.put(
+			scFunc =
+			"// CVCenterControllersMonitor MIDI
+			{ CVCenterControllersMonitor(0) }";
+			this.shortcuts.put(
 				\m,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$m])
 			);
-			// close CVCenterControllersMonitor
 			scFunc =
-			"{ if(CVCenterControllersMonitor.window.notNil.and(
+			"// close CVCenterControllersMonitor
+			{ if(CVCenterControllersMonitor.window.notNil.and(
 				CVCenterControllersMonitor.window.isClosed.not)
 			) { CVCenterControllersMonitor.window.close }}";
-			shortcuts.put(
+			this.shortcuts.put(
 				\esc,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[\esc])
 			);
-			// History GUI: start History and open History window
 			scFunc =
-			"{ if(History.started === false) { History.start };
+			"// History GUI: start History and open History window
+			{ if(History.started === false) { History.start };
 			if(CVCenter.scv.historyWin.isNil or:{
 				CVCenter.scv.historyWin.isClosed
 			}) {
@@ -161,13 +166,13 @@ CVCenter {
 			if(CVCenter.scv.historyWin.notNil and:{
 				CVCenter.scv.historyWin.isClosed.not
 			}) { CVCenter.scv.historyWin.front }}";
-			shortcuts.put(
+			this.shortcuts.put(
 				\h,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$h])
 			);
-			// NdefMixer
 			scFunc =
-			"{ if(CVCenter.scv.nDefWin.isNil or:{ CVCenter.scv.nDefWin.isClosed }) {
+			"// NdefMixer
+			{ if(CVCenter.scv.nDefWin.isNil or:{ CVCenter.scv.nDefWin.isClosed }) {
 				CVCenter.scv.nDefGui = NdefMixer(Server.default);
 				CVCenter.scv.nDefWin = CVCenter.scv.nDefGui.parent
 			};
@@ -176,13 +181,13 @@ CVCenter {
 			}) {
 				CVCenter.scv.nDefWin.front
 			}}";
-			shortcuts.put(
+			this.shortcuts.put(
 				\n,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$n])
 			);
-			// PdefAllGui
 			scFunc =
-			"{ if(CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
+			"// PdefAllGui
+			{ if(CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
 				CVCenter.scv.pDefGui = PdefAllGui();
 				CVCenter.scv.pDefWin = CVCenter.scv.pDefGui.parent
 			};
@@ -191,13 +196,13 @@ CVCenter {
 			}) {
 				CVCenter.scv.pDefWin.front
 			}}";
-			shortcuts.put(
+			this.shortcuts.put(
 				\p,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$p])
 			);
-			// PdefnAllGui
 			scFunc =
-			"{ if(CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
+			"// PdefnAllGui
+			{ if(CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
 				CVCenter.scv.pDefnGui = PdefnAllGui();
 				CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent
 			};
@@ -206,7 +211,7 @@ CVCenter {
 			}) {
 				CVCenter.scv.pDefnWin.front
 			}}";
-			shortcuts.put(
+			this.shortcuts.put(
 				'shift + p',
 				(
 					func: scFunc,
@@ -214,9 +219,9 @@ CVCenter {
 					modifiers: CVCenterKeyDownActions.modifiers[\shift]
 				)
 			);
-			// TdefAllGui
 			scFunc =
-			"{ if(CVCenter.scv.tDefWin.isNil or:{ CVCenter.scv.tDefWin.isClosed }) {
+			"// TdefAllGui
+			{ if(CVCenter.scv.tDefWin.isNil or:{ CVCenter.scv.tDefWin.isClosed }) {
 				CVCenter.scv.tDefGui = TdefAllGui();
 				CVCenter.scv.tDefWin = CVCenter.scv.tDefGui.parent
 			};
@@ -225,13 +230,13 @@ CVCenter {
 			}) {
 				CVCenter.scv.tDefWin.front
 			}}";
-			shortcuts.put(
+			this.shortcuts.put(
 				\t,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$t])
 			);
-			// AllGui
 			scFunc =
-			"{ if(\AllGui.asClass.notNil) {
+			"// AllGui
+			{ if(\AllGui.asClass.notNil) {
 				if(CVCenter.scv.allWin.isNil or:{ CVCenter.scv.allWin.isClosed }) {
 					CVCenter.scv.allGui = \AllGui.asClass.new;
 					CVCenter.scv.allWin = CVCenter.scv.allGui.parent;
@@ -240,13 +245,13 @@ CVCenter {
 					CVCenter.scv.allWin.isClosed.not
 				}) { CVCenter.scv.allWin.front };
 			}}";
-			shortcuts.put(
+			this.shortcuts.put(
 				\a,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$a])
 			);
-			// MasterEQ
 			scFunc =
-			"{ if(\MasterEQ.asClass.notNil) {
+			"// MasterEQ
+			{ if(\MasterEQ.asClass.notNil) {
 				if(CVCenter.scv.eqWin.isNil or:{ CVCenter.scv.eqWin.isClosed }){
 					CVCenter.scv.eqGui = \MasterEQ.asClass.new(
 						Server.default.options.firstPrivateBus, Server.default
@@ -257,28 +262,29 @@ CVCenter {
 					CVCenter.scv.eqWin.isClosed.not
 				}) { CVCenter.scv.eqWin.front };
 			}}";
-			shortcuts.put(
+			this.shortcuts.put(
 				\e,
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$e])
 			);
-			// focus tabs 0-9
 			(0..9).do({ |i|
-				scFunc = "{ CVCenter.tabs.views["++i++"] !? { CVCenter.tabs.focus("++i++") }}";
-				[shortcuts, tabShortcuts].do({ |dict| dict.put(
+				scFunc =
+				"// focus tab "++i++"
+				{ CVCenter.tabs.views["++i++"] !? { CVCenter.tabs.focus("++i++") }}";
+				this.shortcuts.put(
 					i.asSymbol,
 					(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[i.asString[0]])
-				) });
+				);
 			});
-			// end History and open in new Document (cocoa only)
 			scFunc =
-			"{ History.end;
+			"// end History and open in new Document (Cocoa-IDE only)
+			{ History.end;
 			if(Platform.ideName != \"scqt\") { History.document };
 			if(CVCenter.scv.historyWin.notNil and:{
 				CVCenter.scv.historyWin.isClosed.not
 			}, {
 				CVCenter.scv.historyWin.close;
 			})}";
-			shortcuts.put(
+			this.shortcuts.put(
 				'shift + h',
 				(
 					func: scFunc,
@@ -423,7 +429,7 @@ CVCenter {
 			prefPane.resize_(8).background_(Color.black);
 
 			[tabs.view, tabs.views, prefPane].flat.do({ |v|
-				shortcuts.values.do({ |keyDowns|
+				this.shortcuts.values.do({ |keyDowns|
 					v.keyDownAction_(
 						v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
 							case
@@ -1555,7 +1561,7 @@ CVCenter {
 					this.renameTab(tabs.getLabelAt(0), tab.asString);
 				}, {
 					thisTab = tabs.add(tab);
-					shortcuts.values.do({ |keyDowns|
+					this.shortcuts.values.do({ |keyDowns|
 						thisTab.keyDownAction_(
 							thisTab.keyDownAction.add({ |view, char, modifiers, unicode, keycode|
 								case
