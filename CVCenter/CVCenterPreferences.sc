@@ -21,13 +21,17 @@ CVCenterPreferences {
 
 	*dialog {
 		var labelColors, labelStringColors, tabs, scTab, prefsTab, scTabs, flow1, flow2, saveCancel, saveCancelFlow;
-		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
+		var guiView, guiFlow, midiView, midiFlow, responderView, responderFlow;
+		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
+		// shortcut-tabs
+		var cvCenterTab, cvWidgetEditorTab;
+		var cvCenterEditor, cvWidgetEditor;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
 		var saveClassVars, removeResponders;
 		var initMidiOnStartUp, initMidiText;
 		var saveMidiMode, saveMidiResolution, saveCtrlButtonBank, saveMidiMean, saveSoftWithin;
 		var textMidiMode, textMidiResolution, textCtrlButtonBank, textMidiMean, textSoftWithin;
-		var prefSaveGuiProps, buildCheckbox, buildNumTextBox, uView, vHeight;
+		var prefSaveGuiProps, buildCheckbox, buildNumTextBox, vHeight;
 		var cvcBounds, propsText, classVarsText;
 		var fFact, specialHeight;
 		var prefs, rect;
@@ -36,16 +40,17 @@ CVCenterPreferences {
 
 		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
 
+		tabFont = Font("Arial", 12, true);
 		staticTextFont = Font("Arial", 12 * fFact);
 		staticTextColor = Color(0.2, 0.2, 0.2);
 		textFieldFont = Font("Andale Mono", 12);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
-		buildCheckbox = { |active|
+		buildCheckbox = { |view, active|
 			var cBox;
 			if(GUI.id === \cocoa, {
-				cBox = Button(prefsTab, 15@15)
+				cBox = Button(view, 15@15)
 					.states_([
 						["", Color.white, Color.white],
 						["X", Color.black, Color.white],
@@ -54,19 +59,19 @@ CVCenterPreferences {
 				;
 				if(active, { cBox.value_(1) }, { cBox.value_(0) });
 			}, {
-				cBox = \CheckBox.asClass.new(prefsTab, 15@15).value_(active);
+				cBox = \CheckBox.asClass.new(view, 15@15).value_(active);
 			});
 			cBox;
 		};
 
-		buildNumTextBox = { |val, kind, width, height, clip|
+		buildNumTextBox = { |view, val, kind, width, height, clip|
 			var ntBox;
 			case
 				{ kind === \text } {
-					ntBox = TextField(prefsTab, (width ?? { 30 }) @ (height ?? { 20 })).string_(val);
+					ntBox = TextField(view, (width ?? { 30 }) @ (height ?? { 20 })).string_(val);
 				}
 				{ kind === \num } {
-					ntBox = NumberBox(prefsTab, (width ?? { 30 }) @ ( height ?? { 20 }))
+					ntBox = NumberBox(view, (width ?? { 30 }) @ ( height ?? { 20 }))
 						.value_(val)
 						.clipLo_(clip[0] ?? { -100 })
 						.clipHi_(clip[1] ?? { 100 })
@@ -92,41 +97,46 @@ CVCenterPreferences {
 				.unfocusedColors_(Color.red!2)
 				.stringColors_(Color.white!2)
 				.stringFocusedColors_(Color.red!2)
+				.dragTabs_(false)
+				.font_(tabFont)
 			;
+
+			// button-area at the bottom ('cancel', 'save')
 
 			saveCancel = CompositeView(window, Rect(0, window.bounds.height-32, window.bounds.width, 32));
 			saveCancel.decorator = saveCancelFlow = FlowLayout(saveCancel.bounds, 7@2, 1@0);
+
+			// common preferences
 
 			prefsTab = tabs.add("common preferences", scroll: false);
 			scTab = tabs.add("shortcuts", scroll: false);
 
 			prefsTab.decorator = flow1 = FlowLayout(prefsTab.bounds, 7@7, 0@1);
 
-			uView = CompositeView(prefsTab, flow1.indentedRemaining.width@50)
+			guiView = CompositeView(prefsTab, flow1.indentedRemaining.width@57)
 				.background_(Color(0.95, 0.95, 0.95))
 			;
 
-			flow1.nextLine.shift(5, -50);
+			guiView.decorator = guiFlow = FlowLayout(guiView.bounds, 7@7, 0@3);
 
-			saveGuiPosition = PopUpMenu(prefsTab, flow1.bounds.width-30@20)
+			saveGuiPosition = PopUpMenu(guiView, guiFlow.indentedRemaining.width@20)
 				.items_([
-					"No specific settings for GUI-properties",
-					"Remember GUI-properties on shutdown / window-close",
-					"Remember GUI-properties as set below"
+					"No specific settings for CVCenter window-bounds",
+					"Remember CVCenter window-bounds on shutdown / window-close",
+					"Remember CVCenter window-bounds as set below"
 				])
 				.value_(prefs !? { prefs[\saveGuiProperties] } ?? { 0 })
 				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
 			;
 
-			leftText = StaticText(prefsTab, flow1.bounds.width/10@20)
+			leftText = StaticText(guiView, guiFlow.bounds.width/10@20)
 				.string_("left: ")
 				.font_(staticTextFont)
 				.align_(\right)
 			;
 
-			flow1.shift(0, 0);
-
-			left = buildNumTextBox.(prefs !? {
+			left = buildNumTextBox.(guiView, prefs !? {
 				prefs[\guiProperties] !? {
 					prefs[\guiProperties].left ?? { cvcBounds.left }
 				}
@@ -134,41 +144,37 @@ CVCenterPreferences {
 
 			flow1.shift(0, 0);
 
-			topText = StaticText(prefsTab, flow1.bounds.width/10@20)
+			topText = StaticText(guiView, guiFlow.bounds.width/10@20)
 				.string_("top: ")
 				.font_(staticTextFont)
 				.align_(\right)
 			;
 
-			top = buildNumTextBox.(prefs !? {
+			top = buildNumTextBox.(guiView, prefs !? {
 				prefs[\guiProperties] !? {
 					prefs[\guiProperties].top ?? { cvcBounds.top }
 				}
 			}, kind: \text, width: 60);
 
-			flow1.shift(0, 0);
-
-			widthText = StaticText(prefsTab, flow1.bounds.width/10@20)
+			widthText = StaticText(guiView, guiFlow.bounds.width/10@20)
 				.string_("width: ")
 				.font_(staticTextFont)
 				.align_(\right)
 			;
 
-			width = buildNumTextBox.(prefs !? {
+			width = buildNumTextBox.(guiView, prefs !? {
 				prefs[\guiProperties] !? {
 					prefs[\guiProperties].width ?? { cvcBounds.width }
 				}
 			}, kind: \text, width: 60);
 
-			flow1.shift(0, 0);
-
-			heightText = StaticText(prefsTab, flow1.bounds.width/10@20)
+			heightText = StaticText(guiView, guiFlow.bounds.width/10@20)
 				.string_("height: ")
 				.font_(staticTextFont)
 				.align_(\right)
 			;
 
-			height = buildNumTextBox.(prefs !? {
+			height = buildNumTextBox.(guiView, prefs !? {
 				prefs[\guiProperties] !? {
 					prefs[\guiProperties].height ?? { cvcBounds.height }
 				}
@@ -177,9 +183,9 @@ CVCenterPreferences {
 			if(saveGuiPosition.value == 0 or:{ saveGuiPosition.value == 1 }, {
 				[leftText, topText, widthText, heightText].do(_.stringColor_(Color(0.7, 0.7, 0.7, 0.7)));
 				[left, top, width, height].do(_.enabled_(false));
-				uView.background_(Color(0.95, 0.95, 0.95));
+				guiView.background_(Color(0.95, 0.95, 0.95));
 			}, {
-				[leftText, topText, widthText, heightText].do(_.stringColor_(Color.black));
+				[leftText, topText, widthText, heightText].do(_.stringColor_(staticTextColor));
 				[left, top, width, height].do(_.enabled_(true));
 			});
 
@@ -187,32 +193,32 @@ CVCenterPreferences {
 				if(dd.value == 0 or:{ dd.value == 1 }, {
 					[leftText, topText, widthText, heightText].do(_.stringColor_(Color(0.7, 0.7, 0.7, 0.7)));
 					[left, top, width, height].do(_.enabled_(false));
-					uView.background_(Color(0.95, 0.95, 0.95));
+					guiView.background_(Color(0.95, 0.95, 0.95));
 				}, {
 					[leftText, topText, widthText, heightText].do(_.stringColor_(Color.black));
 					[left, top, width, height].do(_.enabled_(true));
 				})
 			});
 
-			flow1.nextLine.shift(0, 6);
+			if(GUI.id ===\cocoa, { vHeight = 240 }, { vHeight = 236 });
 
-			if(GUI.id ===\cocoa, { vHeight = 251 }, { vHeight = 245 });
+			flow1.nextLine;
 
-			CompositeView(prefsTab, flow1.indentedRemaining.width@vHeight)
+			midiView = CompositeView(prefsTab, flow1.indentedRemaining.width@vHeight)
 				.background_(Color(0.95, 0.95, 0.95))
 			;
 
-			flow1.nextLine.shift(5, vHeight.neg);
+			midiView.decorator = midiFlow = FlowLayout(midiView.bounds, 7@7, 0@1);
 
 			if(prefs.notNil, {
-				initMidiOnStartUp = buildCheckbox.(prefs[\initMidiOnStartUp]);
+				initMidiOnStartUp = buildCheckbox.(midiView, prefs[\initMidiOnStartUp]);
 			}, {
-				initMidiOnStartUp = buildCheckbox.(false);
+				initMidiOnStartUp = buildCheckbox.(midiView, false);
 			});
 
-			flow1.shift(5, 1);
+			midiFlow.shift(5, -2);
 
-			initMidiText = StaticText(prefsTab, flow1.bounds.width-100@20)
+			initMidiText = StaticText(midiView, midiFlow.indentedRemaining.width@20)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Initialize MIDI on startup.")
@@ -224,17 +230,17 @@ CVCenterPreferences {
 				));
 			});
 
-			flow1.nextLine.shift(5, -5);
+			midiFlow.nextLine;
 
 			if(prefs.notNil, {
-				saveClassVars = buildCheckbox.(prefs[\saveClassVars]);
+				saveClassVars = buildCheckbox.(midiView, prefs[\saveClassVars]);
 			}, {
-				saveClassVars = buildCheckbox.(false);
+				saveClassVars = buildCheckbox.(midiView, false);
 			});
 
-			flow1.shift(5, 1);
+			midiFlow.shift(5, -2);
 
-			classVarsText = StaticText(prefsTab, flow1.bounds.width-100@20)
+			classVarsText = StaticText(midiView, midiFlow.indentedRemaining.width-100@20)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Remember CVCenter's MIDI-classvar-values on shutdown:")
@@ -247,15 +253,15 @@ CVCenterPreferences {
 				saveClassVars.toolTip_("Select this option to make CVCenter remember the current values\nof its classvars midiMode, midiResolution, midiMean, softWithin,\nctrlButtonBank on shutdown resp. startup.")
 			});
 
-			flow1.nextLine.shift(28, 0);
+			midiFlow.nextLine.shift(20, 2);
 
-			saveMidiMode = buildNumTextBox.(prefs !? {
+			saveMidiMode = buildNumTextBox.(midiView, prefs !? {
 				prefs[\midiMode] } ?? { CVCenter.midiMode }, \text
 			);
 
-			flow1.shift(5, 2);
+			midiFlow.shift(5, 2);
 
-			textMidiMode = StaticText(prefsTab, flow1.bounds.width-100@20)
+			textMidiMode = StaticText(midiView, midiFlow.indentedRemaining.width@20)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Set CVCenter's midi-mode (0 or 1).")
@@ -267,15 +273,15 @@ CVCenterPreferences {
 				)
 			});
 
-			flow1.nextLine.shift(28, 0);
+			midiFlow.nextLine.shift(20, 0);
 
-			saveMidiResolution = buildNumTextBox.(prefs !? {
+			saveMidiResolution = buildNumTextBox.(midiView, prefs !? {
 				prefs[\midiResolution] } ?? { CVCenter.midiResolution }, \text
 			);
 
-			flow1.shift(5, 2);
+			midiFlow.shift(5, 2);
 
-			textMidiResolution = StaticText(prefsTab, flow1.bounds.width-100@20)
+			textMidiResolution = StaticText(midiView, midiFlow.indentedRemaining.width@20)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Set CVCenter's midi-resolution. Applies only if midi-mode is 1.")
@@ -287,15 +293,15 @@ CVCenterPreferences {
 				)
 			});
 
-			flow1.nextLine.shift(28, 0);
+			midiFlow.nextLine.shift(20, 0);
 
-			saveMidiMean = buildNumTextBox.(prefs !? {
+			saveMidiMean = buildNumTextBox.(midiView, prefs !? {
 				prefs[\midiMean] } ?? { CVCenter.midiMean }, \text
 			);
 
-			flow1.shift(5, 2);
+			midiFlow.shift(5, 2);
 
-			textMidiMean = StaticText(prefsTab, flow1.bounds.width-100@30)
+			textMidiMean = StaticText(midiView, midiFlow.indentedRemaining.width@30)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Set CVCenter's midi-mean: the default-output of your MIDI-device's\nsliders in neutral position. Applies only if midi-mode is 1.")
@@ -307,15 +313,15 @@ CVCenterPreferences {
 				)
 			});
 
-			flow1.nextLine.shift(28, 0);
+			midiFlow.nextLine.shift(20, 0);
 
-			saveSoftWithin = buildNumTextBox.(prefs !? {
+			saveSoftWithin = buildNumTextBox.(midiView, prefs !? {
 				prefs[\softWithin] } ?? { CVCenter.softWithin }, \text
 			);
 
-			flow1.shift(5, 2);
+			midiFlow.shift(5, 2);
 
-			textSoftWithin = StaticText(prefsTab, flow1.bounds.width-100@42)
+			textSoftWithin = StaticText(midiView, midiFlow.bounds.width-100@42)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Set the soft-within threshold: the widget will only respond if the\ncurrent MIDI-output is within the widget's current value +/- threshold.\nApplies only if midi-mode is 0.");
@@ -326,17 +332,17 @@ CVCenterPreferences {
 				)
 			});
 
-			flow1.nextLine.shift(28, 0);
+			midiFlow.nextLine.shift(20, 0);
 
-			saveCtrlButtonBank = buildNumTextBox.(prefs !? {
+			saveCtrlButtonBank = buildNumTextBox.(midiView, prefs !? {
 				prefs[\ctrlButtonBank] } ?? { CVCenter.ctrlButtonBank }, \text
 			);
 
-			flow1.shift(5, 2);
+			midiFlow.shift(5, 4);
 
 			if(GUI.id === \cocoa, { specialHeight = 60 }, { specialHeight = 54 });
 
-			textCtrlButtonBank = StaticText(prefsTab, flow1.bounds.width-100@specialHeight)
+			textCtrlButtonBank = StaticText(midiView, midiFlow.indentedRemaining.width@specialHeight)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Set the number of sliders on in one bank of your MIDI-device.\nSetting this number will display the selected slider in a widget not as\na single number but rather as combination of the selected bank and\nthe slider number (e.g.: 4:3 means bank nr. 4, slider nr. 3)")
@@ -356,7 +362,7 @@ CVCenterPreferences {
 						_.enabled_(true)
 					);
 					[textMidiMode, textMidiMean, textMidiResolution, textSoftWithin, textCtrlButtonBank].do(
-						_.stringColor_(Color.black)
+						_.stringColor_(staticTextColor)
 					)
 				})
 			});
@@ -374,7 +380,7 @@ CVCenterPreferences {
 					_.enabled_(true)
 				);
 				[textMidiMode, textMidiMean, textMidiResolution, textSoftWithin, textCtrlButtonBank].do(
-					_.stringColor_(Color.black)
+					_.stringColor_(staticTextColor)
 				)
 			});
 
@@ -384,37 +390,49 @@ CVCenterPreferences {
 				)
 			});
 
-			flow1.nextLine.shift(0, 14);
+			flow1.nextLine;
 
-			CompositeView(prefsTab, flow1.indentedRemaining.width@25)
+			responderView = CompositeView(prefsTab, flow1.indentedRemaining.width@29)
 				.background_(Color(0.95, 0.95, 0.95))
 			;
 
-			flow1.nextLine.shift(5, -25);
+			responderView.decorator = responderFlow = FlowLayout(responderView.bounds, 7@7, 0@1);
 
 			if(prefs.notNil and:{ prefs[\removeResponders].notNil }, {
-				removeResponders = buildCheckbox.(prefs[\removeResponders])
+				removeResponders = buildCheckbox.(responderView, prefs[\removeResponders])
 			}, {
-				removeResponders = buildCheckbox.(CVCenter.removeResponders)
+				removeResponders = buildCheckbox.(responderView, CVCenter.removeResponders)
 			});
 
-			flow1.shift(5, 1);
+			responderFlow.shift(5, -2);
 
-			StaticText(prefsTab, flow1.bounds.width-100@20)
+			StaticText(responderView, responderFlow.indentedRemaining.width@20)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Remove all OSC-/MIDI-responders on cmd/ctrl-period.")
 			;
 
-			flow1.nextLine.shift(0, 8);
+			scTabs = TabbedView2(scTab, Rect(0, 1, scTab.bounds.width, scTab.bounds.height))
+				.tabHeight_(17)
+				.tabCurve_(3)
+				.labelColors_(Color.white!3)
+				.unfocusedColors_(Color.red!3)
+				.stringColors_(Color.white!3)
+				.stringFocusedColors_(Color.red!3)
+				.dragTabs_(false)
+				.font_(tabFont)
+			;
+
+			cvCenterTab = scTabs.add("CVCenter", scroll: false);
+			cvWidgetEditorTab = scTabs.add("CVWidget(MS)Editor", scroll: false);
+
+			cvCenterEditor = CVCenterKeyDownActionsEditor(cvCenterTab, cvCenterTab.bounds, CVCenter.shortcuts, false);
 
 			Button(saveCancel, saveCancelFlow.bounds.width/2-10@23)
 				.states_([["Cancel", Color.black, Color.white]])
 				.font_(Font("Arial", 14, true))
 				.action_({ window.close })
 			;
-
-			flow1.shift(-2, 0);
 
 			Button(saveCancel, saveCancelFlow.indentedRemaining.width@23)
 				.states_([["Save", Color.white, Color.red]])
@@ -426,7 +444,7 @@ CVCenterPreferences {
 						}).size < 4
 					}, {
 						[leftText, topText, widthText, heightText].do(_.stringColor_(Color.red));
-						uView.background_(Color.yellow);
+						guiView.background_(Color.yellow);
 						"Please supply valid values (integer numbers) for 'left', 'top', 'width', 'height'".warn;
 					}, {
 						if([left, top, width, height].select({ |f| f.string.interpret.notNil }).size == 4, {
@@ -475,7 +493,7 @@ CVCenterPreferences {
 		if(saveGuiProperties == 2 and:{
 			guiProperties.isNil
 		}, {
-			Error("Please provide either a Rect or an Array for your desired GUI-properties").throw;
+			Error("Please provide either a Rect or an Array for your desired GUI-bounds").throw;
 		});
 
 		prefsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterPreferences";
