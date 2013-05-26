@@ -134,41 +134,43 @@ CVCenterKeyDownActions {
 					'arrow left' -> 	123,
 					'arrow right' -> 	124,
 				];
+				
+				#arrowsModifiers, modifiers = ()!2;
 
-				switch(GUI.id,
-					\cocoa, {
-						"GUI.id is \cocoa".postln;
-						arrowsModifiers = IdentityDictionary[
+//				switch(GUI.id,
+//					\cocoa, {
+//						"GUI.id is \cocoa".postln;
+						arrowsModifiers.cocoa = IdentityDictionary[
 							'none' ->			10486016,
 							'alt' ->			11010336,
 							'shift' ->			10617090,
 							'alt + shift' ->	11141410
 						];
 
-						modifiers = IdentityDictionary[
+						modifiers.cocoa = IdentityDictionary[
 							\none ->			0,
 							\alt ->				524576,
 							\shift ->			131330,
 							'alt + shift' ->	655650,
-						]
-					},
-					\qt, {
-						"GUI.id is \qt".postln;
-						arrowsModifiers = IdentityDictionary[
+						];
+//					},
+//					\qt, {
+//						"GUI.id is \qt".postln;
+						arrowsModifiers.qt = IdentityDictionary[
 							\none ->			2097152,
 							'alt' ->			2621440,
 							'shift' ->			2228224,
 							'alt + shift' ->	2752512
 						];
 
-						modifiers = IdentityDictionary[
+						modifiers.qt = IdentityDictionary[
 							\none ->			0,
 							\shift ->			131072,
 							\alt ->				524288,
 							'alt + shift' ->	655360,
-						];
-					}
-				)
+						]
+//					}
+//				)
 			},
 
 			\windows, {
@@ -259,6 +261,26 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 		var tmpEditFlow, tmpIndex, join = " + ", mods;
 		// vars for makeEditArea
 		var count, rmBounds;
+		var thisArrowsModifiers, thisModifiers;
+		
+		Platform.case(
+			\osx, {
+				switch(GUI.id,
+					\qt, {
+						thisModifiers = modifiers.qt;
+						thisArrowsModifiers = arrowsModifiers.qt;
+					},
+					\cocoa, {
+						thisModifiers = modifiers.cocoa;
+						thisArrowsModifiers = arrowsModifiers.cocoa;
+					}
+				)
+			},
+			{
+				thisModifiers = modifiers;
+				thisArrowsModifiers = arrowsModifiers;
+			}
+		);
 
 		editAreasBg = Color(0.9, 0.9, 0.9);
 		staticTextColor = Color(0.1, 0.1, 0.1);
@@ -345,35 +367,33 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 							funcFields[i].enabled_(false);
 						});
 						scrollView.keyDownAction_({ |view, char, mod, unicode, keycode, key|
-							GUI.id.postln;
-							[view, char, mod, unicode, keycode, key].postln;
-							CVCenterKeyDownActions.modifiers.postln;
-							if(CVCenterKeyDownActions.keyCodes.findKeyForEqualValue(keycode).notNil, {
+//							GUI.id.postln;
+							if(keyCodes.findKeyForEqualValue(keycode).notNil, {
 								char !? {
-									if(CVCenterKeyDownActions.modifiers.includes(mod) and:{
-										CVCenterKeyDownActions.modifiers.findKeyForValue(mod) != \none
+									if(thisModifiers.includes(mod) and:{
+										thisModifiers.findKeyForValue(mod) != \none
 									}, {
-										mods = CVCenterKeyDownActions.modifiers.findKeyForValue(mod);
+										mods = thisModifiers.findKeyForValue(mod);
 									}, {
-										if(CVCenterKeyDownActions.arrowsModifiers.includes(mod) and:{
-											CVCenterKeyDownActions.arrowsModifiers.findKeyForValue(mod) != \none
+										if(thisArrowsModifiers.includes(mod) and:{
+											thisArrowsModifiers.findKeyForValue(mod) != \none
 										}, {
-											mods = CVCenterKeyDownActions.arrowsModifiers.findKeyForValue(mod);
+											mods = thisArrowsModifiers.findKeyForValue(mod);
 										})
 									});
 									if(mod.notNil and:{
-										mod != CVCenterKeyDownActions.modifiers[\none] and:{
-											mod != CVCenterKeyDownActions.arrowsModifiers[\none]
+										mod != thisModifiers[\none] and:{
+											mod != thisArrowsModifiers[\none]
 										}
 									}, {
 										shortcutField.string_(
 											" "++ mods ++ join ++
-											CVCenterKeyDownActions.keyCodes.findKeyForValue(keycode)
+											keyCodes.findKeyForValue(keycode)
 										);
 									}, {
 										shortcutField.string_(
 											" "++
-											CVCenterKeyDownActions.keyCodes.findKeyForValue(keycode)
+											keyCodes.findKeyForValue(keycode)
 										)
 									})
 								}
