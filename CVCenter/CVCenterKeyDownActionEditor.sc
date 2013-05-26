@@ -137,6 +137,7 @@ CVCenterKeyDownActions {
 
 				switch(GUI.id,
 					\cocoa, {
+						"GUI.id is \cocoa".postln;
 						arrowsModifiers = IdentityDictionary[
 							'none' ->			10486016,
 							'alt' ->			11010336,
@@ -152,6 +153,7 @@ CVCenterKeyDownActions {
 						]
 					},
 					\qt, {
+						"GUI.id is \qt".postln;
 						arrowsModifiers = IdentityDictionary[
 							\none ->			2097152,
 							'alt' ->			2621440,
@@ -343,6 +345,9 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 							funcFields[i].enabled_(false);
 						});
 						scrollView.keyDownAction_({ |view, char, mod, unicode, keycode, key|
+							GUI.id.postln;
+							[view, char, mod, unicode, keycode, key].postln;
+							CVCenterKeyDownActions.modifiers.postln;
 							if(CVCenterKeyDownActions.keyCodes.findKeyForEqualValue(keycode).notNil, {
 								char !? {
 									if(CVCenterKeyDownActions.modifiers.includes(mod) and:{
