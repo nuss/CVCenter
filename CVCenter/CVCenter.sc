@@ -102,7 +102,7 @@ CVCenter {
 		// shortcuts
 		scv = (); // environment holding various variables used in shortcut-functions;
 
-		"prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
+		// "prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
 		if(prefs[\shortcuts].isEmpty, {
 			scFunc =
 			"// next tab
@@ -1197,12 +1197,12 @@ CVCenter {
 				);
 				lib[\all][k].notes = cvWidgets[k].nameField.string;
 				lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
-				if(cvWidgets[k].background != tabProperties[widgetStates[k].tabIndex].tabColor, {
-					lib[\all][k].background = cvWidgets[k].background;
-				});
-				if(cvWidgets[k].stringColor != Color.black, {
-					lib[\all][k].stringColor = cvWidgets[k].stringColor;
-				})
+				// if(cvWidgets[k].background != tabProperties[widgetStates[k].tabIndex].tabColor, {
+				// 	lib[\all][k].background = cvWidgets[k].background;
+				// });
+				// if(cvWidgets[k].stringColor != Color.black, {
+				// 	lib[\all][k].stringColor = cvWidgets[k].stringColor;
+				// })
 			});
 
 			if(GUI.id === \cocoa, {
@@ -1476,8 +1476,8 @@ CVCenter {
 					}
 				);
 				cvWidgets[key].nameField.string_(v.notes);
-				v.background !? { cvWidgets[key].background_(v.background) };
-				v.stringColor !? { cvWidgets[key].stringColor_(v.stringColor) };
+				// v.background !? { cvWidgets[key].background_(v.background) };
+				// v.stringColor !? { cvWidgets[key].stringColor_(v.stringColor) };
 				if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
 				if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
 					CVCenterLoadDialog.window.close;

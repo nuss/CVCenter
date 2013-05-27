@@ -17,7 +17,7 @@
 
 CVWidget {
 
-	classvar <>removeResponders, <>midiSources, midiStateObserver;
+	classvar <>removeResponders, <>midiSources, <>shortcuts/*, midiStateObserver*/;
 	classvar <>debug = false;
 	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <background, <stringColor, <alwaysPositive = 0.1;
@@ -45,6 +45,7 @@ CVWidget {
 				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
 			})
 		});
+		this.shortcuts = IdentityDictionary.new;
 	}
 
 	setup {

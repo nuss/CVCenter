@@ -17,8 +17,8 @@
 
 AbstractCVWidgetEditor {
 
-	classvar <allEditors, xySlots, nextX, nextY, shiftXY;
-	var thisEditor, <window, <tabs, editorEnv, labelStringColors;
+	classvar <allEditors, <>shortcuts, xySlots, nextX, nextY, shiftXY;
+	var thisEditor, <window, <tabs, <scv, editorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
 	var <midiInitBut, <midiSourceSelect, <midiLearnBut, <midiSrcField, <midiChanField, <midiCtrlField;
@@ -32,8 +32,18 @@ AbstractCVWidgetEditor {
 	var flow0, flow1, flow2, flow3;
 
 	*initClass {
-		var localOscFunc;
+		var localOscFunc, scFunc;
+		// Class.initClassTree(CVCenterPreferences);
+
 		allEditors = IdentityDictionary.new;
+		this.shortcuts = IdentityDictionary.new;
+
+		scFunc =
+		"{ this.postln }";
+		this.shortcuts.put(
+			\t,
+			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$t])
+		)
 	}
 
 	front { |tab|

@@ -19,13 +19,17 @@ CVCenterPreferences {
 
 	classvar <window;
 
+	// *initClass {
+	// 	Class.initClassTree(AbstractCVWidgetEditor);
+	// }
+
 	*dialog {
 		var labelColors, labelStringColors, tabs, scTab, prefsTab, scTabs, flow1, flow2, saveCancel, saveCancelFlow;
 		var guiView, guiFlow, midiView, midiFlow, responderView, responderFlow;
 		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		// shortcut-tabs
-		var cvCenterTab, cvWidgetEditorTab;
-		var cvCenterEditor, cvWidgetEditor;
+		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab;
+		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
 		var saveClassVars, removeResponders;
 		var initMidiOnStartUp, initMidiText;
@@ -90,7 +94,7 @@ CVCenterPreferences {
 				Window.screenBounds.height/2-193,
 				498, 385
 			)).front;
-			
+
 			tabs = TabbedView2(window, Rect(0, 1, window.bounds.width, window.bounds.height-33))
 				.tabHeight_(17)
 				.tabCurve_(3)
@@ -425,9 +429,16 @@ CVCenterPreferences {
 			;
 
 			cvCenterTab = scTabs.add("CVCenter", scroll: false);
+			cvWidgetTab = scTabs.add("CVWidget", scroll: false);
 			cvWidgetEditorTab = scTabs.add("CVWidget(MS)Editor", scroll: false);
 
-			cvCenterEditor = CVCenterKeyDownActionsEditor(cvCenterTab, cvCenterTab.bounds, CVCenter.shortcuts, false);
+			cvCenterEditor = CVCenterKeyDownActionsEditor(
+				cvCenterTab, cvCenterTab.bounds, CVCenter.shortcuts, false
+			);
+			// CVWidgets go here
+			cvWidgetEditorEditor = CVCenterKeyDownActionsEditor(
+				cvWidgetEditorTab, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false
+			);
 
 			Button(saveCancel, saveCancelFlow.bounds.width/2-10@23)
 				.states_([["Cancel", Color.black, Color.white]])

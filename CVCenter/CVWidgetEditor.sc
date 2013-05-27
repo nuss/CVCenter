@@ -173,7 +173,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			thisEditor[\tabs] = tabs;
 
 			thisEditor[\tabs].view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
-//				[view, char, modifiers, unicode, keycode].postln;
+				//				[view, char, modifiers, unicode, keycode].postln;
 				switch(unicode,
 					111, { // "o" -> osc
 						switch(widget.class,
@@ -191,6 +191,32 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					115, { if(widget.class != CVWidgetMS, { thisEditor[\tabs].focus(0) }) }, // "s" -> specs
 					120, { this.close(slot) }, // "x" -> close editor
 					99, { OSCCommands.makeWindow } // "c" -> collect OSC-commands resp. open the collector's GUI
+				)
+			});
+
+			this.class.shortcuts.values.do({ |keyDowns|
+				// keyDowns.postcs;
+				thisEditor[\tabs].view.keyDownAction_(
+					thisEditor[\tabs].view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+						case
+						{ keyDowns.modifiers.notNil } {
+							if(keycode == keyDowns.keyCode and:{ modifiers == keyDowns.modifiers }, {
+								// "hot!! %\n".postf([char, modifiers, keycode]);
+								keyDowns.func.interpret.value;
+							})
+						}
+						{ keyDowns.modifiers.isNil } {
+							if(keycode == keyDowns.keyCode and:{
+								(modifiers == CVCenterKeyDownActions.modifiers[\none]).or(
+									modifiers == CVCenterKeyDownActions.arrowsModifiers[\none]
+								)
+								}, {
+									// "hit!! %\n".postf([char, modifiers, modifiers.class, keycode]);
+									keyDowns.func.interpret.value;
+							})
+						}
+						;
+					})
 				)
 			});
 
