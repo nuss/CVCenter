@@ -134,7 +134,7 @@ CVCenterKeyDownActions {
 					'arrow left' -> 	123,
 					'arrow right' -> 	124,
 				];
-				
+
 				#arrowsModifiers, modifiers = ()!2;
 
 //				switch(GUI.id,
@@ -236,6 +236,9 @@ CVCenterKeyDownActions {
 					\alt -> 			524288,
 					'alt + shift' -> 	655360,
 				]
+			},
+			{
+				// dummy for unknown platforms
 			}
 		)
 	}
@@ -262,7 +265,7 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 		// vars for makeEditArea
 		var count, rmBounds;
 		var thisArrowsModifiers, thisModifiers;
-		
+
 		Platform.case(
 			\osx, {
 				switch(GUI.id,
@@ -282,7 +285,7 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 			}
 		);
 
-		editAreasBg = Color(0.9, 0.9, 0.9);
+		editAreasBg = Color(0.8, 0.8, 0.8);
 		staticTextColor = Color(0.1, 0.1, 0.1);
 		staticTextFont = Font("Arial", 10);
 		shortCutFont = Font("Arial", 12, true);
@@ -302,11 +305,11 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 		#editAreas, editFlows, shortcutTexts, shortcutFields, editButs, removeButs, funcFields = []!7;
 
 		scrollArea = ScrollView(window.asView, Rect(
-			0, 0, window.asView.bounds.width, window.asView.bounds.height-29
-		)).hasHorizontalScroller_(false);
+			0, 0, window.asView.bounds.width, window.asView.bounds.height-23
+		)).hasHorizontalScroller_(false).background_(editAreasBg);
 		butArea = CompositeView(window.asView, Rect(
-			0, window.asView.bounds.height-29, window.asView.bounds.width, 29
-		));
+			0, window.asView.bounds.height-23, window.asView.bounds.width, 23
+		)).background_(editAreasBg);
 
 		scrollView = CompositeView(scrollArea, Rect(
 			0, 0, scrollArea.bounds.width, scrollArea.bounds.height
@@ -319,8 +322,8 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 
 			editAreas = editAreas.add(
 				editArea = CompositeView(
-					scrollView, scrollFlow.bounds.width-20@100).background_(Color(0.8, 0.8, 0.8)
-				);
+					scrollView, scrollFlow.bounds.width-20@100
+				).background_(editAreasBg)
 			);
 
 			count = editAreas.size-1;
@@ -358,50 +361,66 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 
 			editButs = editButs.add(
 				editBut = Button(editArea, 60@15)
-					.states_([["edit", staticTextColor]])
+					.states_([
+						["edit", staticTextColor],
+						["save edit", staticTextColor]
+					])
 					.font_(staticTextFont)
 					.action_({ |bt|
-						editAreas.do({ |eArea, i|
-							eArea.background_(editAreasBg);
-							shortcutTexts[i].stringColor_(staticTextColor);
-							funcFields[i].enabled_(false);
-						});
-						scrollView.keyDownAction_({ |view, char, mod, unicode, keycode, key|
-//							GUI.id.postln;
-							if(keyCodes.findKeyForEqualValue(keycode).notNil, {
-								char !? {
-									if(thisModifiers.includes(mod) and:{
-										thisModifiers.findKeyForValue(mod) != \none
-									}, {
-										mods = thisModifiers.findKeyForValue(mod);
-									}, {
-										if(thisArrowsModifiers.includes(mod) and:{
-											thisArrowsModifiers.findKeyForValue(mod) != \none
-										}, {
-											mods = thisArrowsModifiers.findKeyForValue(mod);
-										})
-									});
-									if(mod.notNil and:{
-										mod != thisModifiers[\none] and:{
-											mod != thisArrowsModifiers[\none]
+						switch(bt.value,
+							1, {
+								editAreas.do({ |eArea, i|
+									eArea.background_(editAreasBg);
+									editButs[i].value_(0);
+									shortcutTexts[i].stringColor_(staticTextColor);
+									funcFields[i].enabled_(false);
+								});
+								editBut.value_(1);
+								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
+//									[view, char, mod, unicode, keycode, key].postcs;
+//									GUI.id.postln;
+									if(keyCodes.findKeyForEqualValue(keycode).notNil, {
+										char !? {
+											if(thisModifiers.includes(mod) and:{
+												thisModifiers.findKeyForValue(mod) != \none
+											}, {
+												mods = thisModifiers.findKeyForValue(mod);
+											}, {
+												if(thisArrowsModifiers.includes(mod) and:{
+													thisArrowsModifiers.findKeyForValue(mod) != \none
+												}, {
+													mods = thisArrowsModifiers.findKeyForValue(mod);
+												})
+											});
+											if(mod.notNil and:{
+												mod != thisModifiers[\none] and:{
+													mod != thisArrowsModifiers[\none]
+												}
+											}, {
+												shortcutField.string_(
+													" "++ mods ++ join ++
+													keyCodes.findKeyForValue(keycode)
+												);
+											}, {
+												shortcutField.string_(
+													" "++
+													keyCodes.findKeyForValue(keycode)
+												)
+											})
 										}
-									}, {
-										shortcutField.string_(
-											" "++ mods ++ join ++
-											keyCodes.findKeyForValue(keycode)
-										);
-									}, {
-										shortcutField.string_(
-											" "++
-											keyCodes.findKeyForValue(keycode)
-										)
 									})
-								}
-							})
-						});
-						funcField.enabled_(true);
-						editArea.background_(Color.red);
-						shortcutText.stringColor_(Color.white);
+								});
+								funcField.enabled_(true);
+								editArea.background_(Color.red);
+								shortcutText.stringColor_(Color.white);
+							},
+							0, {
+								ScrollView.globalKeyDownAction_(nil);
+								funcField.enabled_(false);
+								editArea.background_(editAreasBg);
+								shortcutText.stringColor_(staticTextColor);
+							}
+						)
 					})
 				;
 			);
@@ -424,13 +443,12 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 								))
 							})
 						});
-					scrollView.bounds_(Rect(
-						scrollView.bounds.left,
-						scrollView.bounds.top,
-						scrollView.bounds.width,
-						scrollView.bounds.height-100
-					));
-			// };
+						scrollView.bounds_(Rect(
+							scrollView.bounds.left,
+							scrollView.bounds.top,
+							scrollView.bounds.width,
+							scrollView.bounds.height-100
+						))
 					})
 					.font_(staticTextFont)
 				;
@@ -451,7 +469,7 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", "    "))
 		});
 
-		butArea.decorator = butFlow = FlowLayout(butArea.bounds, 7@7, 3@0);
+		butArea.decorator = butFlow = FlowLayout(butArea.bounds, 7@4, 3@0);
 
 		newBut = Button(butArea, 70@15)
 			.font_(staticTextFont)

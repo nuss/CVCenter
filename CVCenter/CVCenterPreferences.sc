@@ -22,7 +22,7 @@ CVCenterPreferences {
 	*dialog {
 		var labelColors, labelStringColors, tabs, scTab, prefsTab, scTabs, flow1, flow2, saveCancel, saveCancelFlow;
 		var guiView, guiFlow, midiView, midiFlow, responderView, responderFlow;
-		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
+		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		// shortcut-tabs
 		var cvCenterTab, cvWidgetEditorTab;
 		var cvCenterEditor, cvWidgetEditor;
@@ -46,6 +46,7 @@ CVCenterPreferences {
 		textFieldFont = Font("Andale Mono", 12);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
+		tabsBg = Color(0.8, 0.8, 0.8);
 
 		buildCheckbox = { |view, active|
 			var cBox;
@@ -89,9 +90,9 @@ CVCenterPreferences {
 				Window.screenBounds.height/2-193,
 				498, 385
 			)).front;
-
+			
 			tabs = TabbedView2(window, Rect(0, 1, window.bounds.width, window.bounds.height-33))
-				.tabHeight_(20)
+				.tabHeight_(17)
 				.tabCurve_(3)
 				.labelColors_(Color.white!2)
 				.unfocusedColors_(Color.red!2)
@@ -103,19 +104,19 @@ CVCenterPreferences {
 
 			// button-area at the bottom ('cancel', 'save')
 
-			saveCancel = CompositeView(window, Rect(0, window.bounds.height-32, window.bounds.width, 32));
+			saveCancel = CompositeView(window, Rect(0, window.bounds.height-32, window.bounds.width, 32))
+				.background_(tabsBg)
+			;
 			saveCancel.decorator = saveCancelFlow = FlowLayout(saveCancel.bounds, 7@2, 1@0);
 
 			// common preferences
 
-			prefsTab = tabs.add("common preferences", scroll: false);
-			scTab = tabs.add("shortcuts", scroll: false);
+			prefsTab = tabs.add("common preferences", scroll: false).background_(tabsBg);
+			scTab = tabs.add("shortcuts", scroll: false).background_(tabsBg);
 
 			prefsTab.decorator = flow1 = FlowLayout(prefsTab.bounds, 7@7, 0@1);
 
-			guiView = CompositeView(prefsTab, flow1.indentedRemaining.width@57)
-				.background_(Color(0.95, 0.95, 0.95))
-			;
+			guiView = CompositeView(prefsTab, flow1.indentedRemaining.width@57);
 
 			guiView.decorator = guiFlow = FlowLayout(guiView.bounds, 7@7, 0@3);
 
