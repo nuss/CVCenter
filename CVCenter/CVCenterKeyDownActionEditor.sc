@@ -247,17 +247,20 @@ CVCenterKeyDownActions {
 
 CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 
-	var <window, <shortcutFields, <funcFields, cachedScrollViewSC;
+	classvar all;
+	var <window, <shortcutFields, <shortcutTexts, <funcFields, <editAreas, <editButs, cachedScrollViewSC;
 
-	*new { |parent, bounds, shortcutsDict, save=true, closeOnSave=false|
-		^super.new.init(parent, bounds, shortcutsDict, save, closeOnSave);
+	*initClass {
+		all = List.new;
 	}
 
-	init { |parent, bounds, shortcutsDict, save, closeOnSave|
-		var thisName, viewName;
-		var scrollArea, scrollView, editAreas, butArea, newBut, saveBut;
-		var editButs, removeButs;
-		var makeEditArea, shortcutTexts, shortcutField;
+	*new { |parent, name, bounds, shortcutsDict, save=true, closeOnSave=false|
+		^super.new.init(parent, name, bounds, shortcutsDict, save, closeOnSave);
+	}
+
+	init { |parent, name, bounds, shortcutsDict, save, closeOnSave|
+		var scrollArea, scrollView, butArea, newBut, saveBut;
+		var removeButs, makeEditArea;
 		var scrollFlow, editFlows, butFlow;
 		var editAreasBg, staticTextColor, staticTextFont, shortCutFont, textFieldFont;
 		var order, orderedShortcuts;
@@ -294,13 +297,20 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 		// if(name.isNil) { thisName = view.class } { thisName = name };
 
 		if(parent.isNil) {
-			window = Window("shortcut editor:"+thisName, bounds ?? { Rect(
+			window = Window("shortcut editor:"+name, bounds ?? { Rect(
 				Window.screenBounds.width-600/2,
 				Window.screenBounds.height-600/2,
 				600, 600
 			) });
 			// view.onClose_({ window.close });
 		} { window = parent };
+
+		window.onClose_({
+			all.remove(this);
+			cachedScrollViewSC !? {
+				ScrollView.globalKeyDownAction_(cachedScrollViewSC);
+			}
+		});
 
 		#editAreas, editFlows, shortcutTexts, shortcutFields, editButs, removeButs, funcFields = []!7;
 
@@ -361,8 +371,6 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 				shortcutField.string_(" "++shortcut);
 			};
 
-			// "shortcut: %\n".postf(shortcut);
-
 			editButs = editButs.add(
 				editBut = Button(editArea, 60@15)
 					.states_([
@@ -373,12 +381,18 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 					.action_({ |bt|
 						switch(bt.value,
 							1, {
-								editAreas.do({ |eArea, i|
-									eArea.background_(editAreasBg);
-									editButs[i].value_(0);
-									shortcutTexts[i].stringColor_(staticTextColor);
-									funcFields[i].enabled_(false);
+								all.do({ |ed|
+									ed.editAreas.do(_.background_(editAreasBg));
+									ed.editButs.do(_.value_(0));
+									ed.shortcutTexts.do(_.stringColor_(staticTextColor));
+									ed.funcFields.do(_.enabled_(false));
 								});
+								// editAreas.do({ |eArea, i|
+								// 	eArea.background_(editAreasBg);
+								// editButs[i].value_(0);
+								// shortcutTexts[i].stringColor_(staticTextColor);
+								// funcFields[i].enabled_(false);
+								// });
 								editBut.value_(1);
 								cachedScrollViewSC = ScrollView.globalKeyDownAction;
 								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
@@ -469,10 +483,8 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 		};
 
 		order = shortcutsDict.order;
-		// "order: %\n".postf(order);
 
 		order.do({ |shortcut, i|
-			[shortcut, shortcutsDict[shortcut][\func].replace("\t", "    "), i].postcs;
 			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", "    "))
 		});
 
@@ -495,6 +507,7 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 			})
 		;
 		parent ?? { window.front };
+		all.add(this);
 	}
 
 }

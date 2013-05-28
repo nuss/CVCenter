@@ -433,11 +433,11 @@ CVCenterPreferences {
 			cvWidgetEditorTab = scTabs.add("CVWidget(MS)Editor", scroll: false);
 
 			cvCenterEditor = CVCenterKeyDownActionsEditor(
-				cvCenterTab, cvCenterTab.bounds, CVCenter.shortcuts, false
+				cvCenterTab, nil, cvCenterTab.bounds, CVCenter.shortcuts, false
 			);
 			// CVWidgets go here
 			cvWidgetEditorEditor = CVCenterKeyDownActionsEditor(
-				cvWidgetEditorTab, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false
+				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false
 			);
 
 			Button(saveCancel, saveCancelFlow.bounds.width/2-10@23)
