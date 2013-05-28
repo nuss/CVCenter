@@ -197,24 +197,26 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			this.class.shortcuts.values.do({ |keyDowns|
 				// keyDowns.postcs;
 				thisEditor[\tabs].view.keyDownAction_(
-					thisEditor[\tabs].view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+					thisEditor[\tabs].view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
+						// [view, char, modifiers, unicode, keycode, key].postcs;
+						// keyDowns.func.postln;
 						case
-						{ keyDowns.modifiers.notNil } {
-							if(keycode == keyDowns.keyCode and:{ modifiers == keyDowns.modifiers }, {
-								// "hot!! %\n".postf([char, modifiers, keycode]);
-								keyDowns.func.interpret.value;
-							})
-						}
-						{ keyDowns.modifiers.isNil } {
-							if(keycode == keyDowns.keyCode and:{
-								(modifiers == CVCenterKeyDownActions.modifiers[\none]).or(
-									modifiers == CVCenterKeyDownActions.arrowsModifiers[\none]
-								)
+							{ keyDowns.modifiers.notNil } {
+								if(keycode == keyDowns.keyCode and:{ modifiers == keyDowns.modifiers }, {
+									// "hot!! %\n".postf([char, modifiers, keycode]);
+									keyDowns.func.interpret.value;
+								})
+							}
+							{ keyDowns.modifiers.isNil } {
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == CVCenterKeyDownActions.modifiers[\none]).or(
+										modifiers == CVCenterKeyDownActions.arrowsModifiers[\none]
+									)
 								}, {
 									// "hit!! %\n".postf([char, modifiers, modifiers.class, keycode]);
 									keyDowns.func.interpret.value;
-							})
-						}
+								})
+							}
 						;
 					})
 				)

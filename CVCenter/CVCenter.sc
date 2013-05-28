@@ -216,7 +216,8 @@ CVCenter {
 				(
 					func: scFunc,
 					keyCode: CVCenterKeyDownActions.keyCodes[$p],
-					modifiers: CVCenterKeyDownActions.modifiers[\shift]
+					modifiersQt: CVCenterKeyDownActions.modifiersQt[\shift],
+					modifiersCocoa: CVCenterKeyDownActions.modifiersCocoa[\shift]
 				)
 			);
 			scFunc =
@@ -289,7 +290,8 @@ CVCenter {
 				(
 					func: scFunc,
 					keyCode: CVCenterKeyDownActions.keyCodes[$h],
-					modifiers: CVCenterKeyDownActions.modifiers[\shift]
+					modifiersQt: CVCenterKeyDownActions.modifiersQt[\shift],
+					modifiersCocoa: CVCenterKeyDownActions.modifiersCocoa[\shift]
 				)
 			)
 		});
@@ -355,6 +357,8 @@ CVCenter {
 		var midiFlag, oscFlag, loadFlag, tmp, wdgtActions;
 		var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
+		var modsDict, arrModsDict;
+		var thisMods, thisArrMods;
 
 		cvs !? { this.put(*cvs) };
 		prefs = CVCenterPreferences.readPreferences;
@@ -373,6 +377,17 @@ CVCenter {
 			flow.margin_(4@0);
 			flow.gap_(0@4);
 			flow.shift(0, 0);
+
+			switch(GUI.id,
+				\cocoa, {
+					modsDict = CVCenterKeyDownActions.modifiersCocoa;
+					arrModsDict = CVCenterKeyDownActions.arrowsModifiersCocoa;
+				},
+				\qt, {
+					modsDict = CVCenterKeyDownActions.modifiersQt;
+					arrModsDict = CVCenterKeyDownActions.arrowsModifiersQt;
+				}
+			);
 
 			if(tabProperties.size < 1, {
 				tabProperties = tabProperties.add(());
@@ -430,19 +445,33 @@ CVCenter {
 
 			[tabs.view, tabs.views, prefPane].flat.do({ |v|
 				this.shortcuts.values.do({ |keyDowns|
+
+					switch(GUI.id,
+						\cocoa, {
+							thisMods = keyDowns.modifiersCocoa;
+							thisMods = keyDowns.arrowsModifiersCocoa;
+						},
+						\qt, {
+							thisMods = keyDowns.modifiersQt;
+							thisMods = keyDowns.arrowsModifiersQt;
+						}
+					);
+
 					v.keyDownAction_(
 						v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
 							case
-								{ keyDowns.modifiers.notNil } {
-									if(keycode == keyDowns.keyCode and:{ modifiers == keyDowns.modifiers }, {
+								{ thisMods.notNil or:{ thisArrMods.notNil }} {
+									if(keycode == keyDowns.keyCode and:{
+										(modifiers == thisMods).or(modifiers == thisArrMods)
+									}, {
 										// "hot!! %\n".postf([char, modifiers, keycode]);
 										keyDowns.func.interpret.value;
 									})
 								}
-								{ keyDowns.modifiers.isNil } {
+								{ thisMods.isNil } {
 									if(keycode == keyDowns.keyCode and:{
-										(modifiers == CVCenterKeyDownActions.modifiers[\none]).or(
-											modifiers == CVCenterKeyDownActions.arrowsModifiers[\none]
+										(modifiers == modsDict[\none]).or(
+											modifiers == arrModsDict[\none]
 										)
 									}, {
 										// "hut!! %\n".postf([char, modifiers, modifiers.class, keycode]);
@@ -1549,6 +1578,19 @@ CVCenter {
 		var cvcArgs, btnColor;
 		var msSize, tmp;
 		var thisTab;
+		var modsDict, arrModsDict;
+		var thisMods, thisArrMods;
+
+		switch(GUI.id,
+			\cocoa, {
+				thisMods = CVCenterKeyDownActions.modifiersCocoa;
+				thisArrMods = CVCenterKeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				thisMods = CVCenterKeyDownActions.modifiersQt;
+				thisArrMods = CVCenterKeyDownActions.arrowsModifiersQt;
+			}
+		);
 
 		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
 
@@ -1562,19 +1604,33 @@ CVCenter {
 				}, {
 					thisTab = tabs.add(tab);
 					this.shortcuts.values.do({ |keyDowns|
+
+						switch(GUI.id,
+							\cocoa, {
+								thisMods = keyDowns.modifiersCocoa;
+								thisArrMods = keyDowns.arrowsModifiersCocoa;
+							},
+							\qt, {
+								thisMods = keyDowns.modifiersQt;
+								thisArrMods = keyDowns.arrowsModifiersQt;
+							}
+						);
+
 						thisTab.keyDownAction_(
 							thisTab.keyDownAction.add({ |view, char, modifiers, unicode, keycode|
 								case
-									{ keyDowns.modifiers.notNil } {
-										if(keycode == keyDowns.keyCode and:{ modifiers == keyDowns.modifiers }, {
+									{ thisMods.notNil or:{ thisArrMods.notNil }} {
+										if(keycode == keyDowns.keyCode and:{
+											(modifiers == thisMods).or(modifiers == thisArrMods)
+										}, {
 											// "hot!! %\n".postf([char, modifiers, keycode]);
 											keyDowns.func.interpret.value;
 										})
 									}
 									{ keyDowns.modifiers.isNil } {
 										if(keycode == keyDowns.keyCode and:{
-											(modifiers == CVCenterKeyDownActions.modifiers[\none]).or(
-												modifiers == CVCenterKeyDownActions.arrowsModifiers[\none]
+											(modifiers == modsDict[\none]).or(
+												modifiers == arrModsDict[\none]
 											)
 										}, {
 											// "hut!! %\n".postf([char, modifiers, modifiers.class, keycode]);

@@ -2,7 +2,7 @@ CVCenterKeyDownActions {
 
 	// classvar <allEditors;
 	// classvar <viewActions;
-	classvar <keyCodes, <modifiers, <arrowsModifiers;
+	classvar <keyCodes, <modifiersQt, <modifiersCocoa, <arrowsModifiersQt, <arrowsModifiersCocoa;
 	// var <window, <>actions;
 
 	*initClass {
@@ -71,7 +71,7 @@ CVCenterKeyDownActions {
 
 				// arrowsModifiers = IdentityDictionary[];
 
-				modifiers = arrowsModifiers = IdentityDictionary[
+				modifiersQt = arrowsModifiersQt = IdentityDictionary[
 					\none ->			0,
 					\shift ->			131072,
 					\alt ->				524288,
@@ -135,42 +135,33 @@ CVCenterKeyDownActions {
 					'arrow right' -> 	124,
 				];
 
-				#arrowsModifiers, modifiers = ()!2;
+				arrowsModifiersCocoa = IdentityDictionary[
+					'none' ->			10486016,
+					'alt' ->			11010336,
+					'shift' ->			10617090,
+					'alt + shift' ->	11141410
+				];
 
-//				switch(GUI.id,
-//					\cocoa, {
-//						"GUI.id is \cocoa".postln;
-						arrowsModifiers.cocoa = IdentityDictionary[
-							'none' ->			10486016,
-							'alt' ->			11010336,
-							'shift' ->			10617090,
-							'alt + shift' ->	11141410
-						];
+				modifiersCocoa = IdentityDictionary[
+					\none ->			0,
+					\alt ->				524576,
+					\shift ->			131330,
+					'alt + shift' ->	655650,
+				];
 
-						modifiers.cocoa = IdentityDictionary[
-							\none ->			0,
-							\alt ->				524576,
-							\shift ->			131330,
-							'alt + shift' ->	655650,
-						];
-//					},
-//					\qt, {
-//						"GUI.id is \qt".postln;
-						arrowsModifiers.qt = IdentityDictionary[
-							\none ->			2097152,
-							'alt' ->			2621440,
-							'shift' ->			2228224,
-							'alt + shift' ->	2752512
-						];
+				arrowsModifiersQt = IdentityDictionary[
+					\none ->			2097152,
+					'alt' ->			2621440,
+					'shift' ->			2228224,
+					'alt + shift' ->	2752512
+				];
 
-						modifiers.qt = IdentityDictionary[
-							\none ->			0,
-							\shift ->			131072,
-							\alt ->				524288,
-							'alt + shift' ->	655360,
-						]
-//					}
-//				)
+				modifiersQt = IdentityDictionary[
+					\none ->			0,
+					\shift ->			131072,
+					\alt ->				524288,
+					'alt + shift' ->	655360,
+				]
 			},
 
 			\windows, {
@@ -230,7 +221,7 @@ CVCenterKeyDownActions {
 					'arrow right' -> 	39,
 				];
 
-				modifiers = arrowsModifiers = IdentityDictionary[
+				modifiersQt = arrowsModifiersQt = IdentityDictionary[
 					\none ->			0,
 					\shift -> 			131072,
 					\alt -> 			524288,
@@ -238,7 +229,10 @@ CVCenterKeyDownActions {
 				]
 			},
 			{
-				// dummy for unknown platforms
+				// dummies for unknown platforms
+				keyCodes = IdentityDictionary.new;
+				modifiersQt = IdentityDictionary.new;
+				arrowsModifiersQt = IdentityDictionary.new;
 			}
 		)
 	}
@@ -273,18 +267,18 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 			\osx, {
 				switch(GUI.id,
 					\qt, {
-						thisModifiers = modifiers.qt;
-						thisArrowsModifiers = arrowsModifiers.qt;
+						thisModifiers = modifiersQt;
+						thisArrowsModifiers = arrowsModifiersQt;
 					},
 					\cocoa, {
-						thisModifiers = modifiers.cocoa;
-						thisArrowsModifiers = arrowsModifiers.cocoa;
+						thisModifiers = modifiersCocoa;
+						thisArrowsModifiers = arrowsModifiersCocoa;
 					}
 				)
 			},
 			{
-				thisModifiers = modifiers;
-				thisArrowsModifiers = arrowsModifiers;
+				thisModifiers = modifiersQt;
+				thisArrowsModifiers = arrowsModifiersQt;
 			}
 		);
 
@@ -387,12 +381,6 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 									ed.shortcutTexts.do(_.stringColor_(staticTextColor));
 									ed.funcFields.do(_.enabled_(false));
 								});
-								// editAreas.do({ |eArea, i|
-								// 	eArea.background_(editAreasBg);
-								// editButs[i].value_(0);
-								// shortcutTexts[i].stringColor_(staticTextColor);
-								// funcFields[i].enabled_(false);
-								// });
 								editBut.value_(1);
 								cachedScrollViewSC = ScrollView.globalKeyDownAction;
 								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
