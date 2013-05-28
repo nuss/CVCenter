@@ -464,8 +464,10 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 		};
 
 		order = shortcutsDict.order;
+		// "order: %\n".postf(order);
 
 		order.do({ |shortcut, i|
+			[shortcut, shortcutsDict[shortcut][\func].replace("\t", "    "), i].postcs;
 			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", "    "))
 		});
 
