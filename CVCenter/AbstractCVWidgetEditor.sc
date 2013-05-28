@@ -43,7 +43,14 @@ AbstractCVWidgetEditor {
 		this.shortcuts.put(
 			\t,
 			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$t])
-		)
+		);
+		scFunc =
+		"{ \"bug me not\".postln }";
+		this.shortcuts.put(
+			\b,
+			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$b])
+		);
+
 	}
 
 	front { |tab|
