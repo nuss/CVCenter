@@ -39,10 +39,196 @@ AbstractCVWidgetEditor {
 		this.shortcuts = IdentityDictionary.new;
 
 		scFunc =
-		"{ this.postln }";
+		"// focus 'specs' tab
+		{ |view, char, modifiers, unicode, keycode, key|
+			AbstractCVWidgetEditor.allEditors.do({ |ed|
+				case
+					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
+						#[lo, hi].do({ |key|
+							ed[k] !? {
+								if(ed[k].editor.notNil and:{
+									ed[k].editor.isClosed.not and:{
+										view == ed[k].tabs.view
+									}
+								}) { ed[k].editor.tabs.focus(0) }
+							}
+						})
+					}
+					{ ed.keys.select(_.isNumber).size == ed.keys.size } {}
+					{
+						if(ed.editor.notNil and:{
+							ed.editor.isClosed.not and:{
+								view == ed.tabs.view
+							}
+						}) { ed.editor.tabs.focus(0) }
+					}
+				;
+			})
+		}";
 		this.shortcuts.put(
-			'alt + t',
-			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$t])
+			\s,
+			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$s])
+		);
+		scFunc =
+		"// focus 'midi' tab
+		{ |view, char, modifiers, unicode, keycode, key|
+			AbstractCVWidgetEditor.allEditors.do({ |ed|
+				case
+					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
+						#[lo, hi].do({ |k|
+							ed[k] !? {
+								if(ed[k].editor.notNil and:{
+									ed[k].editor.isClosed.not and:{
+										view == ed[k].tabs.view
+									}
+								}) { ed[k].editor.tabs.focus(1) }
+							}
+						})
+					}
+					{ ed.keys.select(_.isNumber).size == ed.keys.size } {
+						ed.keys.do({ |k|
+							ed[k] !? {
+								if(ed[k].editor.notNil and:{
+									ed[k].editor.isClosed.not and:{
+										view == ed[k].tabs.view
+									}
+								}) { ed[k].editor.tabs.focus(0) }
+							}
+						})
+					}
+					{
+						if(ed.editor.notNil and:{
+							ed.editor.isClosed.not and:{
+								view == ed.tabs.view
+							}
+						}) { ed.editor.tabs.focus(1) }
+					}
+				;
+			})
+		}";
+		this.shortcuts.put(
+			\m,
+			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$m])
+		);
+		scFunc =
+		"// focus 'osc' tab
+		{ |view, char, modifiers, unicode, keycode, key|
+			AbstractCVWidgetEditor.allEditors.do({ |ed|
+				case
+					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
+						#[lo, hi].do({ |k|
+							ed[k] !? {
+								if(ed[k].editor.notNil and:{
+									ed[k].editor.isClosed.not and:{
+										view == ed[k].tabs.view
+									}
+								}) { ed[k].editor.tabs.focus(2) }
+							}
+						})
+					}
+					{ ed.keys.select(_.isNumber).size == ed.keys.size } {
+						ed.keys.do({ |k|
+							ed[k] !? {
+								if(ed[k].editor.notNil and:{
+									ed[k].editor.isClosed.not and:{
+										view == ed[k].tabs.view
+									}
+								}) { ed[k].editor.tabs.focus(1) }
+							}
+						})
+					}
+					{
+						if(ed.editor.notNil and:{
+							ed.editor.isClosed.not and:{
+								view == ed.tabs.view
+							}
+						}) { ed.editor.tabs.focus(2) }
+					}
+				;
+			})
+		}";
+		this.shortcuts.put(
+			\o,
+			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$o])
+		);
+		scFunc =
+		"// focus 'actions' tab
+		{ |view, char, modifiers, unicode, keycode, key|
+			AbstractCVWidgetEditor.allEditors.do({ |ed|
+				case
+					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
+						#[lo, hi].do({ |k|
+							ed[k] !? {
+								if(ed[k].editor.notNil and:{
+									ed[k].editor.isClosed.not and:{
+										view == ed[k].tabs.view
+									}
+								}) { ed[k].editor.tabs.focus(3) }
+							}
+						})
+					}
+					{ ed.keys.select(_.isNumber).size == ed.keys.size } {}
+					{
+						if(ed.editor.notNil and:{
+							ed.editor.isClosed.not and:{
+								view == ed.tabs.view
+							}
+						}) { ed.editor.tabs.focus(3) }
+					}
+				;
+			})
+		}";
+		this.shortcuts.put(
+			\a,
+			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$a])
+		);
+		scFunc =
+		"// close the editor
+		{ |view, char, modifiers, unicode, keycode, key|
+			AbstractCVWidgetEditor.allEditors.do({ |ed|
+				case
+					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
+						#[lo, hi].do({ |k|
+							ed[k] !? {
+								if(ed[k].editor.notNil and:{
+									ed[k].editor.isClosed.not and:{
+										view == ed[k].tabs.view
+									}
+								}) { ed[k].editor.close(k) }
+							}
+						})
+					}
+					{ ed.keys.select(_.isNumber).size == ed.keys.size } {
+						ed.keys.do({ |k|
+							ed[k] !? {
+								if(ed[k].editor.notNil and:{
+									ed[k].editor.isClosed.not and:{
+										view == ed[k].tabs.view
+									}
+								}) { ed[k].editor.close(k) }
+							}
+						})
+					}
+					{
+						if(ed.editor.notNil and:{
+							ed.editor.isClosed.not and:{
+								view == ed.tabs.view
+							}
+						}) { ed.editor.close }
+					}
+				;
+			})
+		}";
+		this.shortcuts.put(
+			\esc,
+			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[\esc])
+		);
+		scFunc =
+		"// collect OSC-commands resp. open the collector's GUI
+		{ OSCCommands.makeWindow }";
+		this.shortcuts.put(
+			\c,
+			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$c])
 		);
 	}
 

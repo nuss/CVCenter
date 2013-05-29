@@ -53,6 +53,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var connectWarning;
 		var mouseOverFunc;
 		var numCalibActive;
+		var modsDict, arrModsDict;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -70,6 +71,17 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			});
 			cBox;
 		};
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = CVCenterKeyDownActions.modifiersCocoa;
+				arrModsDict = CVCenterKeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = CVCenterKeyDownActions.modifiersQt;
+				arrModsDict = CVCenterKeyDownActions.arrowsModifiersQt;
+			}
+		);
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
@@ -212,15 +224,38 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			thisEditor.oscTabs = oscTabs;
 			thisEditor.midiTabs = midiTabs;
 
-			thisEditor.tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
-//				[view, char, modifiers, unicode, keycode].postln;
-				switch(unicode,
-					111, { thisEditor.tabs.focus(2) }, // "o" -> osc
-					109, { thisEditor.tabs.focus(1) }, // "m" -> midi
-					97, { thisEditor.tabs.focus(3) }, // "a" -> actions
-					115, { thisEditor.tabs.focus(0) }, // "s" -> specs
-					120, { this.close }, // "x" -> close editor
-					99, { OSCCommands.makeWindow } // "c" -> collect OSC-commands resp. open the collector's GUI
+			this.class.shortcuts.values.do({ |keyDowns|
+				// keyDowns.postcs;
+				thisEditor[\tabs].view.keyDownAction_(
+					thisEditor[\tabs].view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
+						var thisMod, thisArrMod;
+
+						switch(GUI.id,
+							\cocoa, {
+								thisMod = keyDowns.modifierCocoa;
+								thisArrMod = keyDowns.arrowsModifierCocoa;
+							},
+							\qt, {
+								thisMod = keyDowns.modifierQt;
+								thisArrMod = keyDowns.arrowsModifierQt;
+							}
+						);
+
+						case
+							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+								// "no modifiers".postln;
+								if(keycode == keyDowns.keyCode and:{
+									thisMod.isNil and:{ thisArrMod.isNil }
+							}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) });
+							}
+							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+								// "some modifier...".postln;
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == thisArrMod).or(modifiers == thisMod)
+							}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) })
+							}
+						;
+					})
 				)
 			});
 

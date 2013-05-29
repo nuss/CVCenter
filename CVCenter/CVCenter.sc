@@ -450,6 +450,8 @@ CVCenter {
 						v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
 							var thisMod, thisArrMod;
 
+							// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
+
 							switch(GUI.id,
 								\cocoa, {
 									thisMod = keyDowns.modifierCocoa;
@@ -463,16 +465,16 @@ CVCenter {
 
 							case
 								{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-									// "no modifiers".postln;
+									// "no modifier".postln;
 									if(keycode == keyDowns.keyCode and:{
 										thisMod.isNil and:{ thisArrMod.isNil }
-									}, { keyDowns.func.interpret.value });
+									}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
 								}
 								{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
 									// "some modifier...".postln;
 									if(keycode == keyDowns.keyCode and:{
 										(modifiers == thisArrMod).or(modifiers == thisMod)
-									}, { keyDowns.func.interpret.value })
+									}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
 								}
 							;
 						})
@@ -1575,16 +1577,15 @@ CVCenter {
 		var msSize, tmp;
 		var thisTab;
 		var modsDict, arrModsDict;
-		var thisMod, thisArrMod;
 
 		switch(GUI.id,
 			\cocoa, {
-				thisMod = CVCenterKeyDownActions.modifiersCocoa;
-				thisArrMod = CVCenterKeyDownActions.arrowsModifiersCocoa;
+				modsDict = CVCenterKeyDownActions.modifiersCocoa;
+				arrModsDict = CVCenterKeyDownActions.arrowsModifiersCocoa;
 			},
 			\qt, {
-				thisMod = CVCenterKeyDownActions.modifiersQt;
-				thisArrMod = CVCenterKeyDownActions.arrowsModifiersQt;
+				modsDict = CVCenterKeyDownActions.modifiersQt;
+				arrModsDict = CVCenterKeyDownActions.arrowsModifiersQt;
 			}
 		);
 
@@ -1617,16 +1618,16 @@ CVCenter {
 
 								case
 									{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-										// "no modifiers".postln;
+										// "no modifier".postln;
 										if(keycode == keyDowns.keyCode and:{
 											thisMod.isNil and:{ thisArrMod.isNil }
-										}, { keyDowns.func.interpret.value });
+										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
 									}
 									{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
 										// "some modifier...".postln;
 										if(keycode == keyDowns.keyCode and:{
 											(modifiers == thisArrMod).or(modifiers == thisMod)
-										}, { keyDowns.func.interpret.value })
+										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
 									}
 								;
 							})

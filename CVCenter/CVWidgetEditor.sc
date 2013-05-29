@@ -38,6 +38,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var buildCheckbox, ddIPsItems, cmdPairs, dropDownIPs;
 		var connectIP, connectPort;
 		var mouseOverFunc;
+		var modsDict, arrModsDict;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -55,6 +56,17 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			});
 			cBox;
 		};
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = CVCenterKeyDownActions.modifiersCocoa;
+				arrModsDict = CVCenterKeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = CVCenterKeyDownActions.modifiersQt;
+				arrModsDict = CVCenterKeyDownActions.arrowsModifiersQt;
+			}
+		);
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
@@ -172,50 +184,35 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			thisEditor[\tabs] = tabs;
 
-			thisEditor[\tabs].view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
-				//				[view, char, modifiers, unicode, keycode].postln;
-				switch(unicode,
-					111, { // "o" -> osc
-						switch(widget.class,
-							CVWidgetMS, { thisEditor[\tabs].focus(1) },
-							{ thisEditor[\tabs].focus(2) }
-						)
-					},
-					109, { // "m" -> midi
-						switch(widget.class,
-							CVWidgetMS, { thisEditor[\tabs].focus(0) },
-							{ thisEditor[\tabs].focus(1) }
-						)
-					},
-					97, { if(widget.class != CVWidgetMS, { thisEditor[\tabs].focus(3) }) }, // "a" -> actions
-					115, { if(widget.class != CVWidgetMS, { thisEditor[\tabs].focus(0) }) }, // "s" -> specs
-					120, { this.close(slot) }, // "x" -> close editor
-					99, { OSCCommands.makeWindow } // "c" -> collect OSC-commands resp. open the collector's GUI
-				)
-			});
-
 			this.class.shortcuts.values.do({ |keyDowns|
 				// keyDowns.postcs;
 				thisEditor[\tabs].view.keyDownAction_(
 					thisEditor[\tabs].view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
-						// [view, char, modifiers, unicode, keycode, key].postcs;
-						// keyDowns.func.postln;
-						case
-							{ keyDowns.modifiers.notNil } {
-								if(keycode == keyDowns.keyCode and:{ modifiers == keyDowns.modifiers }, {
-									// "hot!! %\n".postf([char, modifiers, keycode]);
-									keyDowns.func.interpret.value;
-								})
+						var thisMod, thisArrMod;
+
+						switch(GUI.id,
+							\cocoa, {
+								thisMod = keyDowns.modifierCocoa;
+								thisArrMod = keyDowns.arrowsModifierCocoa;
+							},
+							\qt, {
+								thisMod = keyDowns.modifierQt;
+								thisArrMod = keyDowns.arrowsModifierQt;
 							}
-							{ keyDowns.modifiers.isNil } {
+						);
+
+						case
+							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+								// "no modifiers".postln;
 								if(keycode == keyDowns.keyCode and:{
-									(modifiers == CVCenterKeyDownActions.modifiers[\none]).or(
-										modifiers == CVCenterKeyDownActions.arrowsModifiers[\none]
-									)
-								}, {
-									// "hit!! %\n".postf([char, modifiers, modifiers.class, keycode]);
-									keyDowns.func.interpret.value;
-								})
+									thisMod.isNil and:{ thisArrMod.isNil }
+							}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) });
+							}
+							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+								// "some modifier...".postln;
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == thisArrMod).or(modifiers == thisMod)
+							}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) })
 							}
 						;
 					})
