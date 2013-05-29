@@ -369,7 +369,7 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 				editBut = Button(editArea, 60@15)
 					.states_([
 						["edit", staticTextColor],
-						["save edit", staticTextColor]
+						["end edit", staticTextColor]
 					])
 					.font_(staticTextFont)
 					.action_({ |bt|
