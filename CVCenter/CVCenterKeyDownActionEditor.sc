@@ -465,7 +465,7 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 				funcField = TextView(
 					editArea,
 					tmpEditFlow.indentedRemaining.width@tmpEditFlow.indentedRemaining.height
-				).font_(textFieldFont).enabled_(false);
+				).font_(textFieldFont).enabled_(false).syntaxColorize;
 			);
 			funcString !? { funcFields[count].string_(funcString) };
 		};

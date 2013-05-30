@@ -107,7 +107,9 @@ CVCenter {
 			scFunc =
 			"// next tab
 			{ CVCenter.tabs.focus(
-				(CVCenter.tabs.activeTab+1).wrap(0, CVCenter.tabs.views.size-1)
+				(CVCenter.tabs.tabViews.detectIndex({ |tab|
+					tab === CVCenter.tabs.activeTab
+				})+1).wrap(0, CVCenter.tabs.tabViews.size-1)
 			)}";
 			this.shortcuts.put(
 				'arrow right',
@@ -116,7 +118,9 @@ CVCenter {
 			scFunc =
 			"// previous tab
 			{ CVCenter.tabs.focus(
-				(CVCenter.tabs.activeTab-1).wrap(0, CVCenter.tabs.views.size-1)
+				(CVCenter.tabs.tabViews.detectIndex({ |tab|
+					tab === CVCenter.tabs.activeTab
+				})-1).wrap(0, CVCenter.tabs.tabViews.size-1)
 			)}";
 			this.shortcuts.put(
 				'arrow left',
@@ -237,9 +241,9 @@ CVCenter {
 			);
 			scFunc =
 			"// AllGui
-			{ if(\AllGui.asClass.notNil) {
+			{ if(\\AllGui.asClass.notNil) {
 				if(CVCenter.scv.allWin.isNil or:{ CVCenter.scv.allWin.isClosed }) {
-					CVCenter.scv.allGui = \AllGui.asClass.new;
+					CVCenter.scv.allGui = \\AllGui.asClass.new;
 					CVCenter.scv.allWin = CVCenter.scv.allGui.parent;
 				};
 				if(CVCenter.scv.allWin.notNil and:{
@@ -252,9 +256,9 @@ CVCenter {
 			);
 			scFunc =
 			"// MasterEQ
-			{ if(\MasterEQ.asClass.notNil) {
+			{ if(\\MasterEQ.asClass.notNil) {
 				if(CVCenter.scv.eqWin.isNil or:{ CVCenter.scv.eqWin.isClosed }){
-					CVCenter.scv.eqGui = \MasterEQ.asClass.new(
+					CVCenter.scv.eqGui = \\MasterEQ.asClass.new(
 						Server.default.options.firstPrivateBus, Server.default
 					);
 					CVCenter.scv.eqWin = CVCenter.scv.eqGui.window;
@@ -270,7 +274,7 @@ CVCenter {
 			(0..9).do({ |i|
 				scFunc =
 				"// focus tab "++i++"
-				{ CVCenter.tabs.views["++i++"] !? { CVCenter.tabs.focus("++i++") }}";
+				{ CVCenter.tabs.tabViews["++i++"] !? { CVCenter.tabs.focus("++i++") }}";
 				this.shortcuts.put(
 					i.asSymbol,
 					(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[i.asString[0]])
@@ -418,24 +422,50 @@ CVCenter {
 			labelColors = tabProperties.collect(_.tabColor);
 			unfocusedColors = tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) });
 
-			tabs = TabbedView(
-				window,
-				Rect(0, 0, flow.bounds.width, flow.bounds.height-40),
-				labels: tabLabels,
-				scroll: true
-			);
-			tabs.backgrounds_(Color(0.1, 0.1, 0.1)!tabs.views.size);
-			tabs.view.resize_(5);
+			// tabs = TabbedView(
+			// 	window,
+			// 	Rect(0, 0, flow.bounds.width, flow.bounds.height-40),
+			// 	labels: tabLabels,
+			// 	scroll: true
+			// );
+			// tabs.backgrounds_(Color(0.1, 0.1, 0.1)!tabs.views.size);
+			// tabs.view.resize_(5);
+			//
+			// tabs.labelColors_(labelColors);
+			// tabs.labelPadding_(7);
+			// tabs.tabHeight_(15);
+			// tabs.unfocusedColors_(unfocusedColors);
+			// tabs.font_(GUI.font.new("Helvetica", 10, true));
+			// tabs.tabCurve_(3);
+			// tabs.stringColor_(Color.black);
+			// tabs.stringFocusedColor_(Color(0.0, 0.0, 0.5, 1.0));
+			// tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
 
-			tabs.labelColors_(labelColors);
-			tabs.labelPadding_(7);
-			tabs.tabHeight_(15);
-			tabs.unfocusedColors_(unfocusedColors);
-			tabs.font_(GUI.font.new("Helvetica", 10, true));
-			tabs.tabCurve_(3);
-			tabs.stringColor_(Color.black);
-			tabs.stringFocusedColor_(Color(0.0, 0.0, 0.5, 1.0));
-			tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
+			tabs = TabbedView2(window, Rect(0, 0, flow.bounds.width, flow.bounds.height-40));
+			tabLabels.do({ |lbl, i|
+				tabs.add(lbl, scroll: true)
+					.focusAction_({
+						this.prRegroupWidgets(tabs.tabViews.detectIndex({ |tab| tab === tabs.activeTab }))
+					})
+					.labelColor_(labelColors[i])
+					.background_(Color.black)
+					// .useDetachIcon_(true)
+					// .onChangeParent_({ |view| view.postln })
+					// .closable_(true)
+					// .onBeginClose_({ "I'm going to be closed".postln })
+				;
+			});
+			tabs
+				.backgrounds_(Color(0.1, 0.1, 0.1)!tabs.views.size)
+				.tabCurve_(3)
+				.resize_(5)
+				.tabHeight_(15)
+				.clickbox_(15)
+				// .labelPadding_(7)
+				.font_(Font("Arial", 12, true))
+				.stringColors_(Color.black!tabs.views.size)
+				.stringFocusedColors_(Color(0.0, 0.0, 0.5, 1.0)!tabs.views.size)
+			;
 
 			flow.shift(0, 0);
 
@@ -774,14 +804,14 @@ CVCenter {
 						removedKeys.do({ |k|
 							this.removeAt(k);
 						});
-						this.prRegroupWidgets(tabs.activeTab);
-						tmp = tabs.getLabelAt(0);
+						this.prRegroupWidgets(tabs.tabViews.detectIndex({ |tab| tab === tabs.activeTab }));
+						tmp = tabs.tabViews[0].label;
 					});
 					lastUpdate = all.size;
 				});
 				try {
 					if(window.bounds.width != lastUpdateBounds.width, {
-						this.prRegroupWidgets(tabs.activeTab);
+						this.prRegroupWidgets(tabs.tabViews.detectIndex({ |tab| tab === tabs.activeTab }));
 					});
 					if(window.bounds != lastUpdateBounds, {
 						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
@@ -897,7 +927,7 @@ CVCenter {
 			if(window.isClosed.not, {
 				{ tabs.views.do({ |v, i| v.refresh; if(v.children.size == 0, { this.prRemoveTab(i) }) }) }.defer(0.1);
 			}, {
-				if(this.widgetsAtTab(tabs.getLabelAt(widgetStates[key].tabIndex)).size == 0, {
+					if(this.widgetsAtTab(tabs.tabViews[widgetStates[key].tabIndex].label).size == 0, {
 					if(tabProperties.size == 1, {
 						tabProperties = [(tabLabel: "default", tabColor: tabProperties[0].tabColor)];
 					}, {
@@ -936,6 +966,8 @@ CVCenter {
 
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		thisKey = key.asSymbol;
+
+		// "add called with key '%' and tab '%'\n".postf(key, tab);
 
 		// if a 2D-widget under the given key exists force the given slot to become
 		// the other slot of the already existing widget
@@ -984,17 +1016,23 @@ CVCenter {
 		tab !? {
 			if(widgetStates.notNil and:{
 				widgetStates[thisKey].notNil and:{
-					tabs.getLabelAt(widgetStates[thisKey].tabIndex) != tab.asString
+					// tabs.getLabelAt(widgetStates[thisKey].tabIndex) != tab.asString
+					tabs.tabViews[widgetStates[thisKey].tabIndex].label != tab.asString
 				}
 			}, {
 				// force widget2D-slot to be created under the same tab as the already existing slot
-				thisTab = tabs.getLabelAt(widgetStates[thisKey].tabIndex);
+				// thisTab = tabs.getLabelAt(widgetStates[thisKey].tabIndex);
+				thisTab = tabs.tabViews[widgetStates[thisKey].tabIndex].label;
+					// "widget2D - thisTab: %\n".postf(thisTab);
 			}, {
 				thisTab = tab;
+					// "something else: %\n".postf(thisTab);
 			})
 		};
 
 		this.new;
+
+		// "thisTab inbetween: %\n".postf(thisTab);
 
 		thisSlot !? {
 			widgetStates[thisKey] ?? { widgetStates.put(thisKey, ()) };
@@ -1030,6 +1068,7 @@ CVCenter {
 		if(window.isNil or:{ window.isClosed }, {
 			this.makeWindow(tab);
 		}, {
+				// "thisTab: %\n".postf(thisTab);
 			this.prAddToGui(thisTab, widget2DKey);
 		});
 
@@ -1095,8 +1134,11 @@ CVCenter {
 
 	*renameTab { |oldName, newName|
 		var index;
-		index = tabs.views.detectIndex({ |view, i| tabs.getLabelAt(i) == oldName.asString; });
-		tabs.setLabelAt(index, newName.asString);
+		// index = tabs.views.detectIndex({ |view, i| tabs.tabViews[i].label == oldName.asString; });
+		// tabs.setLabelAt(index, newName.asString);
+		index = tabs.tabViews.detectIndex({ |tab, i| tab.label == oldName.asString });
+		tabs.tabAt(index).label = newName.asString;
+		tabs.refresh;
 		tabProperties[index].tabLabel = newName.asString;
 	}
 
@@ -1589,7 +1631,11 @@ CVCenter {
 			}
 		);
 
-		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
+		// "tab: %\n".postf(tab);
+		// "tabProperties: %\n".postf(tabProperties);
+		// tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
+		tabLabels = tabs.tabViews.collect({ |tab| tab.label.asSymbol });
+		// "tabLabels: %\n".postf(tabLabels);
 
 		if(tab.notNil, {
 			if(tabLabels.includes(tab.asSymbol), {
@@ -1597,9 +1643,15 @@ CVCenter {
 			}, {
 				if(tabs.views.size == 1 and: { tabs.views[0].children.size == 0 }, {
 					cvTabIndex = 0;
-					this.renameTab(tabs.getLabelAt(0), tab.asString);
+					// this.renameTab(tabs.getLabelAt(0), tab.asString);
+					tabs.tabAt(0).label_(tab.asString);
 				}, {
-					thisTab = tabs.add(tab);
+					thisTab = tabs.add(tab)
+						.useDetachIcon_(true)
+						.onChangeParent_({})
+						// .closable_(true)
+						// .onBeginClose_({ "I'm going to closed".postln; })
+					;
 					this.shortcuts.values.do({ |keyDowns|
 						thisTab.keyDownAction_(
 							thisTab.keyDownAction.add({ |view, char, modifiers, unicode, keycode|
@@ -1638,13 +1690,16 @@ CVCenter {
 				})
 			})
 		}, {
-			cvTabIndex = tabs.activeTab;
+			// "tabs: %\n".postf(tabs);
+			// cvTabIndex = tabs.activeTab;
+			cvTabIndex = tabs.tabViews.detectIndex({ |tab| tab === tabs.activeTab });
 		});
 
 		tabs.labelColors_(tabProperties.collect(_.tabColor));
 		tabs.unfocusedColors_(tabProperties.collect({ |t| t.tabColor.copy.alpha_(0.8) }));
 
 		// "tabProperties in *prAddToGui: %\n".postf(tabProperties);
+		// "cvTabIndex: %\n".postf(cvTabIndex);
 		if(tabProperties[cvTabIndex][\nextPos].notNil, {
 			// "tabProperties[cvTabIndex].notNil".postln;
 			thisNextPos = tabProperties[cvTabIndex].nextPos;
@@ -1658,6 +1713,8 @@ CVCenter {
 		allCVKeys = all.keys;
 		widgetKeys = cvWidgets.keys;
 		thisKeys = allCVKeys.difference(widgetKeys);
+
+		// "thisKeys: %\n".postf(thisKeys);
 
 		thisKeys.do({ |k|
 			if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
@@ -1786,7 +1843,10 @@ CVCenter {
 				// add next widget to the right
 				tabProperties[cvTabIndex].nextPos = thisNextPos = thisNextPos.x+colwidth@(thisNextPos.y);
 			});
-			tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
+			// tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab) }}));
+			tabs.tabViews.do(_.focusAction_({
+				this.prRegroupWidgets(tabs.tabViews.detectIndex({ |tab| tab === tabs.activeTab }));
+			}));
 			tabs.focus(cvTabIndex);
 		});
 
@@ -1808,6 +1868,8 @@ CVCenter {
 		rowheight = widgetheight+1+15;
 		thisNextPos = 0@0;
 
+		"tabIndex: %\n".postf(tabIndex);
+
 		tabIndex !? {
 			order = cvWidgets.order;
 			orderedWidgets = cvWidgets.atAll(order);
@@ -1816,6 +1878,7 @@ CVCenter {
 				if(widgetStates[k].notNil and:{ tabIndex == widgetStates[k].tabIndex }, {
 					if(thisNextPos != (0@0), {
 						thisNextPos = tabProperties[widgetStates[k].tabIndex].nextPos;
+						"thisNextPos: %\n".postf(thisNextPos);
 					});
 					orderedWidgets[i].widgetXY_(thisNextPos);
 					orderedRemoveButs[i].bounds_(Rect(
@@ -1844,7 +1907,7 @@ CVCenter {
 			tabProperties.removeAt(index);
 			widgetStates.do({ |w| if(w.tabIndex > index, { w.tabIndex = w.tabIndex-1 }) });
 		}, {
-			if(window.isClosed.not and:{ tabs.getLabelAt(index) != "default" }, { tabs.setLabelAt(index, "default") });
+			if(window.isClosed.not and:{ tabs.tabViews[index].label != "default" }, { tabs.tabViews[index].label_("default") });
 			tabProperties = [(tabLabel: "default", tabColor: tabProperties[index].tabColor)];
 		})
 	}

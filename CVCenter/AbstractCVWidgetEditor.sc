@@ -44,7 +44,7 @@ AbstractCVWidgetEditor {
 			AbstractCVWidgetEditor.allEditors.do({ |ed|
 				case
 					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
-						#[lo, hi].do({ |key|
+						#[lo, hi].do({ |k|
 							ed[k] !? {
 								if(ed[k].editor.notNil and:{
 									ed[k].editor.isClosed.not and:{
