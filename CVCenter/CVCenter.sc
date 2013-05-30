@@ -467,9 +467,11 @@ CVCenter {
 				.stringFocusedColors_(Color(0.0, 0.0, 0.5, 1.0)!tabs.views.size)
 			;
 
+			tabs.tabViews.do({ |tab| tab.view.hasBorder_(false) });
+
 			flow.shift(0, 0);
 
-			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40));
+			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40)).hasBorder_(false);
 			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, 0@0, 0@0);
 			prefPane.resize_(8).background_(Color.black);
 
@@ -1646,12 +1648,15 @@ CVCenter {
 					// this.renameTab(tabs.getLabelAt(0), tab.asString);
 					tabs.tabAt(0).label_(tab.asString);
 				}, {
-					thisTab = tabs.add(tab)
+					thisTab = tabs.add(tab, scroll: true)
 						.useDetachIcon_(true)
 						.onChangeParent_({})
 						// .closable_(true)
 						// .onBeginClose_({ "I'm going to closed".postln; })
 					;
+
+					thisTab.view.hasBorder_(false);
+
 					this.shortcuts.values.do({ |keyDowns|
 						thisTab.keyDownAction_(
 							thisTab.keyDownAction.add({ |view, char, modifiers, unicode, keycode|
