@@ -456,7 +456,7 @@ CVCenter {
 				;
 			});
 			tabs
-				.backgrounds_(Color(0.1, 0.1, 0.1)!tabs.views.size)
+				.backgrounds_(Color.black!tabs.views.size)
 				.tabCurve_(3)
 				.resize_(5)
 				.tabHeight_(15)
@@ -464,7 +464,7 @@ CVCenter {
 				// .labelPadding_(7)
 				.font_(Font("Arial", 12, true))
 				.stringColors_(Color.black!tabs.views.size)
-				.stringFocusedColors_(Color(0.0, 0.0, 0.5, 1.0)!tabs.views.size)
+				.stringFocusedColors_(Color.white!tabs.views.size)
 			;
 
 			tabs.tabViews.do({ |tab| tab.view.hasBorder_(false) });

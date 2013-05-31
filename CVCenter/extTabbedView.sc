@@ -30,3 +30,23 @@
 	}
 
 }
+
++ TabbedViewTab {
+
+	detachCVCTab { |parent|
+		var detachWin, flow;
+
+		if(GUI.id == \qt) {
+			detachWin = Window("CVCenter", Rect(
+				widget.absoluteBounds.left+10,
+				widget.absoluteBounds.top+10,
+				parent.bounds.width+4,
+				parent.bounds.height+4
+			));
+			this.setParent(tabbedView.clone(detachWin));
+			{this.widget.mouseDown(4,4);this.widget.mouseMove(0,0);this.widget.mouseUp(0,0)}.defer(0.2);
+			^detachWin;
+		}
+	}
+
+}
