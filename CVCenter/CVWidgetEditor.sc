@@ -1057,7 +1057,8 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			;
 		});
 
-		thisEditor.window.front;
+		// thisEditor.window.front(tab);
+		this.front(tab)
 	}
 
 	// not to be used directly!

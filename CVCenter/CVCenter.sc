@@ -441,6 +441,7 @@ CVCenter {
 					.stringColor_(Color.white)
 					.stringFocusedColor_(Color.black)
 					.onChangeParent_({ |view|
+						"detached view: %\n".postf(view);
 						this.shortcuts.values.do({ |keyDowns|
 							view.keyDownAction_(
 								view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
@@ -479,7 +480,7 @@ CVCenter {
 				.dragTabs_(true)
 				.refreshAction_({ |me|
 					if(tabProperties.size == me.tabViews.size, {
-						"ordering has changed".postln
+						// "ordering has changed".postln
 					})
 				})
 			;
@@ -1087,7 +1088,7 @@ CVCenter {
 		if(window.isNil or:{ window.isClosed }, {
 			this.makeWindow(tab);
 		}, {
-				// "thisTab: %\n".postf(thisTab);
+			"thisTab: %, widget2DKey: %\n".postf(thisTab, widget2DKey);
 			this.prAddToGui(thisTab, widget2DKey);
 		});
 
@@ -1674,7 +1675,35 @@ CVCenter {
 						.unfocusedColor_(thisTabColor.copy.alpha_(0.5))
 						.stringColor_(Color.white)
 						.stringFocusedColor_(Color.black)
-						.onChangeParent_({ |view| view.dump })
+						.onChangeParent_({ |view|
+								"detached view.view.parent.parent.name: %\n".postf(view.view.parent.parent.name);
+								view.view.parent.background_(Color.black);
+								// view.dump;
+								this.shortcuts.values.do({ |keyDowns|
+								view.keyDownAction_(
+									view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+										var thisMod, thisArrMod;
+										thisMod = keyDowns.modifierQt;
+										thisArrMod = keyDowns.arrowsModifierQt;
+
+										case
+											{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+												// "no modifier".postln;
+												if(keycode == keyDowns.keyCode and:{
+													thisMod.isNil and:{ thisArrMod.isNil }
+												}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+											}
+											{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+												// "some modifier...".postln;
+												if(keycode == keyDowns.keyCode and:{
+													(modifiers == thisArrMod).or(modifiers == thisMod)
+												}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+											}
+										;
+									})
+								)
+							})
+						})
 						// .closable_(true)
 						// .onBeginClose_({ "I'm going to closed".postln; })
 					;
