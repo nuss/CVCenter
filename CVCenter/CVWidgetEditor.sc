@@ -163,10 +163,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			if(slot.notNil, { thisEditor = allEditors[name][slot] }, { thisEditor = allEditors[name] });
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
-			// tabs = TabbedView(window, Rect(0, 1, window.bounds.width, window.bounds.height), ["Spec", "MIDI", "OSC", "Actions"], scroll: true);
-			// tabs.view.resize_(5);
-			// tabs.tabCurve_(4);
-			// tabs.labelColors_(Color.white!4);
+
 			labelColors = [
 				Color(1.0, 0.3), //spec
 				Color.red, //midi
@@ -174,13 +171,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				Color(0.32, 0.67, 0.76), //actions
 			];
 			labelStringColors = labelColors.collect({ |c| Color(c.red * 0.8, c.green * 0.8, c.blue * 0.8) });
-			// tabs.unfocusedColors_(labelColors);
-			// tabs.stringColor_(Color.white);
-			// tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			// tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			// tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			// tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			// tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
 
 			tabs = TabbedView2(window, Rect(0, 1, window.bounds.width, window.bounds.height))
 				.resize_(5).dragTabs_(false)
@@ -488,12 +478,12 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				])
 				.action_({ |ml|
 					ml.value.switch(
-					// wcm.midiDisplay.model.value_((
-					// 	learn: ml.states[ml.value][0],
-					// 	src: wcm.midiDisplay.model.value.src,
-					// 	chan: wcm.midiDisplay.model.value.chan,
-					// 	ctrl: wcm.midiDisplay.model.value.ctrl
-					// )).changedKeys(widget.synchKeys);
+						// wcm.midiDisplay.model.value_((
+						// 	learn: ml.states[ml.value][0],
+						// 	src: wcm.midiDisplay.model.value.src,
+						// 	chan: wcm.midiDisplay.model.value.chan,
+						// 	ctrl: wcm.midiDisplay.model.value.ctrl
+						// )).changedKeys(widget.synchKeys);
 						1, {
 							margs = [
 								[midiSrcField.string, msrc],
@@ -1028,14 +1018,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				})
 			});
 
-			// tabs.tabViews.collect({ |t| t.focusAction_
-			// 	tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
-			// 		{
-			// 			tabs.stringFocusedColor_(labelStringColors[t]);
-			// 			{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
-			// 		}
-			// 	}));
-
 			OSCCommands.collectTempIPsAndCmds;
 			deviceDropDown
 				.mouseDownAction_({ |dd|
@@ -1075,13 +1057,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			;
 		});
 
-		// tab !? {
-		// 	thisEditor[\tabs].focus(tab);
-		// 	if(widget.class == CVWidgetMS, {
-		// 		tabs.stringFocusedColor_(labelStringColors[tab]);
-				// tabs.views[tab].background_(Color(0.8, 0.8, 0.8, 1.0));
-// })
-// };
 		thisEditor.window.front;
 	}
 

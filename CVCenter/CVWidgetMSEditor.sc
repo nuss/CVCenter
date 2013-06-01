@@ -157,10 +157,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 
-			// tabs = TabbedView(window, Rect(0, 1, window.bounds.width, window.bounds.height), ["Spec", "MIDI", "OSC", "Actions"], scroll: true);
-			// tabs.view.resize_(5);
-			// tabs.tabCurve_(4);
-			// tabs.labelColors_(Color.white!4);
 			labelColors = [
 				Color(1.0, 0.3), //specs
 				Color.red, //midi
@@ -168,20 +164,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				Color(0.32, 0.67, 0.76), //actions
 			];
 			labelStringColors = labelColors.collect({ |c| Color(c.red * 0.8, c.green * 0.8, c.blue * 0.8) });
-			// tabs.unfocusedColors_(labelColors);
-			// tabs.stringColor_(Color.white);
-			// tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			// tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 0@0, 0@0);
-			// tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 0@0, 0@0);
-			// tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			// tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
-			// tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
-			// 	{
-			// 		tabs.stringFocusedColor_(labelStringColors[t]);
-			// 		{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
-			// 	}
-			// }));
-			// tabs.stringFocusedColor_(labelStringColors[tab]);
 
 			tabs = TabbedView2(window, Rect(0, 1, window.bounds.width, window.bounds.height))
 				.resize_(5).dragTabs_(false)
@@ -197,8 +179,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			});
 
 			tabs.tabViews.do({ |tab| tab.view.hasBorder_(false) });
-
-			// "tabs.views[0].view: %\n".postf(tabs.views[0].view);
 
 			tabView0 = CompositeView(
 				tabs.views[0].view,
@@ -252,19 +232,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			oscTabs.tabViews.do({ |tab| tab.view.hasBorder_(false) });
 
-			// oscTabs.view.resize_(tabs.view.resize);
-			// oscLabelColor = labelColors[2];
-			// oscLabelStringColor = labelStringColors[2];
-			// oscTabs.tabCurve_(4)
-			// .labelColors_(Color.white!2)
-			// .unfocusedColors_([oscLabelColor])
-			// .stringColor_(Color.white)
-			// .stringFocusedColor_(oscLabelStringColor)
-			// ;
-
-			"midiTabs.views[0].view: %\n".postf(midiTabs.views[0].view);
-			"oscTabs.views[0].view: %\n".postf(oscTabs.views[0].view);
-
 			midiView0 = CompositeView(
 				midiTabs.views[0].view,
 				midiTabs.views[0].view.bounds.width@midiTabs.views[0].view.bounds.height
@@ -288,35 +255,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			oscView0.decorator = oscFlow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			oscView1.decorator = oscFlow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 
-			// oscTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
-			// oscTabs.focusActions_((0..oscTabs.views.size-1).collect({ |t|
-			// 	{
-			// 		{ oscTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
-			// 	}
-			// }));
-
-			// midiTabs.view.resize_(tabs.view.resize);
-			// midiLabelColor = labelColors[1];
-			// midiLabelStringColor = labelStringColors[1];
-			// midiTabs.tabCurve_(4)
-			// .labelColors_(Color.white!2)
-			// .unfocusedColors_([midiLabelColor])
-			// .stringColor_(Color.white)
-			// .stringFocusedColor_(midiLabelStringColor)
-			// ;
-
-			// midiTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
-			// midiTabs.focusActions_((0..midiTabs.views.size-1).collect({ |t|
-			// 	{
-			// 		{ midiTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
-			// 	}
-			// }));
-
 			thisEditor.tabs = tabs;
 			thisEditor.oscTabs = oscTabs;
 			thisEditor.midiTabs = midiTabs;
-
-			"thisEditor[\\tabs].view: %\n".postf(thisEditor[\tabs].view);
 
 			this.class.shortcuts.values.do({ |keyDowns|
 				// keyDowns.postcs;
