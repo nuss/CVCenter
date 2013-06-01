@@ -24,6 +24,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 	var <oscEditBtns, <oscCalibBtns;
 	var <midiEditGroups;
 	var <oscTabs, <midiTabs;
+	var midiView0, midiView1, oscView0, oscView1;
 	var oscFlow0, <oscFlow1, midiFlow0, <midiFlow1;
 
 	*new { |widget, widgetName, tab|
@@ -156,10 +157,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
 
-			tabs = TabbedView(window, Rect(0, 1, window.bounds.width, window.bounds.height), ["Spec", "MIDI", "OSC", "Actions"], scroll: true);
-			tabs.view.resize_(5);
-			tabs.tabCurve_(4);
-			tabs.labelColors_(Color.white!4);
+			// tabs = TabbedView(window, Rect(0, 1, window.bounds.width, window.bounds.height), ["Spec", "MIDI", "OSC", "Actions"], scroll: true);
+			// tabs.view.resize_(5);
+			// tabs.tabCurve_(4);
+			// tabs.labelColors_(Color.white!4);
 			labelColors = [
 				Color(1.0, 0.3), //specs
 				Color.red, //midi
@@ -167,67 +168,160 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				Color(0.32, 0.67, 0.76), //actions
 			];
 			labelStringColors = labelColors.collect({ |c| Color(c.red * 0.8, c.green * 0.8, c.blue * 0.8) });
-			tabs.unfocusedColors_(labelColors);
-			tabs.stringColor_(Color.white);
-			tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 0@0, 0@0);
-			tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 0@0, 0@0);
-			tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
-			tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
-				{
-					tabs.stringFocusedColor_(labelStringColors[t]);
-					{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
-				}
-			}));
-			tabs.stringFocusedColor_(labelStringColors[tab]);
+			// tabs.unfocusedColors_(labelColors);
+			// tabs.stringColor_(Color.white);
+			// tabs.views[0].decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			// tabs.views[1].decorator = flow1 = FlowLayout(window.view.bounds, 0@0, 0@0);
+			// tabs.views[2].decorator = flow2 = FlowLayout(window.view.bounds, 0@0, 0@0);
+			// tabs.views[3].decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			// tabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
+			// tabs.focusActions_((0..tabs.views.size-1).collect({ |t|
+			// 	{
+			// 		tabs.stringFocusedColor_(labelStringColors[t]);
+			// 		{ tabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
+			// 	}
+			// }));
+			// tabs.stringFocusedColor_(labelStringColors[tab]);
 
-			oscTabs = TabbedView(tabs.views[2], Rect(0, 1, tabs.views[2].bounds.width-4, tabs.views[2].bounds.height-4), ["Batch Connection", "Individual Sliders"], scroll: true);
-			oscTabs.view.resize_(tabs.view.resize);
-			oscLabelColor = labelColors[2];
-			oscLabelStringColor = labelStringColors[2];
-			oscTabs.tabCurve_(4)
-				.labelColors_(Color.white!2)
-				.unfocusedColors_([oscLabelColor])
-				.stringColor_(Color.white)
-				.stringFocusedColor_(oscLabelStringColor)
+			tabs = TabbedView2(window, Rect(0, 1, window.bounds.width, window.bounds.height))
+				.resize_(5).dragTabs_(false)
 			;
-			oscTabs.views[0].decorator = oscFlow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			oscTabs.views[1].decorator = oscFlow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			oscTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
-			oscTabs.focusActions_((0..oscTabs.views.size-1).collect({ |t|
-				{
-					{ oscTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
-				}
-			}));
 
-			midiTabs = TabbedView(tabs.views[1], Rect(0, 1, tabs.views[1].bounds.width-4, tabs.views[1].bounds.height-4), ["Batch Connection", "Individual Sliders"], scroll: true);
-			midiTabs.view.resize_(tabs.view.resize);
-			midiLabelColor = labelColors[1];
-			midiLabelStringColor = labelStringColors[1];
-			midiTabs.tabCurve_(4)
-				.labelColors_(Color.white!2)
-				.unfocusedColors_([midiLabelColor])
-				.stringColor_(Color.white)
-				.stringFocusedColor_(midiLabelStringColor)
+			["Spec", "MIDI", "OSC", "Actions"].do({ |lbl, i|
+				tabs.add(lbl, scroll: true)
+					.labelColor_(Color.white)
+					.stringColor_(Color.white)
+					.stringFocusedColor_(labelStringColors[i])
+					.unfocusedColor_(labelColors[i])
+				;
+			});
+
+			tabs.tabViews.do({ |tab| tab.view.hasBorder_(false) });
+
+			// "tabs.views[0].view: %\n".postf(tabs.views[0].view);
+
+			tabView0 = CompositeView(
+				tabs.views[0].view,
+				tabs.views[0].view.bounds.width@tabs.views[0].view.bounds.height
+			);
+			tabView1 = CompositeView(
+				tabs.views[1].view,
+				tabs.views[0].view.bounds.width@tabs.views[0].view.bounds.height
+			);
+			tabView2 = CompositeView(
+				tabs.views[2].view,
+				tabs.views[2].view.bounds.width@tabs.views[2].view.bounds.height
+			);
+			tabView3 = CompositeView(
+				tabs.views[3].view,
+				tabs.views[3].view.bounds.width@tabs.views[3].view.bounds.height
+			);
+
+			tabView0.decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			tabView1.decorator = flow1 = FlowLayout(window.view.bounds, 0@1, 3@3);
+			tabView2.decorator = flow2 = FlowLayout(window.view.bounds, 0@1, 3@3);
+			tabView3.decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
+
+			midiTabs = TabbedView2(tabView1, Rect(0, 1, tabView1.bounds.width-4, tabView1.bounds.height-4))
+				.resize_(5).dragTabs_(false)
 			;
-			midiTabs.views[0].decorator = midiFlow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			midiTabs.views[1].decorator = midiFlow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			midiTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
-			midiTabs.focusActions_((0..midiTabs.views.size-1).collect({ |t|
-				{
-					{ midiTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
-				}
-			}));
+
+			["Batch Connection", "Individual Sliders"].do({ |lbl, i|
+				midiTabs.add(lbl, scroll: true)
+					.labelColor_(Color.white)
+					.stringColor_(Color.white)
+					.stringFocusedColor_(labelStringColors[2])
+					.unfocusedColor_(labelColors[2])
+				;
+			});
+
+			midiTabs.tabViews.do({ |tab| tab.view.hasBorder_(false) });
+
+			oscTabs = TabbedView2(tabView2, Rect(0, 1, tabView2.bounds.width-4, tabView2.bounds.height-4))
+				.resize_(5).dragTabs_(false)
+			;
+
+			["Batch Connection", "Individual Sliders"].do({ |lbl, i|
+				oscTabs.add(lbl, scroll: true)
+					.labelColor_(Color.white)
+					.stringColor_(Color.white)
+					.stringFocusedColor_(labelStringColors[1])
+					.unfocusedColor_(labelColors[1])
+				;
+			});
+
+			oscTabs.tabViews.do({ |tab| tab.view.hasBorder_(false) });
+
+			// oscTabs.view.resize_(tabs.view.resize);
+			// oscLabelColor = labelColors[2];
+			// oscLabelStringColor = labelStringColors[2];
+			// oscTabs.tabCurve_(4)
+			// .labelColors_(Color.white!2)
+			// .unfocusedColors_([oscLabelColor])
+			// .stringColor_(Color.white)
+			// .stringFocusedColor_(oscLabelStringColor)
+			// ;
+
+			"midiTabs.views[0].view: %\n".postf(midiTabs.views[0].view);
+			"oscTabs.views[0].view: %\n".postf(oscTabs.views[0].view);
+
+			midiView0 = CompositeView(
+				midiTabs.views[0].view,
+				midiTabs.views[0].view.bounds.width@midiTabs.views[0].view.bounds.height
+			);
+			midiView1 = CompositeView(
+				midiTabs.views[1].view,
+				midiTabs.views[1].view.bounds.width@midiTabs.views[1].view.bounds.height
+			);
+			oscView0 = CompositeView(
+				oscTabs.views[0].view,
+				oscTabs.views[0].view.bounds.width@oscTabs.views[0].view.bounds.height
+			);
+			oscView1 = CompositeView(
+				oscTabs.views[1].view,
+				oscTabs.views[1].view.bounds.width@oscTabs.views[1].view.bounds.height
+			);
+
+			midiView0.decorator = midiFlow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			midiView1.decorator = midiFlow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
+
+			oscView0.decorator = oscFlow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			oscView1.decorator = oscFlow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
+
+			// oscTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
+			// oscTabs.focusActions_((0..oscTabs.views.size-1).collect({ |t|
+			// 	{
+			// 		{ oscTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
+			// 	}
+			// }));
+
+			// midiTabs.view.resize_(tabs.view.resize);
+			// midiLabelColor = labelColors[1];
+			// midiLabelStringColor = labelStringColors[1];
+			// midiTabs.tabCurve_(4)
+			// .labelColors_(Color.white!2)
+			// .unfocusedColors_([midiLabelColor])
+			// .stringColor_(Color.white)
+			// .stringFocusedColor_(midiLabelStringColor)
+			// ;
+
+			// midiTabs.views.do({ |v| v.background_(Color(0.8, 0.8, 0.8, 1.0)) });
+			// midiTabs.focusActions_((0..midiTabs.views.size-1).collect({ |t|
+			// 	{
+			// 		{ midiTabs.views[t].background_(Color(0.8, 0.8, 0.8, 1.0)) }.defer(0.01);
+			// 	}
+			// }));
 
 			thisEditor.tabs = tabs;
 			thisEditor.oscTabs = oscTabs;
 			thisEditor.midiTabs = midiTabs;
 
+			"thisEditor[\\tabs].view: %\n".postf(thisEditor[\tabs].view);
+
 			this.class.shortcuts.values.do({ |keyDowns|
 				// keyDowns.postcs;
-				thisEditor[\tabs].view.keyDownAction_(
-					thisEditor[\tabs].view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
+				tabs.view.keyDownAction_(
+					tabs.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
 						var thisMod, thisArrMod;
 
 						switch(GUI.id,
@@ -246,13 +340,13 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 								// "no modifiers".postln;
 								if(keycode == keyDowns.keyCode and:{
 									thisMod.isNil and:{ thisArrMod.isNil }
-							}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) });
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) });
 							}
 							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
 								// "some modifier...".postln;
 								if(keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)
-							}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) })
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) })
 							}
 						;
 					})
@@ -265,7 +359,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				widget.getSpec.default.size
 			].maxItem;
 
-			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@43)
+			StaticText(tabView0, flow0.bounds.width-20@43)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 //				.background_(Color.white)
@@ -276,7 +370,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			if(GUI.id == \cocoa, { tmp = "\n" }, { tmp = " " });
 
-			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@85/*60*/)
+			StaticText(tabView0, flow0.bounds.width-20@85/*60*/)
 				.font_(staticTextFontBold)
 				.stringColor_(staticTextColor)
 //				.background_(Color.white)
@@ -285,7 +379,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			// flow0.shift(0, 2);
 
-			StaticText(thisEditor.tabs.views[0], flow0.bounds.width-20@14)
+			StaticText(tabView0, flow0.bounds.width-20@14)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Enter the desired Spec and execute it by hitting shift+return.")
@@ -295,7 +389,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			// flow0.shift(0, 5);
 
 			cvString = widget.getSpec.asCompileString;
-			specField = TextView(thisEditor.tabs.views[0], flow0.bounds.width-20@48)
+			specField = TextView(tabView0, flow0.bounds.width-20@48)
 				.font_(staticTextFont)
 				.string_(cvString)
 				.keyDownAction_({ |tf, char, modifiers, unicode, keycode|
@@ -309,7 +403,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			// flow0.shift(0, 5);
 
-			specsList = PopUpMenu(thisEditor.tabs.views[0], flow0.bounds.width-20@20)
+			specsList = PopUpMenu(tabView0, flow0.bounds.width-20@20)
 				.action_({ |sl|
 					widget.setSpec(specsListSpecs[sl.value])
 				})
@@ -353,7 +447,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				specsList.items = List["custom:"+widget.getSpec.asString]++specsList.items;
 			});
 
-			StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-20@20)
+			StaticText(midiView0, midiFlow0.bounds.width-20@20)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("The following options will apply to all MIDI-responders that get connected within this widget. However you may override these settings within the MIDI-options for any particular slider.")
@@ -363,7 +457,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			midiModes = ["0-127", "+/-"];
 
-			midiModeSelect = PopUpMenu(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+			midiModeSelect = PopUpMenu(midiView0, midiFlow0.bounds.width/5-7@15)
 				.font_(staticTextFont)
 				.items_(midiModes)
 				.action_({ |ms|
@@ -389,7 +483,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				midiModeSelect.toolTip_("Set the mode according to the output\nof your MIDI-device: 0-127 if it outputs\nabsolute values or +/- for in- resp.\ndecremental values")
 			});
 
-			midiMeanNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+			midiMeanNB = TextField(midiView0, midiFlow0.bounds.width/5-7@15)
 				.font_(staticTextFont)
 				.action_({ |mb|
 					tmp = mb.string;
@@ -416,7 +510,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				midiMeanNB.string_("--");
 			});
 
-			softWithinNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+			softWithinNB = TextField(midiView0, midiFlow0.bounds.width/5-7@15)
 				.font_(staticTextFont)
 				.action_({ |mb|
 					tmp = mb.string;
@@ -441,7 +535,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				softWithinNB.string_("--");
 			});
 
-			midiResolutionNB = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+			midiResolutionNB = TextField(midiView0, midiFlow0.bounds.width/5-7@15)
 				.font_(staticTextFont)
 				.action_({ |mb|
 					tmp = mb.string;
@@ -465,7 +559,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				midiResolutionNB.string_("--");
 			});
 
-			ctrlButtonBankField = TextField(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@15)
+			ctrlButtonBankField = TextField(midiView0, midiFlow0.bounds.width/5-7@15)
 				.font_(staticTextFont)
 				.action_({ |mb|
 					tmp = mb.string;
@@ -500,28 +594,28 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			});
 
-			StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@42)
+			StaticText(midiView0, midiFlow0.bounds.width/5-7@42)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-mode:\n0-127 or in-/\ndecremental")
 //				.background_(Color.white)
 			;
 
-			StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@42)
+			StaticText(midiView0, midiFlow0.bounds.width/5-7@42)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-mean (in-/\ndecremental\nmode only)")
 //				.background_(Color.white)
 			;
 
-			StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@42)
+			StaticText(midiView0, midiFlow0.bounds.width/5-7@42)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("minimum snap-\ndistance for sli-\nders (0-127 only)")
 //				.background_(Color.white)
 			;
 
-			StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@42)
+			StaticText(midiView0, midiFlow0.bounds.width/5-7@42)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-resolution\n(in-/decremental\nmode only)")
@@ -530,7 +624,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			//		midiFlow0.shift(0, 0);
 
-			StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width/5-7@30)
+			StaticText(midiView0, midiFlow0.bounds.width/5-7@30)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("number of sliders\nper bank")
@@ -539,14 +633,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			midiFlow0.shift(0, 3);
 
-			StaticText(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-20@15)
+			StaticText(midiView0, midiFlow0.bounds.width-20@15)
 				.font_(staticTextFontBold)
 				.string_("batch-connect a range of MIDI-sliders")
 			;
 
 			// midiFlow0.shift(0, 7);
 
-			midiInitBut = Button(thisEditor.midiTabs.views[0], 60@25)
+			midiInitBut = Button(midiView0, 60@25)
 				.font_(staticTextFont)
 				.action_({ |mb|
 					if(MIDIClient.initialized, {
@@ -570,7 +664,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				midiInitBut.states_([["init MIDI", Color.white, Color.red]]);
 			});
 
-			midiSourceSelect = PopUpMenu(thisEditor.midiTabs.views[0], midiFlow0.indentedRemaining.width-10@25)
+			midiSourceSelect = PopUpMenu(midiView0, midiFlow0.indentedRemaining.width-10@25)
 				.items_(["select device port..."])
 				.font_(staticTextFont)
 				.action_({ |ms|
@@ -586,7 +680,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			midiSrcField = TextField(thisEditor.midiTabs.views[0], 120@15)
+			midiSrcField = TextField(midiView0, 120@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -599,7 +693,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			midiChanField = TextField(thisEditor.midiTabs.views[0], 45@15)
+			midiChanField = TextField(midiView0, 45@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -612,7 +706,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			msMidiIndexStartField = NumberBox(thisEditor.midiTabs.views[0], 25@15)
+			msMidiIndexStartField = NumberBox(midiView0, 25@15)
 				.font_(textFieldFont)
 				.background_(textFieldBg)
 				.stringColor_(textFieldFontColor)
@@ -630,7 +724,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				msMidiIndexStartField.toolTip_("The (multi-)slider index at which to start connecting");
 			});
 
-			extMidiCtrlArrayField = TextField(thisEditor.midiTabs.views[0], midiFlow0.indentedRemaining.width-10@15)
+			extMidiCtrlArrayField = TextField(midiView0, midiFlow0.indentedRemaining.width-10@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -643,7 +737,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			midiConnectorBut = Button(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-24/2@25)
+			midiConnectorBut = Button(midiView0, midiFlow0.bounds.width-24/2@25)
 				.font_(staticTextFont)
 				.states_([
 					["connect MIDI-sliders", Color.white, Color.red],
@@ -674,7 +768,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				[midiConnectorBut.states[0][0], midiConnectorBut.states[0][1], Color.red(alpha: 0.5)]
 			]) });
 
-			midiDisconnectorBut = Button(thisEditor.midiTabs.views[0], midiFlow0.bounds.width-29/2@25)
+			midiDisconnectorBut = Button(midiView0, midiFlow0.bounds.width-29/2@25)
 				.font_(staticTextFont)
 				.states_([
 					["disconnect all Midi-sliders", Color.white, Color.blue]
@@ -704,13 +798,13 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			widget.msSize.do({ |sl|
 				midiEditGroups.add(
-					CVMidiEditGroup(thisEditor.midiTabs.views[1], midiFlow1.bounds.width/5-10@39, widget, sl);
+					CVMidiEditGroup(midiView1, midiFlow1.bounds.width/5-10@39, widget, sl);
 				)
 			});
 
 			// osc
 
-			deviceDropDown = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-110@15)
+			deviceDropDown = PopUpMenu(oscView0, oscFlow0.bounds.width-110@15)
 				.items_(["select IP-address... (optional)"])
 				.font_(Font("Arial", 10))
 			;
@@ -719,14 +813,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				deviceDropDown.toolTip_("Selecting one of the addresses will restrict listening within\nthe responder to messages coming from that address only.\nHowever, an IP-address will only be listed if the program is\nalready receiving OSC messages from that address.");
 			});
 
-			StaticText(thisEditor.oscTabs.views[0], 70@15)
+			StaticText(oscView0, 70@15)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("restrict to port ")
 				.align_(\right)
 			;
 
-			portRestrictor = buildCheckbox.(false, thisEditor.oscTabs.views[0], 15@15, Font("Arial", 10, true));
+			portRestrictor = buildCheckbox.(false, oscView0, 15@15, Font("Arial", 10, true));
 			portRestrictor.action_({ |bt|
 				switch(bt.value.asBoolean,
 					true, {
@@ -748,7 +842,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			oscFlow0.shift(0, 0);
 
-			deviceListMenu = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-46@15)
+			deviceListMenu = PopUpMenu(oscView0, oscFlow0.bounds.width/2-46@15)
 				.items_(["select device..."])
 				.font_(Font("Arial", 10))
 				.action_({ |m|
@@ -782,7 +876,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			oscFlow0.shift(0, 0);
 
-			cmdListMenu = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-11@15)
+			cmdListMenu = PopUpMenu(oscView0, oscFlow0.bounds.width/2-11@15)
 				.items_(["command-names..."])
 				.font_(Font("Arial", 10))
 				.mouseDownAction_({ |m|
@@ -825,7 +919,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			oscFlow0.shift(0, 0);
 
-			addDeviceBut = Button(thisEditor.oscTabs.views[0], 29@15)
+			addDeviceBut = Button(oscView0, 29@15)
 				.states_([
 					["new", Color.white, Color(0.15, 0.5, 0.15)]
 				])
@@ -839,7 +933,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			oscFlow0.shift(0, 0);
 
-			extOscCtrlArrayField = TextField(thisEditor.oscTabs.views[0], 65@15)
+			extOscCtrlArrayField = TextField(oscView0, 65@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -852,7 +946,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			nameField = TextField(thisEditor.oscTabs.views[0], 185@15)
+			nameField = TextField(oscView0, 185@15)
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -865,7 +959,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			intStartIndexField = NumberBox(thisEditor.oscTabs.views[0], 60@15)
+			intStartIndexField = NumberBox(oscView0, 60@15)
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.clipLo_(0)
@@ -884,7 +978,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			indexField = TextField(thisEditor.oscTabs.views[0], 60@15)
+			indexField = TextField(oscView0, 60@15)
 				.font_(textFieldFont)
 				.string_("int or %")
 			;
@@ -895,54 +989,54 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			StaticText(thisEditor.oscTabs.views[0], 65@42)
+			StaticText(oscView0, 65@42)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("placeholder\nvalues (numeric\narray)")
 //				.background_(Color.white)
 			;
 
-			StaticText(thisEditor.oscTabs.views[0], 185@20)
+			StaticText(oscView0, 185@20)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("OSC-command (use % as placeholder)")
 //				.background_(Color.white)
 			;
 
-			StaticText(thisEditor.oscTabs.views[0], 60@42)
+			StaticText(oscView0, 60@42)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Multislider\nstart-index\n(offset)")
 //				.background_(Color.white)
 			;
 
-			StaticText(thisEditor.oscTabs.views[0], 60@42)
+			StaticText(oscView0, 60@42)
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("msg.-slot (use\n% as\nplaceholder)")
 //				.background_(Color.white)
 			;
 
-			StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-10@15)
+			StaticText(oscView0, oscFlow0.bounds.width/2-10@15)
 				.font_(staticTextFont)
 				.string_("Input to Output mapping")
 			// .background_(Color.white)
 			;
 
-			StaticText(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/4@15)
+			StaticText(oscView0, oscFlow0.bounds.width/4@15)
 				.font_(staticTextFont)
 				.string_("Global Calibration")
 			// .background_(Color.white)
 			;
 
-			StaticText(thisEditor.oscTabs.views[0], oscFlow0.indentedRemaining.width-7@15)
+			StaticText(oscView0, oscFlow0.indentedRemaining.width-7@15)
 				.font_(staticTextFont)
 				.string_("Reset Calibration")
 			;
 
 			mappingSelectItems = ["set global mapping...", "linlin", "linexp", "explin", "expexp"];
 
-			mappingSelect = PopUpMenu(thisEditor.oscTabs.views[0], oscFlow0.bounds.width/2-12@20)
+			mappingSelect = PopUpMenu(oscView0, oscFlow0.bounds.width/2-12@20)
 				.font_(Font("Arial", 12))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
@@ -974,7 +1068,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			});
 
-			calibBut = Button(thisEditor.oscTabs.views[0],  oscFlow0.bounds.width/4@20)
+			calibBut = Button(oscView0,  oscFlow0.bounds.width/4@20)
 				.font_(staticTextFont)
 				.states_([
 					["calibrating all", Color.black, Color.green],
@@ -1015,7 +1109,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				calibBut.toolTip_("As the range of incoming values may be unknown the\ncalibration provides a way to detect the constraints\nof incoming values. It may be useful in some cases\nto deactivate the mechanism and restrict the input to\na limited range.")
 			});
 
-			oscResetCalibBut = Button(thisEditor.oscTabs.views[0], oscFlow0.indentedRemaining.width-7@20)
+			oscResetCalibBut = Button(oscView0, oscFlow0.indentedRemaining.width-7@20)
 				.font_(staticTextFont)
 				.states_([
 					["reset all", Color.black, Color(0.9, 0.7, 0.14)],
@@ -1035,7 +1129,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			oscFlow0.shift(0, 0);
 
-			connectorBut = Button(thisEditor.oscTabs.views[0], oscFlow0.bounds.width-24/2@25)
+			connectorBut = Button(oscView0, oscFlow0.bounds.width-24/2@25)
 				.font_(staticTextFont)
 				.states_([
 					["connect OSC-controllers", Color.white, Color.red],
@@ -1110,7 +1204,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				[connectorBut.states[0][0], connectorBut.states[0][1], Color.red(alpha: 0.5)]
 			]) });
 
-			oscDisconnectorBut = Button(thisEditor.oscTabs.views[0], oscFlow0.indentedRemaining.width-7@25)
+			oscDisconnectorBut = Button(oscView0, oscFlow0.indentedRemaining.width-7@25)
 				.font_(staticTextFont)
 				.states_([
 					["disconnect all OSC-controllers", Color.white, Color.blue],
@@ -1140,7 +1234,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			widget.msSize.do({ |sindex|
 				oscEditBtns.add(
-					Button(thisEditor.oscTabs.views[1], oscFlow1.bounds.width/5-10@25)
+					Button(oscView1, oscFlow1.bounds.width/5-10@25)
 						.states_([
 							[sindex.asString++": edit OSC", Color.black, Color.white]
 						])
@@ -1182,7 +1276,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				oscFlow1.shift(-13, oscEditBtns[sindex].bounds.height-10);
 
 				oscCalibBtns.add(
-					Button(thisEditor.oscTabs.views[1], 10@10)
+					Button(oscView1, 10@10)
 						.states_([
 							["", Color.black, Color.green],
 							["", Color.white, Color.red]
@@ -1210,7 +1304,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				oscFlow1.shift(0, (oscEditBtns[sindex].bounds.height-10).neg);
 			});
 
-			actionName = TextField(thisEditor.tabs.views[3], flow3.bounds.width-100@20)
+			actionName = TextField(tabView3, flow3.bounds.width-100@20)
 				.string_("action-name")
 				.font_(textFieldFont)
 			;
@@ -1221,7 +1315,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			flow3.shift(5, 0);
 
-			enterActionBut = Button(thisEditor.tabs.views[3], 57@20)
+			enterActionBut = Button(tabView3, 57@20)
 				.font_(staticTextFont)
 				.states_([
 					["add Action", Color.white, Color.blue],
@@ -1235,7 +1329,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			;
 
-			enterAction = TextView(thisEditor.tabs.views[3], flow3.bounds.width-35@50)
+			enterAction = TextView(tabView3, flow3.bounds.width-35@50)
 				.background_(Color.white)
 				.font_(textFieldFont)
 				.string_("{ |cv| /* do something */ }")
@@ -1255,7 +1349,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(0, 5);
 
-				actionsList[name].nameField = StaticText(thisEditor[\tabs].views[3], flow3.bounds.width-173@15)
+				actionsList[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
 					.font_(staticTextFont)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.string_(""+name.asString)
@@ -1263,7 +1357,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				actionsList[name].activate = Button(thisEditor[\tabs].views[3], 60@15)
+				actionsList[name].activate = Button(tabView3, 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -1288,7 +1382,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				actionsList[name].removeBut = Button(thisEditor[\tabs].views[3], 60@15)
+				actionsList[name].removeBut = Button(tabView3, 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["remove", Color.white, Color.red],
@@ -1300,7 +1394,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(0, 0);
 
-				actionsList[name].actionView = TextView(thisEditor[\tabs].views[3], flow3.bounds.width-35@50)
+				actionsList[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.font_(textFieldFont)
 					.string_(action.asArray[0][0].replace("\t", "    "))
@@ -1371,9 +1465,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		switch(addRemove,
 			\add, {
 				actionsList.put(name, ());
+				tabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height+76);
+
 				flow3.shift(0, 5);
 
-				actionsList[name].nameField = StaticText(thisEditor[\tabs].views[3], flow3.bounds.width-173@15)
+				actionsList[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
 					.font_(staticTextFont)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.string_(""+name.asString)
@@ -1381,7 +1477,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				actionsList[name].activate = Button(thisEditor[\tabs].views[3], 60@15)
+				actionsList[name].activate = Button(tabView3, 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -1406,7 +1502,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				actionsList[name].removeBut = Button(thisEditor[\tabs].views[3], 60@15)
+				actionsList[name].removeBut = Button(tabView3, 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["remove", Color.white, Color.red],
@@ -1418,7 +1514,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(0, 0);
 
-				actionsList[name].actionView = TextView(thisEditor[\tabs].views[3], flow3.bounds.width-35@50)
+				actionsList[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.font_(textFieldFont)
 					.string_(action.asArray[0][0])
@@ -1449,6 +1545,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					})
 				});
 				flow3.top_(flow3.top-76);
+				tabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height-76);
 			}
 		)
 

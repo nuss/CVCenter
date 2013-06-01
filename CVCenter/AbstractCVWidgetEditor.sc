@@ -29,6 +29,7 @@ AbstractCVWidgetEditor {
 	var <mappingSelect, <connectorBut;
 	var actionName, enterAction, enterActionBut, <actionsList;
 	var name;
+	var tabView0, tabView1, tabView2, tabView3;
 	var flow0, flow1, flow2, flow3;
 
 	*initClass {
@@ -40,7 +41,7 @@ AbstractCVWidgetEditor {
 
 		scFunc =
 		"// focus 'specs' tab
-		{ |view, char, modifiers, unicode, keycode, key|
+		{ |view|
 			AbstractCVWidgetEditor.allEditors.do({ |ed|
 				case
 					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
@@ -71,7 +72,7 @@ AbstractCVWidgetEditor {
 		);
 		scFunc =
 		"// focus 'midi' tab
-		{ |view, char, modifiers, unicode, keycode, key|
+		{ |view|
 			AbstractCVWidgetEditor.allEditors.do({ |ed|
 				case
 					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
@@ -112,7 +113,7 @@ AbstractCVWidgetEditor {
 		);
 		scFunc =
 		"// focus 'osc' tab
-		{ |view, char, modifiers, unicode, keycode, key|
+		{ |view|
 			AbstractCVWidgetEditor.allEditors.do({ |ed|
 				case
 					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
@@ -153,7 +154,7 @@ AbstractCVWidgetEditor {
 		);
 		scFunc =
 		"// focus 'actions' tab
-		{ |view, char, modifiers, unicode, keycode, key|
+		{ |view|
 			AbstractCVWidgetEditor.allEditors.do({ |ed|
 				case
 					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
@@ -184,7 +185,7 @@ AbstractCVWidgetEditor {
 		);
 		scFunc =
 		"// close the editor
-		{ |view, char, modifiers, unicode, keycode, key|
+		{ |view|
 			AbstractCVWidgetEditor.allEditors.do({ |ed|
 				case
 					{ ed.keys.includes(\\hi) or:{ ed.keys.includes(\\lo) }} {
@@ -235,7 +236,7 @@ AbstractCVWidgetEditor {
 	front { |tab|
 		thisEditor.window.front;
 		tab !? {
-			thisEditor[\tabs].stringFocusedColor_(labelStringColors[tab]);
+			// thisEditor[\tabs].stringFocusedColor_(labelStringColors[tab]);
 			thisEditor[\tabs].focus(tab);
 		}
 	}
