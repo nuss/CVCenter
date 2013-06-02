@@ -17,7 +17,7 @@
 
 CVCenter {
 
-	classvar <all, nextCVKey, <cvWidgets, <window, <tabs, prefPane, removeButs;
+	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, <tabs, prefPane, removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>shortcuts, <tabShortcuts, <scv;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight;
@@ -96,7 +96,7 @@ CVCenter {
 		};
 
 		this.shortcuts = IdentityDictionary.new;
-		#all, cvWidgets, widgetStates, removeButs, tabShortcuts = IdentityDictionary.new!5;
+		#all, childViews, cvWidgets, widgetStates, removeButs, tabShortcuts = IdentityDictionary.new!6;
 		tabProperties = [];
 
 		// shortcuts
@@ -1676,10 +1676,16 @@ CVCenter {
 						.stringColor_(Color.white)
 						.stringFocusedColor_(Color.black)
 						.onChangeParent_({ |view|
-								"detached view.view.parent.parent.name: %\n".postf(view.view.parent.parent.name);
-								view.view.parent.background_(Color.black);
-								// view.dump;
-								this.shortcuts.values.do({ |keyDowns|
+							"detached view.view.parent.parent.name: %\n".postf(view.view.parent.parent.name);
+							// view.view.parent.background_(Color.black);
+							// view.dump;
+							// view.view.dump;
+							// view.dump;
+							"homeView: %\n".postf(view.homeView);
+							childViews[view] ?? {
+								childViews.put(view, this.widgetsAtTab(thisTab.label))
+							};
+							this.shortcuts.values.do({ |keyDowns|
 								view.keyDownAction_(
 									view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
 										var thisMod, thisArrMod;
@@ -1707,6 +1713,8 @@ CVCenter {
 						// .closable_(true)
 						// .onBeginClose_({ "I'm going to closed".postln; })
 					;
+
+					"thisTab.homeView == thisTab.view: %\n".postf(thisTab.homeView == thisTab.view);
 
 					thisTab.view.hasBorder_(false);
 
