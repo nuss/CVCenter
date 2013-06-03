@@ -359,7 +359,7 @@ CVCenter {
 		var prefs, newPrefs;
 		var modsDict, arrModsDict;
 		// TabbedView2 specific
-		var detached;
+		var detached, labelOrder, tmpProps;
 //		var thisMod, thisArrMod;
 
 		"adding tab within *makeWindow: %\n".postf(tab);
@@ -480,8 +480,14 @@ CVCenter {
 				.dragTabs_(true)
 				.refreshAction_({ |me|
 					if(tabProperties.size == me.tabViews.size, {
-						// "ordering has changed".postln
-					})
+						tmpProps = tabProperties.copy;
+						me.tabViews.do({ |meTab, i|
+							tmpProps.do({ |prop|
+								if(prop.tabLabel == meTab.label, { tabProperties[i] = prop })
+							})
+						})
+					});
+					"tabViews.collect(_.label): %, tabProperties.collect(_.tabLabel): %\n".postf(me.tabViews.collect(_.label), this.tabProperties.collect(_.tabLabel))
 				})
 			;
 
@@ -1655,8 +1661,8 @@ CVCenter {
 
 		// "tab: %\n".postf(tab);
 		// "tabProperties: %\n".postf(tabProperties);
-		// tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
-		tabLabels = tabs.tabViews.collect({ |tab| tab.label.asSymbol });
+		tabLabels = tabProperties.collect({ |tab| tab.tabLabel.asSymbol });
+		// tabLabels = tabs.tabViews.collect({ |tab| tab.label.asSymbol });
 		// "tabLabels: %\n".postf(tabLabels);
 
 		if(tab.notNil, {
@@ -1676,12 +1682,12 @@ CVCenter {
 						.stringColor_(Color.white)
 						.stringFocusedColor_(Color.black)
 						.onChangeParent_({ |view|
-							"detached view.view.parent.parent.name: %\n".postf(view.view.parent.parent.name);
+							// "detached view.view.parent.parent.name: %\n".postf(view.view.parent.parent.name);
 							// view.view.parent.background_(Color.black);
 							// view.dump;
 							// view.view.dump;
 							// view.dump;
-							"homeView: %\n".postf(view.homeView);
+							// "view.index: %\n".postf(view.index);
 							childViews[view] ?? {
 								childViews.put(view, this.widgetsAtTab(thisTab.label))
 							};
@@ -1752,12 +1758,14 @@ CVCenter {
 						)
 					});
 					cvTabIndex = tabLabels.size;
+					"tab ist nicht activeTab".postln;
 					tabProperties = tabProperties.add((tabLabel: tab.asString, tabColor: thisTabColor, detached: false));
 				})
 			})
 		}, {
 			// "tabs: %\n".postf(tabs);
 			// cvTabIndex = tabs.activeTab.index;
+			"tab ist activeTab".postln;
 			cvTabIndex = tabs.activeTab.index;
 		});
 
@@ -1928,6 +1936,8 @@ CVCenter {
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets, orderedRemoveButs;
 		var widgetwidth, widgetheight=160;
 		var wdgtMaxWidth;
+
+		"regroup widgets at tab %\n".postf(tabs.tabAt(tabIndex).label);
 
 		wdgtMaxWidth = this.cvWidgets.collect({ |wdgt| wdgt.widgetProps.x+1 }).maxItem;
 
