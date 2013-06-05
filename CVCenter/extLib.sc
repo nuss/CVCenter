@@ -202,4 +202,23 @@
 		^nil
 	}
 
+	flipKeys { |...oldNewPairs|
+		oldNewPairs.pairsDo({ |o, n|
+			if(this.at(o).notNil and:{ o !== n }, {
+				this.put(n, this[o]);
+				this.removeAt(o);
+			})
+		});
+		^this;
+	}
+
+	detect { |function|
+		this.pairsDo { |key, val| if(function.value(val, key)) { ^val } };
+		^nil;
+	}
+
+	detectKey { |function|
+		this.pairsDo { |key, val| if(function.value(val, key)) { ^key } };
+		^nil;
+	}
 }
