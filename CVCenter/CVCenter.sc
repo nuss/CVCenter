@@ -437,6 +437,7 @@ CVCenter {
 				})
 			;
 
+			// move me out here to *prAddToGui
 			tabLabels.do({ |lbl, i|
 				// [lbl, i].postln;
 				thisTab = tabs.add(lbl, scroll: true)
@@ -482,141 +483,13 @@ CVCenter {
 			tabs.tabViews.do({ |tab| tab.view.hasBorder_(false) });
 			tabs.backgrounds_(Color.black!tabs.tabViews.size);
 
-			flow.shift(0, 0);
-
-			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40)).hasBorder_(false);
-			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(0, 0));
-			prefPane.resize_(8).background_(Color.black);
-
-			[tabs.view, tabs.views, prefPane].flat.do({ |v|
-				this.shortcuts.values.do({ |keyDowns|
-
-					v.keyDownAction_(
-						v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-							var thisMod, thisArrMod;
-
-							// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
-
-							switch(GUI.id,
-								\cocoa, {
-									thisMod = keyDowns.modifierCocoa;
-									thisArrMod = keyDowns.arrowsModifierCocoa;
-								},
-								\qt, {
-									thisMod = keyDowns.modifierQt;
-									thisArrMod = keyDowns.arrowsModifierQt;
-								}
-							);
-
-							case
-								{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-									// "no modifier".postln;
-									if(keycode == keyDowns.keyCode and:{
-										thisMod.isNil and:{ thisArrMod.isNil }
-									}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
-								}
-								{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-									// "some modifier...".postln;
-									if(keycode == keyDowns.keyCode and:{
-										(modifiers == thisArrMod).or(modifiers == thisMod)
-									}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
-								}
-							;
-						})
-					)
-				});
-			});
-
-			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
-				.font_(Font("Helvetica", 10))
-				.states_([["preferences", Color.white, Color(0.3, 0.3, 0.3)]])
-				.action_({ |pb| CVCenterPreferences.dialog })
-			;
-
-			if(GUI.id !== \cocoa, {
-				prefBut.toolTip_("Edit the global preferences for CVCenter (resp.\nCVWidget). Preferences will be written to disk\nand become active upon library-recompile.")
-			});
-
-			swFlow.shift(1, 0);
-
-			saveBut = Button(prefPane, Rect(0, 0, 70, 20))
-				.font_(Font("Helvetica", 10))
-				.states_([["save setup", Color.white, Color(0.15, 0.15, 0.15)]])
-				.action_({ |sb| this.saveSetup })
-			;
-
-			if(GUI.id !== \cocoa, {
-				saveBut.toolTip_("Save the current setup of CVCenter,\nincluding currently active OSC-/MIDI-\nresponders and actions.")
-			});
-
-			swFlow.shift(1, 0);
-
-			loadBut = Button(prefPane, Rect(0, 0, 70, 20))
-				.font_(Font("Helvetica", 10))
-				.states_([["load setup", Color.white, Color(0.15, 0.15, 0.15)]])
-				.action_({ |pb|
-					CVCenterLoadDialog.new;
-				})
-			;
-
-			if(GUI.id !== \cocoa, {
-				loadBut.toolTip_("Load a CVCenter-setup from disk. You\nmay load OSC-/MIDI-responders and\nactions if the corresponding checkboxes\nto the right are checked accordingly.")
-			});
-
-			window.onClose_({
-				AbstractCVWidgetEditor.allEditors.pairsDo({ |editor, val|
-					switch(cvWidgets[editor].class,
-						CVWidgetKnob, {
-							val.window.close;
-						},
-						CVWidget2D, {
-							#[lo, hi].do({ |hilo|
-								val[hilo] !? { val[hilo].window.close };
-							})
-						},
-						CVWidgetMS, {
-							cvWidgets[editor].msSize.do({ |sl|
-								val[sl] !? { val[sl].window.close };
-							});
-							cvWidgets[editor].editor.msEditor !? {
-								cvWidgets[editor].editor.msEditor.window.close;
-							}
-						}
-					)
-				});
-				tabProperties.do({ |prop| prop.nextPos_(Point(0, 0)) });
-				if(prefs[\saveGuiProperties] == 1, {
-					newPrefs = CVCenterPreferences.readPreferences;
-					if(newPrefs[\saveGuiProperties] == 1, {
-						this.guix_(prefs[\guiProperties].left)
-							.guiy_(prefs[\guiProperties].top)
-							.guiwidth_(prefs[\guiProperties].width)
-							.guiheight_(prefs[\guiProperties].height)
-						;
-						newPrefs.put(\guiProperties, prefs[\guiProperties]);
-						CVCenterPreferences.writePreferences(
-							newPrefs[\saveGuiProperties],
-							newPrefs[\guiProperties],
-							newPrefs[\saveClassVars],
-							newPrefs[\midiMode],
-							newPrefs[\midiResolution],
-							newPrefs[\midiMean],
-							newPrefs[\softWithin],
-							newPrefs[\ctrlButtonBank],
-							newPrefs[\removeResponders],
-							newPrefs[\initMidiOnStartUp],
-							"Your CVCenter-preferences have successfully been written to disk."
-						)
-					});
-				})
-			});
-
 			thisNextPos = Point(0, 0);
 			rowheight = widgetheight+1+15; // add a small gap between rows
 
 			order = all.order;
 			orderedCVs = all.atAll(order);
 
+			// move me out here to *prAddToGui
 			order.do({ |k, i|
 				if(cvWidgets[k].notNil and:{ cvWidgets[k].midiOscEnv.notNil }, {
 					cvcArgs = ();
@@ -798,6 +671,136 @@ CVCenter {
 					tabProperties[thisTabLabel].nextPos = Point(thisNextPos.x+colwidth, thisNextPos.y);
 				});
 			});
+
+			flow.shift(0, 0);
+
+			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40)).hasBorder_(false);
+			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(0, 0));
+			prefPane.resize_(8).background_(Color.black);
+
+			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
+				.font_(Font("Helvetica", 10))
+				.states_([["preferences", Color.white, Color(0.3, 0.3, 0.3)]])
+				.action_({ |pb| CVCenterPreferences.dialog })
+			;
+
+			if(GUI.id !== \cocoa, {
+				prefBut.toolTip_("Edit the global preferences for CVCenter (resp.\nCVWidget). Preferences will be written to disk\nand become active upon library-recompile.")
+			});
+
+			swFlow.shift(1, 0);
+
+			saveBut = Button(prefPane, Rect(0, 0, 70, 20))
+				.font_(Font("Helvetica", 10))
+				.states_([["save setup", Color.white, Color(0.15, 0.15, 0.15)]])
+				.action_({ |sb| this.saveSetup })
+			;
+
+			if(GUI.id !== \cocoa, {
+				saveBut.toolTip_("Save the current setup of CVCenter,\nincluding currently active OSC-/MIDI-\nresponders and actions.")
+			});
+
+			swFlow.shift(1, 0);
+
+			loadBut = Button(prefPane, Rect(0, 0, 70, 20))
+				.font_(Font("Helvetica", 10))
+				.states_([["load setup", Color.white, Color(0.15, 0.15, 0.15)]])
+				.action_({ |pb|
+					CVCenterLoadDialog.new;
+				})
+			;
+
+			if(GUI.id !== \cocoa, {
+				loadBut.toolTip_("Load a CVCenter-setup from disk. You\nmay load OSC-/MIDI-responders and\nactions if the corresponding checkboxes\nto the right are checked accordingly.")
+			});
+
+			[tabs.view, tabs.views, prefPane].flat.do({ |v|
+				this.shortcuts.values.do({ |keyDowns|
+
+					v.keyDownAction_(
+						v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+							var thisMod, thisArrMod;
+
+							// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
+
+							switch(GUI.id,
+								\cocoa, {
+									thisMod = keyDowns.modifierCocoa;
+									thisArrMod = keyDowns.arrowsModifierCocoa;
+								},
+								\qt, {
+									thisMod = keyDowns.modifierQt;
+									thisArrMod = keyDowns.arrowsModifierQt;
+								}
+							);
+
+							case
+								{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+									// "no modifier".postln;
+									if(keycode == keyDowns.keyCode and:{
+										thisMod.isNil and:{ thisArrMod.isNil }
+									}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+								}
+								{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+									// "some modifier...".postln;
+									if(keycode == keyDowns.keyCode and:{
+										(modifiers == thisArrMod).or(modifiers == thisMod)
+									}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+								}
+							;
+						})
+					)
+				});
+			});
+
+			window.onClose_({
+				AbstractCVWidgetEditor.allEditors.pairsDo({ |editor, val|
+					switch(cvWidgets[editor].class,
+						CVWidgetKnob, {
+							val.window.close;
+						},
+						CVWidget2D, {
+							#[lo, hi].do({ |hilo|
+								val[hilo] !? { val[hilo].window.close };
+							})
+						},
+						CVWidgetMS, {
+							cvWidgets[editor].msSize.do({ |sl|
+								val[sl] !? { val[sl].window.close };
+							});
+							cvWidgets[editor].editor.msEditor !? {
+								cvWidgets[editor].editor.msEditor.window.close;
+							}
+						}
+					)
+				});
+				tabProperties.do({ |prop| prop.nextPos_(Point(0, 0)) });
+				if(prefs[\saveGuiProperties] == 1, {
+					newPrefs = CVCenterPreferences.readPreferences;
+					if(newPrefs[\saveGuiProperties] == 1, {
+						this.guix_(prefs[\guiProperties].left)
+							.guiy_(prefs[\guiProperties].top)
+							.guiwidth_(prefs[\guiProperties].width)
+							.guiheight_(prefs[\guiProperties].height)
+						;
+						newPrefs.put(\guiProperties, prefs[\guiProperties]);
+						CVCenterPreferences.writePreferences(
+							newPrefs[\saveGuiProperties],
+							newPrefs[\guiProperties],
+							newPrefs[\saveClassVars],
+							newPrefs[\midiMode],
+							newPrefs[\midiResolution],
+							newPrefs[\midiMean],
+							newPrefs[\softWithin],
+							newPrefs[\ctrlButtonBank],
+							newPrefs[\removeResponders],
+							newPrefs[\initMidiOnStartUp],
+							"Your CVCenter-preferences have successfully been written to disk."
+						)
+					});
+				})
+			});
+
 			window.front;
 		});
 		window.front;

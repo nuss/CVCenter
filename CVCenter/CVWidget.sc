@@ -138,7 +138,6 @@ CVWidget {
 		allGuiEls.do({ |el|
 			if(el.class == List, { el.do(_.remove) }, { el.remove });
 		});
-		"after CVWidget:remove: %\n".postf(Main.elapsedTime);
 	}
 
 	close {
