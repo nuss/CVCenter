@@ -205,7 +205,7 @@
 	flipKeys { |...oldNewPairs|
 		oldNewPairs.pairsDo({ |o, n|
 			if(this.at(o).notNil and:{ o !== n }, {
-				this.put(n, this[o]);
+				this.put(n, this.at(o));
 				this.removeAt(o);
 			})
 		});
