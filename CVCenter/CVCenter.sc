@@ -1670,6 +1670,9 @@ CVCenter {
 			}, {
 				thisTabColor = nextColor.next;
 				thisTab = tabs.add(tab, scroll: true)
+					.focusAction_({
+						this.prRegroupWidgets(tabs.activeTab.index)
+					})
 					.useDetachIcon_(true)
 					.labelColor_(thisTabColor)
 					.unfocusedColor_(thisTabColor.copy.alpha_(0.5))
