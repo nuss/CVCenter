@@ -1642,7 +1642,7 @@ CVCenter {
 		var thisTab, thisTabLabel, thisTabColor, thisNextPos;
 		var modsDict, arrModsDict;
 
-		"prAddToGui called: %, %\n".postf(tab, widget2DKey);
+		// "prAddToGui called: %, %\n".postf(tab, widget2DKey);
 
 		switch(GUI.id,
 			\cocoa, {
@@ -1683,8 +1683,7 @@ CVCenter {
 				// thisTabColor = nextColor.next;
 				thisTab = tabs.add(tab, scroll: true)
 					.focusAction_({ |tab|
-						"1: focusAction called: %\n".postf(tab.label);
-						this.prRegroupWidgets(tabs.activeTab.index)
+						this.prRegroupWidgets(tab.index)
 					})
 					.useDetachIcon_(true)
 					.background_(Color.black)
@@ -1945,10 +1944,10 @@ CVCenter {
 				tabProperties[thisTabLabel].nextPos = thisNextPos = thisNextPos.x+colwidth@(thisNextPos.y);
 			});
 			// tabs.focusActions_(Array.fill(tabs.views.size, {{ this.prRegroupWidgets(tabs.activeTab.index) }}));
-			tabs.tabViews.do(_.focusAction_({ |tab|
-				"2: focusAction called: %\n".postf(tab.label);
-				this.prRegroupWidgets(tabs.activeTab.index);
-			}));
+			// tabs.tabViews.do(_.focusAction_({ |tab|
+			// 	"2: focusAction called: %\n".postf(tab.label);
+			// 	this.prRegroupWidgets(tabs.activeTab.index);
+			// }));
 		});
 
 		widget2DKey !? {
@@ -1956,7 +1955,7 @@ CVCenter {
 			cvWidgets[widget2DKey.key].setSpec(widget2DKey.spec, widget2DKey.slot);
 		};
 		// this.prRegroupWidgets(cvTabIndex);
-		tabs.focus(cvTabIndex);
+		if(tabs.activeTab.index == cvTabIndex, { this.prRegroupWidgets(cvTabIndex) }, { tabs.focus(cvTabIndex) });
 		window.front;
 		// "cvTabIndex: %\n".postf(cvTabIndex);
 	}
@@ -1967,7 +1966,7 @@ CVCenter {
 		var wdgtMaxWidth;
 		var thisTabKey;
 
-		"regroup widgets at tab %\n".postf(tabs.tabAt(tabIndex).label);
+		// "regroup widgets at tab %\n".postf(tabs.tabAt(tabIndex).label);
 
 		wdgtMaxWidth = this.cvWidgets.collect({ |wdgt| wdgt.widgetProps.x+1 }).maxItem;
 

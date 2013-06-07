@@ -310,7 +310,7 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 
 		scrollArea = ScrollView(window.asView, Rect(
 			0, 0, window.asView.bounds.width, window.asView.bounds.height-23
-		)).hasHorizontalScroller_(false).background_(editAreasBg);
+		)).hasHorizontalScroller_(false).background_(editAreasBg).hasBorder_(false);
 		butArea = CompositeView(window.asView, Rect(
 			0, window.asView.bounds.height-23, window.asView.bounds.width, 23
 		)).background_(editAreasBg);
@@ -328,7 +328,7 @@ CVCenterKeyDownActionsEditor : CVCenterKeyDownActions {
 
 			editAreas = editAreas.add(
 				editArea = CompositeView(
-					scrollView, scrollFlow.bounds.width-20@100
+					scrollView, scrollFlow.bounds.width-16@100
 				).background_(editAreasBg)
 			);
 

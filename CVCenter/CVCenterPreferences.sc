@@ -115,8 +115,8 @@ CVCenterPreferences {
 
 			// common preferences
 
-			prefsTab = tabs.add("common preferences", scroll: false).background_(tabsBg);
-			scTab = tabs.add("shortcuts", scroll: false).background_(tabsBg);
+			prefsTab = tabs.add("Common Preferences", scroll: false).background_(tabsBg);
+			scTab = tabs.add("Shortcuts", scroll: false).background_(tabsBg);
 
 			prefsTab.decorator = flow1 = FlowLayout(prefsTab.bounds, 7@7, 0@1);
 
