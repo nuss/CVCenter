@@ -350,7 +350,7 @@ CVCenter {
 		var cvTabIndex, order, orderedCVs, msSize;
 		var updateRoutine, lastUpdate, lastUpdateBounds, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
 		var lastCtrlBtnsMode, swFlow, tabOrder;
-		var thisNextPos, thisTab, thisTabColor, thisTabLabel, tabLabels, labelColors, unfocusedColors;
+		var thisNextPos, thisTab, thisTabColor, thisTabLabel, labelColors, unfocusedColors;
 		var funcToAdd;
 		var cvcArgs, btnColor;
 		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
@@ -413,7 +413,6 @@ CVCenter {
 				})
 			});
 
-			tabLabels = thisTabLabel;
 			labelColors = tabProperties[thisTabLabel].tabColor;
 			unfocusedColors = tabProperties[thisTabLabel].tabColor.copy.alpha_(0.3);
 
@@ -437,51 +436,49 @@ CVCenter {
 				})
 			;
 
-			// move me out here to *prAddToGui
-			tabLabels.do({ |lbl, i|
-				// [lbl, i].postln;
-				thisTab = tabs.add(lbl, scroll: true)
-					.focusAction_({
-						this.prRegroupWidgets(tabs.activeTab.index)
-					})
-					.useDetachIcon_(true)
-					.background_(Color.black)
-					.labelColor_(tabProperties[lbl].tabColor)
-					.unfocusedColor_(tabProperties[lbl].tabColor.copy.alpha_(0.5))
-					.stringColor_(Color.white)
-					.stringFocusedColor_(Color.black)
-					.onChangeParent_({ |view|
-						"detached view: %\n".postf(view);
-						this.shortcuts.values.do({ |keyDowns|
-							view.keyDownAction_(
-								view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-									var thisMod, thisArrMod;
-									thisMod = keyDowns.modifierQt;
-									thisArrMod = keyDowns.arrowsModifierQt;
+			this.prAddToGui(thisTabLabel);
 
-									case
-										{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-											// "no modifier".postln;
-											if(keycode == keyDowns.keyCode and:{
-												thisMod.isNil and:{ thisArrMod.isNil }
-											}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
-										}
-										{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-											// "some modifier...".postln;
-											if(keycode == keyDowns.keyCode and:{
-												(modifiers == thisArrMod).or(modifiers == thisMod)
-											}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
-										}
-									;
-								})
-							)
-						})
-					})
-				;
-			});
+/*
+			thisTab = tabs.add(thisTabLabel, scroll: true)
+				.focusAction_({
+					this.prRegroupWidgets(tabs.activeTab.index)
+				})
+				.useDetachIcon_(true)
+				.background_(Color.black)
+				.labelColor_(tabProperties[thisTabLabel].tabColor)
+				.unfocusedColor_(tabProperties[thisTabLabel].tabColor.copy.alpha_(0.5))
+				.stringColor_(Color.white)
+				.stringFocusedColor_(Color.black)
+				.onChangeParent_({ |view|
+					"detached view: %\n".postf(view);
+					this.shortcuts.values.do({ |keyDowns|
+						view.keyDownAction_(
+							view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+								var thisMod, thisArrMod;
+								thisMod = keyDowns.modifierQt;
+								thisArrMod = keyDowns.arrowsModifierQt;
 
-			tabs.tabViews.do({ |tab| tab.view.hasBorder_(false) });
-			tabs.backgrounds_(Color.black!tabs.tabViews.size);
+								case
+									{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+										// "no modifier".postln;
+										if(keycode == keyDowns.keyCode and:{
+											thisMod.isNil and:{ thisArrMod.isNil }
+										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+									}
+									{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+										// "some modifier...".postln;
+										if(keycode == keyDowns.keyCode and:{
+											(modifiers == thisArrMod).or(modifiers == thisMod)
+										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+									}
+								;
+							})
+						)
+					})
+				})
+			;
+
+			thisTab.view.hasBorder_(false);
 
 			thisNextPos = Point(0, 0);
 			rowheight = widgetheight+1+15; // add a small gap between rows
@@ -671,6 +668,7 @@ CVCenter {
 					tabProperties[thisTabLabel].nextPos = Point(thisNextPos.x+colwidth, thisNextPos.y);
 				});
 			});
+*/
 
 			flow.shift(0, 0);
 
@@ -1643,8 +1641,6 @@ CVCenter {
 		var thisTab, thisTabLabel, thisTabColor, thisNextPos;
 		var modsDict, arrModsDict;
 
-		// "*prAddToGui called: %\n".postf(tab);
-
 		switch(GUI.id,
 			\cocoa, {
 				modsDict = CVCenterKeyDownActions.modifiersCocoa;
@@ -1661,12 +1657,15 @@ CVCenter {
 			thisTabLabel = tab.asSymbol;
 			if(tabs.tabViews.size == 1 and:{ tabs.tabViews[0].label == "default" }, {
 				tabs.tabViews[0].label_(tab.asString);
-				tabProperties.flipKeys(\default, tab.asSymbol);
+				tabProperties.flipKeys(\default, thisTabLabel);
 			});
+
 			tabLabels = tabProperties.keys;
-			if(tabLabels.includes(tab.asSymbol), {
-				cvTabIndex = tabProperties[tab.asSymbol].index;
+
+			if(tabLabels.includes(thisTabLabel), {
+				cvTabIndex = tabProperties[thisTabLabel].index;
 				thisTab = tabs.tabViews[cvTabIndex];
+				"*prAddToGui called: %\n".postf(tab);
 			}, {
 				thisTabColor = nextColor.next;
 				thisTab = tabs.add(tab, scroll: true)
@@ -1674,13 +1673,14 @@ CVCenter {
 						this.prRegroupWidgets(tabs.activeTab.index)
 					})
 					.useDetachIcon_(true)
+					.background_(Color.black)
 					.labelColor_(thisTabColor)
 					.unfocusedColor_(thisTabColor.copy.alpha_(0.5))
 					.stringColor_(Color.white)
 					.stringFocusedColor_(Color.black)
 					.onChangeParent_({ |view|
 						childViews[view] ?? {
-							childViews.put(view, this.widgetsAtTab(thisTab.label))
+							childViews.put(view, this.widgetsAtTab(thisTabLabel))
 						};
 						this.shortcuts.values.do({ |keyDowns|
 							view.keyDownAction_(
