@@ -293,7 +293,19 @@ CVCenter {
 					modifierQt: CVCenterKeyDownActions.modifiersQt[\shift],
 					modifierCocoa: CVCenterKeyDownActions.modifiersCocoa[\shift]
 				)
-			)
+			);
+			scFunc =
+			"// detach the currently focused tab from the main window
+			{ CVCenter.tabs.activeTab.detachTab }";
+			this.shortcuts.put(
+				'alt + d',
+				(
+					func: scFunc,
+					keyCode: CVCenterKeyDownActions.keyCodes[$d],
+					modifierQt: CVCenterKeyDownActions.modifiersQt[\alt],
+					modifierCocoa: CVCenterKeyDownActions.modifiersCocoa[\alt]
+				)
+			);
 		});
 	}
 
