@@ -1086,7 +1086,7 @@ CVCenter {
 		if(window.isNil or:{ window.isClosed }, {
 			this.makeWindow(tab);
 		}, {
-				// "thisTab: %, widget2DKey: %\n".postf(thisTab, widget2DKey);
+			// "thisTab: %, widget2DKey: %\n".postf(thisTab, widget2DKey);
 			this.prAddToGui(thisTab, widget2DKey);
 		});
 
@@ -1664,6 +1664,8 @@ CVCenter {
 		});
 		unfocusedColor = labelColor.copy.alpha_(0.3);
 
+		// "given tab was: %\n".postf(tab);
+
 		if(tab.notNil, {
 			thisTabLabel = tab.asSymbol;
 
@@ -1677,7 +1679,11 @@ CVCenter {
 
 			if(tabLabels.includes(thisTabLabel), {
 				cvTabIndex = tabProperties[thisTabLabel].index;
-				thisTab = tabs.tabViews[cvTabIndex];
+				if(this.childViews.keys.collect(_.label).includes(thisTabLabel.asString), {
+					thisTab = this.childViews.keys.detect({ |tab| tab.label == thisTabLabel.asString });
+				}, {
+					thisTab = tabs.tabViews.detect({ |tab| tab.label == thisTabLabel.asString });
+				});
 			}, {
 				// "tabLabels.includes(thisTabLabel).not: %\n".postf(tabLabels.includes(thisTabLabel).not);
 				// thisTabColor = nextColor.next;
@@ -1766,7 +1772,7 @@ CVCenter {
 				thisTab.focus;
 			})
 		}, {
-			// "tab is nil??".postln;
+			"tab is nil??".postln;
 			cvTabIndex = tabs.activeTab.index;
 			thisTab = tabs.activeTab;
 			thisTabLabel = tabs.activeTab.label.asSymbol;
@@ -1810,6 +1816,8 @@ CVCenter {
 
 		// "thisKeys: %\n".postf(thisKeys);
 		// "thisTab: %\n".postf(thisTab);
+
+		"should now add to '%'\n".postf(thisTab.label);
 
 		thisKeys.do({ |k|
 			if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
