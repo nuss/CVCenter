@@ -1825,7 +1825,7 @@ CVCenter {
 		// "thisKeys: %\n".postf(thisKeys);
 		// "thisTab: %\n".postf(thisTab);
 
-		"should now add to '%'\n".postf(thisTab.label);
+		// "should now add to '%'\n".postf(thisTab.label);
 
 		thisKeys.do({ |k|
 			if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
@@ -1984,7 +1984,7 @@ CVCenter {
 
 		// "regroup widgets at tab %\n".postf(tabs.tabAt(tabIndex).label);
 
-		wdgtMaxWidth = this.cvWidgets.collect({ |wdgt| wdgt.widgetProps.x+1 }).maxItem;
+		wdgtMaxWidth = cvWidgets.collect({ |wdgt| wdgt.widgetProps.x+1 }).maxItem;
 
 		rowheight = widgetheight+1+15;
 		thisNextPos = Point(0, 0);
@@ -1996,7 +1996,9 @@ CVCenter {
 			order = cvWidgets.order;
 			orderedWidgets = cvWidgets.atAll(order);
 			orderedRemoveButs = removeButs.atAll(order);
+			"orderedRemoveButs.bounds: %\n".postf(orderedRemoveButs.collect(_.bounds));
 			order.do({ |k, i|
+				[k, orderedRemoveButs[i]].postln;
 				if(widgetStates[k].notNil and:{ tabIndex == widgetStates[k].tabIndex }, {
 					if(thisNextPos != (Point(0, 0)), {
 						thisNextPos = tabProperties[thisTabKey].nextPos;
@@ -2012,8 +2014,9 @@ CVCenter {
 						orderedRemoveButs[i].bounds.height
 					));
 					colwidth = orderedWidgets[i].widgetProps.x+1; // add a small gap to the right
-					// "tabs.views[widgetStates[k].tabIndex]: %\n".postf(tabs.views[widgetStates[k].tabIndex]);
+					"tabs.views[widgetStates[k].tabIndex]: %\n".postf(tabs.views[widgetStates[k].tabIndex]);
 					rowwidth = tabs.views[widgetStates[k].tabIndex].bounds.width/*-15*/;
+					"rowwidth: %\n".postf(rowwidth);
 					if(thisNextPos.x+colwidth >= (rowwidth-colwidth/*-15*/), {
 						// jump to next row
 						tabProperties[thisTabKey].nextPos = thisNextPos = Point(0, thisNextPos.y+rowheight);
@@ -2029,7 +2032,7 @@ CVCenter {
 
 	*prRemoveTab { |key|
 		var index;
-		"key: %, tabProperties: %\n".postf(key, tabProperties);
+		// "key: %, tabProperties: %\n".postf(key, tabProperties);
 		index = tabProperties[key].index;
 		if(tabs.views.size > 1, {
 			if(window.isClosed.not, { "removing tab at index %\n".postf(index); tabs.removeAt(index) });
