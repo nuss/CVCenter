@@ -126,8 +126,8 @@ CVCenter {
 			"// OSCCommands gui
 			{ OSCCommands.makeWindow }";
 			this.shortcuts.put(
-				\d,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$d])
+				\c,
+				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$c])
 			);
 			scFunc =
 			"// CVCenterControllersMonitor OSC
@@ -298,13 +298,8 @@ CVCenter {
 			"// detach the currently focused tab from the main window
 			{ CVCenter.tabs.activeTab.detachTab }";
 			this.shortcuts.put(
-				'alt + d',
-				(
-					func: scFunc,
-					keyCode: CVCenterKeyDownActions.keyCodes[$d],
-					modifierQt: CVCenterKeyDownActions.modifiersQt[\alt],
-					modifierCocoa: CVCenterKeyDownActions.modifiersCocoa[\alt]
-				)
+				\d,
+				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$d])
 			);
 		});
 	}
@@ -1392,9 +1387,9 @@ CVCenter {
 
 									cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo);
 									if(activateCalibration and:{ resetCalibration }, {
-										cvWidgets[key].setOscInputConstraints(0.0001 @ 0.0001, hilo);
+										cvWidgets[key].setOscInputConstraints(Point(0.0001, 0.0001), hilo);
 										cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
-											[0.0001, 0.0001]
+											[Point(0.0001, 0.0001)]
 										).changedKeys(cvWidgets[key].synchKeys);
 									}, {
 										cvWidgets[key].setOscInputConstraints(
@@ -1465,14 +1460,14 @@ CVCenter {
 								cvWidgets[key].setOscMapping(v.osc.oscMapping);
 								if(activateCalibration and:{ resetCalibration }, {
 									cvWidgets[key].setOscInputConstraints(
-										0.0001 @ 0.0001
+										Point(0.0001, 0.0001)
 									);
 									cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
-										[0.0001, 0.0001]
+										[Point(0.0001, 0.0001)]
 									).changedKeys(cvWidgets[key].synchKeys);
 								}, {
 									cvWidgets[key].setOscInputConstraints(
-										v.osc.calibConstraints.lo @ v.osc.calibConstraints.hi
+											Point(v.osc.calibConstraints.lo, v.osc.calibConstraints.hi)
 									);
 									cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
 										[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
@@ -1541,10 +1536,10 @@ CVCenter {
 									cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl);
 									if(activateCalibration and:{ resetCalibration }, {
 										cvWidgets[key].setOscInputConstraints(
-											0.0001 @ 0.0001, sl
+											Point(0.0001, 0.0001), sl
 										);
 										cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
-											[0.0001, 0.0001]
+											[Point(0.0001, 0.0001)]
 										).changedKeys(cvWidgets[key].synchKeys);
 									}, {
 										cvWidgets[key].setOscInputConstraints(
@@ -1736,7 +1731,8 @@ CVCenter {
 									;
 								})
 							)
-						})
+						});
+						Window.allWindows.select({ |w| w.name == "***" }).do({ |w| w.view.background = Color.black })
 					})
 				;
 
