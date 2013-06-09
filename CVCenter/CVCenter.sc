@@ -2014,7 +2014,9 @@ CVCenter {
 						orderedRemoveButs[i].bounds.height
 					));
 					colwidth = orderedWidgets[i].widgetProps.x+1; // add a small gap to the right
-					"tabs.views[widgetStates[k].tabIndex]: %\n".postf(tabs.views[widgetStates[k].tabIndex]);
+					// "tabs.views[widgetStates[k].tabIndex]: %\n".postf(tabs.views[widgetStates[k].tabIndex]);
+					// rowwidth = tabs.views[widgetStates[k].tabIndex].bounds.width/*-15*/;
+					"tabProperties: %,\ntabs.tabViews: %,\nwidtgetStates: %\n".postf(tabProperties, tabs.tabViews, widgetStates);
 					rowwidth = tabs.views[widgetStates[k].tabIndex].bounds.width/*-15*/;
 					"rowwidth: %\n".postf(rowwidth);
 					if(thisNextPos.x+colwidth >= (rowwidth-colwidth/*-15*/), {
