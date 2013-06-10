@@ -835,10 +835,10 @@ CVCenter {
 					lastUpdate = all.size;
 				});
 				try {
-					if(window.bounds.width != lastUpdateBounds.width, {
-						// this.prRegroupWidgets(tabs.activeTab.index);
-						this.prRegroupWidgets(tabs.activeTab);
-					});
+					// if(window.bounds.width != lastUpdateBounds.width, {
+					// 	// this.prRegroupWidgets(tabs.activeTab.index);
+					// 	this.prRegroupWidgets(tabs.activeTab);
+					// });
 					if(window.bounds != lastUpdateBounds, {
 						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
 						// prefs[\guiProperties].postln;
@@ -1742,6 +1742,7 @@ CVCenter {
 				;
 
 				tabs.labelPadding_(10).refresh;
+				thisTab.parent.onResize_({ |view| view.bounds.postln; this.prRegroupWidgets(thisTab) });
 
 				thisTab.view.hasBorder_(false);
 
@@ -1785,7 +1786,7 @@ CVCenter {
 				thisTab.focus;
 			})
 		}, {
-			"tab is nil??".postln;
+				// "tab is nil??".postln;
 			cvTabIndex = tabs.activeTab.index;
 			thisTab = tabs.activeTab;
 			thisTabLabel = tabs.activeTab.label.asSymbol;
@@ -1988,7 +1989,7 @@ CVCenter {
 		var wdgtMaxWidth;
 		var thisTabKey;
 
-		// "regroup widgets at tab %\n".postf(tabs.tabAt(tabIndex).label);
+		"regroup widgets at tab %\n".postf(tab.label);
 
 		wdgtMaxWidth = cvWidgets.collect({ |wdgt| wdgt.widgetProps.x+1 }).maxItem;
 
