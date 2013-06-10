@@ -828,14 +828,16 @@ CVCenter {
 						removedKeys.do({ |k|
 							this.removeAt(k);
 						});
-						this.prRegroupWidgets(tabs.activeTab.index);
+						// this.prRegroupWidgets(tabs.activeTab.index);
+						this.prRegroupWidgets(tabs.activeTab);
 						tmp = tabs.tabViews[0].label;
 					});
 					lastUpdate = all.size;
 				});
 				try {
 					if(window.bounds.width != lastUpdateBounds.width, {
-						this.prRegroupWidgets(tabs.activeTab.index);
+						// this.prRegroupWidgets(tabs.activeTab.index);
+						this.prRegroupWidgets(tabs.activeTab);
 					});
 					if(window.bounds != lastUpdateBounds, {
 						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
@@ -1696,7 +1698,8 @@ CVCenter {
 				// thisTabColor = nextColor.next;
 				thisTab = tabs.add(tab, scroll: true)
 					.focusAction_({ |tab|
-						this.prRegroupWidgets(tab.index)
+						// this.prRegroupWidgets(tab.index)
+						this.prRegroupWidgets(tab)
 					})
 					.useDetachIcon_(true)
 					.background_(Color.black)
@@ -1705,9 +1708,11 @@ CVCenter {
 					.stringColor_(Color.white)
 					.stringFocusedColor_(Color.black)
 					.onChangeParent_({ |view|
-						childViews[view] ?? {
+						if(tabs.tabViews.includes(view), {
 							childViews.put(view, this.widgetsAtTab(thisTabLabel))
-						};
+						}, {
+							childViews.removeAt(view);
+						});
 						this.shortcuts.values.do({ |keyDowns|
 							view.keyDownAction_(
 								view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
@@ -1971,12 +1976,13 @@ CVCenter {
 			cvWidgets[widget2DKey.key].setSpec(widget2DKey.spec, widget2DKey.slot);
 		};
 		// this.prRegroupWidgets(cvTabIndex);
-		if(tabs.activeTab.index == cvTabIndex, { this.prRegroupWidgets(cvTabIndex) }, { tabs.focus(cvTabIndex) });
+		// if(tabs.activeTab.index == cvTabIndex, { this.prRegroupWidgets(cvTabIndex) }, { tabs.focus(cvTabIndex) });
+		if(tabs.activeTab.index == cvTabIndex, { this.prRegroupWidgets(tabs.activeTab) }, { tabs.focus(cvTabIndex) });
 		window.front;
 		// "cvTabIndex: %\n".postf(cvTabIndex);
 	}
 
-	*prRegroupWidgets { |tabIndex|
+	*prRegroupWidgets { |tab|
 		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets, orderedRemoveButs;
 		var widgetwidth, widgetheight=160;
 		var wdgtMaxWidth;
@@ -1991,15 +1997,18 @@ CVCenter {
 
 		// "tabIndex: %\n".postf(tabIndex);
 
-		tabIndex !? {
-			thisTabKey = tabProperties.detectKey({ |prop| prop.index == tabIndex });
+		// tabIndex !? {
+		tab !? {
+			// thisTabKey = tabProperties.detectKey({ |prop| prop.index == tabIndex });
+			thisTabKey = tab.label.asSymbol;
 			order = cvWidgets.order;
 			orderedWidgets = cvWidgets.atAll(order);
 			orderedRemoveButs = removeButs.atAll(order);
-			"orderedRemoveButs.bounds: %\n".postf(orderedRemoveButs.collect(_.bounds));
+			// "orderedRemoveButs.bounds: %\n".postf(orderedRemoveButs.collect(_.bounds));
 			order.do({ |k, i|
 				[k, orderedRemoveButs[i]].postln;
-				if(widgetStates[k].notNil and:{ tabIndex == widgetStates[k].tabIndex }, {
+				// if(widgetStates[k].notNil and:{ tabIndex == widgetStates[k].tabIndex }, {
+				if(cvWidgets[k].window === tab, {
 					if(thisNextPos != (Point(0, 0)), {
 						thisNextPos = tabProperties[thisTabKey].nextPos;
 						// "thisNextPos: %\n".postf(thisNextPos);
@@ -2016,9 +2025,10 @@ CVCenter {
 					colwidth = orderedWidgets[i].widgetProps.x+1; // add a small gap to the right
 					// "tabs.views[widgetStates[k].tabIndex]: %\n".postf(tabs.views[widgetStates[k].tabIndex]);
 					// rowwidth = tabs.views[widgetStates[k].tabIndex].bounds.width/*-15*/;
-					"tabProperties: %,\ntabs.tabViews: %,\nwidtgetStates: %\n".postf(tabProperties, tabs.tabViews, widgetStates);
-					rowwidth = tabs.views[widgetStates[k].tabIndex].bounds.width/*-15*/;
-					"rowwidth: %\n".postf(rowwidth);
+					// "childViews: %\ntabProperties: %\ntabs.tabViews: %\nwidtgetStates: %\n".postf(childViews, tabProperties, tabs.tabViews, widgetStates);
+					// rowwidth = tabs.views[widgetStates[k].tabIndex].bounds.width/*-15*/;
+					rowwidth = tab.bounds.width/*-15*/;
+					// "rowwidth: %\n".postf(rowwidth);
 					if(thisNextPos.x+colwidth >= (rowwidth-colwidth/*-15*/), {
 						// jump to next row
 						tabProperties[thisTabKey].nextPos = thisNextPos = Point(0, thisNextPos.y+rowheight);
