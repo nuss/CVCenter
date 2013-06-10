@@ -1709,7 +1709,10 @@ CVCenter {
 					.stringFocusedColor_(Color.black)
 					.onChangeParent_({ |view|
 						if(tabs.tabViews.includes(view), {
-							childViews.put(view, this.widgetsAtTab(thisTabLabel))
+							childViews.put(view, this.widgetsAtTab(thisTabLabel));
+							childViews.keys.do({ |cview| cview.parent.postln; cview.parent.onResize_({ |pview|
+								this.prRegroupWidgets(cview)
+							})})
 						}, {
 							childViews.removeAt(view);
 						});
@@ -1742,7 +1745,9 @@ CVCenter {
 				;
 
 				tabs.labelPadding_(10).refresh;
-				thisTab.parent.onResize_({ |view| view.bounds.postln; this.prRegroupWidgets(thisTab) });
+				tabs.views.do({ |t| t.parent.onResize_({
+					|view| this.prRegroupWidgets(tabs.activeTab)
+				}) });
 
 				thisTab.view.hasBorder_(false);
 
