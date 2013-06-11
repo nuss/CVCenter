@@ -71,7 +71,7 @@ CVCenterKeyDownActions {
 
 				// arrowsModifiers = IdentityDictionary[];
 
-				modifiersQt = arrowsModifiersQt = IdentityDictionary[
+				modifiersQt = modifiersCocoa = arrowsModifiersQt = IdentityDictionary[
 					\none ->			0,
 					\shift ->			131072,
 					\alt ->				524288,
@@ -221,7 +221,7 @@ CVCenterKeyDownActions {
 					'arrow right' -> 	39,
 				];
 
-				modifiersQt = arrowsModifiersQt = IdentityDictionary[
+				modifiersQt = modifiersCocoa = arrowsModifiersQt = IdentityDictionary[
 					\none ->			0,
 					\shift -> 			131072,
 					\alt -> 			524288,

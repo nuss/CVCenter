@@ -34,6 +34,8 @@ AbstractCVWidgetEditor {
 
 	*initClass {
 		var localOscFunc, scFunc;
+
+		Class.initClassTree(CVCenterKeyDownActions);
 		// Class.initClassTree(CVCenterPreferences);
 
 		allEditors = IdentityDictionary.new;

@@ -99,9 +99,10 @@ CVCenter {
 		#all, childViews, cvWidgets, widgetStates, removeButs, tabProperties, tabShortcuts = IdentityDictionary.new!6;
 
 		// shortcuts
-		scv = (); // environment holding various variables used in shortcut-functions;
+		scv = (); // environment holding various variables used in shortcut-functions;,
 
 		// "prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
+		"prefs[\\shortcuts].isEmpty: %\n".postf(prefs[\shortcuts].isEmpty);
 		if(prefs[\shortcuts].isEmpty, {
 			scFunc =
 			"// next tab
