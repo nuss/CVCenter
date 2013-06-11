@@ -835,10 +835,11 @@ CVCenter {
 					lastUpdate = all.size;
 				});
 				try {
-					// if(window.bounds.width != lastUpdateBounds.width, {
-					// 	// this.prRegroupWidgets(tabs.activeTab.index);
-					// 	this.prRegroupWidgets(tabs.activeTab);
-					// });
+					// [window, childViews.keys.collect(_.bounds)].do({ |view| });
+					if(window.bounds.width != lastUpdateBounds.width, {
+						// this.prRegroupWidgets(tabs.activeTab.index);
+						this.prRegroupWidgets(tabs.activeTab);
+					});
 					if(window.bounds != lastUpdateBounds, {
 						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
 						// prefs[\guiProperties].postln;
@@ -1710,9 +1711,15 @@ CVCenter {
 					.onChangeParent_({ |view|
 						if(tabs.tabViews.includes(view), {
 							childViews.put(view, this.widgetsAtTab(thisTabLabel));
-							childViews.keys.do({ |cview| cview.parent.postln; cview.parent.onResize_({ |pview|
-								this.prRegroupWidgets(cview)
-							})})
+							childViews.keys.do({ |cview|
+								"label: %\n".postf(cview.label);
+								"cview.parent.onResize before: %\n".postf(cview.parent.onResize);
+								cview.parent.onResize_({ |pview|
+									"onResize triggered: %\n".postf(cview.label);
+									this.prRegroupWidgets(cview)
+								});
+								"cview.parent.onResize after: %\n".postf(cview.parent.onResize);
+							})
 						}, {
 							childViews.removeAt(view);
 						});
@@ -1745,9 +1752,11 @@ CVCenter {
 				;
 
 				tabs.labelPadding_(10).refresh;
-				tabs.views.do({ |t| t.parent.onResize_({
-					|view| this.prRegroupWidgets(tabs.activeTab)
-				}) });
+
+				// QtGUI only
+				// tabs.views.do({ |t| t.parent.onResize_({
+				// 	|view| this.prRegroupWidgets(tabs.activeTab)
+				// }) });
 
 				thisTab.view.hasBorder_(false);
 
@@ -1994,7 +2003,7 @@ CVCenter {
 		var wdgtMaxWidth;
 		var thisTabKey;
 
-		"regroup widgets at tab %\n".postf(tab.label);
+		// "regroup widgets at tab %\n".postf(tab.label);
 
 		wdgtMaxWidth = cvWidgets.collect({ |wdgt| wdgt.widgetProps.x+1 }).maxItem;
 
@@ -2012,7 +2021,7 @@ CVCenter {
 			orderedRemoveButs = removeButs.atAll(order);
 			// "orderedRemoveButs.bounds: %\n".postf(orderedRemoveButs.collect(_.bounds));
 			order.do({ |k, i|
-				[k, orderedRemoveButs[i]].postln;
+				// [k, orderedRemoveButs[i]].postln;
 				// if(widgetStates[k].notNil and:{ tabIndex == widgetStates[k].tabIndex }, {
 				if(cvWidgets[k].window === tab, {
 					if(thisNextPos != (Point(0, 0)), {
