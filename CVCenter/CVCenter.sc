@@ -413,8 +413,6 @@ CVCenter {
 				})
 			;
 
-			this.prAddToGui(tab);
-
 			flow.shift(0, 0);
 
 			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40)).hasBorder_(false);
@@ -544,7 +542,11 @@ CVCenter {
 				})
 			});
 
-			window.front;
+			tab !? { this.prAddToGui(tab) };
+			"widgetStates: %\n".postf(widgetStates);
+			"tabProperties: %\n".postf(tabProperties);
+
+			// window.front;
 		});
 		window.front;
 
@@ -803,8 +805,6 @@ CVCenter {
 
 		this.new;
 
-		// "thisTab inbetween: %\n".postf(thisTab);
-
 		thisSlot !? {
 			widgetStates[thisKey] ?? { widgetStates.put(thisKey, ()) };
 			widgetStates[thisKey][thisSlot] ?? { widgetStates[thisKey].put(thisSlot, ()) };
@@ -839,7 +839,6 @@ CVCenter {
 		if(window.isNil or:{ window.isClosed }, {
 			this.makeWindow(tab);
 		}, {
-			// "thisTab: %, widget2DKey: %\n".postf(thisTab, widget2DKey);
 			this.prAddToGui(thisTab, widget2DKey);
 		});
 
@@ -1390,7 +1389,7 @@ CVCenter {
 		var thisTab, thisTabLabel, thisTabColor, thisNextPos;
 		var modsDict, arrModsDict;
 
-		// "prAddToGui called: %, %\n".postf(tab, widget2DKey);
+		"prAddToGui called: %, %\n".postf(tab, widget2DKey);
 
 		switch(GUI.id,
 			\cocoa, {
@@ -1423,7 +1422,7 @@ CVCenter {
 			});
 
 			tabLabels = tabProperties.keys;
-			// "tabLabels: %\n".postf(tabLabels);
+			"tabLabels: %\n".postf(tabLabels);
 
 			if(tabLabels.includes(thisTabLabel), {
 				cvTabIndex = tabProperties[thisTabLabel].index;
@@ -1521,7 +1520,7 @@ CVCenter {
 				thisTab.focus;
 			})
 		}, {
-				// "tab is nil??".postln;
+			"tab is nil??".postln;
 			cvTabIndex = tabs.activeTab.index;
 			thisTab = tabs.activeTab;
 			thisTabLabel = tabs.activeTab.label.asSymbol;
