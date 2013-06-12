@@ -1458,9 +1458,7 @@ CVCenter {
 				lib = Library.readTextArchive(f);
 			});
 			all !? {
-				[addToExisting, addToExisting.class].postln;
-				if(addToExisting.not, {
-					"should now remove all widgets".postln;
+				if(addToExisting === false, {
 					this.removeAll;
 				})
 			};
@@ -1764,7 +1762,7 @@ CVCenter {
 		var wdgtMaxWidth;
 		var thisTabKey;
 
-		"*prRegroupWidgets called: %\n".postf(tab.label);
+		// "*prRegroupWidgets called: %\n".postf(tab.label);
 
 		wdgtMaxWidth = cvWidgets.collect({ |wdgt|
 			if(wdgt.isClosed.not, { wdgt.widgetProps.x+1 })

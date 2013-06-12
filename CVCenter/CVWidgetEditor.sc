@@ -189,19 +189,19 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			tabView0 = CompositeView(
 				tabs.views[0].view,
-				tabs.views[0].view.bounds.width@tabs.views[0].view.bounds.height
+				Point(tabs.views[0].view.bounds.width, tabs.views[0].view.bounds.height)
 			);
 			tabView1 = CompositeView(
 				tabs.views[1].view,
-				tabs.views[0].view.bounds.width@tabs.views[0].view.bounds.height
+				Point(tabs.views[1].view.bounds.width, tabs.views[1].view.bounds.height)
 			);
 			tabView2 = CompositeView(
 				tabs.views[2].view,
-				tabs.views[2].view.bounds.width@tabs.views[2].view.bounds.height
+				Point(tabs.views[2].view.bounds.width, tabs.views[2].view.bounds.height)
 			);
 			tabView3 = CompositeView(
 				tabs.views[3].view,
-				tabs.views[3].view.bounds.width@tabs.views[3].view.bounds.height
+				Point(tabs.views[3].view.bounds.width, tabs.views[3].view.bounds.height)
 			);
 
 			tabView0.decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
