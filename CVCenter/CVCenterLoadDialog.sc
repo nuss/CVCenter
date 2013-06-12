@@ -454,7 +454,7 @@ CVCenterLoadDialog {
 						initCCCtrl = loadMidiCtrl.value.asBoolean;
 					});
 					CVCenter.loadSetup(
-						addToExisting: replaceExisting.value.asBoolean,
+						addToExisting: replaceExisting.value.asBoolean.not,
 						autoConnectOSC: loadOscResponders.value.asBoolean,
 						oscConnectToIP: initOscIP,
 						oscRestrictToPort: initOscPort,

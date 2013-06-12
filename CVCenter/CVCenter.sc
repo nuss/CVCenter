@@ -548,16 +548,10 @@ CVCenter {
 			});
 
 			tab !? { this.prAddToGui(tab) };
-			// "widgetStates: %\n".postf(widgetStates);
-			// "tabProperties: %\n".postf(tabProperties);
-			// cvWidgets.pairsDo({ |key, widget|
-			// "\n%: %\nmidiOscEnv: %\nwdgtModelsAndControllers: %\n".postf(key, widget, widget.midiOscEnv, widget.wdgtControllersAndModels);
-		// });
+
 			if(cvWidgets.size > 0, {
 				cvWidgets.pairsDo({ |key, wdgt|
-					[key, wdgt, wdgt.isClosed].postln;
 					if(wdgt.isClosed, {
-						"widgetStates[%][\\tabKey]: %\n".postf(key, widgetStates[key][\tabKey]);
 						switch(wdgt.class,
 							CVWidget2D, {
 								#[lo, hi].do({ |slot|
@@ -590,7 +584,7 @@ CVCenter {
 						removedKeys.do({ |k|
 							this.removeAt(k);
 						});
-						this.prRegroupWidgets(tabs.activeTab);
+						([tabs.activeTab]++this.childViews.keys).do({ |view| this.prRegroupWidgets(view) });
 						tmp = tabs.tabViews[0].label;
 					});
 					lastUpdate = all.size;
@@ -660,7 +654,11 @@ CVCenter {
 		if(tab.notNil, {
 			thisTabLabel = tab.asSymbol;
 
-			if(tabs.tabViews.size == 1 and:{ tabs.tabViews[0].label == "default" }, {
+			if(tabs.tabViews.size == 1 and:{
+				tabs.tabViews[0].label == "default" and:{
+					this.widgetsAtTab(\default).size == 0
+				}
+			}, {
 				tabs.tabViews[0].label_(tab.asString);
 				tabProperties.flipKeys(\default, thisTabLabel);
 			});
@@ -770,7 +768,6 @@ CVCenter {
 				thisTab.focus;
 			})
 		}, {
-			"tab is nil??".postln;
 			cvTabIndex = tabs.activeTab.index;
 			thisTab = tabs.activeTab;
 			thisTabLabel = tabs.activeTab.label.asSymbol;
@@ -782,8 +779,6 @@ CVCenter {
 
 		if(key.isNil, {
 			allCVKeys = all.keys;
-			// widgetKeys = cvWidgets.keys;
-
 			widgetKeys = cvWidgets.keys.select({ |key|
 				cvWidgets[key].notNil and:{ cvWidgets[key].isClosed.not }
 			});
@@ -792,21 +787,14 @@ CVCenter {
 			thisKeys = [key];
 		});
 
-		"thisKeys: %\n".postf(thisKeys);
+		// "thisKeys: %\n".postf(thisKeys);
 
 		thisKeys.do({ |k|
-			if(widgetStates[k].notNil, {
-				// widgetStates[k].tabKey !? {
-				// 	// tabs.tabViews.collect(_.label).postln;
-				// 	thisTab = tabs.tabViews.detect({ |view| view.label == widgetStates[k].tabKey.asString });
-					"thisTab: %\n".postf(thisTab);
-				// };
-				if(widgetStates[k].midiOscEnv.notNil, {
-					cvcArgs = ();
-					cvcArgs.midiOscEnv = widgetStates[k].midiOscEnv;
-				}, {
-					cvcArgs = true;
-				})
+			if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
+				cvcArgs = ();
+				cvcArgs.midiOscEnv = widgetStates[k].midiOscEnv;
+			}, {
+				cvcArgs = true;
 			});
 			case
 				{ all[k].class === Event and:{
@@ -920,6 +908,50 @@ CVCenter {
 					tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 				}
 			;
+
+			switch(cvWidgets[k].class,
+				CVWidgetKnob, {
+					cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value_(
+						cvWidgets[k].wdgtControllersAndModels.midiDisplay.model.value
+					).changedKeys(cvWidgets[k].synchKeys);
+					cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value_(
+						cvWidgets[k].wdgtControllersAndModels.oscDisplay.model.value
+					).changedKeys(cvWidgets[k].synchKeys);
+					cvWidgets[k].wdgtControllersAndModels.actions.model.value_((
+						numActions: cvWidgets[k].wdgtActions.size,
+						activeActions: cvWidgets[k].wdgtActions.select({ |v| v.asArray[0][1] == true }).size
+					)).changedKeys(cvWidgets[k].synchKeys);
+				},
+				CVWidget2D, {
+					#[lo, hi].do({ |hilo|
+						cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value_(
+							cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value
+						).changedKeys(cvWidgets[k].synchKeys);
+						cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value_(
+							cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model.value
+						).changedKeys(cvWidgets[k].synchKeys);
+						cvWidgets[k].wdgtControllersAndModels[hilo].actions.model.value_((
+							numActions: cvWidgets[k].wdgtActions[hilo].size,
+							activeActions: cvWidgets[k].wdgtActions[hilo].select({ |v| v.asArray[0][1] == true }).size
+						)).changedKeys(cvWidgets[k].synchKeys);
+					})
+				},
+				CVWidgetMS, {
+					cvWidgets[k].msSize.do({ |sl|
+						cvWidgets[k].wdgtControllersAndModels.slots[sl].midiDisplay.model.value_(
+							cvWidgets[k].wdgtControllersAndModels.slots[sl].midiDisplay.model.value
+						).changedKeys(cvWidgets[k].synchKeys);
+						cvWidgets[k].wdgtControllersAndModels.slots[sl].oscDisplay.model.value_(
+							cvWidgets[k].wdgtControllersAndModels.slots[sl].oscDisplay.model.value
+						).changedKeys(cvWidgets[k].synchKeys);
+					});
+					cvWidgets[k].wdgtControllersAndModels.actions.model.value_((
+						numActions: cvWidgets[k].wdgtActions.size,
+						activeActions: cvWidgets[k].wdgtActions.select({ |v| v.asArray[0][1] == true }).size
+					)).changedKeys(cvWidgets[k].synchKeys);
+				}
+			);
+
 			cvWidgets[k].widgetBg.background_(tabProperties[thisTabLabel].tabColor);
 			colwidth = widgetwidth+1; // add a small gap between widgets
 			rowwidth = thisTab.bounds.width-15;
@@ -1271,10 +1303,10 @@ CVCenter {
 
 	*widgetsAtTab { |label|
 		var index, wdgts = [];
-		// index = tabProperties.detectIndex({ |t, i| t.tabLabel.asSymbol === label.asSymbol });
-		index = tabProperties[label.asSymbol];
 		all.keys.do({ |key|
-			if(widgetStates[key].tabKey == label.asSymbol, { wdgts = wdgts.add(key) });
+			widgetStates[key] !? {
+				if(widgetStates[key].tabKey == label.asSymbol, { wdgts = wdgts.add(key) });
+			}
 		});
 		^wdgts;
 	}
@@ -1418,6 +1450,7 @@ CVCenter {
 		|
 		var lib, successFunc;
 
+
 		successFunc = { |f|
 			if(GUI.id === \qt, {
 				lib = Library.readTextArchive(*f);
@@ -1425,7 +1458,9 @@ CVCenter {
 				lib = Library.readTextArchive(f);
 			});
 			all !? {
-				if(addToExisting === false, {
+				[addToExisting, addToExisting.class].postln;
+				if(addToExisting.not, {
+					"should now remove all widgets".postln;
 					this.removeAll;
 				})
 			};
@@ -1728,6 +1763,8 @@ CVCenter {
 		var widgetwidth, widgetheight=160;
 		var wdgtMaxWidth;
 		var thisTabKey;
+
+		"*prRegroupWidgets called: %\n".postf(tab.label);
 
 		wdgtMaxWidth = cvWidgets.collect({ |wdgt|
 			if(wdgt.isClosed.not, { wdgt.widgetProps.x+1 })
