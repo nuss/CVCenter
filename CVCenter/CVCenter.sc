@@ -515,6 +515,10 @@ CVCenter {
 						}
 					)
 				});
+				if(childViews.size > 0, {
+					childViews.keysDo({ |child| child.parent.parent.close })
+				});
+				childViews.clear;
 				// tabProperties.do({ |prop| prop.nextPos_(Point(0, 0)) });
 				tabProperties.clear;
 				if(prefs[\saveGuiProperties] == 1, {
@@ -551,17 +555,20 @@ CVCenter {
 		// });
 			if(cvWidgets.size > 0, {
 				cvWidgets.pairsDo({ |key, wdgt|
-					switch(wdgt.class,
-						CVWidget2D, {
-							#[lo, hi].do({ |slot|
-								this.prAddToGui(widgetStates[key][\tabKey]/*, slot*/);
-							})
-						},
-						{ this.prAddToGui(widgetStates[key][\tabKey]) }
-					)
+					[key, wdgt, wdgt.isClosed].postln;
+					if(wdgt.isClosed, {
+						"widgetStates[%][\\tabKey]: %\n".postf(key, widgetStates[key][\tabKey]);
+						switch(wdgt.class,
+							CVWidget2D, {
+								#[lo, hi].do({ |slot|
+									this.prAddToGui(widgetStates[key][\tabKey], (key: key, slot: slot, spec: all[key][slot].spec), key);
+								})
+							},
+							{ this.prAddToGui(widgetStates[key][\tabKey], key: key) }
+						)
+					})
 				})
 			})
-			// window.front;
 		});
 		window.front;
 
@@ -592,12 +599,14 @@ CVCenter {
 					if(window.bounds.width != lastUpdateBounds.width, {
 						this.prRegroupWidgets(tabs.activeTab);
 					});
-					childViews.pairsDo({ |tab, child|
-						child.lastUpdateBounds !? {
-							if(tab.bounds.width != child.lastUpdateBounds.width, {
-								this.prRegroupWidgets(tab)
-							})
-						}
+					if(childViews.size > 0, {
+						childViews.pairsDo({ |tab, child|
+							child.lastUpdateBounds !? {
+								if(tab.bounds.width != child.lastUpdateBounds.width, {
+									this.prRegroupWidgets(tab)
+								})
+							}
+						})
 					});
 					if(window.bounds != lastUpdateBounds, {
 						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
@@ -605,14 +614,16 @@ CVCenter {
 					})
 				};
 				lastUpdateBounds = window.bounds;
-				childViews.pairsDo({ |tab, child| child.put(\lastUpdateBounds, tab.bounds) });
+				if(childViews.size > 0, {
+					childViews.pairsDo({ |tab, child| child.put(\lastUpdateBounds, tab.bounds) })
+				});
 				if(prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
 				lastSetUp = this.setup;
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});
 	}
 
-	*prAddToGui { |tab, widget2DKey|
+	*prAddToGui { |tab, widget2DKey, key|
 		var allCVKeys, widgetKeys, thisKeys;
 		var rowwidth, colcount;
 		var cvTabIndex, tabLabels;
@@ -622,7 +633,7 @@ CVCenter {
 		var thisTab, thisTabLabel, thisTabColor, thisNextPos;
 		var modsDict, arrModsDict;
 
-		"prAddToGui called: %, %\n".postf(tab, widget2DKey);
+		// "prAddToGui called: %, %\n".postf(tab, widget2DKey);
 
 		switch(GUI.id,
 			\cocoa, {
@@ -655,16 +666,16 @@ CVCenter {
 			});
 
 			tabLabels = tabProperties.keys;
-			"tabLabels: %\n".postf(tabLabels);
+			// "tabLabels: %\n".postf(tabLabels);
 
 			if(tabLabels.includes(thisTabLabel), {
-				"tabProperties[%]: %\n".postf(thisTabLabel, tabProperties[thisTabLabel]);
+				// "tabProperties[%]: %\n".postf(thisTabLabel, tabProperties[thisTabLabel]);
 				cvTabIndex = tabProperties[thisTabLabel].index;
-				"cvTabIndex: %\n".postf(cvTabIndex);
+				// "cvTabIndex: %\n".postf(cvTabIndex);
 				if(this.childViews.keys.collect(_.label).includes(thisTabLabel.asString), {
-					thisTab = this.childViews.keys.detect({ |tab| tab.label == thisTabLabel.asString });
+					thisTab = this.childViews.keys.detect({ |ctab| ctab.label == thisTabLabel.asString });
 				}, {
-					thisTab = tabs.tabViews.detect({ |tab| tab.label == thisTabLabel.asString });
+					thisTab = tabs.tabViews.detect({ |ttab| ttab.label == thisTabLabel.asString });
 				});
 			}, {
 				thisTab = tabs.add(tab, scroll: true)
@@ -680,8 +691,12 @@ CVCenter {
 					.onChangeParent_({ |view|
 						if(tabs.tabViews.includes(view), {
 							childViews.put(view, (widgets: this.widgetsAtTab(thisTabLabel)));
+							// childViews.removeAt(view);
+							view.parent.parent.name.postln;
 						}, {
+							// childViews.put(view, (widgets: this.widgetsAtTab(thisTabLabel)));
 							childViews.removeAt(view);
+							view.parent.parent.name.postln;
 						});
 						this.shortcuts.values.do({ |keyDowns|
 							view.keyDownAction_(
@@ -765,16 +780,33 @@ CVCenter {
 
 		rowheight = widgetheight+1+15; // add a small gap between rows
 
-		allCVKeys = all.keys;
-		widgetKeys = cvWidgets.keys;
-		thisKeys = allCVKeys.difference(widgetKeys);
+		if(key.isNil, {
+			allCVKeys = all.keys;
+			// widgetKeys = cvWidgets.keys;
+
+			widgetKeys = cvWidgets.keys.select({ |key|
+				cvWidgets[key].notNil and:{ cvWidgets[key].isClosed.not }
+			});
+			thisKeys = allCVKeys.difference(widgetKeys);
+		}, {
+			thisKeys = [key];
+		});
+
+		"thisKeys: %\n".postf(thisKeys);
 
 		thisKeys.do({ |k|
-			if(widgetStates[k].notNil and:{ widgetStates[k].midiOscEnv.notNil }, {
-				cvcArgs = ();
-				cvcArgs.midiOscEnv = widgetStates[k].midiOscEnv;
-			}, {
-				cvcArgs = true;
+			if(widgetStates[k].notNil, {
+				// widgetStates[k].tabKey !? {
+				// 	// tabs.tabViews.collect(_.label).postln;
+				// 	thisTab = tabs.tabViews.detect({ |view| view.label == widgetStates[k].tabKey.asString });
+					"thisTab: %\n".postf(thisTab);
+				// };
+				if(widgetStates[k].midiOscEnv.notNil, {
+					cvcArgs = ();
+					cvcArgs.midiOscEnv = widgetStates[k].midiOscEnv;
+				}, {
+					cvcArgs = true;
+				})
 			});
 			case
 				{ all[k].class === Event and:{
@@ -903,7 +935,7 @@ CVCenter {
 		widget2DKey !? {
 			cvWidgets[widget2DKey.key].setSpec(widget2DKey.spec, widget2DKey.slot);
 		};
-		"tabs.activeTab: %\n".postf(tabs.activeTab);
+		// "tabs.activeTab: %\n".postf(tabs.activeTab);
 		tabs.activeTab !? {
 			if(tabs.activeTab.index == cvTabIndex, { this.prRegroupWidgets(tabs.activeTab) }, { tabs.focus(cvTabIndex) });
 		};
@@ -1102,7 +1134,6 @@ CVCenter {
 		tab !? {
 			if(widgetStates.notNil and:{
 				widgetStates[thisKey].notNil and:{
-					// tabs.getLabelAt(widgetStates[thisKey].tabIndex) != tab.asString
 					tabs.tabViews[widgetStates[thisKey].tabIndex].label != tab.asString
 				}
 			}, {
