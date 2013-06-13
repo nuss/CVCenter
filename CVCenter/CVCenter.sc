@@ -780,7 +780,7 @@ CVCenter {
 		rowheight = widgetheight+1+15; // add a small gap between rows
 
 		if(key.isNil, {
-			// "key is nil??".postln;
+			"key is nil??".postln;
 			allCVKeys = all.keys;
 			widgetKeys = cvWidgets.keys.select({ |key|
 				cvWidgets[key].notNil and:{ cvWidgets[key].isClosed.not }
@@ -788,8 +788,11 @@ CVCenter {
 			thisKeys = allCVKeys.difference(widgetKeys);
 			// "thisKeys: %\n".postf(thisKeys);
 			thisTabLabel !? {
-				thisKeys = thisKeys.select({ |k|
-					widgetStates.select({ |ws| ws.tabkey === thisTabLabel }).keys.includes(k)
+				// "widgetStates: %\n".postf(widgetStates);
+				if(widgetStates.size > 0, {
+					thisKeys = thisKeys.select({ |k|
+						widgetStates.select({ |ws| ws.tabkey === thisTabLabel }).keys.includes(k)
+					})
 				})
 			};
 			// "thisKeys: %\n".postf(thisKeys);
@@ -1089,14 +1092,12 @@ CVCenter {
 		if(window.notNil and:{
 			window.isClosed.not
 		}, {
-			if(this.widgetsAtTab(widgetStates[thisKey].tabKey).size == 0, {
-				this.prRemoveTab(widgetStates[thisKey].tabKey);
+				if(this.widgetsAtTab(widgetStates[thisKey][\tabKey]).size == 0, {
+					this.prRemoveTab(widgetStates[thisKey][\tabKey]);
 			})
 		});
 
-		"widgetStates[%]: %\n".postf(thisKey, widgetStates[thisKey]);
-		if(this.widgetsAtTab(widgetStates[thisKey].tabKey.postln).size == 0, {
-			"widgetStates[%].tabKey: %\n".postf(thisKey, widgetStates[thisKey].tabKey);
+		if(this.widgetsAtTab(widgetStates[thisKey][\tabKey].postln).size == 0, {
 			if(tabProperties.size > 1, {
 				widgetStates.do({ |ws|
 					if(ws.tabIndex > widgetStates[thisKey].tabIndex, { ws.tabIndex = ws.tabIndex-1 });
@@ -1245,7 +1246,7 @@ CVCenter {
 		// thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
 
 		if(window.isNil or:{ window.isClosed }, {
-			// "makeWindow: %\n".postf(tab);
+			// "makeWindow: %, key: %\n".postf(tab, thisKey);
 			this.makeWindow(tab);
 		}, {
 			// "prAddToGui: %\n".postf(thisKey);
@@ -1484,42 +1485,120 @@ CVCenter {
 		|
 		var lib, successFunc;
 
-
 		successFunc = { |f|
 			if(GUI.id === \qt, {
 				lib = Library.readTextArchive(*f);
 			}, {
 				lib = Library.readTextArchive(f);
 			});
-			all !? {
-				if(addToExisting === false, {
-					this.removeAll;
-				})
-			};
-			lib[\all].pairsDo({ |key, v|
-				switch(v.wdgtClass,
-					CVWidget2D, {
-						#[lo, hi].do({ |hilo|
-							this.add(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
-							cvWidgets[key].setMidiMode(v[hilo].midi.midiMode, hilo)
-								.setMidiMean(v[hilo].midi.midiMean, hilo)
-								.setSoftWithin(v[hilo].midi.softWithin, hilo)
-								.setMidiResolution(v[hilo].midi.midiResolution, hilo)
-								.setCtrlButtonBank(v[hilo].midi.ctrlButtonBank, hilo)
+			if(this.childViews.size > 0, {
+				childViews.keysDo({ |child| child.parent.parent.close })
+			});
+
+			{
+				all !? {
+					if(addToExisting === false, {
+						this.removeAll;
+					})
+				};
+				lib[\all].pairsDo({ |key, v|
+					switch(v.wdgtClass,
+						CVWidget2D, {
+							#[lo, hi].do({ |hilo|
+								this.add(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
+								cvWidgets[key].setMidiMode(v[hilo].midi.midiMode, hilo)
+									.setMidiMean(v[hilo].midi.midiMean, hilo)
+									.setSoftWithin(v[hilo].midi.softWithin, hilo)
+									.setMidiResolution(v[hilo].midi.midiResolution, hilo)
+									.setCtrlButtonBank(v[hilo].midi.ctrlButtonBank, hilo)
+								;
+								if(loadActions, {
+									v[hilo].actions !? {
+										v[hilo].actions.pairsDo({ |ak, av|
+											this.addActionAt(key, ak, av.asArray[0][0], hilo, av.asArray[0][1]);
+										})
+									}
+								});
+								if(autoConnectOSC, {
+									if(v[hilo].osc.notNil and:{ v[hilo].osc.cmdName.notNil }, {
+										cvWidgets[key].oscConnect(
+											if(oscIPAddress.isNil, {
+												oscConnectToIP !? {
+													if(oscConnectToIP, { v[hilo].osc.addr !? { v[hilo].osc.addr.ip }})
+												}
+											}, {
+												oscIPAddress.asString.split($:)[0]
+											}),
+											if(oscIPAddress.isNil, {
+												oscRestrictToPort !? {
+													if(oscConnectToIP and:{ oscRestrictToPort }, {
+														v[hilo].osc.addr !? { v[hilo].osc.addr.port }
+													})
+												}
+											}, {
+												oscIPAddress.asString.split($:)[1]
+											}),
+											v[hilo].osc.cmdName,
+											v[hilo].osc.msgIndex,
+											hilo
+										);
+
+										cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo);
+										if(activateCalibration and:{ resetCalibration }, {
+											cvWidgets[key].setOscInputConstraints(Point(0.0001, 0.0001), hilo);
+											cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
+												[Point(0.0001, 0.0001)]
+											).changedKeys(cvWidgets[key].synchKeys);
+										}, {
+											cvWidgets[key].setOscInputConstraints(
+												v[hilo].osc.calibConstraints.lo @ v[hilo].osc.calibConstraints.hi, hilo
+											);
+											cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
+												[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
+											).changedKeys(cvWidgets[key].synchKeys)
+										});
+										if(activateCalibration, { cvWidgets[key].setCalibrate(true, hilo) });
+									})
+								});
+								if(autoConnectMIDI, {
+									if(v[hilo].midi.notNil and:{ v[hilo].midi.num.notNil }, {
+										try {
+											cvWidgets[key].midiConnect(
+												if(midiSrcID.isNil, {
+													if(midiConnectSrc, { v[hilo].midi.src })
+												}, {
+													midiSrcID.asInt
+												}),
+												if(midiConnectChannel, { v[hilo].midi.chan }),
+												if(midiConnectCtrl, { v[hilo].midi.num }),
+												hilo
+											)
+										}
+									})
+								})
+							})
+						},
+						CVWidgetKnob, {
+							this.add(key, v.spec, v.val, v.tabLabel);
+							cvWidgets[key].setMidiMode(v.midi.midiMode)
+								.setMidiMean(v.midi.midiMean)
+								.setSoftWithin(v.midi.softWithin)
+								.setMidiResolution(v.midi.midiResolution)
+								.setCtrlButtonBank(v.midi.ctrlButtonBank)
 							;
 							if(loadActions, {
-								v[hilo].actions !? {
-									v[hilo].actions.pairsDo({ |ak, av|
-										this.addActionAt(key, ak, av.asArray[0][0], hilo, av.asArray[0][1]);
+								v.actions !? {
+									v.actions.pairsDo({ |ak, av|
+										this.addActionAt(key, ak, av.asArray[0][0], active: av.asArray[0][1]);
 									})
 								}
 							});
 							if(autoConnectOSC, {
-								if(v[hilo].osc.notNil and:{ v[hilo].osc.cmdName.notNil }, {
+								v.osc.cmdName !? {
 									cvWidgets[key].oscConnect(
 										if(oscIPAddress.isNil, {
 											oscConnectToIP !? {
-												if(oscConnectToIP, { v[hilo].osc.addr !? { v[hilo].osc.addr.ip }})
+												if(oscConnectToIP, { v.osc.addr !? { v.osc.addr.ip }})
 											}
 										}, {
 											oscIPAddress.asString.split($:)[0]
@@ -1527,211 +1606,138 @@ CVCenter {
 										if(oscIPAddress.isNil, {
 											oscRestrictToPort !? {
 												if(oscConnectToIP and:{ oscRestrictToPort }, {
-													v[hilo].osc.addr !? { v[hilo].osc.addr.port }
+													v.osc.addr !? { v.osc.addr.port }
 												})
 											}
 										}, {
 											oscIPAddress.asString.split($:)[1]
 										}),
-										v[hilo].osc.cmdName,
-										v[hilo].osc.msgIndex,
-										hilo
+										v.osc.cmdName,
+										v.osc.msgIndex
 									);
-
-									cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo);
+									cvWidgets[key].setOscMapping(v.osc.oscMapping);
 									if(activateCalibration and:{ resetCalibration }, {
-										cvWidgets[key].setOscInputConstraints(Point(0.0001, 0.0001), hilo);
-										cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
+										cvWidgets[key].setOscInputConstraints(
+											Point(0.0001, 0.0001)
+										);
+										cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
 											[Point(0.0001, 0.0001)]
 										).changedKeys(cvWidgets[key].synchKeys);
 									}, {
 										cvWidgets[key].setOscInputConstraints(
-											v[hilo].osc.calibConstraints.lo @ v[hilo].osc.calibConstraints.hi, hilo
+											Point(v.osc.calibConstraints.lo, v.osc.calibConstraints.hi)
 										);
-										cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
-											[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
-										).changedKeys(cvWidgets[key].synchKeys)
+										cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
+											[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
+										).changedKeys(cvWidgets[key].synchKeys);
 									});
-									if(activateCalibration, { cvWidgets[key].setCalibrate(true, hilo) });
+									if(activateCalibration, { cvWidgets[key].setCalibrate(true) });
+								}
+							});
+							if(autoConnectMIDI, {
+								v.midi.num !? {
+									try {
+										cvWidgets[key].midiConnect(
+											if(midiSrcID.isNil, {
+												if(midiConnectSrc, { v.midi.src })
+											}, {
+												midiSrcID.asInt
+											}),
+											if(midiConnectChannel, { v.midi.chan }),
+											if(midiConnectCtrl, { v.midi.num }),
+										)
+									}
+								}
+							})
+						},
+						CVWidgetMS, {
+							this.add(key, v.spec, v.val, v.tabLabel);
+							cvWidgets[key].msSize.do({ |sl|
+								cvWidgets[key].setMidiMode(v.midi[sl].midiMode, sl)
+									.setMidiMean(v.midi[sl].midiMean, sl)
+									.setSoftWithin(v.midi[sl].softWithin, sl)
+									.setMidiResolution(v.midi[sl].midiResolution, sl)
+									.setCtrlButtonBank(v.midi[sl].ctrlButtonBank, sl)
+								;
+							});
+							if(loadActions, {
+								v.actions !? {
+									v.actions.pairsDo({ |ak, av|
+										this.addActionAt(key, ak, av.asArray[0][0], active: av.asArray[0][1]);
+									})
+								}
+							});
+							if(autoConnectOSC, {
+								cvWidgets[key].msSize.do({ |sl|
+									v.osc[sl].cmdName !? {
+										cvWidgets[key].oscConnect(
+											if(oscIPAddress.isNil, {
+												oscConnectToIP !? {
+													if(oscConnectToIP, { v.osc[sl].addr !? { v.osc[sl].addr.ip }})
+												}
+											}, {
+												oscIPAddress.asString.split($:)[0]
+											}),
+											if(oscIPAddress.isNil, {
+												oscRestrictToPort !? {
+													if(oscConnectToIP and:{ oscRestrictToPort }, {
+														v.osc[sl].addr !? { v.osc[sl].addr.port }
+													})
+												}
+											}, {
+												oscIPAddress.asString.split($:)[1]
+											}),
+											v.osc[sl].cmdName,
+											v.osc[sl].msgIndex,
+											sl
+										);
+										cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl);
+										if(activateCalibration and:{ resetCalibration }, {
+											cvWidgets[key].setOscInputConstraints(
+												Point(0.0001, 0.0001), sl
+											);
+											cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
+												[Point(0.0001, 0.0001)]
+											).changedKeys(cvWidgets[key].synchKeys);
+										}, {
+											cvWidgets[key].setOscInputConstraints(
+												v.osc[sl].calibConstraints.lo @ v.osc[sl].calibConstraints.hi, sl
+											);
+											cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
+												[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
+											).changedKeys(cvWidgets[key].synchKeys);
+										});
+										if(activateCalibration, { cvWidgets[key].setCalibrate(true, sl) });
+									}
 								})
 							});
 							if(autoConnectMIDI, {
-								if(v[hilo].midi.notNil and:{ v[hilo].midi.num.notNil }, {
-									try {
-										cvWidgets[key].midiConnect(
-											if(midiSrcID.isNil, {
-												if(midiConnectSrc, { v[hilo].midi.src })
-											}, {
-												midiSrcID.asInt
-											}),
-											if(midiConnectChannel, { v[hilo].midi.chan }),
-											if(midiConnectCtrl, { v[hilo].midi.num }),
-											hilo
-										)
+								cvWidgets[key].msSize.do({ |sl|
+									v.midi[sl].num !? {
+										try {
+											cvWidgets[key].midiConnect(
+												if(midiSrcID.isNil, {
+													if(midiConnectSrc, { v.midi[sl].src })
+												}, {
+													midiSrcID.asInt
+												}),
+												if(midiConnectChannel, { v.midi[sl].chan }),
+												if(midiConnectCtrl, { v.midi[sl].num }),
+												slot: sl
+											)
+										}
 									}
 								})
 							})
-						})
-					},
-					CVWidgetKnob, {
-						this.add(key, v.spec, v.val, v.tabLabel);
-						cvWidgets[key].setMidiMode(v.midi.midiMode)
-							.setMidiMean(v.midi.midiMean)
-							.setSoftWithin(v.midi.softWithin)
-							.setMidiResolution(v.midi.midiResolution)
-							.setCtrlButtonBank(v.midi.ctrlButtonBank)
-						;
-						if(loadActions, {
-							v.actions !? {
-								v.actions.pairsDo({ |ak, av|
-									this.addActionAt(key, ak, av.asArray[0][0], active: av.asArray[0][1]);
-								})
-							}
-						});
-						if(autoConnectOSC, {
-							v.osc.cmdName !? {
-								cvWidgets[key].oscConnect(
-									if(oscIPAddress.isNil, {
-										oscConnectToIP !? {
-											if(oscConnectToIP, { v.osc.addr !? { v.osc.addr.ip }})
-										}
-									}, {
-										oscIPAddress.asString.split($:)[0]
-									}),
-									if(oscIPAddress.isNil, {
-										oscRestrictToPort !? {
-											if(oscConnectToIP and:{ oscRestrictToPort }, {
-												v.osc.addr !? { v.osc.addr.port }
-											})
-										}
-									}, {
-										oscIPAddress.asString.split($:)[1]
-									}),
-									v.osc.cmdName,
-									v.osc.msgIndex
-								);
-								cvWidgets[key].setOscMapping(v.osc.oscMapping);
-								if(activateCalibration and:{ resetCalibration }, {
-									cvWidgets[key].setOscInputConstraints(
-										Point(0.0001, 0.0001)
-									);
-									cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
-										[Point(0.0001, 0.0001)]
-									).changedKeys(cvWidgets[key].synchKeys);
-								}, {
-									cvWidgets[key].setOscInputConstraints(
-											Point(v.osc.calibConstraints.lo, v.osc.calibConstraints.hi)
-									);
-									cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
-										[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
-									).changedKeys(cvWidgets[key].synchKeys);
-								});
-								if(activateCalibration, { cvWidgets[key].setCalibrate(true) });
-							}
-						});
-						if(autoConnectMIDI, {
-							v.midi.num !? {
-								try {
-									cvWidgets[key].midiConnect(
-										if(midiSrcID.isNil, {
-											if(midiConnectSrc, { v.midi.src })
-										}, {
-											midiSrcID.asInt
-										}),
-										if(midiConnectChannel, { v.midi.chan }),
-										if(midiConnectCtrl, { v.midi.num }),
-									)
-								}
-							}
-						})
-					},
-					CVWidgetMS, {
-						this.add(key, v.spec, v.val, v.tabLabel);
-						cvWidgets[key].msSize.do({ |sl|
-							cvWidgets[key].setMidiMode(v.midi[sl].midiMode, sl)
-								.setMidiMean(v.midi[sl].midiMean, sl)
-								.setSoftWithin(v.midi[sl].softWithin, sl)
-								.setMidiResolution(v.midi[sl].midiResolution, sl)
-								.setCtrlButtonBank(v.midi[sl].ctrlButtonBank, sl)
-							;
-						});
-						if(loadActions, {
-							v.actions !? {
-								v.actions.pairsDo({ |ak, av|
-									this.addActionAt(key, ak, av.asArray[0][0], active: av.asArray[0][1]);
-								})
-							}
-						});
-						if(autoConnectOSC, {
-							cvWidgets[key].msSize.do({ |sl|
-								v.osc[sl].cmdName !? {
-									cvWidgets[key].oscConnect(
-										if(oscIPAddress.isNil, {
-											oscConnectToIP !? {
-												if(oscConnectToIP, { v.osc[sl].addr !? { v.osc[sl].addr.ip }})
-											}
-										}, {
-											oscIPAddress.asString.split($:)[0]
-										}),
-										if(oscIPAddress.isNil, {
-											oscRestrictToPort !? {
-												if(oscConnectToIP and:{ oscRestrictToPort }, {
-													v.osc[sl].addr !? { v.osc[sl].addr.port }
-												})
-											}
-										}, {
-											oscIPAddress.asString.split($:)[1]
-										}),
-										v.osc[sl].cmdName,
-										v.osc[sl].msgIndex,
-										sl
-									);
-									cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl);
-									if(activateCalibration and:{ resetCalibration }, {
-										cvWidgets[key].setOscInputConstraints(
-											Point(0.0001, 0.0001), sl
-										);
-										cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
-											[Point(0.0001, 0.0001)]
-										).changedKeys(cvWidgets[key].synchKeys);
-									}, {
-										cvWidgets[key].setOscInputConstraints(
-											v.osc[sl].calibConstraints.lo @ v.osc[sl].calibConstraints.hi, sl
-										);
-										cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
-											[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
-										).changedKeys(cvWidgets[key].synchKeys);
-									});
-									if(activateCalibration, { cvWidgets[key].setCalibrate(true, sl) });
-								}
-							})
-						});
-						if(autoConnectMIDI, {
-							cvWidgets[key].msSize.do({ |sl|
-								v.midi[sl].num !? {
-									try {
-										cvWidgets[key].midiConnect(
-											if(midiSrcID.isNil, {
-												if(midiConnectSrc, { v.midi[sl].src })
-											}, {
-												midiSrcID.asInt
-											}),
-											if(midiConnectChannel, { v.midi[sl].chan }),
-											if(midiConnectCtrl, { v.midi[sl].num }),
-											slot: sl
-										)
-									}
-								}
-							})
-						})
-					}
-				);
-				cvWidgets[key].nameField.string_(v.notes);
-				if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
-				if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
-					CVCenterLoadDialog.window.close;
+						}
+					);
+					cvWidgets[key].nameField.string_(v.notes);
+					if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
+					if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
+						CVCenterLoadDialog.window.close;
+					})
 				})
-			})
+			}.defer(0.1)
 		};
 
 		if(path.isNil, {
