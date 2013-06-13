@@ -496,6 +496,7 @@ CVCenter {
 
 			window.onClose_({
 				AbstractCVWidgetEditor.allEditors.pairsDo({ |editor, val|
+					[editor, val].postln;
 					switch(cvWidgets[editor].class,
 						CVWidgetKnob, {
 							val.window.close;
@@ -509,7 +510,7 @@ CVCenter {
 							cvWidgets[editor].msSize.do({ |sl|
 								val[sl] !? { val[sl].window.close };
 							});
-							cvWidgets[editor].editor.msEditor !? {
+							cvWidgets[(editor.asString[0..(editor.asString.size-3)]).asSymbol].editor.msEditor !? {
 								cvWidgets[editor].editor.msEditor.window.close;
 							}
 						}
@@ -780,7 +781,6 @@ CVCenter {
 		rowheight = widgetheight+1+15; // add a small gap between rows
 
 		if(key.isNil, {
-			"key is nil??".postln;
 			allCVKeys = all.keys;
 			widgetKeys = cvWidgets.keys.select({ |key|
 				cvWidgets[key].notNil and:{ cvWidgets[key].isClosed.not }
