@@ -1215,11 +1215,11 @@ CVCenter {
 			}, {
 				if(widgetStates[thisKey][\hi][\made] == true, {
 					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
-						this.at(thisKey)[thisSlot].value = thisVal;
+					this.at(thisKey)[thisSlot].value = thisVal;
 				});
 				if(widgetStates[thisKey][\lo][\made] == true, {
 					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
-						this.at(thisKey)[thisSlot].value = thisVal;
+					this.at(thisKey)[thisSlot].value = thisVal;
 				});
 				widgetStates[thisKey][thisSlot][\made] = true
 				^all[thisKey][thisSlot];
@@ -1227,33 +1227,6 @@ CVCenter {
 		}, { all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) }});
 
 		thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
-		// if(thisSlot.notNil and:{ widgetStates[thisKey][thisSlot][\made] != true }, {
-		// 	widgetStates[thisKey][thisSlot].made = true;
-		// 	if(thisSlot === \lo or: { thisSlot === \hi }, {
-		// 		all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
-		// 		all[thisKey][thisSlot].spec_(thisSpec, thisVal);
-		// 		widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
-		// 	})
-		// 	}, {
-		// 		// CVWidget2D: if the widget already exists
-		// 		// don't pass the key on to prAddToGui
-		// 		// just set spec and value
-		// 		"cvWidgets[%]: %\n".postf(thisKey, cvWidgets[thisKey]);
-		// 		if(cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
-		// 			"cvWidget '%' already exists, setting slot '%'\n".postf(thisKey, thisSlot);
-		// 			if(widgetStates[thisKey][\hi][\made] == true, {
-		// 				cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
-		// 				this.at(thisKey).value_(thisVal)
-		// 			});
-		// 			if(widgetStates[thisKey][\lo][\made] == true, {
-		// 				cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
-		// 				this.at(thisKey).value_(thisVal)
-		// 			});
-		// 			^all[thisKey][thisSlot];
-		// 		});
-		// 		all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) };
-		// });
-		// thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
 
 		if(window.isNil or:{ window.isClosed }, {
 			// "makeWindow: %\n".postf(tab);
