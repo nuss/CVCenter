@@ -1094,10 +1094,12 @@ CVCenter {
 			})
 		});
 
-		if(this.widgetsAtTab(widgetStates[thisKey].tabKey).size == 0, {
+		"widgetStates[%]: %\n".postf(thisKey, widgetStates[thisKey]);
+		if(this.widgetsAtTab(widgetStates[thisKey].tabKey.postln).size == 0, {
+			"widgetStates[%].tabKey: %\n".postf(thisKey, widgetStates[thisKey].tabKey);
 			if(tabProperties.size > 1, {
-				widgetStates.do({ |w|
-					if(w.tabIndex > widgetStates[key].tabIndex, { w.tabIndex = w.tabIndex-1 });
+				widgetStates.do({ |ws|
+					if(ws.tabIndex > widgetStates[thisKey].tabIndex, { ws.tabIndex = ws.tabIndex-1 });
 				})
 			})
 		});
