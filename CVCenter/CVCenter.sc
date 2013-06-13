@@ -652,6 +652,7 @@ CVCenter {
 		// "given tab was: %\n".postf(tab);
 
 		if(tab.notNil, {
+			// "tab not nil: %\n".postf(tab);
 			thisTabLabel = tab.asSymbol;
 
 			if(tabs.tabViews.size == 1 and:{
@@ -690,11 +691,11 @@ CVCenter {
 						if(tabs.tabViews.includes(view), {
 							childViews.put(view, (widgets: this.widgetsAtTab(thisTabLabel)));
 							// childViews.removeAt(view);
-							view.parent.parent.name.postln;
+							// view.parent.parent.name.postln;
 						}, {
 							// childViews.put(view, (widgets: this.widgetsAtTab(thisTabLabel)));
 							childViews.removeAt(view);
-							view.parent.parent.name.postln;
+							// view.parent.parent.name.postln;
 						});
 						this.shortcuts.values.do({ |keyDowns|
 							view.keyDownAction_(
@@ -785,6 +786,7 @@ CVCenter {
 			thisKeys = allCVKeys.difference(widgetKeys);
 		}, {
 			thisKeys = [key];
+			// "given key: %, thisTab: %\n".postf(thisKeys, thisTab.label);
 		});
 
 		// "thisKeys: %\n".postf(thisKeys);
@@ -1144,6 +1146,8 @@ CVCenter {
 			})
 		});
 
+		"thisSlot: %\n".postf(thisSlot);
+
 		// CVWidgetMS
 		if(spec.isArray.not, { thisSpec = spec.asSpec }, {
 			if(spec.select({ |sp| sp.asSpec.class == ControlSpec }).size > 0, {
@@ -1164,19 +1168,20 @@ CVCenter {
 		});
 
 		tab !? {
-			if(widgetStates.notNil and:{
-				widgetStates[thisKey].notNil and:{
-					tabs.tabViews[widgetStates[thisKey].tabIndex].label != tab.asString
-				}
-			}, {
-				// force widget2D-slot to be created under the same tab as the already existing slot
-				// thisTab = tabs.getLabelAt(widgetStates[thisKey].tabIndex);
-				thisTab = tabs.tabViews[widgetStates[thisKey].tabIndex].label;
-					// "widget2D - thisTab: %\n".postf(thisTab);
-			}, {
+			// if(widgetStates.notNil and:{
+			// 	widgetStates[thisKey].notNil and:{
+			// 		tabs.tabViews[widgetStates[thisKey].tabIndex].label != tab.asString
+			// 	}
+			// 	}, {
+			// 		[tab, tabs.tabViews[widgetStates[thisKey].tabIndex].label, tabs.tabViews[widgetStates[thisKey].tabIndex].label.class].postln;
+			// 		// force widget2D-slot to be created under the same tab as the already existing slot
+			// 		// thisTab = tabs.getLabelAt(widgetStates[thisKey].tabIndex);
+			// 		thisTab = tabs.tabViews[widgetStates[thisKey].tabIndex].label;
+			// 		"given tab doesn't exist yet: %\n".postf(thisTab);
+			// 	}, {
 				thisTab = tab;
-					// "something else: %\n".postf(thisTab);
-			})
+			// "tab exists".postln;
+	// })
 		};
 
 		this.new;
@@ -1201,21 +1206,61 @@ CVCenter {
 			thisVal = thisVal.asArray;
 		});
 
-		if(thisSlot.notNil and:{ widgetStates[thisKey][thisSlot][\made] != true }, {
-			widgetStates[thisKey][thisSlot].made = true;
-			if(thisSlot === \lo or: { thisSlot === \hi }, {
+		if(thisSlot.notNil and:{ (thisSlot === \lo).or(thisSlot === \hi) }, {
+			if(cvWidgets[thisKey].isNil or:{ cvWidgets[thisKey].isClosed }, {
 				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
 				all[thisKey][thisSlot].spec_(thisSpec, thisVal);
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
+				widgetStates[thisKey][thisSlot].made = true;
+			}, {
+				if(widgetStates[thisKey][\hi][\made] == true, {
+					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
+						this.at(thisKey)[thisSlot].value = thisVal;
+				});
+				if(widgetStates[thisKey][\lo][\made] == true, {
+					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
+						this.at(thisKey)[thisSlot].value = thisVal;
+				});
+				widgetStates[thisKey][thisSlot][\made] = true
+				^all[thisKey][thisSlot];
 			})
-		}, {
-			all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) };
-		});
+		}, { all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) }});
+
+		thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
+		// if(thisSlot.notNil and:{ widgetStates[thisKey][thisSlot][\made] != true }, {
+		// 	widgetStates[thisKey][thisSlot].made = true;
+		// 	if(thisSlot === \lo or: { thisSlot === \hi }, {
+		// 		all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
+		// 		all[thisKey][thisSlot].spec_(thisSpec, thisVal);
+		// 		widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
+		// 	})
+		// 	}, {
+		// 		// CVWidget2D: if the widget already exists
+		// 		// don't pass the key on to prAddToGui
+		// 		// just set spec and value
+		// 		"cvWidgets[%]: %\n".postf(thisKey, cvWidgets[thisKey]);
+		// 		if(cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
+		// 			"cvWidget '%' already exists, setting slot '%'\n".postf(thisKey, thisSlot);
+		// 			if(widgetStates[thisKey][\hi][\made] == true, {
+		// 				cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
+		// 				this.at(thisKey).value_(thisVal)
+		// 			});
+		// 			if(widgetStates[thisKey][\lo][\made] == true, {
+		// 				cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
+		// 				this.at(thisKey).value_(thisVal)
+		// 			});
+		// 			^all[thisKey][thisSlot];
+		// 		});
+		// 		all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) };
+		// });
+		// thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
 
 		if(window.isNil or:{ window.isClosed }, {
+			// "makeWindow: %\n".postf(tab);
 			this.makeWindow(tab);
 		}, {
-			this.prAddToGui(thisTab, widget2DKey);
+			// "prAddToGui: %\n".postf(thisKey);
+			this.prAddToGui(thisTab, widget2DKey, thisKey);
 		});
 
 		if(slot.notNil, {
@@ -1806,7 +1851,7 @@ CVCenter {
 		var index;
 		index = tabProperties[key].index;
 		if(tabs.views.size > 1, {
-			if(window.isClosed.not, { "removing tab at index %\n".postf(index); tabs.removeAt(index) });
+			if(window.isClosed.not, { /*"removing tab at index %\n".postf(index); */tabs.removeAt(index) });
 			tabProperties.do({ |prop|
 				if(prop.index > index, { prop.index = prop.index-1 })
 			});
