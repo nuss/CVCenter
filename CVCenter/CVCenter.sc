@@ -549,7 +549,7 @@ CVCenter {
 
 			tab !? { this.prAddToGui(tab) };
 
-			if(cvWidgets.size > 0, {
+			if(cvWidgets.size > 0 and:{ tab.isNil }, {
 				cvWidgets.pairsDo({ |key, wdgt|
 					if(wdgt.isClosed, {
 						switch(wdgt.class,
@@ -564,6 +564,7 @@ CVCenter {
 				})
 			})
 		});
+
 		window.front;
 
 		skipJacks = SkipJack.all.collect({ |r| r === updateRoutine });
@@ -627,7 +628,7 @@ CVCenter {
 		var thisTab, thisTabLabel, thisTabColor, thisNextPos;
 		var modsDict, arrModsDict;
 
-		// "prAddToGui called: %, %\n".postf(tab, widget2DKey);
+		// "prAddToGui called: %, %\n".postf(tab, widget2DKey, key);
 
 		switch(GUI.id,
 			\cocoa, {
@@ -779,11 +780,19 @@ CVCenter {
 		rowheight = widgetheight+1+15; // add a small gap between rows
 
 		if(key.isNil, {
+			// "key is nil??".postln;
 			allCVKeys = all.keys;
 			widgetKeys = cvWidgets.keys.select({ |key|
 				cvWidgets[key].notNil and:{ cvWidgets[key].isClosed.not }
 			});
 			thisKeys = allCVKeys.difference(widgetKeys);
+			// "thisKeys: %\n".postf(thisKeys);
+			thisTabLabel !? {
+				thisKeys = thisKeys.select({ |k|
+					widgetStates.select({ |ws| ws.tabkey === thisTabLabel }).keys.includes(k)
+				})
+			};
+			// "thisKeys: %\n".postf(thisKeys);
 		}, {
 			thisKeys = [key];
 			// "given key: %, thisTab: %\n".postf(thisKeys, thisTab.label);
@@ -811,31 +820,33 @@ CVCenter {
 						},
 						wdgtActions: cvWidgets[k] !? { cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions }};
 					);
-					cvWidgets[k] = CVWidget2D(
-						thisTab,
-						[all[k].lo, all[k].hi],
-						k,
-						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight),
-						setup: tmp,
-						controllersAndModels: cvWidgets[k] !? {
-							(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi)
-						},
-						cvcGui: cvcArgs
-					);
-					removeButs.put(k,
-						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-							.states_([["remove", Color.white, Color(0.0, 0.15)]])
-							.action_({ |b| this.removeAt(k) })
-							.font_(Font("Arial", 10))
-						;
-					);
-					if(widgetStates[k].isNil, {
-						widgetStates.put(k, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
-					}, {
-						widgetStates[k].tabIndex = cvTabIndex;
-						widgetStates[k].tabKey = thisTabLabel;
-					});
-					cvWidgets[k].background_(tabProperties[thisTabLabel].tabColor);
+					if(cvWidgets[k].isNil or:{ cvWidgets[k].isClosed }, {
+						cvWidgets[k] = CVWidget2D(
+							thisTab,
+							[all[k].lo, all[k].hi],
+							k,
+							Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight),
+							setup: tmp,
+							controllersAndModels: cvWidgets[k] !? {
+								(lo: cvWidgets[k].wdgtControllersAndModels.lo, hi: cvWidgets[k].wdgtControllersAndModels.hi)
+							},
+							cvcGui: cvcArgs
+						);
+						removeButs.put(k,
+							Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+								.states_([["remove", Color.white, Color(0.0, 0.15)]])
+								.action_({ |b| this.removeAt(k) })
+								.font_(Font("Arial", 10))
+							;
+						);
+						if(widgetStates[k].isNil, {
+							widgetStates.put(k, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
+						}, {
+							widgetStates[k].tabIndex = cvTabIndex;
+							widgetStates[k].tabKey = thisTabLabel;
+						});
+						cvWidgets[k].background_(tabProperties[thisTabLabel].tabColor);
+				});
 					tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 				}
 				{ #[minval, maxval, step, default].select({ |prop| all[k].spec.perform(prop).isArray }).size > 0} {
@@ -1146,7 +1157,7 @@ CVCenter {
 			})
 		});
 
-		"thisSlot: %\n".postf(thisSlot);
+		// "thisSlot: %\n".postf(thisSlot);
 
 		// CVWidgetMS
 		if(spec.isArray.not, { thisSpec = spec.asSpec }, {
@@ -1206,13 +1217,10 @@ CVCenter {
 			thisVal = thisVal.asArray;
 		});
 
+		// cvWidgets[thisKey] !? { "cvWidgets[%].isClosed: %\n".postf(thisKey, cvWidgets[thisKey].isClosed) };
 		if(thisSlot.notNil and:{ (thisSlot === \lo).or(thisSlot === \hi) }, {
-			if(cvWidgets[thisKey].isNil or:{ cvWidgets[thisKey].isClosed }, {
-				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
-				all[thisKey][thisSlot].spec_(thisSpec, thisVal);
-				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
-				widgetStates[thisKey][thisSlot].made = true;
-			}, {
+			if(cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
+				// "cvWidgets[%].notNil and:{ cvWidgets[%].isClosed.not }\n".postf(thisKey, thisKey);
 				if(widgetStates[thisKey][\hi][\made] == true, {
 					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
 					this.at(thisKey)[thisSlot].value = thisVal;
@@ -1223,10 +1231,16 @@ CVCenter {
 				});
 				widgetStates[thisKey][thisSlot][\made] = true
 				^all[thisKey][thisSlot];
+			}, {
+				// "cvWidgets[%].isNil or:{ cvWidgets[%].isClosed }\n".postf(thisKey, thisKey);
+				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
+				all[thisKey][thisSlot].spec_(thisSpec, thisVal);
+				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
+				widgetStates[thisKey][thisSlot].made = true;
 			})
 		}, { all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) }});
 
-		thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
+		// thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
 
 		if(window.isNil or:{ window.isClosed }, {
 			// "makeWindow: %\n".postf(tab);
