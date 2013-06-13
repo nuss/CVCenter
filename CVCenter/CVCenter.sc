@@ -510,7 +510,7 @@ CVCenter {
 							cvWidgets[editor].msSize.do({ |sl|
 								val[sl] !? { val[sl].window.close };
 							});
-							cvWidgets[(editor.asString[0..(editor.asString.size-3)]).asSymbol].editor.msEditor !? {
+							cvWidgets[editor].editor.msEditor !? {
 								cvWidgets[editor].editor.msEditor.window.close;
 							}
 						}
