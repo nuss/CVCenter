@@ -495,27 +495,6 @@ CVCenter {
 			});
 
 			window.onClose_({
-				AbstractCVWidgetEditor.allEditors.pairsDo({ |editor, val|
-					[editor, val].postln;
-					switch(cvWidgets[editor].class,
-						CVWidgetKnob, {
-							val.window.close;
-						},
-						CVWidget2D, {
-							#[lo, hi].do({ |hilo|
-								val[hilo] !? { val[hilo].window.close };
-							})
-						},
-						CVWidgetMS, {
-							cvWidgets[editor].msSize.do({ |sl|
-								val[sl] !? { val[sl].window.close };
-							});
-							cvWidgets[editor].editor.msEditor !? {
-								cvWidgets[editor].editor.msEditor.window.close;
-							}
-						}
-					)
-				});
 				if(childViews.size > 0, {
 					childViews.keysDo({ |child| child.parent.parent.close })
 				});
@@ -791,11 +770,11 @@ CVCenter {
 				// "widgetStates: %\n".postf(widgetStates);
 				if(widgetStates.size > 0, {
 					thisKeys = thisKeys.select({ |k|
-						widgetStates.select({ |ws| ws.tabkey === thisTabLabel }).keys.includes(k)
+						widgetStates.select({ |ws| ws.tabKey === thisTabLabel }).keys.includes(k)
 					})
-				})
+				});
+				// "thisKeys: %\n".postf(thisKeys);
 			};
-			// "thisKeys: %\n".postf(thisKeys);
 		}, {
 			thisKeys = [key];
 			// "given key: %, thisTab: %\n".postf(thisKeys, thisTab.label);
@@ -1181,22 +1160,12 @@ CVCenter {
 			})
 		});
 
-		tab !? {
-			// if(widgetStates.notNil and:{
-			// 	widgetStates[thisKey].notNil and:{
-			// 		tabs.tabViews[widgetStates[thisKey].tabIndex].label != tab.asString
-			// 	}
-			// 	}, {
-			// 		[tab, tabs.tabViews[widgetStates[thisKey].tabIndex].label, tabs.tabViews[widgetStates[thisKey].tabIndex].label.class].postln;
-			// 		// force widget2D-slot to be created under the same tab as the already existing slot
-			// 		// thisTab = tabs.getLabelAt(widgetStates[thisKey].tabIndex);
-			// 		thisTab = tabs.tabViews[widgetStates[thisKey].tabIndex].label;
-			// 		"given tab doesn't exist yet: %\n".postf(thisTab);
-			// 	}, {
-				thisTab = tab;
-			// "tab exists".postln;
-	// })
-		};
+		case
+			{ tab.notNil } { thisTab = tab }
+			{ tab.isNil and:{ tabs.notNil and:{ tabs.activeTab.notNil }}} { thisTab = tabs.activeTab.label }
+			{ tab.isNil and:{ tabs.notNil and:{ tabs.activeTab.isNil }}} { thisTab = \default }
+			{ tab.isNil and:{ tabs.isNil }} { thisTab = \default }
+		;
 
 		this.new;
 
@@ -1246,8 +1215,8 @@ CVCenter {
 		// thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
 
 		if(window.isNil or:{ window.isClosed }, {
-			// "makeWindow: %, key: %\n".postf(tab, thisKey);
-			this.makeWindow(tab);
+			"makeWindow: %, key: %\n".postf(thisTab, thisKey);
+			this.makeWindow(thisTab);
 		}, {
 			// "prAddToGui: %\n".postf(thisKey);
 			this.prAddToGui(thisTab, widget2DKey, thisKey);

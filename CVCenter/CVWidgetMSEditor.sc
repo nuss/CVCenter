@@ -210,8 +210,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				midiTabs.add(lbl, scroll: true)
 					.labelColor_(Color.white)
 					.stringColor_(Color.white)
-					.stringFocusedColor_(labelStringColors[2])
-					.unfocusedColor_(labelColors[2])
+					.stringFocusedColor_(labelStringColors[1])
+					.unfocusedColor_(labelColors[1])
 				;
 			});
 
@@ -225,8 +225,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				oscTabs.add(lbl, scroll: true)
 					.labelColor_(Color.white)
 					.stringColor_(Color.white)
-					.stringFocusedColor_(labelStringColors[1])
-					.unfocusedColor_(labelColors[1])
+					.stringFocusedColor_(labelStringColors[2])
+					.unfocusedColor_(labelColors[2])
 				;
 			});
 
@@ -674,7 +674,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			if(GUI.id !== \cocoa, {
 				extMidiCtrlArrayField.toolTip_(
-					"Enter an array, representing the range of sliders\nyou want to connect. 0 corresponds to slider nr. 1.\nBy default the field displays an array that connects\nall slots of the multi-slider to midi-fader 1 to the\nnumber of slots of the multi-slider."
+					"Enter an array, representing the range of sliders\nyou want to connect. 0 corresponds to slider nr. 1.\nBy default the field displays an array that connects\nall slots of the multi-slider from midi-fader 1 (0)\nto the midi-fader n where n is represented by\nthe number of slots minus 1."
 				)
 			});
 
