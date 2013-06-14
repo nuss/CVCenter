@@ -1775,16 +1775,22 @@ CVWidget {
 
 					this.getMidiMode(slot).switch(
 						0, {
-							if(val/127 < (argWidgetCV.input[slot]+(this.getSoftWithin(slot)/2)) and: {
-								val/127 > (argWidgetCV.input[slot]-(this.getSoftWithin(slot)/2));
-							}, {
-								switch(this.class,
-									CVWidgetMS, {
+							switch(this.class,
+								CVWidgetMS, {
+									if(val/127 < (argWidgetCV.input[slot]+(this.getSoftWithin(slot)/2)) and: {
+										val/127 > (argWidgetCV.input[slot]-(this.getSoftWithin(slot)/2));
+									}, {
 										argWidgetCV.input_(argWidgetCV.input.collect({ |it, i|
 											if(i == slot, { val/127 }, { it })
-										}));
+										}))
 									},
-									{ argWidgetCV.input_(val/127) }
+									{
+										if(val/127 < (argWidgetCV.input+(this.getSoftWithin(slot)/2)) and: {
+											val/127 > (argWidgetCV.input-(this.getSoftWithin(slot)/2));
+										}, {
+											argWidgetCV.input_(val/127)
+										})
+									}
 								)
 							})
 						},
@@ -2675,7 +2681,11 @@ CVWidget {
 
 			if(window.isClosed.not, {
 				if(this.class != CVWidgetMS, {
-					if(midiOscEnv.oscResponder.isNil, { tmp = background }, { tmp = Color.cyan(0.5) });
+					if(midiOscEnv.oscResponder.isNil, {
+						// this.label.states[0][0].postln;
+						// "midiOscEnv.oscResponder is nil".postln;
+						tmp = background
+					}, { tmp = Color.cyan(0.5) });
 					thisGuiEnv.oscEditBut.states_([
 						[theChanger.value.but[0], theChanger.value.but[1], tmp]
 					]);

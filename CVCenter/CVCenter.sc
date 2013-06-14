@@ -185,6 +185,27 @@ CVCenter {
 				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$n])
 			);
 			scFunc =
+			"// save setup
+			{ CVCenter.saveSetup }";
+			this.shortcuts.put(
+				\s,
+				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$s])
+			);
+			scFunc =
+			"// load setup
+			{ CVCenterLoadDialog.new }";
+			this.shortcuts.put(
+				\l,
+				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$l])
+			);
+			scFunc =
+			"// open the preferences dialog
+			{ CVCenterPreferences.dialog }";
+			this.shortcuts.put(
+				\p,
+				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$p])
+			);
+			scFunc =
 			"// PdefAllGui
 			{ if(CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
 				CVCenter.scv.pDefGui = PdefAllGui();
@@ -196,8 +217,13 @@ CVCenter {
 				CVCenter.scv.pDefWin.front
 			}}";
 			this.shortcuts.put(
-				\p,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$p])
+				'alt + p',
+				(
+					func: scFunc,
+					keyCode: CVCenterKeyDownActions.keyCodes[$p],
+					modifierQt: CVCenterKeyDownActions.modifiersQt[\alt],
+					modifierCocoa: CVCenterKeyDownActions.modifiersCocoa[\alt]
+				)
 			);
 			scFunc =
 			"// PdefnAllGui
@@ -828,7 +854,7 @@ CVCenter {
 							widgetStates[k].tabKey = thisTabLabel;
 						});
 						cvWidgets[k].background_(tabProperties[thisTabLabel].tabColor);
-				});
+					});
 					tmp.wdgtActions !? { cvWidgets[k].wdgtActions = tmp.wdgtActions };
 				}
 				{ #[minval, maxval, step, default].select({ |prop| all[k].spec.perform(prop).isArray }).size > 0} {
@@ -919,6 +945,10 @@ CVCenter {
 				},
 				CVWidget2D, {
 					#[lo, hi].do({ |hilo|
+						"%[%]: %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model);
+						"%[%]: %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model);
+						"%[%]: %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].actions.model);
+
 						cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value_(
 							cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value
 						).changedKeys(cvWidgets[k].synchKeys);
@@ -1076,7 +1106,7 @@ CVCenter {
 			})
 		});
 
-		if(this.widgetsAtTab(widgetStates[thisKey][\tabKey].postln).size == 0, {
+		if(this.widgetsAtTab(widgetStates[thisKey][\tabKey]).size == 0, {
 			if(tabProperties.size > 1, {
 				widgetStates.do({ |ws|
 					if(ws.tabIndex > widgetStates[thisKey].tabIndex, { ws.tabIndex = ws.tabIndex-1 });
@@ -1215,7 +1245,7 @@ CVCenter {
 		// thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
 
 		if(window.isNil or:{ window.isClosed }, {
-			"makeWindow: %, key: %\n".postf(thisTab, thisKey);
+			// "makeWindow: %, key: %\n".postf(thisTab, thisKey);
 			this.makeWindow(thisTab);
 		}, {
 			// "prAddToGui: %\n".postf(thisKey);
