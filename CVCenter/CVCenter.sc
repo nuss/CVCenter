@@ -791,16 +791,22 @@ CVCenter {
 				cvWidgets[key].notNil and:{ cvWidgets[key].isClosed.not }
 			});
 			thisKeys = allCVKeys.difference(widgetKeys);
-			// "thisKeys: %\n".postf(thisKeys);
+			"thisKeys: %\n".postf(thisKeys);
 			thisTabLabel !? {
 				// "widgetStates: %\n".postf(widgetStates);
-				if(widgetStates.size > 0, {
+				// take special care of CVWidget2D... sigh
+				if(widgetStates.size > 0 and:{
+					all.size != 1 and:{
+						all[thisKeys.unbubble].class != Event
+					}
+				}, {
 					thisKeys = thisKeys.select({ |k|
 						widgetStates.select({ |ws| ws.tabKey === thisTabLabel }).keys.includes(k)
 					})
-				});
+				})
 				// "thisKeys: %\n".postf(thisKeys);
 			};
+			// "thisKeys: %\n".postf(thisKeys);
 		}, {
 			thisKeys = [key];
 			// "given key: %, thisTab: %\n".postf(thisKeys, thisTab.label);
@@ -945,9 +951,9 @@ CVCenter {
 				},
 				CVWidget2D, {
 					#[lo, hi].do({ |hilo|
-						"%[%]: %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model);
-						"%[%]: %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model);
-						"%[%]: %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].actions.model);
+						// "%[%]: %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model);
+						// "%[%]: %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].oscDisplay.model);
+						// "%[%]: %\n".postf(k, hilo, cvWidgets[k].wdgtControllersAndModels[hilo].actions.model);
 
 						cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value_(
 							cvWidgets[k].wdgtControllersAndModels[hilo].midiDisplay.model.value
@@ -1231,7 +1237,7 @@ CVCenter {
 					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
 					this.at(thisKey)[thisSlot].value = thisVal;
 				});
-				widgetStates[thisKey][thisSlot][\made] = true
+				widgetStates[thisKey][thisSlot][\made] = true;
 				^all[thisKey][thisSlot];
 			}, {
 				// "cvWidgets[%].isNil or:{ cvWidgets[%].isClosed }\n".postf(thisKey, thisKey);
@@ -1245,10 +1251,10 @@ CVCenter {
 		// thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
 
 		if(window.isNil or:{ window.isClosed }, {
-			// "makeWindow: %, key: %\n".postf(thisTab, thisKey);
+			"makeWindow: %, key: %\n".postf(thisTab, thisKey);
 			this.makeWindow(thisTab);
 		}, {
-			// "prAddToGui: %\n".postf(thisKey);
+			"prAddToGui: %\n".postf(thisKey);
 			this.prAddToGui(thisTab, widget2DKey, thisKey);
 		});
 

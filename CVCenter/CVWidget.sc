@@ -1777,7 +1777,7 @@ CVWidget {
 						0, {
 							switch(this.class,
 								CVWidgetMS, {
-									if(val/127 < (argWidgetCV.input[slot]+(this.getSoftWithin(slot)/2)) and: {
+									if(val/127 < (argWidgetCV.input[slot]+(this.getSoftWithin(slot)/2)) and:{
 										val/127 > (argWidgetCV.input[slot]-(this.getSoftWithin(slot)/2));
 									}, {
 										argWidgetCV.input_(argWidgetCV.input.collect({ |it, i|
@@ -1785,7 +1785,7 @@ CVWidget {
 										}))
 									},
 									{
-										if(val/127 < (argWidgetCV.input+(this.getSoftWithin(slot)/2)) and: {
+										if(val/127 < (argWidgetCV.input+(this.getSoftWithin(slot)/2)) and:{
 											val/127 > (argWidgetCV.input-(this.getSoftWithin(slot)/2));
 										}, {
 											argWidgetCV.input_(val/127)

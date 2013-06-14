@@ -195,7 +195,7 @@ CVWidget2D : CVWidget {
 		;
 
 		if(GUI.id !== \cocoa, {
-			label.toolTip_(nameField.asString);
+			label.toolTip_(nameField.string);
 		});
 
 		label.action_({ |lbl|
