@@ -566,7 +566,7 @@ CVCenter {
 			});
 
 			all.pairsDo({ |key, cv|
-				[key, cv].postln;
+				// [key, cv].postln;
 				if((cvWidgets[key].notNil and:{ cvWidgets[key].isClosed }).or(
 					cvWidgets[key].isNil
 				), {
