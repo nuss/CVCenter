@@ -980,7 +980,13 @@ CVCenter {
 		};
 		// "tabs.activeTab: %\n".postf(tabs.activeTab);
 		tabs.activeTab !? {
-			if(tabs.activeTab.index == cvTabIndex, { this.prRegroupWidgets(tabs.activeTab) }, { tabs.focus(cvTabIndex) });
+			if(tabs.activeTab.index == cvTabIndex, {
+				"tabs.activeTab.index == cvTabIndex".postln;
+				this.prRegroupWidgets(tabs.activeTab)
+			}/*, {
+				"tabs.activeTab.index != cvTabIndex".postln;
+				tabs.focus(cvTabIndex)
+			}*/);
 		};
 		// window.front;
 	}
