@@ -773,7 +773,7 @@ CVCenter {
 		var thisTab, thisTabLabel, thisTabColor, thisNextPos;
 		var modsDict, arrModsDict;
 
-		"prAddWidget called: %, %\n".postf(tab, widget2DKey, key);
+		// "prAddWidget called: %, %\n".postf(tab, widget2DKey, key);
 
 		if(tabProperties.notNil, {
 			allTabs = tabs.tabViews++childViews.keys;
@@ -857,58 +857,62 @@ CVCenter {
 				if(msSize <= numMsSlotsPerColumn, { widgetwidth = 106 }, {
 					widgetwidth = (52*(msSize/numMsSlotsPerColumn).ceil)+1
 				});
-				cvWidgets[key] = CVWidgetMS(
-					thisTab,
-					all[key],
-					key,
-					Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight),
-					setup: tmp.setup,
-					controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
-					cvcGui: cvcArgs
-				);
-				removeButs.put(key,
-					Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-						.states_([["remove", Color.white, Color(0.0, 0.15)]])
-						.action_({ |b| this.removeAt(key) })
-						.font_(Font("Arial", 10))
-					;
-				);
-				if(widgetStates[key].isNil, {
-					widgetStates.put(key, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
-				}, {
-					widgetStates[key].tabIndex = cvTabIndex;
-					widgetStates[key].tabKey = thisTabLabel;
+				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
+					cvWidgets[key] = CVWidgetMS(
+						thisTab,
+						all[key],
+						key,
+						Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight),
+						setup: tmp.setup,
+						controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
+						cvcGui: cvcArgs
+					);
+					removeButs.put(key,
+						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+							.states_([["remove", Color.white, Color(0.0, 0.15)]])
+							.action_({ |b| this.removeAt(key) })
+							.font_(Font("Arial", 10))
+						;
+					);
+					if(widgetStates[key].isNil, {
+						widgetStates.put(key, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
+					}, {
+						widgetStates[key].tabIndex = cvTabIndex;
+						widgetStates[key].tabKey = thisTabLabel;
+					});
+					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
-				cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
 			{
 				tmp = this.setup.calibrate = cvWidgets[key] !? {
 					cvWidgets[key].wdgtControllersAndModels.calibration.model.value
 				};
-				cvWidgets[key] = CVWidgetKnob(
-					thisTab,
-					all[key],
-					key,
-					Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
-					setup: tmp,
-					controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
-					cvcGui: cvcArgs
-				);
-				removeButs.put(key,
-					Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-						.states_([["remove", Color.white, Color(0.0, 0.15)]])
-						.action_({ |b| this.removeAt(key) })
-						.font_(Font("Arial", 10))
-					;
-				);
-				if(widgetStates[key].isNil, {
-					widgetStates.put(key, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
-				}, {
-					widgetStates[key].tabIndex = cvTabIndex;
-					widgetStates[key].tabKey = thisTabLabel;
+				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
+					cvWidgets[key] = CVWidgetKnob(
+						thisTab,
+						all[key],
+						key,
+						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
+						setup: tmp,
+						controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
+						cvcGui: cvcArgs
+					);
+					removeButs.put(key,
+						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+							.states_([["remove", Color.white, Color(0.0, 0.15)]])
+							.action_({ |b| this.removeAt(key) })
+							.font_(Font("Arial", 10))
+						;
+					);
+					if(widgetStates[key].isNil, {
+						widgetStates.put(key, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
+					}, {
+						widgetStates[key].tabIndex = cvTabIndex;
+						widgetStates[key].tabKey = thisTabLabel;
+					});
+					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
-				cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
 		;
