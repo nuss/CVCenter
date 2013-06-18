@@ -200,7 +200,9 @@ CVWidget2D : CVWidget {
 
 		label.action_({ |lbl|
 			this.toggleComment(lbl.value.asBoolean);
-			// if(GUI.id !== \cocoa, { lbl.toolTip_(nameField.string) });
+			if(GUI.id !== \cocoa, {
+				lbl.toolTip_(nameField.string)
+			});
 		});
 
 		nextY = thisXY.y+1+label.bounds.height;
