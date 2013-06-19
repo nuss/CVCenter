@@ -2694,9 +2694,11 @@ CVWidget {
 					numOscResponders = this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size;
 					numOscString = "OSC ("++numOscResponders++"/"++msSize++")";
 					if(numOscResponders > 0, {
+						// "numOscResponders > 0: %\n".postf(numOscResponders);
 						oscButBg = Color.cyan(0.5);
 						oscButTextColor = Color.white;
 					}, {
+						// "no OSCresponders".postln;
 						oscButBg = background;
 						oscButTextColor = stringColor;
 					});

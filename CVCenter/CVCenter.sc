@@ -561,7 +561,7 @@ CVCenter {
 			});
 
 			allTabs.do({ |label|
-				"label passed to prAddTab: %\n".postf(label);
+				// "label passed to prAddTab: %\n".postf(label);
 				this.prAddTab(label)
 			});
 
@@ -793,12 +793,15 @@ CVCenter {
 
 		rowheight = widgetheight+1+15; // add a small gap between rows
 
-		if(widgetStates[key].notNil and:{ widgetStates[key].midiOscEnv.notNil }, {
-			cvcArgs = ();
-			cvcArgs.midiOscEnv = widgetStates[key].midiOscEnv;
-		}, {
+		// if(widgetStates[key].notNil and:{ widgetStates[key].midiOscEnv.notNil }, {
+		// 	"widgetStates[%].midiOscEnv not nil? %\n".postf(key, widgetStates[key].midiOscEnv.notNil);
+		// 	cvcArgs = ();
+		// 	cvcArgs.midiOscEnv = widgetStates[key].midiOscEnv;
+		// 	}, {
 			cvcArgs = true;
-		});
+		// });
+
+		"cvcArgs: %\n".postf(cvcArgs);
 
 		case
 			{ all[key].class === Event and:{
@@ -981,7 +984,7 @@ CVCenter {
 		// "tabs.activeTab: %\n".postf(tabs.activeTab);
 		tabs.activeTab !? {
 			if(tabs.activeTab.index == cvTabIndex, {
-				"tabs.activeTab.index == cvTabIndex".postln;
+				// "tabs.activeTab.index == cvTabIndex".postln;
 				this.prRegroupWidgets(tabs.activeTab)
 			}/*, {
 				"tabs.activeTab.index != cvTabIndex".postln;
@@ -1093,8 +1096,8 @@ CVCenter {
 		if(window.notNil and:{
 			window.isClosed.not
 		}, {
-				if(this.widgetsAtTab(widgetStates[thisKey][\tabKey]).size == 0, {
-					this.prRemoveTab(widgetStates[thisKey][\tabKey]);
+			if(this.widgetsAtTab(widgetStates[thisKey][\tabKey]).size == 0, {
+				this.prRemoveTab(widgetStates[thisKey][\tabKey]);
 			})
 		});
 
@@ -1237,10 +1240,10 @@ CVCenter {
 		// thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
 
 		if(window.isNil or:{ window.isClosed }, {
-			"makeWindow: %, key: %\n".postf(thisTab, thisKey);
+			// "makeWindow: %, key: %\n".postf(thisTab, thisKey);
 			this.makeWindow(thisTab);
 		}, {
-			"prAddWidget: %\n".postf(thisKey);
+			// "prAddWidget: %\n".postf(thisKey);
 			this.prAddWidget(thisTab, widget2DKey, thisKey);
 		});
 
