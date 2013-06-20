@@ -972,7 +972,7 @@ CVCenter {
 			}
 		);
 
-		cvWidgets[key].widgetBg.background_(tabProperties[thisTabLabel].tabColor);
+		// cvWidgets[key].widgetBg.background_(tabProperties[thisTabLabel].tabColor);
 		colwidth = widgetwidth+1; // add a small gap between widgets
 		rowwidth = thisTab.bounds.width-15;
 		if(thisNextPos.x+colwidth >= (rowwidth-colwidth-15), {
