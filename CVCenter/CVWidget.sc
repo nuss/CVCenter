@@ -1901,7 +1901,6 @@ CVWidget {
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			if(debug, { "widget '%' (%) at slot '%' midiDisplay.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
-			// "thisGuiEnv: %\n".postf(thisGuiEnv);
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
 			}, {
@@ -2368,6 +2367,7 @@ CVWidget {
 				})
 			})
 		})
+
 	}
 
 	prInitMidiOptions { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
@@ -2564,8 +2564,6 @@ CVWidget {
 					})
 				};
 
-				// "IP, IP.class: %, %\nport, port.class: %, %\n".postf(theChanger.value[0], theChanger.value[0].class, theChanger.value[1], theChanger.value[1].class);
-
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
 
 				if(midiOscEnv.oscResponder.isNil, {
@@ -2581,6 +2579,7 @@ CVWidget {
 					tmp = slot.asString++":"+tmp;
 				});
 
+				// "now synching oscDisplay: %[%]\n".postf(this.label.states[0][0], slot);
 				wcm.oscDisplay.model.value_(
 					(
 						but: [tmp, Color.white, Color.cyan(0.5)],
@@ -2615,7 +2614,7 @@ CVWidget {
 						editEnabled: true
 					)
 				).changedKeys(synchKeys);
-			});
+			})
 		})
 	}
 
@@ -2631,6 +2630,8 @@ CVWidget {
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscDisplay: %\n".postf(theChanger);
 			if(debug, { "widget '%' (%) at slot '%' oscDisplay.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+
+			// "oscDisplay.controller in - %[%]: %\n".postf(this.label.states[0][0], slot, midiOscEnv);
 
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
@@ -2809,7 +2810,8 @@ CVWidget {
 						thisEditor.indexField
 					].do(_.enabled_(theChanger.value.editEnabled));
 				}
-			})
+			});
+			// "oscDisplay.controller out - %[%]: %\n".postf(this.label.states[0][0], slot, midiOscEnv);
 		})
 	}
 
@@ -2825,7 +2827,6 @@ CVWidget {
 			// "prInitOscInputRange: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' oscInputRange.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
-			// "midiOscEnv: %\n".postf(midiOscEnv);
 			midiOscEnv.calibConstraints = (lo: theChanger.value[0], hi: theChanger.value[1]);
 
 			if(this.class == CVWidgetMS, {

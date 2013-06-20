@@ -19,7 +19,7 @@ CVCenter {
 
 	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, <tabs, prefPane, removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
-	classvar <>shortcuts, <tabShortcuts, <scv;
+	classvar <>shortcuts, <scv;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight;
 	classvar <widgetStates;
 	classvar <tabProperties, colors, nextColor;
@@ -96,7 +96,7 @@ CVCenter {
 		};
 
 		this.shortcuts = IdentityDictionary.new;
-		#all, childViews, cvWidgets, widgetStates, removeButs, tabProperties, tabShortcuts = IdentityDictionary.new!6;
+		#all, childViews, cvWidgets, widgetStates, removeButs, tabProperties = IdentityDictionary.new!6;
 
 		// shortcuts
 		scv = (); // environment holding various variables used in shortcut-functions;,
@@ -668,6 +668,9 @@ CVCenter {
 		});
 		unfocusedColor = labelColor.copy.alpha_(0.3);
 
+		"tabProperties: %\n".postf(tabProperties);
+		"tabProperties[thisTabLabel]: %\n".postf(tabProperties[thisTabLabel]);
+
 		tabProperties[thisTabLabel] ?? {
 			thisTab = tabs.add(thisTabLabel, scroll: true)
 				.focusAction_({ |tab|
@@ -773,7 +776,7 @@ CVCenter {
 		var thisTab, thisTabLabel, thisTabColor, thisNextPos;
 		var modsDict, arrModsDict;
 
-		// "prAddWidget called: %, %\n".postf(tab, widget2DKey, key);
+		"prAddWidget called: %, %, %\n".postf(tab, widget2DKey, key);
 
 		if(tabProperties.notNil, {
 			allTabs = tabs.tabViews++childViews.keys;
@@ -801,7 +804,7 @@ CVCenter {
 			cvcArgs = true;
 		// });
 
-		"cvcArgs: %\n".postf(cvcArgs);
+		// "cvcArgs: %\n".postf(cvcArgs);
 
 		case
 			{ all[key].class === Event and:{
@@ -935,16 +938,18 @@ CVCenter {
 			},
 			CVWidget2D, {
 				#[lo, hi].do({ |hilo|
-					// "%[%]: %\n".postf(k, hilo, cvWidgets[key].wdgtControllersAndModels[hilo].midiDisplay.model);
-					// "%[%]: %\n".postf(k, hilo, cvWidgets[key].wdgtControllersAndModels[hilo].oscDisplay.model);
-					// "%[%]: %\n".postf(k, hilo, cvWidgets[key].wdgtControllersAndModels[hilo].actions.model);
+					// "%[%]: %\n".postf(key, hilo, cvWidgets[key].wdgtControllersAndModels[hilo].midiDisplay.model);
+					// "%[%]: %\n".postf(key, hilo, cvWidgets[key].wdgtControllersAndModels[hilo].oscDisplay.model);
+					// "%[%]: %\n".postf(key, hilo, cvWidgets[key].wdgtControllersAndModels[hilo].actions.model);
 
 					cvWidgets[key].wdgtControllersAndModels[hilo].midiDisplay.model.value_(
 						cvWidgets[key].wdgtControllersAndModels[hilo].midiDisplay.model.value
 					).changedKeys(cvWidgets[key].synchKeys);
+					// "before syncing oscDisplay: %[%], midiOscEnv: %\n".postf(key, hilo, cvWidgets[key].midiOscEnv);
 					cvWidgets[key].wdgtControllersAndModels[hilo].oscDisplay.model.value_(
 						cvWidgets[key].wdgtControllersAndModels[hilo].oscDisplay.model.value
 					).changedKeys(cvWidgets[key].synchKeys);
+					// "after syncing oscDisplay: %[%], midiOscEnv: %\n".postf(key, hilo, cvWidgets[key].midiOscEnv);
 					cvWidgets[key].wdgtControllersAndModels[hilo].actions.model.value_((
 						numActions: cvWidgets[key].wdgtActions[hilo].size,
 						activeActions: cvWidgets[key].wdgtActions[hilo].select({ |v| v.asArray[0][1] == true }).size
@@ -981,7 +986,7 @@ CVCenter {
 		widget2DKey !? {
 			cvWidgets[widget2DKey.key].setSpec(widget2DKey.spec, widget2DKey.slot);
 		};
-		// "tabs.activeTab: %\n".postf(tabs.activeTab);
+
 		tabs.activeTab !? {
 			if(tabs.activeTab.index == cvTabIndex, {
 				// "tabs.activeTab.index == cvTabIndex".postln;

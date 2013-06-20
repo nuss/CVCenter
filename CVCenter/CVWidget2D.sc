@@ -71,11 +71,13 @@ CVWidget2D : CVWidget {
 
 		cvcGui !? { isCVCWidget = true };
 
+		"midiOscEnv before: %\n".postf(midiOscEnv);
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
 		#[lo, hi].do({ |hilo|
 			midiOscEnv[hilo] ?? { midiOscEnv.put(hilo, ()) };
 			midiOscEnv[hilo].oscMapping ?? { midiOscEnv[hilo].oscMapping = \linlin };
 		});
+		"midiOscEnv after: %\n".postf(midiOscEnv);
 
 		if(name.isNil, { thisName = "2D" }, { thisName = name });
 		wdgtInfo = thisName.asString;
