@@ -848,9 +848,7 @@ CVCenter {
 			}
 			{ #[minval, maxval, step, default].select({ |prop| all[key].spec.perform(prop).isArray }).size > 0} {
 				msSize = #[minval, maxval, step, default].collect({ |prop| all[key].spec.perform(prop).size }).maxItem;
-				tmp = (setup: [], wdgtActions: cvWidgets[key] !? {
-					cvWidgets[key].wdgtActions !? { cvWidgets[key].wdgtActions }
-				});
+				tmp = (setup: [], wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions });
 				msSize.do({ |sl|
 					tmp.setup = tmp.setup.add(
 						this.setup.calibrate = cvWidgets[key] !? {
@@ -900,16 +898,28 @@ CVCenter {
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
 			{
+				// cvWidgets[key] !? { "cvWidgets[%].wdgtActions: %\n".postf(key, cvWidgets[key].wdgtActions) };
 				tmp = this.setup.calibrate = cvWidgets[key] !? {
 					cvWidgets[key].wdgtControllersAndModels.calibration.model.value
 				};
+				tmp = (
+					setup: (
+						midiMode: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMode }, { this.midiMode }),
+						midiResolution: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution }, { this.midiResolution }),
+						midiMean: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMean }, { this.midiMean }),
+						ctrlButtonBank: if(cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank }, { this.ctrlButtonBank }),
+						softWithin: if(cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin }, { this.softWithin }),
+						calibrate: if(cvWidgets[key].notNil, { cvWidgets[key].getCalibrate }, { true }),
+					),
+					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
+				);
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
 					cvWidgets[key] = CVWidgetKnob(
 						thisTab,
 						all[key],
 						key,
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
-						setup: tmp,
+						setup: tmp.setup,
 						controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
 						cvcGui: cvcArgs
 					);
