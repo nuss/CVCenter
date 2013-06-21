@@ -97,10 +97,12 @@ CVWidgetMS : CVWidget {
 //		what's the editor gonna look like?
 		editor = (editors: Array.newClear(msSize));
 
-//		TO DO
-		// "wdgtControllersAndModels before init: %\n".postf(wdgtControllersAndModels);
-		msSize.do(this.initControllersAndModels(controllersAndModels, _));
-		// "wdgtControllersAndModels after init: %\n".postf(wdgtControllersAndModels);
+		// "wdgtControllersAndModels before init: %\n".postf(wdgtControllersAndModels.slots.collect(_.oscConnection));
+		// controllersAndModels.pairsDo({ |k, v|
+		// 	if(k == \slots, { v.pairsDo({ |kk, vv| [kk, vv].postcs }) }, { [k, v].postln })
+		// });
+		msSize.do({ |sl| this.initControllersAndModels(controllersAndModels, sl) });
+		// "wdgtControllersAndModels after init: %\n".postf(wdgtControllersAndModels.slots.collect(_.oscConnection));
 
 		setupArgs !? {
 			msSize.do({ |slot|

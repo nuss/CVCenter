@@ -776,7 +776,7 @@ CVCenter {
 		var thisTab, thisTabLabel, thisTabColor, thisNextPos;
 		var modsDict, arrModsDict;
 
-		"prAddWidget called: %, %, %\n".postf(tab, widget2DKey, key);
+		// "prAddWidget called: %, %, %\n".postf(tab, widget2DKey, key);
 
 		if(tabProperties.notNil, {
 			allTabs = tabs.tabViews++childViews.keys;
@@ -796,15 +796,6 @@ CVCenter {
 
 		rowheight = widgetheight+1+15; // add a small gap between rows
 
-		// if(widgetStates[key].notNil and:{ widgetStates[key].midiOscEnv.notNil }, {
-		// 	"widgetStates[%].midiOscEnv not nil? %\n".postf(key, widgetStates[key].midiOscEnv.notNil);
-		// 	cvcArgs = ();
-		// 	cvcArgs.midiOscEnv = widgetStates[key].midiOscEnv;
-		// 	}, {
-		// cvcArgs = true;
-		// });
-
-		// "cvcArgs: %\n".postf(cvcArgs);
 		cvWidgets[key] !? {
 			if(cvWidgets[key].midiOscEnv.notNil, {
 				cvcArgs = (midiOscEnv: cvWidgets[key].midiOscEnv);
@@ -870,6 +861,17 @@ CVCenter {
 				if(msSize <= numMsSlotsPerColumn, { widgetwidth = 106 }, {
 					widgetwidth = (52*(msSize/numMsSlotsPerColumn).ceil)+1
 				});
+
+				cvWidgets[key] !? {
+					cvWidgets[key].wdgtControllersAndModels.pairsDo({ |k, v|
+						if(k == \slots, {
+							v.pairsDo({ |kk, vv| [kk, vv].postcs })
+						}, {
+							[k, v].postcs
+						})
+					})
+				};
+
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
 					cvWidgets[key] = CVWidgetMS(
 						thisTab,
@@ -929,7 +931,7 @@ CVCenter {
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
 		;
-		"after: cvWidgets[%].midiOscEnv: %\n".postf(key, cvWidgets[key].midiOscEnv);
+		// "after: cvWidgets[%].midiOscEnv: %\n".postf(key, cvWidgets[key].midiOscEnv);
 
 		switch(cvWidgets[key].class,
 			CVWidgetKnob, {

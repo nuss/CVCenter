@@ -647,6 +647,8 @@ CVWidget {
 	setCalibrate { |bool, slot|
 		var thisSlot, wcm;
 
+		// "setCalibrate called: %\n".postf(this.label.states[0][0]);
+
 		switch(this.class,
 			CVWidget2D, {
 				thisSlot = slot.asSymbol;
@@ -782,6 +784,8 @@ CVWidget {
 	oscConnect { |ip, port, name, oscMsgIndex=1, slot|
 		var thisSlot, wcm;
 		var thisIP, intPort;
+
+		// "oscConnect called: %\n".postf(this.label.states[0][0]);
 
 		switch(this.class,
 			CVWidget2D, {
@@ -1011,23 +1015,29 @@ CVWidget {
 		var midiStateObserver;
 
 		if(controllersAndModels.notNil, {
+			// "controllersAndModels not nil???".postln;
 			wdgtControllersAndModels = controllersAndModels;
 		}, {
-			wdgtControllersAndModels ?? {
-				switch(this.class,
-					CVWidgetMS, { wdgtControllersAndModels = (slots: Array.newClear(msSize)) },
-					{ wdgtControllersAndModels = () }
-				)
-			}
+			// "controllersAndModels: %\n".postf(controllersAndModels);
+			switch(this.class,
+				CVWidgetMS, {
+					wdgtControllersAndModels ?? {
+						wdgtControllersAndModels = (slots: Array.newClear(msSize))
+					}
+				},
+				{ wdgtControllersAndModels ?? { wdgtControllersAndModels = () }}
+			)
 		});
 
 		slot !? {
-			if(wdgtControllersAndModels[slot].isNil, {
-				switch(this.class,
-					CVWidget2D, { wdgtControllersAndModels.put(slot, ()) },
-					CVWidgetMS, { wdgtControllersAndModels.slots[slot] = () }
-				)
-			})
+			switch(this.class,
+				CVWidget2D, {
+					wdgtControllersAndModels[slot] ?? { wdgtControllersAndModels.put(slot, ()) }
+				},
+				CVWidgetMS, {
+					wdgtControllersAndModels.slots[slot] ?? { wdgtControllersAndModels.slots[slot] = () }
+				}
+			)
 		};
 
 		if(slot.notNil, {
@@ -1039,9 +1049,7 @@ CVWidget {
 			wcm = wdgtControllersAndModels;
 		});
 
-		wcm.calibration ?? {
-			wcm.calibration = ();
-		};
+		wcm.calibration ?? { wcm.calibration = () };
 		wcm.calibration.model ?? {
 			if(slot.notNil, {
 				wcm.calibration.model = Ref(prCalibrate[slot]);
@@ -1049,6 +1057,7 @@ CVWidget {
 				wcm.calibration.model = Ref(prCalibrate);
 			})
 		};
+
 		switch(this.class,
 			CVWidgetMS, {
 				wdgtControllersAndModels.cvSpec ?? {
@@ -1065,21 +1074,18 @@ CVWidget {
 				}
 			}
 		);
-		wcm.oscInputRange ?? {
-			wcm.oscInputRange = ();
-		};
+
+		wcm.oscInputRange ?? { wcm.oscInputRange = () };
 		wcm.oscInputRange.model ?? {
 			wcm.oscInputRange.model = Ref([0.0001, 0.0001]);
 		};
-		wcm.oscConnection ?? {
-			wcm.oscConnection = ();
-		};
+
+		wcm.oscConnection ?? { wcm.oscConnection = () };
 		wcm.oscConnection.model ?? {
 			wcm.oscConnection.model = Ref(false);
 		};
-		wcm.oscDisplay ?? {
-			wcm.oscDisplay = ();
-		};
+
+		wcm.oscDisplay ?? { wcm.oscDisplay = () };
 		wcm.oscDisplay.model ?? {
 			if(this.class == CVWidgetMS, { tmp = slot.asString++": edit OSC" }, { tmp = "edit OSC" });
 			wcm.oscDisplay.model = Ref((
@@ -1092,21 +1098,18 @@ CVWidget {
 				editEnabled: true
 			))
 		};
-		wcm.midiConnection ?? {
-			wcm.midiConnection = ();
-		};
+
+		wcm.midiConnection ?? { wcm.midiConnection = () };
 		wcm.midiConnection.model ?? {
 			wcm.midiConnection.model = Ref(nil);
 		};
-		wcm.midiDisplay ?? {
-			wcm.midiDisplay = ();
-		};
+
+		wcm.midiDisplay ?? { wcm.midiDisplay = () };
 		wcm.midiDisplay.model ?? {
 			wcm.midiDisplay.model = Ref((src: "source", chan: "chan", ctrl: "ctrl", learn: "L"));
 		};
-		wcm.midiOptions ?? {
-			wcm.midiOptions = ();
-		};
+
+		wcm.midiOptions ?? { wcm.midiOptions = () };
 		wcm.midiOptions.model ?? {
 			switch(this.class,
 				CVWidgetMS, {
@@ -1131,12 +1134,14 @@ CVWidget {
 				)}
 			)
 		};
+
 		wcm.mapConstrainterLo ?? {
-			wcm.mapConstrainterLo = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[0]);
+			wcm.mapConstrainterLo = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[0])
 		};
 		wcm.mapConstrainterHi ?? {
-			wcm.mapConstrainterHi = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[1]);
+			wcm.mapConstrainterHi = CV([-inf, inf].asSpec, wcm.oscInputRange.model.value[1])
 		};
+
 		switch(this.class,
 			CVWidgetMS, {
 				wdgtControllersAndModels.actions ?? {
@@ -1155,6 +1160,12 @@ CVWidget {
 				}
 			}
 		);
+
+		// wdgtControllersAndModels.pairsDo({ |k, v|
+		// 	if(k == \slots, {
+		// 		v.pairsDo({ |kk, vv| [kk, vv].postcs; "\n\n\n".postln })
+		// 	}, { [k, v].postcs; "\n\n\n".postln })
+		// });
 
 		// midiStateObserver ?? {
 		// 	midiStateObserver = SimpleController(MIDIClient).put(\initialized, { |theChanger, what, moreArgs|
