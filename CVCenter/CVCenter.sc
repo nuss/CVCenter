@@ -801,11 +801,17 @@ CVCenter {
 		// 	cvcArgs = ();
 		// 	cvcArgs.midiOscEnv = widgetStates[key].midiOscEnv;
 		// 	}, {
-			cvcArgs = true;
+		// cvcArgs = true;
 		// });
 
 		// "cvcArgs: %\n".postf(cvcArgs);
-
+		cvWidgets[key] !? {
+			if(cvWidgets[key].midiOscEnv.notNil, {
+				cvcArgs = (midiOscEnv: cvWidgets[key].midiOscEnv);
+			}, {
+				cvcArgs = true;
+			});
+		};
 		case
 			{ all[key].class === Event and:{
 				all[key].keys.includesAny(#[lo, hi])
@@ -818,6 +824,7 @@ CVCenter {
 						cvWidgets[key].wdgtControllersAndModels.hi.calibration.model.value
 					},
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions !? { cvWidgets[key].wdgtActions }};
+
 				);
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
 					cvWidgets[key] = CVWidget2D(
@@ -922,6 +929,7 @@ CVCenter {
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
 		;
+		"after: cvWidgets[%].midiOscEnv: %\n".postf(key, cvWidgets[key].midiOscEnv);
 
 		switch(cvWidgets[key].class,
 			CVWidgetKnob, {
