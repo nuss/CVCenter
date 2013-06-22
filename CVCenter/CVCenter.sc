@@ -796,13 +796,17 @@ CVCenter {
 
 		rowheight = widgetheight+1+15; // add a small gap between rows
 
-		cvWidgets[key] !? {
+		if(cvWidgets[key].notNil, {
+			// "cvWidgets[key] not nil".postln;
 			if(cvWidgets[key].midiOscEnv.notNil, {
 				cvcArgs = (midiOscEnv: cvWidgets[key].midiOscEnv);
 			}, {
 				cvcArgs = true;
 			});
-		};
+		}, { cvcArgs = true });
+
+		// "cvcArgs: %\n".postf(cvcArgs);
+
 		case
 			{ all[key].class === Event and:{
 				all[key].keys.includesAny(#[lo, hi])
@@ -899,9 +903,9 @@ CVCenter {
 			}
 			{
 				// cvWidgets[key] !? { "cvWidgets[%].wdgtActions: %\n".postf(key, cvWidgets[key].wdgtActions) };
-				tmp = this.setup.calibrate = cvWidgets[key] !? {
-					cvWidgets[key].wdgtControllersAndModels.calibration.model.value
-				};
+				// tmp = this.setup.calibrate = cvWidgets[key] !? {
+				// 	cvWidgets[key].wdgtControllersAndModels.calibration.model.value
+				// };
 				tmp = (
 					setup: (
 						midiMode: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMode }, { this.midiMode }),
@@ -945,12 +949,18 @@ CVCenter {
 
 		switch(cvWidgets[key].class,
 			CVWidgetKnob, {
-				cvWidgets[key].wdgtControllersAndModels.midiDisplay.model.value_(
-					cvWidgets[key].wdgtControllersAndModels.midiDisplay.model.value
+				cvWidgets[key].wdgtControllersAndModels.oscConnection.model.value_(
+					cvWidgets[key].wdgtControllersAndModels.oscConnection.model.value
 				).changedKeys(cvWidgets[key].synchKeys);
-				cvWidgets[key].wdgtControllersAndModels.oscDisplay.model.value_(
-					cvWidgets[key].wdgtControllersAndModels.oscDisplay.model.value
+				cvWidgets[key].wdgtControllersAndModels.midiConnection.model.value_(
+					cvWidgets[key].wdgtControllersAndModels.midiConnection.model.value
 				).changedKeys(cvWidgets[key].synchKeys);
+				// cvWidgets[key].wdgtControllersAndModels.midiDisplay.model.value_(
+				// 	cvWidgets[key].wdgtControllersAndModels.midiDisplay.model.value
+				// ).changedKeys(cvWidgets[key].synchKeys);
+				// cvWidgets[key].wdgtControllersAndModels.oscDisplay.model.value_(
+				// 	cvWidgets[key].wdgtControllersAndModels.oscDisplay.model.value
+				// ).changedKeys(cvWidgets[key].synchKeys);
 				cvWidgets[key].wdgtControllersAndModels.actions.model.value_((
 					numActions: cvWidgets[key].wdgtActions.size,
 					activeActions: cvWidgets[key].wdgtActions.select({ |v| v.asArray[0][1] == true }).size

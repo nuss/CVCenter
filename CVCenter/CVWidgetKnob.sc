@@ -114,12 +114,10 @@ CVWidgetKnob : CVWidget {
 						})
 					})
 				})
-			})
-		};
-
-		cvcGui ?? {
+			});
 			if(persistent == false or:{ persistent.isNil }, {
 				window.onClose_(window.onClose.addFunc({
+					// "remove, remove".postln;
 					midiOscEnv.oscResponder !? { midiOscEnv.oscResponder.remove };
 					midiOscEnv.cc !? { midiOscEnv.cc.remove };
 					wdgtControllersAndModels.do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
