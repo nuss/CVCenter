@@ -86,9 +86,9 @@ CVCenterControllersMonitor {
 
 			tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
 				switch(keycode,
-					CVCenterKeyDownActions.keyCodes[$o], { tabs.focus(1) }, // key "o" -> osc
-					CVCenterKeyDownActions.keyCodes[$m], { tabs.focus(0) }, // key "m" -> midi
-					CVCenterKeyDownActions.keyCodes[\esc], { window.close } // key "esc" -> close window
+					KeyDownActions.keyCodes[$o], { tabs.focus(1) }, // key "o" -> osc
+					KeyDownActions.keyCodes[$m], { tabs.focus(0) }, // key "m" -> midi
+					KeyDownActions.keyCodes[\esc], { window.close } // key "esc" -> close window
 				)
 			});
 

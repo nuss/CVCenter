@@ -117,7 +117,7 @@ CVCenterPreferences {
 
 			prefsTab = tabs.add("Common Preferences", scroll: false).background_(tabsBg);
 			scTab = tabs.add("Shortcuts", scroll: false).background_(tabsBg);
-			cvKeyCodesEditorTab = tabs.add("KeyCodes", scroll: false);
+			cvKeyCodesEditorTab = tabs.add("KeyCodes & modifiers", scroll: false);
 
 			prefsTab.decorator = flow1 = FlowLayout(prefsTab.bounds, 7@7, 0@1);
 
