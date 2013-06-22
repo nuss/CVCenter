@@ -167,15 +167,14 @@ CVWidgetMS : CVWidget {
 						})
 					})
 				}
-			})
-		};
-
-		cvcGui ?? {
+			});
 			if(persistent == false or:{ persistent.isNil }, {
 				window.onClose_(window.onClose.addFunc({
 					msSize.do({ |slot|
-						midiOscEnv[slot].oscResponder !? { midiOscEnv[slot].oscResponder.remove };
-						midiOscEnv[slot].cc !? { midiOscEnv[slot].cc.remove };
+						this.oscDisconnect(slot);
+						this.midiDisconnect(slot);
+						// midiOscEnv[slot].oscResponder !? { midiOscEnv[slot].oscResponder.remove };
+						// midiOscEnv[slot].cc !? { midiOscEnv[slot].cc.remove };
 						wdgtControllersAndModels[slot].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 					})
 				}))

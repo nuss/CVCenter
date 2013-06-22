@@ -71,13 +71,11 @@ CVWidget2D : CVWidget {
 
 		cvcGui !? { isCVCWidget = true };
 
-		"midiOscEnv before: %\n".postf(midiOscEnv);
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
 		#[lo, hi].do({ |hilo|
 			midiOscEnv[hilo] ?? { midiOscEnv.put(hilo, ()) };
 			midiOscEnv[hilo].oscMapping ?? { midiOscEnv[hilo].oscMapping = \linlin };
 		});
-		"midiOscEnv after: %\n".postf(midiOscEnv);
 
 		if(name.isNil, { thisName = "2D" }, { thisName = name });
 		wdgtInfo = thisName.asString;
@@ -159,15 +157,14 @@ CVWidget2D : CVWidget {
 						})
 					})
 				})
-			})
-		};
-
-		cvcGui ?? {
+			});
 			if(persistent == false or:{ persistent.isNil }, {
 				window.onClose_(window.onClose.addFunc({
 					#[lo, hi].do({ |hilo|
-						midiOscEnv[hilo].oscResponder !? { midiOscEnv[hilo].oscResponder.remove };
-						midiOscEnv[hilo].cc !? { midiOscEnv[hilo].cc.remove };
+						this.oscDisconnect(hilo);
+						this.midiDisconnect(hilo);
+						// midiOscEnv[hilo].oscResponder !? { midiOscEnv[hilo].oscResponder.remove };
+						// midiOscEnv[hilo].cc !? { midiOscEnv[hilo].cc.remove };
 						wdgtControllersAndModels[hilo].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 					})
 				}))

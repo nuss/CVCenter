@@ -547,7 +547,27 @@ CVCenter {
 							newPrefs[\initMidiOnStartUp],
 							"Your CVCenter-preferences have successfully been written to disk."
 						)
-					});
+					})
+				});
+				AbstractCVWidgetEditor.allEditors.pairsDo({ |editor, val|
+					switch(cvWidgets[editor].class,
+						CVWidgetKnob, {
+							val.window.close;
+						},
+						CVWidget2D, {
+							#[lo, hi].do({ |hilo|
+								val[hilo] !? { val[hilo].window.close };
+							})
+						},
+						CVWidgetMS, {
+							cvWidgets[editor].msSize.do({ |sl|
+								val[sl] !? { val[sl].window.close };
+							});
+							cvWidgets[editor].editor.msEditor !? {
+								cvWidgets[editor].editor.msEditor.window.close;
+							}
+						}
+					)
 				})
 			});
 
@@ -668,8 +688,8 @@ CVCenter {
 		});
 		unfocusedColor = labelColor.copy.alpha_(0.3);
 
-		"tabProperties: %\n".postf(tabProperties);
-		"tabProperties[thisTabLabel]: %\n".postf(tabProperties[thisTabLabel]);
+		// "tabProperties: %\n".postf(tabProperties);
+		// "tabProperties[thisTabLabel]: %\n".postf(tabProperties[thisTabLabel]);
 
 		tabProperties[thisTabLabel] ?? {
 			thisTab = tabs.add(thisTabLabel, scroll: true)
@@ -797,7 +817,6 @@ CVCenter {
 		rowheight = widgetheight+1+15; // add a small gap between rows
 
 		if(cvWidgets[key].notNil, {
-			// "cvWidgets[key] not nil".postln;
 			if(cvWidgets[key].midiOscEnv.notNil, {
 				cvcArgs = (midiOscEnv: cvWidgets[key].midiOscEnv);
 			}, {
@@ -812,14 +831,25 @@ CVCenter {
 				all[key].keys.includesAny(#[lo, hi])
 			}} {
 				tmp = (
-					lo: this.setup.calibrate = cvWidgets[key] !? {
-						cvWidgets[key].wdgtControllersAndModels.lo.calibration.model.value
-					},
-					hi: this.setup.calibrate = cvWidgets[key] !? {
-						cvWidgets[key].wdgtControllersAndModels.hi.calibration.model.value
-					},
-					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions !? { cvWidgets[key].wdgtActions }};
-
+					setup: (
+						lo: (
+							midiMode: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMode(\lo) }, { this.midiMode }),
+							midiResolution: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution(\lo) }, { this.midiResolution }),
+							midiMean: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMean(\lo) }, { this.midiMean }),
+							ctrlButtonBank: if(cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank(\lo) }, { this.ctrlButtonBank }),
+							softWithin: if(cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin(\lo) }, { this.softWithin }),
+							calibrate: if(cvWidgets[key].notNil, { cvWidgets[key].getCalibrate(\lo) }, { true })
+						),
+						hi: (
+							midiMode: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMode(\hi) }, { this.midiMode }),
+							midiResolution: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution(\hi) }, { this.midiResolution }),
+							midiMean: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMean(\hi) }, { this.midiMean }),
+							ctrlButtonBank: if(cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank(\hi) }, { this.ctrlButtonBank }),
+							softWithin: if(cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin(\hi) }, { this.softWithin }),
+							calibrate: if(cvWidgets[key].notNil, { cvWidgets[key].getCalibrate(\hi) }, { true })
+						),
+					),
+					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
 					cvWidgets[key] = CVWidget2D(
@@ -827,7 +857,7 @@ CVCenter {
 						[all[key].lo, all[key].hi],
 						key,
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight),
-						setup: tmp,
+						setup: tmp.setup,
 						controllersAndModels: cvWidgets[key] !? {
 							(lo: cvWidgets[key].wdgtControllersAndModels.lo, hi: cvWidgets[key].wdgtControllersAndModels.hi)
 						},
@@ -852,29 +882,28 @@ CVCenter {
 			}
 			{ #[minval, maxval, step, default].select({ |prop| all[key].spec.perform(prop).isArray }).size > 0} {
 				msSize = #[minval, maxval, step, default].collect({ |prop| all[key].spec.perform(prop).size }).maxItem;
-				tmp = (setup: [], wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions });
-				msSize.do({ |sl|
-					tmp.setup = tmp.setup.add(
-						this.setup.calibrate = cvWidgets[key] !? {
-							cvWidgets[key].wdgtControllersAndModels.slots[sl].calibration.model.value;
-						}
-					)
-				});
+				tmp = (
+					setup: msSize.collect({ |sl|
+						(
+							midiMode: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMode(sl) }, { this.midiMode }),
+							midiResolution: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution(sl) }, { this.midiResolution }),
+							midiMean: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMean(sl) }, { this.midiMean }),
+							ctrlButtonBank: if(cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank(sl) }, {this.ctrlButtonBank }),
+							softWithin: if(cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin(sl) }, { this.softWithin }),
+							calibrate: if(cvWidgets[key].notNil, { cvWidgets[key].getCalibrate(sl) }, { true })
+						)
+					}),
+					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
+				);
+
 				if(msSize <= numMsSlotsPerColumn, { widgetwidth = 106 }, {
 					widgetwidth = (52*(msSize/numMsSlotsPerColumn).ceil)+1
 				});
 
-				cvWidgets[key] !? {
-					cvWidgets[key].wdgtControllersAndModels.pairsDo({ |k, v|
-						if(k == \slots, {
-							v.pairsDo({ |kk, vv| [kk, vv].postcs })
-						}, {
-							[k, v].postcs
-						})
-					})
-				};
-
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
+					cvWidgets[key] !? {
+						"editors for key '%': %\n".postf(key, cvWidgets[key].editor)
+					};
 					cvWidgets[key] = CVWidgetMS(
 						thisTab,
 						all[key],
@@ -902,10 +931,6 @@ CVCenter {
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
 			{
-				// cvWidgets[key] !? { "cvWidgets[%].wdgtActions: %\n".postf(key, cvWidgets[key].wdgtActions) };
-				// tmp = this.setup.calibrate = cvWidgets[key] !? {
-				// 	cvWidgets[key].wdgtControllersAndModels.calibration.model.value
-				// };
 				tmp = (
 					setup: (
 						midiMode: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMode }, { this.midiMode }),
@@ -918,6 +943,9 @@ CVCenter {
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
+					cvWidgets[key] !? {
+						"editors for key '%': %\n".postf(key, cvWidgets[key].editor)
+					};
 					cvWidgets[key] = CVWidgetKnob(
 						thisTab,
 						all[key],
@@ -945,22 +973,15 @@ CVCenter {
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
 		;
-		// "after: cvWidgets[%].midiOscEnv: %\n".postf(key, cvWidgets[key].midiOscEnv);
 
 		switch(cvWidgets[key].class,
 			CVWidgetKnob, {
-				cvWidgets[key].wdgtControllersAndModels.oscConnection.model.value_(
-					cvWidgets[key].wdgtControllersAndModels.oscConnection.model.value
+				cvWidgets[key].wdgtControllersAndModels.midiDisplay.model.value_(
+					cvWidgets[key].wdgtControllersAndModels.midiDisplay.model.value
 				).changedKeys(cvWidgets[key].synchKeys);
-				cvWidgets[key].wdgtControllersAndModels.midiConnection.model.value_(
-					cvWidgets[key].wdgtControllersAndModels.midiConnection.model.value
+				cvWidgets[key].wdgtControllersAndModels.oscDisplay.model.value_(
+					cvWidgets[key].wdgtControllersAndModels.oscDisplay.model.value
 				).changedKeys(cvWidgets[key].synchKeys);
-				// cvWidgets[key].wdgtControllersAndModels.midiDisplay.model.value_(
-				// 	cvWidgets[key].wdgtControllersAndModels.midiDisplay.model.value
-				// ).changedKeys(cvWidgets[key].synchKeys);
-				// cvWidgets[key].wdgtControllersAndModels.oscDisplay.model.value_(
-				// 	cvWidgets[key].wdgtControllersAndModels.oscDisplay.model.value
-				// ).changedKeys(cvWidgets[key].synchKeys);
 				cvWidgets[key].wdgtControllersAndModels.actions.model.value_((
 					numActions: cvWidgets[key].wdgtActions.size,
 					activeActions: cvWidgets[key].wdgtActions.select({ |v| v.asArray[0][1] == true }).size
@@ -968,18 +989,12 @@ CVCenter {
 			},
 			CVWidget2D, {
 				#[lo, hi].do({ |hilo|
-					// "%[%]: %\n".postf(key, hilo, cvWidgets[key].wdgtControllersAndModels[hilo].midiDisplay.model);
-					// "%[%]: %\n".postf(key, hilo, cvWidgets[key].wdgtControllersAndModels[hilo].oscDisplay.model);
-					// "%[%]: %\n".postf(key, hilo, cvWidgets[key].wdgtControllersAndModels[hilo].actions.model);
-
 					cvWidgets[key].wdgtControllersAndModels[hilo].midiDisplay.model.value_(
 						cvWidgets[key].wdgtControllersAndModels[hilo].midiDisplay.model.value
 					).changedKeys(cvWidgets[key].synchKeys);
-					// "before syncing oscDisplay: %[%], midiOscEnv: %\n".postf(key, hilo, cvWidgets[key].midiOscEnv);
 					cvWidgets[key].wdgtControllersAndModels[hilo].oscDisplay.model.value_(
 						cvWidgets[key].wdgtControllersAndModels[hilo].oscDisplay.model.value
 					).changedKeys(cvWidgets[key].synchKeys);
-					// "after syncing oscDisplay: %[%], midiOscEnv: %\n".postf(key, hilo, cvWidgets[key].midiOscEnv);
 					cvWidgets[key].wdgtControllersAndModels[hilo].actions.model.value_((
 						numActions: cvWidgets[key].wdgtActions[hilo].size,
 						activeActions: cvWidgets[key].wdgtActions[hilo].select({ |v| v.asArray[0][1] == true }).size
@@ -1002,7 +1017,6 @@ CVCenter {
 			}
 		);
 
-		// cvWidgets[key].widgetBg.background_(tabProperties[thisTabLabel].tabColor);
 		colwidth = widgetwidth+1; // add a small gap between widgets
 		rowwidth = thisTab.bounds.width-15;
 		if(thisNextPos.x+colwidth >= (rowwidth-colwidth-15), {
@@ -1026,7 +1040,7 @@ CVCenter {
 				tabs.focus(cvTabIndex)
 			}*/);
 		};
-		// window.front;
+		window.front;
 	}
 
 	*put { |...args|
