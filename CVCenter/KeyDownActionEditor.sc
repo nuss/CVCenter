@@ -2,7 +2,7 @@ KeyDownActions {
 
 	// classvar <allEditors;
 	// classvar <viewActions;
-	classvar <keyCodes, <modifiersQt, <modifiersCocoa, <arrowsModifiersQt, <arrowsModifiersCocoa;
+	classvar <>keyCodes, <>modifiersQt, <>modifiersCocoa, <>arrowsModifiersQt, <>arrowsModifiersCocoa;
 	// var <window, <>actions;
 
 	*initClass {
@@ -13,7 +13,7 @@ KeyDownActions {
 
 		Platform.case(
 			\linux, {
-				keyCodes = IdentityDictionary[
+				this.keyCodes = IdentityDictionary[
 					$1 ->				10,
 					$2 ->				11,
 					$3 ->				12,
@@ -71,7 +71,7 @@ KeyDownActions {
 
 				// arrowsModifiers = IdentityDictionary[];
 
-				modifiersQt = modifiersCocoa = arrowsModifiersQt = IdentityDictionary[
+				this.modifiersQt = this.modifiersCocoa = this.arrowsModifiersQt = IdentityDictionary[
 					\none ->			0,
 					\shift ->			131072,
 					\alt ->				524288,
@@ -80,7 +80,7 @@ KeyDownActions {
 			},
 
 			\osx, {
-				keyCodes = IdentityDictionary[
+				this.keyCodes = IdentityDictionary[
 					$1 -> 				18,
 					$2 -> 				19,
 					$3 -> 				20,
@@ -135,28 +135,28 @@ KeyDownActions {
 					'arrow right' -> 	124,
 				];
 
-				arrowsModifiersCocoa = IdentityDictionary[
+				this.arrowsModifiersCocoa = IdentityDictionary[
 					'none' ->			10486016,
 					'alt' ->			11010336,
 					'shift' ->			10617090,
 					'alt + shift' ->	11141410
 				];
 
-				modifiersCocoa = IdentityDictionary[
+				this.modifiersCocoa = IdentityDictionary[
 					\none ->			0,
 					\alt ->				524576,
 					\shift ->			131330,
 					'alt + shift' ->	655650,
 				];
 
-				arrowsModifiersQt = IdentityDictionary[
+				this.arrowsModifiersQt = IdentityDictionary[
 					\none ->			2097152,
 					'alt' ->			2621440,
 					'shift' ->			2228224,
 					'alt + shift' ->	2752512
 				];
 
-				modifiersQt = IdentityDictionary[
+				this.modifiersQt = IdentityDictionary[
 					\none ->			0,
 					\shift ->			131072,
 					\alt ->				524288,
@@ -165,7 +165,7 @@ KeyDownActions {
 			},
 
 			\windows, {
-				keyCodes = IdentityDictionary[
+				this.keyCodes = IdentityDictionary[
 					$1 -> 				49,
 					$2 -> 				50,
 					$3 -> 				51,
@@ -221,7 +221,7 @@ KeyDownActions {
 					'arrow right' -> 	39,
 				];
 
-				modifiersQt = modifiersCocoa = arrowsModifiersQt = IdentityDictionary[
+				this.modifiersQt = this.modifiersCocoa = this.arrowsModifiersQt = IdentityDictionary[
 					\none ->			0,
 					\shift -> 			131072,
 					\alt -> 			524288,
@@ -230,9 +230,11 @@ KeyDownActions {
 			},
 			{
 				// dummies for unknown platforms
-				keyCodes = IdentityDictionary.new;
-				modifiersQt = IdentityDictionary.new;
-				arrowsModifiersQt = IdentityDictionary.new;
+				this.keyCodes = IdentityDictionary.new;
+				this.modifiersQt = IdentityDictionary.new;
+				this.arrowsModifiersQt = IdentityDictionary.new;
+				this.modifiersCocoa = IdentityDictionary.new;
+				this.arrowsModifiersCocoa = IdentityDictionary.new;
 			}
 		)
 	}
@@ -345,19 +347,19 @@ KeyDownActionsEditor : KeyDownActions {
 
 			shortcutTexts = shortcutTexts.add(
 				shortcutText = StaticText(editArea, 40@15)
-					.string_("shortcut:")
-					.font_(staticTextFont)
-					.stringColor_(staticTextColor)
-					.canFocus_(false)
+				.string_("shortcut:")
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.canFocus_(false)
 				;
 			);
 
 			shortcutFields = shortcutFields.add(
 				shortcutField = StaticText(editArea, tmpEditFlow.indentedRemaining.width-125@15)
-					.background_(Color.white)
-					.font_(shortCutFont)
-					.stringColor_(staticTextColor)
-					.canFocus_(false)
+				.background_(Color.white)
+				.font_(shortCutFont)
+				.stringColor_(staticTextColor)
+				.canFocus_(false)
 				;
 			);
 
@@ -384,8 +386,8 @@ KeyDownActionsEditor : KeyDownActions {
 								editBut.value_(1);
 								cachedScrollViewSC = ScrollView.globalKeyDownAction;
 								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
-//									[view, char, mod, unicode, keycode, key].postcs;
-//									GUI.id.postln;
+									// [view, char, mod, unicode, keycode, key].postcs;
+									// GUI.id.postln;
 									if(keyCodes.findKeyForEqualValue(keycode).notNil, {
 										char !? {
 											if(thisModifiers.includes(mod) and:{
@@ -473,7 +475,7 @@ KeyDownActionsEditor : KeyDownActions {
 		order = shortcutsDict.order;
 
 		order.do({ |shortcut, i|
-			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", "    "))
+			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "))
 		});
 
 		butArea.decorator = butFlow = FlowLayout(butArea.bounds, 7@4, 3@0);
@@ -494,6 +496,114 @@ KeyDownActionsEditor : KeyDownActions {
 				makeEditArea.(funcString: "{ /*do something */ }");
 			})
 		;
+		parent ?? { window.front };
+		all.add(this);
+	}
+}
+
+KeyCodesEditor : KeyDownActions {
+
+	classvar all;
+	var <window, <keyCodesArea, <modsQtArea, <modsCocoaArea, <arrModsQtArea, <arrModsCocoaArea;
+
+	*initClass {
+		all = List.new;
+	}
+
+	*new { |parent, bounds, closeOnSave=false|
+		^super.new.init(parent, bounds, closeOnSave);
+	}
+
+	init { |parent, bounds, closeOnSave|
+		var platform, scrollArea, scrollView, flow;
+		var editAreasBg, staticTextColor, staticTextFont, shortCutFont, textFieldFont;
+		var makeEditArea, editArea;
+
+		editAreasBg = Color(0.8, 0.8, 0.8);
+		staticTextColor = Color(0.1, 0.1, 0.1);
+		staticTextFont = Font("Arial", 10);
+		shortCutFont = Font("Arial", 12, true);
+		textFieldFont = Font("Andale Mono", 10);
+
+		Platform.case(
+			\osx, { platform = "OSX" },
+			\linux, { platform = "Linux" },
+			\windows, { platform = "Windows" },
+			{ platform = "an unknown platform" }
+		);
+
+		switch(GUI.id,
+			\cocoa, { platform = platform+"[Cocoa]" },
+			\qt, { platform = platform+"[Qt]" },
+			\swing, { platform = platform+"[SwingOSC]" }
+		);
+
+		if(parent.isNil) {
+			window = Window("key-codes and modifiers for"+platform, bounds ?? { Rect(
+				Window.screenBounds.width-600/2,
+				Window.screenBounds.height-600/2,
+				600, 600
+			) });
+		} { window = parent };
+
+		window.onClose_({ all.remove(this) });
+
+		scrollArea = ScrollView(window.view, Point(
+			window.view.bounds.width, window.view.bounds.height
+		)).hasHorizontalScroller_(false).hasVerticalScroller_(true).background_(editAreasBg).hasBorder_(false);
+
+		scrollView = CompositeView(scrollArea, Point(
+			scrollArea.bounds.width, scrollArea.bounds.height
+		));
+
+		scrollView.decorator = flow = FlowLayout(scrollView.bounds, 8@8, 0@0);
+
+		makeEditArea = { |dictName, dict, height|
+			var editArea, name, key;
+
+			name = StaticText(scrollView, Point(
+				flow.indentedRemaining.width, 17
+			)).font_(shortCutFont).stringColor_(staticTextColor).string_(dictName);
+
+			flow.nextLine;
+
+			editArea = TextView(scrollView, Point(
+				flow.indentedRemaining.width-15, height
+			)).font_(textFieldFont).syntaxColorize.hasVerticalScroller_(true);
+
+			editArea.string = "";
+			editArea.string = dictName+"= IdentityDictionary[\n";
+			dict.pairsDo({ |k, v|
+				switch(k.class,
+					Symbol, { key = "'"++k++"'" },
+					Char, { key = "$"++k }
+				);
+				editArea.string_(editArea.string++"    "++key+"->"+v++",\n");
+			});
+			editArea.string_(editArea.string++"];");
+
+			flow.nextLine.shift(0, 5);
+			name.bounds.height+editArea.bounds.height+16;
+		};
+
+		editArea = makeEditArea.("KeyDownActions.keyCodes", keyCodes, 300);
+		scrollView.bounds = Rect(0, 0, scrollView.bounds.width, editArea);
+		if(GUI.id !== \cocoa) {
+			editArea = makeEditArea.("KeyDownActions.modifiersQt", modifiersQt, 100);
+			scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
+			if(arrowsModifiersQt !== modifiersQt) {
+				editArea = makeEditArea.("KeyDownActions.arrowsModifiersQt", arrowsModifiersQt, 100);
+				scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
+			}
+		} {
+			editArea = makeEditArea.("KeyDownActions.modifiersCocoa", modifiersCocoa, 100);
+			scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
+			if(arrowsModifiersCocoa !== modifiersCocoa) {
+				editArea = makeEditArea.("KeyDownActions.arrowsModifiersCocoa", arrowsModifiersCocoa, 100);
+				scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
+			}
+		};
+
 		parent ?? { window.front };
 		all.add(this);
 	}

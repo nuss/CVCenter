@@ -29,7 +29,7 @@ CVCenterPreferences {
 		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		// shortcut-tabs
 		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab, cvKeyCodesEditorTab;
-		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor;
+		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor, cvCenterKeyCodesEditor;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
 		var saveClassVars, removeResponders;
 		var initMidiOnStartUp, initMidiText;
@@ -439,6 +439,10 @@ CVCenterPreferences {
 			// CVWidgets should go here but...
 			cvWidgetEditorEditor = KeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false
+			);
+
+			cvCenterKeyCodesEditor = KeyCodesEditor(
+				cvKeyCodesEditorTab, nil, false
 			);
 
 			Button(saveCancel, saveCancelFlow.bounds.width/2-10@23)

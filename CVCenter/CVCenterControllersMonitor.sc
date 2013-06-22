@@ -19,7 +19,7 @@ CVCenterControllersMonitor {
 	classvar <window, <tabs;
 
 	*initClass {
-		Class.initClassTree(CVCenterKeyDownActions);
+		Class.initClassTree(KeyDownActions);
 	}
 
 	*new { |focus|
