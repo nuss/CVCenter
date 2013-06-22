@@ -75,12 +75,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		switch(GUI.id,
 			\cocoa, {
-				modsDict = CVCenterKeyDownActions.modifiersCocoa;
-				arrModsDict = CVCenterKeyDownActions.arrowsModifiersCocoa;
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
 			},
 			\qt, {
-				modsDict = CVCenterKeyDownActions.modifiersQt;
-				arrModsDict = CVCenterKeyDownActions.arrowsModifiersQt;
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
 			}
 		);
 

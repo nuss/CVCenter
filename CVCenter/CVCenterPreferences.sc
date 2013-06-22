@@ -433,11 +433,11 @@ CVCenterPreferences {
 			// cvWidgetTab = scTabs.add("CVWidget", scroll: false);
 			cvWidgetEditorTab = scTabs.add("CVWidget(MS)Editor", scroll: false);
 
-			cvCenterEditor = CVCenterKeyDownActionsEditor(
+			cvCenterEditor = KeyDownActionsEditor(
 				cvCenterTab, nil, cvCenterTab.bounds, CVCenter.shortcuts, false
 			);
 			// CVWidgets should go here but...
-			cvWidgetEditorEditor = CVCenterKeyDownActionsEditor(
+			cvWidgetEditorEditor = KeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false
 			);
 
