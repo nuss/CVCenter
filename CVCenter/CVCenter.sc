@@ -36,7 +36,7 @@ CVCenter {
 
 		Class.initClassTree(CVCenterPreferences);
 		Class.initClassTree(CVWidget);
-		Class.initClassTree(CVCenterKeyDownActions);
+		Class.initClassTree(KeyDownActions);
 		prefs = CVCenterPreferences.readPreferences;
 
 		prefs !? {
@@ -110,7 +110,7 @@ CVCenter {
 			)}";
 			this.shortcuts.put(
 				'arrow right',
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes['arrow right'])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow right'])
 			);
 			scFunc =
 			"// previous tab
@@ -119,28 +119,28 @@ CVCenter {
 			)}";
 			this.shortcuts.put(
 				'arrow left',
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes['arrow left'])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow left'])
 			);
 			scFunc =
 			"// OSCCommands gui
 			{ OSCCommands.makeWindow }";
 			this.shortcuts.put(
 				\c,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$c])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])
 			);
 			scFunc =
 			"// CVCenterControllersMonitor OSC
 			{ CVCenterControllersMonitor(1) }";
 			this.shortcuts.put(
 				\o,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$o])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$o])
 			);
 			scFunc =
 			"// CVCenterControllersMonitor MIDI
 			{ CVCenterControllersMonitor(0) }";
 			this.shortcuts.put(
 				\m,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$m])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$m])
 			);
 			scFunc =
 			"// close CVCenterControllersMonitor
@@ -149,7 +149,7 @@ CVCenter {
 			) { CVCenterControllersMonitor.window.close }}";
 			this.shortcuts.put(
 				\esc,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[\esc])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[\esc])
 			);
 			scFunc =
 			"// History GUI: start History and open History window
@@ -167,7 +167,7 @@ CVCenter {
 			}) { CVCenter.scv.historyWin.front }}";
 			this.shortcuts.put(
 				\h,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$h])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$h])
 			);
 			scFunc =
 			"// NdefMixer
@@ -182,28 +182,28 @@ CVCenter {
 			}}";
 			this.shortcuts.put(
 				\n,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$n])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$n])
 			);
 			scFunc =
 			"// save setup
 			{ CVCenter.saveSetup }";
 			this.shortcuts.put(
 				\s,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$s])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$s])
 			);
 			scFunc =
 			"// load setup
 			{ CVCenterLoadDialog.new }";
 			this.shortcuts.put(
 				\l,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$l])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$l])
 			);
 			scFunc =
 			"// open the preferences dialog
 			{ CVCenterPreferences.dialog }";
 			this.shortcuts.put(
 				\p,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$p])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$p])
 			);
 			scFunc =
 			"// PdefAllGui
@@ -220,9 +220,9 @@ CVCenter {
 				'alt + p',
 				(
 					func: scFunc,
-					keyCode: CVCenterKeyDownActions.keyCodes[$p],
-					modifierQt: CVCenterKeyDownActions.modifiersQt[\alt],
-					modifierCocoa: CVCenterKeyDownActions.modifiersCocoa[\alt]
+					keyCode: KeyDownActions.keyCodes[$p],
+					modifierQt: KeyDownActions.modifiersQt[\alt],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
 				)
 			);
 			scFunc =
@@ -240,9 +240,9 @@ CVCenter {
 				'shift + p',
 				(
 					func: scFunc,
-					keyCode: CVCenterKeyDownActions.keyCodes[$p],
-					modifierQt: CVCenterKeyDownActions.modifiersQt[\shift],
-					modifierCocoa: CVCenterKeyDownActions.modifiersCocoa[\shift]
+					keyCode: KeyDownActions.keyCodes[$p],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
 				)
 			);
 			scFunc =
@@ -258,7 +258,7 @@ CVCenter {
 			}}";
 			this.shortcuts.put(
 				\t,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$t])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$t])
 			);
 			scFunc =
 			"// AllGui
@@ -273,7 +273,7 @@ CVCenter {
 			}}";
 			this.shortcuts.put(
 				\a,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$a])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$a])
 			);
 			scFunc =
 			"// MasterEQ
@@ -290,7 +290,7 @@ CVCenter {
 			}}";
 			this.shortcuts.put(
 				\e,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$e])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$e])
 			);
 			(0..9).do({ |i|
 				scFunc =
@@ -298,7 +298,7 @@ CVCenter {
 				{ CVCenter.tabs.tabViews["++i++"] !? { CVCenter.tabs.focus("++i++") }}";
 				this.shortcuts.put(
 					i.asSymbol,
-					(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[i.asString[0]])
+					(func: scFunc, keyCode: KeyDownActions.keyCodes[i.asString[0]])
 				);
 			});
 			scFunc =
@@ -314,9 +314,9 @@ CVCenter {
 				'shift + h',
 				(
 					func: scFunc,
-					keyCode: CVCenterKeyDownActions.keyCodes[$h],
-					modifierQt: CVCenterKeyDownActions.modifiersQt[\shift],
-					modifierCocoa: CVCenterKeyDownActions.modifiersCocoa[\shift]
+					keyCode: KeyDownActions.keyCodes[$h],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
 				)
 			);
 			scFunc =
@@ -324,7 +324,7 @@ CVCenter {
 			{ CVCenter.tabs.activeTab.detachTab }";
 			this.shortcuts.put(
 				\d,
-				(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$d])
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$d])
 			);
 		});
 	}
@@ -408,12 +408,12 @@ CVCenter {
 
 			switch(GUI.id,
 				\cocoa, {
-					modsDict = CVCenterKeyDownActions.modifiersCocoa;
-					arrModsDict = CVCenterKeyDownActions.arrowsModifiersCocoa;
+					modsDict = KeyDownActions.modifiersCocoa;
+					arrModsDict = KeyDownActions.arrowsModifiersCocoa;
 				},
 				\qt, {
-					modsDict = CVCenterKeyDownActions.modifiersQt;
-					arrModsDict = CVCenterKeyDownActions.arrowsModifiersQt;
+					modsDict = KeyDownActions.modifiersQt;
+					arrModsDict = KeyDownActions.arrowsModifiersQt;
 				}
 			);
 
@@ -673,12 +673,12 @@ CVCenter {
 
 		switch(GUI.id,
 			\cocoa, {
-				modsDict = CVCenterKeyDownActions.modifiersCocoa;
-				arrModsDict = CVCenterKeyDownActions.arrowsModifiersCocoa;
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
 			},
 			\qt, {
-				modsDict = CVCenterKeyDownActions.modifiersQt;
-				arrModsDict = CVCenterKeyDownActions.arrowsModifiersQt;
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
 			}
 		);
 

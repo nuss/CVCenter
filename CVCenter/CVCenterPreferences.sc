@@ -28,7 +28,7 @@ CVCenterPreferences {
 		var guiView, guiFlow, midiView, midiFlow, responderView, responderFlow;
 		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		// shortcut-tabs
-		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab;
+		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab, cvKeyCodesEditorTab;
 		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
 		var saveClassVars, removeResponders;
@@ -117,6 +117,7 @@ CVCenterPreferences {
 
 			prefsTab = tabs.add("Common Preferences", scroll: false).background_(tabsBg);
 			scTab = tabs.add("Shortcuts", scroll: false).background_(tabsBg);
+			cvKeyCodesEditorTab = tabs.add("KeyCodes", scroll: false);
 
 			prefsTab.decorator = flow1 = FlowLayout(prefsTab.bounds, 7@7, 0@1);
 
@@ -429,13 +430,13 @@ CVCenterPreferences {
 			;
 
 			cvCenterTab = scTabs.add("CVCenter", scroll: false);
-			cvWidgetTab = scTabs.add("CVWidget", scroll: false);
+			// cvWidgetTab = scTabs.add("CVWidget", scroll: false);
 			cvWidgetEditorTab = scTabs.add("CVWidget(MS)Editor", scroll: false);
 
 			cvCenterEditor = CVCenterKeyDownActionsEditor(
 				cvCenterTab, nil, cvCenterTab.bounds, CVCenter.shortcuts, false
 			);
-			// CVWidgets go here
+			// CVWidgets should go here but...
 			cvWidgetEditorEditor = CVCenterKeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false
 			);

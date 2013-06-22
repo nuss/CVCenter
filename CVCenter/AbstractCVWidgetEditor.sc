@@ -35,7 +35,7 @@ AbstractCVWidgetEditor {
 	*initClass {
 		var localOscFunc, scFunc;
 
-		Class.initClassTree(CVCenterKeyDownActions);
+		Class.initClassTree(KeyDownActions);
 		// Class.initClassTree(CVCenterPreferences);
 
 		allEditors = IdentityDictionary.new;
@@ -70,7 +70,7 @@ AbstractCVWidgetEditor {
 		}";
 		this.shortcuts.put(
 			\s,
-			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$s])
+			(func: scFunc, keyCode: KeyDownActions.keyCodes[$s])
 		);
 		scFunc =
 		"// focus 'midi' tab
@@ -111,7 +111,7 @@ AbstractCVWidgetEditor {
 		}";
 		this.shortcuts.put(
 			\m,
-			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$m])
+			(func: scFunc, keyCode: KeyDownActions.keyCodes[$m])
 		);
 		scFunc =
 		"// focus 'osc' tab
@@ -152,7 +152,7 @@ AbstractCVWidgetEditor {
 		}";
 		this.shortcuts.put(
 			\o,
-			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$o])
+			(func: scFunc, keyCode: KeyDownActions.keyCodes[$o])
 		);
 		scFunc =
 		"// focus 'actions' tab
@@ -183,7 +183,7 @@ AbstractCVWidgetEditor {
 		}";
 		this.shortcuts.put(
 			\a,
-			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$a])
+			(func: scFunc, keyCode: KeyDownActions.keyCodes[$a])
 		);
 		scFunc =
 		"// close the editor
@@ -224,14 +224,14 @@ AbstractCVWidgetEditor {
 		}";
 		this.shortcuts.put(
 			\esc,
-			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[\esc])
+			(func: scFunc, keyCode: KeyDownActions.keyCodes[\esc])
 		);
 		scFunc =
 		"// collect OSC-commands resp. open the collector's GUI
 		{ OSCCommands.makeWindow }";
 		this.shortcuts.put(
 			\c,
-			(func: scFunc, keyCode: CVCenterKeyDownActions.keyCodes[$c])
+			(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])
 		);
 	}
 
