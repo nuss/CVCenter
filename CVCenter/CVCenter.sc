@@ -402,9 +402,9 @@ CVCenter {
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
 			window.view.decorator = flow;
-			flow.margin_(4@0);
-			flow.gap_(0@4);
-			flow.shift(0, 0);
+			flow.margin_(Point(4, 0));
+			flow.gap_(Point(0, 4));
+			flow.shift;
 
 			switch(GUI.id,
 				\cocoa, {
@@ -571,7 +571,7 @@ CVCenter {
 				})
 			});
 
-			if(widgetStates.size > 0, {
+			if(cvWidgets.collect({ |w| w.notNil and:{ w.isClosed.not } }).size > 0, {
 				allTabs = widgetStates.collectAs(_.tabKey, Array);
 			}, {
 				allTabs = [];
@@ -581,8 +581,7 @@ CVCenter {
 			});
 
 			allTabs.do({ |label|
-				// "label passed to prAddTab: %\n".postf(label);
-				this.prAddTab(label)
+				this.prAddTab(thisTabLabel = label)
 			});
 
 			all.pairsDo({ |key, cv|
@@ -590,7 +589,9 @@ CVCenter {
 				if((cvWidgets[key].notNil and:{ cvWidgets[key].isClosed }).or(
 					cvWidgets[key].isNil
 				), {
-					widgetStates[key] !? { thisTabLabel = widgetStates[key].tabKey };
+					widgetStates[key] !? {
+						widgetStates[key].tabKey !? { thisTabLabel = widgetStates[key].tabKey }
+					};
 					if(all[key].class == Event, {
 						#[lo, hi].do({ |slot|
 							this.prAddWidget(
@@ -901,9 +902,6 @@ CVCenter {
 				});
 
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
-					cvWidgets[key] !? {
-						"editors for key '%': %\n".postf(key, cvWidgets[key].editor)
-					};
 					cvWidgets[key] = CVWidgetMS(
 						thisTab,
 						all[key],
@@ -943,9 +941,6 @@ CVCenter {
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
-					cvWidgets[key] !? {
-						"editors for key '%': %\n".postf(key, cvWidgets[key].editor)
-					};
 					cvWidgets[key] = CVWidgetKnob(
 						thisTab,
 						all[key],
@@ -1268,12 +1263,14 @@ CVCenter {
 			if(cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
 				// "cvWidgets[%].notNil and:{ cvWidgets[%].isClosed.not }\n".postf(thisKey, thisKey);
 				if(widgetStates[thisKey][\hi][\made] == true, {
+					"thisVal[\hi]: %\n".postf(thisVal);
 					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
-					this.at(thisKey)[thisSlot].value = thisVal;
+					this.at(thisKey)[thisSlot].value_(thisVal);
 				});
 				if(widgetStates[thisKey][\lo][\made] == true, {
+					"thisVal[\lo]: %\n".postf(thisVal);
 					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
-					this.at(thisKey)[thisSlot].value = thisVal;
+					this.at(thisKey)[thisSlot].value_(thisVal);
 				});
 				widgetStates[thisKey][thisSlot][\made] = true;
 				^all[thisKey][thisSlot];
