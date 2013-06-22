@@ -594,11 +594,13 @@ CVCenter {
 					};
 					if(all[key].class == Event, {
 						#[lo, hi].do({ |slot|
+							tmp = all[key][slot].value;
 							this.prAddWidget(
 								thisTabLabel,
 								(key: key, slot: slot, spec: all[key][slot].spec),
 								key
-							)
+							);
+							this.at(key)[slot].value_(tmp);
 						})
 					}, {
 						this.prAddWidget(thisTabLabel, key: key)
@@ -1258,32 +1260,25 @@ CVCenter {
 			thisVal = thisVal.asArray;
 		});
 
-		// cvWidgets[thisKey] !? { "cvWidgets[%].isClosed: %\n".postf(thisKey, cvWidgets[thisKey].isClosed) };
 		if(thisSlot.notNil and:{ (thisSlot === \lo).or(thisSlot === \hi) }, {
 			if(cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
-				// "cvWidgets[%].notNil and:{ cvWidgets[%].isClosed.not }\n".postf(thisKey, thisKey);
 				if(widgetStates[thisKey][\hi][\made] == true, {
-					"thisVal[\hi]: %\n".postf(thisVal);
 					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
 					this.at(thisKey)[thisSlot].value_(thisVal);
 				});
 				if(widgetStates[thisKey][\lo][\made] == true, {
-					"thisVal[\lo]: %\n".postf(thisVal);
 					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
 					this.at(thisKey)[thisSlot].value_(thisVal);
 				});
 				widgetStates[thisKey][thisSlot][\made] = true;
 				^all[thisKey][thisSlot];
 			}, {
-				// "cvWidgets[%].isNil or:{ cvWidgets[%].isClosed }\n".postf(thisKey, thisKey);
 				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
-				all[thisKey][thisSlot].spec_(thisSpec, thisVal);
+				all[thisKey][thisSlot].spec_(thisSpec);
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				widgetStates[thisKey][thisSlot].made = true;
 			})
 		}, { all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) }});
-
-		// thisSlot !? { "widgetStates[%][%]: %\n".postf(thisKey, thisSlot, widgetStates[thisKey][thisSlot]) };
 
 		if(window.isNil or:{ window.isClosed }, {
 			// "makeWindow: %, key: %\n".postf(thisTab, thisKey);
@@ -1886,7 +1881,7 @@ CVCenter {
 		var index;
 		index = tabProperties[key].index;
 		if(tabs.views.size > 1, {
-			if(window.isClosed.not, { /*"removing tab at index %\n".postf(index); */tabs.removeAt(index) });
+			if(window.isClosed.not, { tabs.removeAt(index) });
 			tabProperties.do({ |prop|
 				if(prop.index > index, { prop.index = prop.index-1 })
 			});
