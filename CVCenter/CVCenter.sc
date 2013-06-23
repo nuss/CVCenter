@@ -1350,7 +1350,7 @@ CVCenter {
 
 	*isClosed {
 		if(this.childViews.size == 0 and:{
-			(this.window.isNil).or(this.window.notNil and:{ this.window.isClosed })
+			this.window.isNil.or(this.window.notNil and:{ this.window.isClosed })
 		}, { ^true });
 		^false;
 	}
