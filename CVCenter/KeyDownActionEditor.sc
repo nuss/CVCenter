@@ -71,12 +71,15 @@ KeyDownActions {
 
 				// arrowsModifiers = IdentityDictionary[];
 
-				this.modifiersQt = this.modifiersCocoa = this.arrowsModifiersQt = IdentityDictionary[
+				this.modifiersQt = IdentityDictionary[
 					\none ->			0,
 					\shift ->			131072,
 					\alt ->				524288,
 					'alt + shift' ->	655360,
 				];
+
+				this.modifiersCocoa = this.modifiersQt;
+				this.arrowsModifiersQt = this.modifiersQt;
 			},
 
 			\osx, {
@@ -221,12 +224,15 @@ KeyDownActions {
 					'arrow right' -> 	39,
 				];
 
-				this.modifiersQt = this.modifiersCocoa = this.arrowsModifiersQt = IdentityDictionary[
+				this.modifiersQt = IdentityDictionary[
 					\none ->			0,
 					\shift -> 			131072,
 					\alt -> 			524288,
 					'alt + shift' -> 	655360,
-				]
+				];
+
+				this.modifiersCocoa = this.modifiersQt;
+				this.arrowsModifiersQt = this.modifiersQt;
 			},
 			{
 				// dummies for unknown platforms
