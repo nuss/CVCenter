@@ -577,7 +577,7 @@ KeyCodesEditor : KeyDownActions {
 				flow.indentedRemaining.width-15, height
 			)).font_(textFieldFont).syntaxColorize.hasVerticalScroller_(true);
 
-			editArea.string = "IdentityDictionary[\n");
+			editArea.string = "IdentityDictionary[\n";
 			dict.pairsDo({ |k, v|
 				switch(k.class,
 					Symbol, { key = "'"++k++"'" },
