@@ -217,12 +217,12 @@ CVCenter {
 				CVCenter.scv.pDefWin.front
 			}}";
 			this.shortcuts.put(
-				'alt + p',
+				'shift + p',
 				(
 					func: scFunc,
 					keyCode: KeyDownActions.keyCodes[$p],
-					modifierQt: KeyDownActions.modifiersQt[\alt],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
 				)
 			);
 			scFunc =
@@ -237,12 +237,12 @@ CVCenter {
 				CVCenter.scv.pDefnWin.front
 			}}";
 			this.shortcuts.put(
-				'shift + p',
+				'alt + p',
 				(
 					func: scFunc,
 					keyCode: KeyDownActions.keyCodes[$p],
-					modifierQt: KeyDownActions.modifiersQt[\shift],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
+					modifierQt: KeyDownActions.modifiersQt[\alt],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
 				)
 			);
 			scFunc =
@@ -1346,6 +1346,13 @@ CVCenter {
 		this.guiwidth_(rect.width);
 		this.guiheight_(rect.height);
 		window.bounds_(rect);
+	}
+
+	*isClosed {
+		if(this.childViews.size == 0 and:{
+			(this.window.isNil).or(this.window.notNil and:{ this.window.isClosed })
+		}, { ^true });
+		^false;
 	}
 
 	*renameTab { |oldName, newName|

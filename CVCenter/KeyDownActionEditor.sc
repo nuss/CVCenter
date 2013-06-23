@@ -595,19 +595,19 @@ KeyCodesEditor : KeyDownActions {
 		scrollView.bounds = Rect(0, 0, scrollView.bounds.width, editArea);
 
 		if(GUI.id !== \cocoa) {
-			editArea = makeEditArea.("KeyDownActions.modifiersQt", modifiersQt, 200);
+			editArea = makeEditArea.("KeyDownActions.modifiersQt", modifiersQt, 100);
 			scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
 
 			if(arrowsModifiersQt !== modifiersQt) {
-				editArea = makeEditArea.("KeyDownActions.arrowsModifiersQt", arrowsModifiersQt, 200);
+				editArea = makeEditArea.("KeyDownActions.arrowsModifiersQt", arrowsModifiersQt, 100);
 				scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
 			}
 		} {
-			editArea = makeEditArea.("KeyDownActions.modifiersCocoa", modifiersCocoa, 200);
+			editArea = makeEditArea.("KeyDownActions.modifiersCocoa", modifiersCocoa, 100);
 			scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
 
 			if(arrowsModifiersCocoa !== modifiersCocoa) {
-				editArea = makeEditArea.("KeyDownActions.arrowsModifiersCocoa", arrowsModifiersCocoa, 200);
+				editArea = makeEditArea.("KeyDownActions.arrowsModifiersCocoa", arrowsModifiersCocoa, 100);
 				scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
 			}
 		};
