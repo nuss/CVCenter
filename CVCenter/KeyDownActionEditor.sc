@@ -577,8 +577,7 @@ KeyCodesEditor : KeyDownActions {
 				flow.indentedRemaining.width-15, height
 			)).font_(textFieldFont).syntaxColorize.hasVerticalScroller_(true);
 
-			editArea.string = "";
-			editArea.string = dictName+"= IdentityDictionary[\n";
+			editArea.string = "IdentityDictionary[\n");
 			dict.pairsDo({ |k, v|
 				switch(k.class,
 					Symbol, { key = "'"++k++"'" },
@@ -592,20 +591,23 @@ KeyCodesEditor : KeyDownActions {
 			name.bounds.height+editArea.bounds.height+16;
 		};
 
-		editArea = makeEditArea.("KeyDownActions.keyCodes", keyCodes, 300);
+		editArea = makeEditArea.("KeyDownActions.keyCodes", keyCodes, 400);
 		scrollView.bounds = Rect(0, 0, scrollView.bounds.width, editArea);
+
 		if(GUI.id !== \cocoa) {
-			editArea = makeEditArea.("KeyDownActions.modifiersQt", modifiersQt, 100);
+			editArea = makeEditArea.("KeyDownActions.modifiersQt", modifiersQt, 200);
 			scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
+
 			if(arrowsModifiersQt !== modifiersQt) {
-				editArea = makeEditArea.("KeyDownActions.arrowsModifiersQt", arrowsModifiersQt, 100);
+				editArea = makeEditArea.("KeyDownActions.arrowsModifiersQt", arrowsModifiersQt, 200);
 				scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
 			}
 		} {
-			editArea = makeEditArea.("KeyDownActions.modifiersCocoa", modifiersCocoa, 100);
+			editArea = makeEditArea.("KeyDownActions.modifiersCocoa", modifiersCocoa, 200);
 			scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
+
 			if(arrowsModifiersCocoa !== modifiersCocoa) {
-				editArea = makeEditArea.("KeyDownActions.arrowsModifiersCocoa", arrowsModifiersCocoa, 100);
+				editArea = makeEditArea.("KeyDownActions.arrowsModifiersCocoa", arrowsModifiersCocoa, 200);
 				scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
 			}
 		};
