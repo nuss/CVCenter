@@ -21,11 +21,8 @@ CVWidgetKnob : CVWidget {
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
-	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, server|
-		^super.new.init(
-			parent,
-			cv,
-			name,
+	*new { |parent, widgetCV, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, server|
+		^super.newCopyArgs(parent, widgetCV, name).init(
 			bounds,
 			defaultAction,
 			setup,
@@ -36,8 +33,8 @@ CVWidgetKnob : CVWidget {
 		)
 	}
 
-	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, server|
-		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
+	init { |bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, server|
+		var thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
 		var text, tActions;
@@ -59,14 +56,9 @@ CVWidgetKnob : CVWidget {
 		if(cvcGui.class == Event and:{ cvcGui.midiOscEnv.notNil }, { midiOscEnv = cvcGui.midiOscEnv }, { midiOscEnv = () });
 		midiOscEnv.oscMapping ?? { midiOscEnv.oscMapping = \linlin };
 
-		if(name.isNil, { thisName = "knob" }, { thisName = name });
-		wdgtInfo = thisName.asString;
+		name ?? { name = "knob" };
 
-		if(cv.isNil, {
-			widgetCV = CV.new;
-		}, {
-			widgetCV = cv;
-		});
+		widgetCV ?? { widgetCV = CV.new };
 
 		this.initControllersAndModels(controllersAndModels);
 
@@ -88,35 +80,33 @@ CVWidgetKnob : CVWidget {
 			thisWidth = 52;
 			thisHeight = 164;
 		}, {
-			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
+			if(parent.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
 			thisX = bounds.left; thisY = bounds.top;
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
 
-		if(parentView.isNil, {
-			window = Window(thisName, Rect(thisX, thisY, thisWidth+14, thisHeight+7), server: server);
-		}, {
-			window = parentView;
-		});
-		// window.acceptsMouseOver_(true);
+		parent ?? {
+			parent = Window(name, Rect(thisX, thisY, thisWidth+14, thisHeight+7), server: server);
+		};
+		// parent.acceptsMouseOver_(true);
 
 		cvcGui ?? {
-			window.onClose_({
+			parent.onClose_({
 				if(editor.notNil, {
 					if(editor.isClosed.not, {
 						editor.close;
 					}, {
 						if(AbstractCVWidgetEditor.allEditors.notNil and:{
-							AbstractCVWidgetEditor.allEditors[thisName.asSymbol].notNil;
+							AbstractCVWidgetEditor.allEditors[name.asSymbol].notNil;
 						}, {
-							AbstractCVWidgetEditor.allEditors.removeAt(thisName.asSymbol)
+							AbstractCVWidgetEditor.allEditors.removeAt(name.asSymbol)
 						})
 					})
 				})
 			});
 			if(persistent == false or:{ persistent.isNil }, {
-				window.onClose_(window.onClose.addFunc({
+				parent.onClose_(parent.onClose.addFunc({
 					// "remove, remove".postln;
 					this.oscDisconnect;
 					this.midiDisconnect;
@@ -131,20 +121,20 @@ CVWidgetKnob : CVWidget {
 
 		persistent !? { if(persistent, { isPersistent = true }) };
 
-		widgetBg = CompositeView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
+		widgetBg = CompositeView(parent, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 			.background_(background)
 		;
-		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
+		label = Button(parent, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
 			.states_([
-				[""+thisName.asString, Color.white, Color.blue],
-				[""+thisName.asString, Color.black, Color.yellow],
+				[""+name.asString, Color.white, Color.blue],
+				[""+name.asString, Color.black, Color.yellow],
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |b|
 				this.toggleComment(b.value.asBoolean);
 			})
 		;
-		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
+		nameField = TextView(parent, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Arial", 9))
 			.string_("Add some notes if you like")
@@ -175,22 +165,22 @@ CVWidgetKnob : CVWidget {
 			knobX = thisWidth-knobsize/2+thisXY.x;
 			knobY = thisXY.y+16;
 		});
-		knob = Knob(window, Rect(knobX, knobY, knobsize, knobsize))
+		knob = Knob(parent, Rect(knobX, knobY, knobsize, knobsize))
 			.canFocus_(false)
 			.mode_(\vert)
 		;
 		if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
 		nextY = thisXY.y+thisHeight-112;
-		numVal = NumberBox(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		numVal = NumberBox(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(widgetCV.value).font_(Font("Arial", 9.5))
 		;
 		nextY = nextY+numVal.bounds.height;
-		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		specBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Arial", 9))
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 			.action_({ |btn|
 				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, thisName, 0);
+					editor = CVWidgetEditor(this, name, 0);
 					guiEnv.editor = editor;
 				}, {
 					editor.front(0)
@@ -206,12 +196,12 @@ CVWidgetKnob : CVWidget {
 		if(GUI.id !== \cocoa, { specBut.toolTip_("Edit the CV's ControlSpec:\n"++(this.getSpec.asCompileString)) });
 
 		nextY = nextY+specBut.bounds.height+1;
-		midiHead = Button(window, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
+		midiHead = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
 			.font_(Font("Arial", 9))
 			.states_([["MIDI", stringColor, background]])
 			.action_({ |ms|
 				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, thisName, 1);
+					editor = CVWidgetEditor(this, name, 1);
 					guiEnv.editor = editor;
 				}, {
 					editor.front(1)
@@ -234,7 +224,7 @@ CVWidgetKnob : CVWidget {
 			})
 		});
 
-		midiLearn = Button(window, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
+		midiLearn = Button(parent, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
 			.font_(Font("Arial", 9))
 			.states_([
 				["L", Color.white, Color.blue],
@@ -261,7 +251,7 @@ CVWidgetKnob : CVWidget {
 		if(GUI.id !== \cocoa, { midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget to that slider.") });
 
 		nextY = nextY+midiLearn.bounds.height;
-		midiSrc = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
+		midiSrc = TextField(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
 			.font_(Font("Arial", 9))
 			.string_(msrc)
 			.background_(Color.white)
@@ -288,7 +278,7 @@ CVWidgetKnob : CVWidget {
 		if(GUI.id !== \cocoa, { midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget") });
 
 		nextY = nextY+midiSrc.bounds.height;
-		midiChan = TextField(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
+		midiChan = TextField(parent, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Arial", 9))
 			.string_(mchan)
 			.background_(Color.white)
@@ -314,7 +304,7 @@ CVWidgetKnob : CVWidget {
 		;
 		if(GUI.id !== \cocoa, { midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget") });
 
-		midiCtrl = TextField(window, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
+		midiCtrl = TextField(parent, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
 			.font_(Font("Arial", 9))
 			.string_(mctrl)
 			.background_(Color.white)
@@ -342,14 +332,14 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+midiCtrl.bounds.height+1;
 
-		oscEditBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 25))
+		oscEditBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 25))
 			.font_(Font("Arial", 9))
 			.states_([
 				["edit OSC", stringColor, background]
 			])
 			.action_({ |oscb|
 				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, thisName, 2);
+					editor = CVWidgetEditor(this, name, 2);
 					guiEnv.editor = editor;
 				}, {
 					editor.front(2)
@@ -382,7 +372,7 @@ CVWidgetKnob : CVWidget {
 		});
 		if(GUI.id !== \cocoa, { oscEditBut.toolTip_("no OSC-responders present.\nClick to edit.") });
 
-		calibBut = Button(window, Rect(
+		calibBut = Button(parent, Rect(
 			thisXY.x+oscEditBut.bounds.width-9,
 			nextY+oscEditBut.bounds.height-10,
 			10, 10
@@ -410,14 +400,14 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+oscEditBut.bounds.height;
 		// nextY = nextY+calibBut.bounds.height;
-		actionsBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
+		actionsBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font("Arial", 9))
 			.states_([
 				["actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)],
 			])
 			.action_({ |ab|
 				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, thisName, 3);
+					editor = CVWidgetEditor(this, name, 3);
 					guiEnv.editor = editor;
 				}, {
 					editor.front(3)
@@ -478,14 +468,14 @@ CVWidgetKnob : CVWidget {
 		);
 
 		this.initControllerActions;
-		oldBounds = window.bounds;
-		if(window.respondsTo(\name), { oldName = window.name });
+		oldBounds = parent.bounds;
+		if(parent.respondsTo(\name), { oldName = parent.name });
 	}
 
-	open { |parent, wdgtBounds|
+	open { |window, wdgtBounds|
 		var thisWdgt, thisBounds;
 
-		if(parent.isNil, {
+		if(window.isNil, {
 			thisBounds = Rect(oldBounds.left, oldBounds.top, oldBounds.width-14, oldBounds.height-7);
 		}, {
 			if(wdgtBounds.isNil, { thisBounds = oldBounds });
@@ -493,7 +483,7 @@ CVWidgetKnob : CVWidget {
 
 		if(this.notNil and:{ this.isClosed and:{ isPersistent }}, {
 			thisWdgt = this.class.new(
-				parent: parent,
+				parent: window,
 				cv: widgetCV,
 				name: oldName,
 				bounds: thisBounds,
@@ -517,7 +507,7 @@ CVWidgetKnob : CVWidget {
 			thisWdgt.wdgtControllersAndModels.calibration.model.value_(
 				wdgtControllersAndModels.calibration.model.value
 			).changedKeys(synchKeys);
-			thisWdgt.window.onClose_(thisWdgt.window.onClose.addFunc({
+			thisWdgt.parent.onClose_(thisWdgt.parent.onClose.addFunc({
 				if(thisWdgt.editor.notNil and:{
 					thisWdgt.editor.isClosed.not
 				}, { thisWdgt.editor.close });

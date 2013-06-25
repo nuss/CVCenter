@@ -5,11 +5,8 @@ CVWidgetMS : CVWidget {
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
-	*new { |parent, cv, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, numSliders=5, server|
-		^super.new.init(
-			parent,
-			cv,
-			name,
+	*new { |parent, widgetCV, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, numSliders=5, server|
+		^super.newCopyArgs(parent, widgetCV, name).init(
 			bounds,
 			defaultAction,
 			setup,
@@ -21,8 +18,8 @@ CVWidgetMS : CVWidget {
 		)
 	}
 
-	init { |parentView, cv, name, bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, numSliders, server|
-		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize;
+	init { |bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, numSliders, server|
+		var name, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize;
 		// hmmm...
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextX, nextY, knobX, knobY;
@@ -37,11 +34,7 @@ CVWidgetMS : CVWidget {
 
 		calibViews = List();
 
-		if(cv.isNil, {
-			widgetCV = CV([0 ! numSliders, 1 ! numSliders]);
-		}, {
-			widgetCV = cv;
-		});
+		widgetCV ?? { widgetCV = CV([0 ! numSliders, 1 ! numSliders]) };
 
 		if(widgetCV.spec.minval.isArray.not and:{
 			widgetCV.spec.maxval.isArray.not and:{
@@ -91,8 +84,7 @@ CVWidgetMS : CVWidget {
 			midiOscEnv[i].oscMapping ?? { midiOscEnv[i].oscMapping = \linlin };
 		});
 
-		if(name.isNil, { thisName = "multislider" }, { thisName = name });
-		wdgtInfo = thisName.asString;
+		name ?? { name = "multislider" };
 
 //		what's the editor gonna look like?
 		editor = (editors: Array.newClear(msSize));
@@ -123,32 +115,28 @@ CVWidgetMS : CVWidget {
 			thisWidth = 122;
 			thisHeight = 196;
 		}, {
-			if(parentView.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
+			if(parent.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
 			thisX = bounds.left; thisY = bounds.top;
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;
 		});
 
-		if(parentView.isNil, {
-			window = Window(thisName, Rect(thisX, thisY, thisWidth+14, thisHeight+7), server: server);
-		}, {
-			window = parentView;
-		});
-		// window.acceptsMouseOver_(true);
+		parent ?? { parent = Window(name, Rect(thisX, thisY, thisWidth+14, thisHeight+7), server: server) };
+		// parent.acceptsMouseOver_(true);
 
 		cvcGui ?? {
-			window.onClose_({
+			parent.onClose_({
 				msSize.do({ |slot|
 					if(editor.editors[slot].notNil, {
 						if(editor.editors[slot].isClosed.not, {
 							editor.editors[slot].close(slot);
 						}, {
 							if(AbstractCVWidgetEditor.allEditors.notNil and:{
-								AbstractCVWidgetEditor.allEditors[thisName.asSymbol].notNil
+								AbstractCVWidgetEditor.allEditors[name.asSymbol].notNil
 							}, {
-								AbstractCVWidgetEditor.allEditors[thisName.asSymbol].removeAt(slot);
-								if(AbstractCVWidgetEditor.allEditors[thisName.asSymbol].isEmpty, {
-									AbstractCVWidgetEditor.allEditors.removeAt(thisName.asSymbol);
+								AbstractCVWidgetEditor.allEditors[name.asSymbol].removeAt(slot);
+								if(AbstractCVWidgetEditor.allEditors[name.asSymbol].isEmpty, {
+									AbstractCVWidgetEditor.allEditors.removeAt(name.asSymbol);
 								})
 							})
 						})
@@ -159,17 +147,17 @@ CVWidgetMS : CVWidget {
 						editor.msEditor.close;
 					}, {
 						if(AbstractCVWidgetEditor.allEditors.notNil and:{
-							AbstractCVWidgetEditor.allEditors[(thisName.asString++"MS").asSymbol].notNil
+							AbstractCVWidgetEditor.allEditors[(name.asString++"MS").asSymbol].notNil
 						}, {
-							if(AbstractCVWidgetEditor.allEditors[(thisName.asString++"MS").asSymbol].isEmpty, {
-								AbstractCVWidgetEditor.allEditors.removeAt((thisName.asString++"MS").asSymbol);
+							if(AbstractCVWidgetEditor.allEditors[(name.asString++"MS").asSymbol].isEmpty, {
+								AbstractCVWidgetEditor.allEditors.removeAt((name.asString++"MS").asSymbol);
 							})
 						})
 					})
 				}
 			});
 			if(persistent == false or:{ persistent.isNil }, {
-				window.onClose_(window.onClose.addFunc({
+				parent.onClose_(parent.onClose.addFunc({
 					msSize.do({ |slot|
 						this.oscDisconnect(slot);
 						this.midiDisconnect(slot);
@@ -185,17 +173,17 @@ CVWidgetMS : CVWidget {
 
 		persistent !? { if(persistent, { isPersistent = true }) };
 
-		widgetBg = CompositeView(window, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
+		widgetBg = CompositeView(parent, Rect(thisXY.x, thisXY.y, thisWidth, thisHeight))
 			.background_(background)
 		;
-		label = Button(window, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
+		label = Button(parent, Rect(thisXY.x+1, thisXY.y+1, thisWidth-2, 15))
 			.states_([
-				[thisName.asString, Color.white, Color.blue],
-				[thisName.asString, Color.black, Color.yellow],
+				[name.asString, Color.white, Color.blue],
+				[name.asString, Color.black, Color.yellow],
 			])
 			.font_(Font("Arial", 9))
 		;
-		nameField = TextView(window, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
+		nameField = TextView(parent, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font("Arial", 9))
 			.string_("Add some notes if you like")
@@ -214,7 +202,7 @@ CVWidgetMS : CVWidget {
 			})
 		});
 
-		mSlider = MultiSliderView(window, Rect(thisXY.x+1, thisXY.y+16, thisWidth-2, thisHeight-2-79))
+		mSlider = MultiSliderView(parent, Rect(thisXY.x+1, thisXY.y+16, thisWidth-2, thisHeight-2-79))
 			.drawRects_(true)
 			.isFilled_(true)
 			.colors_(Color.clear, Color.blue)
@@ -228,7 +216,7 @@ CVWidgetMS : CVWidget {
 		calibViewsNextX = thisXY.x+1;
 		msSize.do({ |sl|
 			calibViews.add(
-				CompositeView(window, Rect(calibViewsNextX, nextY, calibViewsWidth, 2)).background_(Color.green);
+				CompositeView(parent, Rect(calibViewsNextX, nextY, calibViewsWidth, 2)).background_(Color.green);
 			);
 			calibViewsNextX = calibViewsNextX+calibViewsWidth;
 			if(GUI.id !== \cocoa, {
@@ -243,7 +231,7 @@ CVWidgetMS : CVWidget {
 
 		nextY = nextY+2+1;
 
-		numVal = TextView(window, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
+		numVal = TextView(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.string_(widgetCV.value.asCompileString).font_(Font("Arial", 9.5))
 			.keyDownAction_({ |nv, char, modifiers, unicode, keycode|
 				if(char == $\r and:{ modifiers == 131072 }, {
@@ -257,14 +245,14 @@ CVWidgetMS : CVWidget {
 		// nextY = thisXY.y+numVal.bounds.top+numVal.bounds.height+1;
 		nextY = numVal.bounds.top+numVal.bounds.height+1;
 
-		midiBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
+		midiBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
 				["MIDI"+"("++numMidiResponders++"/"++msSize++")", stringColor, background]
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |mb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
-					editor.msEditor = CVWidgetMSEditor(this, thisName, 1);
+					editor.msEditor = CVWidgetMSEditor(this, name, 1);
 					guiEnv.msEditor = editor.msEditor;
 				}, {
 					editor.msEditor.front(1)
@@ -312,14 +300,14 @@ CVWidgetMS : CVWidget {
 		});
 
 		nextX = thisXY.x+1+midiBut.bounds.width;
-		oscBut = Button(window, Rect(nextX, nextY, thisWidth-2/2, 15))
+		oscBut = Button(parent, Rect(nextX, nextY, thisWidth-2/2, 15))
 			.states_([
 				["OSC"+"("++numOscResponders++"/"++msSize++")", stringColor, background]
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |oscb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
-					editor.msEditor = CVWidgetMSEditor(this, thisName, 2);
+					editor.msEditor = CVWidgetMSEditor(this, name, 2);
 					guiEnv.msEditor = editor.msEditor;
 				}, {
 					editor.msEditor.front(2)
@@ -357,14 +345,14 @@ CVWidgetMS : CVWidget {
 		if(GUI.id !== \cocoa, { oscBut.toolTip_("no OSC-responders present.\nClick to edit.") });
 
 		nextY = nextY+oscBut.bounds.height;
-		specBut = Button(window, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
+		specBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2/2, 15))
 			.states_([
 				["Spec", Color.white, Color(1.0, 0.3)]
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |spb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
-					editor.msEditor = CVWidgetMSEditor(this, thisName, 0);
+					editor.msEditor = CVWidgetMSEditor(this, name, 0);
 					guiEnv.msEditor = editor.msEditor;
 				}, {
 					editor.msEditor.front(0)
@@ -375,14 +363,14 @@ CVWidgetMS : CVWidget {
 		if(GUI.id !== \cocoa, { specBut.toolTip_("Edit the CV's ControlSpec:\n"++(this.getSpec.asCompileString)) });
 
 		nextX = nextX+specBut.bounds.width;
-		actionsBut = Button(window, Rect(thisXY.x+1+specBut.bounds.width, nextY, thisWidth-2/2, 15))
+		actionsBut = Button(parent, Rect(thisXY.x+1+specBut.bounds.width, nextY, thisWidth-2/2, 15))
 			.states_([
 				["Actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])
 			.font_(Font("Arial", 9))
 			.action_({ |spb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
-					editor.msEditor = CVWidgetMSEditor(this, thisName, 3);
+					editor.msEditor = CVWidgetMSEditor(this, name, 3);
 					guiEnv.msEditor = editor.msEditor;
 				}, {
 					editor.msEditor.front(3)
@@ -438,14 +426,14 @@ CVWidgetMS : CVWidget {
 		widgetCV.connect(mSlider);
 		widgetCV.connect(numVal);
 
-		oldBounds = window.bounds;
-		if(window.respondsTo(\name), { oldName = window.name });
+		oldBounds = parent.bounds;
+		if(parent.respondsTo(\name), { oldName = parent.name });
 	}
 
-	open { |parent, wdgtBounds|
+	open { |window, wdgtBounds|
 		var thisWdgt, thisBounds;
 
-		if(parent.isNil, {
+		if(window.isNil, {
 			thisBounds = Rect(oldBounds.left, oldBounds.top, oldBounds.width-14, oldBounds.height-7);
 		}, {
 			if(wdgtBounds.isNil, { thisBounds = oldBounds });
@@ -453,7 +441,7 @@ CVWidgetMS : CVWidget {
 
 		if(this.notNil and:{ this.isClosed and:{ isPersistent }}, {
 			thisWdgt = this.class.new(
-				parent: parent,
+				parent: window,
 				cv: widgetCV,
 				name: oldName,
 				bounds: thisBounds,
@@ -480,7 +468,7 @@ CVWidgetMS : CVWidget {
 					wdgtControllersAndModels.slots[slot].calibration.model.value
 				).changedKeys(synchKeys);
 			});
-			thisWdgt.window.onClose_(thisWdgt.window.onClose.addFunc({
+			thisWdgt.parent.onClose_(thisWdgt.parent.onClose.addFunc({
 				msSize.do({ |slot|
 					// "thisWdgt.editor.editors[%]: %\n".postf(slot, thisWdgt.editor.editors[slot]);
 					thisWdgt.editor.editors[slot] !? {

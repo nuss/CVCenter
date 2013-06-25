@@ -19,8 +19,9 @@ CVWidget {
 
 	classvar <>removeResponders, <>midiSources, <>shortcuts/*, midiStateObserver*/;
 	classvar <>debug = false;
-	var <window, <guiEnv;
-	var <widgetCV, prDefaultAction, <>wdgtActions, <background, <stringColor, <alwaysPositive = 0.1;
+	var <parent, <widgetCV, <name;
+	var <guiEnv;
+	var prDefaultAction, <>wdgtActions, <background, <stringColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, allGuiEls, isCVCWidget = false;
@@ -141,7 +142,7 @@ CVWidget {
 	}
 
 	close {
-		if(isCVCWidget and:{ isPersistent == false or:{ isPersistent == nil }}, { this.remove }, { this.window.close });
+		if(isCVCWidget and:{ isPersistent == false or:{ isPersistent == nil }}, { this.remove }, { parent.close });
 	}
 
 	addAction { |name, action, slot, active=true|
@@ -990,8 +991,10 @@ CVWidget {
 	}
 
 	front {
-		this.window.front;
+		parent.front;
 	}
+
+	window { ^parent }
 
 	isClosed {
 		if(isCVCWidget, {
@@ -1003,8 +1006,8 @@ CVWidget {
 				}, { el.isClosed.not })
 			}).size == 0, { ^true }, { ^false });
 		}, {
-			// we just want to check for a single widget resp. its parent window
-			^window.isClosed;
+			// we just want to check for a single widget resp. its parent parent
+			^parent.isClosed;
 		})
 	}
 
@@ -1262,14 +1265,14 @@ CVWidget {
 			theChanger.value.switch(
 				true, {
 					if(this.class != CVWidgetMS, {
-						window.isClosed.not.if {
+						parent.isClosed.not.if {
 							thisGuiEnv.calibBut.value_(0);
 							if(GUI.id !== \cocoa, {
 								thisGuiEnv.calibBut.toolTip_("Calibration is active.\nClick to deactivate.");
 							})
 						};
 					}, {
-						window.isClosed.not.if { this.calibViews[slot].background_(Color.green) };
+						parent.isClosed.not.if { this.calibViews[slot].background_(Color.green) };
 					});
 					if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
 						thisEditor.calibBut.value_(0);
@@ -1320,14 +1323,14 @@ CVWidget {
 				},
 				false, {
 					if(this.class != CVWidgetMS, {
-						window.isClosed.not.if {
+						parent.isClosed.not.if {
 							thisGuiEnv.calibBut.value_(1);
 							if(GUI.id !== \cocoa, {
 								thisGuiEnv.calibBut.toolTip_("Calibration is inactive.\nClick to activate.");
 							})
 						};
 					}, {
-						window.isClosed.not.if { this.calibViews[slot].background_(Color.red) };
+						parent.isClosed.not.if { this.calibViews[slot].background_(Color.red) };
 					});
 					if(thisEditor.notNil and:{ thisEditor.isClosed.not }, {
 						thisEditor.calibBut.value_(1);
@@ -1517,7 +1520,7 @@ CVWidget {
 						});
 						msEditors.removeAt(sl);
 
-						if(window.notNil and:{ window.isClosed.not }, {
+						if(parent.notNil and:{ parent.isClosed.not }, {
 							this.calibViews[sl].remove;
 							this.calibViews.removeAt(sl);
 							calibViewsWidth = this.mSlider.bounds.width/specSize;
@@ -1551,7 +1554,7 @@ CVWidget {
 					(specSize-msSize).do({ |i|
 						this.calibViews.add(
 							CompositeView(
-								window, Rect(calibViewsNextX, this.calibViews[0].bounds.top, calibViewsWidth, 2)
+								parent, Rect(calibViewsNextX, this.calibViews[0].bounds.top, calibViewsWidth, 2)
 							).background_(Color.green)
 						);
 						calibViewsNextX = calibViewsNextX+calibViewsWidth;
@@ -1643,7 +1646,7 @@ CVWidget {
 				});
 
 				if(specSize != msSize, {
-					if(window.notNil and:{ window.isClosed.not }, {
+					if(parent.notNil and:{ parent.isClosed.not }, {
 						this.oscBut.states_([
 							[
 								"OSC ("++this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size++"/"++specSize++")",
@@ -1959,7 +1962,7 @@ CVWidget {
 				"X", {
 					if(this.class != CVWidgetMS, {
 						defer {
-							if(window.isClosed.not, {
+							if(parent.isClosed.not, {
 								thisGuiEnv.midiSrc.string_(theChanger.value.src.asString)
 									.background_(Color.red)
 									.stringColor_(Color.white)
@@ -2072,7 +2075,7 @@ CVWidget {
 				"C", {
 					if(this.class != CVWidgetMS, {
 						defer {
-							if(window.isClosed.not, {
+							if(parent.isClosed.not, {
 								thisGuiEnv.midiLearn.states_([
 									["C", Color.white, Color(0.11, 0.38, 0.2)],
 									["X", Color.white, Color.red]
@@ -2189,7 +2192,7 @@ CVWidget {
 				"L", {
 					if(this.class != CVWidgetMS, {
 						defer {
-							if(window.isClosed.not, {
+							if(parent.isClosed.not, {
 								thisGuiEnv.midiSrc
 									.string_(theChanger.value.src)
 									.background_(Color.white)
@@ -2304,7 +2307,7 @@ CVWidget {
 			);
 
 			if(this.class == CVWidgetMS, {
-				if(window.notNil and:{ window.isClosed.not }, {
+				if(parent.notNil and:{ parent.isClosed.not }, {
 					numMidiResponders = this.midiOscEnv.select({ |it| it.cc.notNil }).size;
 					numMidiString = "MIDI ("++numMidiResponders++"/"++msSize++")";
 					if(numMidiResponders > 0, {
@@ -2411,7 +2414,7 @@ CVWidget {
 
 				// thisGuiEnv.postln;
 			if(this.class != CVWidgetMS, {
-				if(window.notNil and:{ window.isClosed.not }, {
+				if(parent.notNil and:{ parent.isClosed.not }, {
 					if(slot.notNil, { typeText = "'s '"++slot++"' slot" }, { typeText = "" });
 					if(GUI.id !== \cocoa, {
 						thisGuiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
@@ -2691,7 +2694,7 @@ CVWidget {
 				thisOscEditBut = thisGuiEnv.oscEditBut;
 			});
 
-			if(window.isClosed.not, {
+			if(parent.isClosed.not, {
 				if(this.class != CVWidgetMS, {
 					if(midiOscEnv.oscResponder.isNil, {
 						// this.label.states[0][0].postln;
@@ -2896,7 +2899,7 @@ CVWidget {
 					})
 				});
 
-				if(window.isClosed.not, {
+				if(parent.isClosed.not, {
 					if(this.class != CVWidgetMS, {
 						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
 							thisGuiEnv.oscEditBut.states_([[
@@ -2933,7 +2936,7 @@ CVWidget {
 			// "prInitActionsControl: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' actions.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
 
-			if(window.isClosed.not, {
+			if(parent.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[
 					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
 					Color(0.08, 0.09, 0.14),
