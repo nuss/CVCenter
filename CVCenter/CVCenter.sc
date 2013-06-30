@@ -96,8 +96,7 @@ CVCenter {
 		};
 
 		this.shortcuts = IdentityDictionary.new;
-		#all, cvWidgets, widgetStates, removeButs, tabProperties = IdentityDictionary.new!5;
-		childViews = List.new;
+		#all, cvWidgets, widgetStates, removeButs, tabProperties, childViews = IdentityDictionary.new!6;
 
 		// shortcuts
 		scv = (); // environment holding various variables used in shortcut-functions;,
@@ -481,7 +480,7 @@ CVCenter {
 			});
 
 			[tabs.view, tabs.views, prefPane].flat.do({ |v|
-				this.shortcuts.values.do({ |keyDowns|
+				this.shortcuts.do({ |keyDowns|
 
 					v.keyDownAction_(
 						v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
@@ -521,7 +520,8 @@ CVCenter {
 
 			window.onClose_({
 				if(childViews.size > 0, {
-					childViews.do({ |child| child.view.parent.parent.close })
+					childViews.postln;
+					childViews.keysDo(_.close)
 				});
 				// childViews.clear;
 				// tabProperties.do({ |prop| prop.nextPos_(Point(0, 0)) });
@@ -630,7 +630,7 @@ CVCenter {
 						removedKeys.do({ |k|
 							this.removeAt(k);
 						});
-						([tabs.activeTab]++childViews.collect(_.view)).do({ |view| this.prRegroupWidgets(view) });
+						([tabs.activeTab]++(childViews.collect({ |child| child }).flat)).do({ |view| this.prRegroupWidgets(view) });
 						tmp = tabs.tabViews[0].label;
 					});
 					lastUpdate = all.size;
@@ -640,8 +640,9 @@ CVCenter {
 						this.prRegroupWidgets(tabs.activeTab);
 					});
 					if(childViews.size > 0, {
-						childViews.do({ |child|
-							child.collect(_.lastUpdateBounds).do(_ !? {
+						childViews.pairsDo({ |child, childProps|
+							// "child, childProps: %, %\n".postf(child, childProps);
+							childProps.collect(_.lastUpdateBounds).do(_ !? {
 								if(tab.bounds.width != _.width, {
 									this.prRegroupWidgets(tab)
 								})
@@ -655,7 +656,7 @@ CVCenter {
 				};
 				lastUpdateBounds = window.bounds;
 				if(childViews.size > 0, {
-					childViews.do({ |child| child.put(\lastUpdateBounds, child.view.bounds) })
+					childViews.pairsDo({ |child, childProps| childProps.put(\lastUpdateBounds, child.bounds) })
 				});
 				if(prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
 				lastSetUp = this.setup;
@@ -666,8 +667,8 @@ CVCenter {
 	*prAddTab { |label|
 		var labelColor, unfocusedColor;
 		var modsDict, arrModsDict;
-		var thisTab, thisTabLabel;
-		var cachedView;
+		var thisTab, thisTabLabel, thisIndex;
+		var cachedView, oldChildView;
 
 		if(label.notNil, { thisTabLabel = label.asSymbol }, {
 			Error("*prAddTab has been called without providing a label for the tab").throw;
@@ -708,21 +709,20 @@ CVCenter {
 				.stringColor_(Color.white)
 				.stringFocusedColor_(Color.black)
 				.onChangeParent_({ |view|
+					childViews[view.parent.parent] !? {
+						oldChildView = childViews[view.parent.parent][view];
+					};
+					"onChangeParent triggered: %\n".postf(view.label);
 					if(tabs.tabViews.includes(view), {
-					cachedView = (view: view, widgets: this.widgetsAtTab(thisTabLabel));
-						// childViews.removeAt(view);
-						// view.parent.parent.name.postln;
+						cachedView = ().put(view, (widgets: this.widgetsAtTab(thisTabLabel)));
 					}, {
-						if(childViews.collect(_.view).includes(view), {
-							childViews.remove(childViews.detect({ |me| me.index == view.index }));
-
-							// hier -> // { childViews.collect(_.
+						childViews.do({ |child|
+							cachedView = child[view];
+							child.removeAt(view);
 						});
-							// childViews.put(view, (widgets: this.widgetsAtTab(thisTabLabel)));
-						childViews.removeAt(view);
-						// view.parent.parent.name.postln;
+							// child.removeAt(child.keys.asArray.detect({ |tab| tab.index == view.index }));
 					});
-					this.shortcuts.values.do({ |keyDowns|
+					this.shortcuts.do({ |keyDowns|
 						view.keyDownAction_(
 							view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
 								var thisMod, thisArrMod;
@@ -747,18 +747,29 @@ CVCenter {
 						)
 					});
 					// Window.allWindows.select({ |w| w.name == "***" }).do({ |w| w.view.background = Color.black })
-					childViews.do({ |child| child.view.parent.parent.background_(Color.black).name_("CVCenter") });
+					childViews.keysDo({ |child| child.view.background_(Color.black).name_("CVCenter") });
 				})
-				.onAfterSetParent_({ |view|
+				.onAfterChangeParent_({ |view|
+					"onAfterChangeParent triggered: %\n".postf(view.label);
 					cachedView !? {
 						if(childViews[view.parent.parent].isNil and:{
 							tabs.tabViews.includes(view).not
 						}, {
 							childViews.put(view.parent.parent, cachedView);
+							CVCenter.window.name_("CVCenter: "++tabs.tabViews.collect(_.label));
 						}, {
-
+							"childViews[view.parent.parent]: %\n".postf(childViews[view.parent.parent]);
+							childViews[view.parent.parent].add(view -> cachedView);
+							if(tabs.tabViews.includes(view).not, {
+								view.parent.parent.name_("CVCenter: "++childViews[view.parent.parent].keys.collect(_.label));
+							}, {
+								this.window.name_("CVCenter: "++tabs.tabViews.collect(_.label));
+							})
 						})
-					}
+					};
+					if(childViews.size > 0, {
+						childViews.pairsDo({ |child, childProps| child.name_("CVCenter: "++childProps.widgets) });
+					})
 				})
 			;
 
@@ -766,7 +777,7 @@ CVCenter {
 
 			thisTab.view.hasBorder_(false);
 
-			this.shortcuts.values.do({ |keyDowns|
+			this.shortcuts.do({ |keyDowns|
 				thisTab.keyDownAction_(
 					thisTab.keyDownAction.add({ |view, char, modifiers, unicode, keycode|
 						var thisMod, thisArrMod;
@@ -821,7 +832,7 @@ CVCenter {
 		// "prAddWidget called: %, %, %\n".postf(tab, widget2DKey, key);
 
 		if(tabProperties.notNil, {
-			allTabs = tabs.tabViews++childViews.keys;
+			allTabs = tabs.tabViews++childViews.collect(_.keys);
 		}, { allTabs = [] });
 
 		if(tab.notNil, { thisTabLabel = tab.asSymbol }, {
@@ -876,7 +887,7 @@ CVCenter {
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
 					cvWidgets[key] = CVWidget2D(
 						thisTab,
-						[all[key].lo, all[key].hi],
+						(lo: all[key].lo, hi: all[key].hi),
 						key,
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight),
 						setup: tmp.setup,
@@ -1164,10 +1175,10 @@ CVCenter {
 		}, {
 			if(this.widgetsAtTab(widgetStates[thisKey][\tabKey]).size == 0, {
 				"thisKey: %\n".postf(thisKey);
-				"tabs.tabViews.labels: %, chidViews.labels".postf(tabs.tabViews.collect(_.label), childViews.values);
-				"going to close tab '%'\n".postf(tabs.tabViews[widgetStates[thisKey][\tabIndex]] ?? {
-					childViews.keys.detect({ |tab| tab.label.postln == widgetStates[thisKey][\tabKey].postln });
-				});
+				"tabs.tabViews.labels: %, chidViews.labels".postf(tabs.tabViews.collect(_.label), childViews.keys.collect(_.label));
+					// "going to close tab '%'\n".postf(tabs.tabViews[widgetStates[thisKey][\tabIndex]] ?? {
+					// 	childViews.collect({ |tab| tabView.keys.detect({ |tab| tab.label.postln == widgetStates[thisKey][\tabKey].postln });
+					// 	});
 				this.prRemoveTab(thisTabKey);
 			})
 		});
@@ -1558,9 +1569,7 @@ CVCenter {
 			}, {
 				lib = Library.readTextArchive(f);
 			});
-			if(this.childViews.size > 0, {
-				childViews.keysDo({ |child| child.parent.parent.close })
-			});
+			if(this.childViews.size > 0, { childViews.keysDo(_.close) });
 
 			{
 				all !? {
