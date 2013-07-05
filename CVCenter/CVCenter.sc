@@ -642,10 +642,9 @@ CVCenter {
 					if(childViews.size > 0, {
 						childViews.pairsDo({ |child, childProps|
 							// "child, childProps: %, %\n".postf(child, childProps);
-							childProps.collect(_.lastUpdateBounds).do(_ !? {
-								if(tab.bounds.width != _.width, {
-									this.prRegroupWidgets(tab)
-								})
+							// [child.bounds, childProps.lastUpdateBounds].postln;
+							if(child.bounds.width != childProps.lastUpdateBounds.width, {
+								childProps.tabs.keysDo({ |tab| this.prRegroupWidgets(tab) })
 							})
 						})
 					});
@@ -726,7 +725,7 @@ CVCenter {
 						// "onChangeParent childViews after remove tab: %\n".postf(childViews[view.parent.parent]);
 						// child.removeAt(child.keys.asArray.detect({ |tab| tab.index == view.index }));
 					});
-					"childViews after onChangeParent: %\n".postf(childViews);
+				// "childViews after onChangeParent: %\n".postf(childViews);
 					this.shortcuts.do({ |keyDowns|
 						view.keyDownAction_(
 							view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
@@ -783,8 +782,8 @@ CVCenter {
 							// "childViews after update: %\n".postf(childViews);
 						});
 						window.name_("CVCenter: "++tabs.tabViews.collect(_.label));
-						childViews.keysDo({ |window|
-							window.name_("CVCenter: "++childViews[window][\tabs].keys.collectAs({ |tab| tab.label }, Array));
+						childViews.pairsDo({ |child, childProps|
+							child.name_("CVCenter: "++childProps[\tabs].keys.collectAs({ |tab| tab.label }, Array));
 						});
 
 						//, {
