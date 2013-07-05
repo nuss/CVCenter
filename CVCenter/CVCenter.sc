@@ -712,20 +712,21 @@ CVCenter {
 					childViews[view.parent.parent] !? {
 						oldChildView = childViews[view.parent.parent][\tabs][view];
 					};
-					"onChangeParent - old parent name: %\n".postf(view.parent.parent.name);
+				// "onChangeParent - old parent name: %\n".postf(view.parent.parent.name);
 				// "onChangeParent triggered: %\n".postf(view.label);
 					if(tabs.tabViews.includes(view), {
 						cachedView = (widgets: this.widgetsAtTab(thisTabLabel));
 						// "cachedView: %\n".postf(cachedView);
 					}, {
-						"onChangeParent childViews before remove tab: %\n".postf(childViews[view.parent.parent]);
+						// "onChangeParent childViews before remove tab: %\n".postf(childViews[view.parent.parent]);
 						childViews.do({ |child|
 							cachedView = child[\tabs][view];
-							child[tabs].removeAt(view);
+							child[\tabs].removeAt(view);
 						});
-						"onChangeParent childViews after remove tab: %\n".postf(childViews[view.parent.parent]);
+						// "onChangeParent childViews after remove tab: %\n".postf(childViews[view.parent.parent]);
 						// child.removeAt(child.keys.asArray.detect({ |tab| tab.index == view.index }));
 					});
+					"childViews after onChangeParent: %\n".postf(childViews);
 					this.shortcuts.do({ |keyDowns|
 						view.keyDownAction_(
 							view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
@@ -750,18 +751,18 @@ CVCenter {
 							})
 						)
 					});
-					"view.tabbedView: %\n".postf(view.tabbedView);
+					// "view.tabbedView: %\n".postf(view.tabbedView);
 					// Window.allWindows.select({ |w| w.name == "***" }).do({ |w| w.view.background = Color.black })
 					// childViews.keysDo({ |child| child.view.background_(Color.black).name_("CVCenter") });
 				})
 				.onAfterChangeParent_({ |view|
-					"onAfterChangeParent triggered: %\n".postf(view);
-					"view.tabbedView.window: %\n".postf(view.tabbedView.window);
+					// "onAfterChangeParent triggered: %\n".postf(view);
+					// "view.tabbedView.window: %\n".postf(view.tabbedView.window);
 					view.tabbedView.window !? {
 						view.tabbedView.window.background_(Color.black);
 					};
 					cachedView !? {
-						"view.label, cachedView exists: %\n".postf(view.label);
+						// "view.label, cachedView exists: %\n".postf(view.label);
 						"cachedView: %\n".postf(cachedView);
 						// "view: %\n".postf(view);
 						// "view.parent: %\n".postf(view.parent);
@@ -771,7 +772,7 @@ CVCenter {
 						// "view.parent.parent.name: %\n".postf(view.parent.parent.name);
 						// "childViews[view.parent.parent]: %\n".postf(childViews[view.parent.parent]);
 						if(tabs.tabViews.includes(view).not, {
-							"childViews before update: %\n".postf(childViews);
+							// "childViews before update: %\n".postf(childViews);
 							if(childViews[view.parent.parent].isNil, {
 								childViews.put(view.parent.parent, ());
 							});
@@ -779,9 +780,13 @@ CVCenter {
 								childViews[view.parent.parent].put(\tabs, ());
 							};
 							childViews[view.parent.parent][\tabs].put(view, cachedView);
-							"childViews after update: %\n".postf(childViews);
+							// "childViews after update: %\n".postf(childViews);
 						});
 						window.name_("CVCenter: "++tabs.tabViews.collect(_.label));
+						childViews.keysDo({ |window|
+							window.name_("CVCenter: "++childViews[window][\tabs].keys.collectAs({ |tab| tab.label }, Array));
+						});
+
 						//, {
 						// 		"childViews[view.parent.parent]: %\n".postf(childViews[view.parent.parent]);
 						// 		childViews[view.parent.parent].add(view -> cachedView);
@@ -791,13 +796,16 @@ CVCenter {
 						// 			this.window.name_("CVCenter: "++tabs.tabViews.collect(_.label));
 						// 		})
 					};
-					if(childViews.size > 0, {
+					// if(childViews.size > 0, {
 						// "childViews: %\n".postf(childViews);
 						// "view.parent.parent.name: %\n".postf(view.parent.parent.name);
 						// "childViews[view.parent.parent].keys.select(_.respondsTo(\label)): %\n".postf(childViews[view.parent.parent].keys.select(_.respondsTo(\label)));
-						view.parent.parent.name_("CVCenter: "++childViews[view.parent.parent][\tabs].keys.select(_.respondsTo(\label)).collectAs({ |child| child.label }, Array));
+						// view.parent.parent.name_("CVCenter: "++childViews[view.parent.parent][\tabs].keys.collectAs({ |child| child.label }, Array));
 						// childViews.pairsDo({ |child, childProps| "child: %\n".postf(child); child.name_("CVCenter: "++childProps.widgets) });
-					})
+					// })
+					// "childViews after onAfterChangeParent: %\n".postf(childViews);
+					childViews.pairsDo({ |child, childProps| if(childProps.tabs.size < 1, { childViews.removeAt(child) }) });
+					// "childViews child remove in onAfterChangeParent: %\n".postf(childViews);
 				})
 			;
 
