@@ -20,6 +20,7 @@ CVCenter {
 	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, <tabs, prefPane, removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>shortcuts, <scv;
+	classvar <alwaysOnTop=false;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight;
 	classvar <widgetStates;
 	classvar <tabProperties, colors, nextColor;
@@ -420,7 +421,7 @@ CVCenter {
 			tabs = TabbedView2(window, Rect(0, 0, flow.bounds.width, flow.bounds.height-40))
 				.tabCurve_(3)
 				.labelPadding_(10)
-				.alwaysOnTop_(false)
+				.alwaysOnTop_(alwaysOnTop)
 				.resize_(5)
 				.tabHeight_(15)
 				.clickbox_(15)
@@ -758,7 +759,7 @@ CVCenter {
 					// "onAfterChangeParent triggered: %\n".postf(view);
 					// "view.tabbedView.window: %\n".postf(view.tabbedView.window);
 					view.tabbedView.window !? {
-						view.tabbedView.window.background_(Color.black);
+						view.tabbedView.window.background_(Color.black).alwaysOnTop_(alwaysOnTop);
 					};
 					cachedView !? {
 						// "view.label, cachedView exists: %\n".postf(view.label);
@@ -1387,6 +1388,14 @@ CVCenter {
 			ctrlButtonBank: this.ctrlButtonBank,
 			softWithin: this.softWithin
 		)
+	}
+
+	*alwaysOnTop_ { |bool|
+		alwaysOnTop = bool.asBoolean;
+		window !? { window.alwaysOnTop_(alwaysOnTop) };
+		if(childViews.size > 0, {
+			childViews.keys.do(_.alwaysOnTop_(alwaysOnTop));
+		})
 	}
 
 	*guiMoveTo { |point|
