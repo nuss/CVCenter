@@ -398,7 +398,7 @@ CVCenter {
 		this.guiheight ?? { this.guiheight_(prefs !? { prefs[\guiProperties] !? { prefs[\guiProperties].height }} ?? { 265 }) };
 
 		if(window.isNil or:{ window.isClosed }, {
-			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
+			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight)).alwaysOnTop_(alwaysOnTop);
 			if(Quarks.isInstalled("wslib") and:{ GUI.id !== \swing }, { window.background_(Color.black) });
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
@@ -631,7 +631,7 @@ CVCenter {
 						removedKeys.do({ |k|
 							this.removeAt(k);
 						});
-						([tabs.activeTab]++(childViews.collect({ |child| child[\tabs] }).flat)).do({ |view| this.prRegroupWidgets(view) });
+						([tabs.activeTab]++(childViews.collectAs({ |child| child[\tabs] }, Array))).do({ |view| this.prRegroupWidgets(view) });
 						tmp = tabs.tabViews[0].label;
 					});
 					lastUpdate = all.size;
