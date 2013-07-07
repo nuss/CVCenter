@@ -521,10 +521,9 @@ CVCenter {
 
 			window.onClose_({
 				if(childViews.size > 0, {
-					childViews.postln;
 					childViews.keysDo(_.close)
 				});
-				// childViews.clear;
+				childViews.clear;
 				// tabProperties.do({ |prop| prop.nextPos_(Point(0, 0)) });
 				tabProperties.clear;
 				if(prefs[\saveGuiProperties] == 1, {
@@ -656,7 +655,9 @@ CVCenter {
 				};
 				lastUpdateBounds = window.bounds;
 				if(childViews.size > 0, {
-					childViews.pairsDo({ |child, childProps| childProps.put(\lastUpdateBounds, child.bounds) })
+					childViews.pairsDo({ |child, childProps|
+						childProps.put(\lastUpdateBounds, child.bounds)
+					})
 				});
 				if(prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
 				lastSetUp = this.setup;
