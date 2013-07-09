@@ -631,7 +631,7 @@ CVCenter {
 						removedKeys.do({ |k|
 							this.removeAt(k);
 						});
-						([tabs.activeTab]++(childViews.collect({ |child| child[\tabs] }).flat)).do({ |view| this.prRegroupWidgets(view) });
+						([tabs.activeTab]++childViews.collect({ |view| view.tabs.keys.asArray })).flat.do({ |view| this.prRegroupWidgets(view) });
 						tmp = tabs.tabViews[0].label;
 					});
 					lastUpdate = all.size;
@@ -868,8 +868,10 @@ CVCenter {
 		// "prAddWidget called: %, %, %\n".postf(tab, widget2DKey, key);
 
 		if(tabProperties.notNil, {
-			allTabs = tabs.tabViews++childViews.collect(_.keys);
+			allTabs = (tabs.tabViews++childViews.collect({ |view| view.tabs.keys.asArray })).flat;
 		}, { allTabs = [] });
+
+		// "allTabs: %\n".postf(allTabs);
 
 		if(tab.notNil, { thisTabLabel = tab.asSymbol }, {
 			if(tabs.activeTab.notNil, { thisTabLabel = tabs.activeTab.label }, { thisTabLabel = \default });
@@ -1210,11 +1212,6 @@ CVCenter {
 			window.isClosed.not
 		}, {
 			if(this.widgetsAtTab(widgetStates[thisKey][\tabKey]).size == 0, {
-				"thisKey: %\n".postf(thisKey);
-				"tabs.tabViews.labels: %, chidViews.labels".postf(tabs.tabViews.collect(_.label), childViews.keys.collect(_.label));
-					// "going to close tab '%'\n".postf(tabs.tabViews[widgetStates[thisKey][\tabIndex]] ?? {
-					// 	childViews.collect({ |tab| tabView.keys.detect({ |tab| tab.label.postln == widgetStates[thisKey][\tabKey].postln });
-					// 	});
 				this.prRemoveTab(thisTabKey);
 			})
 		});
@@ -1965,12 +1962,20 @@ CVCenter {
 	*prRemoveTab { |key|
 		var index;
 		index = tabProperties[key].index;
+		[key, index].postln;
 		if(tabs.views.size > 1, {
-			// childViews.keys.do({ |tabProps| if(tapProps
 			if(window.isClosed.not and:{
 				tabs.tabViews.detect({ |tab| tab.label.asSymbol == key.asSymbol }).notNil
 			}, { tabs.removeAt(index) });
-			// childViews.values.do({ |labels| if(labels.includes.key
+			childViews.pairsDo({ |child, childProps|
+				childProps.tabs.keysDo({ |view|
+					"tabProperties[%]: %\n".postf(key, tabProperties[key]);
+					if(view.label.asSymbol == key.asSymbol, {
+						child.close;
+						tabs.removeAt(index).defer(0.1);
+					});
+				})
+			});
 			tabProperties.do({ |prop|
 				if(prop.index > index, { prop.index = prop.index-1 })
 			});
