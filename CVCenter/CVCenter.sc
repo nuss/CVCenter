@@ -398,7 +398,7 @@ CVCenter {
 		this.guiheight ?? { this.guiheight_(prefs !? { prefs[\guiProperties] !? { prefs[\guiProperties].height }} ?? { 265 }) };
 
 		if(window.isNil or:{ window.isClosed }, {
-			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight));
+			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight)).alwaysOnTop_(alwaysOnTop);
 			if(Quarks.isInstalled("wslib") and:{ GUI.id !== \swing }, { window.background_(Color.black) });
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
@@ -521,10 +521,9 @@ CVCenter {
 
 			window.onClose_({
 				if(childViews.size > 0, {
-					childViews.postln;
 					childViews.keysDo(_.close)
 				});
-				// childViews.clear;
+				childViews.clear;
 				// tabProperties.do({ |prop| prop.nextPos_(Point(0, 0)) });
 				tabProperties.clear;
 				if(prefs[\saveGuiProperties] == 1, {
@@ -656,7 +655,9 @@ CVCenter {
 				};
 				lastUpdateBounds = window.bounds;
 				if(childViews.size > 0, {
-					childViews.pairsDo({ |child, childProps| childProps.put(\lastUpdateBounds, child.bounds) })
+					childViews.pairsDo({ |child, childProps|
+						childProps.put(\lastUpdateBounds, child.bounds)
+					})
 				});
 				if(prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
 				lastSetUp = this.setup;
