@@ -1960,20 +1960,24 @@ CVCenter {
 		}
 	}
 
+	// fix me
 	*prRemoveTab { |key|
 		var index;
-		index = tabProperties[key].index;
-		[key, index].postln;
+
 		if(tabs.views.size > 1, {
 			if(window.isClosed.not and:{
 				tabs.tabViews.detect({ |tab| tab.label.asSymbol == key.asSymbol }).notNil
-			}, { tabs.removeAt(index) });
+			}, {
+				index = tabProperties[key].index;
+				tabs.removeAt(index)
+			});
 			childViews.pairsDo({ |child, childProps|
 				childProps.tabs.keysDo({ |view|
 					"tabProperties[%]: %\n".postf(key, tabProperties[key]);
 					if(view.label.asSymbol == key.asSymbol, {
 						child.close;
-						tabs.removeAt(index).defer(0.1);
+						index = tabProperties[key].index;
+						tabs.removeAt(index);
 					});
 				})
 			});
@@ -1983,6 +1987,9 @@ CVCenter {
 			tabProperties.removeAt(key);
 			widgetStates.do({ |w| if(w.tabIndex > index, { w.tabIndex = w.tabIndex-1 }) });
 		}, {
+			// not working properly if tab is detached;
+			index = tabProperties[key].index;
+			"tabs.tabViews[%]: %\n".postf(tabs.tabViews[index]);
 			if(window.isClosed.not and:{ tabs.tabViews[index].label != "default" }, {
 				tabs.tabViews[index].label_("default");
 				tabs.refresh;
