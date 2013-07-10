@@ -353,19 +353,19 @@ KeyDownActionsEditor : KeyDownActions {
 
 			shortcutTexts = shortcutTexts.add(
 				shortcutText = StaticText(editArea, 40@15)
-				.string_("shortcut:")
-				.font_(staticTextFont)
-				.stringColor_(staticTextColor)
-				.canFocus_(false)
+					.string_("shortcut:")
+					.font_(staticTextFont)
+					.stringColor_(staticTextColor)
+					.canFocus_(false)
 				;
 			);
 
 			shortcutFields = shortcutFields.add(
 				shortcutField = StaticText(editArea, tmpEditFlow.indentedRemaining.width-125@15)
-				.background_(Color.white)
-				.font_(shortCutFont)
-				.stringColor_(staticTextColor)
-				.canFocus_(false)
+					.background_(Color.white)
+					.font_(shortCutFont)
+					.stringColor_(staticTextColor)
+					.canFocus_(false)
 				;
 			);
 

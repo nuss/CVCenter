@@ -494,6 +494,7 @@ CVCenterPreferences {
 
 	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, informString|
 		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders, thisInformString, thisInitMidi;
+		var shortcutsPath, shortcuts;
 
 		thisSaveClassVars = saveClassVars.asBoolean;
 		thisRemoveResponders = removeResponders.asBoolean;
@@ -519,6 +520,14 @@ CVCenterPreferences {
 		}, {
 			prefs = ();
 		});
+
+		shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcuts";
+		if(File.exists(shortcutsPath), {
+			shortcuts = Object.readArchive(shortcutsPath);
+		}, {
+			shortcuts = ();
+		});
+
 		prefs.put(\saveGuiProperties, saveGuiProperties);
 		if(saveGuiProperties == 2 or:{ saveGuiProperties == 1 }, {
 			prefs.put(\guiProperties, thisGuiProperties)
@@ -537,7 +546,8 @@ CVCenterPreferences {
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);
 		// shortcuts dummy
-		prefs.put(\shortcuts, ());
+		shortcuts.putPairs([\cvcenter, (), \cvwidgeteditor, ()]);
+
 		prefs.writeArchive(prefsPath);
 		if(informString.isNil, {
 			thisInformString = "Your CVCenter-preferences have successfully been written to disk and will become active after library-recompilation.";
