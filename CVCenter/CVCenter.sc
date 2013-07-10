@@ -631,7 +631,7 @@ CVCenter {
 							this.removeAt(k);
 						});
 						([tabs.activeTab]++childViews.collect({ |view| view.tabs.keys.asArray })).flat.do({ |view| this.prRegroupWidgets(view) });
-						tmp = tabs.tabViews[0].label;
+						// tmp = tabs.tabViews[0].label;
 					});
 					lastUpdate = all.size;
 				});
@@ -1960,43 +1960,29 @@ CVCenter {
 		}
 	}
 
-	// fix me
 	*prRemoveTab { |key|
 		var index;
 
-		if(tabs.views.size > 1, {
-			if(window.isClosed.not and:{
-				tabs.tabViews.detect({ |tab| tab.label.asSymbol == key.asSymbol }).notNil
-			}, {
-				index = tabProperties[key].index;
-				tabs.removeAt(index)
-			});
-			childViews.pairsDo({ |child, childProps|
-				childProps.tabs.keysDo({ |view|
-					"tabProperties[%]: %\n".postf(key, tabProperties[key]);
-					if(view.label.asSymbol == key.asSymbol, {
-						child.close;
-						index = tabProperties[key].index;
-						tabs.removeAt(index);
-					});
-				})
-			});
-			tabProperties.do({ |prop|
-				if(prop.index > index, { prop.index = prop.index-1 })
-			});
-			tabProperties.removeAt(key);
-			widgetStates.do({ |w| if(w.tabIndex > index, { w.tabIndex = w.tabIndex-1 }) });
+		if(window.isClosed.not and:{
+			tabs.tabViews.detect({ |tab| tab.label.asSymbol == key.asSymbol }).notNil
 		}, {
-			// not working properly if tab is detached;
-			index = tabProperties[key].index;
-			"tabs.tabViews[%]: %\n".postf(tabs.tabViews[index]);
-			if(window.isClosed.not and:{ tabs.tabViews[index].label != "default" }, {
-				tabs.tabViews[index].label_("default");
-				tabs.refresh;
-			});
-			tabProperties.flipKeys(key, \default);
-			tabProperties[\default].index_(0).nextPos_(Point(0, 0));
-		})
+			index = tabs.tabViews.detect({ |tab| tab.label.asSymbol == key.asSymbol }).index;
+			tabs.removeAt(index)
+		});
+		childViews.pairsDo({ |child, childProps|
+			childProps.tabs.keysDo({ |view|
+				if(view.label.asSymbol == key.asSymbol, {
+					child.close;
+					index = tabProperties[key].index;
+					tabs.removeAt(index);
+				});
+			})
+		});
+		tabProperties.do({ |prop|
+			if(prop.index > index, { prop.index = prop.index-1 })
+		});
+		tabProperties.removeAt(key);
+		widgetStates.do({ |w| if(w.tabIndex > index, { w.tabIndex = w.tabIndex-1 }) });
 	}
 
 	/* utilities */
