@@ -499,6 +499,7 @@ KeyDownActionsEditor : KeyDownActions {
 						rmBounds = bt.parent.bounds;
 						bt.parent.remove;
 						editAreas.removeAt(tmpIndex);
+						shortcutFields[tmpIndex].removeAt(\val);
 						editAreas.do({ |it|
 							if(it.bounds.top > rmBounds.top, {
 								it.bounds_(Rect(
