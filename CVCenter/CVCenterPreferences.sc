@@ -29,6 +29,7 @@ CVCenterPreferences {
 		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		// shortcut-tabs
 		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab, cvKeyCodesEditorTab;
+		var saveShortcuts, saveKeyCodesAndMods;
 		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor, cvCenterKeyCodesEditor;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
 		var saveClassVars, removeResponders;
@@ -436,7 +437,7 @@ CVCenterPreferences {
 			cvCenterEditor = KeyDownActionsEditor(
 				cvCenterTab, nil, cvCenterTab.bounds, CVCenter.shortcuts, false
 			);
-			cvCenterEditor.shortcutFields.collect(_.val).postln;
+			// cvCenterEditor.shortcutFields.collect(_.val).postln;
 			// CVWidgets should go here but...
 			cvWidgetEditorEditor = KeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false
@@ -473,7 +474,18 @@ CVCenterPreferences {
 								height.string.interpret.asInteger
 							)
 						});
-						this.writePreferences(
+						#saveKeyCodesAndMods, saveShortcuts = IdentityDictionary.new!2;
+						cvCenterEditor.shortcutFields.collect(_.val).do({ |scPair|
+							saveShortcuts = saveShortcuts.add(scPair);
+						});
+						saveKeyCodesAndMods.put(\keyCodes, cvKeyCodesEditorTab.keyCodesArea.string.interpret);
+						if(GUI.id !== \cocoa, {
+							saveKeyCodesAndMods.put(\modifiersQt, cvKeyCodesEditorTab.modsQtArea.string.interpret);
+						}, {
+							saveKeyCodesAndMods.put(\modifiersCocoa, cvKeyCodesEditorTab.modsQtArea.string.interpret);
+							saveKeyCodesAndMods.put(\arrowsModifiersCocoa, cvKeyCodesEditorTab.arrModsCocoaArea.string.interpret);
+						})
+							this.writePreferences(
 							saveGuiPosition.value,
 							rect,
 							saveClassVars.value,
@@ -483,7 +495,9 @@ CVCenterPreferences {
 							saveSoftWithin.string.interpret,
 							saveCtrlButtonBank.string.interpret,
 							removeResponders.value,
-							initMidiOnStartUp.value
+							initMidiOnStartUp.value,
+							saveShortcuts,
+							saveKeyCodesAndMods
 						);
 						window.close;
 					})
@@ -493,7 +507,7 @@ CVCenterPreferences {
 		window.front;
 	}
 
-	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, informString|
+	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, informString, savedShortcuts, savedKeyCodesAndMods|
 		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders, thisInformString, thisInitMidi;
 		var shortcutsPath, shortcuts;
 
@@ -553,6 +567,11 @@ CVCenterPreferences {
 		if(informString.isNil, {
 			thisInformString = "Your CVCenter-preferences have successfully been written to disk and will become active after library-recompilation.";
 		}, { thisInformString = informString });
+
+		/*****************************************************/
+		// do sthg with  savedShortcuts, savedKeyCodesAndMods//
+		/*****************************************************/
+
 		thisInformString.inform;
 	}
 
