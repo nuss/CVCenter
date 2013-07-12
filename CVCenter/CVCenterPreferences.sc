@@ -436,6 +436,7 @@ CVCenterPreferences {
 			cvCenterEditor = KeyDownActionsEditor(
 				cvCenterTab, nil, cvCenterTab.bounds, CVCenter.shortcuts, false
 			);
+			cvCenterEditor.shortcutFields.collect(_.val).postln;
 			// CVWidgets should go here but...
 			cvWidgetEditorEditor = KeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false

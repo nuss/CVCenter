@@ -360,17 +360,17 @@ KeyDownActionsEditor : KeyDownActions {
 				;
 			);
 
-			shortcutFields = shortcutFields.add(
-				shortcutField = StaticText(editArea, tmpEditFlow.indentedRemaining.width-125@15)
+			shortcutFields = shortcutFields.add((
+				shortcutField = (display: StaticText(editArea, tmpEditFlow.indentedRemaining.width-125@15)
 					.background_(Color.white)
 					.font_(shortCutFont)
 					.stringColor_(staticTextColor)
-					.canFocus_(false)
-				;
-			);
+					.canFocus_(false),
+				val: ());
+			));
 
 			shortcut !? {
-				shortcutField.string_(" "++shortcut);
+				shortcutField.display.string_(" "++shortcut);
 			};
 
 			editButs = editButs.add(
@@ -412,15 +412,36 @@ KeyDownActionsEditor : KeyDownActions {
 													mod != thisArrowsModifiers[\none]
 												}
 											}, {
-												shortcutField.string_(
+												// "shortcutField.val: %\n".postf(shortcutField.val);
+												shortcutField.display.string_(
 													" "++ mods ++ join ++
 													keyCodes.findKeyForValue(keycode)
 												);
+												shortcutField.val.keyCode = keycode;
+												if(thisArrowsModifiers.includes(mod), {
+													if(GUI.id !== \cocoa, {
+														shortcutField.val.modifierQt = nil;
+														shortcutField.val.arrowModifierQt = mod;
+													}, {
+														shortcutField.val.modifierCocoa = nil;
+														shortcutField.val.arrowModifierCocoa = mod;
+													});
+												}, {
+													if(GUI.id !== \cocoa, {
+														shortcutField.val.arrowModifierQt = nil;
+														shortcutField.val.modifierQt = mod;
+													}, {
+														shortcutField.val.arrowModifierCocoa = nil;
+														shortcutField.val.modifierCocoa = mod;
+													})
+												});
+												// "shortcutField.val new: %\n".postf(shortcutField.val);
 											}, {
-												shortcutField.string_(
+												shortcutField.display.string_(
 													" "++
 													keyCodes.findKeyForValue(keycode)
-												)
+												);
+												shortcutField.val_((keyCode: keycode));
 											})
 										}
 									})
@@ -481,7 +502,14 @@ KeyDownActionsEditor : KeyDownActions {
 		order = shortcutsDict.order;
 
 		order.do({ |shortcut, i|
-			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "))
+			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "));
+			shortcutFields[i].val = (
+				keyCode: shortcutsDict[shortcut][\keyCode],
+				modifierQt: shortcutsDict[shortcut][\modifierQt],
+				modifierCocoa: shortcutsDict[shortcut][\modifierCocoa],
+				arrowModifierQt: shortcutsDict[shortcut][\arrowModifierQt],
+				arrowModifierCocoa: shortcutsDict[shortcut][\arrowModifierCocoa]
+			)
 		});
 
 		butArea.decorator = butFlow = FlowLayout(butArea.bounds, 7@4, 3@0);
