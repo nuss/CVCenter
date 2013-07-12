@@ -412,36 +412,66 @@ KeyDownActionsEditor : KeyDownActions {
 													mod != thisArrowsModifiers[\none]
 												}
 											}, {
-												// "shortcutField.val: %\n".postf(shortcutField.val);
+												"shortcutField.val: %\n".postf(shortcutField.val);
 												shortcutField.display.string_(
 													" "++ mods ++ join ++
 													keyCodes.findKeyForValue(keycode)
 												);
-												shortcutField.val.keyCode = keycode;
 												if(thisArrowsModifiers.includes(mod), {
 													if(GUI.id !== \cocoa, {
-														shortcutField.val.modifierQt = nil;
-														shortcutField.val.arrowModifierQt = mod;
+														shortcutField.val_((mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+															func: funcField.string,
+															keyCode: keycode,
+															arrowModifierCocoa: nil,
+															arrowModifierQt: mod,
+															modifierCocoa: nil,
+															modifierQt: nil
+														))
 													}, {
-														shortcutField.val.modifierCocoa = nil;
-														shortcutField.val.arrowModifierCocoa = mod;
+														shortcutField.val_((mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+															func: funcField.string,
+															keyCode: keycode,
+															arrowModifierCocoa: mod,
+															arrowModifierQt: nil,
+															modifierCocoa: nil,
+															modifierQt: nil
+														))
 													});
 												}, {
 													if(GUI.id !== \cocoa, {
-														shortcutField.val.arrowModifierQt = nil;
-														shortcutField.val.modifierQt = mod;
+														shortcutField.val_((mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+															func: funcField.string,
+															keyCode: keycode,
+															arrowModifierCocoa: nil,
+															arrowModifierQt: nil,
+															modifierCocoa: nil,
+															modifierQt: mod
+														))
 													}, {
-														shortcutField.val.arrowModifierCocoa = nil;
-														shortcutField.val.modifierCocoa = mod;
+														shortcutField.val_((mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+															func: funcField.string,
+															keyCode: keycode,
+															arrowModifierCocoa: nil,
+															arrowModifierQt: nil,
+															modifierCocoa: mod,
+															modifierQt: nil
+														))
 													})
 												});
-												// "shortcutField.val new: %\n".postf(shortcutField.val);
+												"shortcutField.val new: %\n".postf(shortcutField.val);
 											}, {
 												shortcutField.display.string_(
 													" "++
 													keyCodes.findKeyForValue(keycode)
 												);
-												shortcutField.val_((keyCode: keycode));
+												shortcutField.val_(keyCodes.findKeyForValue(keycode) -> (
+													func: funcField.string,
+													keyCode: keycode,
+													arrowModifierCocoa: nil,
+													arrowModifierQt: nil,
+													modifierCocoa: nil,
+													modifierQt: nil
+												));
 											})
 										}
 									})
@@ -494,7 +524,9 @@ KeyDownActionsEditor : KeyDownActions {
 				funcField = TextView(
 					editArea,
 					tmpEditFlow.indentedRemaining.width@tmpEditFlow.indentedRemaining.height
-				).font_(textFieldFont).enabled_(false).syntaxColorize;
+				).font_(textFieldFont).enabled_(false).syntaxColorize.action_({ |ffield|
+					shortcutFields[count].val.value.func = funcField.string;
+				});
 			);
 			funcString !? { funcFields[count].string_(funcString) };
 		};
@@ -503,13 +535,19 @@ KeyDownActionsEditor : KeyDownActions {
 
 		order.do({ |shortcut, i|
 			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "));
-			shortcutFields[i].val = (
+			shortcutFields[i].val = shortcut -> (
+				func: shortcutsDict[shortcut][\func],
 				keyCode: shortcutsDict[shortcut][\keyCode],
 				modifierQt: shortcutsDict[shortcut][\modifierQt],
 				modifierCocoa: shortcutsDict[shortcut][\modifierCocoa],
 				arrowModifierQt: shortcutsDict[shortcut][\arrowModifierQt],
 				arrowModifierCocoa: shortcutsDict[shortcut][\arrowModifierCocoa]
 			)
+		});
+
+		shortcutFields.do({ |it, i|
+			"shortcutFields[%].val: %\n".postf(i, it.val);
+			"funcFields[%].string: %\n".postf(i, funcFields[i].string);
 		});
 
 		butArea.decorator = butFlow = FlowLayout(butArea.bounds, 7@4, 3@0);
