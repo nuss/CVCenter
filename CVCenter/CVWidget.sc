@@ -1797,16 +1797,16 @@ CVWidget {
 										argWidgetCV.input_(argWidgetCV.input.collect({ |it, i|
 											if(i == slot, { val/127 }, { it })
 										}))
-									},
-									{
-										if(val/127 < (argWidgetCV.input+(this.getSoftWithin(slot)/2)) and:{
-											val/127 > (argWidgetCV.input-(this.getSoftWithin(slot)/2));
-										}, {
-											argWidgetCV.input_(val/127)
-										})
-									}
-								)
-							})
+									})
+								},
+								{
+									if(val/127 < (argWidgetCV.input+(this.getSoftWithin(slot)/2)) and:{
+										val/127 > (argWidgetCV.input-(this.getSoftWithin(slot)/2));
+									}, {
+										argWidgetCV.input_(val/127)
+									})
+								}
+							)
 						},
 						1, {
 							meanVal = this.getMidiMean(slot);

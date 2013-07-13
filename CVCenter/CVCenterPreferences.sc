@@ -484,8 +484,8 @@ CVCenterPreferences {
 						}, {
 							saveKeyCodesAndMods.put(\modifiersCocoa, cvKeyCodesEditorTab.modsQtArea.string.interpret);
 							saveKeyCodesAndMods.put(\arrowsModifiersCocoa, cvKeyCodesEditorTab.arrModsCocoaArea.string.interpret);
-						})
-							this.writePreferences(
+						});
+						this.writePreferences(
 							saveGuiPosition.value,
 							rect,
 							saveClassVars.value,
