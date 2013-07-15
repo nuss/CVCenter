@@ -29,7 +29,6 @@ CVCenterPreferences {
 		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		// shortcut-tabs
 		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab, cvKeyCodesEditorTab;
-		var saveShortcuts, saveKeyCodesAndMods;
 		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor, cvCenterKeyCodesEditor;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
 		var saveClassVars, removeResponders;
@@ -474,19 +473,8 @@ CVCenterPreferences {
 								height.string.interpret.asInteger
 							)
 						});
-						#saveKeyCodesAndMods, saveShortcuts = IdentityDictionary.new!2;
-						"cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
-						"cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
-						// cvCenterEditor.shortcutFields.collect(_.val).do({ |scPair|
-						// 	saveShortcuts = saveShortcuts.add(scPair);
-						// });
-						// saveKeyCodesAndMods.put(\keyCodes, cvKeyCodesEditorTab.keyCodesArea.string.interpret);
-						// if(GUI.id !== \cocoa, {
-						// 	saveKeyCodesAndMods.put(\modifiersQt, cvKeyCodesEditorTab.modsQtArea.string.interpret);
-						// 	}, {
-						// 		saveKeyCodesAndMods.put(\modifiersCocoa, cvKeyCodesEditorTab.modsQtArea.string.interpret);
-						// 		saveKeyCodesAndMods.put(\arrowsModifiersCocoa, cvKeyCodesEditorTab.arrModsCocoaArea.string.interpret);
-						// });
+						// "cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
+						// "cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
 						this.writePreferences(
 							saveGuiPosition.value,
 							rect,
@@ -498,9 +486,9 @@ CVCenterPreferences {
 							saveCtrlButtonBank.string.interpret,
 							removeResponders.value,
 							initMidiOnStartUp.value,
-							// saveShortcuts,
-							// saveKeyCodesAndMods
+							cvCenterEditor.result
 						);
+						cvCenterKeyCodesEditor.result(true);
 						window.close;
 					})
 				})
@@ -509,7 +497,7 @@ CVCenterPreferences {
 		window.front;
 	}
 
-	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, informString, savedShortcuts, savedKeyCodesAndMods|
+	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, savedShortcuts, informString|
 		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders, thisInformString, thisInitMidi;
 		var shortcutsPath, shortcuts;
 
@@ -538,7 +526,13 @@ CVCenterPreferences {
 			prefs = ();
 		});
 
-		shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcuts";
+		switch(GUI.id,
+			\cocoa, {
+				shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcutsCocoa";
+			},
+			{ shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcutsQt" }
+		);
+
 		if(File.exists(shortcutsPath), {
 			shortcuts = Object.readArchive(shortcutsPath);
 		}, {
@@ -563,7 +557,7 @@ CVCenterPreferences {
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);
 		// shortcuts dummy
-		shortcuts.putPairs([\cvcenter, (), \cvwidgeteditor, ()]);
+		// shortcuts.putPairs([\cvcenter, (), \cvwidgeteditor, ()]);
 
 		prefs.writeArchive(prefsPath);
 		if(informString.isNil, {

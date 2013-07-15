@@ -131,6 +131,7 @@ KeyDownActions {
 					$, -> 				43,
 					$. -> 				47,
 					$/ -> 				44,
+					\space ->			49,
 					\esc -> 			53,
 					'arrow up' -> 		126,
 					'arrow down' -> 	125,
@@ -670,7 +671,7 @@ KeyCodesEditor : KeyDownActions {
 		eas = ();
 
 		eas.keyCodes = makeEditArea.("KeyDownActions.keyCodes", keyCodes, 400);
-		"eas.keyCodes: %\n".postf(eas.keyCodes);
+		// "eas.keyCodes: %\n".postf(eas.keyCodes);
 		scrollView.bounds = Rect(0, 0, scrollView.bounds.width, eas.keyCodes[0]);
 
 		if(GUI.id !== \cocoa) {
@@ -695,29 +696,38 @@ KeyCodesEditor : KeyDownActions {
 		all.add(this);
 	}
 
-	result {
+	result { |write|
 		var res = IdentityDictionary.new, tmp;
-		if((tmp = eas.keyCodes[1].string.interpret).size > 0, { res.put(\keyCodes, tmp) });
+		var keyCodesPath, guiId;
+
+		switch(GUI.id,
+			\cocoa, { guiId = "Cocoa" },
+			{ guiId = "Qt" },
+		);
+
+		keyCodesPath = this.class.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++guiId;
+
+		if((tmp = eas.keyCodes[1].string.interpret).size > 0) { res.put(\keyCodes, tmp) };
 		if(GUI.id !== \cocoa, {
 			if((tmp = eas.modifiersQt[1].string.interpret).size > 0, { res.put(\modifiersQt, tmp) });
 			eas.arrowsModifiersQt !? {
 				if(eas.arrowsModifiersQt[1].string.interpret.size > 0 and:{
 					tmp !== eas.arrowsModifiersQt[1].string.interpret
-				}, {
+				}) {
 					res.put(\arrowsModifiersQt, eas.arrowsModifiersQt[1].string.interpret)
-				}, { res.arrowsModifiersQt = res.modifiersQt })
+				} { res.arrowsModifiersQt = res.modifiersQt }
 			}
 		}, {
-			if((tmp = eas.modifiersCocoa[1].string.interpret).size > 0, { res.put(\modifiersCocoa, tmp) });
+			if((tmp = eas.modifiersCocoa[1].string.interpret).size > 0) { res.put(\modifiersCocoa, tmp) };
 			eas.arrowsModifiersCocoa !? {
 				if(eas.arrowsModifiersCocoa[1].string.interpret.size > 0 and:{
 					tmp !== eas.arrowsModifiersCocoa[1].string.interpret
-				}, {
+				}) {
 					res.put(\arrowsModifiersCocoa, eas.arrowsModifiersCocoa[1].string.interpret)
-				}, { res.arrowsModifiersCocoa = res.modifiersCocoa })
+				} { res.arrowsModifiersCocoa = res.modifiersCocoa }
 			}
 		});
-		^res
+		if(write) { ^res.writeArchive(keyCodesPath) } { ^res }
 	}
 
 }
