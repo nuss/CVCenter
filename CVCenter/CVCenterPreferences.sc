@@ -20,7 +20,7 @@ CVCenterPreferences {
 	classvar <window;
 
 	// *initClass {
-	// 	Class.initClassTree(AbstractCVWidgetEditor);
+	// 	Class.initClassTree(KeyDownActions);
 	// }
 
 	*dialog {
@@ -28,6 +28,7 @@ CVCenterPreferences {
 		var guiView, guiFlow, midiView, midiFlow, responderView, responderFlow;
 		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		// shortcut-tabs
+		var prefShortcutsPath, prefShortCuts;
 		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab, cvKeyCodesEditorTab;
 		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor, cvCenterKeyCodesEditor;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
@@ -38,7 +39,7 @@ CVCenterPreferences {
 		var prefSaveGuiProps, buildCheckbox, buildNumTextBox, vHeight;
 		var cvcBounds, propsText, classVarsText;
 		var fFact, specialHeight;
-		var prefs, rect;
+		var prefs, rect, shortcuts;
 
 		prefs = this.readPreferences;
 
@@ -473,6 +474,7 @@ CVCenterPreferences {
 								height.string.interpret.asInteger
 							)
 						});
+						shortcuts = (cvcenter:  cvCenterEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
 						// "cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
 						// "cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
 						this.writePreferences(
@@ -486,9 +488,9 @@ CVCenterPreferences {
 							saveCtrlButtonBank.string.interpret,
 							removeResponders.value,
 							initMidiOnStartUp.value,
-							cvCenterEditor.result
+							shortcuts,
+							cvCenterKeyCodesEditor.result(false)
 						);
-						cvCenterKeyCodesEditor.result(true);
 						window.close;
 					})
 				})
@@ -497,9 +499,17 @@ CVCenterPreferences {
 		window.front;
 	}
 
-	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, savedShortcuts, informString|
+	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, shortcuts, keyCodesAndMods, informString|
 		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders, thisInformString, thisInitMidi;
-		var shortcutsPath, shortcuts;
+		var shortcutsPath, keyCodesPath;
+		var platform;
+
+		Platform.case(
+			\linux, { platform = "Linux" },
+			\osx, { platform = "OSX" },
+			\windows, { platform = "Windows" },
+			{ platform = "NN" }
+		);
 
 		thisSaveClassVars = saveClassVars.asBoolean;
 		thisRemoveResponders = removeResponders.asBoolean;
@@ -526,18 +536,11 @@ CVCenterPreferences {
 			prefs = ();
 		});
 
-		switch(GUI.id,
-			\cocoa, {
-				shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcutsCocoa";
-			},
-			{ shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcutsQt" }
-		);
+		shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcuts";
+		shortcuts !? { shortcuts.writeArchive(shortcutsPath) };
 
-		if(File.exists(shortcutsPath), {
-			shortcuts = Object.readArchive(shortcutsPath);
-		}, {
-			shortcuts = ();
-		});
+		keyCodesPath = KeyDownActions.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++platform;
+		keyCodesAndMods !? { keyCodesAndMods.writeArchive(keyCodesPath) };
 
 		prefs.put(\saveGuiProperties, saveGuiProperties);
 		if(saveGuiProperties == 2 or:{ saveGuiProperties == 1 }, {
@@ -556,34 +559,66 @@ CVCenterPreferences {
 			#[midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].do(prefs.removeAt(_));
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);
-		// shortcuts dummy
-		// shortcuts.putPairs([\cvcenter, (), \cvwidgeteditor, ()]);
-
 		prefs.writeArchive(prefsPath);
+
 		if(informString.isNil, {
 			thisInformString = "Your CVCenter-preferences have successfully been written to disk and will become active after library-recompilation.";
 		}, { thisInformString = informString });
-
-		/*****************************************************/
-		// do sthg with  savedShortcuts, savedKeyCodesAndMods//
-		/*****************************************************/
 
 		thisInformString.inform;
 	}
 
 	*readPreferences { |...args|
 		var prefsPath, prefs, res;
+		var shortcutsPath, shortcuts, keyCodesAndModsPath, keyCodesAndMods;
+		var platform;
+
+		Platform.case(
+			\osx, { platform = "OSX" },
+			\linux, { platform = "Linux" },
+			\windows, { platform = "Windows" },
+			{ platform = "NN" }
+		);
+
 		prefsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterPreferences";
+		shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortCuts";
+		keyCodesAndModsPath = KeyCodesEditor.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++platform;
+
 		if(File.exists(prefsPath), {
 			prefs = Object.readArchive(prefsPath);
 			if(args.size > 0, {
 				res = ();
 				args.do({ |val| res.put(val.asSymbol, prefs[val.asSymbol]) });
-				^res;
-			}, {
-				^prefs;
 			})
-		})
-		^nil;
+		});
+		if(File.exists(shortcutsPath), {
+			if(args.size > 0, {
+				if(args.collect(_.asSymbol).includes(\shortcuts), {
+					res ?? { res = () };
+					res.shortcuts = Object.readArchive(shortcutsPath)
+				})
+			}, {
+				prefs ?? { prefs = () };
+				prefs.put(\shortcuts, Object.readArchive(shortcutsPath))
+			})
+		});
+		if(File.exists(keyCodesAndModsPath), {
+			if(args.size > 0, {
+				if(args.collect(_.asSymbol).includes(\keyCodesAndMods), {
+					res ?? { res = () };
+					res.keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
+				})
+			}, {
+				prefs ?? { prefs = () };
+				prefs.put(\keyCodesAndMods, Object.readArchive(keyCodesAndModsPath));
+			})
+		});
+
+		prefs.postcs;
+
+		// "prefs.shortcuts: %\n".postf(prefs.shortcuts);
+		// "prefs.keyCodesAndMods: %\n".postf(prefs.keyCodesAndMods);
+
+		if(res.notNil, { ^res }, { ^prefs });
 	}
 }

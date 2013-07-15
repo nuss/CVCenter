@@ -697,16 +697,18 @@ KeyCodesEditor : KeyDownActions {
 		all.add(this);
 	}
 
-	result { |write|
+	result { |write=true|
 		var res = IdentityDictionary.new, tmp;
-		var keyCodesPath, guiId;
+		var keyCodesPath, pform;
 
-		switch(GUI.id,
-			\cocoa, { guiId = "Cocoa" },
-			{ guiId = "Qt" },
+		Platform.case(
+			\osx, { pform = "OSX" },
+			\linux, { pform = "Linux" },
+			\windows, { pform = "Windows" },
+			{ pform = "NN" }
 		);
 
-		keyCodesPath = this.class.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++guiId;
+		keyCodesPath = this.class.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++pform;
 
 		if((tmp = eas.keyCodes[1].string.interpret).size > 0) { res.put(\keyCodes, tmp) };
 		if(GUI.id !== \cocoa, {
@@ -716,7 +718,7 @@ KeyCodesEditor : KeyDownActions {
 					tmp !== eas.arrowsModifiersQt[1].string.interpret
 				}) {
 					res.put(\arrowsModifiersQt, eas.arrowsModifiersQt[1].string.interpret)
-				} { res.arrowsModifiersQt = res.modifiersQt }
+				} { res.arrowsModifiersQt = res.modifiersQt };
 			}
 		}, {
 			if((tmp = eas.modifiersCocoa[1].string.interpret).size > 0) { res.put(\modifiersCocoa, tmp) };
@@ -728,6 +730,22 @@ KeyCodesEditor : KeyDownActions {
 				} { res.arrowsModifiersCocoa = res.modifiersCocoa }
 			}
 		});
+
+		// if on OSX build dummies for the other GUI (cocoa or qt)
+		if(pform == "OSX") {
+			switch(GUI.id,
+				\cocoa, {
+					res.put(\modifiersQt, this.class.modifiersQt);
+					res.put(\arrowsModifiersQt, this.class.arrowsModifiersQt);
+				},
+				\qt, {
+					res.put(\modifiersCocoa, this.class.modifiersCocoa);
+					res.put(\arrowsModifiersCocoa, this.class.arrowsModifiersCocoa);
+				}
+			)
+		};
+
+
 		if(write) { ^res.writeArchive(keyCodesPath) } { ^res }
 	}
 

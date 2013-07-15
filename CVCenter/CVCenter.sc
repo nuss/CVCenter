@@ -102,7 +102,7 @@ CVCenter {
 		// shortcuts
 		scv = (); // environment holding various variables used in shortcut-functions;,
 
-		// "prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
+		"prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
 		if(prefs[\shortcuts].isEmpty, {
 			scFunc =
 			"// next tab
@@ -546,7 +546,7 @@ CVCenter {
 							newPrefs[\ctrlButtonBank],
 							newPrefs[\removeResponders],
 							newPrefs[\initMidiOnStartUp],
-							"Your CVCenter-preferences have successfully been written to disk."
+							informString: "Your CVCenter-preferences have successfully been written to disk."
 						)
 					})
 				});
