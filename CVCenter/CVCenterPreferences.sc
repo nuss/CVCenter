@@ -475,16 +475,18 @@ CVCenterPreferences {
 							)
 						});
 						#saveKeyCodesAndMods, saveShortcuts = IdentityDictionary.new!2;
-						cvCenterEditor.shortcutFields.collect(_.val).do({ |scPair|
-							saveShortcuts = saveShortcuts.add(scPair);
-						});
-						saveKeyCodesAndMods.put(\keyCodes, cvKeyCodesEditorTab.keyCodesArea.string.interpret);
-						if(GUI.id !== \cocoa, {
-							saveKeyCodesAndMods.put(\modifiersQt, cvKeyCodesEditorTab.modsQtArea.string.interpret);
-						}, {
-							saveKeyCodesAndMods.put(\modifiersCocoa, cvKeyCodesEditorTab.modsQtArea.string.interpret);
-							saveKeyCodesAndMods.put(\arrowsModifiersCocoa, cvKeyCodesEditorTab.arrModsCocoaArea.string.interpret);
-						});
+						"cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
+						"cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
+						// cvCenterEditor.shortcutFields.collect(_.val).do({ |scPair|
+						// 	saveShortcuts = saveShortcuts.add(scPair);
+						// });
+						// saveKeyCodesAndMods.put(\keyCodes, cvKeyCodesEditorTab.keyCodesArea.string.interpret);
+						// if(GUI.id !== \cocoa, {
+						// 	saveKeyCodesAndMods.put(\modifiersQt, cvKeyCodesEditorTab.modsQtArea.string.interpret);
+						// 	}, {
+						// 		saveKeyCodesAndMods.put(\modifiersCocoa, cvKeyCodesEditorTab.modsQtArea.string.interpret);
+						// 		saveKeyCodesAndMods.put(\arrowsModifiersCocoa, cvKeyCodesEditorTab.arrModsCocoaArea.string.interpret);
+						// });
 						this.writePreferences(
 							saveGuiPosition.value,
 							rect,
@@ -496,8 +498,8 @@ CVCenterPreferences {
 							saveCtrlButtonBank.string.interpret,
 							removeResponders.value,
 							initMidiOnStartUp.value,
-							saveShortcuts,
-							saveKeyCodesAndMods
+							// saveShortcuts,
+							// saveKeyCodesAndMods
 						);
 						window.close;
 					})

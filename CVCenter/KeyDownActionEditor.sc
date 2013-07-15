@@ -250,7 +250,7 @@ KeyDownActions {
 KeyDownActionsEditor : KeyDownActions {
 
 	classvar all;
-	var <window, <shortcutFields, <shortcutTexts, <funcFields, <editAreas, <editButs, cachedScrollViewSC;
+	var <window, <tmpShortcuts, <shortcutFields, <shortcutTexts, <funcFields, <editAreas, <editButs, cachedScrollViewSC;
 
 	*initClass {
 		all = List.new;
@@ -314,7 +314,7 @@ KeyDownActionsEditor : KeyDownActions {
 			}
 		});
 
-		#editAreas, editFlows, shortcutTexts, shortcutFields, editButs, removeButs, funcFields = []!7;
+		#editAreas, editFlows, shortcutTexts, shortcutFields, editButs, removeButs, funcFields, tmpShortcuts = []!8;
 
 		scrollArea = ScrollView(window.asView, Rect(
 			0, 0, window.asView.bounds.width, window.asView.bounds.height-23
@@ -351,6 +351,8 @@ KeyDownActionsEditor : KeyDownActions {
 
 			editArea.decorator = tmpEditFlow = FlowLayout(editArea.bounds, 7@7, 2@2);
 
+			tmpShortcuts = tmpShortcuts.add(nil);
+
 			shortcutTexts = shortcutTexts.add(
 				shortcutText = StaticText(editArea, 40@15)
 					.string_("shortcut:")
@@ -360,17 +362,17 @@ KeyDownActionsEditor : KeyDownActions {
 				;
 			);
 
-			shortcutFields = shortcutFields.add((
-				shortcutField = (display: StaticText(editArea, tmpEditFlow.indentedRemaining.width-125@15)
+			shortcutFields = shortcutFields.add(
+				shortcutField = StaticText(editArea, tmpEditFlow.indentedRemaining.width-125@15)
 					.background_(Color.white)
 					.font_(shortCutFont)
 					.stringColor_(staticTextColor)
-					.canFocus_(false),
-				val: ());
-			));
+					.canFocus_(false)
+				;
+			);
 
 			shortcut !? {
-				shortcutField.display.string_(" "++shortcut);
+				shortcutField.string_(" "++shortcut);
 			};
 
 			editButs = editButs.add(
@@ -412,66 +414,66 @@ KeyDownActionsEditor : KeyDownActions {
 													mod != thisArrowsModifiers[\none]
 												}
 											}, {
-												"shortcutField.val: %\n".postf(shortcutField.val);
-												shortcutField.display.string_(
+												// "tmpShortcuts[%]: %\n".postf(count, tmpShortcuts[count]);
+												shortcutField.string_(
 													" "++ mods ++ join ++
 													keyCodes.findKeyForValue(keycode)
 												);
 												if(thisArrowsModifiers.includes(mod), {
 													if(GUI.id !== \cocoa, {
-														shortcutField.val_((mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+														tmpShortcuts[count] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
 															arrowModifierCocoa: nil,
 															arrowModifierQt: mod,
 															modifierCocoa: nil,
 															modifierQt: nil
-														))
+														)
 													}, {
-														shortcutField.val_((mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+														tmpShortcuts[count] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
 															arrowModifierCocoa: mod,
 															arrowModifierQt: nil,
 															modifierCocoa: nil,
 															modifierQt: nil
-														))
+														)
 													});
 												}, {
 													if(GUI.id !== \cocoa, {
-														shortcutField.val_((mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+														tmpShortcuts[count] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
 															arrowModifierCocoa: nil,
 															arrowModifierQt: nil,
 															modifierCocoa: nil,
 															modifierQt: mod
-														))
+														)
 													}, {
-														shortcutField.val_((mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+														tmpShortcuts[count] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
 															arrowModifierCocoa: nil,
 															arrowModifierQt: nil,
 															modifierCocoa: mod,
 															modifierQt: nil
-														))
+														)
 													})
 												});
-												"shortcutField.val new: %\n".postf(shortcutField.val);
+												// "tmpShortcuts[%] =  new: %\n".postf(count, tmpShortcuts[count]);
 											}, {
-												shortcutField.display.string_(
+												shortcutField.string_(
 													" "++
 													keyCodes.findKeyForValue(keycode)
 												);
-												shortcutField.val_(keyCodes.findKeyForValue(keycode) -> (
+												tmpShortcuts[count] = keyCodes.findKeyForValue(keycode) -> (
 													func: funcField.string,
 													keyCode: keycode,
 													arrowModifierCocoa: nil,
 													arrowModifierQt: nil,
 													modifierCocoa: nil,
 													modifierQt: nil
-												));
+												);
 											})
 										}
 									})
@@ -499,7 +501,7 @@ KeyDownActionsEditor : KeyDownActions {
 						rmBounds = bt.parent.bounds;
 						bt.parent.remove;
 						editAreas.removeAt(tmpIndex);
-						shortcutFields[tmpIndex].removeAt(\val);
+						tmpShortcuts.remove(tmpShortcuts[tmpIndex]);
 						editAreas.do({ |it|
 							if(it.bounds.top > rmBounds.top, {
 								it.bounds_(Rect(
@@ -526,7 +528,7 @@ KeyDownActionsEditor : KeyDownActions {
 					editArea,
 					tmpEditFlow.indentedRemaining.width@tmpEditFlow.indentedRemaining.height
 				).font_(textFieldFont).enabled_(false).syntaxColorize.action_({ |ffield|
-					shortcutFields[count].val.value.func = funcField.string;
+					tmpShortcuts[count].value.func = funcField.string;
 				});
 			);
 			funcString !? { funcFields[count].string_(funcString) };
@@ -536,7 +538,7 @@ KeyDownActionsEditor : KeyDownActions {
 
 		order.do({ |shortcut, i|
 			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "));
-			shortcutFields[i].val = shortcut -> (
+			tmpShortcuts[i] = shortcut -> (
 				func: shortcutsDict[shortcut][\func],
 				keyCode: shortcutsDict[shortcut][\keyCode],
 				modifierQt: shortcutsDict[shortcut][\modifierQt],
@@ -546,10 +548,10 @@ KeyDownActionsEditor : KeyDownActions {
 			)
 		});
 
-		shortcutFields.do({ |it, i|
-			"shortcutFields[%].val: %\n".postf(i, it.val);
-			"funcFields[%].string: %\n".postf(i, funcFields[i].string);
-		});
+		// tmpShortcuts.do({ |it, i|
+		// 	"tmpShortcuts[%]: %\n".postf(i, it);
+		// 	"funcFields[%].string: %\n".postf(i, funcFields[i].string);
+		// });
 
 		butArea.decorator = butFlow = FlowLayout(butArea.bounds, 7@4, 3@0);
 
@@ -572,12 +574,20 @@ KeyDownActionsEditor : KeyDownActions {
 		parent ?? { window.front };
 		all.add(this);
 	}
+
+	result {
+		var res;
+		res = IdentityDictionary.new;
+		tmpShortcuts.do({ |it| res.put(it.key, it.value) });
+		^res;
+	}
+
 }
 
 KeyCodesEditor : KeyDownActions {
 
 	classvar all;
-	var <window, <keyCodesArea, <modsQtArea, <modsCocoaArea, <arrModsQtArea, <arrModsCocoaArea;
+	var <window, <eas;
 
 	*initClass {
 		all = List.new;
@@ -639,7 +649,6 @@ KeyCodesEditor : KeyDownActions {
 			)).font_(shortCutFont).stringColor_(staticTextColor).string_(dictName);
 
 			flow.nextLine;
-
 			editArea = TextView(scrollView, Point(
 				flow.indentedRemaining.width-15, height
 			)).font_(textFieldFont).syntaxColorize.hasVerticalScroller_(true);
@@ -655,32 +664,60 @@ KeyCodesEditor : KeyDownActions {
 			editArea.string_(editArea.string++"];");
 
 			flow.nextLine.shift(0, 5);
-			name.bounds.height+editArea.bounds.height+16;
+			[name.bounds.height+editArea.bounds.height+16, editArea];
 		};
 
-		editArea = makeEditArea.("KeyDownActions.keyCodes", keyCodes, 400);
-		scrollView.bounds = Rect(0, 0, scrollView.bounds.width, editArea);
+		eas = ();
+
+		eas.keyCodes = makeEditArea.("KeyDownActions.keyCodes", keyCodes, 400);
+		"eas.keyCodes: %\n".postf(eas.keyCodes);
+		scrollView.bounds = Rect(0, 0, scrollView.bounds.width, eas.keyCodes[0]);
 
 		if(GUI.id !== \cocoa) {
-			editArea = makeEditArea.("KeyDownActions.modifiersQt", modifiersQt, 100);
-			scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
+			eas.modifiersQt = makeEditArea.("KeyDownActions.modifiersQt", modifiersQt, 100);
+			scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+eas.modifiersQt[0]);
 
 			if(arrowsModifiersQt !== modifiersQt) {
-				editArea = makeEditArea.("KeyDownActions.arrowsModifiersQt", arrowsModifiersQt, 100);
-				scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
+				eas.arrowsModifiersQt = makeEditArea.("KeyDownActions.arrowsModifiersQt", arrowsModifiersQt, 100);
+				scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+eas.arrowsModifiersQt[0]);
 			}
 		} {
-			editArea = makeEditArea.("KeyDownActions.modifiersCocoa", modifiersCocoa, 100);
-			scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
+			eas.modifiersCocoa = makeEditArea.("KeyDownActions.modifiersCocoa", modifiersCocoa, 100);
+			scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+eas.modifiersCocoa[0]);
 
 			if(arrowsModifiersCocoa !== modifiersCocoa) {
-				editArea = makeEditArea.("KeyDownActions.arrowsModifiersCocoa", arrowsModifiersCocoa, 100);
-				scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+editArea);
+				eas.arrowsModifiersCocoa = makeEditArea.("KeyDownActions.arrowsModifiersCocoa", arrowsModifiersCocoa, 100);
+				scrollView.bounds = Rect(0, 0, scrollView.bounds.width, scrollView.bounds.height+eas.arrowsModifiersCocoa[0]);
 			}
 		};
 
 		parent ?? { window.front };
 		all.add(this);
+	}
+
+	result {
+		var res = IdentityDictionary.new, tmp;
+		if((tmp = eas.keyCodes[1].string.interpret).size > 0, { res.put(\keyCodes, tmp) });
+		if(GUI.id !== \cocoa, {
+			if((tmp = eas.modifiersQt[1].string.interpret).size > 0, { res.put(\modifiersQt, tmp) });
+			eas.arrowsModifiersQt !? {
+				if(eas.arrowsModifiersQt[1].string.interpret.size > 0 and:{
+					tmp !== eas.arrowsModifiersQt[1].string.interpret
+				}, {
+					res.put(\arrowsModifiersQt, eas.arrowsModifiersQt[1].string.interpret)
+				}, { res.arrowsModifiersQt = res.modifiersQt })
+			}
+		}, {
+			if((tmp = eas.modifiersCocoa[1].string.interpret).size > 0, { res.put(\modifiersCocoa, tmp) });
+			eas.arrowsModifiersCocoa !? {
+				if(eas.arrowsModifiersCocoa[1].string.interpret.size > 0 and:{
+					tmp !== eas.arrowsModifiersCocoa[1].string.interpret
+				}, {
+					res.put(\arrowsModifiersCocoa, eas.arrowsModifiersCocoa[1].string.interpret)
+				}, { res.arrowsModifiersCocoa = res.modifiersCocoa })
+			}
+		});
+		^res
 	}
 
 }
