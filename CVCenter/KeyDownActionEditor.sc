@@ -76,6 +76,7 @@ KeyDownActions {
 						$, ->				59,
 						$. ->				60,
 						$/ ->				61,
+						\space -> 			65,
 						\esc ->				9,
 						$` ->				49,
 						'arrow up' ->		111,
