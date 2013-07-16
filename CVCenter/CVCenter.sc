@@ -102,7 +102,8 @@ CVCenter {
 		// shortcuts
 		scv = (); // environment holding various variables used in shortcut-functions;,
 
-		"prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
+		// "prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
+
 		if(prefs[\shortcuts].isEmpty, {
 			scFunc =
 			"// next tab
@@ -327,6 +328,8 @@ CVCenter {
 				\d,
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[$d])
 			);
+		}, {
+			this.shortcuts = prefs[\shortcuts][\cvcenter];
 		});
 	}
 

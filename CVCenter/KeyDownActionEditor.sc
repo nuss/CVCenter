@@ -6,232 +6,280 @@ KeyDownActions {
 	// var <window, <>actions;
 
 	*initClass {
+		var keyCodesAndModsPath, keyCodesAndMods, platform;
+
 		Class.initClassTree(Platform);
 		Class.initClassTree(GUI);
 
-		// viewActions = IdentityDictionary.new;
+		Platform.case(
+			\osx, { platform = "OSX" },
+			\linux, { platform = "Linux" },
+			\windows, { platform = "Windows" },
+			{ platform = "NN" }
+		);
+
+		keyCodesAndModsPath = this.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++platform;
+		keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
+		keyCodesAndMods.pairsDo({ |k, v| [k, v].postln });
+		// keyCodesAndMods.keyCodes.postln;
 
 		Platform.case(
 			\linux, {
-				this.keyCodes = IdentityDictionary[
-					$1 ->				10,
-					$2 ->				11,
-					$3 ->				12,
-					$4 ->				13,
-					$5 ->				14,
-					$6 ->				15,
-					$7 ->				16,
-					$8 ->				17,
-					$9 ->				18,
-					$0 ->				19,
-					$- ->				20,
-					$= ->				21,
-					$q ->				24,
-					$w ->				25,
-					$e ->				26,
-					$r ->				27,
-					$t ->				28,
-					$y ->				29,
-					$u ->				30,
-					$i ->				31,
-					$o ->				32,
-					$p ->				33,
-					$[ ->				34,
-					$] ->				35,
-					$a ->				38,
-					$s ->				39,
-					$d ->				40,
-					$f ->				41,
-					$g ->				42,
-					$h ->				43,
-					$j ->				44,
-					$k ->				45,
-					$l ->				46,
-					$; ->				47,
-					$' ->				48,
-					(92.asAscii) ->		51,
-					$< ->				94,
-					$z ->				52,
-					$x ->				53,
-					$c ->				54,
-					$v ->				55,
-					$b ->				56,
-					$n ->				57,
-					$m ->				58,
-					$, ->				59,
-					$. ->				60,
-					$/ ->				61,
-					\esc ->				9,
-					$` ->				49,
-					'arrow up' ->		111,
-					'arrow down' ->		116,
-					'arrow left' ->		113,
-					'arrow right' ->	114,
-				];
+				if(keyCodesAndMods.notNil and:{ keyCodesAndMods[\keyCodes].notNil }) {
+					this.keyCodes = keyCodesAndMods[\keyCodes];
+				} {
+					this.keyCodes = IdentityDictionary[
+						$1 ->				10,
+						$2 ->				11,
+						$3 ->				12,
+						$4 ->				13,
+						$5 ->				14,
+						$6 ->				15,
+						$7 ->				16,
+						$8 ->				17,
+						$9 ->				18,
+						$0 ->				19,
+						$- ->				20,
+						$= ->				21,
+						$q ->				24,
+						$w ->				25,
+						$e ->				26,
+						$r ->				27,
+						$t ->				28,
+						$y ->				29,
+						$u ->				30,
+						$i ->				31,
+						$o ->				32,
+						$p ->				33,
+						$[ ->				34,
+						$] ->				35,
+						$a ->				38,
+						$s ->				39,
+						$d ->				40,
+						$f ->				41,
+						$g ->				42,
+						$h ->				43,
+						$j ->				44,
+						$k ->				45,
+						$l ->				46,
+						$; ->				47,
+						$' ->				48,
+						(92.asAscii) ->		51,
+						$< ->				94,
+						$z ->				52,
+						$x ->				53,
+						$c ->				54,
+						$v ->				55,
+						$b ->				56,
+						$n ->				57,
+						$m ->				58,
+						$, ->				59,
+						$. ->				60,
+						$/ ->				61,
+						\esc ->				9,
+						$` ->				49,
+						'arrow up' ->		111,
+						'arrow down' ->		116,
+						'arrow left' ->		113,
+						'arrow right' ->	114,
+					]
+				};
 
 				// arrowsModifiers = IdentityDictionary[];
 
-				this.modifiersQt = IdentityDictionary[
-					\none ->			0,
-					\shift ->			131072,
-					\alt ->				524288,
-					'alt + shift' ->	655360,
-				];
+				if(keyCodesAndMods.notNil and:{ keyCodesAndMods[\modifiersQt].notNil }) {
+					this.modifiersQt = keyCodesAndMods[\modifiersQt];
+				} {
+					this.modifiersQt = IdentityDictionary[
+						\none ->			0,
+						\shift ->			131072,
+						\alt ->				524288,
+						'alt + shift' ->	655360,
+					]
+				};
 
 				this.modifiersCocoa = this.modifiersQt;
 				this.arrowsModifiersQt = this.modifiersQt;
 			},
 
 			\osx, {
-				this.keyCodes = IdentityDictionary[
-					$1 -> 				18,
-					$2 -> 				19,
-					$3 -> 				20,
-					$4 -> 				21,
-					$5 -> 				23,
-					$6 -> 				22,
-					$7 -> 				26,
-					$8 -> 				28,
-					$9 -> 				25,
-					$0 -> 				29,
-					$- -> 				27,
-					$= -> 				24,
-					$q -> 				12,
-					$w -> 				13,
-					$e -> 				14,
-					$r -> 				15,
-					$t -> 				17,
-					$y -> 				16,
-					$u -> 				32,
-					$i -> 				34,
-					$o -> 				31,
-					$p -> 				35,
-					$[ -> 				33,
-					$] -> 				30,
-					$a -> 				0,
-					$s -> 				1,
-					$d -> 				2,
-					$f -> 				3,
-					$g -> 				5,
-					$h -> 				4,
-					$j -> 				38,
-					$k -> 				40,
-					$l -> 				37,
-					$; -> 				41,
-					$' -> 				39,
-					(92.asAscii) -> 	42,
-					$` -> 				50,
-					$z -> 				6,
-					$x -> 				7,
-					$c -> 				8,
-					$v -> 				9,
-					$b -> 				11,
-					$n -> 				45,
-					$m -> 				46,
-					$, -> 				43,
-					$. -> 				47,
-					$/ -> 				44,
-					\space ->			49,
-					\esc -> 			53,
-					'arrow up' -> 		126,
-					'arrow down' -> 	125,
-					'arrow left' -> 	123,
-					'arrow right' -> 	124,
-				];
+				if(keyCodesAndMods.notNil and:{ keyCodesAndMods[\keyCodes].notNil }) {
+					this.keyCodes = keyCodesAndMods[\keyCodes];
+				} {
+					this.keyCodes = IdentityDictionary[
+						$1 -> 				18,
+						$2 -> 				19,
+						$3 -> 				20,
+						$4 -> 				21,
+						$5 -> 				23,
+						$6 -> 				22,
+						$7 -> 				26,
+						$8 -> 				28,
+						$9 -> 				25,
+						$0 -> 				29,
+						$- -> 				27,
+						$= -> 				24,
+						$q -> 				12,
+						$w -> 				13,
+						$e -> 				14,
+						$r -> 				15,
+						$t -> 				17,
+						$y -> 				16,
+						$u -> 				32,
+						$i -> 				34,
+						$o -> 				31,
+						$p -> 				35,
+						$[ -> 				33,
+						$] -> 				30,
+						$a -> 				0,
+						$s -> 				1,
+						$d -> 				2,
+						$f -> 				3,
+						$g -> 				5,
+						$h -> 				4,
+						$j -> 				38,
+						$k -> 				40,
+						$l -> 				37,
+						$; -> 				41,
+						$' -> 				39,
+						(92.asAscii) -> 	42,
+						$` -> 				50,
+						$z -> 				6,
+						$x -> 				7,
+						$c -> 				8,
+						$v -> 				9,
+						$b -> 				11,
+						$n -> 				45,
+						$m -> 				46,
+						$, -> 				43,
+						$. -> 				47,
+						$/ -> 				44,
+						\space ->			49,
+						\esc -> 			53,
+						'arrow up' -> 		126,
+						'arrow down' -> 	125,
+						'arrow left' -> 	123,
+						'arrow right' -> 	124,
+					]
+				};
 
-				this.arrowsModifiersCocoa = IdentityDictionary[
-					'none' ->			10486016,
-					'alt' ->			11010336,
-					'shift' ->			10617090,
-					'alt + shift' ->	11141410
-				];
+				if(keyCodesAndMods.notNil and:{ keyCodesAndMods[\arrowsModifiersCocoa].notNil }) {
+					this.arrowsModifiersCocoa = keyCodesAndMods[\arrowsModifiersCocoa];
+				} {
+					this.arrowsModifiersCocoa = IdentityDictionary[
+						'none' ->			10486016,
+						'alt' ->			11010336,
+						'shift' ->			10617090,
+						'alt + shift' ->	11141410
+					]
+				};
 
-				this.modifiersCocoa = IdentityDictionary[
-					\none ->			0,
-					\alt ->				524576,
-					\shift ->			131330,
-					'alt + shift' ->	655650,
-				];
+				if(keyCodesAndMods.notNil and:{ keyCodesAndMods[\modifiersCocoa].notNil }) {
+					this.modifiersCocoa = keyCodesAndMods[\modifiersCocoa];
+				} {
+					this.modifiersCocoa = IdentityDictionary[
+						\none ->			0,
+						\alt ->				524576,
+						\shift ->			131330,
+						'alt + shift' ->	655650,
+					]
+				};
 
-				this.arrowsModifiersQt = IdentityDictionary[
-					\none ->			2097152,
-					'alt' ->			2621440,
-					'shift' ->			2228224,
-					'alt + shift' ->	2752512
-				];
+				if(keyCodesAndMods.notNil and:{ keyCodesAndMods[\arrowsModifiersQt].notNil }) {
+					this.arrowsModifiersQt = keyCodesAndMods[\arrowsModifiersQt];
+				} {
+					this.arrowsModifiersQt = IdentityDictionary[
+						\none ->			2097152,
+						'alt' ->			2621440,
+						'shift' ->			2228224,
+						'alt + shift' ->	2752512
+					]
+				};
 
-				this.modifiersQt = IdentityDictionary[
-					\none ->			0,
-					\shift ->			131072,
-					\alt ->				524288,
-					'alt + shift' ->	655360,
-				]
+				if(keyCodesAndMods.notNil and:{ keyCodesAndMods[\modifiersQt].notNil }) {
+					this.modifiersQt = keyCodesAndMods[\modifiersQt];
+				} {
+					this.modifiersQt = IdentityDictionary[
+						\none ->			0,
+						\shift ->			131072,
+						\alt ->				524288,
+						'alt + shift' ->	655360,
+					]
+				}
 			},
 
 			\windows, {
-				this.keyCodes = IdentityDictionary[
-					$1 -> 				49,
-					$2 -> 				50,
-					$3 -> 				51,
-					$4 -> 				52,
-					$5 -> 				53,
-					$6 -> 				54,
-					$7 -> 				55,
-					$8 -> 				56,
-					$9 -> 				57,
-					$0 -> 				48,
-					$- -> 				189,
-					$= -> 				187,
-					$q -> 				81,
-					$w -> 				87,
-					$e -> 				69,
-					$r -> 				82,
-					$t -> 				84,
-					$y -> 				89,
-					$u -> 				85,
-					$i -> 				73,
-					$o -> 				79,
-					$p -> 				80,
-					$[ -> 				219,
-					$] -> 				221,
-					$a -> 				65,
-					$s -> 				83,
-					$d -> 				68,
-					$f -> 				70,
-					$g -> 				71,
-					$h -> 				72,
-					$j -> 				74,
-					$k -> 				75,
-					$l -> 				76,
-					$; -> 				186,
-					$' -> 				222,
-					(92.asAscii) ->		220,
-					$< -> 				226,
-					$z -> 				90,
-					$x -> 				88,
-					$c -> 				67,
-					$v -> 				86,
-					$b -> 				66,
-					$n -> 				78,
-					$m -> 				77,
-					$, -> 				188,
-					$. -> 				190,
-					$/ -> 				191,
-					\esc -> 			27,
-					\space -> 			65,
-					$` -> 				192,
-					'arrow up' -> 		38,
-					'arrow down' -> 	40,
-					'arrow left' -> 	37,
-					'arrow right' -> 	39,
-				];
+				if(keyCodesAndMods.notNil and:{ keyCodesAndMods[\keyCodes].notNil }) {
+					this.keyCodes = keyCodesAndMods[\keyCodes];
+				} {
+					this.keyCodes = IdentityDictionary[
+						$1 -> 				49,
+						$2 -> 				50,
+						$3 -> 				51,
+						$4 -> 				52,
+						$5 -> 				53,
+						$6 -> 				54,
+						$7 -> 				55,
+						$8 -> 				56,
+						$9 -> 				57,
+						$0 -> 				48,
+						$- -> 				189,
+						$= -> 				187,
+						$q -> 				81,
+						$w -> 				87,
+						$e -> 				69,
+						$r -> 				82,
+						$t -> 				84,
+						$y -> 				89,
+						$u -> 				85,
+						$i -> 				73,
+						$o -> 				79,
+						$p -> 				80,
+						$[ -> 				219,
+						$] -> 				221,
+						$a -> 				65,
+						$s -> 				83,
+						$d -> 				68,
+						$f -> 				70,
+						$g -> 				71,
+						$h -> 				72,
+						$j -> 				74,
+						$k -> 				75,
+						$l -> 				76,
+						$; -> 				186,
+						$' -> 				222,
+						(92.asAscii) ->		220,
+						$< -> 				226,
+						$z -> 				90,
+						$x -> 				88,
+						$c -> 				67,
+						$v -> 				86,
+						$b -> 				66,
+						$n -> 				78,
+						$m -> 				77,
+						$, -> 				188,
+						$. -> 				190,
+						$/ -> 				191,
+						\esc -> 			27,
+						\space -> 			65,
+						$` -> 				192,
+						'arrow up' -> 		38,
+						'arrow down' -> 	40,
+						'arrow left' -> 	37,
+						'arrow right' -> 	39,
+					]
+				};
 
-				this.modifiersQt = IdentityDictionary[
-					\none ->			0,
-					\shift -> 			131072,
-					\alt -> 			524288,
-					'alt + shift' -> 	655360,
-				];
+				if(keyCodesAndMods.notNil and:{ keyCodesAndMods[\modifiersQt].notNil }) {
+					this.modifiersQt = keyCodesAndMods[\modifiersQt];
+				} {
+					this.modifiersQt = IdentityDictionary[
+						\none ->			0,
+						\shift -> 			131072,
+						\alt -> 			524288,
+						'alt + shift' -> 	655360,
+					]
+				};
 
 				this.modifiersCocoa = this.modifiersQt;
 				this.arrowsModifiersQt = this.modifiersQt;
@@ -251,8 +299,8 @@ KeyDownActions {
 
 KeyDownActionsEditor : KeyDownActions {
 
-	classvar all;
-	var <window, <tmpShortcuts, <shortcutFields, <shortcutTexts, <funcFields, <editAreas, <editButs, cachedScrollViewSC;
+	classvar all, <cachedScrollViewSC;
+	var <window, <tmpShortcuts, <shortcutFields, <shortcutTexts, <funcFields, <editAreas, <editButs;
 
 	*initClass {
 		all = List.new;
@@ -270,7 +318,7 @@ KeyDownActionsEditor : KeyDownActions {
 		var order, orderedShortcuts;
 		var tmpEditFlow, tmpIndex, join = " + ", mods;
 		// vars for makeEditArea
-		var count, rmBounds;
+		var count, rmBounds, deleteShortcutKey;
 		var thisArrowsModifiers, thisModifiers;
 
 		Platform.case(
@@ -394,7 +442,9 @@ KeyDownActionsEditor : KeyDownActions {
 									ed.funcFields.do(_.enabled_(false));
 								});
 								editBut.value_(1);
+								deleteShortcutKey = shortcutField.string[1..].asSymbol;
 								cachedScrollViewSC = ScrollView.globalKeyDownAction;
+								"tmpShortcuts[%]: %\n".postf(count, tmpShortcuts[count]);
 								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
 									// [view, char, mod, unicode, keycode, key].postcs;
 									// GUI.id.postln;
@@ -468,7 +518,7 @@ KeyDownActionsEditor : KeyDownActions {
 													" "++
 													keyCodes.findKeyForValue(keycode)
 												);
-												tmpShortcuts[count] = keyCodes.findKeyForValue(keycode) -> (
+												tmpShortcuts[count] = (keyCodes.findKeyForValue(keycode)).asSymbol -> (
 													func: funcField.string,
 													keyCode: keycode,
 													arrowModifierCocoa: nil,
@@ -476,9 +526,14 @@ KeyDownActionsEditor : KeyDownActions {
 													modifierCocoa: nil,
 													modifierQt: nil
 												);
-											})
+											});
+											"tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }): %\n".postf(tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }));
+											tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }) !? {
+												tmpShortcuts.remove(tmpShortcuts[tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey })]);
+											}
 										}
-									})
+									});
+									ScrollView.globalKeyDownAction_(cachedScrollViewSC)
 								});
 								funcField.enabled_(true);
 								editArea.background_(Color.red);

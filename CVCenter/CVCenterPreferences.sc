@@ -435,12 +435,12 @@ CVCenterPreferences {
 			cvWidgetEditorTab = scTabs.add("CVWidget(MS)Editor", scroll: false);
 
 			cvCenterEditor = KeyDownActionsEditor(
-				cvCenterTab, nil, cvCenterTab.bounds, CVCenter.shortcuts, false
+				cvCenterTab, nil, cvCenterTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvcenter ?? { CVCenter.shortcuts }}, false
 			);
 			// cvCenterEditor.shortcutFields.collect(_.val).postln;
 			// CVWidgets should go here but...
 			cvWidgetEditorEditor = KeyDownActionsEditor(
-				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false
+				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvwidgeteditor ?? { AbstractCVWidgetEditor.shortcuts }}, false
 			);
 
 			cvCenterKeyCodesEditor = KeyCodesEditor(
@@ -474,6 +474,9 @@ CVCenterPreferences {
 								height.string.interpret.asInteger
 							)
 						});
+						KeyDownActionsEditor.cachedScrollViewSC !? {
+							ScrollView.globalKeyDownAction_(KeyDownActionsEditor.cachedScrollViewSC);
+						};
 						shortcuts = (cvcenter:  cvCenterEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
 						// "cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
 						// "cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
@@ -614,11 +617,11 @@ CVCenterPreferences {
 			})
 		});
 
-		prefs.postcs;
+		// prefs.postcs;
 
 		// "prefs.shortcuts: %\n".postf(prefs.shortcuts);
 		// "prefs.keyCodesAndMods: %\n".postf(prefs.keyCodesAndMods);
 
-		if(res.notNil, { ^res }, { ^prefs });
+		^if(res.notNil, { res }, { if(prefs.notEmpty, { prefs }, { nil }) });
 	}
 }
