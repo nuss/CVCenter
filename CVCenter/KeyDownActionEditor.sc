@@ -20,7 +20,7 @@ KeyDownActions {
 
 		keyCodesAndModsPath = this.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++platform;
 		keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
-		keyCodesAndMods.pairsDo({ |k, v| [k, v].postln });
+		// keyCodesAndMods.pairsDo({ |k, v| [k, v].postln });
 		// keyCodesAndMods.keyCodes.postln;
 
 		Platform.case(
@@ -484,9 +484,9 @@ KeyDownActionsEditor : KeyDownActions {
 								editBut.value_(1);
 								deleteShortcutKey = shortcutField.string[1..].asSymbol;
 								cachedScrollViewSC = ScrollView.globalKeyDownAction;
-								"tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount].cs);
+							// "tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount].cs);
 								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
-									[view, char, mod, unicode, keycode, key].postcs;
+									// [view, char, mod, unicode, keycode, key].postcs;
 									// GUI.id.postln;
 									if(keyCodes.findKeyForEqualValue(keycode).notNil, {
 										char !? {
@@ -676,7 +676,7 @@ KeyDownActionsEditor : KeyDownActions {
 		var res;
 		res = IdentityDictionary.new;
 		tmpShortcuts.do({ |it| res.put(it.key, it.value) });
-		^res.postcs;
+		^res;
 	}
 
 }
