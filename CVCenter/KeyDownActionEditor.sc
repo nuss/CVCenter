@@ -29,18 +29,18 @@ KeyDownActions {
 					this.keyCodes = keyCodesAndMods[\keyCodes];
 				} {
 					this.keyCodes = IdentityDictionary[
-						// 'fn + F1' -> 		67,
-						// 'fn + F2' -> 		68,
-						// 'fn + F3' -> 		69,
-						// 'fn + F4' -> 		70,
-						// 'fn + F5' -> 		71,
-						// 'fn + F6' -> 		72,
-						// 'fn + F7' -> 		73,
-						// 'fn + F8' -> 		74,
-						// 'fn + F9' -> 		75,
-						// 'fn + F10' -> 		76,
-						// 'fn + F11' -> 		95,
-						// 'fn + F12' -> 		96,
+						'fn + F1' -> 		67,
+						'fn + F2' -> 		68,
+						'fn + F3' -> 		69,
+						'fn + F4' -> 		70,
+						'fn + F5' -> 		71,
+						'fn + F6' -> 		72,
+						'fn + F7' -> 		73,
+						'fn + F8' -> 		74,
+						'fn + F9' -> 		75,
+						'fn + F10' -> 		76,
+						'fn + F11' -> 		95,
+						'fn + F12' -> 		96,
 						$1 ->				10,
 						$2 ->				11,
 						$3 ->				12,
@@ -417,7 +417,7 @@ KeyDownActionsEditor : KeyDownActions {
 		scrollView.decorator = scrollFlow = FlowLayout(scrollView.bounds, 0@0, 1@0);
 
 		makeEditArea = { |shortcut, funcString|
-			var editArea, shortcutText, shortcutField, editBut, removeBut, funcField;
+			var editArea, shortcutText, shortcutField, editBut, removeBut, funcField, myCount;
 
 			// "shortcut: %, funcString: %, scrollView.parent: %\n".postf(shortcut, funcString, scrollView.parent);
 
@@ -428,12 +428,13 @@ KeyDownActionsEditor : KeyDownActions {
 			);
 
 			count = editAreas.size-1;
+			myCount = count;
 
 			scrollView.bounds_(Rect(
 				scrollView.bounds.left,
 				scrollView.bounds.top,
 				scrollView.bounds.width,
-				count+1 * 100
+				myCount+1 * 100
 			));
 
 			editArea.decorator = tmpEditFlow = FlowLayout(editArea.bounds, 7@7, 2@2);
@@ -462,6 +463,8 @@ KeyDownActionsEditor : KeyDownActions {
 				shortcutField.string_(" "++shortcut);
 			};
 
+
+
 			editButs = editButs.add(
 				editBut = Button(editArea, 60@15)
 					.states_([
@@ -481,9 +484,9 @@ KeyDownActionsEditor : KeyDownActions {
 								editBut.value_(1);
 								deleteShortcutKey = shortcutField.string[1..].asSymbol;
 								cachedScrollViewSC = ScrollView.globalKeyDownAction;
-								"tmpShortcuts[%]: %\n".postf(count, tmpShortcuts[count]);
+								"tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount].cs);
 								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
-									// [view, char, mod, unicode, keycode, key].postcs;
+									[view, char, mod, unicode, keycode, key].postcs;
 									// GUI.id.postln;
 									if(keyCodes.findKeyForEqualValue(keycode).notNil, {
 										char !? {
@@ -503,14 +506,14 @@ KeyDownActionsEditor : KeyDownActions {
 													mod != thisArrowsModifiers[\none]
 												}
 											}, {
-												// "tmpShortcuts[%]: %\n".postf(count, tmpShortcuts[count]);
+												// "tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount]);
 												shortcutField.string_(
 													" "++ mods ++ join ++
 													keyCodes.findKeyForValue(keycode)
 												);
 												if(thisArrowsModifiers.includes(mod), {
 													if(GUI.id !== \cocoa, {
-														tmpShortcuts[count] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+														tmpShortcuts[myCount] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
 															arrowModifierCocoa: nil,
@@ -519,7 +522,7 @@ KeyDownActionsEditor : KeyDownActions {
 															modifierQt: nil
 														)
 													}, {
-														tmpShortcuts[count] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+														tmpShortcuts[myCount] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
 															arrowModifierCocoa: mod,
@@ -530,7 +533,7 @@ KeyDownActionsEditor : KeyDownActions {
 													});
 												}, {
 													if(GUI.id !== \cocoa, {
-														tmpShortcuts[count] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+														tmpShortcuts[myCount] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
 															arrowModifierCocoa: nil,
@@ -539,7 +542,7 @@ KeyDownActionsEditor : KeyDownActions {
 															modifierQt: mod
 														)
 													}, {
-														tmpShortcuts[count] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
+														tmpShortcuts[myCount] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
 															arrowModifierCocoa: nil,
@@ -549,13 +552,13 @@ KeyDownActionsEditor : KeyDownActions {
 														)
 													})
 												});
-												// "tmpShortcuts[%] =  new: %\n".postf(count, tmpShortcuts[count]);
+												// "tmpShortcuts[%] =  new: %\n".postf(myCount, tmpShortcuts[myCount]);
 											}, {
 												shortcutField.string_(
 													" "++
 													keyCodes.findKeyForValue(keycode)
 												);
-												tmpShortcuts[count] = (keyCodes.findKeyForValue(keycode)).asSymbol -> (
+												tmpShortcuts[myCount] = (keyCodes.findKeyForValue(keycode)).asSymbol -> (
 													func: funcField.string,
 													keyCode: keycode,
 													arrowModifierCocoa: nil,
@@ -570,7 +573,7 @@ KeyDownActionsEditor : KeyDownActions {
 											}
 										}
 									});
-									ScrollView.globalKeyDownAction_(cachedScrollViewSC)
+								// ScrollView.globalKeyDownAction_(cachedScrollViewSC)
 								});
 								funcField.enabled_(true);
 								editArea.background_(Color.red);
@@ -622,10 +625,10 @@ KeyDownActionsEditor : KeyDownActions {
 					editArea,
 					tmpEditFlow.indentedRemaining.width@tmpEditFlow.indentedRemaining.height
 				).font_(textFieldFont).enabled_(false).syntaxColorize.action_({ |ffield|
-					tmpShortcuts[count].value.func = funcField.string;
+					tmpShortcuts[myCount].value.func = funcField.string;
 				});
 			);
-			funcString !? { funcFields[count].string_(funcString) };
+			funcString !? { funcFields[myCount].string_(funcString) };
 		};
 
 		order = shortcutsDict.order;
@@ -673,7 +676,7 @@ KeyDownActionsEditor : KeyDownActions {
 		var res;
 		res = IdentityDictionary.new;
 		tmpShortcuts.do({ |it| res.put(it.key, it.value) });
-		^res;
+		^res.postcs;
 	}
 
 }
