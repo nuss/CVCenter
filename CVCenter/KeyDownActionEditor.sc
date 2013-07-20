@@ -120,6 +120,18 @@ KeyDownActions {
 					this.keyCodes = keyCodesAndMods[\keyCodes];
 				} {
 					this.keyCodes = IdentityDictionary[
+						'fn + F1' -> 		122,
+						'fn + F2' -> 		120,
+						'fn + F3' -> 		99,
+						'fn + F4' -> 		118,
+						'fn + F5' -> 		96,
+						'fn + F6' -> 		97,
+						'fn + F7' -> 		98,
+						'fn + F8' -> 		100,
+						'fn + F9' -> 		101,
+						'fn + F10' -> 		109,
+						'fn + F11' -> 		103,
+						'fn + F12' -> 		111,
 						$1 -> 				18,
 						$2 -> 				19,
 						$3 -> 				20,
@@ -226,6 +238,18 @@ KeyDownActions {
 					this.keyCodes = keyCodesAndMods[\keyCodes];
 				} {
 					this.keyCodes = IdentityDictionary[
+						'fn + F1' -> 		67,
+						'fn + F2' -> 		68,
+						'fn + F3' -> 		69,
+						'fn + F4' -> 		70,
+						'fn + F5' -> 		71,
+						'fn + F6' -> 		72,
+						'fn + F7' -> 		73,
+						'fn + F8' -> 		74,
+						'fn + F9' -> 		75,
+						'fn + F10' -> 		76,
+						'fn + F11' -> 		95,
+						'fn + F12' -> 		96,
 						$1 -> 				49,
 						$2 -> 				50,
 						$3 -> 				51,
