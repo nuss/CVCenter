@@ -478,6 +478,7 @@ CVCenterPreferences {
 							ScrollView.globalKeyDownAction_(KeyDownActionsEditor.cachedScrollViewSC);
 						};
 						shortcuts = (cvcenter:  cvCenterEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
+						// "shortcuts.cvcenter['fn + F1']: %\n".postf(shortcuts.cvcenter['fn + F1']);
 						// "cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
 						// "cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
 						this.writePreferences(
@@ -595,25 +596,24 @@ CVCenterPreferences {
 			})
 		});
 		if(File.exists(shortcutsPath), {
+			"shortcutsPath exists".postln;
+			prefs ?? { prefs = () };
+			prefs.put(\shortcuts, Object.readArchive(shortcutsPath));
 			if(args.size > 0, {
 				if(args.collect(_.asSymbol).includes(\shortcuts), {
 					res ?? { res = () };
 					res.shortcuts = Object.readArchive(shortcutsPath)
 				})
-			}, {
-				prefs ?? { prefs = () };
-				prefs.put(\shortcuts, Object.readArchive(shortcutsPath))
 			})
 		});
 		if(File.exists(keyCodesAndModsPath), {
+			prefs ?? { prefs = () };
+			prefs.put(\keyCodesAndMods, Object.readArchive(keyCodesAndModsPath));
 			if(args.size > 0, {
 				if(args.collect(_.asSymbol).includes(\keyCodesAndMods), {
 					res ?? { res = () };
 					res.keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
 				})
-			}, {
-				prefs ?? { prefs = () };
-				prefs.put(\keyCodesAndMods, Object.readArchive(keyCodesAndModsPath));
 			})
 		});
 

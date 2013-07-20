@@ -567,7 +567,7 @@ KeyDownActionsEditor : KeyDownActions {
 													modifierQt: nil
 												);
 											});
-											"tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }): %\n".postf(tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }));
+										// "tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }): %\n".postf(tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }));
 											tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }) !? {
 												tmpShortcuts.remove(tmpShortcuts[tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey })]);
 											}
