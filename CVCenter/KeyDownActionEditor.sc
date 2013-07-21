@@ -378,36 +378,38 @@ KeyDownActions {
 		};
 
 		NotificationCenter.register(Server.default, \newAllocators, \listenToShortcuts, {
-			shortcutsListener ?? {
-				shortcutsListener = synthStarter.value.postln;
-				// ServerTree.add(shortcutsListener);
-			};
-			oscResponder ?? {
-				oscResponder = responderStarter.value;
-			};
-			CmdPeriod.add(synthStarter);
-			if(Main.versionAtLeast(3, 5)) {
-				removeShortcutsListener = OSCFunc({ |msg|
-					if(msg[1].asSymbol == '/quit') {
-						[shortcutsListener, responderStarter].do({ |it| it.free; it = nil });
-						CmdPeriod.remove(synthStarter);
-						removeShortcutsListener.free;
-						"\nlistening to global key-downs deactivated\n".inform;
-					}
-				}, '/done', Server.default.addr);
-			} {
-				removeShortcutsListener = OSCresponderNode(Server.default.addr, '/done', { |t, r, msg|
-					if(msg[1].asSymbol == '/quit') {
-						shortcutsListener.free;
-						responderStarter.remove;
-						CmdPeriod.remove(synthStarter);
-						removeShortcutsListener.remove;
-						"\nlistening to global key-downs deactivated\n".inform;
-					}
-				})
-			};
+			Server.default.waitForBoot {
+				shortcutsListener ?? {
+					shortcutsListener = synthStarter.value;
+					// ServerTree.add(shortcutsListener);
+				};
+				oscResponder ?? {
+					oscResponder = responderStarter.value;
+				};
+				CmdPeriod.add(synthStarter);
+				if(Main.versionAtLeast(3, 5)) {
+					removeShortcutsListener = OSCFunc({ |msg|
+						if(msg[1].asSymbol == '/quit') {
+							[shortcutsListener, responderStarter].do({ |it| it.free; it = nil });
+							CmdPeriod.remove(synthStarter);
+							removeShortcutsListener.free;
+							"\nlistening to global key-downs deactivated\n".inform;
+						}
+					}, '/done', Server.default.addr);
+				} {
+					removeShortcutsListener = OSCresponderNode(Server.default.addr, '/done', { |t, r, msg|
+						if(msg[1].asSymbol == '/quit') {
+							shortcutsListener.free;
+							responderStarter.remove;
+							CmdPeriod.remove(synthStarter);
+							removeShortcutsListener.remove;
+							"\nlistening to global key-downs deactivated\n".inform;
+						}
+					})
+				};
 
-			"\nglobal key-down actions enabled\n".inform;
+				"\nglobal key-down actions enabled\n".inform;
+			}
 		})
 	}
 }
