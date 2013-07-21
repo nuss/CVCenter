@@ -352,7 +352,7 @@ KeyDownActions {
 		// { SynthDescLib.global[\globalShortcutListener].postln }.defer(0.1);
 
 		synthStarter = {
-			Synth(\keyListener);
+			Synth(\keyListener).postln;
 		};
 
 		responderStarter = {
@@ -366,7 +366,7 @@ KeyDownActions {
 						sc.keyCode == msg[2].asInt
 					});
 					funcSlot !? { { funcSlot.func.interpret.value }.defer(0.1) };
-				}, '/tr', ).postln;
+				}, '/tr', Server.default.addr);
 			} {
 				OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
 					funcSlot = this.globalShortcuts.values.detect({ |sc|
