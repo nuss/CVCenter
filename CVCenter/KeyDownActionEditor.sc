@@ -3,13 +3,19 @@ KeyDownActions {
 	// classvar <allEditors;
 	// classvar <viewActions;
 	classvar <>keyCodes, <>modifiersQt, <>modifiersCocoa, <>arrowsModifiersQt, <>arrowsModifiersCocoa;
+	classvar <>globalShortcuts;
+	classvar shortcutsListener, oscResponder, removeShortcutsListener ;
 	// var <window, <>actions;
 
 	*initClass {
 		var keyCodesAndModsPath, keyCodesAndMods, platform;
+		var synthStarter, responderStarter, cmdPeriodSynthRestart;
+		var funcSlot;
 
 		Class.initClassTree(Platform);
 		Class.initClassTree(GUI);
+		Class.initClassTree(SynthDescLib);
+		Class.initClassTree(SynthDef);
 
 		Platform.case(
 			\osx, { platform = "OSX" },
@@ -329,9 +335,81 @@ KeyDownActions {
 				this.modifiersCocoa = IdentityDictionary.new;
 				this.arrowsModifiersCocoa = IdentityDictionary.new;
 			}
-		)
-	}
+		);
 
+		this.globalShortcuts = IdentityDictionary[
+			\c -> (func: "{ CVCenter.makeWindow }", keyCode: KeyDownActions.keyCodes[$c])
+		];
+
+		SynthDef(\keyListener, {
+			var state;
+			this.keyCodes.asArray.collect({ |kcode|
+				state = KeyState.kr(kcode, lag: 0);
+				SendTrig.kr(Changed.kr(state), kcode, state);
+			})
+		}).load;
+
+		// { SynthDescLib.global[\globalShortcutListener].postln }.defer(0.1);
+
+		synthStarter = {
+			Synth(\keyListener);
+		};
+
+		responderStarter = {
+			// ~serverResponder ?? {
+			// 	~serverResponder = OSCFunc({ |msg| "msg: %\n".postf(msg) }, '/done', Server.default.addr);
+			// };
+			if(Main.versionAtLeast(3, 5)) {
+				OSCFunc({ |msg, time, addr, recvPort|
+					"msg: %\n".postf([msg, time, addr, recvPort]);
+					funcSlot = this.globalShortcuts.values.detect({ |sc|
+						sc.keyCode == msg[2].asInt
+					});
+					funcSlot !? { { funcSlot.func.interpret.value }.defer(0.1) };
+				}, '/tr', ).postln;
+			} {
+				OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
+					funcSlot = this.globalShortcuts.values.detect({ |sc|
+						sc.keyCode == msg[2].asInt
+					});
+					funcSlot !? { { funcSlot.func.interpret.value }.defer(0.1) };
+				}).add
+			};
+		};
+
+		NotificationCenter.register(Server.default, \newAllocators, \listenToShortcuts, {
+			shortcutsListener ?? {
+				shortcutsListener = synthStarter.value.postln;
+				// ServerTree.add(shortcutsListener);
+			};
+			oscResponder ?? {
+				oscResponder = responderStarter.value;
+			};
+			CmdPeriod.add(synthStarter);
+			if(Main.versionAtLeast(3, 5)) {
+				removeShortcutsListener = OSCFunc({ |msg|
+					if(msg[1].asSymbol == '/quit') {
+						[shortcutsListener, responderStarter].do({ |it| it.free; it = nil });
+						CmdPeriod.remove(synthStarter);
+						removeShortcutsListener.free;
+						"\nlistening to global key-downs deactivated\n".inform;
+					}
+				}, '/done', Server.default.addr);
+			} {
+				removeShortcutsListener = OSCresponderNode(Server.default.addr, '/done', { |t, r, msg|
+					if(msg[1].asSymbol == '/quit') {
+						shortcutsListener.free;
+						responderStarter.remove;
+						CmdPeriod.remove(synthStarter);
+						removeShortcutsListener.remove;
+						"\nlistening to global key-downs deactivated\n".inform;
+					}
+				})
+			};
+
+			"\nglobal key-down actions enabled\n".inform;
+		})
+	}
 }
 
 KeyDownActionsEditor : KeyDownActions {
