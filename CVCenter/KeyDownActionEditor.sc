@@ -372,6 +372,7 @@ KeyDownActions {
 			"\nglobal key-down actions enabled\n".inform;
 		};
 
+		"SynthDescLib.global[\keyListener]: %\n".postf(SynthDescLib.global[\keyListener]);
 
 		SynthDef(\keyListener, {
 			var state;
@@ -384,29 +385,15 @@ KeyDownActions {
 			Server.default.doWhenBooted {
 				syncStarter.value;
 				CmdPeriod.add(syncStarter);
-			};
-			{
-				[trackingSynth, syncResponder].do(_.free);
-				syncResponder = nil;
-				CmdPeriod.remove(syncStarter);
-				"\nlistening to global key-downs deactivated\n".inform;
-			}.doOnServerQuit(Server.default);
+			}
 		);
 
-		// { SynthDescLib.global[\globalShortcutListener].postln }.defer(0.1);
-
-		// syncStarter = {
-		// 	Server.default.waitForBoot {
-		// 		Server.default.bind {
-		// // }
-		// // };
-		//
-		// // NotificationCenter.register(Server.default, \newAllocators, \listenToShortcuts, {
-		// // 	if(Server.default.serverRunning.not) {
-		// // 		[trackingSynth, syncResponder].do(_.free);
-		// // 		syncStarter.value;
-		// // };
-		// // })
+		{
+			[trackingSynth, syncResponder].do(_.free);
+			syncResponder = nil;
+			CmdPeriod.remove(syncStarter);
+			"\nlistening to global key-downs deactivated\n".inform;
+		}.doOnServerQuit(Server.default);
 	}
 }
 
