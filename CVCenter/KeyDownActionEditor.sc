@@ -4,13 +4,13 @@ KeyDownActions {
 	// classvar <viewActions;
 	classvar <>keyCodes, <>modifiersQt, <>modifiersCocoa, <>arrowsModifiersQt, <>arrowsModifiersCocoa;
 	classvar <>globalShortcuts;
-	classvar shortcutsListener, oscResponder, removeShortcutsListener ;
+	classvar shortcutsListener, oscResponder, removeShortcutsListener, trackingSynthID;
 	// var <window, <>actions;
 
 	*initClass {
 		var keyCodesAndModsPath, keyCodesAndMods, platform;
 		var synthStarter, responderStarter, cmdPeriodSynthRestart;
-		var funcSlot;
+		var funcSlot, trackingSynth;
 
 		Class.initClassTree(Platform);
 		Class.initClassTree(GUI);
@@ -352,7 +352,8 @@ KeyDownActions {
 		// { SynthDescLib.global[\globalShortcutListener].postln }.defer(0.1);
 
 		synthStarter = {
-			Synth(\keyListener).postln;
+			trackingSynth = Synth(\keyListener);
+			trackingSynthID = trackingSynth.nodeID;
 		};
 
 		responderStarter = {
@@ -362,17 +363,21 @@ KeyDownActions {
 			if(Main.versionAtLeast(3, 5)) {
 				OSCFunc({ |msg, time, addr, recvPort|
 					"msg: %\n".postf([msg, time, addr, recvPort]);
-					funcSlot = this.globalShortcuts.values.detect({ |sc|
-						sc.keyCode == msg[2].asInt
-					});
-					funcSlot !? { { funcSlot.func.interpret.value }.defer(0.1) };
+					if(msg[1].asInt == trackingSynthID) {
+						funcSlot = this.globalShortcuts.values.detect({ |sc|
+							sc.keyCode == msg[2].asInt
+						});
+						funcSlot !? { { funcSlot.func.interpret.value }.defer };
+					};
 				}, '/tr', Server.default.addr);
 			} {
 				OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
-					funcSlot = this.globalShortcuts.values.detect({ |sc|
-						sc.keyCode == msg[2].asInt
-					});
-					funcSlot !? { { funcSlot.func.interpret.value }.defer(0.1) };
+					if(msg[1].asInt == trackingSynthID) {
+						funcSlot = this.globalShortcuts.values.detect({ |sc|
+							sc.keyCode == msg[2].asInt
+						});
+						funcSlot !? { { funcSlot.func.interpret.value }.defer(0.1) };
+					};
 				}).add
 			};
 		};
