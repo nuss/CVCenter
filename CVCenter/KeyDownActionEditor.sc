@@ -10,6 +10,7 @@ KeyDownActions {
 		var keyCodesAndModsPath, keyCodesAndMods, platform;
 		var syncStarter, syncResponder, cmdPeriodSynthRestart;
 		var funcSlot, trackingSynth, trackingSynthID;
+		var test;
 
 		Class.initClassTree(Platform);
 		Class.initClassTree(GUI);
@@ -372,28 +373,52 @@ KeyDownActions {
 			"\nglobal key-down actions enabled\n".inform;
 		};
 
-		"SynthDescLib.global[\keyListener]: %\n".postf(SynthDescLib.global[\keyListener]);
+		"\n\n\n\n\t\t\hallo\n\n\n\n".postln;
 
-		SynthDef(\keyListener, {
-			var state;
-			this.keyCodes.asArray.collect({ |kcode|
-				state = KeyState.kr(kcode, lag: 0);
-				SendTrig.kr(Changed.kr(state), kcode, state);
-			})
-		}).store(completionMsg:
-			// "hello ccnerd".postln;
-			Server.default.doWhenBooted {
-				syncStarter.value;
-				CmdPeriod.add(syncStarter);
-			}
-		);
+		test = OSCFunc({ |msg, time, addr, recvPort| [msg, time, addr, recvPort].postln }, '/done');
+		"test: %\n".postf(test);
 
-		{
-			[trackingSynth, syncResponder].do(_.free);
-			syncResponder = nil;
-			CmdPeriod.remove(syncStarter);
-			"\nlistening to global key-downs deactivated\n".inform;
-		}.doOnServerQuit(Server.default);
+		if(Server.default.serverBooting) {
+			"\nserver booting\n".postln;
+			SynthDef(\keyListener, {
+				var state;
+				this.keyCodes.asArray.collect({ |kcode|
+					state = KeyState.kr(kcode, lag: 0);
+					SendTrig.kr(Changed.kr(state), kcode, state);
+				})
+			}).store(completionMsg:
+				// "hello ccnerd".postln;
+				Server.default.doWhenBooted {
+					syncStarter.value;
+					CmdPeriod.add(syncStarter);
+				}
+			)
+		};
+
+		if(Server.default.serverRunning.not) {
+			"\nserver not running\n".postln;
+			{
+				SynthDef(\keyListener, {
+					var state;
+					this.keyCodes.asArray.collect({ |kcode|
+						state = KeyState.kr(kcode, lag: 0);
+						SendTrig.kr(Changed.kr(state), kcode, state);
+					})
+				}).store(completionMsg:
+					// "hello ccnerd".postln;
+					Server.default.doWhenBooted {
+						syncStarter.value;
+						CmdPeriod.add(syncStarter);
+					}
+				)
+			}/*.doOnServerBoot(Server.default)*/;
+			{
+				[trackingSynth, syncResponder].do(_.free);
+				syncResponder = nil;
+				CmdPeriod.remove(syncStarter);
+				"\nlistening to global key-downs deactivated\n".inform;
+			}.doOnServerQuit(Server.default);
+		}
 	}
 }
 
