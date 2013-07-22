@@ -4,13 +4,12 @@ KeyDownActions {
 	// classvar <viewActions;
 	classvar <>keyCodes, <>modifiersQt, <>modifiersCocoa, <>arrowsModifiersQt, <>arrowsModifiersCocoa;
 	classvar <>globalShortcuts;
-	classvar shortcutsListener, oscResponder, removeShortcutsListener, trackingSynthID;
 	// var <window, <>actions;
 
 	*initClass {
 		var keyCodesAndModsPath, keyCodesAndMods, platform;
-		var synthStarter, responderStarter, cmdPeriodSynthRestart;
-		var funcSlot, trackingSynth;
+		var syncStarter, syncResponder, cmdPeriodSynthRestart;
+		var funcSlot, trackingSynth, trackingSynthID;
 
 		Class.initClassTree(Platform);
 		Class.initClassTree(GUI);
@@ -341,27 +340,16 @@ KeyDownActions {
 			\c -> (func: "{ CVCenter.makeWindow }", keyCode: KeyDownActions.keyCodes[$c])
 		];
 
-		SynthDef(\keyListener, {
-			var state;
-			this.keyCodes.asArray.collect({ |kcode|
-				state = KeyState.kr(kcode, lag: 0);
-				SendTrig.kr(Changed.kr(state), kcode, state);
-			})
-		}).load;
-
-		// { SynthDescLib.global[\globalShortcutListener].postln }.defer(0.1);
-
-		synthStarter = {
-			trackingSynth = Synth(\keyListener);
+		// to be executed on Server boot
+		syncStarter = {
+			"syncStarter now executing".postln;
+			[trackingSynth, syncResponder].do(_.free);
+			syncResponder = nil;
+			trackingSynth = Synth(\keyListener).postln;
 			trackingSynthID = trackingSynth.nodeID;
-		};
-
-		responderStarter = {
-			// ~serverResponder ?? {
-			// 	~serverResponder = OSCFunc({ |msg| "msg: %\n".postf(msg) }, '/done', Server.default.addr);
-			// };
+			syncResponder.postln;
 			if(Main.versionAtLeast(3, 5)) {
-				OSCFunc({ |msg, time, addr, recvPort|
+				syncResponder = OSCFunc({ |msg, time, addr, recvPort|
 					"msg: %\n".postf([msg, time, addr, recvPort]);
 					if(msg[1].asInt == trackingSynthID) {
 						funcSlot = this.globalShortcuts.values.detect({ |sc|
@@ -371,51 +359,54 @@ KeyDownActions {
 					};
 				}, '/tr', Server.default.addr);
 			} {
-				OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
+				syncResponder = OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
 					if(msg[1].asInt == trackingSynthID) {
 						funcSlot = this.globalShortcuts.values.detect({ |sc|
 							sc.keyCode == msg[2].asInt
 						});
-						funcSlot !? { { funcSlot.func.interpret.value }.defer(0.1) };
+						funcSlot !? { { funcSlot.func.interpret.value }.defer };
 					};
 				}).add
 			};
+			syncResponder.postln;
+			"\nglobal key-down actions enabled\n".inform;
 		};
 
-		NotificationCenter.register(Server.default, \newAllocators, \listenToShortcuts, {
-			Server.default.waitForBoot {
-				shortcutsListener ?? {
-					shortcutsListener = synthStarter.value;
-					// ServerTree.add(shortcutsListener);
-				};
-				oscResponder ?? {
-					oscResponder = responderStarter.value;
-				};
-				CmdPeriod.add(synthStarter);
-				if(Main.versionAtLeast(3, 5)) {
-					removeShortcutsListener = OSCFunc({ |msg|
-						if(msg[1].asSymbol == '/quit') {
-							[shortcutsListener, responderStarter].do({ |it| it.free; it = nil });
-							CmdPeriod.remove(synthStarter);
-							removeShortcutsListener.free;
-							"\nlistening to global key-downs deactivated\n".inform;
-						}
-					}, '/done', Server.default.addr);
-				} {
-					removeShortcutsListener = OSCresponderNode(Server.default.addr, '/done', { |t, r, msg|
-						if(msg[1].asSymbol == '/quit') {
-							shortcutsListener.free;
-							responderStarter.remove;
-							CmdPeriod.remove(synthStarter);
-							removeShortcutsListener.remove;
-							"\nlistening to global key-downs deactivated\n".inform;
-						}
-					})
-				};
 
-				"\nglobal key-down actions enabled\n".inform;
-			}
-		})
+		SynthDef(\keyListener, {
+			var state;
+			this.keyCodes.asArray.collect({ |kcode|
+				state = KeyState.kr(kcode, lag: 0);
+				SendTrig.kr(Changed.kr(state), kcode, state);
+			})
+		}).store(completionMsg:
+			// "hello ccnerd".postln;
+			Server.default.doWhenBooted {
+				syncStarter.value;
+				CmdPeriod.add(syncStarter);
+			};
+			{
+				[trackingSynth, syncResponder].do(_.free);
+				syncResponder = nil;
+				CmdPeriod.remove(syncStarter);
+				"\nlistening to global key-downs deactivated\n".inform;
+			}.doOnServerQuit(Server.default);
+		);
+
+		// { SynthDescLib.global[\globalShortcutListener].postln }.defer(0.1);
+
+		// syncStarter = {
+		// 	Server.default.waitForBoot {
+		// 		Server.default.bind {
+		// // }
+		// // };
+		//
+		// // NotificationCenter.register(Server.default, \newAllocators, \listenToShortcuts, {
+		// // 	if(Server.default.serverRunning.not) {
+		// // 		[trackingSynth, syncResponder].do(_.free);
+		// // 		syncStarter.value;
+		// // };
+		// // })
 	}
 }
 
@@ -428,11 +419,11 @@ KeyDownActionsEditor : KeyDownActions {
 		all = List.new;
 	}
 
-	*new { |parent, name, bounds, shortcutsDict, save=true, closeOnSave=false|
-		^super.new.init(parent, name, bounds, shortcutsDict, save, closeOnSave);
+	*new { |parent, name, bounds, shortcutsDict, save=true, closeOnSave=false, showMods=true|
+		^super.new.init(parent, name, bounds, shortcutsDict, save, closeOnSave, showMods);
 	}
 
-	init { |parent, name, bounds, shortcutsDict, save, closeOnSave|
+	init { |parent, name, bounds, shortcutsDict, save, closeOnSave, showMods|
 		var scrollArea, scrollView, butArea, newBut, saveBut;
 		var removeButs, makeEditArea;
 		var scrollFlow, editFlows, butFlow;
@@ -586,9 +577,11 @@ KeyDownActionsEditor : KeyDownActions {
 													mods = thisArrowsModifiers.findKeyForValue(mod);
 												})
 											});
-											if(mod.notNil and:{
-												mod != thisModifiers[\none] and:{
-													mod != thisArrowsModifiers[\none]
+											if(showMods.asBoolean and:{
+												mod.notNil and:{
+													mod != thisModifiers[\none] and:{
+														mod != thisArrowsModifiers[\none]
+													}
 												}
 											}, {
 												// "tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount]);

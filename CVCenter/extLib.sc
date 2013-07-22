@@ -1,3 +1,9 @@
++OSCresponder {
+
+	free { ^this.remove }
+
+}
+
 +ControlSpec {
 
 	excludingZeroCrossing {
