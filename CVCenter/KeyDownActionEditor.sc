@@ -343,13 +343,13 @@ KeyDownActions {
 
 		// to be executed on Server boot
 		syncStarter = {
-			"syncStarter now executing".postln;
+			// "syncStarter now executing".postln;
 			[trackingSynth, syncResponder].do(_.free);
 			// syncResponder = nil;
 			// trackingSynth = Synth(\keyListener).postln;
-			trackingSynth = Synth.basicNew(\keyListener).postln;
+			trackingSynth = Synth.basicNew(\keyListener);
 			trackingSynthID = trackingSynth.nodeID;
-			syncResponder.postln;
+			// syncResponder.postln;
 			if(Main.versionAtLeast(3, 5)) {
 				syncResponder = OSCFunc({ |msg, time, addr, recvPort|
 					// "msg: %\n".postf([msg, time, addr, recvPort]);
@@ -373,7 +373,7 @@ KeyDownActions {
 			};
 			CmdPeriod.add(syncStarter);
 			"\nglobal key-down actions enabled\n".inform;
-			trackingSynth.newMsg.postln;
+			trackingSynth.newMsg;
 		};
 
 		ServerTree.add({
@@ -386,7 +386,11 @@ KeyDownActions {
 			}).add(completionMsg: syncStarter.value)
 		}, \default);
 
-		ServerQuit.add({ CmdPeriod.remove(syncStarter); syncResponder.free });
+		ServerQuit.add({
+			CmdPeriod.remove(syncStarter);
+			syncResponder.free;
+			"\nglobal key-down act deactivated\n".inform;
+		});
 	}
 }
 

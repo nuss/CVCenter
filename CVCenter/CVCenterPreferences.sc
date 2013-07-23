@@ -29,8 +29,8 @@ CVCenterPreferences {
 		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		// shortcut-tabs
 		var prefShortcutsPath, prefShortCuts;
-		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab, cvKeyCodesEditorTab;
-		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor, cvCenterKeyCodesEditor;
+		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab, globalShortcutsTab, cvKeyCodesEditorTab;
+		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor, globalShortcutsEditorTab, cvCenterKeyCodesEditor;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
 		var saveClassVars, removeResponders;
 		var initMidiOnStartUp, initMidiText;
@@ -433,6 +433,7 @@ CVCenterPreferences {
 			cvCenterTab = scTabs.add("CVCenter", scroll: false);
 			// cvWidgetTab = scTabs.add("CVWidget", scroll: false);
 			cvWidgetEditorTab = scTabs.add("CVWidget(MS)Editor", scroll: false);
+			globalShortcutsTab = scTabs.add("global shortcuts", scroll: false).postln;
 
 			cvCenterEditor = KeyDownActionsEditor(
 				cvCenterTab, nil, cvCenterTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvcenter ?? { CVCenter.shortcuts }}, false
@@ -441,6 +442,9 @@ CVCenterPreferences {
 			// CVWidgets should go here but...
 			cvWidgetEditorEditor = KeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvwidgeteditor ?? { AbstractCVWidgetEditor.shortcuts }}, false
+			);
+			globalShortcutsEditorTab = KeyDownActionsEditor(
+				globalShortcutsTab, nil, globalShortcutsTab.bounds, /* prefs!!! */KeyDownActions.globalShortcuts, false, false, false
 			);
 
 			cvCenterKeyCodesEditor = KeyCodesEditor(
