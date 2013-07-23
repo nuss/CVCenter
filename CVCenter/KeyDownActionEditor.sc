@@ -345,7 +345,7 @@ KeyDownActions {
 		syncStarter = {
 			"syncStarter now executing".postln;
 			[trackingSynth, syncResponder].do(_.free);
-			syncResponder = nil;
+			// syncResponder = nil;
 			trackingSynth = Synth(\keyListener).postln;
 			trackingSynthID = trackingSynth.nodeID;
 			syncResponder.postln;
@@ -374,12 +374,13 @@ KeyDownActions {
 		};
 
 		"\n\n\n\n\t\t\hallo\n\n\n\n".postln;
-
-		test = OSCFunc({ |msg, time, addr, recvPort| [msg, time, addr, recvPort].postln }, '/done');
+		// Server.default.startAliveThread;
+		test = OSCFunc({ |msg, time, addr, recvPort| [msg, time, addr, recvPort].postln }, '/done', Server.default.addr);
 		"test: %\n".postf(test);
 
-		if(Server.default.serverBooting) {
-			"\nserver booting\n".postln;
+		NotificationCenter.register(Server.default, \newAllocators, syncStarter, {
+			// if(Server.default.serverRunning) {
+			"\nserver running!\n".postln;
 			SynthDef(\keyListener, {
 				var state;
 				this.keyCodes.asArray.collect({ |kcode|
@@ -388,37 +389,56 @@ KeyDownActions {
 				})
 			}).store(completionMsg:
 				// "hello ccnerd".postln;
-				Server.default.doWhenBooted {
-					syncStarter.value;
-					CmdPeriod.add(syncStarter);
-				}
+				syncStarter.value;
+				CmdPeriod.add(syncStarter);
 			)
-		};
+			// } {
+			// 	syncResponder.free;
+			// }
+		});
 
-		if(Server.default.serverRunning.not) {
-			"\nserver not running\n".postln;
-			{
-				SynthDef(\keyListener, {
-					var state;
-					this.keyCodes.asArray.collect({ |kcode|
-						state = KeyState.kr(kcode, lag: 0);
-						SendTrig.kr(Changed.kr(state), kcode, state);
-					})
-				}).store(completionMsg:
-					// "hello ccnerd".postln;
-					Server.default.doWhenBooted {
-						syncStarter.value;
-						CmdPeriod.add(syncStarter);
-					}
-				)
-			}/*.doOnServerBoot(Server.default)*/;
-			{
-				[trackingSynth, syncResponder].do(_.free);
-				syncResponder = nil;
-				CmdPeriod.remove(syncStarter);
-				"\nlistening to global key-downs deactivated\n".inform;
-			}.doOnServerQuit(Server.default);
-		}
+
+		// if(Server.default.serverBooting) {
+		// 	"\nserver booting\n".postln;
+		// 	SynthDef(\keyListener, {
+		// 		var state;
+		// 		this.keyCodes.asArray.collect({ |kcode|
+		// 			state = KeyState.kr(kcode, lag: 0);
+		// 			SendTrig.kr(Changed.kr(state), kcode, state);
+		// 		})
+		// 	}).store(completionMsg:
+		// 		// "hello ccnerd".postln;
+		// 		Server.default.doWhenBooted {
+		// 			syncStarter.value;
+		// 			CmdPeriod.add(syncStarter);
+		// 		}
+		// 	)
+		// };
+		//
+		// if(Server.default.serverRunning.not) {
+		// 	"\nserver not running\n".postln;
+		// 	{
+		// 		SynthDef(\keyListener, {
+		// 			var state;
+		// 			this.keyCodes.asArray.collect({ |kcode|
+		// 				state = KeyState.kr(kcode, lag: 0);
+		// 				SendTrig.kr(Changed.kr(state), kcode, state);
+		// 			})
+		// 		}).store(completionMsg:
+		// 			// "hello ccnerd".postln;
+		// 			Server.default.doWhenBooted {
+		// 				syncStarter.value;
+		// 				CmdPeriod.add(syncStarter);
+		// 			}
+		// 		)
+		// 	}/*.doOnServerBoot(Server.default)*/;
+		// 	{
+		// 		[trackingSynth, syncResponder].do(_.free);
+		// 		syncResponder = nil;
+		// 		CmdPeriod.remove(syncStarter);
+		// 		"\nlistening to global key-downs deactivated\n".inform;
+		// 	}.doOnServerQuit(Server.default);
+		// }
 	}
 }
 
