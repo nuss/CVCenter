@@ -346,99 +346,47 @@ KeyDownActions {
 			"syncStarter now executing".postln;
 			[trackingSynth, syncResponder].do(_.free);
 			// syncResponder = nil;
-			trackingSynth = Synth(\keyListener).postln;
+			// trackingSynth = Synth(\keyListener).postln;
+			trackingSynth = Synth.basicNew(\keyListener).postln;
 			trackingSynthID = trackingSynth.nodeID;
 			syncResponder.postln;
 			if(Main.versionAtLeast(3, 5)) {
 				syncResponder = OSCFunc({ |msg, time, addr, recvPort|
-					"msg: %\n".postf([msg, time, addr, recvPort]);
+					// "msg: %\n".postf([msg, time, addr, recvPort]);
 					if(msg[1].asInt == trackingSynthID) {
 						funcSlot = this.globalShortcuts.values.detect({ |sc|
-							sc.keyCode == msg[2].asInt
+							sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
 						});
 						funcSlot !? { { funcSlot.func.interpret.value }.defer };
 					};
 				}, '/tr', Server.default.addr);
 			} {
 				syncResponder = OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
+					// "msg: %\n".postf([t, r, msg]);
 					if(msg[1].asInt == trackingSynthID) {
 						funcSlot = this.globalShortcuts.values.detect({ |sc|
-							sc.keyCode == msg[2].asInt
+							sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
 						});
 						funcSlot !? { { funcSlot.func.interpret.value }.defer };
 					};
 				}).add
 			};
-			syncResponder.postln;
+			CmdPeriod.add(syncStarter);
 			"\nglobal key-down actions enabled\n".inform;
+			trackingSynth.newMsg.postln;
 		};
 
-		"\n\n\n\n\t\t\hallo\n\n\n\n".postln;
-		// Server.default.startAliveThread;
-		test = OSCFunc({ |msg, time, addr, recvPort| [msg, time, addr, recvPort].postln }, '/done', Server.default.addr);
-		"test: %\n".postf(test);
-
-		NotificationCenter.register(Server.default, \newAllocators, syncStarter, {
-			// if(Server.default.serverRunning) {
-			"\nserver running!\n".postln;
+		ServerTree.add({
 			SynthDef(\keyListener, {
 				var state;
 				this.keyCodes.asArray.collect({ |kcode|
 					state = KeyState.kr(kcode, lag: 0);
 					SendTrig.kr(Changed.kr(state), kcode, state);
 				})
-			}).store(completionMsg:
-				// "hello ccnerd".postln;
-				syncStarter.value;
-				CmdPeriod.add(syncStarter);
-			)
-			// } {
-			// 	syncResponder.free;
-			// }
-		});
+			}).add(completionMsg: syncStarter.value)
+		}, \default);
 
-
-		// if(Server.default.serverBooting) {
-		// 	"\nserver booting\n".postln;
-		// 	SynthDef(\keyListener, {
-		// 		var state;
-		// 		this.keyCodes.asArray.collect({ |kcode|
-		// 			state = KeyState.kr(kcode, lag: 0);
-		// 			SendTrig.kr(Changed.kr(state), kcode, state);
-		// 		})
-		// 	}).store(completionMsg:
-		// 		// "hello ccnerd".postln;
-		// 		Server.default.doWhenBooted {
-		// 			syncStarter.value;
-		// 			CmdPeriod.add(syncStarter);
-		// 		}
-		// 	)
-		// };
-		//
-		// if(Server.default.serverRunning.not) {
-		// 	"\nserver not running\n".postln;
-		// 	{
-		// 		SynthDef(\keyListener, {
-		// 			var state;
-		// 			this.keyCodes.asArray.collect({ |kcode|
-		// 				state = KeyState.kr(kcode, lag: 0);
-		// 				SendTrig.kr(Changed.kr(state), kcode, state);
-		// 			})
-		// 		}).store(completionMsg:
-		// 			// "hello ccnerd".postln;
-		// 			Server.default.doWhenBooted {
-		// 				syncStarter.value;
-		// 				CmdPeriod.add(syncStarter);
-		// 			}
-		// 		)
-		// 	}/*.doOnServerBoot(Server.default)*/;
-		// 	{
-		// 		[trackingSynth, syncResponder].do(_.free);
-		// 		syncResponder = nil;
-		// 		CmdPeriod.remove(syncStarter);
-		// 		"\nlistening to global key-downs deactivated\n".inform;
-		// 	}.doOnServerQuit(Server.default);
-		// }
+		ServerQuit.add({ CmdPeriod.remove(syncStarter); syncResponder.free });
 	}
 }
 
