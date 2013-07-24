@@ -352,11 +352,8 @@ KeyDownActions {
 				})
 			}).add(completionMsg: {
 				[trackingSynth, syncResponder].do(_.free);
-				// syncResponder = nil;
-				// trackingSynth = Synth(\keyListener).postln;
 				trackingSynth = Synth.basicNew(\keyListener);
 				trackingSynthID = trackingSynth.nodeID;
-				// syncResponder.postln;
 				if(Main.versionAtLeast(3, 5)) {
 					syncResponder = OSCFunc({ |msg, time, addr, recvPort|
 						// "msg: %\n".postf([msg, time, addr, recvPort]);
