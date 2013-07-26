@@ -7,7 +7,9 @@ KeyDownActions {
 	// var <window, <>actions;
 
 	*initClass {
-		var keyCodesAndModsPath, keyCodesAndMods, platform;
+		var keyCodesAndModsPath, keyCodesAndMods;
+		var globalShortcutsPath, globalShortcuts;
+		var platform;
 		var syncStarter, syncResponder, cmdPeriodSynthRestart;
 		var funcSlot, trackingSynth, trackingSynthID;
 		var test;
@@ -26,6 +28,8 @@ KeyDownActions {
 
 		keyCodesAndModsPath = this.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++platform;
 		keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
+		globalShortcutsPath = this.filenameSymbol.asString.dirname +/+ "globalShortcuts";
+		globalShortcuts = Object.readArchive(globalShortcutsPath);
 		// keyCodesAndMods.pairsDo({ |k, v| [k, v].postln });
 		// keyCodesAndMods.keyCodes.postln;
 
@@ -337,9 +341,9 @@ KeyDownActions {
 			}
 		);
 
-		this.globalShortcuts = IdentityDictionary[
-			\c -> (func: "{ CVCenter.makeWindow }", keyCode: KeyDownActions.keyCodes[$c])
-		];
+		globalShortcuts !? {
+			this.globalShortcuts = globalShortcuts;
+		};
 
 		// to be executed on Server boot
 		syncStarter = {
@@ -388,7 +392,7 @@ KeyDownActions {
 		ServerQuit.add({
 			CmdPeriod.remove(syncStarter);
 			syncResponder.free;
-			"\nglobal key-down act deactivated\n".inform;
+			"\nglobal key-down actions deactivated\n".inform;
 		});
 	}
 }
@@ -692,19 +696,21 @@ KeyDownActionsEditor : KeyDownActions {
 			funcString !? { funcFields[myCount].string_(funcString) };
 		};
 
-		order = shortcutsDict.order;
+		shortcutsDict !? {
+			order = shortcutsDict.order;
 
-		order.do({ |shortcut, i|
-			makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "));
-			tmpShortcuts[i] = shortcut -> (
-				func: shortcutsDict[shortcut][\func],
-				keyCode: shortcutsDict[shortcut][\keyCode],
-				modifierQt: shortcutsDict[shortcut][\modifierQt],
-				modifierCocoa: shortcutsDict[shortcut][\modifierCocoa],
-				arrowModifierQt: shortcutsDict[shortcut][\arrowModifierQt],
-				arrowModifierCocoa: shortcutsDict[shortcut][\arrowModifierCocoa]
-			)
-		});
+			order.do({ |shortcut, i|
+				makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "));
+				tmpShortcuts[i] = shortcut -> (
+					func: shortcutsDict[shortcut][\func],
+					keyCode: shortcutsDict[shortcut][\keyCode],
+					modifierQt: shortcutsDict[shortcut][\modifierQt],
+					modifierCocoa: shortcutsDict[shortcut][\modifierCocoa],
+					arrowModifierQt: shortcutsDict[shortcut][\arrowModifierQt],
+					arrowModifierCocoa: shortcutsDict[shortcut][\arrowModifierCocoa]
+				)
+			})
+		};
 
 		// tmpShortcuts.do({ |it, i|
 		// 	"tmpShortcuts[%]: %\n".postf(i, it);

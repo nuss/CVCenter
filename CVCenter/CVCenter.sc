@@ -55,7 +55,8 @@ CVCenter {
 						newPrefs[\softWithin],
 						newPrefs[\ctrlButtonBank],
 						newPrefs[\removeResponders],
-						newPrefs[\initMidiOnStartUp]
+						newPrefs[\initMidiOnStartUp],
+						newPrefs[\shortcuts]
 					)
 				};
 				if(prefs[\saveGuiProperties] == 1 or:{

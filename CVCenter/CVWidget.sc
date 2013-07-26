@@ -148,6 +148,7 @@ CVWidget {
 	addAction { |name, action, slot, active=true|
 		var act, controller, thisEditor;
 
+		"\nACTION!!!\n".postln;
 		// "this.guiEnv: %\n".postf(this.guiEnv.asCompileString);
 
 		switch(this.class,

@@ -497,6 +497,7 @@ CVCenterPreferences {
 							removeResponders.value,
 							initMidiOnStartUp.value,
 							shortcuts,
+							globalShortcutsEditorTab.result,
 							cvCenterKeyCodesEditor.result(false)
 						);
 						window.close;
@@ -507,9 +508,9 @@ CVCenterPreferences {
 		window.front;
 	}
 
-	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, shortcuts, keyCodesAndMods, informString|
+	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, shortcuts, globalShortcuts, keyCodesAndMods, informString|
 		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders, thisInformString, thisInitMidi;
-		var shortcutsPath, keyCodesPath;
+		var shortcutsPath, globalShortcutsPath, keyCodesPath;
 		var platform;
 
 		Platform.case(
@@ -547,6 +548,9 @@ CVCenterPreferences {
 		shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcuts";
 		shortcuts !? { shortcuts.writeArchive(shortcutsPath) };
 
+		globalShortcutsPath = this.filenameSymbol.asString.dirname +/+ "globalShortcuts";
+		globalShortcuts !? { globalShortcuts.writeArchive(globalShortcutsPath) };
+
 		keyCodesPath = KeyDownActions.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++platform;
 		keyCodesAndMods !? { keyCodesAndMods.writeArchive(keyCodesPath) };
 
@@ -578,7 +582,7 @@ CVCenterPreferences {
 
 	*readPreferences { |...args|
 		var prefsPath, prefs, res;
-		var shortcutsPath, shortcuts, keyCodesAndModsPath, keyCodesAndMods;
+		var shortcutsPath, shortcuts, globalShortcutsPath, keyCodesAndModsPath, keyCodesAndMods;
 		var platform;
 
 		Platform.case(
@@ -590,6 +594,7 @@ CVCenterPreferences {
 
 		prefsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterPreferences";
 		shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortCuts";
+		globalShortcutsPath = KeyCodesEditor.filenameSymbol.asString.dirname +/+ "globalShortcuts";
 		keyCodesAndModsPath = KeyCodesEditor.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++platform;
 
 		if(File.exists(prefsPath), {
@@ -605,6 +610,17 @@ CVCenterPreferences {
 			prefs.put(\shortcuts, Object.readArchive(shortcutsPath));
 			if(args.size > 0, {
 				if(args.collect(_.asSymbol).includes(\shortcuts), {
+					res ?? { res = () };
+					res.shortcuts = Object.readArchive(shortcutsPath)
+				})
+			})
+		});
+		if(File.exists(globalShortcutsPath), {
+			"globalShortcutsPath exists".postln;
+			prefs ?? { prefs = () };
+			prefs.put(\globalShortcuts, Object.readArchive(shortcutsPath));
+			if(args.size > 0, {
+				if(args.collect(_.asSymbol).includes(\globalShortcuts), {
 					res ?? { res = () };
 					res.shortcuts = Object.readArchive(shortcutsPath)
 				})
