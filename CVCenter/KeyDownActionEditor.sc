@@ -345,15 +345,13 @@ KeyDownActions {
 			this.globalShortcuts = globalShortcuts;
 		};
 
-		"globalShortcuts: %\n".postf(globalShortcuts);
-
 		// to be executed on Server boot
 		syncStarter = {
 			// "syncStarter now executing".postln;
 			if(this.globalShortcuts.notNil and:{ this.globalShortcuts.isEmpty.not }) {
 				SynthDef(\keyListener, {
 					var state;
-					this.globalShortcuts.postln.asArray.collect(_.keyCode).postln.collect({ |kcode|
+					this.globalShortcuts.asArray.collect(_.keyCode).collect({ |kcode|
 						state = KeyState.kr(kcode, lag: 0);
 						SendTrig.kr(Changed.kr(state), kcode, state);
 					})
@@ -551,37 +549,39 @@ KeyDownActionsEditor : KeyDownActions {
 								editBut.value_(1);
 								deleteShortcutKey = shortcutField.string[1..].asSymbol;
 								cachedScrollViewSC = ScrollView.globalKeyDownAction;
+								"cachedScrollViewSC: %\n".postf(cachedScrollViewSC);
 							// "tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount].cs);
 								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
 									// [view, char, mod, unicode, keycode, key].postcs;
 									// GUI.id.postln;
-									if(keyCodes.findKeyForEqualValue(keycode).notNil, {
+									if(keyCodes.findKeyForEqualValue(keycode).notNil) {
+									// "thisModifiers: %\n".postf(thisModifiers);
 										char !? {
 											if(thisModifiers.includes(mod) and:{
 												thisModifiers.findKeyForValue(mod) != \none
 											}, {
 												mods = thisModifiers.findKeyForValue(mod);
-											}, {
+											}) {
 												if(thisArrowsModifiers.includes(mod) and:{
 													thisArrowsModifiers.findKeyForValue(mod) != \none
-												}, {
+												}) {
 													mods = thisArrowsModifiers.findKeyForValue(mod);
-												})
-											});
+												}
+											};
 											if(showMods.asBoolean and:{
 												mod.notNil and:{
 													mod != thisModifiers[\none] and:{
 														mod != thisArrowsModifiers[\none]
 													}
 												}
-											}, {
+											}) {
 												// "tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount]);
 												shortcutField.string_(
 													" "++ mods ++ join ++
 													keyCodes.findKeyForValue(keycode)
 												);
-												if(thisArrowsModifiers.includes(mod), {
-													if(GUI.id !== \cocoa, {
+												if(thisArrowsModifiers.includes(mod)) {
+													if(GUI.id !== \cocoa) {
 														tmpShortcuts[myCount] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
@@ -590,7 +590,7 @@ KeyDownActionsEditor : KeyDownActions {
 															modifierCocoa: nil,
 															modifierQt: nil
 														)
-													}, {
+													} {
 														tmpShortcuts[myCount] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
@@ -599,9 +599,9 @@ KeyDownActionsEditor : KeyDownActions {
 															modifierCocoa: nil,
 															modifierQt: nil
 														)
-													});
-												}, {
-													if(GUI.id !== \cocoa, {
+													};
+												} {
+													if(GUI.id !== \cocoa) {
 														tmpShortcuts[myCount] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
@@ -610,7 +610,7 @@ KeyDownActionsEditor : KeyDownActions {
 															modifierCocoa: nil,
 															modifierQt: mod
 														)
-													}, {
+													} {
 														tmpShortcuts[myCount] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
 															keyCode: keycode,
@@ -619,10 +619,10 @@ KeyDownActionsEditor : KeyDownActions {
 															modifierCocoa: mod,
 															modifierQt: nil
 														)
-													})
-												});
+													}
+												};
 												// "tmpShortcuts[%] =  new: %\n".postf(myCount, tmpShortcuts[myCount]);
-											}, {
+											} {
 												shortcutField.string_(
 													" "++
 													keyCodes.findKeyForValue(keycode)
@@ -635,13 +635,15 @@ KeyDownActionsEditor : KeyDownActions {
 													modifierCocoa: nil,
 													modifierQt: nil
 												);
-											});
+											};
 										// "tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }): %\n".postf(tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }));
-											tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }) !? {
-												tmpShortcuts.remove(tmpShortcuts[tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey })]);
+											if(deleteShortcutKey !== shortcutField.string[1..].asSymbol) {
+												tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }) !? {
+													tmpShortcuts.remove(tmpShortcuts[tmpShortcuts.detectIndex({ |sc| (sc.key.postln === deleteShortcutKey).postln })]);
+												}
 											}
 										}
-									});
+									};
 								// ScrollView.globalKeyDownAction_(cachedScrollViewSC)
 								});
 								funcField.enabled_(true);
@@ -649,7 +651,10 @@ KeyDownActionsEditor : KeyDownActions {
 								shortcutText.stringColor_(Color.white);
 							},
 							0, {
+								"cachedScrollViewSC: %\n".postf(cachedScrollViewSC);
 								ScrollView.globalKeyDownAction_(cachedScrollViewSC);
+								"ScrollView.globalKeyDownAction: %\n".postf(ScrollView.globalKeyDownAction);
+
 								funcField.enabled_(false);
 								editArea.background_(editAreasBg);
 								shortcutText.stringColor_(staticTextColor);
@@ -747,6 +752,7 @@ KeyDownActionsEditor : KeyDownActions {
 		var res;
 		res = IdentityDictionary.new;
 		tmpShortcuts.do({ |it| res.put(it.key, it.value) });
+		"res: %\n".postf(res.cs);
 		^res;
 	}
 

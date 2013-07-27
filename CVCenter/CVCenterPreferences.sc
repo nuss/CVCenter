@@ -593,7 +593,7 @@ CVCenterPreferences {
 		);
 
 		prefsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterPreferences";
-		shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortCuts";
+		shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcuts";
 		globalShortcutsPath = KeyCodesEditor.filenameSymbol.asString.dirname +/+ "globalShortcuts";
 		keyCodesAndModsPath = KeyCodesEditor.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++platform;
 
