@@ -345,44 +345,48 @@ KeyDownActions {
 			this.globalShortcuts = globalShortcuts;
 		};
 
+		"globalShortcuts: %\n".postf(globalShortcuts);
+
 		// to be executed on Server boot
 		syncStarter = {
 			// "syncStarter now executing".postln;
-			SynthDef(\keyListener, {
-				var state;
-				this.globalShortcuts.asArray.collect(_.keyCode).collect({ |kcode|
-					state = KeyState.kr(kcode, lag: 0);
-					SendTrig.kr(Changed.kr(state), kcode, state);
-				})
-			}).add(completionMsg: {
-				[trackingSynth, syncResponder].do(_.free);
-				trackingSynth = Synth.basicNew(\keyListener);
-				trackingSynthID = trackingSynth.nodeID;
-				if(Main.versionAtLeast(3, 5)) {
-					syncResponder = OSCFunc({ |msg, time, addr, recvPort|
-						// "msg: %\n".postf([msg, time, addr, recvPort]);
-						if(msg[1].asInt == trackingSynthID) {
-							funcSlot = this.globalShortcuts.values.detect({ |sc|
-								sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
-							});
-							funcSlot !? { { funcSlot.func.interpret.value }.defer };
-						};
-					}, '/tr', Server.default.addr);
-				} {
-					syncResponder = OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
-						// "msg: %\n".postf([t, r, msg]);
-						if(msg[1].asInt == trackingSynthID) {
-							funcSlot = this.globalShortcuts.values.detect({ |sc|
-								sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
-							});
-							funcSlot !? { { funcSlot.func.interpret.value }.defer };
-						};
-					}).add
-				};
-				CmdPeriod.add(syncStarter);
-				"\nglobal key-down actions enabled\n".inform;
-				trackingSynth.newMsg;
-			}.value);
+			if(this.globalShortcuts.notNil and:{ this.globalShortcuts.isEmpty.not }) {
+				SynthDef(\keyListener, {
+					var state;
+					this.globalShortcuts.postln.asArray.collect(_.keyCode).postln.collect({ |kcode|
+						state = KeyState.kr(kcode, lag: 0);
+						SendTrig.kr(Changed.kr(state), kcode, state);
+					})
+				}).add(completionMsg: {
+					[trackingSynth, syncResponder].do(_.free);
+					trackingSynth = Synth.basicNew(\keyListener);
+					trackingSynthID = trackingSynth.nodeID;
+					if(Main.versionAtLeast(3, 5)) {
+						syncResponder = OSCFunc({ |msg, time, addr, recvPort|
+							// "msg: %\n".postf([msg, time, addr, recvPort]);
+							if(msg[1].asInt == trackingSynthID) {
+								funcSlot = this.globalShortcuts.values.detect({ |sc|
+									sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
+								});
+								funcSlot !? { { funcSlot.func.interpret.value }.defer };
+							};
+						}, '/tr', Server.default.addr);
+					} {
+						syncResponder = OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
+							// "msg: %\n".postf([t, r, msg]);
+							if(msg[1].asInt == trackingSynthID) {
+								funcSlot = this.globalShortcuts.values.detect({ |sc|
+									sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
+								});
+								funcSlot !? { { funcSlot.func.interpret.value }.defer };
+							};
+						}).add
+					};
+					CmdPeriod.add(syncStarter);
+					"\nglobal key-down actions enabled\n".inform;
+					trackingSynth.newMsg;
+				}.value);
+			}
 		};
 
 		ServerTree.add({
