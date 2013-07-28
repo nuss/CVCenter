@@ -384,7 +384,7 @@ CVCenter {
 		var lastCtrlBtnsMode, swFlow;
 		var allTabs, thisTabLabel;
 		var modsDict, arrModsDict;
-		var prefBut, saveBut, loadBut, autoConnectOSCRadio, autoConnectMIDIRadio, loadActionsRadio;
+		var prefBut, saveBut, loadBut, shortcutsBut, enableGlobalSCButton;
 		var tmp, doMakeWdgt;
 		// var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
@@ -448,7 +448,7 @@ CVCenter {
 			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(0, 0));
 			prefPane.resize_(8).background_(Color.black);
 
-			prefBut = Button(prefPane, Rect(0, 0, 70, 20))
+			prefBut = Button(prefPane, Point(70, 20))
 				.font_(Font("Helvetica", 10))
 				.states_([["preferences", Color.white, Color(0.3, 0.3, 0.3)]])
 				.action_({ |pb| CVCenterPreferences.dialog })
@@ -460,7 +460,7 @@ CVCenter {
 
 			swFlow.shift(1, 0);
 
-			saveBut = Button(prefPane, Rect(0, 0, 70, 20))
+			saveBut = Button(prefPane, Point(70, 20))
 				.font_(Font("Helvetica", 10))
 				.states_([["save setup", Color.white, Color(0.15, 0.15, 0.15)]])
 				.action_({ |sb| this.saveSetup })
@@ -472,7 +472,7 @@ CVCenter {
 
 			swFlow.shift(1, 0);
 
-			loadBut = Button(prefPane, Rect(0, 0, 70, 20))
+			loadBut = Button(prefPane, Point(70, 20))
 				.font_(Font("Helvetica", 10))
 				.states_([["load setup", Color.white, Color(0.15, 0.15, 0.15)]])
 				.action_({ |pb|
@@ -483,6 +483,17 @@ CVCenter {
 			if(GUI.id !== \cocoa, {
 				loadBut.toolTip_("Load a CVCenter-setup from disk. You\nmay load OSC-/MIDI-responders and\nactions if the corresponding checkboxes\nto the right are checked accordingly.")
 			});
+
+			swFlow.shift(1, 0);
+
+			shortcutsBut = Button(prefPane, Point(70, 20))
+				.font_(Font("Helvetica", 10))
+				.states_([["shortcuts", Color.white, Color.red]])
+				.action_({ |scb|
+					CVCenterShortcutsEditor.dialog;
+				})
+			;
+
 
 			[tabs.view, tabs.views, prefPane].flat.do({ |v|
 				this.shortcuts.do({ |keyDowns|

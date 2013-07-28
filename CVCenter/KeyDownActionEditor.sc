@@ -549,10 +549,11 @@ KeyDownActionsEditor : KeyDownActions {
 								editBut.value_(1);
 								deleteShortcutKey = shortcutField.string[1..].asSymbol;
 								cachedScrollViewSC = ScrollView.globalKeyDownAction;
-								"cachedScrollViewSC: %\n".postf(cachedScrollViewSC);
+							// "cachedScrollViewSC: %\n".postf(cachedScrollViewSC);
 							// "tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount].cs);
 								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
-									// [view, char, mod, unicode, keycode, key].postcs;
+								// [view, char, mod, unicode, keycode, key].postcs;
+								// keyCodes.findKeyForEqualValue(keycode).postln;
 									// GUI.id.postln;
 									if(keyCodes.findKeyForEqualValue(keycode).notNil) {
 									// "thisModifiers: %\n".postf(thisModifiers);
@@ -639,7 +640,7 @@ KeyDownActionsEditor : KeyDownActions {
 										// "tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }): %\n".postf(tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }));
 											if(deleteShortcutKey !== shortcutField.string[1..].asSymbol) {
 												tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }) !? {
-													tmpShortcuts.remove(tmpShortcuts[tmpShortcuts.detectIndex({ |sc| (sc.key.postln === deleteShortcutKey).postln })]);
+													tmpShortcuts.remove(tmpShortcuts[tmpShortcuts.detectIndex({ |sc| (sc.key.postln === deleteShortcutKey) })]);
 												}
 											}
 										}
@@ -651,9 +652,9 @@ KeyDownActionsEditor : KeyDownActions {
 								shortcutText.stringColor_(Color.white);
 							},
 							0, {
-								"cachedScrollViewSC: %\n".postf(cachedScrollViewSC);
+							// "cachedScrollViewSC: %\n".postf(cachedScrollViewSC);
 								ScrollView.globalKeyDownAction_(cachedScrollViewSC);
-								"ScrollView.globalKeyDownAction: %\n".postf(ScrollView.globalKeyDownAction);
+							// "ScrollView.globalKeyDownAction: %\n".postf(ScrollView.globalKeyDownAction);
 
 								funcField.enabled_(false);
 								editArea.background_(editAreasBg);
@@ -752,7 +753,7 @@ KeyDownActionsEditor : KeyDownActions {
 		var res;
 		res = IdentityDictionary.new;
 		tmpShortcuts.do({ |it| res.put(it.key, it.value) });
-		"res: %\n".postf(res.cs);
+		// "res: %\n".postf(res.cs);
 		^res;
 	}
 
@@ -903,7 +904,7 @@ KeyCodesEditor : KeyDownActions {
 			}
 		});
 
-		// if on OSX build dummies for the other GUI (cocoa or qt)
+		// if on OSX build dummies for other GUI-schemes (cocoa or qt)
 		if(pform == "OSX") {
 			switch(GUI.id,
 				\cocoa, {
