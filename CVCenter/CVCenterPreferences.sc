@@ -61,7 +61,7 @@ CVCenterPreferences {
 						["", Color.white, Color.white],
 						["X", Color.black, Color.white],
 					])
-					.font_(Font(Font.defaultSansFace, 10, true))
+					.font_("Arial Black", 10, true))
 				;
 				if(active, { cBox.value_(1) }, { cBox.value_(0) });
 			}, {

@@ -384,13 +384,33 @@ CVCenter {
 		var lastCtrlBtnsMode, swFlow;
 		var allTabs, thisTabLabel;
 		var modsDict, arrModsDict;
-		var prefBut, saveBut, loadBut, shortcutsBut, enableGlobalSCButton;
+		var prefBut, saveBut, loadBut, shortcutsBut, activateGlobalShortcuts;
 		var tmp, doMakeWdgt;
 		// var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
+		var buildCheckbox;
 		// TabbedView2 specific
 
 		// "adding tab within *makeWindow: %\n".postf(tab);
+
+		// function for building cross-platform checkboxes
+		buildCheckbox = { |view, active|
+			var cBox;
+			if(GUI.id === \cocoa, {
+				cBox = Button(view, 15@15)
+					.states_([
+						["", Color.white, Color.white],
+						["X", Color.black, Color.white],
+					])
+					.font_(Font("Arial Black", 10, true))
+				;
+				if(active, { cBox.value_(1) }, { cBox.value_(0) });
+			}, {
+				cBox = \CheckBox.asClass.new(view, 15@15).value_(active);
+			});
+			cBox;
+		};
+
 
 		tab !? { thisTabLabel = tab };
 		cvs !? { this.put(*cvs) };
@@ -402,7 +422,7 @@ CVCenter {
 		this.guiheight ?? { this.guiheight_(prefs !? { prefs[\guiProperties] !? { prefs[\guiProperties].height }} ?? { 265 }) };
 
 		if(window.isNil or:{ window.isClosed }, {
-			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight)).alwaysOnTop_(alwaysOnTop);
+			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight)).alwaysOnTop_(alwaysOnTop).acceptsMouseOver_(true);
 			if(Quarks.isInstalled("wslib") and:{ GUI.id !== \swing }, { window.background_(Color.black) });
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
@@ -448,10 +468,13 @@ CVCenter {
 			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(0, 0));
 			prefPane.resize_(8).background_(Color.black);
 
+			prefPane.bounds.postln;
+
 			prefBut = Button(prefPane, Point(70, 20))
 				.font_(Font("Helvetica", 10))
 				.states_([["preferences", Color.white, Color(0.3, 0.3, 0.3)]])
 				.action_({ |pb| CVCenterPreferences.dialog })
+				.acceptsMouseOver_(true)
 			;
 
 			if(GUI.id !== \cocoa, {
@@ -494,6 +517,17 @@ CVCenter {
 				})
 			;
 
+			swFlow.shift(5, 2);
+
+			activateGlobalShortcuts = buildCheckbox.(prefPane, false);
+
+			swFlow.shift(3, -2);
+
+			StaticText(prefPane, Point(180, 20))
+				.string_("activate global shortcuts")
+				.stringColor_(Color.white)
+				.font_(Font("Arial", 12))
+			;
 
 			[tabs.view, tabs.views, prefPane].flat.do({ |v|
 				this.shortcuts.do({ |keyDowns|
