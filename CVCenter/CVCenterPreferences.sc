@@ -61,7 +61,7 @@ CVCenterPreferences {
 						["", Color.white, Color.white],
 						["X", Color.black, Color.white],
 					])
-					.font_("Arial Black", 10, true))
+					.font_(Font("Arial Black", 10, true))
 				;
 				if(active, { cBox.value_(1) }, { cBox.value_(0) });
 			}, {
@@ -433,7 +433,7 @@ CVCenterPreferences {
 			cvCenterTab = scTabs.add("CVCenter", scroll: false);
 			// cvWidgetTab = scTabs.add("CVWidget", scroll: false);
 			cvWidgetEditorTab = scTabs.add("CVWidget(MS)Editor", scroll: false);
-			globalShortcutsTab = scTabs.add("global shortcuts", scroll: false).postln;
+			globalShortcutsTab = scTabs.add("global shortcuts", scroll: false);
 
 			cvCenterEditor = KeyDownActionsEditor(
 				cvCenterTab, nil, cvCenterTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvcenter ?? { CVCenter.shortcuts }}, false
