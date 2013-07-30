@@ -72,7 +72,7 @@ CVCenterShortcutsEditor {
 			;
 
 			Button(saveCancel, saveCancelFlow.indentedRemaining.width@23)
-				.states_([["Save", Color.white, Color.red]])
+				.states_([["set shortcuts", Color.white, Color.red]])
 				.font_(Font("Arial", 14, true))
 				.action_({
 					KeyDownActionsEditor.cachedScrollViewSC !? {
@@ -81,7 +81,8 @@ CVCenterShortcutsEditor {
 					CVCenter.shortcuts_(cvCenterEditor.result);
 					AbstractCVWidgetEditor.shortcuts_(cvWidgetEditorEditor.result);
 					KeyDownActions.keyCodes_(keyCodesAndModsEditor.result);
-					shortcuts = (cvcenter:  cvCenterEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
+					CVCenter.setShortcuts;
+				// shortcuts = (cvcenter:  cvCenterEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
 				// 	// "shortcuts.cvcenter['fn + F1']: %\n".postf(shortcuts.cvcenter['fn + F1']);
 				// 	// "cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
 				// 	// "cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);

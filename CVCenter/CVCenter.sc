@@ -383,7 +383,6 @@ CVCenter {
 		var updateRoutine, lastUpdate, lastUpdateBounds, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
 		var lastCtrlBtnsMode, swFlow;
 		var allTabs, thisTabLabel;
-		var modsDict, arrModsDict;
 		var prefBut, saveBut, loadBut, shortcutsBut, activateGlobalShortcuts;
 		var tmp, doMakeWdgt;
 		// var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
@@ -430,17 +429,6 @@ CVCenter {
 			flow.margin_(Point(4, 0));
 			flow.gap_(Point(0, 4));
 			flow.shift;
-
-			switch(GUI.id,
-				\cocoa, {
-					modsDict = KeyDownActions.modifiersCocoa;
-					arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-				},
-				\qt, {
-					modsDict = KeyDownActions.modifiersQt;
-					arrModsDict = KeyDownActions.arrowsModifiersQt;
-				}
-			);
 
 			tabs = TabbedView2(window, Rect(0, 0, flow.bounds.width, flow.bounds.height-40))
 				.tabCurve_(3)
@@ -529,44 +517,45 @@ CVCenter {
 				.font_(Font("Arial", 12))
 			;
 
-			[tabs.view, tabs.views, prefPane].flat.do({ |v|
-				this.shortcuts.do({ |keyDowns|
-
-					v.keyDownAction_(
-						v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-							var thisMod, thisArrMod;
-
-							// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
-
-							switch(GUI.id,
-								\cocoa, {
-									thisMod = keyDowns.modifierCocoa;
-									thisArrMod = keyDowns.arrowsModifierCocoa;
-								},
-								\qt, {
-									thisMod = keyDowns.modifierQt;
-									thisArrMod = keyDowns.arrowsModifierQt;
-								}
-							);
-
-							case
-								{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-									// "no modifier".postln;
-									if(keycode == keyDowns.keyCode and:{
-										thisMod.isNil and:{ thisArrMod.isNil }
-									}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
-								}
-								{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-									// "some modifier...".postln;
-									if(keycode == keyDowns.keyCode and:{
-										(modifiers == thisArrMod).or(modifiers == thisMod)
-									}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
-								}
-							;
-						})
-					)
-				});
-			});
+			this.setShortcuts;
+			// [tabs.view, tabs.views, prefPane].flat.do({ |v|
+			// 	this.shortcuts.do({ |keyDowns|
+			//
+			// 		v.keyDownAction_(
+			// 			v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+			// 				var thisMod, thisArrMod;
+			//
+			// 				// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
+			//
+			// 				switch(GUI.id,
+			// 					\cocoa, {
+			// 						thisMod = keyDowns.modifierCocoa;
+			// 						thisArrMod = keyDowns.arrowsModifierCocoa;
+			// 					},
+			// 					\qt, {
+			// 						thisMod = keyDowns.modifierQt;
+			// 						thisArrMod = keyDowns.arrowsModifierQt;
+			// 					}
+			// 				);
+			//
+			// 				case
+			// 				{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+			// 					// "no modifier".postln;
+			// 					if(keycode == keyDowns.keyCode and:{
+			// 						thisMod.isNil and:{ thisArrMod.isNil }
+			// 					}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+			// 				}
+			// 				{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+			// 					// "some modifier...".postln;
+			// 					if(keycode == keyDowns.keyCode and:{
+			// 						(modifiers == thisArrMod).or(modifiers == thisMod)
+			// 					}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+			// 				}
+			// 				;
+			// 			})
+			// 		)
+			// 	});
+			// });
 
 			window.onClose_({
 				if(childViews.size > 0, {
@@ -712,6 +701,60 @@ CVCenter {
 				lastSetUp = this.setup;
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});
+	}
+
+	*setShortcuts {
+		var modsDict, arrModsDict;
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
+			}
+		);
+
+		[tabs.view, tabs.views, prefPane].flat.do({ |v|
+			this.shortcuts.do({ |keyDowns|
+
+				v.keyDownAction_(
+					v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+						var thisMod, thisArrMod;
+
+							// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
+
+						switch(GUI.id,
+							\cocoa, {
+								thisMod = keyDowns.modifierCocoa;
+								thisArrMod = keyDowns.arrowsModifierCocoa;
+							},
+							\qt, {
+								thisMod = keyDowns.modifierQt;
+								thisArrMod = keyDowns.arrowsModifierQt;
+							}
+						);
+
+						case
+							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+								// "no modifier".postln;
+								if(keycode == keyDowns.keyCode and:{
+									thisMod.isNil and:{ thisArrMod.isNil }
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+							}
+							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+								// "some modifier...".postln;
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == thisArrMod).or(modifiers == thisMod)
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+							}
+						;
+					})
+				)
+			})
+		})
 	}
 
 	*prAddTab { |label|
