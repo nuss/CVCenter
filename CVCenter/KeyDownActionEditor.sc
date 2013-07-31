@@ -3,7 +3,7 @@ KeyDownActions {
 	// classvar <allEditors;
 	// classvar <viewActions;
 	classvar <>keyCodes, <>modifiersQt, <>modifiersCocoa, <>arrowsModifiersQt, <>arrowsModifiersCocoa;
-	classvar <>globalShortcuts;
+	classvar <>globalShortcuts, <globalShortcutsEnabled=true;
 	// var <window, <>actions;
 
 	*initClass {
@@ -397,6 +397,10 @@ KeyDownActions {
 			"\nglobal key-down actions deactivated\n".inform;
 		});
 	}
+
+	globalShortcutsEnabled_ { |bool|
+
+	}
 }
 
 KeyDownActionsEditor : KeyDownActions {
@@ -484,8 +488,6 @@ KeyDownActionsEditor : KeyDownActions {
 		makeEditArea = { |shortcut, funcString|
 			var editArea, shortcutText, shortcutField, editBut, removeBut, funcField, myCount;
 
-			// "shortcut: %, funcString: %, scrollView.parent: %\n".postf(shortcut, funcString, scrollView.parent);
-
 			editAreas = editAreas.add(
 				editArea = CompositeView(
 					scrollView, scrollFlow.bounds.width-16@100
@@ -545,17 +547,11 @@ KeyDownActionsEditor : KeyDownActions {
 									ed.funcFields.do(_.enabled_(false));
 								});
 								editBut.value_(1);
-								// deleteShortcutKey = shortcutField.string[1..].asSymbol;
 
 								cachedScrollViewSC = ScrollView.globalKeyDownAction;
-								// "cachedScrollViewSC: %\n".postf(cachedScrollViewSC);
-								// "tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount].cs);
+
 								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
-									// [view, char, mod, unicode, keycode, key].postcs;
-									// keyCodes.findKeyForEqualValue(keycode).postln;
-									// GUI.id.postln;
 									if(keyCodes.findKeyForEqualValue(keycode).notNil) {
-										// "thisModifiers: %\n".postf(thisModifiers);
 										char !? {
 											if(thisModifiers.includes(mod) and:{
 												thisModifiers.findKeyForValue(mod) != \none
@@ -575,7 +571,6 @@ KeyDownActionsEditor : KeyDownActions {
 													}
 												}
 											}) {
-												// "tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount]);
 												shortcutField.string_(
 													" "++ mods ++ join ++
 													keyCodes.findKeyForValue(keycode)
@@ -620,14 +615,12 @@ KeyDownActionsEditor : KeyDownActions {
 															modifierQt: nil
 														)
 													}
-												};
-												// "tmpShortcuts[%] =  new: %\n".postf(myCount, tmpShortcuts[myCount]);
+												}
 											} {
 												shortcutField.string_(
 													" "++
 													keyCodes.findKeyForValue(keycode)
 												);
-												// "tmpShortcuts[%] before: %\n".postf(myCount, tmpShortcuts[myCount]);
 												tmpShortcuts[myCount] = (keyCodes.findKeyForValue(keycode)).asSymbol -> (
 													func: funcField.string,
 													keyCode: keycode,
@@ -636,28 +629,16 @@ KeyDownActionsEditor : KeyDownActions {
 													modifierCocoa: nil,
 													modifierQt: nil
 												);
-												// "tmpShortcuts[%] after: %\n".postf(myCount, tmpShortcuts[myCount]);
-											};
-											// "deleteShortcutKey: %\n".postf(deleteShortcutKey);
-											// "tmpShortcuts: %\n".postf(tmpShortcuts);
-											// "tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }): %\n".postf(tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }));
-											// if(deleteShortcutKey !== shortcutField.string[1..].asSymbol) {
-											// 	tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }) !? {
-											// 		tmpShortcuts.remove(tmpShortcuts[tmpShortcuts.detectIndex({ |sc| (sc.key === deleteShortcutKey) })]);
-											// 	}
-											// }
+											}
 										}
-									};
-								// ScrollView.globalKeyDownAction_(cachedScrollViewSC)
+									}
 								});
 								funcField.enabled_(true);
 								editArea.background_(Color.red);
 								shortcutText.stringColor_(Color.white);
 							},
 							0, {
-							// "cachedScrollViewSC: %\n".postf(cachedScrollViewSC);
 								ScrollView.globalKeyDownAction_(cachedScrollViewSC);
-							// "ScrollView.globalKeyDownAction: %\n".postf(ScrollView.globalKeyDownAction);
 
 								funcField.enabled_(false);
 								editArea.background_(editAreasBg);

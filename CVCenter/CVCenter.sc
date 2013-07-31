@@ -139,6 +139,18 @@ CVCenter {
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[$o])
 			);
 			scFunc =
+			"// set temporary shortcuts
+			{ CVCenterShortcutsEditor.dialog }";
+			this.shortcuts.put(
+				'alt + s',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$s],
+					modifierQt: KeyDownActions.modifiersQt[\alt],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
+				)
+			);
+			scFunc =
 			"// CVCenterControllersMonitor MIDI
 			{ CVCenterControllersMonitor(0) }";
 			this.shortcuts.put(
@@ -507,7 +519,7 @@ CVCenter {
 
 			swFlow.shift(5, 2);
 
-			activateGlobalShortcuts = buildCheckbox.(prefPane, false);
+			activateGlobalShortcuts = buildCheckbox.(prefPane, KeyDownActions.globalShortcutsEnabled);
 
 			swFlow.shift(3, -2);
 
