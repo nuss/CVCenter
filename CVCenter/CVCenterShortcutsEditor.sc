@@ -41,7 +41,7 @@ CVCenterShortcutsEditor {
 			// cvWidgetTab = tabs.add("CVWidget", scroll: false);
 			cvWidgetEditorTab = tabs.add("CVWidget(MS)Editor", scroll: false);
 			globalShortcutsTab = tabs.add("global shortcuts", scroll: false);
-			keyCodesAndModsTab = tabs.add("keycodes and modifiers", scroll: false);
+			// keyCodesAndModsTab = tabs.add("keycodes and modifiers", scroll: false);
 
 			cvCenterEditor = KeyDownActionsEditor(
 				cvCenterTab, nil, cvCenterTab.bounds, CVCenter.shortcuts, false
@@ -55,9 +55,9 @@ CVCenterShortcutsEditor {
 				globalShortcutsTab, nil, globalShortcutsTab.bounds, KeyDownActions.globalShortcuts, false, false, false
 			);
 
-			keyCodesAndModsEditor = KeyCodesEditor(
-				keyCodesAndModsTab, nil, false
-			);
+			// keyCodesAndModsEditor = KeyCodesEditor(
+			// 	keyCodesAndModsTab, nil, false
+			// );
 
 			saveCancel = CompositeView(window, Rect(0, window.bounds.height-32, window.bounds.width, 32))
 				.background_(tabsBg)
@@ -75,22 +75,23 @@ CVCenterShortcutsEditor {
 				.states_([["set shortcuts", Color.white, Color.red]])
 				.font_(Font("Arial", 14, true))
 				.action_({
+					// "KeyDownActionsEditor.cachedScrollViewSC: %\n".postf(KeyDownActionsEditor.cachedScrollViewSC);
 					KeyDownActionsEditor.cachedScrollViewSC !? {
 						ScrollView.globalKeyDownAction_(KeyDownActionsEditor.cachedScrollViewSC);
 					};
 					CVCenter.shortcuts_(cvCenterEditor.result);
 					AbstractCVWidgetEditor.shortcuts_(cvWidgetEditorEditor.result);
-					KeyDownActions.keyCodes_(keyCodesAndModsEditor.result);
+					// KeyDownActions.keyCodes_(keyCodesAndModsEditor.result);
 					CVCenter.setShortcuts;
-				// shortcuts = (cvcenter:  cvCenterEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
-				// 	// "shortcuts.cvcenter['fn + F1']: %\n".postf(shortcuts.cvcenter['fn + F1']);
-				// 	// "cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
-				// 	// "cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
-				// 	this.writePreferences(
-				// 		shortcuts: shortcuts,
-				// 		globalShortcuts: globalShortcutsEditorTab.result,
-				// 		keyCodesAndMods: keyCodesAndModsEditor.result(false)
-				// 	);
+					// shortcuts = (cvcenter:  cvCenterEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
+					// 	// "shortcuts.cvcenter['fn + F1']: %\n".postf(shortcuts.cvcenter['fn + F1']);
+					// 	// "cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
+					// 	// "cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
+					// 	this.writePreferences(
+					// 		shortcuts: shortcuts,
+					// 		globalShortcuts: globalShortcutsEditorTab.result,
+					// 		keyCodesAndMods: keyCodesAndModsEditor.result(false)
+					// 	);
 					window.close;
 				})
 			;

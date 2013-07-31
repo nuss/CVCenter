@@ -420,7 +420,7 @@ KeyDownActionsEditor : KeyDownActions {
 		var order, orderedShortcuts;
 		var tmpEditFlow, tmpIndex, join = " + ", mods;
 		// vars for makeEditArea
-		var count, rmBounds, deleteShortcutKey;
+		var count, rmBounds;
 		var thisArrowsModifiers, thisModifiers;
 
 		Platform.case(
@@ -528,8 +528,6 @@ KeyDownActionsEditor : KeyDownActions {
 				shortcutField.string_(" "++shortcut);
 			};
 
-
-
 			editButs = editButs.add(
 				editBut = Button(editArea, 60@15)
 					.states_([
@@ -547,16 +545,17 @@ KeyDownActionsEditor : KeyDownActions {
 									ed.funcFields.do(_.enabled_(false));
 								});
 								editBut.value_(1);
-								deleteShortcutKey = shortcutField.string[1..].asSymbol;
+								// deleteShortcutKey = shortcutField.string[1..].asSymbol;
+
 								cachedScrollViewSC = ScrollView.globalKeyDownAction;
-							// "cachedScrollViewSC: %\n".postf(cachedScrollViewSC);
-							// "tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount].cs);
+								// "cachedScrollViewSC: %\n".postf(cachedScrollViewSC);
+								// "tmpShortcuts[%]: %\n".postf(myCount, tmpShortcuts[myCount].cs);
 								ScrollView.globalKeyDownAction_({ |view, char, mod, unicode, keycode, key|
-								// [view, char, mod, unicode, keycode, key].postcs;
-								// keyCodes.findKeyForEqualValue(keycode).postln;
+									// [view, char, mod, unicode, keycode, key].postcs;
+									// keyCodes.findKeyForEqualValue(keycode).postln;
 									// GUI.id.postln;
 									if(keyCodes.findKeyForEqualValue(keycode).notNil) {
-									// "thisModifiers: %\n".postf(thisModifiers);
+										// "thisModifiers: %\n".postf(thisModifiers);
 										char !? {
 											if(thisModifiers.includes(mod) and:{
 												thisModifiers.findKeyForValue(mod) != \none
@@ -628,6 +627,7 @@ KeyDownActionsEditor : KeyDownActions {
 													" "++
 													keyCodes.findKeyForValue(keycode)
 												);
+												// "tmpShortcuts[%] before: %\n".postf(myCount, tmpShortcuts[myCount]);
 												tmpShortcuts[myCount] = (keyCodes.findKeyForValue(keycode)).asSymbol -> (
 													func: funcField.string,
 													keyCode: keycode,
@@ -636,13 +636,16 @@ KeyDownActionsEditor : KeyDownActions {
 													modifierCocoa: nil,
 													modifierQt: nil
 												);
+												// "tmpShortcuts[%] after: %\n".postf(myCount, tmpShortcuts[myCount]);
 											};
-										// "tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }): %\n".postf(tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }));
-											if(deleteShortcutKey !== shortcutField.string[1..].asSymbol) {
-												tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }) !? {
-													tmpShortcuts.remove(tmpShortcuts[tmpShortcuts.detectIndex({ |sc| (sc.key.postln === deleteShortcutKey) })]);
-												}
-											}
+											// "deleteShortcutKey: %\n".postf(deleteShortcutKey);
+											// "tmpShortcuts: %\n".postf(tmpShortcuts);
+											// "tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }): %\n".postf(tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }));
+											// if(deleteShortcutKey !== shortcutField.string[1..].asSymbol) {
+											// 	tmpShortcuts.detectIndex({ |sc| sc.key === deleteShortcutKey }) !? {
+											// 		tmpShortcuts.remove(tmpShortcuts[tmpShortcuts.detectIndex({ |sc| (sc.key === deleteShortcutKey) })]);
+											// 	}
+											// }
 										}
 									};
 								// ScrollView.globalKeyDownAction_(cachedScrollViewSC)

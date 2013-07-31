@@ -518,44 +518,6 @@ CVCenter {
 			;
 
 			this.setShortcuts;
-			// [tabs.view, tabs.views, prefPane].flat.do({ |v|
-			// 	this.shortcuts.do({ |keyDowns|
-			//
-			// 		v.keyDownAction_(
-			// 			v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-			// 				var thisMod, thisArrMod;
-			//
-			// 				// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
-			//
-			// 				switch(GUI.id,
-			// 					\cocoa, {
-			// 						thisMod = keyDowns.modifierCocoa;
-			// 						thisArrMod = keyDowns.arrowsModifierCocoa;
-			// 					},
-			// 					\qt, {
-			// 						thisMod = keyDowns.modifierQt;
-			// 						thisArrMod = keyDowns.arrowsModifierQt;
-			// 					}
-			// 				);
-			//
-			// 				case
-			// 				{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-			// 					// "no modifier".postln;
-			// 					if(keycode == keyDowns.keyCode and:{
-			// 						thisMod.isNil and:{ thisArrMod.isNil }
-			// 					}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
-			// 				}
-			// 				{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-			// 					// "some modifier...".postln;
-			// 					if(keycode == keyDowns.keyCode and:{
-			// 						(modifiers == thisArrMod).or(modifiers == thisMod)
-			// 					}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
-			// 				}
-			// 				;
-			// 			})
-			// 		)
-			// 	});
-			// });
 
 			window.onClose_({
 				if(childViews.size > 0, {
@@ -718,13 +680,15 @@ CVCenter {
 		);
 
 		[tabs.view, tabs.views, prefPane].flat.do({ |v|
-			this.shortcuts.do({ |keyDowns|
+			// reset keyDownAction - it's getting reassigned
+			v.keyDownAction_(nil);
 
+			this.shortcuts.do({ |keyDowns|
 				v.keyDownAction_(
 					v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
 						var thisMod, thisArrMod;
 
-							// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
+						// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
 
 						switch(GUI.id,
 							\cocoa, {
