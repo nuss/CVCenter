@@ -405,7 +405,7 @@ CVCenter {
 		// "adding tab within *makeWindow: %\n".postf(tab);
 
 		// function for building cross-platform checkboxes
-		buildCheckbox = { |view, active|
+		buildCheckbox = { |view, active, action|
 			var cBox;
 			if(GUI.id === \cocoa, {
 				cBox = Button(view, 15@15)
@@ -419,7 +419,7 @@ CVCenter {
 			}, {
 				cBox = \CheckBox.asClass.new(view, 15@15).value_(active);
 			});
-			cBox;
+			cBox.action_(action);
 		};
 
 
@@ -519,7 +519,7 @@ CVCenter {
 
 			swFlow.shift(5, 2);
 
-			activateGlobalShortcuts = buildCheckbox.(prefPane, KeyDownActions.globalShortcutsEnabled);
+			activateGlobalShortcuts = buildCheckbox.(prefPane, KeyDownActions.globalShortcutsEnabled, { KeyDownActions.globalShortcutsEnabled_(activateGlobalShortcuts.value) });
 
 			swFlow.shift(3, -2);
 

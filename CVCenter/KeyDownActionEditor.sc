@@ -390,18 +390,27 @@ KeyDownActions {
 
 		ServerTree.add({
 			// syncStarter.value;
-			this.globalShortcutsSync;
+			if(globalShortcutsEnabled) {
+				this.globalShortcutsSync;
+			}
 		}, \default);
 
 		ServerQuit.add({
-			CmdPeriod.remove({ this.globalShortcutsSync });
+			CmdPeriod.remove({
+				if(globalShortcutsEnabled) {
+					this.globalShortcutsSync;
+				}
+			});
 			syncResponder.free;
 			"\nglobal key-down actions deactivated\n".inform;
 		});
 	}
 
 	*globalShortcutsEnabled_ { |bool|
-
+		if(Server.default.serverRunning) {
+			if(bool) { this.globalShortcutsSync } { [trackingSynth, syncResponder].do(_.free) };
+		};
+		globalShortcutsEnabled = bool;
 	}
 
 	*globalShortcutsSync {
@@ -440,7 +449,11 @@ KeyDownActions {
 					}).add
 				};
 				// [this.method, this.method.name].postln;
-				CmdPeriod.add({ this.globalShortcutsSync });
+				CmdPeriod.add({
+					if(globalShortcutsEnabled) {
+						this.globalShortcutsSync;
+					}
+				});
 				"\nglobal key-down actions enabled\n".inform;
 				trackingSynth.newMsg;
 			}.value);
