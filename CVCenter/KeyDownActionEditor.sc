@@ -4,14 +4,15 @@ KeyDownActions {
 	// classvar <viewActions;
 	classvar <>keyCodes, <>modifiersQt, <>modifiersCocoa, <>arrowsModifiersQt, <>arrowsModifiersCocoa;
 	classvar <>globalShortcuts, <globalShortcutsEnabled=true;
+	classvar trackingSynth, syncResponder, trackingSynthID;
 	// var <window, <>actions;
 
 	*initClass {
 		var keyCodesAndModsPath, keyCodesAndMods;
 		var globalShortcutsPath, globalShortcuts;
 		var platform;
-		var syncStarter, syncResponder, cmdPeriodSynthRestart;
-		var funcSlot, trackingSynth, trackingSynthID;
+		var syncStarter, cmdPeriodSynthRestart;
+		// var /*funcSlot*//*, trackingSynth, trackingSynthID*/;
 		var test;
 
 		Class.initClassTree(Platform);
@@ -346,61 +347,107 @@ KeyDownActions {
 		};
 
 		// to be executed on Server boot
-		syncStarter = {
-			// "syncStarter now executing".postln;
-			if(this.globalShortcuts.notNil and:{ this.globalShortcuts.isEmpty.not }) {
-				SynthDef(\keyListener, {
-					var state;
-					this.globalShortcuts.asArray.collect(_.keyCode).collect({ |kcode|
-						state = KeyState.kr(kcode, lag: 0);
-						SendTrig.kr(Changed.kr(state), kcode, state);
-					})
-				}).add(completionMsg: {
-					[trackingSynth, syncResponder].do(_.free);
-					trackingSynth = Synth.basicNew(\keyListener);
-					trackingSynthID = trackingSynth.nodeID;
-					if(Main.versionAtLeast(3, 5)) {
-						syncResponder = OSCFunc({ |msg, time, addr, recvPort|
-							// "msg: %\n".postf([msg, time, addr, recvPort]);
-							if(msg[1].asInt == trackingSynthID) {
-								funcSlot = this.globalShortcuts.values.detect({ |sc|
-									sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
-								});
-								funcSlot !? { { funcSlot.func.interpret.value }.defer };
-							};
-						}, '/tr', Server.default.addr);
-					} {
-						syncResponder = OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
-							// "msg: %\n".postf([t, r, msg]);
-							if(msg[1].asInt == trackingSynthID) {
-								funcSlot = this.globalShortcuts.values.detect({ |sc|
-									sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
-								});
-								funcSlot !? { { funcSlot.func.interpret.value }.defer };
-							};
-						}).add
-					};
-					CmdPeriod.add(syncStarter);
-					"\nglobal key-down actions enabled\n".inform;
-					trackingSynth.newMsg;
-				}.value);
-			}
-		};
+		// syncStarter = {
+		// 	// "syncStarter now executing".postln;
+		// 	if(this.globalShortcuts.notNil and:{ this.globalShortcuts.isEmpty.not }) {
+		// 		SynthDef(\keyListener, {
+		// 			var state;
+		// 			this.globalShortcuts.asArray.collect(_.keyCode).collect({ |kcode|
+		// 				state = KeyState.kr(kcode, lag: 0);
+		// 				SendTrig.kr(Changed.kr(state), kcode, state);
+		// 			})
+		// 		}).add(completionMsg: {
+		// 			[trackingSynth, syncResponder].do(_.free);
+		// 			trackingSynth = Synth.basicNew(\keyListener);
+		// 			trackingSynthID = trackingSynth.nodeID;
+		// 			if(Main.versionAtLeast(3, 5)) {
+		// 				syncResponder = OSCFunc({ |msg, time, addr, recvPort|
+		// 					// "msg: %\n".postf([msg, time, addr, recvPort]);
+		// 					if(msg[1].asInt == trackingSynthID) {
+		// 						funcSlot = this.globalShortcuts.values.detect({ |sc|
+		// 							sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
+		// 						});
+		// 						funcSlot !? { { funcSlot.func.interpret.value }.defer };
+		// 					};
+		// 				}, '/tr', Server.default.addr);
+		// 			} {
+		// 				syncResponder = OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
+		// 					// "msg: %\n".postf([t, r, msg]);
+		// 					if(msg[1].asInt == trackingSynthID) {
+		// 						funcSlot = this.globalShortcuts.values.detect({ |sc|
+		// 							sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
+		// 						});
+		// 						funcSlot !? { { funcSlot.func.interpret.value }.defer };
+		// 					};
+		// 				}).add
+		// 			};
+		// 			CmdPeriod.add(syncStarter);
+		// 			"\nglobal key-down actions enabled\n".inform;
+		// 			trackingSynth.newMsg;
+		// 		}.value);
+		// 	}
+		// };
 
 		ServerTree.add({
-			syncStarter.value;
+			// syncStarter.value;
+			this.globalShortcutsSync;
 		}, \default);
 
 		ServerQuit.add({
-			CmdPeriod.remove(syncStarter);
+			CmdPeriod.remove({ this.globalShortcutsSync });
 			syncResponder.free;
 			"\nglobal key-down actions deactivated\n".inform;
 		});
 	}
 
-	globalShortcutsEnabled_ { |bool|
+	*globalShortcutsEnabled_ { |bool|
 
 	}
+
+	*globalShortcutsSync {
+		var funcSlot;
+		// "syncStarter now executing".postln;
+		if(this.globalShortcuts.notNil and:{ this.globalShortcuts.isEmpty.not }) {
+			SynthDef(\keyListener, {
+				var state;
+				this.globalShortcuts.asArray.collect(_.keyCode).collect({ |kcode|
+					state = KeyState.kr(kcode, lag: 0);
+					SendTrig.kr(Changed.kr(state), kcode, state);
+				})
+			}).add(completionMsg: {
+				[trackingSynth, syncResponder].do(_.free);
+				trackingSynth = Synth.basicNew(\keyListener);
+				trackingSynthID = trackingSynth.nodeID;
+				if(Main.versionAtLeast(3, 5)) {
+					syncResponder = OSCFunc({ |msg, time, addr, recvPort|
+						// "msg: %\n".postf([msg, time, addr, recvPort]);
+						if(msg[1].asInt == trackingSynthID) {
+							funcSlot = this.globalShortcuts.values.detect({ |sc|
+								sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
+							});
+							funcSlot !? { { funcSlot.func.interpret.value }.defer };
+						};
+					}, '/tr', Server.default.addr);
+				} {
+					syncResponder = OSCresponderNode(Server.default.addr, '/tr', { |t, r, msg|
+						// "msg: %\n".postf([t, r, msg]);
+						if(msg[1].asInt == trackingSynthID) {
+							funcSlot = this.globalShortcuts.values.detect({ |sc|
+								sc.keyCode == msg[2].asInt and:{ msg[3].asInt.asBoolean }
+							});
+							funcSlot !? { { funcSlot.func.interpret.value }.defer };
+						};
+					}).add
+				};
+				// [this.method, this.method.name].postln;
+				CmdPeriod.add({ this.globalShortcutsSync });
+				"\nglobal key-down actions enabled\n".inform;
+				trackingSynth.newMsg;
+			}.value);
+		}
+
+	}
+
 }
 
 KeyDownActionsEditor : KeyDownActions {
