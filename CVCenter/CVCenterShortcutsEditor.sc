@@ -4,12 +4,31 @@ CVCenterShortcutsEditor {
 	*dialog {
 		var tabs, cvCenterFlow, cvWidgetFlow, cvWidgetEditorFlow, globalShortcutsFlow, keyCodesAndModsFlow;
 		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab, globalShortcutsTab, keyCodesAndModsTab;
+		// var cvCenterFlow, cvWidgetFlow, cvWidgetEditorFlow, globalShortcutsFlow;
 		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor, globalShortcutsEditor, keyCodesAndModsEditor;
 		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		var saveCancel, saveCancelFlow;
+		var buildCheckbox, copyToPrefs;
 		var fFact, shortcuts;
 
 		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
+
+		buildCheckbox = { |view, active|
+			var cBox;
+			if(GUI.id === \cocoa, {
+				cBox = Button(view, 15@15)
+					.states_([
+						["", Color.white, Color.white],
+						["X", Color.black, Color.white],
+					])
+					.font_(Font("Arial Black", 10, true))
+				;
+				if(active, { cBox.value_(1) }, { cBox.value_(0) });
+			}, {
+				cBox = \CheckBox.asClass.new(view, 15@15).value_(active);
+			});
+			cBox;
+		};
 
 		tabFont = Font("Arial", 12, true);
 		staticTextFont = Font("Arial", 12 * fFact);
@@ -26,7 +45,7 @@ CVCenterShortcutsEditor {
 				498, 385
 			));
 
-			tabs = TabbedView2(window, Rect(0, 1, window.bounds.width, window.bounds.height-33))
+			tabs = TabbedView2(window, Rect(0, 1, window.bounds.width, window.bounds.height-50))
 				.tabHeight_(17)
 				.tabCurve_(3)
 				.labelColors_(Color.white!2)
@@ -59,7 +78,7 @@ CVCenterShortcutsEditor {
 			// 	keyCodesAndModsTab, nil, false
 			// );
 
-			saveCancel = CompositeView(window, Rect(0, window.bounds.height-32, window.bounds.width, 32))
+			saveCancel = CompositeView(window, Rect(0, window.bounds.height-49, window.bounds.width, 49))
 				.background_(tabsBg)
 			;
 
@@ -94,6 +113,14 @@ CVCenterShortcutsEditor {
 					// 	);
 					window.close;
 				})
+			;
+
+			saveCancelFlow.nextLine.shift(saveCancelFlow.bounds.width/2-8, 4);
+			copyToPrefs = buildCheckbox.(saveCancel, false);
+			saveCancelFlow.shift(4, -2);
+			StaticText(saveCancel, Point(saveCancelFlow.indentedRemaining.width, 20))
+				.string_("copy to preferences")
+				.font_(staticTextFont)
 			;
 		};
 		window.front;
