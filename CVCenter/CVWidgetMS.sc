@@ -182,6 +182,7 @@ CVWidgetMS : CVWidget {
 				[name.asString, Color.black, Color.yellow],
 			])
 			.font_(Font("Arial", 9))
+			.focusColor_(Color.green)
 		;
 		nameField = TextView(parent, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
@@ -208,6 +209,7 @@ CVWidgetMS : CVWidget {
 			.colors_(Color.clear, Color.blue)
 			.background_(Color.white)
 			.elasticMode_(1)
+			.focusColor_(Color.green)
 		;
 
 		nextY = thisXY.y+mSlider.bounds.height+label.bounds.height+1;
@@ -240,6 +242,7 @@ CVWidgetMS : CVWidget {
 					}, { nv.doAction })
 				})
 			})
+			.focusColor_(Color.green)
 		;
 
 		// nextY = thisXY.y+numVal.bounds.top+numVal.bounds.height+1;
@@ -250,6 +253,7 @@ CVWidgetMS : CVWidget {
 				["MIDI"+"("++numMidiResponders++"/"++msSize++")", stringColor, background]
 			])
 			.font_(Font("Arial", 9))
+			.focusColor_(Color.green)
 			.action_({ |mb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, name, 1);
@@ -305,6 +309,7 @@ CVWidgetMS : CVWidget {
 				["OSC"+"("++numOscResponders++"/"++msSize++")", stringColor, background]
 			])
 			.font_(Font("Arial", 9))
+			.focusColor_(Color.green)
 			.action_({ |oscb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, name, 2);
@@ -350,6 +355,7 @@ CVWidgetMS : CVWidget {
 				["Spec", Color.white, Color(1.0, 0.3)]
 			])
 			.font_(Font("Arial", 9))
+			.focusColor_(Color.green)
 			.action_({ |spb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, name, 0);
@@ -368,6 +374,7 @@ CVWidgetMS : CVWidget {
 				["Actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])
 			.font_(Font("Arial", 9))
+			.focusColor_(Color.green)
 			.action_({ |spb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
 					editor.msEditor = CVWidgetMSEditor(this, name, 3);

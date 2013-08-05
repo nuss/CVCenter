@@ -174,6 +174,7 @@ CVWidget2D : CVWidget {
 				[name.asString, Color.black, Color.yellow],
 			])
 			.font_(Font("Arial", 9))
+			.focusColor_(Color.green)
 		;
 		nameField = TextView(parent, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
@@ -197,9 +198,10 @@ CVWidget2D : CVWidget {
 		nextY = thisXY.y+1+label.bounds.height;
 
 		slider2d = Slider2D(parent, Rect(thisXY.x+1, nextY, thisWidth-42, thisWidth-42))
-			.canFocus_(false)
+		// .canFocus_(false)
 			.background_(Color.white)
 			.knobColor_(Color.red)
+			.focusColor_(Color.green)
 		;
 
 		nextY = nextY+slider2d.bounds.height;
@@ -210,8 +212,10 @@ CVWidget2D : CVWidget {
 			thisWidth-42,
 			15
 		))
-		.canFocus_(false)
-		.background_(Color.white);
+			// .canFocus_(false)
+			.focusColor_(Color.green)
+			.background_(Color.white)
+		;
 		nextY = nextY+this.rangeSlider.bounds.height;
 
 		numVal.lo = NumberBox(parent);
@@ -224,7 +228,7 @@ CVWidget2D : CVWidget {
 				this.rangeSlider.bounds.width/2,
 				15
 			));
-			k.font_(Font("Arial", 9.5));
+			k.font_(Font("Arial", 9.5)).focusColor_(Color.green);
 		});
 
 		specBut.lo = Button(parent)
@@ -307,6 +311,7 @@ CVWidget2D : CVWidget {
 		[specBut.hi, [nextY, \hi], specBut.lo, [nextY+52, \lo]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightColumnX, v[0], thisWidth-slider2d.bounds.width-2, 13))
 			.font_(Font("Arial", 8))
+			.focusColor_(Color.green)
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 		});
 
@@ -321,6 +326,7 @@ CVWidget2D : CVWidget {
 		[midiHead.hi, nextY, midiHead.lo, nextY+52].pairsDo({ |k, v|
 			k.bounds_(Rect(rightColumnX, v, thisWidth-slider2d.bounds.width-2-12, 13))
 				.font_(Font("Arial", 7))
+				.focusColor_(Color.green)
 				.states_([["MIDI", stringColor, background]])
 			;
 
@@ -342,6 +348,7 @@ CVWidget2D : CVWidget {
 		[midiLearn.hi, [\hi, nextY], midiLearn.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightColumnX+midiHead.lo.bounds.width, v[1], 12, 13))
 			.font_(Font("Arial", 7))
+			.focusColor_(Color.green)
 			.states_([
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
@@ -376,6 +383,7 @@ CVWidget2D : CVWidget {
 		[midiSrc.hi, [\hi, nextY], midiSrc.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightColumnX, v[1], thisWidth-slider2d.bounds.width-2, 13))
 			.font_(Font("Arial", 8.5))
+			.focusColor_(Color.green)
 			.string_("source")
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -410,6 +418,7 @@ CVWidget2D : CVWidget {
 		[midiChan.hi, [\hi, nextY], midiChan.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightColumnX, v[1], thisWidth-slider2d.bounds.width-2-25, 13))
 			.font_(Font("Arial", 8.5))
+			.focusColor_(Color.green)
 			.string_("chan")
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -442,6 +451,7 @@ CVWidget2D : CVWidget {
 		[midiCtrl.hi, [\hi, nextY], midiCtrl.lo, [\lo, nextY+52]].pairsDo({ |k, v|
 			k.bounds_(Rect(rightColumnX+midiChan[v[0]].bounds.width, v[1], 25, 13))
 			.font_(Font("Arial", 8.5))
+			.focusColor_(Color.green)
 			.string_("ctrl")
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -504,6 +514,7 @@ CVWidget2D : CVWidget {
 		[oscEditBut.lo, [\lo, thisXY.x+1], oscEditBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, oscEditButHeight))
 			.font_(Font("Arial", 8.5))
+			.focusColor_(Color.green)
 			.states_([
 				["edit OSC", stringColor, background]
 			])
@@ -550,6 +561,7 @@ CVWidget2D : CVWidget {
 		[calibBut.lo, [\lo, thisXY.x+1], calibBut.hi, [\hi, thisXY.x+(thisWidth/2)]].pairsDo({ |k, v|
 			k.bounds_(Rect(v[1]+oscEditBut[v[0]].bounds.width-10, nextY+oscEditBut.lo.bounds.height-10, 10, 10))
 			.font_(Font("Arial", 9))
+			.focusColor_(Color.green)
 			.states_([
 				["", Color.black, Color.green],
 				["", Color.white, Color.red]
@@ -580,6 +592,7 @@ CVWidget2D : CVWidget {
 
 			k.bounds_(Rect(v[1], nextY, thisWidth/2-1, 15))
 			.font_(Font("Arial", 9))
+			.focusColor_(Color.green)
 			.states_([
 				["actions ("++this.wdgtActions[v[0]].select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions[v[0]].size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])

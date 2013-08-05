@@ -133,7 +133,7 @@ CVWidgetKnob : CVWidget {
 			.action_({ |b|
 				this.toggleComment(b.value.asBoolean);
 			})
-			.focusColor_(Color.yellow)
+			.focusColor_(Color.green)
 		;
 		nameField = TextView(parent, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
