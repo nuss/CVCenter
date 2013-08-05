@@ -38,6 +38,18 @@ CVWidgetKnob : CVWidget {
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, knobX, knobY;
 		var text, tActions;
+		var modsDict, arrModsDict;
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
+			}
+		);
 
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };
@@ -167,13 +179,15 @@ CVWidgetKnob : CVWidget {
 			knobY = thisXY.y+16;
 		});
 		knob = Knob(parent, Rect(knobX, knobY, knobsize, knobsize))
-			.canFocus_(false)
+			// .canFocus_(false)
 			.mode_(\vert)
+			.focusColor_(Color.green)
 		;
 		if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
 		nextY = thisXY.y+thisHeight-112;
 		numVal = NumberBox(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(widgetCV.value).font_(Font("Arial", 9.5))
+			.focusColor_(Color.green)
 		;
 		nextY = nextY+numVal.bounds.height;
 		specBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
@@ -193,6 +207,7 @@ CVWidgetKnob : CVWidget {
 					wdgtControllersAndModels.midiDisplay.model.value
 				).changedKeys(synchKeys);
 			})
+			.focusColor_(Color.green)
 		;
 		if(GUI.id !== \cocoa, { specBut.toolTip_("Edit the CV's ControlSpec:\n"++(this.getSpec.asCompileString)) });
 
@@ -214,6 +229,7 @@ CVWidgetKnob : CVWidget {
 					wdgtControllersAndModels.midiDisplay.model.value
 				).changedKeys(synchKeys);
 			})
+			.focusColor_(Color.green)
 		;
 		if(GUI.id !== \cocoa, { midiHead.toolTip_("Edit all MIDI-options\nof this widget.\nmidiMode:"+this.getMidiMode++"\nmidiMean:"+this.getMidiMean++"\nmidiResolution:"+this.getMidiResolution++"\nsoftWithin:"+this.getSoftWithin++"\nctrlButtonBank:"+this.getCtrlButtonBank) });
 
@@ -248,6 +264,7 @@ CVWidgetKnob : CVWidget {
 					0, { this.midiDisconnect }
 				)
 			})
+			.focusColor_(Color.green)
 		;
 		if(GUI.id !== \cocoa, { midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget to that slider.") });
 
@@ -275,6 +292,7 @@ CVWidgetKnob : CVWidget {
 					tf.stringColor_(Color.black);
 				})
 			})
+			.focusColor_(Color.green)
 		;
 		if(GUI.id !== \cocoa, { midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget") });
 
@@ -302,6 +320,7 @@ CVWidgetKnob : CVWidget {
 					tf.stringColor_(Color.black);
 				})
 			})
+			.focusColor_(Color.green)
 		;
 		if(GUI.id !== \cocoa, { midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget") });
 
@@ -328,6 +347,7 @@ CVWidgetKnob : CVWidget {
 					tf.stringColor_(Color.black);
 				})
 			})
+			.focusColor_(Color.green)
 		;
 		if(GUI.id !== \cocoa, { midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget") });
 
@@ -358,6 +378,7 @@ CVWidgetKnob : CVWidget {
 					wdgtControllersAndModels.midiDisplay.model.value
 				).changedKeys(synchKeys);
 			})
+			.focusColor_(Color.green)
 		;
 
 		if(GUI.id === \qt, {
@@ -414,6 +435,7 @@ CVWidgetKnob : CVWidget {
 					editor.front(3)
 				});
 			})
+			.focusColor_(Color.green)
 		;
 		if(GUI.id !== \cocoa, {
 			text = [];
@@ -424,6 +446,43 @@ CVWidgetKnob : CVWidget {
 		});
 
 		if(prCalibrate, { calibBut.value_(0) }, { calibBut.value_(1) });
+
+		this.class.shortcuts.values.do({ |keyDowns|
+			// keyDowns.postcs;
+			[label, knob, numVal, specBut, midiHead, midiLearn, midiSrc, midiChan, midiCtrl, oscEditBut, actionsBut].do({ |el|
+				el.view.keyDownAction_(
+					el.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
+						var thisMod, thisArrMod;
+
+						switch(GUI.id,
+							\cocoa, {
+								thisMod = keyDowns.modifierCocoa;
+								thisArrMod = keyDowns.arrowsModifierCocoa;
+							},
+							\qt, {
+								thisMod = keyDowns.modifierQt;
+								thisArrMod = keyDowns.arrowsModifierQt;
+							}
+						);
+
+						case
+							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+								// "no modifiers".postln;
+								if(keycode == keyDowns.keyCode and:{
+									thisMod.isNil and:{ thisArrMod.isNil }
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) });
+							}
+							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+								// "some modifier...".postln;
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == thisArrMod).or(modifiers == thisMod)
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) })
+							}
+						;
+					})
+				)
+			})
+		});
 
 		[knob, numVal].do({ |view| widgetCV.connect(view) });
 		visibleGuiEls = [

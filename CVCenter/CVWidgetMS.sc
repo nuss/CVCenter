@@ -25,6 +25,29 @@ CVWidgetMS : CVWidget {
 		var nextX, nextY, knobX, knobY;
 		var calibViewsWidth, calibViewsNextX;
 		var text, tActions;
+		var modsDict, arrModsDict;
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
+			}
+		);
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
+			}
+		);
 
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };
@@ -384,6 +407,51 @@ CVWidgetMS : CVWidget {
 				})
 			})
 		;
+
+		this.class.shortcuts.values.do({ |keyDowns|
+			// keyDowns.postcs;
+			[
+				label,
+				mSlider,
+				numVal,
+				midiBut,
+				oscBut,
+				specBut,
+				actionsBut
+			].do({ |el|
+				el.view.keyDownAction_(
+					el.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
+						var thisMod, thisArrMod;
+
+						switch(GUI.id,
+							\cocoa, {
+								thisMod = keyDowns.modifierCocoa;
+								thisArrMod = keyDowns.arrowsModifierCocoa;
+							},
+							\qt, {
+								thisMod = keyDowns.modifierQt;
+								thisArrMod = keyDowns.arrowsModifierQt;
+							}
+						);
+
+						case
+							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+								// "no modifiers".postln;
+								if(keycode == keyDowns.keyCode and:{
+									thisMod.isNil and:{ thisArrMod.isNil }
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) });
+							}
+							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+								// "some modifier...".postln;
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == thisArrMod).or(modifiers == thisMod)
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) })
+							}
+						;
+					})
+				)
+			})
+		});
 
 		if(GUI.id !== \cocoa, {
 			text = [];

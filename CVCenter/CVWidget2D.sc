@@ -38,6 +38,18 @@ CVWidget2D : CVWidget {
 		var nextY, rightColumnX, oscEditButHeight, right, left;
 		var text, tActions;
 		var tmpWin;
+		var modsDict, arrModsDict;
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
+			}
+		);
 
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };
@@ -617,6 +629,56 @@ CVWidget2D : CVWidget {
 		});
 
 		#[lo, hi].do({ |slot| if(prCalibrate[slot], { calibBut[slot].value_(0) }, { calibBut[slot].value_(1) }) });
+
+		this.class.shortcuts.values.do({ |keyDowns|
+			// keyDowns.postcs;
+			[
+				label,
+				slider2d,
+				rangeSlider,
+				numVal.asArray,
+				specBut.asArray,
+				midiHead.asArray,
+				midiLearn.asArray,
+				midiSrc.asArray,
+				midiChan.asArray,
+				midiCtrl.asArray,
+				oscEditBut.asArray,
+				actionsBut.asArray
+			].flat.do({ |el|
+				el.view.keyDownAction_(
+					el.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
+						var thisMod, thisArrMod;
+
+						switch(GUI.id,
+							\cocoa, {
+								thisMod = keyDowns.modifierCocoa;
+								thisArrMod = keyDowns.arrowsModifierCocoa;
+							},
+							\qt, {
+								thisMod = keyDowns.modifierQt;
+								thisArrMod = keyDowns.arrowsModifierQt;
+							}
+						);
+
+						case
+							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+								// "no modifiers".postln;
+								if(keycode == keyDowns.keyCode and:{
+									thisMod.isNil and:{ thisArrMod.isNil }
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) });
+							}
+							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+								// "some modifier...".postln;
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == thisArrMod).or(modifiers == thisMod)
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) })
+							}
+						;
+					})
+				)
+			})
+		});
 
 		// widgetCV
 		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
