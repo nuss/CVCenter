@@ -3,3 +3,6 @@
 HelpSource/Classes/*.txt
 OSCCommands
 *.tmproj
+CVCenter/CVCenterShortcuts
+CVCenter/globalShortcuts
+CVCenter/keyCodesAndModsOSX
