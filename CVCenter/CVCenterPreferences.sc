@@ -431,20 +431,21 @@ CVCenterPreferences {
 			;
 
 			cvCenterTab = scTabs.add("CVCenter", scroll: false);
-			// cvWidgetTab = scTabs.add("CVWidget", scroll: false);
+			cvWidgetTab = scTabs.add("CVWidget", scroll: false);
 			cvWidgetEditorTab = scTabs.add("CVWidget(MS)Editor", scroll: false);
 			globalShortcutsTab = scTabs.add("global shortcuts", scroll: false);
 
 			cvCenterEditor = KeyDownActionsEditor(
 				cvCenterTab, nil, cvCenterTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvcenter ?? { CVCenter.shortcuts }}, false
 			);
-			// cvCenterEditor.shortcutFields.collect(_.val).postln;
-			// CVWidgets should go here but...
+			cvWidgetEditor = KeyDownActionsEditor(
+				cvWidgetTab, nil, cvWidgetTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvwidget ?? { CVWidget.shortcuts }}, false
+			);
 			cvWidgetEditorEditor = KeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvwidgeteditor ?? { AbstractCVWidgetEditor.shortcuts }}, false
 			);
 			globalShortcutsEditorTab = KeyDownActionsEditor(
-				globalShortcutsTab, nil, globalShortcutsTab.bounds, /* prefs!!! */KeyDownActions.globalShortcuts, false, false, false
+				globalShortcutsTab, nil, globalShortcutsTab.bounds, prefs.globalShortcuts ?? { KeyDownActions.globalShortcuts }, false, false, false
 			);
 
 			cvCenterKeyCodesEditor = KeyCodesEditor(
@@ -622,7 +623,7 @@ CVCenterPreferences {
 			if(args.size > 0, {
 				if(args.collect(_.asSymbol).includes(\globalShortcuts), {
 					res ?? { res = () };
-					res.shortcuts = Object.readArchive(shortcutsPath)
+					res.globalShortcuts = Object.readArchive(globalShortcutsPath)
 				})
 			})
 		});

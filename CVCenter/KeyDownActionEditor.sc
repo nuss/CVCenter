@@ -712,6 +712,7 @@ KeyDownActionsEditor : KeyDownActions {
 			order = shortcutsDict.order;
 
 			order.do({ |shortcut, i|
+				"shortcutsDict[shortcut][\\func]: %\n".postf(shortcutsDict[shortcut][\func]);
 				makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "));
 				tmpShortcuts[i] = shortcut -> (
 					func: shortcutsDict[shortcut][\func],
