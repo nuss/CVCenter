@@ -708,22 +708,23 @@ KeyDownActionsEditor : KeyDownActions {
 			funcString !? { funcFields[myCount].string_(funcString) };
 		};
 
-		shortcutsDict !? {
-			order = shortcutsDict.order;
+			shortcutsDict !? {
+				order = shortcutsDict.order;
 
-			order.do({ |shortcut, i|
-				"shortcutsDict[shortcut][\\func]: %\n".postf(shortcutsDict[shortcut][\func]);
-				makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "));
-				tmpShortcuts[i] = shortcut -> (
-					func: shortcutsDict[shortcut][\func],
-					keyCode: shortcutsDict[shortcut][\keyCode],
-					modifierQt: shortcutsDict[shortcut][\modifierQt],
-					modifierCocoa: shortcutsDict[shortcut][\modifierCocoa],
-					arrowModifierQt: shortcutsDict[shortcut][\arrowModifierQt],
-					arrowModifierCocoa: shortcutsDict[shortcut][\arrowModifierCocoa]
-				)
-			})
-		};
+				order.do({ |shortcut, i|
+					// "shortcut.keys: %, shortcutsDict[shortcut][\\func]: %\n".postf(shortcutsDict.keys, shortcutsDict[shortcut][\func]);
+					makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "));
+					tmpShortcuts[i] = shortcut -> (
+						func: shortcutsDict[shortcut][\func],
+						keyCode: shortcutsDict[shortcut][\keyCode],
+						modifierQt: shortcutsDict[shortcut][\modifierQt],
+						modifierCocoa: shortcutsDict[shortcut][\modifierCocoa],
+						arrowModifierQt: shortcutsDict[shortcut][\arrowModifierQt],
+						arrowModifierCocoa: shortcutsDict[shortcut][\arrowModifierCocoa]
+					)
+				})
+			};
+
 
 		// tmpShortcuts.do({ |it, i|
 		// 	"tmpShortcuts[%]: %\n".postf(i, it);

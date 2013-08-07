@@ -444,6 +444,7 @@ CVCenterPreferences {
 			cvWidgetEditorEditor = KeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvwidgeteditor ?? { AbstractCVWidgetEditor.shortcuts }}, false
 			);
+			"prefs.globalShortcuts: %\n".postf(prefs.globalShortcuts);
 			globalShortcutsEditorTab = KeyDownActionsEditor(
 				globalShortcutsTab, nil, globalShortcutsTab.bounds, prefs.globalShortcuts ?? { KeyDownActions.globalShortcuts }, false, false, false
 			);
@@ -482,7 +483,7 @@ CVCenterPreferences {
 						KeyDownActionsEditor.cachedScrollViewSC !? {
 							ScrollView.globalKeyDownAction_(KeyDownActionsEditor.cachedScrollViewSC);
 						};
-						shortcuts = (cvcenter:  cvCenterEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
+						shortcuts = (cvcenter:  cvCenterEditor.result, cvwidget: cvWidgetEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
 						// "shortcuts.cvcenter['fn + F1']: %\n".postf(shortcuts.cvcenter['fn + F1']);
 						// "cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
 						// "cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
@@ -619,7 +620,7 @@ CVCenterPreferences {
 		if(File.exists(globalShortcutsPath), {
 			"globalShortcutsPath exists".postln;
 			prefs ?? { prefs = () };
-			prefs.put(\globalShortcuts, Object.readArchive(shortcutsPath));
+			prefs.put(\globalShortcuts, Object.readArchive(globalShortcutsPath));
 			if(args.size > 0, {
 				if(args.collect(_.asSymbol).includes(\globalShortcuts), {
 					res ?? { res = () };
@@ -640,7 +641,7 @@ CVCenterPreferences {
 
 		// prefs.postcs;
 
-		// "prefs.shortcuts: %\n".postf(prefs.shortcuts);
+		// "prefs.shortcuts: %\n".postf(prefs.shortcuts.cs);
 		// "prefs.keyCodesAndMods: %\n".postf(prefs.keyCodesAndMods);
 
 		^if(res.notNil, { res }, { if(prefs.notEmpty, { prefs }, { nil }) });
