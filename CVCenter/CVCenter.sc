@@ -125,6 +125,20 @@ CVCenter {
 				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow left'])
 			);
 			scFunc =
+			"// switch windows in CVCenter
+			{
+				var windows = [CVCenter.window]++[CVCenter.childViews.keys];
+			}";
+			this.shortcuts.put(
+				'alt + arrow left',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes['arrow left'],
+					arrowModifierQt: KeyDownActions.arrowsModifiersQt[\alt],
+					arrowModifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+				)
+			);
+			scFunc =
 			"// OSCCommands gui
 			{ OSCCommands.makeWindow }";
 			this.shortcuts.put(
