@@ -17,7 +17,7 @@
 
 CVCenter {
 
-	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, <tabs, prefPane, removeButs;
+	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, <windowStates, <tabs, prefPane, removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>shortcuts, <scv;
 	classvar <alwaysOnTop=false;
@@ -38,6 +38,7 @@ CVCenter {
 		Class.initClassTree(CVCenterPreferences);
 		Class.initClassTree(CVWidget);
 		Class.initClassTree(KeyDownActions);
+		windowStates = ();
 		prefs = CVCenterPreferences.readPreferences;
 
 		prefs !? {
@@ -448,6 +449,14 @@ CVCenter {
 
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight)).alwaysOnTop_(alwaysOnTop).acceptsMouseOver_(true);
+			windowStates.put(window, true);
+			window.toFrontAction_({
+				windowStates[window] = true;
+				[windowStates[window], windowStates].postln;
+			}).endFrontAction_({
+				"window.endFrontAction triggered".postln;
+				windowStates[window] = false;
+			});
 			if(Quarks.isInstalled("wslib") and:{ GUI.id !== \swing }, { window.background_(Color.black) });
 			window.view.background_(Color.black);
 			flow = FlowLayout(window.bounds.insetBy(4));
@@ -537,7 +546,7 @@ CVCenter {
 
 			swFlow.shift(3, -2);
 
-			StaticText(prefPane, Point(180, 20))
+			StaticText(prefPane, Point(140, 20))
 				.string_("activate global shortcuts")
 				.stringColor_(Color.white)
 				.font_(Font("Arial", 12))
@@ -550,6 +559,7 @@ CVCenter {
 					childViews.keysDo(_.close)
 				});
 				childViews.clear;
+				windowStates.removeAt(window);
 				// tabProperties.do({ |prop| prop.nextPos_(Point(0, 0)) });
 				tabProperties.clear;
 				if(prefs[\saveGuiProperties] == 1, {
@@ -826,6 +836,21 @@ CVCenter {
 				.onAfterChangeParent_({ |view|
 					view.tabbedView.window !? {
 						view.tabbedView.window.background_(Color.black).alwaysOnTop_(alwaysOnTop);
+						windowStates[view.tabbedView.window] ?? {
+							// "no state at the given slot".postln;
+							windowStates.put(view.tabbedView.window, true);
+						};
+						view.tabbedView.window.toFrontAction_({
+							windowStates[view.tabbedView.window] = true;
+							windowStates.postln;
+						}).endFrontAction_({
+							windowStates[view.tabbedView.window] = false;
+							windowStates.postln;
+						}).onClose_({
+							// "onClose triggered!".postln;
+							windowStates.removeAt(view.tabbedView.window);
+							windowStates.postln;
+						})
 					};
 					cachedView !? {
 						if(tabs.tabViews.includes(view).not, {
