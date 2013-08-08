@@ -127,15 +127,15 @@ CVCenter {
 			scFunc =
 			"// switch windows in CVCenter
 			{
-				var windows = [CVCenter.window]++[CVCenter.childViews.keys];
+				var windows = [CVCenter.window]++[CVCenter.childViews.keys].asArray;
 			}";
 			this.shortcuts.put(
 				'alt + arrow left',
 				(
 					func: scFunc,
 					keyCode: KeyDownActions.keyCodes['arrow left'],
-					arrowModifierQt: KeyDownActions.arrowsModifiersQt[\alt],
-					arrowModifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
+					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
 				)
 			);
 			scFunc =
