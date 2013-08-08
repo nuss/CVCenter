@@ -56,7 +56,9 @@ CVCenter {
 						newPrefs[\ctrlButtonBank],
 						newPrefs[\removeResponders],
 						newPrefs[\initMidiOnStartUp],
-						newPrefs[\shortcuts]
+						newPrefs[\shortcuts],
+						newPrefs[\globalShortcuts],
+						newPrefs[\keyCodesAndMods]
 					)
 				};
 				if(prefs[\saveGuiProperties] == 1 or:{
@@ -127,7 +129,7 @@ CVCenter {
 			scFunc =
 			"// switch windows in CVCenter
 			{
-				var windows = [CVCenter.window]++[CVCenter.childViews.keys].asArray;
+				var windows = [CVCenter.window]++[CVCenter.childViews.keys.asArray].flat.postln;
 			}";
 			this.shortcuts.put(
 				'alt + arrow left',
