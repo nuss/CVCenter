@@ -124,6 +124,7 @@ KeyDownActions {
 
 				this.modifiersCocoa = this.modifiersQt;
 				this.arrowsModifiersQt = this.modifiersQt;
+				this.arrowsModifiersCocoa = this.modifiersQt;
 			},
 
 			\osx, {
@@ -331,6 +332,7 @@ KeyDownActions {
 
 				this.modifiersCocoa = this.modifiersQt;
 				this.arrowsModifiersQt = this.modifiersQt;
+				this.arrowsModifiersCocoa = this.modifiersQt;
 			},
 			{
 				// dummies for unknown platforms

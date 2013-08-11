@@ -57,7 +57,9 @@ CVCenter {
 						newPrefs[\ctrlButtonBank],
 						newPrefs[\removeResponders],
 						newPrefs[\initMidiOnStartUp],
-						newPrefs[\shortcuts]
+						newPrefs[\shortcuts],
+						newPrefs[\globalShortcuts],
+						newPrefs[\keyCodesAndMods]
 					)
 				};
 				if(prefs[\saveGuiProperties] == 1 or:{
