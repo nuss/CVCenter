@@ -127,45 +127,45 @@ CVCenter {
 				'arrow left',
 				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow left'])
 			);
-			scFunc =
-			"// focus widgets within focused tab from right to left
-			{
-				//var labels = CVCenter.widgetsAtTab();
-				\"hello\".postln;
-				Window.allWindows.detect({ |w| w.view.hasFocus }).name.postln;
-			}";
-			this.shortcuts.put(
-				'alt + arrow left',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes['arrow left'],
-					modifiersQt: KeyDownActions.arrowsModifiersQt[\alt],
-					modifiersCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
-				)
-			);
-			scFunc =
-			"// switch windows in CVCenter
-			// doesn't really work - delete or find your own, better working way
-			{
-				var windows;
-				windows = ([CVCenter.window.view]++CVCenter.childViews.keys.asArray).flat;
-				CVCenter.scv.winID ?? {
-					CVCenter.scv.winID = windows.detectIndex({ |winView| winView.hasFocus }) ?? { windows.size-1 };
-				};
-				{
-					windows.wrapAt(CVCenter.scv.winID-1).front;
-					CVCenter.scv.winID = CVCenter.scv.winID-1;
-				}.defer;
-			}";
-			this.shortcuts.put(
-				'shift + arrow left',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes['arrow left'],
-					modifierQt: KeyDownActions.arrowsModifiersQt[\shift],
-					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\shift]
-				)
-			);
+			// scFunc =
+			// "// focus widgets within focused tab from right to left
+			// {
+			// //var labels = CVCenter.widgetsAtTab();
+			// \"hello\".postln;
+			// Window.allWindows.detect({ |w| w.view.hasFocus }).name.postln;
+			// }";
+			// this.shortcuts.put(
+			// 	'alt + arrow left',
+			// 	(
+			// 		func: scFunc,
+			// 		keyCode: KeyDownActions.keyCodes['arrow left'],
+			// 		modifiersQt: KeyDownActions.arrowsModifiersQt[\alt],
+			// 		modifiersCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+			// 	)
+			// );
+			// scFunc =
+			// "// switch windows in CVCenter
+			// // doesn't really work - delete or find your own, better working way
+			// {
+			// var windows;
+			// windows = ([CVCenter.window.view]++CVCenter.childViews.keys.asArray).flat;
+			// CVCenter.scv.winID ?? {
+			// CVCenter.scv.winID = windows.detectIndex({ |winView| winView.hasFocus }) ?? { windows.size-1 };
+			// };
+			// {
+			// windows.wrapAt(CVCenter.scv.winID-1).front;
+			// CVCenter.scv.winID = CVCenter.scv.winID-1;
+			// }.defer;
+			// }";
+			// this.shortcuts.put(
+			// 	'shift + arrow left',
+			// 	(
+			// 		func: scFunc,
+			// 		keyCode: KeyDownActions.keyCodes['arrow left'],
+			// 		modifierQt: KeyDownActions.arrowsModifiersQt[\shift],
+			// 		modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\shift]
+			// 	)
+			// );
 			scFunc =
 			"// OSCCommands gui
 			{ OSCCommands.makeWindow }";
@@ -766,13 +766,13 @@ CVCenter {
 
 						case
 							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-								// "no modifier".postln;
+								"no modifier: %\n".postf(modifiers);
 								if(keycode == keyDowns.keyCode and:{
 									thisMod.isNil and:{ thisArrMod.isNil }
 								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
 							}
 							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-								// "some modifier...".postln;
+								"some modifier: %\n".postf(modifiers);
 								if(keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)
 								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
