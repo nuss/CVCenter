@@ -128,6 +128,22 @@ CVCenter {
 				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow left'])
 			);
 			scFunc =
+			"// focus widgets within focused tab from right to left
+			{
+				//var labels = CVCenter.widgetsAtTab();
+				\"hello\".postln;
+				Window.allWindows.detect({ |w| w.view.hasFocus }).name.postln;
+			}";
+			this.shortcuts.put(
+				'alt + arrow left',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes['arrow left'],
+					modifiersQt: KeyDownActions.arrowsModifiersQt[\alt],
+					modifiersCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+				)
+			);
+			scFunc =
 			"// switch windows in CVCenter
 			// doesn't really work - delete or find your own, better working way
 			{
@@ -142,12 +158,12 @@ CVCenter {
 				}.defer;
 			}";
 			this.shortcuts.put(
-				'alt + arrow left',
+				'shift + arrow left',
 				(
 					func: scFunc,
 					keyCode: KeyDownActions.keyCodes['arrow left'],
-					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
-					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+					modifierQt: KeyDownActions.arrowsModifiersQt[\shift],
+					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\shift]
 				)
 			);
 			scFunc =
