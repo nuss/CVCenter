@@ -595,7 +595,7 @@ KeyDownActionsEditor : KeyDownActions {
 													" "++ mods ++ join ++
 													keyCodes.findKeyForValue(keycode)
 												);
-												if(thisArrowsModifiers.includes(mod)) {
+												if(thisArrowsModifiers.includes(mod) and:{ thisModifiers.includes(mod).not }) {
 													if(GUI.id !== \cocoa) {
 														tmpShortcuts[myCount] = (mods ++ join ++ keyCodes.findKeyForValue(keycode)).asSymbol -> (
 															func: funcField.string,
@@ -706,6 +706,7 @@ KeyDownActionsEditor : KeyDownActions {
 				).font_(textFieldFont).enabled_(false).syntaxColorize.action_({ |ffield|
 					tmpShortcuts[myCount].value.func = funcField.string;
 				});
+				if(GUI.id !== \cocoa) { funcField.tabWidth_(20) };
 			);
 			funcString !? { funcFields[myCount].string_(funcString) };
 		};

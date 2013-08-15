@@ -17,7 +17,7 @@
 
 CVWidget {
 
-	classvar <>removeResponders, <>midiSources, <>shortcuts/*, midiStateObserver*/;
+	classvar <>removeResponders, <>midiSources, <>shortcuts, prefs/*, midiStateObserver*/;
 	classvar <>debug = false;
 	var <parent, <widgetCV, <name;
 	var <guiEnv;
@@ -46,7 +46,10 @@ CVWidget {
 				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
 			})
 		});
+
+		prefs = CVCenterPreferences.readPreferences;
 		this.shortcuts = IdentityDictionary.new;
+
 	}
 
 	setup {

@@ -44,9 +44,9 @@ AbstractCVWidgetEditor {
 		allEditors = IdentityDictionary.new;
 		this.shortcuts = IdentityDictionary.new;
 
-		"shortcutsPrefs[\cvwidgeteditor]: %\n".postf(shortcutsPrefs[\cvwidgeteditor]);
+		"shortcutsPrefs[\cvwidgeteditor]: %\n".postf(shortcutsPrefs[\shortcuts].cvwidgeteditor);
 
-		if(shortcutsPrefs[\cvwidgeteditor].isNil, {
+		if(shortcutsPrefs[\shortcuts][\cvwidgeteditor].isNil, {
 			scFunc =
 			"// focus 'specs' tab
 			{ |view|
@@ -240,7 +240,7 @@ AbstractCVWidgetEditor {
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])
 			)
 		}, {
-			this.shortcuts = shortcutsPrefs[\cvwidgeteditor];
+			this.shortcuts = shortcutsPrefs[\shortcuts][\cvwidgeteditor];
 		});
 	}
 

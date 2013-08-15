@@ -127,22 +127,22 @@ CVCenter {
 				'arrow left',
 				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow left'])
 			);
-			// scFunc =
-			// "// focus widgets within focused tab from right to left
-			// {
-			// //var labels = CVCenter.widgetsAtTab();
-			// \"hello\".postln;
-			// Window.allWindows.detect({ |w| w.view.hasFocus }).name.postln;
-			// }";
-			// this.shortcuts.put(
-			// 	'alt + arrow left',
-			// 	(
-			// 		func: scFunc,
-			// 		keyCode: KeyDownActions.keyCodes['arrow left'],
-			// 		modifiersQt: KeyDownActions.arrowsModifiersQt[\alt],
-			// 		modifiersCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
-			// 	)
-			// );
+/*			scFunc =
+			"// focus widgets within focused tab from right to left
+			{ |view|
+				var labels = CVCenter.widgetsAtTab(view.label);
+				\"alt + arrow right hit\".postln;
+				labels.postln;
+			}";
+			this.shortcuts.put(
+				'alt + arrow left',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes['arrow left'],
+					modifiersQt: KeyDownActions.arrowsModifiersQt[\alt],
+					modifiersCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+				)
+			); */
 			// scFunc =
 			// "// switch windows in CVCenter
 			// // doesn't really work - delete or find your own, better working way
@@ -360,13 +360,13 @@ CVCenter {
 			});
 			scFunc =
 			"// end History and open in new Document (Cocoa-IDE only)
-			{ History.end;
-			if(Platform.ideName != \"scqt\") { History.document };
-			if(CVCenter.scv.historyWin.notNil and:{
-				CVCenter.scv.historyWin.isClosed.not
-			}, {
-				CVCenter.scv.historyWin.close;
-			})}";
+			{
+				History.end;
+				if(Platform.ideName != \"scqt\") { History.document };
+				if(CVCenter.scv.historyWin.notNil and:{
+					CVCenter.scv.historyWin.isClosed.not
+				}) { CVCenter.scv.historyWin.close }
+			}";
 			this.shortcuts.put(
 				'shift + h',
 				(
@@ -766,16 +766,22 @@ CVCenter {
 
 						case
 							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-								"no modifier: %\n".postf(modifiers);
+								// "no modifier: %\n".postf(modifiers);
 								if(keycode == keyDowns.keyCode and:{
 									thisMod.isNil and:{ thisArrMod.isNil }
-								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+								}, {
+									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
+									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+								});
 							}
 							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-								"some modifier: %\n".postf(modifiers);
+								// "some modifier: %\n".postf(modifiers);
 								if(keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)
-								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+								}, {
+									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
+									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+								})
 							}
 						;
 					})
@@ -836,6 +842,7 @@ CVCenter {
 						});
 					});
 					this.shortcuts.do({ |keyDowns|
+						// "onChangeParent view: %\n".postf(view.parent.parent);
 						view.keyDownAction_(
 							view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
 								var thisMod, thisArrMod;
@@ -858,7 +865,7 @@ CVCenter {
 								;
 							})
 						)
-					});
+					})
 				})
 				.onAfterChangeParent_({ |view|
 					view.tabbedView.window !? {
@@ -879,6 +886,31 @@ CVCenter {
 							child.name_("CVCenter: "++childProps[\tabs].keys.collectAs({ |tab| tab.label }, Array));
 						});
 					};
+					/*this.shortcuts.do({ |keyDowns|
+						// "onAfterChangeParent view: %\n".postf(view.parent.parent);
+						view.keyDownAction_(
+							view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+								var thisMod, thisArrMod;
+								thisMod = keyDowns.modifierQt;
+								thisArrMod = keyDowns.arrowsModifierQt;
+
+								case
+									{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+									// "no modifier".postln;
+										if(keycode == keyDowns.keyCode and:{
+											thisMod.isNil and:{ thisArrMod.isNil }
+										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+									}
+									{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+										// "some modifier...".postln;
+										if(keycode == keyDowns.keyCode and:{
+											(modifiers == thisArrMod).or(modifiers == thisMod)
+										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+									}
+								;
+							})
+						)
+					});*/
 					childViews.pairsDo({ |child, childProps| if(childProps.tabs.size < 1, { childViews.removeAt(child) }) });
 				})
 			;
