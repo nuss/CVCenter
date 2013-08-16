@@ -40,6 +40,8 @@ CVWidget {
 	var <msSize;
 
 	*initClass {
+		var scFunc;
+
 		StartUp.add({
 			midiSources = ();
 			if(Quarks.isInstalled("cruciallib"), {
@@ -48,8 +50,24 @@ CVWidget {
 		});
 
 		prefs = CVCenterPreferences.readPreferences;
+		"prefs[\shortcuts][\cvwidget]: %\n".postf(prefs[\shortcuts][\cvwidget]);
 		this.shortcuts = IdentityDictionary.new;
 
+		if(prefs[\shortcuts][\cvwidget].isNil, {
+			scFunc =
+			"// test
+			{ |view|
+				[view.parent.parent, CVCenter.tabs.tabViews.includes(view.parent.parent)].postln;
+				CVCenter.cvWidgets.do({ |widget| widget.view.notNil.postln });
+				true;
+			}";
+			this.shortcuts.put(
+				\t,
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$t])
+			)
+		}, {
+			this.shortcuts = prefs[\shortcuts][\cvwidget];
+		})
 	}
 
 	setup {

@@ -19,35 +19,12 @@ CVWidgetMS : CVWidget {
 	}
 
 	init { |bounds, action, setupArgs, controllersAndModels, cvcGui, persistent, numSliders, server|
-		var name, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize;
+		var thisXY, thisX, thisY, thisWidth, thisHeight, knobsize;
 		// hmmm...
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextX, nextY, knobX, knobY;
 		var calibViewsWidth, calibViewsNextX;
 		var text, tActions;
-		var modsDict, arrModsDict;
-
-		switch(GUI.id,
-			\cocoa, {
-				modsDict = KeyDownActions.modifiersCocoa;
-				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-			},
-			\qt, {
-				modsDict = KeyDownActions.modifiersQt;
-				arrModsDict = KeyDownActions.arrowsModifiersQt;
-			}
-		);
-
-		switch(GUI.id,
-			\cocoa, {
-				modsDict = KeyDownActions.modifiersCocoa;
-				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-			},
-			\qt, {
-				modsDict = KeyDownActions.modifiersQt;
-				arrModsDict = KeyDownActions.arrowsModifiersQt;
-			}
-		);
 
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };
@@ -408,51 +385,6 @@ CVWidgetMS : CVWidget {
 			})
 		;
 
-		this.class.shortcuts.values.do({ |keyDowns|
-			// keyDowns.postcs;
-			[
-				label,
-				mSlider,
-				numVal,
-				midiBut,
-				oscBut,
-				specBut,
-				actionsBut
-			].do({ |el|
-				el.view.keyDownAction_(
-					el.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
-						var thisMod, thisArrMod;
-
-						switch(GUI.id,
-							\cocoa, {
-								thisMod = keyDowns.modifierCocoa;
-								thisArrMod = keyDowns.arrowsModifierCocoa;
-							},
-							\qt, {
-								thisMod = keyDowns.modifierQt;
-								thisArrMod = keyDowns.arrowsModifierQt;
-							}
-						);
-
-						case
-							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-								// "no modifiers".postln;
-								if(keycode == keyDowns.keyCode and:{
-									thisMod.isNil and:{ thisArrMod.isNil }
-								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) });
-							}
-							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-								// "some modifier...".postln;
-								if(keycode == keyDowns.keyCode and:{
-									(modifiers == thisArrMod).or(modifiers == thisMod)
-								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) })
-							}
-						;
-					})
-				)
-			})
-		});
-
 		if(GUI.id !== \cocoa, {
 			text = [];
 			text = text.add(this.wdgtActions.size);
@@ -501,8 +433,82 @@ CVWidgetMS : CVWidget {
 		widgetCV.connect(mSlider);
 		widgetCV.connect(numVal);
 
+		this.setShortcuts;
+
 		oldBounds = parent.bounds;
 		if(parent.respondsTo(\name), { oldName = parent.name });
+	}
+
+	setShortcuts {
+		var modsDict, arrModsDict;
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
+			}
+		);
+
+		// "this.class.shortcuts: %\n".postf(this.class.shortcuts);
+
+		[
+			label,
+			mSlider,
+			numVal,
+			midiBut,
+			oscBut,
+			specBut,
+			actionsBut
+		].do({ |v|
+			// reset keyDownAction - it's getting reassigned
+			v.keyDownAction_(nil);
+
+			this.class.shortcuts.do({ |keyDowns|
+				v.keyDownAction_(
+					v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+						var thisMod, thisArrMod;
+
+						// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
+
+						switch(GUI.id,
+							\cocoa, {
+								thisMod = keyDowns.modifierCocoa;
+								thisArrMod = keyDowns.arrowsModifierCocoa;
+							},
+							\qt, {
+								thisMod = keyDowns.modifierQt;
+								thisArrMod = keyDowns.arrowsModifierQt;
+							}
+						);
+
+						case
+							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+								// "no modifier: %\n".postf(modifiers);
+								if(keycode == keyDowns.keyCode and:{
+									thisMod.isNil and:{ thisArrMod.isNil }
+								}, {
+									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
+									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+								});
+							}
+							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+								// "some modifier: %\n".postf(modifiers);
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == thisArrMod).or(modifiers == thisMod)
+								}, {
+									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
+									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+								})
+							}
+						;
+					})
+				)
+			})
+		})
 	}
 
 	open { |window, wdgtBounds|

@@ -108,7 +108,7 @@ CVCenter {
 
 		// "prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
 
-		if(prefs[\shortcuts].isEmpty, {
+		if(prefs[\shortcuts][\cvcenter].isNil, {
 			scFunc =
 			"// next tab
 			{ CVCenter.tabs.focus(
@@ -127,45 +127,38 @@ CVCenter {
 				'arrow left',
 				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow left'])
 			);
-/*			scFunc =
-			"// focus widgets within focused tab from right to left
-			{ |view|
-				var labels = CVCenter.widgetsAtTab(view.label);
-				\"alt + arrow right hit\".postln;
-				labels.postln;
+			scFunc =
+			"// select first widget
+			{
+				var labels = CVCenter.cvWidgets.order;
+				CVCenter.cvWidgets[labels.first].parent.front.focus;
+				CVCenter.cvWidgets[labels.first].label.focus;
 			}";
 			this.shortcuts.put(
 				'alt + arrow left',
 				(
 					func: scFunc,
 					keyCode: KeyDownActions.keyCodes['arrow left'],
-					modifiersQt: KeyDownActions.arrowsModifiersQt[\alt],
-					modifiersCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
+					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
 				)
-			); */
-			// scFunc =
-			// "// switch windows in CVCenter
-			// // doesn't really work - delete or find your own, better working way
-			// {
-			// var windows;
-			// windows = ([CVCenter.window.view]++CVCenter.childViews.keys.asArray).flat;
-			// CVCenter.scv.winID ?? {
-			// CVCenter.scv.winID = windows.detectIndex({ |winView| winView.hasFocus }) ?? { windows.size-1 };
-			// };
-			// {
-			// windows.wrapAt(CVCenter.scv.winID-1).front;
-			// CVCenter.scv.winID = CVCenter.scv.winID-1;
-			// }.defer;
-			// }";
-			// this.shortcuts.put(
-			// 	'shift + arrow left',
-			// 	(
-			// 		func: scFunc,
-			// 		keyCode: KeyDownActions.keyCodes['arrow left'],
-			// 		modifierQt: KeyDownActions.arrowsModifiersQt[\shift],
-			// 		modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\shift]
-			// 	)
-			// );
+			);
+			scFunc =
+			"// select last widget
+			{
+				var labels = CVCenter.cvWidgets.order;
+				CVCenter.cvWidgets[labels.last].parent.front.focus;
+				CVCenter.cvWidgets[labels.last].label.focus;
+			}";
+			this.shortcuts.put(
+				'alt + arrow right',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes['arrow right'],
+					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
+					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+				)
+			);
 			scFunc =
 			"// OSCCommands gui
 			{ OSCCommands.makeWindow }";

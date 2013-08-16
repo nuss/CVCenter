@@ -44,7 +44,7 @@ AbstractCVWidgetEditor {
 		allEditors = IdentityDictionary.new;
 		this.shortcuts = IdentityDictionary.new;
 
-		"shortcutsPrefs[\cvwidgeteditor]: %\n".postf(shortcutsPrefs[\shortcuts].cvwidgeteditor);
+		// "shortcutsPrefs[\cvwidgeteditor]: %\n".postf(shortcutsPrefs[\shortcuts].cvwidgeteditor);
 
 		if(shortcutsPrefs[\shortcuts][\cvwidgeteditor].isNil, {
 			scFunc =
