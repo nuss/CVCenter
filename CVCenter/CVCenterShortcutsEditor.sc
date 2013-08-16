@@ -57,7 +57,7 @@ CVCenterShortcutsEditor {
 			;
 
 			cvCenterTab = tabs.add("CVCenter", scroll: false);
-			// cvWidgetTab = tabs.add("CVWidget", scroll: false);
+			cvWidgetTab = tabs.add("CVWidget", scroll: false);
 			cvWidgetEditorTab = tabs.add("CVWidget(MS)Editor", scroll: false);
 			globalShortcutsTab = tabs.add("global shortcuts", scroll: false);
 			// keyCodesAndModsTab = tabs.add("keycodes and modifiers", scroll: false);
@@ -65,18 +65,15 @@ CVCenterShortcutsEditor {
 			cvCenterEditor = KeyDownActionsEditor(
 				cvCenterTab, nil, cvCenterTab.bounds, CVCenter.shortcuts, false
 			);
-			// cvCenterEditor.shortcutFields.collect(_.val).postln;
-			// CVWidgets should go here but...
+			cvWidgetEditor = KeyDownActionsEditor(
+				cvWidgetTab, nil, cvWidgetTab.bounds, CVWidget.shortcuts, false
+			);
 			cvWidgetEditorEditor = KeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false
 			);
 			globalShortcutsEditor = KeyDownActionsEditor(
 				globalShortcutsTab, nil, globalShortcutsTab.bounds, KeyDownActions.globalShortcuts, false, false, false
 			);
-
-			// keyCodesAndModsEditor = KeyCodesEditor(
-			// 	keyCodesAndModsTab, nil, false
-			// );
 
 			saveCancel = CompositeView(window, Rect(0, window.bounds.height-49, window.bounds.width, 49))
 				.background_(tabsBg)

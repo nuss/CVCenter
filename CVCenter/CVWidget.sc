@@ -24,7 +24,7 @@ CVWidget {
 	var prDefaultAction, <>wdgtActions, <background, <stringColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
-	var visibleGuiEls, allGuiEls, isCVCWidget = false;
+	var visibleGuiEls, allGuiEls, <focusElements, isCVCWidget = false;
 	var <widgetBg, <label, <nameField, wdgtInfo; // elements contained in any kind of CVWidget
 	var widgetXY, widgetProps, <editor;
 	var <wdgtControllersAndModels, <midiOscEnv;
@@ -42,6 +42,8 @@ CVWidget {
 	*initClass {
 		var scFunc;
 
+		Class.initClassTree(KeyDownActions);
+
 		StartUp.add({
 			midiSources = ();
 			if(Quarks.isInstalled("cruciallib"), {
@@ -50,20 +52,57 @@ CVWidget {
 		});
 
 		prefs = CVCenterPreferences.readPreferences;
-		"prefs[\shortcuts][\cvwidget]: %\n".postf(prefs[\shortcuts][\cvwidget]);
+		// "prefs[\shortcuts][\cvwidget]: %\n".postf(prefs[\shortcuts][\cvwidget]);
 		this.shortcuts = IdentityDictionary.new;
 
 		if(prefs[\shortcuts][\cvwidget].isNil, {
 			scFunc =
-			"// test
+			"// focus previous widget (alphabetically ordered)
 			{ |view|
-				[view.parent.parent, CVCenter.tabs.tabViews.includes(view.parent.parent)].postln;
-				CVCenter.cvWidgets.do({ |widget| widget.view.notNil.postln });
+				block { |break|
+					CVCenter.cvWidgets.order.do({ |name, i|
+						if(CVCenter.cvWidgets[name].focusElements.includes(view)) {
+							break.value(
+								CVCenter.cvWidgets[CVCenter.cvWidgets.order.wrapAt(i-1)].parent.front.focus;
+								CVCenter.cvWidgets[CVCenter.cvWidgets.order.wrapAt(i-1)].label.focus;
+							)
+						}
+					})
+				};
 				true;
 			}";
 			this.shortcuts.put(
-				\t,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$t])
+				'alt + arrow left',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes['arrow left'],
+					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
+					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+				)
+			);
+			scFunc =
+			"// focus next widget (alphabetically ordered)
+			{ |view|
+				block { |break|
+					CVCenter.cvWidgets.order.do({ |name, i|
+						if(CVCenter.cvWidgets[name].focusElements.includes(view)) {
+							break.value(
+								CVCenter.cvWidgets[CVCenter.cvWidgets.order.wrapAt(i+1)].parent.front.focus;
+								CVCenter.cvWidgets[CVCenter.cvWidgets.order.wrapAt(i+1)].label.focus;
+							)
+						}
+					})
+				};
+				true;
+			}";
+			this.shortcuts.put(
+				'alt + arrow right',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes['arrow right'],
+					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
+					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+				)
 			)
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvwidget];
@@ -2967,6 +3006,71 @@ CVWidget {
 				if(GUI.id !== \cocoa, {
 					thisGuiEnv.actionsBut.toolTip_(""++theChanger.value.activeActions++" of "++theChanger.value.numActions++" active.\nClick to edit")
 				})
+			})
+		})
+	}
+
+	// shortcut support
+	setShortcuts {
+		var modsDict, arrModsDict;
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
+			}
+		);
+
+		// "this.class.shortcuts: %\n".postf(this.class.shortcuts);
+
+		focusElements.do({ |v|
+			// reset keyDownAction - it's getting reassigned
+			v.keyDownAction_(nil);
+
+			this.class.shortcuts.do({ |keyDowns|
+				v.keyDownAction_(
+					v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+						var thisMod, thisArrMod;
+
+						// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
+
+						switch(GUI.id,
+							\cocoa, {
+								thisMod = keyDowns.modifierCocoa;
+								thisArrMod = keyDowns.arrowsModifierCocoa;
+							},
+							\qt, {
+								thisMod = keyDowns.modifierQt;
+								thisArrMod = keyDowns.arrowsModifierQt;
+							}
+						);
+
+						case
+							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+								// "no modifier: %\n".postf(modifiers);
+								if(keycode == keyDowns.keyCode and:{
+									thisMod.isNil and:{ thisArrMod.isNil }
+								}, {
+									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
+									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+								});
+							}
+							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+								// "some modifier: %\n".postf(modifiers);
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == thisArrMod).or(modifiers == thisMod)
+								}, {
+									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
+									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+								})
+							}
+						;
+					})
+				)
 			})
 		})
 	}

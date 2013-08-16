@@ -478,87 +478,13 @@ CVWidgetKnob : CVWidget {
 			midiLearn: midiLearn
 		);
 
+		focusElements = allGuiEls.copy.removeAll([widgetBg, nameField, calibBut]);
+
 		this.initControllerActions;
 		this.setShortcuts;
 
 		oldBounds = parent.bounds;
 		if(parent.respondsTo(\name), { oldName = parent.name });
-	}
-
-	setShortcuts {
-		var modsDict, arrModsDict;
-
-		switch(GUI.id,
-			\cocoa, {
-				modsDict = KeyDownActions.modifiersCocoa;
-				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-			},
-			\qt, {
-				modsDict = KeyDownActions.modifiersQt;
-				arrModsDict = KeyDownActions.arrowsModifiersQt;
-			}
-		);
-
-		// "this.class.shortcuts: %\n".postf(this.class.shortcuts);
-
-		[
-			label,
-			knob,
-			numVal,
-			specBut,
-			midiHead,
-			midiLearn,
-			midiSrc,
-			midiChan,
-			midiCtrl,
-			oscEditBut,
-			actionsBut
-		].do({ |v|
-			// reset keyDownAction - it's getting reassigned
-			v.keyDownAction_(nil);
-
-			this.class.shortcuts.do({ |keyDowns|
-				v.keyDownAction_(
-					v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-						var thisMod, thisArrMod;
-
-						// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
-
-						switch(GUI.id,
-							\cocoa, {
-								thisMod = keyDowns.modifierCocoa;
-								thisArrMod = keyDowns.arrowsModifierCocoa;
-							},
-							\qt, {
-								thisMod = keyDowns.modifierQt;
-								thisArrMod = keyDowns.arrowsModifierQt;
-							}
-						);
-
-						case
-							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-								// "no modifier: %\n".postf(modifiers);
-								if(keycode == keyDowns.keyCode and:{
-									thisMod.isNil and:{ thisArrMod.isNil }
-								}, {
-									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
-									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
-								});
-							}
-							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-								// "some modifier: %\n".postf(modifiers);
-								if(keycode == keyDowns.keyCode and:{
-									(modifiers == thisArrMod).or(modifiers == thisMod)
-								}, {
-									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
-									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
-								})
-							}
-						;
-					})
-				)
-			})
-		})
 	}
 
 	open { |window, wdgtBounds|

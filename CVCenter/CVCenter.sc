@@ -135,10 +135,10 @@ CVCenter {
 				CVCenter.cvWidgets[labels.first].label.focus;
 			}";
 			this.shortcuts.put(
-				'alt + arrow left',
+				'alt + arrow right',
 				(
 					func: scFunc,
-					keyCode: KeyDownActions.keyCodes['arrow left'],
+					keyCode: KeyDownActions.keyCodes['arrow right'],
 					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
 					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
 				)
@@ -151,10 +151,10 @@ CVCenter {
 				CVCenter.cvWidgets[labels.last].label.focus;
 			}";
 			this.shortcuts.put(
-				'alt + arrow right',
+				'alt + arrow left',
 				(
 					func: scFunc,
-					keyCode: KeyDownActions.keyCodes['arrow right'],
+					keyCode: KeyDownActions.keyCodes['arrow left'],
 					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
 					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
 				)
