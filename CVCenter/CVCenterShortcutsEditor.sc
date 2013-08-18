@@ -91,7 +91,6 @@ CVCenterShortcutsEditor {
 				.states_([["set shortcuts", Color.white, Color.red]])
 				.font_(Font("Arial", 14, true))
 				.action_({
-					// "KeyDownActionsEditor.cachedScrollViewSC: %\n".postf(KeyDownActionsEditor.cachedScrollViewSC);
 					KeyDownActionsEditor.cachedScrollViewSC !? {
 						ScrollView.globalKeyDownAction_(KeyDownActionsEditor.cachedScrollViewSC);
 					};
@@ -99,15 +98,19 @@ CVCenterShortcutsEditor {
 					AbstractCVWidgetEditor.shortcuts_(cvWidgetEditorEditor.result);
 					// KeyDownActions.keyCodes_(keyCodesAndModsEditor.result);
 					CVCenter.setShortcuts;
-					// shortcuts = (cvcenter:  cvCenterEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
-					// 	// "shortcuts.cvcenter['fn + F1']: %\n".postf(shortcuts.cvcenter['fn + F1']);
-					// 	// "cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
-					// 	// "cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
-					// 	this.writePreferences(
-					// 		shortcuts: shortcuts,
-					// 		globalShortcuts: globalShortcutsEditorTab.result,
-					// 		keyCodesAndMods: keyCodesAndModsEditor.result(false)
-					// 	);
+					if(Server.default.serverRunning and:{
+						KeyDownActions.globalShortcutsEnabled;
+					}, {
+						KeyDownActions.globalShortcutsSync;
+					});
+					if(copyToPrefs.value.asBoolean, {
+						shortcuts = (cvcenter:  cvCenterEditor.result, cvwidget: cvWidgetEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
+						CVCenterPreferences.writePreferences(
+							shortcuts: shortcuts,
+							globalShortcuts: globalShortcutsEditor.result,
+							informString: "shortcuts have successfully been written to preferences"
+						)
+					});
 					window.close;
 				})
 			;

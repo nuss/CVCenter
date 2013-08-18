@@ -12,7 +12,6 @@ KeyDownActions {
 		var globalShortcutsPath, globalShortcuts;
 		var platform;
 		var syncStarter, cmdPeriodSynthRestart;
-		// var /*funcSlot*//*, trackingSynth, trackingSynthID*/;
 		var test;
 
 		Class.initClassTree(Platform);
@@ -31,8 +30,6 @@ KeyDownActions {
 		keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
 		globalShortcutsPath = this.filenameSymbol.asString.dirname +/+ "globalShortcuts";
 		globalShortcuts = Object.readArchive(globalShortcutsPath);
-		// keyCodesAndMods.pairsDo({ |k, v| [k, v].postln });
-		// keyCodesAndMods.keyCodes.postln;
 
 		Platform.case(
 			\linux, {
