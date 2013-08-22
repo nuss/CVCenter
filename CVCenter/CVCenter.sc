@@ -32,6 +32,7 @@ CVCenter {
 
 	*initClass {
 		var newPrefs, newBounds;
+		var scPrefs = false;
 		var shutDownFunc;
 		var scFunc;
 
@@ -107,8 +108,9 @@ CVCenter {
 		scv = (); // environment holding various variables used in shortcut-functions;,
 
 		// "prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
+		prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvcenter] !? { scPrefs = true }}};
 
-		if(prefs[\shortcuts][\cvcenter].isNil, {
+		if(scPrefs == false, {
 			scFunc =
 			"// next tab
 			{ CVCenter.tabs.focus(
@@ -705,7 +707,9 @@ CVCenter {
 						})
 					});
 					if(window.bounds != lastUpdateBounds, {
-						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
+						prefs !? {
+							if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
+						};
 						// prefs[\guiProperties].postln;
 					})
 				};
@@ -715,7 +719,9 @@ CVCenter {
 						childProps.put(\lastUpdateBounds, child.bounds)
 					})
 				});
-				if(prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
+				prefs !? {
+					if(prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
+				};
 				lastSetUp = this.setup;
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});

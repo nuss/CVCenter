@@ -40,7 +40,7 @@ CVWidget {
 	var <msSize;
 
 	*initClass {
-		var scFunc;
+		var scFunc, scPrefs = false;
 
 		Class.initClassTree(KeyDownActions);
 
@@ -53,9 +53,11 @@ CVWidget {
 
 		prefs = CVCenterPreferences.readPreferences;
 		// "prefs[\shortcuts][\cvwidget]: %\n".postf(prefs[\shortcuts][\cvwidget]);
+		prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvwidget] !? { scPrefs = true }}};
+
 		this.shortcuts = IdentityDictionary.new;
 
-		if(prefs[\shortcuts][\cvwidget].isNil, {
+		if(scPrefs == false, {
 			scFunc =
 			"// focus previous widget (alphabetically ordered)
 			{ |view|

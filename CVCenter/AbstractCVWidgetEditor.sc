@@ -34,19 +34,20 @@ AbstractCVWidgetEditor {
 
 	*initClass {
 		var localOscFunc, scFunc;
-		var shortcutsPrefs;
+		var prefs, scPrefs = false;
 
 		Class.initClassTree(KeyDownActions);
 		// Class.initClassTree(CVCenterPreferences);
 
-		shortcutsPrefs = CVCenterPreferences.readPreferences;
+		prefs = CVCenterPreferences.readPreferences;
+		prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvwidgeteditor] !? { scPrefs = true }}};
 
 		allEditors = IdentityDictionary.new;
 		this.shortcuts = IdentityDictionary.new;
 
-		// "shortcutsPrefs[\cvwidgeteditor]: %\n".postf(shortcutsPrefs[\shortcuts].cvwidgeteditor);
+		// "prefs[\cvwidgeteditor]: %\n".postf(prefs[\shortcuts].cvwidgeteditor);
 
-		if(shortcutsPrefs[\shortcuts][\cvwidgeteditor].isNil, {
+		if(scPrefs == false, {
 			scFunc =
 			"// focus 'specs' tab
 			{ |view|
@@ -240,7 +241,7 @@ AbstractCVWidgetEditor {
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])
 			)
 		}, {
-			this.shortcuts = shortcutsPrefs[\shortcuts][\cvwidgeteditor];
+			this.shortcuts = prefs[\shortcuts][\cvwidgeteditor];
 		});
 	}
 

@@ -10,7 +10,7 @@ KeyDownActions {
 	*initClass {
 		var keyCodesAndModsPath, keyCodesAndMods;
 		var globalShortcutsPath, globalShortcuts;
-		var platform;
+		var platform, scFunc;
 		var syncStarter, cmdPeriodSynthRestart;
 		var test;
 
@@ -341,7 +341,17 @@ KeyDownActions {
 			}
 		);
 
-		globalShortcuts !? {
+		this.globalShortcuts = IdentityDictionary.new;
+
+		if(globalShortcuts.isNil) {
+			scFunc =
+			"// bring all Windows to front and call CVCenter.makeWindow *afterwards*
+			{ Window.allWindows.do(_.front); CVCenter.makeWindow }";
+			this.globalShortcuts.put(
+				'fn + F1',
+				(func: scFunc, keyCode: KeyDownActions.keyCodes['fn + F1'])
+			)
+		} {
 			this.globalShortcuts = globalShortcuts;
 		};
 

@@ -408,7 +408,7 @@ CVCenterPreferences {
 			if(prefs.notNil and:{ prefs[\removeResponders].notNil }, {
 				removeResponders = buildCheckbox.(responderView, prefs[\removeResponders])
 			}, {
-				removeResponders = buildCheckbox.(responderView, CVCenter.removeResponders)
+				removeResponders = buildCheckbox.(responderView, CVWidget.removeResponders)
 			});
 
 			responderFlow.shift(5, -2);
@@ -436,17 +436,50 @@ CVCenterPreferences {
 			globalShortcutsTab = scTabs.add("global shortcuts", scroll: false);
 
 			cvCenterEditor = KeyDownActionsEditor(
-				cvCenterTab, nil, cvCenterTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvcenter ?? { CVCenter.shortcuts }}, false
+				// cvCenterTab, nil, cvCenterTab.bounds, prefs !? { prefs.shortcuts.cvcenter ?? { "no shortcts for CVCenter in preferences".postln; CVCenter.shortcuts }}, false
+				cvCenterTab, nil, cvCenterTab.bounds,
+				if(prefs.notNil, {
+					if(prefs[\shortcuts][\cvcenter].notNil, {
+						prefs[\shortcuts][\cvcenter]
+					}, {
+						CVCenter.shortcuts
+					})
+				}, { CVCenter.shortcuts }),
+				false
 			);
 			cvWidgetEditor = KeyDownActionsEditor(
-				cvWidgetTab, nil, cvWidgetTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvwidget ?? { CVWidget.shortcuts }}, false
+				cvWidgetTab, nil, cvWidgetTab.bounds,
+				if(prefs.notNil, {
+					if(prefs[\shortcuts][\cvwidget].notNil, {
+						prefs[\shortcuts][\cvwidget]
+					}, {
+						CVWidget.shortcuts
+					})
+				}, { CVWidget.shortcuts }),
+				false
 			);
 			cvWidgetEditorEditor = KeyDownActionsEditor(
-				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, prefs.shortcuts !? { prefs.shortcuts.cvwidgeteditor ?? { AbstractCVWidgetEditor.shortcuts }}, false
+				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds,
+				if(prefs.notNil, {
+					if(prefs[\shortcuts][\cvwidgeteditor].notNil, {
+						prefs[\shortcuts][\cvwidgeteditor]
+					}, {
+						AbstractCVWidgetEditor.shortcuts
+					})
+				}, { AbstractCVWidgetEditor.shortcuts }),
+				false
 			);
-			"prefs.globalShortcuts: %\n".postf(prefs.globalShortcuts);
+			// "prefs.globalShortcuts: %\n".postf(prefs.globalShortcuts);
 			globalShortcutsEditorTab = KeyDownActionsEditor(
-				globalShortcutsTab, nil, globalShortcutsTab.bounds, prefs.globalShortcuts ?? { KeyDownActions.globalShortcuts }, false, false, false
+				globalShortcutsTab, nil, globalShortcutsTab.bounds,
+				if(prefs.notNil, {
+					if(prefs[\globalShortcuts].notNil, {
+						prefs[\globalShortcuts]
+					}, {
+						KeyDownActions.globalShortcuts
+					})
+				}, { KeyDownActions.globalShortcuts }),
+				false, false, false
 			);
 
 			cvCenterKeyCodesEditor = KeyCodesEditor(
@@ -639,11 +672,11 @@ CVCenterPreferences {
 			})
 		});
 
-		// prefs.postcs;
+		"res: %, prefs: %\n".postf(res, prefs);
 
 		// "prefs.shortcuts: %\n".postf(prefs.shortcuts.cs);
 		// "prefs.keyCodesAndMods: %\n".postf(prefs.keyCodesAndMods);
 
-		^if(res.notNil, { res }, { if(prefs.notEmpty, { prefs }, { nil }) });
+		^if(res.notNil, { res }, { if(prefs.notNil and:{ prefs.notEmpty }, { prefs }, { nil }) });
 	}
 }
