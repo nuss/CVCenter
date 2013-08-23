@@ -637,42 +637,42 @@ CVCenterPreferences {
 			if(args.size > 0, {
 				res = ();
 				args.do({ |val| res.put(val.asSymbol, prefs[val.asSymbol]) });
-			})
-		});
-		if(File.exists(shortcutsPath), {
-			"shortcutsPath exists".postln;
-			prefs ?? { prefs = () };
-			prefs.put(\shortcuts, Object.readArchive(shortcutsPath));
-			if(args.size > 0, {
-				if(args.collect(_.asSymbol).includes(\shortcuts), {
-					res ?? { res = () };
-					res.shortcuts = Object.readArchive(shortcutsPath)
+			});
+			if(File.exists(shortcutsPath), {
+				"shortcutsPath exists".postln;
+				prefs ?? { prefs = () };
+				prefs.put(\shortcuts, Object.readArchive(shortcutsPath));
+				if(args.size > 0, {
+					if(args.collect(_.asSymbol).includes(\shortcuts), {
+						res ?? { res = () };
+						res.shortcuts = Object.readArchive(shortcutsPath)
+					})
 				})
-			})
-		});
-		if(File.exists(globalShortcutsPath), {
-			"globalShortcutsPath exists".postln;
-			prefs ?? { prefs = () };
-			prefs.put(\globalShortcuts, Object.readArchive(globalShortcutsPath));
-			if(args.size > 0, {
-				if(args.collect(_.asSymbol).includes(\globalShortcuts), {
-					res ?? { res = () };
-					res.globalShortcuts = Object.readArchive(globalShortcutsPath)
+			});
+			if(File.exists(globalShortcutsPath), {
+				"globalShortcutsPath exists".postln;
+				prefs ?? { prefs = () };
+				prefs.put(\globalShortcuts, Object.readArchive(globalShortcutsPath));
+				if(args.size > 0, {
+					if(args.collect(_.asSymbol).includes(\globalShortcuts), {
+						res ?? { res = () };
+						res.globalShortcuts = Object.readArchive(globalShortcutsPath)
+					})
 				})
-			})
-		});
-		if(File.exists(keyCodesAndModsPath), {
-			prefs ?? { prefs = () };
-			prefs.put(\keyCodesAndMods, Object.readArchive(keyCodesAndModsPath));
-			if(args.size > 0, {
-				if(args.collect(_.asSymbol).includes(\keyCodesAndMods), {
-					res ?? { res = () };
-					res.keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
+			});
+			if(File.exists(keyCodesAndModsPath), {
+				prefs ?? { prefs = () };
+				prefs.put(\keyCodesAndMods, Object.readArchive(keyCodesAndModsPath));
+				if(args.size > 0, {
+					if(args.collect(_.asSymbol).includes(\keyCodesAndMods), {
+						res ?? { res = () };
+						res.keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
+					})
 				})
 			})
 		});
 
-		"res: %, prefs: %\n".postf(res, prefs);
+		// "res: %, prefs: %\n".postf(res, prefs);
 
 		// "prefs.shortcuts: %\n".postf(prefs.shortcuts.cs);
 		// "prefs.keyCodesAndMods: %\n".postf(prefs.keyCodesAndMods);
