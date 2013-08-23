@@ -17,7 +17,7 @@
 
 CVWidget {
 
-	classvar <>removeResponders, <>midiSources, <>shortcuts, prefs/*, midiStateObserver*/;
+	classvar <>removeResponders = true, <>midiSources, <>shortcuts, prefs/*, midiStateObserver*/;
 	classvar <>debug = false;
 	var <parent, <widgetCV, <name;
 	var <guiEnv;
