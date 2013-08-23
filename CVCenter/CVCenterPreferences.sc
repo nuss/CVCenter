@@ -438,46 +438,44 @@ CVCenterPreferences {
 			cvCenterEditor = KeyDownActionsEditor(
 				// cvCenterTab, nil, cvCenterTab.bounds, prefs !? { prefs.shortcuts.cvcenter ?? { "no shortcts for CVCenter in preferences".postln; CVCenter.shortcuts }}, false
 				cvCenterTab, nil, cvCenterTab.bounds,
-				if(prefs.notNil, {
-					if(prefs[\shortcuts][\cvcenter].notNil, {
-						prefs[\shortcuts][\cvcenter]
-					}, {
-						CVCenter.shortcuts
-					})
+				if(prefs.notNil and:{
+					prefs[\shortcuts].notNil and:{
+						prefs[\shortcuts][\cvcenter].notNil
+					}
+				}, {
+					prefs[\shortcuts][\cvcenter]
 				}, { CVCenter.shortcuts }),
 				false
 			);
 			cvWidgetEditor = KeyDownActionsEditor(
 				cvWidgetTab, nil, cvWidgetTab.bounds,
-				if(prefs.notNil, {
-					if(prefs[\shortcuts][\cvwidget].notNil, {
-						prefs[\shortcuts][\cvwidget]
-					}, {
-						CVWidget.shortcuts
-					})
+				if(prefs.notNil and:{
+					prefs[\shortcuts].notNil and:{
+						prefs[\shortcuts][\cvwidget].notNil
+					}
+				}, {
+					prefs[\shortcuts][\cvwidget]
 				}, { CVWidget.shortcuts }),
 				false
 			);
 			cvWidgetEditorEditor = KeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds,
-				if(prefs.notNil, {
-					if(prefs[\shortcuts][\cvwidgeteditor].notNil, {
-						prefs[\shortcuts][\cvwidgeteditor]
-					}, {
-						AbstractCVWidgetEditor.shortcuts
-					})
+				if(prefs.notNil and:{
+					prefs[\shortcuts].notNil and:{
+						prefs[\shortcuts][\cvwidgeteditor].notNil
+					}
+				}, {
+					prefs[\shortcuts][\cvwidgeteditor]
 				}, { AbstractCVWidgetEditor.shortcuts }),
 				false
 			);
 			// "prefs.globalShortcuts: %\n".postf(prefs.globalShortcuts);
 			globalShortcutsEditorTab = KeyDownActionsEditor(
 				globalShortcutsTab, nil, globalShortcutsTab.bounds,
-				if(prefs.notNil, {
-					if(prefs[\globalShortcuts].notNil, {
-						prefs[\globalShortcuts]
-					}, {
-						KeyDownActions.globalShortcuts
-					})
+				if(prefs.notNil and:{
+					prefs[\globalShortcuts].notNil
+				}, {
+					prefs[\globalShortcuts]
 				}, { KeyDownActions.globalShortcuts }),
 				false, false, false
 			);
@@ -652,11 +650,13 @@ CVCenterPreferences {
 			if(File.exists(globalShortcutsPath), {
 				"globalShortcutsPath exists".postln;
 				prefs ?? { prefs = () };
-				prefs.put(\globalShortcuts, Object.readArchive(globalShortcutsPath));
+					prefs.put(\globalShortcuts, Object.readArchive(globalShortcutsPath));
 				if(args.size > 0, {
 					if(args.collect(_.asSymbol).includes(\globalShortcuts), {
 						res ?? { res = () };
-						res.globalShortcuts = Object.readArchive(globalShortcutsPath)
+						res.globalShortcuts = Object.readArchive(globalShortcutsPath) ?? {
+							KeyDownActions.globalShortcuts
+						}
 					})
 				})
 			});
@@ -666,7 +666,15 @@ CVCenterPreferences {
 				if(args.size > 0, {
 					if(args.collect(_.asSymbol).includes(\keyCodesAndMods), {
 						res ?? { res = () };
-						res.keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
+						res.keyCodesAndMods = Object.readArchive(keyCodesAndModsPath) ?? {
+							IdentityDictionary[
+								\keyCodes -> KeyDownActions.keyCodes,
+								\modifiersQt -> KeyDownActions.modifiersQt,
+								\modifiersCocoa -> KeyDownActions.modifiersCocoa,
+								\arrowsModifiersQt -> KeyDownActions.arrowsModifiersQt,
+								\arrowsModifiersCocoa -> KeyDownActions.arrowsModifiersCocoa
+							]
+						}
 					})
 				})
 			})
