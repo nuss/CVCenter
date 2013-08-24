@@ -17,7 +17,7 @@
 
 CVWidget {
 
-	classvar <>removeResponders;
+	classvar <>removeResponders = true;
 	classvar <>debug = false;
 	var <window, <guiEnv;
 	var <widgetCV, prDefaultAction, <>wdgtActions, <>bgColor, <alwaysPositive = 0.1;

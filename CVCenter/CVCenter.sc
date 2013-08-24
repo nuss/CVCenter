@@ -412,29 +412,31 @@ CVCenter {
 					)
 				});
 				tabProperties.do(_.nextPos_(0@0));
-				if(prefs[\saveGuiProperties] == 1, {
-					newPrefs = CVCenterPreferences.readPreferences;
-					if(newPrefs[\saveGuiProperties] == 1, {
-						this.guix_(prefs[\guiProperties].left)
-							.guiy_(prefs[\guiProperties].top)
-							.guiwidth_(prefs[\guiProperties].width)
-							.guiheight_(prefs[\guiProperties].height)
-						;
-						newPrefs.put(\guiProperties, prefs[\guiProperties]);
-						CVCenterPreferences.writePreferences(
-							newPrefs[\saveGuiProperties],
-							prefs[\guiProperties],
-							newPrefs[\saveClassVars],
-							newPrefs[\midiMode],
-							newPrefs[\midiResolution],
-							newPrefs[\midiMean],
-							newPrefs[\softWithin],
-							newPrefs[\ctrlButtonBank],
-							newPrefs[\removeResponders],
-							"Your CVCenter-preferences have successfully been written to disk."
-						)
-					});
-				})
+				prefs !? {
+					if(prefs[\saveGuiProperties] == 1, {
+						newPrefs = CVCenterPreferences.readPreferences;
+						if(newPrefs[\saveGuiProperties] == 1, {
+							this.guix_(prefs[\guiProperties].left)
+								.guiy_(prefs[\guiProperties].top)
+								.guiwidth_(prefs[\guiProperties].width)
+								.guiheight_(prefs[\guiProperties].height)
+							;
+							newPrefs.put(\guiProperties, prefs[\guiProperties]);
+							CVCenterPreferences.writePreferences(
+								newPrefs[\saveGuiProperties],
+								prefs[\guiProperties],
+								newPrefs[\saveClassVars],
+								newPrefs[\midiMode],
+								newPrefs[\midiResolution],
+								newPrefs[\midiMean],
+								newPrefs[\softWithin],
+								newPrefs[\ctrlButtonBank],
+								newPrefs[\removeResponders],
+								"Your CVCenter-preferences have successfully been written to disk."
+							)
+						});
+					})
+				}
 			});
 
 			thisNextPos = 0@0;
@@ -640,12 +642,16 @@ CVCenter {
 						this.prRegroupWidgets(tabs.activeTab);
 					});
 					if(window.bounds != lastUpdateBounds, {
-						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
+						prefs !? {
+							if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
+						};
 						// prefs[\guiProperties].postln;
 					})
 				};
 				lastUpdateBounds = window.bounds;
-				if(prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
+				prefs !? {
+					if(prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
+				};
 				lastSetUp = this.setup;
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});

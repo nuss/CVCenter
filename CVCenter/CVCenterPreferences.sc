@@ -360,7 +360,7 @@ CVCenterPreferences {
 			if(prefs.notNil and:{ prefs[\removeResponders].notNil }, {
 				removeResponders = buildCheckbox.(prefs[\removeResponders])
 			}, {
-				removeResponders = buildCheckbox.(CVCenter.removeResponders)
+				removeResponders = buildCheckbox.(CVWidget.removeResponders)
 			});
 
 			flow.shift(5, 1);
