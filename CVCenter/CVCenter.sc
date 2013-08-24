@@ -569,7 +569,7 @@ CVCenter {
 			swFlow.shift(3, -2);
 
 			StaticText(prefPane, Point(140, 20))
-				.string_("activate global shortcuts")
+				.string_("enable global shortcuts")
 				.stringColor_(Color.white)
 				.font_(Font("Arial", 12))
 			;
