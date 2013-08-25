@@ -9,7 +9,7 @@ CVWidget is the abstract superclass of all CVWidgets (currently: link::Classes/C
 CLASSMETHODS::
 
 METHOD:: removeResponders
-A link::Classes/Boolean::, indicating wether MIDI- and OSC-responders shall be removed upon hitting Cmd/Ctrl-period. If it is set to code::false:: unreferenced ghost-responders are left that may be hard to remove.
+A link::Classes/Boolean::, indicating whether MIDI- and OSC-responders shall be removed upon hitting Cmd/Ctrl-period. If it is set to code::false:: unreferenced ghost-responders are left that may be hard to remove.
 
 returns:: code::this:: (CVWidget)
 
@@ -30,8 +30,8 @@ METHOD:: setup
 The current widget-setup, returned as an link::Classes/Event::. If the widget is a link::Classes/CVWidget2D:: each key of the returned Event will be split in a code::\lo:: and a code::\hi:: value:
 definitionList::
 	## midiMode || as set by link::#-setMidiMode::. default: code::0::
-	## calibrate || indicates wether OSC-calibration is active or not, set by link::#-setCalibrate::. default: code::true::
-	## ctrlButtonBank || indicates wether the code::ctrlButtonBank:: parameter, reflecting a MIDI-device's bank-layout is set. This can be set with link::#-setCtrlButtonBank::. default: code::nil::
+	## calibrate || indicates whether OSC-calibration is active or not, set by link::#-setCalibrate::. default: code::true::
+	## ctrlButtonBank || indicates whether the code::ctrlButtonBank:: parameter, reflecting a MIDI-device's bank-layout is set. This can be set with link::#-setCtrlButtonBank::. default: code::nil::
 	## midiMean || if a MIDI-device is set to in-/decremental mode reps. code::midiMode:: is set to code::1:: this will be the mean output-value. Can be set with link::#-setMidiMean::. default: code::64::
 	## midiResolution || if code::midiMode:: is set to code::1:: the step-size of each slider is determined by this parameter. Can be set with link::#-setMidiResolution::. default: code::1::
 	## softWithin || if code::midiMode:: is set to code::0:: this determines the tolerance at which a MIDI-slider will respond when moved. For a more detailed explanation see link::#-setSoftWithin::. default: code::0.1::
@@ -150,7 +150,7 @@ METHOD:: setCalibrate
 Unlike MIDI the range of incoming OSC-values isn't 0-127 - it is unknown at the time of initialization of the OSC-responder. All CVWidgets have an inbuilt calibration mechanism that determines the range automatically. At initialization the range is set to [0.0001, 0.0001]. If the mechanism detects a value that is lower or higher than the values set at initialization it will set the constraints accordingly. This method allows to stop or start the calibration-process.
 
 argument:: bool
-a link::Classes/Boolean::, indicating wether the calibration-process shall be started or stopped.
+a link::Classes/Boolean::, indicating whether the calibration-process shall be started or stopped.
 
 argument:: slot
 only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
@@ -304,7 +304,7 @@ argument:: slot
 only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
 
 argument:: active
-a link::Classes/Boolean::, indicating wether the action shall become active immediatly
+a link::Classes/Boolean::, indicating whether the action shall become active immediatly
 
 returns:: the receiver
 
@@ -326,7 +326,7 @@ argument:: name
 a link::Classes/Symbol:: or a link::Classes/String::, representing the action's name
 
 argument:: activate
-a link::Classes/Boolean::, indicating wether the action shall be activated or deactivated
+a link::Classes/Boolean::, indicating whether the action shall be activated or deactivated
 
 argument:: slot
 only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::

@@ -29,7 +29,7 @@ ARGUMENT:: guiProperties
 a link::Classes/Rect:: an link::Classes/Array:: providing code::left::, code::top::, code::width::, code::height:: - will be ignored if 'saveProperties is set to code::0:: or code::1::
 
 ARGUMENT:: saveClassVars
-a link::Classes/Boolean::, or an link::Classes/Integer:: ( code::0:: or code::1::), indicating wether CVCenter's classvars link::Classes/CVCenter#*midiMode#midiMode::, link::Classes/CVCenter#*midiResolution#midiResolution::, link::Classes/CVCenter#*midiMean#midiMean::, link::Classes/CVCenter#*softWithin#softWithin::, link::Classes/CVCenter#*ctrlButtonBank#ctrlButtonBank::. All these classvars have equivalent instancevars in CVWidget that will overwrite CVCenter's classvars if set. Thus the user may set global values here and tweak them within each CVWidget created in CVCenter.
+a link::Classes/Boolean::, or an link::Classes/Integer:: ( code::0:: or code::1::), indicating whether CVCenter's classvars link::Classes/CVCenter#*midiMode#midiMode::, link::Classes/CVCenter#*midiResolution#midiResolution::, link::Classes/CVCenter#*midiMean#midiMean::, link::Classes/CVCenter#*softWithin#softWithin::, link::Classes/CVCenter#*ctrlButtonBank#ctrlButtonBank::. All these classvars have equivalent instancevars in CVWidget that will overwrite CVCenter's classvars if set. Thus the user may set global values here and tweak them within each CVWidget created in CVCenter.
 If set to code::0:: the arguments code::midiMode::, code::midiResolution::, code::midiMean::, code::softWithin:: and code::ctrlButtonBank:: will be ignored.
 
 ARGUMENT:: midiMode
@@ -51,7 +51,7 @@ ARGUMENT:: ctrlButtonBank
 CVCenter was written with a Doepfer Pocket Dial in mind which provides 16 fader-knobs and 4 different banks which sums up to 64 different slider-slots. However, it is not obvious which slider has to be moved to trigger a CCResponder initialised for controller nr. 37. Setting this argument to 16 (the number of knobs) will display controller nr. 37 as 3:5 (knob number 5 in bank 3).
 
 ARGUMENT:: removeResponders
-a link::Classes/Boolean::, or an link::Classes/Integer:: ( code::0:: or code::1::). This argument sets link::Classes/CVWidget#*removeResponders::, indicating wether MIDI- and OSC-responders shall be removed upon hitting Cmd/Ctrl-period. If it is set to code::0:: or code::false:: unreferenced ghost-responders are left that may be hard to remove.
+a link::Classes/Boolean::, or an link::Classes/Integer:: ( code::0:: or code::1::). This argument sets link::Classes/CVWidget#*removeResponders::, indicating whether MIDI- and OSC-responders shall be removed upon hitting Cmd/Ctrl-period. If it is set to code::0:: or code::false:: unreferenced ghost-responders are left that may be hard to remove.
 
 ARGUMENT:: informString
 a link::Classes/String::, used as alternative inform-message (optional) 

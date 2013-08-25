@@ -86,7 +86,7 @@ Put new link::Classes/CV::s into CVCenter
 note::It shouldn't be necessary to initialize CVCenter with an explicit call to strong::*new::. Rather use strong::*use:: whenever possible as (strong::*use:: uses strong::*put:: internally)::
 argument::  ... args
 key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV),  \wdgtNameN, a CV::
-If the number of arguments is odd and the last one is a link::Classes/Boolean:: this will indicate wether already contained values will be overwritten (default: code::false::)
+If the number of arguments is odd and the last one is a link::Classes/Boolean:: this will indicate whether already contained values will be overwritten (default: code::false::)
 
 returns:: this (CVCenter)
 
