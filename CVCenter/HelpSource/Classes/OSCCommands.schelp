@@ -90,3 +90,4 @@ OSCCommands.storedDevices;
 // delete a stored device including its command-names
 OSCCommands.clearCmdsAt(\myAppOrDeviceName);
 ::
+
