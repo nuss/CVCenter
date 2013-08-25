@@ -584,30 +584,32 @@ CVCenter {
 				// windowStates.removeAt(window);
 				// tabProperties.do({ |prop| prop.nextPos_(Point(0, 0)) });
 				tabProperties.clear;
-				if(prefs[\saveGuiProperties] == 1, {
-					newPrefs = CVCenterPreferences.readPreferences;
-					if(newPrefs[\saveGuiProperties] == 1, {
-						this.guix_(prefs[\guiProperties].left)
+				prefs !? {
+					if(prefs[\saveGuiProperties] == 1, {
+						newPrefs = CVCenterPreferences.readPreferences;
+						if(newPrefs[\saveGuiProperties] == 1, {
+							this.guix_(prefs[\guiProperties].left)
 							.guiy_(prefs[\guiProperties].top)
 							.guiwidth_(prefs[\guiProperties].width)
 							.guiheight_(prefs[\guiProperties].height)
-						;
-						newPrefs.put(\guiProperties, prefs[\guiProperties]);
-						CVCenterPreferences.writePreferences(
-							newPrefs[\saveGuiProperties],
-							newPrefs[\guiProperties],
-							newPrefs[\saveClassVars],
-							newPrefs[\midiMode],
-							newPrefs[\midiResolution],
-							newPrefs[\midiMean],
-							newPrefs[\softWithin],
-							newPrefs[\ctrlButtonBank],
-							newPrefs[\removeResponders],
-							newPrefs[\initMidiOnStartUp],
-							informString: "Your CVCenter-preferences have successfully been written to disk."
-						)
+							;
+							newPrefs.put(\guiProperties, prefs[\guiProperties]);
+							CVCenterPreferences.writePreferences(
+								newPrefs[\saveGuiProperties],
+								newPrefs[\guiProperties],
+								newPrefs[\saveClassVars],
+								newPrefs[\midiMode],
+								newPrefs[\midiResolution],
+								newPrefs[\midiMean],
+								newPrefs[\softWithin],
+								newPrefs[\ctrlButtonBank],
+								newPrefs[\removeResponders],
+								newPrefs[\initMidiOnStartUp],
+								informString: "Your CVCenter-preferences have successfully been written to disk."
+							)
+						})
 					})
-				});
+				};
 				AbstractCVWidgetEditor.allEditors.pairsDo({ |editor, val|
 					switch(cvWidgets[editor].class,
 						CVWidgetKnob, {
