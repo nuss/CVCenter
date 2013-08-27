@@ -513,7 +513,7 @@ CVCenter {
 			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(0, 0));
 			prefPane.resize_(8).background_(Color.black);
 
-			prefPane.bounds.postln;
+			// prefPane.bounds.postln;
 
 			prefBut = Button(prefPane, Point(70, 20))
 				.font_(Font("Helvetica", 10))
@@ -695,26 +695,24 @@ CVCenter {
 					});
 					lastUpdate = all.size;
 				});
-				try {
-					if(window.bounds.width != lastUpdateBounds.width, {
-						this.prRegroupWidgets(tabs.activeTab);
-					});
-					if(childViews.size > 0, {
-						childViews.pairsDo({ |child, childProps|
-							// "child, childProps: %, %\n".postf(child, childProps);
-							// [child.bounds, childProps.lastUpdateBounds].postln;
-							if(child.bounds.width != childProps.lastUpdateBounds.width, {
-								childProps.tabs.keysDo({ |tab| this.prRegroupWidgets(tab) })
-							})
+				if(lastUpdateBounds.notNil and:{ window.bounds.width != lastUpdateBounds.width }, {
+					this.prRegroupWidgets(tabs.activeTab);
+				});
+				if(childViews.size > 0, {
+					childViews.pairsDo({ |child, childProps|
+						// "child, childProps: %, %\n".postf(child, childProps);
+						// [child.bounds, childProps.lastUpdateBounds].postln;
+						if(child.bounds.width != childProps.lastUpdateBounds.width, {
+							childProps.tabs.keysDo({ |tab| this.prRegroupWidgets(tab) })
 						})
-					});
-					if(window.bounds != lastUpdateBounds, {
-						prefs !? {
-							if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
-						};
-						// prefs[\guiProperties].postln;
 					})
-				};
+				});
+				if(window.bounds != lastUpdateBounds, {
+					prefs !? {
+						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
+					};
+					// prefs[\guiProperties].postln;
+				});
 				lastUpdateBounds = window.bounds;
 				if(childViews.size > 0, {
 					childViews.pairsDo({ |child, childProps|
@@ -887,31 +885,6 @@ CVCenter {
 							child.name_("CVCenter: "++childProps[\tabs].keys.collectAs({ |tab| tab.label }, Array));
 						});
 					};
-					/*this.shortcuts.do({ |keyDowns|
-						// "onAfterChangeParent view: %\n".postf(view.parent.parent);
-						view.keyDownAction_(
-							view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-								var thisMod, thisArrMod;
-								thisMod = keyDowns.modifierQt;
-								thisArrMod = keyDowns.arrowsModifierQt;
-
-								case
-									{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-									// "no modifier".postln;
-										if(keycode == keyDowns.keyCode and:{
-											thisMod.isNil and:{ thisArrMod.isNil }
-										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
-									}
-									{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-										// "some modifier...".postln;
-										if(keycode == keyDowns.keyCode and:{
-											(modifiers == thisArrMod).or(modifiers == thisMod)
-										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
-									}
-								;
-							})
-						)
-					});*/
 					childViews.pairsDo({ |child, childProps| if(childProps.tabs.size < 1, { childViews.removeAt(child) }) });
 				})
 			;
