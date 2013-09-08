@@ -475,9 +475,9 @@ KeyDownActionsEditor : KeyDownActions {
 
 		editAreasBg = Color(0.8, 0.8, 0.8);
 		staticTextColor = Color(0.1, 0.1, 0.1);
-		staticTextFont = Font("Arial", 10);
-		shortCutFont = Font("Arial", 12, true);
-		textFieldFont = Font("Andale Mono", 10);
+		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 10);
+		shortCutFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12, true);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 10);
 
 		// if(name.isNil) { thisName = view.class } { thisName = name };
 
@@ -793,9 +793,9 @@ KeyCodesEditor : KeyDownActions {
 
 		editAreasBg = Color(0.8, 0.8, 0.8);
 		staticTextColor = Color(0.1, 0.1, 0.1);
-		staticTextFont = Font("Arial", 10);
-		shortCutFont = Font("Arial", 12, true);
-		textFieldFont = Font("Andale Mono", 10);
+		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 10);
+		shortCutFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12, true);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 10);
 
 		Platform.case(
 			\osx, { platform = "OSX" },

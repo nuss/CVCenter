@@ -136,9 +136,9 @@ OSCCommands {
 		var flow, fields = (), deviceNameField, saveBut;
 		var progress, progressStates, progressRoutine, collectRoutine, stopFunc;
 		var makeField, nextFields;
-		var staticTextFont = Font("Arial", 10);
+		var staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 10);
 		var staticTextColor = Color(0.2, 0.2, 0.2);
-		var textFieldFont = Font("Andale Mono", 9);
+		var textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 9);
 		var textFieldFontColor = Color.black;
 		var textFieldBg = Color.white;
 
@@ -184,7 +184,7 @@ OSCCommands {
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
 
-			progress = StaticText(window, flow.indentedRemaining.width@30).font_(Font("Arial", 20, true));
+			progress = StaticText(window, flow.indentedRemaining.width@30).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 20, true));
 
 			flow.nextLine.shift(0, 0);
 
@@ -236,7 +236,7 @@ OSCCommands {
 			// flow.shift(0, 0);
 
 			deviceNameField = TextField(window, 144@40)
-				.font_(Font("Andale Mono", 15))
+				.font_(Font(Font.available("Courier New") ? Font.defaultSansFace, 15))
 				.string_("< device-name >")
 			;
 
@@ -244,7 +244,7 @@ OSCCommands {
 
 			saveBut = Button(window, flow.indentedRemaining.width-20@40)
 				.states_([["save", Color.white, Color(0.15, 0.5, 0.15)]])
-				.font_(Font("Arial", 15, true))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 15, true))
 				.action_({ |b|
 					if(deviceNameField.string != "< device-name >" and:{ deviceNameField.string.size > 0 }, {
 						this.collect(false);

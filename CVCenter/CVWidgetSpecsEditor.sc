@@ -48,10 +48,10 @@ CVWidgetSpecsEditor {
 
 		// allEls = [cNameRect, cNameEnterTextRect, specEnterTextRect, specSelectRect];
 
-		staticTextFont = Font("Arial", 10);
+		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 10);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font("Andale Mono", 10);
-		selectFont = Font("Andale Mono", 10, true);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 10);
+		selectFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 10, true);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 

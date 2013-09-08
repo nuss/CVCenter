@@ -1641,7 +1641,7 @@ CVWidget {
 									.states_([
 										[oscIndex.asString++": edit OSC", Color.black, Color.white(0.2)]
 									])
-									.font_(Font("Arial", 9.4))
+									.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9.4))
 									.action_({ |bt|
 										// (btnIndex[i]).postln;
 										if(msEditors[btnIndex[i]].isNil or:{

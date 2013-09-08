@@ -129,7 +129,7 @@ CVWidgetKnob : CVWidget {
 				[""+name.asString, Color.white, Color.blue],
 				[""+name.asString, Color.black, Color.yellow],
 			])
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.action_({ |b|
 				this.toggleComment(b.value.asBoolean);
 			})
@@ -137,7 +137,7 @@ CVWidgetKnob : CVWidget {
 		;
 		nameField = TextView(parent, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.string_("Add some notes if you like")
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
@@ -174,12 +174,12 @@ CVWidgetKnob : CVWidget {
 		if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
 		nextY = thisXY.y+thisHeight-112;
 		numVal = NumberBox(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.value_(widgetCV.value).font_(Font("Arial", 9.5))
+			.value_(widgetCV.value).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9.5))
 			.focusColor_(Color.green)
 		;
 		nextY = nextY+numVal.bounds.height;
 		specBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 			.action_({ |btn|
 				if(editor.isNil or:{ editor.isClosed }, {
@@ -201,7 +201,7 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+specBut.bounds.height+1;
 		midiHead = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-17, 15))
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.states_([["MIDI", stringColor, background]])
 			.action_({ |ms|
 				if(editor.isNil or:{ editor.isClosed }, {
@@ -230,7 +230,7 @@ CVWidgetKnob : CVWidget {
 		});
 
 		midiLearn = Button(parent, Rect(thisXY.x+thisWidth-16, nextY, 15, 15))
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.states_([
 				["L", Color.white, Color.blue],
 				["X", Color.white, Color.red]
@@ -258,7 +258,7 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+midiLearn.bounds.height;
 		midiSrc = TextField(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 12))
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.string_(msrc)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -286,7 +286,7 @@ CVWidgetKnob : CVWidget {
 
 		nextY = nextY+midiSrc.bounds.height;
 		midiChan = TextField(parent, Rect(thisXY.x+1, nextY, thisWidth-2/2, 12))
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.string_(mchan)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -313,7 +313,7 @@ CVWidgetKnob : CVWidget {
 		if(GUI.id !== \cocoa, { midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget") });
 
 		midiCtrl = TextField(parent, Rect(thisXY.x+(thisWidth-2/2)+1, nextY, thisWidth-2/2, 12))
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.string_(mctrl)
 			.background_(Color.white)
 			.stringColor_(Color.black)
@@ -342,7 +342,7 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+midiCtrl.bounds.height+1;
 
 		oscEditBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 25))
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.states_([
 				["edit OSC", stringColor, background]
 			])
@@ -387,7 +387,7 @@ CVWidgetKnob : CVWidget {
 			nextY+oscEditBut.bounds.height-10,
 			10, 10
 		))
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.states_([
 				["", Color.black, Color.green],
 				["", Color.white, Color.red]
@@ -411,7 +411,7 @@ CVWidgetKnob : CVWidget {
 		nextY = nextY+oscEditBut.bounds.height;
 		// nextY = nextY+calibBut.bounds.height;
 		actionsBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.states_([
 				["actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)],
 			])

@@ -107,9 +107,9 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		});
 
 
-		staticTextFont = Font("Arial", 9.4);
+		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 9.4);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font("Andale Mono", 9);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 9);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
@@ -581,7 +581,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			deviceDropDown = PopUpMenu(tabView2, flow2.bounds.width-95@15)
 				.items_(["select IP-address... (optional)"])
-				.font_(Font("Arial", 10))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 			;
 
 			StaticText(tabView2, 60@15)
@@ -597,7 +597,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			portRestrictor = buildCheckbox.(false, tabView2, 15@15, Font("Arial", 10, true));
+			portRestrictor = buildCheckbox.(false, tabView2, 15@15, Font(Font.available("Arial") ? Font.defaultSansFace, 10, true));
 			portRestrictor.action_({ |bt|
 				switch(bt.value.asBoolean,
 					true, {
@@ -627,7 +627,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			deviceListMenu = PopUpMenu(tabView2, flow2.bounds.width/2-40@15)
 				.items_(["select device..."])
-				.font_(Font("Arial", 10))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 				.action_({ |m|
 					cmdListMenu.items_(["command-names..."]);
 					thisCmdNames = [nil];
@@ -661,7 +661,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			cmdListMenu = PopUpMenu(tabView2, flow2.bounds.width/2-11@15)
 				.items_(["command-names..."])
-				.font_(Font("Arial", 10))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 				.mouseDownAction_({ |m|
 					if(deviceDropDown.value > 0 and:{ deviceListMenu.value == 0 }, {
 						cmdPairs = [];
@@ -836,7 +836,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 
 			mappingSelect = PopUpMenu(tabView2, flow2.bounds.width-15@20)
-				.font_(Font("Arial", 12))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 12))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
 					widget.setOscMapping(ms.item, slot);
@@ -1065,8 +1065,8 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 	amendActionsList { |widget, addRemove, name, action, slot, active|
 
-		var staticTextFont = Font("Arial", 9.4);
-		var textFieldFont = Font("Andale Mono", 9);
+		var staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 9.4);
+		var textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 9);
 		var actTop;
 
 		if(widget.class != CVWidgetMS, {

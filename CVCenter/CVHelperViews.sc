@@ -29,8 +29,8 @@ CVMidiEditGroup {
 		var flow, thisBounds, thisSlot;
 		var margs, msrc="source", mchan="chan", mctrl="ctrl";
 		var wcm, editor, tabIndex;
-		var staticTextFont = Font("Arial", 8.5);
-		var textFieldFont = Font("Andale Mono", 7);
+		var staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 8.5);
+		var textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 7);
 		var slotText = "";
 
 		if(bounds.class == Rect, { thisBounds = bounds });

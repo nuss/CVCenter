@@ -228,3 +228,11 @@
 		^nil;
 	}
 }
+
++Font {
+
+	*available { |name|
+		^Font.availableFonts.detect(_ == name)
+	}
+
+}

@@ -450,7 +450,7 @@ CVCenter {
 						["", Color.white, Color.white],
 						["X", Color.black, Color.white],
 					])
-					.font_(Font("Arial Black", 10, true))
+					.font_(Font(Font.available("Arial Black") ? Font.defaultSansFace, 10, true))
 				;
 				if(active, { cBox.value_(1) }, { cBox.value_(0) });
 			}, {
@@ -494,7 +494,7 @@ CVCenter {
 				.resize_(5)
 				.tabHeight_(15)
 				.clickbox_(15)
-				.font_(Font("Arial", 12, true))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 12, true))
 				.dragTabs_(true)
 				.refreshAction_({ |me|
 					if(tabProperties.size == me.tabViews.size, {
@@ -516,7 +516,7 @@ CVCenter {
 			// prefPane.bounds.postln;
 
 			prefBut = Button(prefPane, Point(70, 20))
-				.font_(Font("Helvetica", 10))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 				.states_([["preferences", Color.white, Color(0.3, 0.3, 0.3)]])
 				.action_({ |pb| CVCenterPreferences.dialog })
 				.acceptsMouseOver_(true)
@@ -529,7 +529,7 @@ CVCenter {
 			swFlow.shift(1, 0);
 
 			saveBut = Button(prefPane, Point(70, 20))
-				.font_(Font("Helvetica", 10))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 				.states_([["save setup", Color.white, Color(0.15, 0.15, 0.15)]])
 				.action_({ |sb| this.saveSetup })
 			;
@@ -541,7 +541,7 @@ CVCenter {
 			swFlow.shift(1, 0);
 
 			loadBut = Button(prefPane, Point(70, 20))
-				.font_(Font("Helvetica", 10))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 				.states_([["load setup", Color.white, Color(0.15, 0.15, 0.15)]])
 				.action_({ |pb|
 					CVCenterLoadDialog.new;
@@ -555,7 +555,7 @@ CVCenter {
 			swFlow.shift(1, 0);
 
 			shortcutsBut = Button(prefPane, Point(70, 20))
-				.font_(Font("Helvetica", 10))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 				.states_([["shortcuts", Color.white, Color.red]])
 				.action_({ |scb|
 					CVCenterShortcutsEditor.dialog;
@@ -571,7 +571,7 @@ CVCenter {
 			StaticText(prefPane, Point(140, 20))
 				.string_("enable global shortcuts")
 				.stringColor_(Color.white)
-				.font_(Font("Arial", 12))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 			;
 
 			this.setShortcuts;
@@ -1020,7 +1020,7 @@ CVCenter {
 						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0.0, 0.15)]])
 							.action_({ |b| this.removeAt(key) })
-							.font_(Font("Arial", 10))
+							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 						;
 					);
 					if(widgetStates[key].isNil, {
@@ -1067,7 +1067,7 @@ CVCenter {
 						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0.0, 0.15)]])
 							.action_({ |b| this.removeAt(key) })
-							.font_(Font("Arial", 10))
+							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 						;
 					);
 					if(widgetStates[key].isNil, {
@@ -1106,7 +1106,7 @@ CVCenter {
 						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 							.states_([["remove", Color.white, Color(0.0, 0.15)]])
 							.action_({ |b| this.removeAt(key) })
-							.font_(Font("Arial", 10))
+							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 						;
 					);
 					if(widgetStates[key].isNil, {

@@ -116,10 +116,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			thisCtrlButtonBank[i] = widget.getCtrlButtonBank(i);
 		});
 
-		staticTextFont = Font("Arial", 9.4);
-		staticTextFontBold = Font("Arial", 9.4, true);
+		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 9.4);
+		staticTextFontBold = Font(Font.available("Arial") ? Font.defaultSansFace, 9.4, true);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font("Andale Mono", 9);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 9);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
@@ -747,7 +747,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			deviceDropDown = PopUpMenu(oscView0, oscFlow0.bounds.width-110@15)
 				.items_(["select IP-address... (optional)"])
-				.font_(Font("Arial", 10))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 			;
 
 			if(GUI.id !== \cocoa, {
@@ -761,7 +761,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.align_(\right)
 			;
 
-			portRestrictor = buildCheckbox.(false, oscView0, 15@15, Font("Arial", 10, true));
+			portRestrictor = buildCheckbox.(false, oscView0, 15@15, Font(Font.available("Arial") ? Font.defaultSansFace, 10, true));
 			portRestrictor.action_({ |bt|
 				switch(bt.value.asBoolean,
 					true, {
@@ -785,7 +785,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			deviceListMenu = PopUpMenu(oscView0, oscFlow0.bounds.width/2-46@15)
 				.items_(["select device..."])
-				.font_(Font("Arial", 10))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 				.action_({ |m|
 					cmdListMenu.items_(["command-names..."]);
 					thisCmdNames = [nil];
@@ -819,7 +819,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			cmdListMenu = PopUpMenu(oscView0, oscFlow0.bounds.width/2-11@15)
 				.items_(["command-names..."])
-				.font_(Font("Arial", 10))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 				.mouseDownAction_({ |m|
 					if(deviceDropDown.value > 0 and:{ deviceListMenu.value == 0 }, {
 						cmdPairs = [];
@@ -978,7 +978,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			mappingSelectItems = ["set global mapping...", "linlin", "linexp", "explin", "expexp"];
 
 			mappingSelect = PopUpMenu(oscView0, oscFlow0.bounds.width/2-12@20)
-				.font_(Font("Arial", 12))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 12))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
 					if(ms.value != 0, {
@@ -1400,8 +1400,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 	amendActionsList { |widget, addRemove, name, action, slot, active|
 
-		var staticTextFont = Font("Arial", 9.4);
-		var textFieldFont = Font("Andale Mono", 9);
+		var staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 9.4);
+		var textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 9);
 		var actTop;
 
 		switch(addRemove,

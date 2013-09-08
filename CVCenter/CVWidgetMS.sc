@@ -181,12 +181,12 @@ CVWidgetMS : CVWidget {
 				[name.asString, Color.white, Color.blue],
 				[name.asString, Color.black, Color.yellow],
 			])
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.focusColor_(Color.green)
 		;
 		nameField = TextView(parent, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.string_("Add some notes if you like")
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
@@ -234,7 +234,7 @@ CVWidgetMS : CVWidget {
 		nextY = nextY+2+1;
 
 		numVal = TextView(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
-			.string_(widgetCV.value.asCompileString).font_(Font("Arial", 9.5))
+			.string_(widgetCV.value.asCompileString).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9.5))
 			.keyDownAction_({ |nv, char, modifiers, unicode, keycode|
 				if(char == $\r and:{ modifiers == 131072 }, {
 					if(nv.string.interpret.class == Array and:{
@@ -252,7 +252,7 @@ CVWidgetMS : CVWidget {
 			.states_([
 				["MIDI"+"("++numMidiResponders++"/"++msSize++")", stringColor, background]
 			])
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.focusColor_(Color.green)
 			.action_({ |mb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
@@ -308,7 +308,7 @@ CVWidgetMS : CVWidget {
 			.states_([
 				["OSC"+"("++numOscResponders++"/"++msSize++")", stringColor, background]
 			])
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.focusColor_(Color.green)
 			.action_({ |oscb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
@@ -354,7 +354,7 @@ CVWidgetMS : CVWidget {
 			.states_([
 				["Spec", Color.white, Color(1.0, 0.3)]
 			])
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.focusColor_(Color.green)
 			.action_({ |spb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
@@ -373,7 +373,7 @@ CVWidgetMS : CVWidget {
 			.states_([
 				["Actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)]
 			])
-			.font_(Font("Arial", 9))
+			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.focusColor_(Color.green)
 			.action_({ |spb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {

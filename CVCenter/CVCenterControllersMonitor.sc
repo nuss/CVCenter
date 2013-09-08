@@ -28,7 +28,7 @@ CVCenterControllersMonitor {
 		var oscOrder, orderedOscCtrlrs;
 		var labelColors, labelStringColors, tabView0, tabView1, flow0, flow1;
 		var thisFocus, tmp;
-		var staticTextFont = Font("Arial", 10);
+		var staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 10);
 		var staticTextColor = Color(0.2, 0.2, 0.2);
 
 		if(focus.isNil, { thisFocus = 0 }, { thisFocus = focus });
@@ -51,7 +51,7 @@ CVCenterControllersMonitor {
 				.alwaysOnTop_(false)
 				.resize_(5)
 				.tabHeight_(17)
-				.font_(Font("Arial", 12, true))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 12, true))
 				.dragTabs_(false)
 			;
 

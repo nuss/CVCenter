@@ -30,10 +30,10 @@ CVCenterShortcutsEditor {
 			cBox;
 		};
 
-		tabFont = Font("Arial", 12, true);
-		staticTextFont = Font("Arial", 12 * fFact);
+		tabFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12, true);
+		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12 * fFact);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font("Andale Mono", 12);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 12);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 		tabsBg = Color(0.8, 0.8, 0.8);
@@ -83,13 +83,13 @@ CVCenterShortcutsEditor {
 
 			Button(saveCancel, saveCancelFlow.bounds.width/2-10@23)
 				.states_([["Cancel", Color.black, Color.white]])
-				.font_(Font("Arial", 14, true))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 14, true))
 				.action_({ window.close })
 			;
 
 			Button(saveCancel, saveCancelFlow.indentedRemaining.width@23)
 				.states_([["set shortcuts", Color.white, Color.red]])
-				.font_(Font("Arial", 14, true))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 14, true))
 				.action_({
 					KeyDownActionsEditor.cachedScrollViewSC !? {
 						ScrollView.globalKeyDownAction_(KeyDownActionsEditor.cachedScrollViewSC);

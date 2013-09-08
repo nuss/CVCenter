@@ -30,10 +30,10 @@ CVCenterLoadDialog {
 
 		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
 
-		staticTextFont = Font("Arial", 12 * fFact);
-		staticTextFontBold = Font("Arial", 12 * fFact, true);
+		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12 * fFact);
+		staticTextFontBold = Font(Font.available("Arial") ? Font.defaultSansFace, 12 * fFact, true);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font("Andale Mono", 12);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 12);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
@@ -161,7 +161,7 @@ CVCenterLoadDialog {
 
 			midiFlow.nextLine.shift(15, 0);
 
-			midiInitBut = Button(midiBg, 60@15).font_(Font("Arial", 9, true));
+			midiInitBut = Button(midiBg, 60@15).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9, true));
 
 			if(MIDIClient.initialized, {
 				midiInitBut.states_([
@@ -200,7 +200,7 @@ CVCenterLoadDialog {
 			});
 
 			midiSourceSelect = PopUpMenu(midiBg, midiFlow.indentedRemaining.width@15)
-				.font_(Font("Arial", 9))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 				.items_(["select device port..."])
 				.action_({ |dd|
 					if(dd.value != 0, {
@@ -359,7 +359,7 @@ CVCenterLoadDialog {
 			oscFlow.nextLine.shift(15, 0);
 
 			oscIPSelect = PopUpMenu(oscBg, 130@15)
-				.font_(Font("Arial", 9))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 				.items_(["select IP-address..."])
 				.mouseDownAction_({ |m|
 					if(restrictToPort.value.asBoolean, {
@@ -383,7 +383,7 @@ CVCenterLoadDialog {
 
 			textRestrictToPort = StaticText(oscBg, 60@15)
 				.string_("restrict to port")
-				.font_(Font("Arial", 9))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 				.align_(\right)
 			;
 
@@ -426,13 +426,13 @@ CVCenterLoadDialog {
 
 			cancelBut = Button(window.view, flow.bounds.width.div(2)-8@flow.indentedRemaining.height)
 				.states_([["Cancel", Color.black, Color.white]])
-				.font_(Font("Arial", 14, true))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 14, true))
 				.action_({ |b| window.close })
 			;
 
 			loadBut = Button(window.view, flow.indentedRemaining.width@flow.indentedRemaining.height)
 				.states_([["Load Setup", Color.white, Color.red]])
-				.font_(Font("Arial", 14, true))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 14, true))
 				.action_({ |b|
 					if(loadOscResponders.value.asBoolean, {
 						if(oscIPSelect.value == 0, {
