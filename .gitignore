@@ -4,3 +4,7 @@ HelpSource/Classes/*.txt
 OSCCommands
 *.tmproj
 CVCenterPreferences
+CVCenterShortcuts
+globalShortcuts
+keyCodesAndModsOSX
+keyCodesAndModsLinux
