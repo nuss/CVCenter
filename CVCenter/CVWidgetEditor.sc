@@ -1055,6 +1055,17 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					)
 				})
 			;
+
+			switch(widget.class,
+				CVWidget2D, {
+					widget.editor[slot] = this;
+					// widget.guiEnv[slot].editor = widget.editor[slot];
+				},
+				CVWidgetMS, {
+					widget.editor.editors[slot] = this;
+				},
+				{ widget.editor = this }
+			)
 		});
 
 		// thisEditor.window.front(tab);

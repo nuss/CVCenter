@@ -93,9 +93,9 @@ CVWidgetKnob : CVWidget {
 
 		cvcGui ?? {
 			parent.onClose_({
-				if(editor.notNil, {
-					if(editor.isClosed.not, {
-						editor.close;
+				if(this.editor.notNil, {
+					if(this.editor.isClosed.not, {
+						this.editor.close;
 					}, {
 						if(AbstractCVWidgetEditor.allEditors.notNil and:{
 							AbstractCVWidgetEditor.allEditors[name.asSymbol].notNil;
@@ -182,11 +182,10 @@ CVWidgetKnob : CVWidget {
 			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 			.action_({ |btn|
-				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, name, 0);
-					guiEnv.editor = editor;
+				if(this.editor.isNil or:{ this.editor.isClosed }, {
+					CVWidgetEditor(this, name, 0);
 				}, {
-					editor.front(0)
+					this.editor.front(0)
 				});
 				wdgtControllersAndModels.oscDisplay.model.value_(
 					wdgtControllersAndModels.oscDisplay.model.value;
@@ -204,11 +203,10 @@ CVWidgetKnob : CVWidget {
 			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 			.states_([["MIDI", stringColor, background]])
 			.action_({ |ms|
-				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, name, 1);
-					guiEnv.editor = editor;
+				if(this.editor.isNil or:{ this.editor.isClosed }, {
+					CVWidgetEditor(this, name, 1);
 				}, {
-					editor.front(1)
+					this.editor.front(1)
 				});
 				wdgtControllersAndModels.oscDisplay.model.value_(
 					wdgtControllersAndModels.oscDisplay.model.value;
@@ -347,17 +345,16 @@ CVWidgetKnob : CVWidget {
 				["edit OSC", stringColor, background]
 			])
 			.action_({ |oscb|
-				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, name, 2);
-					guiEnv.editor = editor;
+				if(this.editor.isNil or:{ this.editor.isClosed }, {
+					CVWidgetEditor(this, name, 2);
 				}, {
-					editor.front(2)
+					this.editor.front(2)
 				});
-				editor.calibNumBoxes !? {
-					wdgtControllersAndModels.mapConstrainterLo.connect(editor.calibNumBoxes.lo);
-					editor.calibNumBoxes.lo.value_(wdgtControllersAndModels.oscInputRange.model.value[0]);
-					wdgtControllersAndModels.mapConstrainterHi.connect(editor.calibNumBoxes.hi);
-					editor.calibNumBoxes.hi.value_(wdgtControllersAndModels.oscInputRange.model.value[1]);
+				this.editor.calibNumBoxes !? {
+					wdgtControllersAndModels.mapConstrainterLo.connect(this.editor.calibNumBoxes.lo);
+					this.editor.calibNumBoxes.lo.value_(wdgtControllersAndModels.oscInputRange.model.value[0]);
+					wdgtControllersAndModels.mapConstrainterHi.connect(this.editor.calibNumBoxes.hi);
+					this.editor.calibNumBoxes.hi.value_(wdgtControllersAndModels.oscInputRange.model.value[1]);
 				};
 				wdgtControllersAndModels.oscDisplay.model.value_(
 					wdgtControllersAndModels.oscDisplay.model.value;
@@ -416,11 +413,10 @@ CVWidgetKnob : CVWidget {
 				["actions ("++this.wdgtActions.select({ |v| v.asArray[0][1] == true }).size++"/"++this.wdgtActions.size++")", Color(0.08, 0.09, 0.14), Color(0.32, 0.67, 0.76)],
 			])
 			.action_({ |ab|
-				if(editor.isNil or:{ editor.isClosed }, {
-					editor = CVWidgetEditor(this, name, 3);
-					guiEnv.editor = editor;
+				if(this.editor.isNil or:{ this.editor.isClosed }, {
+					CVWidgetEditor(this, name, 3);
 				}, {
-					editor.front(3)
+					this.editor.front(3)
 				});
 			})
 			.focusColor_(Color.green)
@@ -466,7 +462,7 @@ CVWidgetKnob : CVWidget {
 			actionsBut
 		];
 		guiEnv = (
-			editor: editor,
+			editor: this.editor,
 			calibBut: calibBut,
 			actionsBut: actionsBut,
 			knob: knob,

@@ -1184,9 +1184,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 							if(widget.editor.editors[sindex].isNil or:{
 								widget.editor.editors[sindex].isClosed
 							}, {
-								widget.editor.editors[sindex] = CVWidgetEditor(
-									widget, widget.label.states[0][0], 1, sindex
-								);
+								CVWidgetEditor(widget, widget.label.states[0][0], 1, sindex);
 							}, {
 								widget.editor.editors[sindex].front(1)
 							});
@@ -1347,52 +1345,57 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			window.onClose_({
 				msEditorEnv.specsListSpecs = specsListSpecs;
 				msEditorEnv.specsListItems = specsList.items;
-			})
-		});
+			});
 
-		OSCCommands.collectTempIPsAndCmds;
-		deviceDropDown
-			.mouseDownAction_({ |dd|
-				dropDownIPs = OSCCommands.tempIPsAndCmds.keys.asArray;
-				if(portRestrictor.value.asBoolean, {
-					ddIPsItems = dropDownIPs;
-				}, {
-					ddIPsItems = dropDownIPs.collect({ |addr| addr.asString.split($:)[0].asSymbol });
-				});
-				dd.items_([dd.items[0]]);
-				ddIPsItems.do({ |it|
-					if(dd.items.includesEqual(it).not, {
-						dd.items_(dd.items.add(it));
-					})
-				})
-			})
-			.action_({ |dd|
-				if(dd.value != 0, { deviceListMenu.value_(0) });
-				cmdPairs = [];
-				if(portRestrictor.value.asBoolean, {
-					OSCCommands.tempIPsAndCmds[dd.items[dd.value]].pairsDo({ |cmd, size|
-						cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
-					})
-				}, {
-					OSCCommands.tempIPsAndCmds.pairsDo({ |k, v|
-						if(k.asString.contains(dd.items[dd.value].asString), {
-							v.pairsDo({ |cmd, size|
-								cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
-							})
+			OSCCommands.collectTempIPsAndCmds;
+			deviceDropDown
+				.mouseDownAction_({ |dd|
+					dropDownIPs = OSCCommands.tempIPsAndCmds.keys.asArray;
+					if(portRestrictor.value.asBoolean, {
+						ddIPsItems = dropDownIPs;
+					}, {
+						ddIPsItems = dropDownIPs.collect({ |addr| addr.asString.split($:)[0].asSymbol });
+					});
+					dd.items_([dd.items[0]]);
+					ddIPsItems.do({ |it|
+						if(dd.items.includesEqual(it).not, {
+							dd.items_(dd.items.add(it));
 						})
 					})
-				});
-				cmdListMenu.items_(
-					[cmdListMenu.items[0]] ++ cmdPairs.sort;
-				)
-			})
-		;
+				})
+				.action_({ |dd|
+					if(dd.value != 0, { deviceListMenu.value_(0) });
+					cmdPairs = [];
+					if(portRestrictor.value.asBoolean, {
+						OSCCommands.tempIPsAndCmds[dd.items[dd.value]].pairsDo({ |cmd, size|
+							cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
+						})
+					}, {
+						OSCCommands.tempIPsAndCmds.pairsDo({ |k, v|
+							if(k.asString.contains(dd.items[dd.value].asString), {
+								v.pairsDo({ |cmd, size|
+									cmdPairs = cmdPairs.add(cmd.asString+"("++size++")");
+								})
+							})
+						})
+					});
+					cmdListMenu.items_(
+						[cmdListMenu.items[0]] ++ cmdPairs.sort;
+					)
+				})
+			;
+
+			widget.editor.msEditor = this;
+			widget.guiEnv.msEditor = widget.editor.msEditor;
+		});
+
 
 		// tab !? {
 		// 	thisEditor.tabs.focus(tab);
 		// 	tabs.views[tab].background_(Color(0.8, 0.8, 0.8, 1.0));
 		// };
 		// thisEditor.window.front;
+
 		this.front(tab);
 	}
 

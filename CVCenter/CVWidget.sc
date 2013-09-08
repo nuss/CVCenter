@@ -26,7 +26,7 @@ CVWidget {
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
 	var visibleGuiEls, allGuiEls, <focusElements, isCVCWidget = false;
 	var <widgetBg, <label, <nameField, wdgtInfo; // elements contained in any kind of CVWidget
-	var widgetXY, widgetProps, <editor;
+	var widgetXY, widgetProps, <>editor;
 	var <wdgtControllersAndModels, <midiOscEnv;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
@@ -102,6 +102,34 @@ CVWidget {
 				(
 					func: scFunc,
 					keyCode: KeyDownActions.keyCodes['arrow right'],
+					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
+					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+				)
+			);
+			scFunc =
+			"// open a CVWidget(MS)Editor and focus its MIDI tab
+			{ |view|
+				\"m was hit\".postln;
+				block { |break|
+					CVCenter.all.keys.do({ |key|
+						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
+							break.value(
+								switch(CVCenter.cvWidgets[key].class,
+									CVWidgetMS, { CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 1) },
+									CVWidget2D, { },
+									{ CVWidgetEditor(CVCenter.cvWidgets[key], key, 1) }
+								)
+							)
+						}
+					})
+				};
+				true;
+			}";
+			this.shortcuts.put(
+				'alt + o',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes($m),
 					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
 					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
 				)
@@ -1016,16 +1044,16 @@ CVWidget {
 			CVWidget2D, {
 				thisSlot = slot.asSymbol;
 				wcm = wdgtControllersAndModels[thisSlot];
-				thisEditor = editor[thisSlot];
+				thisEditor = this.editor[thisSlot];
 			},
 			CVWidgetMS, {
 				thisSlot = slot.asInt;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
-				thisEditor = editor.editors[thisSlot];
+				thisEditor = this.editor.editors[thisSlot];
 			},
 			{
 				wcm = wdgtControllersAndModels;
-				thisEditor = editor;
+				thisEditor = this.editor;
 			}
 		);
 

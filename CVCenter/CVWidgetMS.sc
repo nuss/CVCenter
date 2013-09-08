@@ -256,8 +256,7 @@ CVWidgetMS : CVWidget {
 			.focusColor_(Color.green)
 			.action_({ |mb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
-					editor.msEditor = CVWidgetMSEditor(this, name, 1);
-					guiEnv.msEditor = editor.msEditor;
+					CVWidgetMSEditor(this, name, 1);
 				}, {
 					editor.msEditor.front(1)
 				});
@@ -312,8 +311,7 @@ CVWidgetMS : CVWidget {
 			.focusColor_(Color.green)
 			.action_({ |oscb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
-					editor.msEditor = CVWidgetMSEditor(this, name, 2);
-					guiEnv.msEditor = editor.msEditor;
+					CVWidgetMSEditor(this, name, 2);
 				}, {
 					editor.msEditor.front(2)
 				});
@@ -358,8 +356,7 @@ CVWidgetMS : CVWidget {
 			.focusColor_(Color.green)
 			.action_({ |spb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
-					editor.msEditor = CVWidgetMSEditor(this, name, 0);
-					guiEnv.msEditor = editor.msEditor;
+					CVWidgetMSEditor(this, name, 0);
 				}, {
 					editor.msEditor.front(0)
 				})
@@ -377,8 +374,7 @@ CVWidgetMS : CVWidget {
 			.focusColor_(Color.green)
 			.action_({ |spb|
 				if(editor.msEditor.isNil or:{ editor.msEditor.isClosed }, {
-					editor.msEditor = CVWidgetMSEditor(this, name, 3);
-					guiEnv.msEditor = editor.msEditor;
+					CVWidgetMSEditor(this, name, 3);
 				}, {
 					editor.msEditor.front(3)
 				})
