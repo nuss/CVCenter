@@ -109,14 +109,15 @@ CVWidget {
 			scFunc =
 			"// open a CVWidget(MS)Editor and focus its MIDI tab
 			{ |view|
-				\"m was hit\".postln;
 				block { |break|
 					CVCenter.all.keys.do({ |key|
 						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
 							break.value(
 								switch(CVCenter.cvWidgets[key].class,
 									CVWidgetMS, { CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 1) },
-									CVWidget2D, { },
+									CVWidget2D, { #[lo, hi].do({ |slot|
+										CVWidgetEditor(CVCenter.cvWidgets[key], key, 1, slot)
+									})},
 									{ CVWidgetEditor(CVCenter.cvWidgets[key], key, 1) }
 								)
 							)
@@ -126,14 +127,101 @@ CVWidget {
 				true;
 			}";
 			this.shortcuts.put(
-				'alt + o',
+				'shift + m',
 				(
 					func: scFunc,
-					keyCode: KeyDownActions.keyCodes($m),
-					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
-					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+					keyCode: KeyDownActions.keyCodes[$m],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
 				)
+			);
+			scFunc =
+			"// open a CVWidget(MS)Editor and focus its Spec tab
+			{ |view|
+				block { |break|
+					CVCenter.all.keys.do({ |key|
+						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
+							break.value(
+								switch(CVCenter.cvWidgets[key].class,
+									CVWidgetMS, { CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 0) },
+									CVWidget2D, { #[lo, hi].do({ |slot|
+										CVWidgetEditor(CVCenter.cvWidgets[key], key, 0, slot)
+									})},
+									{ CVWidgetEditor(CVCenter.cvWidgets[key], key, 0) }
+								)
+							)
+						}
+					})
+				};
+				true;
+			}";
+			this.shortcuts.put(
+				'shift + s',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$s],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
+				)
+			);
+			scFunc =
+			"// open a CVWidget(MS)Editor and focus its OSC tab
+			{ |view|
+				block { |break|
+					CVCenter.all.keys.do({ |key|
+						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
+							break.value(
+								switch(CVCenter.cvWidgets[key].class,
+									CVWidgetMS, { CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 2) },
+									CVWidget2D, { #[lo, hi].do({ |slot|
+										CVWidgetEditor(CVCenter.cvWidgets[key], key, 2, slot)
+									})},
+									{ CVWidgetEditor(CVCenter.cvWidgets[key], key, 2) }
+								)
+							)
+						}
+					})
+				};
+				true;
+			}";
+			this.shortcuts.put(
+				'shift + o',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$o],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
+				)
+			);
+			scFunc =
+			"// open a CVWidget(MS)Editor and focus its Actions tab
+			{ |view|
+			block { |break|
+			CVCenter.all.keys.do({ |key|
+			if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
+			break.value(
+			switch(CVCenter.cvWidgets[key].class,
+			CVWidgetMS, { CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 3) },
+			CVWidget2D, { #[lo, hi].do({ |slot|
+			CVWidgetEditor(CVCenter.cvWidgets[key], key, 3, slot)
+			})},
+			{ CVWidgetEditor(CVCenter.cvWidgets[key], key, 3) }
 			)
+			)
+			}
+			})
+			};
+			true;
+			}";
+			this.shortcuts.put(
+				'shift + a',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$a],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
+				)
+			);
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvwidget];
 		})
@@ -3062,6 +3150,7 @@ CVWidget {
 			v.keyDownAction_(nil);
 
 			this.class.shortcuts.do({ |keyDowns|
+				keyDowns.postln;
 				v.keyDownAction_(
 					v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
 						var thisMod, thisArrMod;
@@ -3094,7 +3183,7 @@ CVWidget {
 								if(keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)
 								}, {
-									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
+									"keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(keyDowns.keyCode, keycode, thisMod, thisArrMod);
 									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
 								})
 							}
