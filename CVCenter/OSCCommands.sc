@@ -275,7 +275,10 @@ OSCCommands {
 		var thisDeviceName, thisCmds, cmdsPath;
 
 		deviceName !? { thisDeviceName = deviceName.asSymbol };
-		cmdsPath = this.filenameSymbol.asString.dirname +/+ "OSCCommands";
+		if(File.exists(this.filenameSymbol.asString.dirname +/+ "OSCCommands")) {
+			cmdsPath = this.filenameSymbol.asString.dirname +/+ "OSCCommands";
+		} { ^nil };
+
 		thisCmds = Object.readArchive(cmdsPath);
 
 		if(deviceName.notNil, { ^thisCmds[thisDeviceName] }, { ^thisCmds });
@@ -283,17 +286,21 @@ OSCCommands {
 
 	*clearCmdsAt { |deviceName|
 		var cmdsPath, cmds;
-		cmdsPath = this.filenameSymbol.asString.dirname +/+ "OSCCommands";
-		cmds = Object.readArchive(cmdsPath);
-		cmds.removeAt(deviceName.asSymbol);
-		cmds.writeArchive(cmdsPath);
+		if(File.exists(this.filenameSymbol.asString.dirname +/+ "OSCCommands")) {
+			cmdsPath = this.filenameSymbol.asString.dirname +/+ "OSCCommands";
+			cmds = Object.readArchive(cmdsPath);
+			cmds.removeAt(deviceName.asSymbol);
+			cmds.writeArchive(cmdsPath);
+		}
 	}
 
 	*storedDevices {
 		var cmdsPath, cmds;
-		cmdsPath = this.filenameSymbol.asString.dirname +/+ "OSCCommands";
-		cmds = Object.readArchive(cmdsPath);
-		^cmds.keys;
+		if(File.exists(this.filenameSymbol.asString.dirname +/+ "OSCCommands")) {
+			cmdsPath = this.filenameSymbol.asString.dirname +/+ "OSCCommands";
+			cmds = Object.readArchive(cmdsPath);
+			^cmds.keys;
+		} { ^nil }
 	}
 
 }
