@@ -107,35 +107,6 @@ CVWidget {
 				)
 			);
 			scFunc =
-			"// open a CVWidget(MS)Editor and focus its MIDI tab
-			{ |view|
-				block { |break|
-					CVCenter.all.keys.do({ |key|
-						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
-							break.value(
-								switch(CVCenter.cvWidgets[key].class,
-									CVWidgetMS, { CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 1) },
-									CVWidget2D, { #[lo, hi].do({ |slot|
-										CVWidgetEditor(CVCenter.cvWidgets[key], key, 1, slot)
-									})},
-									{ CVWidgetEditor(CVCenter.cvWidgets[key], key, 1) }
-								)
-							)
-						}
-					})
-				};
-				true;
-			}";
-			this.shortcuts.put(
-				'shift + m',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$m],
-					modifierQt: KeyDownActions.modifiersQt[\shift],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
-				)
-			);
-			scFunc =
 			"// open a CVWidget(MS)Editor and focus its Spec tab
 			{ |view|
 				block { |break|
@@ -143,11 +114,33 @@ CVWidget {
 						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
 							break.value(
 								switch(CVCenter.cvWidgets[key].class,
-									CVWidgetMS, { CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 0) },
+									CVWidgetMS, {
+										if(CVCenter.cvWidgets[key].editor.msEditor.isNil or:{
+											CVCenter.cvWidgets[key].editor.msEditor.isClosed }
+										) {
+											CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 0)
+										} {
+											CVCenter.cvWidgets[key].editor.msEditor.front(0)
+										}
+									},
 									CVWidget2D, { #[lo, hi].do({ |slot|
-										CVWidgetEditor(CVCenter.cvWidgets[key], key, 0, slot)
+										if(CVCenter.cvWidgets[key].editor[slot].isNil or:{
+											CVCenter.cvWidgets[key].editor[slot].isClosed }
+										) {
+											CVWidgetEditor(CVCenter.cvWidgets[key], key, 0, slot)
+										} {
+											CVCenter.cvWidgets[key].editor[slot].front(0)
+										}
 									})},
-									{ CVWidgetEditor(CVCenter.cvWidgets[key], key, 0) }
+									{
+										if(CVCenter.cvWidgets[key].editor.isNil or:{
+											CVCenter.cvWidgets[key].editor.isClosed }
+										) {
+											CVWidgetEditor(CVCenter.cvWidgets[key], key, 0)
+										} {
+											CVCenter.cvWidgets[key].editor.front(0)
+										}
+									}
 								)
 							)
 						}
@@ -165,6 +158,57 @@ CVWidget {
 				)
 			);
 			scFunc =
+			"// open a CVWidget(MS)Editor and focus its MIDI tab
+			{ |view|
+				block { |break|
+					CVCenter.all.keys.do({ |key|
+						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
+							break.value(
+								switch(CVCenter.cvWidgets[key].class,
+									CVWidgetMS, {
+										if(CVCenter.cvWidgets[key].editor.msEditor.isNil or:{
+											CVCenter.cvWidgets[key].editor.msEditor.isClosed }
+										) {
+											CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 1)
+										} {
+											CVCenter.cvWidgets[key].editor.msEditor.front(1)
+										}
+									},
+									CVWidget2D, { #[lo, hi].do({ |slot|
+										if(CVCenter.cvWidgets[key].editor[slot].isNil or:{
+											CVCenter.cvWidgets[key].editor[slot].isClosed }
+										) {
+											CVWidgetEditor(CVCenter.cvWidgets[key], key, 1, slot)
+										} {
+											CVCenter.cvWidgets[key].editor[slot].front(1)
+										}
+									})},
+									{
+										if(CVCenter.cvWidgets[key].editor.isNil or:{
+											CVCenter.cvWidgets[key].editor.isClosed }
+										) {
+											CVWidgetEditor(CVCenter.cvWidgets[key], key, 1)
+										} {
+											CVCenter.cvWidgets[key].editor.front(1)
+										}
+									}
+								)
+							)
+						}
+					})
+				};
+				true;
+			}";
+			this.shortcuts.put(
+				'shift + m',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$m],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
+				)
+			);
+			scFunc =
 			"// open a CVWidget(MS)Editor and focus its OSC tab
 			{ |view|
 				block { |break|
@@ -172,11 +216,33 @@ CVWidget {
 						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
 							break.value(
 								switch(CVCenter.cvWidgets[key].class,
-									CVWidgetMS, { CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 2) },
+									CVWidgetMS, {
+										if(CVCenter.cvWidgets[key].editor.msEditor.isNil or:{
+											CVCenter.cvWidgets[key].editor.msEditor.isClosed }
+										) {
+											CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 2)
+										} {
+											CVCenter.cvWidgets[key].editor.msEditor.front(2)
+										}
+									},
 									CVWidget2D, { #[lo, hi].do({ |slot|
-										CVWidgetEditor(CVCenter.cvWidgets[key], key, 2, slot)
+										if(CVCenter.cvWidgets[key].editor[slot].isNil or:{
+											CVCenter.cvWidgets[key].editor[slot].isClosed }
+										) {
+											CVWidgetEditor(CVCenter.cvWidgets[key], key, 2, slot)
+										} {
+											CVCenter.cvWidgets[key].editor[slot].front(2)
+										}
 									})},
-									{ CVWidgetEditor(CVCenter.cvWidgets[key], key, 2) }
+									{
+										if(CVCenter.cvWidgets[key].editor.isNil or:{
+											CVCenter.cvWidgets[key].editor.isClosed }
+										) {
+											CVWidgetEditor(CVCenter.cvWidgets[key], key, 2)
+										} {
+											CVCenter.cvWidgets[key].editor.front(2)
+										}
+									}
 								)
 							)
 						}
@@ -196,28 +262,50 @@ CVWidget {
 			scFunc =
 			"// open a CVWidget(MS)Editor and focus its Actions tab
 			{ |view|
-			block { |break|
-			CVCenter.all.keys.do({ |key|
-			if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
-			break.value(
-			switch(CVCenter.cvWidgets[key].class,
-			CVWidgetMS, { CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 3) },
-			CVWidget2D, { #[lo, hi].do({ |slot|
-			CVWidgetEditor(CVCenter.cvWidgets[key], key, 3, slot)
-			})},
-			{ CVWidgetEditor(CVCenter.cvWidgets[key], key, 3) }
-			)
-			)
-			}
-			})
-			};
-			true;
+				block { |break|
+					CVCenter.all.keys.do({ |key|
+						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
+							break.value(
+								switch(CVCenter.cvWidgets[key].class,
+									CVWidgetMS, {
+										if(CVCenter.cvWidgets[key].editor.msEditor.isNil or:{
+											CVCenter.cvWidgets[key].editor.msEditor.isClosed }
+										) {
+											CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 3)
+										} {
+											CVCenter.cvWidgets[key].editor.msEditor.front(3)
+										}
+									},
+									CVWidget2D, { #[lo, hi].do({ |slot|
+										if(CVCenter.cvWidgets[key].editor[slot].isNil or:{
+											CVCenter.cvWidgets[key].editor[slot].isClosed }
+										) {
+											CVWidgetEditor(CVCenter.cvWidgets[key], key, 3, slot)
+										} {
+											CVCenter.cvWidgets[key].editor[slot].front(3)
+										}
+									})},
+									{
+										if(CVCenter.cvWidgets[key].editor.isNil or:{
+											CVCenter.cvWidgets[key].editor.isClosed }
+										) {
+											CVWidgetEditor(CVCenter.cvWidgets[key], key, 3)
+										} {
+											CVCenter.cvWidgets[key].editor.front(3)
+										}
+									}
+								)
+							)
+						}
+					})
+				};
+				true;
 			}";
 			this.shortcuts.put(
-				'shift + a',
+				'shift + f',
 				(
 					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$a],
+					keyCode: KeyDownActions.keyCodes[$f],
 					modifierQt: KeyDownActions.modifiersQt[\shift],
 					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
 				)
@@ -3150,7 +3238,7 @@ CVWidget {
 			v.keyDownAction_(nil);
 
 			this.class.shortcuts.do({ |keyDowns|
-				keyDowns.postln;
+				// keyDowns.postln;
 				v.keyDownAction_(
 					v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
 						var thisMod, thisArrMod;
@@ -3183,7 +3271,7 @@ CVWidget {
 								if(keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)
 								}, {
-									"keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(keyDowns.keyCode, keycode, thisMod, thisArrMod);
+									// "keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(keyDowns.keyCode, keycode, thisMod, thisArrMod);
 									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
 								})
 							}
