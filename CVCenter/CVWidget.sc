@@ -3266,7 +3266,13 @@ CVWidget {
 									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
 								});
 							}
-							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+							{
+								char !== 0.asAscii and:{
+									modifiers != modsDict[\none] and:{
+										modifiers != arrModsDict[\none]
+									}
+								}
+							} {
 								// "some modifier: %\n".postf(modifiers);
 								if(keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)

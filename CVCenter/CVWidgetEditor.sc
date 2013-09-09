@@ -235,7 +235,13 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 									thisMod.isNil and:{ thisArrMod.isNil }
 								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) });
 							}
-							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+							{
+								char !== 0.asAscii and:{
+									modifiers != modsDict[\none] and:{
+										modifiers != arrModsDict[\none]
+									}
+								}
+							} {
 								// "some modifier...".postln;
 								if(keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)

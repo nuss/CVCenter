@@ -776,7 +776,13 @@ CVCenter {
 									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
 								});
 							}
-							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+							{
+								char !== 0.asAscii and:{
+									modifiers != modsDict[\none] and:{
+										modifiers != arrModsDict[\none]
+									}
+								}
+							} {
 								// "some modifier: %\n".postf(modifiers);
 								if(keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)
@@ -1685,7 +1691,7 @@ CVCenter {
 			path, addToExisting=false,
 			autoConnectOSC=true, oscConnectToIP=true, oscRestrictToPort=false, activateCalibration=false, resetCalibration=false,
 			autoConnectMIDI=true, midiConnectSrc=false, midiConnectChannel=false, midiConnectCtrl=true,
-			loadActions=true, midiSrcID, oscIPAddress
+			loadActions=true, midiSrcID, oscIPAddress, loadShortcuts=true
 		|
 		var lib, successFunc;
 
@@ -1935,6 +1941,11 @@ CVCenter {
 					);
 					cvWidgets[key].nameField.string_(v.notes);
 					if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
+
+					if(loadShortcuts, {
+
+					});
+
 					if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
 						CVCenterLoadDialog.window.close;
 					})
