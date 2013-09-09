@@ -3218,7 +3218,7 @@ CVWidget {
 
 	// shortcut support
 	setShortcuts {
-		var modsDict, arrModsDict;
+		var modsDict, arrModsDict, arrowKeys;
 
 		switch(GUI.id,
 			\cocoa, {
@@ -3230,6 +3230,13 @@ CVWidget {
 				arrModsDict = KeyDownActions.arrowsModifiersQt;
 			}
 		);
+
+		arrowKeys = [
+			KeyDownActions.keyCodes['arrow up'],
+			KeyDownActions.keyCodes['arrow down'],
+			KeyDownActions.keyCodes['arrow left'],
+			KeyDownActions.keyCodes['arrow right']
+		];
 
 		// "this.class.shortcuts: %\n".postf(this.class.shortcuts);
 
@@ -3267,7 +3274,7 @@ CVWidget {
 								});
 							}
 							{
-								char !== 0.asAscii and:{
+								(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
 									modifiers != modsDict[\none] and:{
 										modifiers != arrModsDict[\none]
 									}

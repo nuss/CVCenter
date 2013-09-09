@@ -728,7 +728,7 @@ CVCenter {
 	}
 
 	*setShortcuts {
-		var modsDict, arrModsDict;
+		var modsDict, arrModsDict, arrowKeys;
 
 		switch(GUI.id,
 			\cocoa, {
@@ -740,6 +740,13 @@ CVCenter {
 				arrModsDict = KeyDownActions.arrowsModifiersQt;
 			}
 		);
+
+		arrowKeys = [
+			KeyDownActions.keyCodes['arrow up'],
+			KeyDownActions.keyCodes['arrow down'],
+			KeyDownActions.keyCodes['arrow left'],
+			KeyDownActions.keyCodes['arrow right']
+		];
 
 		[tabs.view, tabs.views, prefPane].flat.do({ |v|
 			// reset keyDownAction - it's getting reassigned
@@ -777,7 +784,7 @@ CVCenter {
 								});
 							}
 							{
-								char !== 0.asAscii and:{
+								(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
 									modifiers != modsDict[\none] and:{
 										modifiers != arrModsDict[\none]
 									}
@@ -787,7 +794,7 @@ CVCenter {
 								if(keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)
 								}, {
-									// "keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(keyDowns.keyCode, keycode, thisMod, thisArrMod);
+									// "char: %, keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(char.cs, keyDowns.keyCode, keycode, thisMod, thisArrMod);
 									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
 								})
 							}

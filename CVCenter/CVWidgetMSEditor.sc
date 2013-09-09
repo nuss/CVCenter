@@ -54,7 +54,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var connectWarning;
 		var mouseOverFunc;
 		var numCalibActive;
-		var modsDict, arrModsDict;
+		var modsDict, arrModsDict, arrowKeys ;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -83,6 +83,13 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				arrModsDict = KeyDownActions.arrowsModifiersQt;
 			}
 		);
+
+		arrowKeys = [
+			KeyDownActions.keyCodes['arrow up'],
+			KeyDownActions.keyCodes['arrow down'],
+			KeyDownActions.keyCodes['arrow left'],
+			KeyDownActions.keyCodes['arrow right']
+		];
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
@@ -286,7 +293,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 								})
 							}
 							{
-								char !== 0.asAscii and:{
+								(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
 									modifiers != modsDict[\none] and:{
 										modifiers != arrModsDict[\none]
 									}
