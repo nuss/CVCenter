@@ -189,8 +189,8 @@ AbstractCVWidgetEditor {
 				})
 			}";
 			this.shortcuts.put(
-				\a,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$a])
+				\f,
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$f])
 			);
 			scFunc =
 			"// close the editor

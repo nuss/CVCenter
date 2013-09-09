@@ -781,7 +781,7 @@ CVCenter {
 								if(keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)
 								}, {
-									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
+									// "keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(keyDowns.keyCode, keycode, thisMod, thisArrMod);
 									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
 								})
 							}

@@ -302,10 +302,10 @@ CVWidget {
 				true;
 			}";
 			this.shortcuts.put(
-				'shift + f',
+				'shift + a',
 				(
 					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$f],
+					keyCode: KeyDownActions.keyCodes[$a],
 					modifierQt: KeyDownActions.modifiersQt[\shift],
 					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
 				)
