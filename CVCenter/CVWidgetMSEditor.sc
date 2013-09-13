@@ -266,48 +266,50 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			thisEditor.oscTabs = oscTabs;
 			thisEditor.midiTabs = midiTabs;
 
-			this.class.shortcuts.values.do({ |keyDowns|
-				// keyDowns.postcs;
-				tabs.view.keyDownAction_(
-					tabs.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
-						var thisMod, thisArrMod;
+			this.setShortcuts;
 
-						switch(GUI.id,
-							\cocoa, {
-								thisMod = keyDowns.modifierCocoa;
-								thisArrMod = keyDowns.arrowsModifierCocoa;
-							},
-							\qt, {
-								thisMod = keyDowns.modifierQt;
-								thisArrMod = keyDowns.arrowsModifierQt;
-							}
-						);
-
-						case
-							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-								// "no modifiers".postln;
-								if(keycode == keyDowns.keyCode and:{
-									thisMod.isNil and:{ thisArrMod.isNil }
-								}, {
-									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key)
-								})
-							}
-							{
-								(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
-									modifiers != modsDict[\none] and:{
-										modifiers != arrModsDict[\none]
-									}
-								}
-							} {
-								// "some modifier...".postln;
-								if(keycode == keyDowns.keyCode and:{
-									(modifiers == thisArrMod).or(modifiers == thisMod)
-								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) })
-							}
-						;
-					})
-				)
-			});
+			// this.class.shortcuts.values.do({ |keyDowns|
+			// 	// keyDowns.postcs;
+			// 	tabs.view.keyDownAction_(
+			// 		tabs.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode, key|
+			// 			var thisMod, thisArrMod;
+			//
+			// 			switch(GUI.id,
+			// 				\cocoa, {
+			// 					thisMod = keyDowns.modifierCocoa;
+			// 					thisArrMod = keyDowns.arrowsModifierCocoa;
+			// 				},
+			// 				\qt, {
+			// 					thisMod = keyDowns.modifierQt;
+			// 					thisArrMod = keyDowns.arrowsModifierQt;
+			// 				}
+			// 			);
+			//
+			// 			case
+			// 			{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+			// 				// "no modifiers".postln;
+			// 				if(keycode == keyDowns.keyCode and:{
+			// 					thisMod.isNil and:{ thisArrMod.isNil }
+			// 					}, {
+			// 						keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key)
+			// 				})
+			// 			}
+			// 			{
+			// 				(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
+			// 					modifiers != modsDict[\none] and:{
+			// 						modifiers != arrModsDict[\none]
+			// 					}
+			// 				}
+			// 			} {
+			// 				// "some modifier...".postln;
+			// 				if(keycode == keyDowns.keyCode and:{
+			// 					(modifiers == thisArrMod).or(modifiers == thisMod)
+			// 				}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode, key) })
+			// 			}
+			// 			;
+			// 		})
+			// 	)
+			// });
 
 			maxNum = [
 				widget.getSpec.minval.size,

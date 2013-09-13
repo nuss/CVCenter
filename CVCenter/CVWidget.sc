@@ -149,13 +149,8 @@ CVWidget {
 				true;
 			}";
 			this.shortcuts.put(
-				'shift + s',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$s],
-					modifierQt: KeyDownActions.modifiersQt[\shift],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
-				)
+				\s,
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$s])
 			);
 			scFunc =
 			"// open a CVWidget(MS)Editor and focus its MIDI tab
@@ -200,13 +195,8 @@ CVWidget {
 				true;
 			}";
 			this.shortcuts.put(
-				'shift + m',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$m],
-					modifierQt: KeyDownActions.modifiersQt[\shift],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
-				)
+				\m,
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$m])
 			);
 			scFunc =
 			"// open a CVWidget(MS)Editor and focus its OSC tab
@@ -251,13 +241,8 @@ CVWidget {
 				true;
 			}";
 			this.shortcuts.put(
-				'shift + o',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$o],
-					modifierQt: KeyDownActions.modifiersQt[\shift],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
-				)
+				\o,
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$o])
 			);
 			scFunc =
 			"// open a CVWidget(MS)Editor and focus its Actions tab
@@ -302,14 +287,16 @@ CVWidget {
 				true;
 			}";
 			this.shortcuts.put(
-				'shift + a',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$a],
-					modifierQt: KeyDownActions.modifiersQt[\shift],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
-				)
+				\a,
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$a])
 			);
+			scFunc =
+			"// set focus to the view that contains the widget
+			{ CVCenter.prefPane.focus }";
+			this.shortcuts.put(
+				\esc,
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[\esc])
+			)
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvwidget];
 		})

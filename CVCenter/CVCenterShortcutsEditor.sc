@@ -95,9 +95,11 @@ CVCenterShortcutsEditor {
 						ScrollView.globalKeyDownAction_(KeyDownActionsEditor.cachedScrollViewSC);
 					};
 					CVCenter.shortcuts_(cvCenterEditor.result);
+					CVWidget.shortcuts_(cvWidgetEditor.result);
 					AbstractCVWidgetEditor.shortcuts_(cvWidgetEditorEditor.result);
-					// KeyDownActions.keyCodes_(keyCodesAndModsEditor.result);
 					CVCenter.setShortcuts;
+					CVCenter.cvWidgets.do(_.setShortcuts);
+					AbstractCVWidgetEditor.allEditors.collect(_.editor).do(_.setShortcuts);
 					if(Server.default.serverRunning and:{
 						KeyDownActions.globalShortcutsEnabled;
 					}, {

@@ -17,7 +17,7 @@
 
 CVCenter {
 
-	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, /*<windowStates, */<tabs, prefPane, removeButs;
+	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, /*<windowStates, */<tabs, <prefPane, removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>shortcuts, <scv;
 	classvar <alwaysOnTop=false;
@@ -196,9 +196,9 @@ CVCenter {
 			);
 			scFunc =
 			"// close CVCenterControllersMonitor
-			{ if(CVCenterControllersMonitor.window.notNil.and(
-				CVCenterControllersMonitor.window.isClosed.not)
-			) { CVCenterControllersMonitor.window.close }}";
+			{ if(CVCenterControllersMonitor.window.notNil and:{
+				CVCenterControllersMonitor.window.isClosed.not
+			}) { CVCenterControllersMonitor.window.close }}";
 			this.shortcuts.put(
 				\esc,
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[\esc])
@@ -507,6 +507,10 @@ CVCenter {
 				})
 			;
 
+			tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
+				if(keycode == 9, { prefPane.focus })
+			});
+
 			flow.shift(0, 0);
 
 			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40)).hasBorder_(false);
@@ -748,7 +752,7 @@ CVCenter {
 			KeyDownActions.keyCodes['arrow right']
 		];
 
-		[tabs.view, tabs.views, prefPane].flat.do({ |v|
+		[tabs.views, prefPane].flat.do({ |v|
 			// reset keyDownAction - it's getting reassigned
 
 			v.keyDownAction_(nil);
