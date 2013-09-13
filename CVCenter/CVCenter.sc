@@ -516,7 +516,6 @@ CVCenter {
 			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40)).hasBorder_(false);
 			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(0, 0));
 			prefPane.resize_(8).background_(Color.black);
-
 			// prefPane.bounds.postln;
 
 			prefBut = Button(prefPane, Point(70, 20))
