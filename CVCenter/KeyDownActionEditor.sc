@@ -195,6 +195,8 @@ KeyDownActions {
 						$. -> 				47,
 						$/ -> 				44,
 						\space ->			49,
+						\tab ->				48,
+						\return ->			36,
 						\esc -> 			53,
 						'arrow up' -> 		126,
 						'arrow down' -> 	125,
