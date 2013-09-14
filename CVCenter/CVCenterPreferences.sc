@@ -637,7 +637,7 @@ CVCenterPreferences {
 				args.do({ |val| res.put(val.asSymbol, prefs[val.asSymbol]) });
 			});
 			if(File.exists(shortcutsPath), {
-				"shortcutsPath exists".postln;
+				// "shortcutsPath exists".postln;
 				prefs ?? { prefs = () };
 				prefs.put(\shortcuts, Object.readArchive(shortcutsPath));
 				if(args.size > 0, {
@@ -648,9 +648,9 @@ CVCenterPreferences {
 				})
 			});
 			if(File.exists(globalShortcutsPath), {
-				"globalShortcutsPath exists".postln;
+				// "globalShortcutsPath exists".postln;
 				prefs ?? { prefs = () };
-					prefs.put(\globalShortcuts, Object.readArchive(globalShortcutsPath));
+				prefs.put(\globalShortcuts, Object.readArchive(globalShortcutsPath));
 				if(args.size > 0, {
 					if(args.collect(_.asSymbol).includes(\globalShortcuts), {
 						res ?? { res = () };

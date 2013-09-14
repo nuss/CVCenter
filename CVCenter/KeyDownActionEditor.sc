@@ -27,9 +27,13 @@ KeyDownActions {
 		);
 
 		keyCodesAndModsPath = this.filenameSymbol.asString.dirname +/+ "keyCodesAndMods"++platform;
-		keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
+		if(File.exists(keyCodesAndModsPath)) {
+			keyCodesAndMods = Object.readArchive(keyCodesAndModsPath);
+		};
 		globalShortcutsPath = this.filenameSymbol.asString.dirname +/+ "globalShortcuts";
-		globalShortcuts = Object.readArchive(globalShortcutsPath);
+		if(File.exists(globalShortcutsPath)) {
+			globalShortcuts = Object.readArchive(globalShortcutsPath);
+		};
 
 		Platform.case(
 			\linux, {
