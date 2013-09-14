@@ -1679,7 +1679,8 @@ CVCenter {
 			lib[\all].put(\shortcuts, (
 				cvCenter: CVCenter.shortcuts,
 				cvWidget: CVWidget.shortcuts,
-				cvWidgetEditor: AbstractCVWidgetEditor.shortcuts
+				cvWidgetEditor: AbstractCVWidgetEditor.shortcuts,
+				globalShortcuts: KeyDownActions.globalShortcuts
 			));
 
 			if(GUI.id === \cocoa, {
@@ -1972,6 +1973,7 @@ CVCenter {
 					CVWidget.shortcuts_(lib[\all][\shortcuts][\cvWidget]);
 					CVCenter.cvWidgets.do(_.setShortcuts);
 					AbstractCVWidgetEditor.shortcuts_(lib[\all][\shortcuts][\cvWidgetEditor]);
+					KeyDownActions.globalShortcuts_(lib[\all][\shortcuts][\globalShortcuts]);
 				}
 			}.defer(0.2)
 		};
