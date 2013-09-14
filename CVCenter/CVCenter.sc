@@ -508,7 +508,7 @@ CVCenter {
 			;
 
 			tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
-				if(keycode == 9, { prefPane.focus })
+				if(keycode == KeyDownActions.keyCodes[\esc], { prefPane.focus })
 			});
 
 			flow.shift(0, 0);
@@ -1974,6 +1974,9 @@ CVCenter {
 					CVCenter.cvWidgets.do(_.setShortcuts);
 					AbstractCVWidgetEditor.shortcuts_(lib[\all][\shortcuts][\cvWidgetEditor]);
 					KeyDownActions.globalShortcuts_(lib[\all][\shortcuts][\globalShortcuts]);
+					if(Server.default.serverRunning, {
+						KeyDownActions.globalShortcutsSync;
+					});
 				}
 			}.defer(0.2)
 		};

@@ -9,14 +9,14 @@ CVCenterLoadDialog {
 	*new {
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var buildCheckbox;
-		var flow, replaceBg, midiBg, oscBg, actionsBg;
-		var replaceFlow, midiFlow, oscFlow, actionsFlow;
+		var flow, replaceBg, midiBg, oscBg, actionsBg, shortcutsBg;
+		var replaceFlow, midiFlow, oscFlow, actionsFlow, shortcutsFlow;
 		var replaceExisting, textReplaceExisting;
 		var loadMidiCC, loadMidiSrc, loadMidiChan, loadMidiCtrl;
 		var textMidiSrc, textMidiChan, textMidiCtrl;
 		var loadOscResponders, loadOscIP, loadOscPort, activateCalibration, resetCalibration;
 		var textOscIP, textOscPort, textActivateCalibration, textResetCalibration;
-		var activateActions, textActivateActions;
+		var activateActions, textActivateActions, loadShortcuts, textLoadShortcuts;
 		var cancelBut, loadBut;
 		var lineheight, linebreak, fFact;
 		var initCCSrc, initCCChan, initCCCtrl;
@@ -65,42 +65,44 @@ CVCenterLoadDialog {
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("load a new setup from disk", Rect(
 				(Window.screenBounds.width-500).div(2),
-				(Window.screenBounds.height-328).div(2),
-				500, 328
+				(Window.screenBounds.height-360).div(2),
+				500, 360
 			), false);
 
-			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
+			window.view.decorator = flow = FlowLayout(window.view.bounds, Point(7, 7), Point(3, 3));
 
-			replaceBg = CompositeView(window.view, flow.indentedRemaining.width@29);
+			replaceBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 29));
 			flow.nextLine;
-			midiBg = CompositeView(window.view, flow.bounds.width.div(2)-8@218);
-			oscBg = CompositeView(window.view, flow.indentedRemaining.width@218);
+			midiBg = CompositeView(window.view, Point(flow.bounds.width.div(2)-8, 218));
+			oscBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 218));
 			flow.nextLine;
-			actionsBg = CompositeView(window.view, flow.indentedRemaining.width@29);
-			[replaceBg, midiBg, oscBg, actionsBg].do({ |el| el.background_(Color(0.95, 0.95, 0.95)) });
+			actionsBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 29));
+			flow.nextLine;
+			shortcutsBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 29));
+			[replaceBg, midiBg, oscBg, actionsBg, shortcutsBg].do({ |el| el.background_(Color(0.95, 0.95, 0.95)) });
 
-			replaceBg.decorator = replaceFlow = FlowLayout(replaceBg.bounds, 7@7, 3@3);
-			midiBg.decorator = midiFlow = FlowLayout(midiBg.bounds, 7@7, 3@3);
-			oscBg.decorator = oscFlow = FlowLayout(oscBg.bounds, 7@7, 3@3);
-			actionsBg.decorator = actionsFlow = FlowLayout(actionsBg.bounds, 7@7, 3@3);
-
+			replaceBg.decorator = replaceFlow = FlowLayout(replaceBg.bounds, Point(7, 7), Point(3, 3));
+			midiBg.decorator = midiFlow = FlowLayout(midiBg.bounds, Point(7, 7), Point(3, 3));
+			oscBg.decorator = oscFlow = FlowLayout(oscBg.bounds, Point(7, 7), Point(3, 3));
+			actionsBg.decorator = actionsFlow = FlowLayout(actionsBg.bounds, Point(7, 7), Point(3, 3));
+			shortcutsBg.decorator = shortcutsFlow = FlowLayout(actionsBg.bounds, Point(7, 7), Point(3, 3));
 			// replace existing widgets in CVCenter or not
 
-			replaceExisting = buildCheckbox.(true, replaceBg, 15@15, staticTextFontBold);
+			replaceExisting = buildCheckbox.(true, replaceBg, Point(15, 15), staticTextFontBold);
 
-			textReplaceExisting = StaticText(replaceBg, replaceFlow.indentedRemaining.width@15)
+			textReplaceExisting = StaticText(replaceBg, Point(replaceFlow.indentedRemaining.width, 15))
 				.font_(staticTextFont)
 				.string_("replace the existing setup in CVCenter")
 			;
 
 			// midi
 
-			StaticText(midiBg, midiFlow.indentedRemaining.width@20)
+			StaticText(midiBg, Point(midiFlow.indentedRemaining.width, 20))
 				.font_(staticTextFontBold)
 				.string_("MIDI options")
 			;
 
-			loadMidiCC = buildCheckbox.(true, midiBg, 15@15, staticTextFontBold)
+			loadMidiCC = buildCheckbox.(true, midiBg, Point(15, 15), staticTextFontBold)
 				.action_({ |cb|
 					switch(cb.value.asBoolean,
 						true, {
@@ -115,7 +117,7 @@ CVCenterLoadDialog {
 				})
 			;
 
-			StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(1))
+			StaticText(midiBg, Point(midiFlow.indentedRemaining.width, lineheight.(1)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("load CCResponders")
@@ -123,9 +125,9 @@ CVCenterLoadDialog {
 
 			midiFlow.nextLine.shift(15, 0);
 
-			loadMidiCtrl = buildCheckbox.(true, midiBg, 15@15, staticTextFontBold);
+			loadMidiCtrl = buildCheckbox.(true, midiBg, Point(15, 15), staticTextFontBold);
 
-			textMidiCtrl = StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
+			textMidiCtrl = StaticText(midiBg, Point(midiFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("initialize CCResponders with ctrl-nr.%stored in the setup".format(linebreak))
@@ -133,9 +135,9 @@ CVCenterLoadDialog {
 
 			midiFlow.nextLine.shift(15, 0);
 
-			loadMidiChan = buildCheckbox.(true, midiBg, 15@15, staticTextFontBold);
+			loadMidiChan = buildCheckbox.(true, midiBg, Point(15, 15), staticTextFontBold);
 
-			textMidiChan = StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
+			textMidiChan = StaticText(midiBg, Point(midiFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("initialize CCResponders with channel-nr.%stored in the setup".format(linebreak))
@@ -143,9 +145,9 @@ CVCenterLoadDialog {
 
 			midiFlow.nextLine.shift(15, 0);
 
-			loadMidiSrc = buildCheckbox.(false, midiBg, 15@15, staticTextFontBold);
+			loadMidiSrc = buildCheckbox.(false, midiBg, Point(15, 15), staticTextFontBold);
 
-			textMidiSrc = StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
+			textMidiSrc = StaticText(midiBg, Point(midiFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("initialize CCResponders with source-ID%stored in the setup".format(linebreak))
@@ -153,7 +155,7 @@ CVCenterLoadDialog {
 
 			midiFlow.nextLine.shift(15, 0);
 
-			textMidiSelect = StaticText(midiBg, midiFlow.indentedRemaining.width@lineheight.(2))
+			textMidiSelect = StaticText(midiBg, Point(midiFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("... or select from a list of currently%available sources".format(linebreak))
@@ -161,7 +163,7 @@ CVCenterLoadDialog {
 
 			midiFlow.nextLine.shift(15, 0);
 
-			midiInitBut = Button(midiBg, 60@15).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9, true));
+			midiInitBut = Button(midiBg, Point(60, 15)).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9, true));
 
 			if(MIDIClient.initialized, {
 				midiInitBut.states_([
@@ -232,12 +234,12 @@ CVCenterLoadDialog {
 
 			// osc
 
-			StaticText(oscBg, oscFlow.indentedRemaining.width@20)
+			StaticText(oscBg, Point(oscFlow.indentedRemaining.width, 20))
 				.font_(staticTextFontBold)
 				.string_("OSC options")
 			;
 
-			loadOscResponders = buildCheckbox.(true, oscBg, 15@15, staticTextFontBold)
+			loadOscResponders = buildCheckbox.(true, oscBg, Point(15, 15), staticTextFontBold)
 				.action_({ |cb|
 					switch(cb.value.asBoolean,
 						true, {
@@ -270,7 +272,7 @@ CVCenterLoadDialog {
 				})
 			;
 
-			StaticText(oscBg, oscFlow.indentedRemaining.width@18)
+			StaticText(oscBg, Point(oscFlow.indentedRemaining.width, 18))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("load OSCresponders")
@@ -278,7 +280,7 @@ CVCenterLoadDialog {
 
 			oscFlow.nextLine.shift(15, 0);
 
-			activateCalibration = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold)
+			activateCalibration = buildCheckbox.(false, oscBg, Point(15, 15), staticTextFontBold)
 				.action_({ |cb|
 					switch(cb.value.asBoolean,
 						true, {
@@ -296,7 +298,7 @@ CVCenterLoadDialog {
 				})
 			;
 
-			textActivateCalibration = StaticText(oscBg, oscFlow.indentedRemaining.width@15)
+			textActivateCalibration = StaticText(oscBg, Point(oscFlow.indentedRemaining.width, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("activate calibration")
@@ -304,9 +306,9 @@ CVCenterLoadDialog {
 
 			oscFlow.nextLine.shift(15, 0);
 
-			resetCalibration = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold).enabled_(false);
+			resetCalibration = buildCheckbox.(false, oscBg, Point(15, 15), staticTextFontBold).enabled_(false);
 
-			textResetCalibration = StaticText(oscBg, oscFlow.indentedRemaining.width@15)
+			textResetCalibration = StaticText(oscBg, Point(oscFlow.indentedRemaining.width, 15))
 				.font_(staticTextFont)
 				.stringColor_(Color(0.7, 0.7, 0.7))
 				.string_("reset calibration")
@@ -314,7 +316,7 @@ CVCenterLoadDialog {
 
 			oscFlow.nextLine.shift(15, 0);
 
-			loadOscIP = buildCheckbox.(true, oscBg, 15@15, staticTextFontBold)
+			loadOscIP = buildCheckbox.(true, oscBg, Point(15, 15), staticTextFontBold)
 				.action_({ |cb|
 					switch(cb.value.asBoolean,
 						true, {
@@ -332,7 +334,7 @@ CVCenterLoadDialog {
 				})
 			;
 
-			textOscIP = StaticText(oscBg, oscFlow.indentedRemaining.width@lineheight.(2))
+			textOscIP = StaticText(oscBg, Point(oscFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("initialize OSCresponders with IP-%addresses stored in the setup".format(linebreak))
@@ -340,9 +342,9 @@ CVCenterLoadDialog {
 
 			oscFlow.nextLine.shift(15, 0);
 
-			loadOscPort = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold);
+			loadOscPort = buildCheckbox.(false, oscBg, Point(15, 15), staticTextFontBold);
 
-			textOscPort = StaticText(oscBg, oscFlow.indentedRemaining.width@lineheight.(2))
+			textOscPort = StaticText(oscBg, Point(oscFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("initialize OSCresponders with the port%stored in the setup".format(linebreak))
@@ -350,7 +352,7 @@ CVCenterLoadDialog {
 
 			oscFlow.nextLine.shift(15, 0);
 
-			textOscSelect = StaticText(oscBg, oscFlow.indentedRemaining.width@lineheight.(2))
+			textOscSelect = StaticText(oscBg, Point(oscFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("... or select from a list of currently%available addresses".format(linebreak))
@@ -381,13 +383,13 @@ CVCenterLoadDialog {
 				})
 			;
 
-			textRestrictToPort = StaticText(oscBg, 60@15)
+			textRestrictToPort = StaticText(oscBg, Point(60, 15))
 				.string_("restrict to port")
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 				.align_(\right)
 			;
 
-			restrictToPort = buildCheckbox.(false, oscBg, 15@15, staticTextFontBold)
+			restrictToPort = buildCheckbox.(false, oscBg, Point(15, 15), staticTextFontBold)
 				.action_({ |cb|
 					switch(cb.value.asBoolean,
 						true, {
@@ -412,9 +414,9 @@ CVCenterLoadDialog {
 
 			// actions
 
-			activateActions = buildCheckbox.(true, actionsBg, 15@15, staticTextFontBold);
+			activateActions = buildCheckbox.(true, actionsBg, Point(15, 15), staticTextFontBold);
 
-			textActivateActions = StaticText(actionsBg, actionsFlow.indentedRemaining.width@15)
+			textActivateActions = StaticText(actionsBg, Point(actionsFlow.indentedRemaining.width, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("load all CVWidget-actions stored in the setup")
@@ -422,15 +424,23 @@ CVCenterLoadDialog {
 
 			flow.nextLine;
 
+			loadShortcuts = buildCheckbox.(true, shortcutsBg, Point(15, 15), staticTextFontBold);
+
+			textLoadShortcuts = StaticText(shortcutsBg, Point(shortcutsFlow.indentedRemaining.width, 15))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("load shortcuts stored in the setup")
+			;
+
 			// cancel or load a setup;
 
-			cancelBut = Button(window.view, flow.bounds.width.div(2)-8@flow.indentedRemaining.height)
+			cancelBut = Button(window.view, Point(flow.bounds.width.div(2)-8, flow.indentedRemaining.height))
 				.states_([["Cancel", Color.black, Color.white]])
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 14, true))
 				.action_({ |b| window.close })
 			;
 
-			loadBut = Button(window.view, flow.indentedRemaining.width@flow.indentedRemaining.height)
+			loadBut = Button(window.view, Point(flow.indentedRemaining.width, flow.indentedRemaining.height))
 				.states_([["Load Setup", Color.white, Color.red]])
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 14, true))
 				.action_({ |b|
@@ -462,11 +472,17 @@ CVCenterLoadDialog {
 						resetCalibration: initCalibReset,
 						autoConnectMIDI: loadMidiCC.value.asBoolean,
 						loadActions: activateActions.value.asBoolean,
+						loadShortcuts: loadShortcuts.value.asBoolean,
 						midiSrcID: midiSrcID,
 						oscIPAddress: oscIPAddress
 					)
 				})
 			;
+
+			window.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
+				if(keycode == KeyDownActions.keyCodes[\return]) { loadBut.doAction };
+				if(keycode == KeyDownActions.keyCodes[\esc]) { window.close };
+			})
 		});
 		window.front;
 	}

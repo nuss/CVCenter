@@ -365,6 +365,11 @@ CVWidgetSpecsEditor {
 			})
 		;
 
+		window.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
+			if(keycode == KeyDownActions.keyCodes[\return]) { sendBut.doAction };
+			if(keycode == KeyDownActions.keyCodes[\esc]) { window.close };
+		});
+
 		window.front;
 	}
 

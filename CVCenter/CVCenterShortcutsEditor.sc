@@ -8,6 +8,7 @@ CVCenterShortcutsEditor {
 		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor, globalShortcutsEditor, keyCodesAndModsEditor;
 		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		var saveCancel, saveCancelFlow;
+		var saveBut;
 		var buildCheckbox, copyToPrefs;
 		var fFact, shortcuts;
 
@@ -87,7 +88,7 @@ CVCenterShortcutsEditor {
 				.action_({ window.close })
 			;
 
-			Button(saveCancel, saveCancelFlow.indentedRemaining.width@23)
+			saveBut = Button(saveCancel, saveCancelFlow.indentedRemaining.width@23)
 				.states_([["set shortcuts", Color.white, Color.red]])
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 14, true))
 				.action_({
@@ -97,6 +98,7 @@ CVCenterShortcutsEditor {
 					CVCenter.shortcuts_(cvCenterEditor.result);
 					CVWidget.shortcuts_(cvWidgetEditor.result);
 					AbstractCVWidgetEditor.shortcuts_(cvWidgetEditorEditor.result);
+					KeyDownActions.globalShortcuts_(globalShortcutsEditor.result);
 					CVCenter.setShortcuts;
 					CVCenter.cvWidgets.do(_.setShortcuts);
 					AbstractCVWidgetEditor.allEditors.collect(_.editor).do(_.setShortcuts);
@@ -124,6 +126,11 @@ CVCenterShortcutsEditor {
 				.string_("copy to preferences")
 				.font_(staticTextFont)
 			;
+
+			window.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
+				if(keycode == KeyDownActions.keyCodes[\return]) { saveBut.doAction };
+				// if(keycode == KeyDownActions.keyCodes[\esc]) { window.close };
+			})
 		};
 		window.front;
 	}

@@ -100,6 +100,7 @@ KeyDownActions {
 						$, ->				59,
 						$. ->				60,
 						$/ ->				61,
+						\return ->			36,
 						\tab ->				23,
 						\space -> 			65,
 						\esc ->				9,
@@ -429,7 +430,7 @@ KeyDownActions {
 				"\nglobal key-down actions enabled\n".inform;
 				trackingSynth.newMsg;
 			}.value);
-		}
+		} { [trackingSynth, syncResponder].do(_.free) };
 
 	}
 

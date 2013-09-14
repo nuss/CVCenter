@@ -38,6 +38,7 @@ CVCenterPreferences {
 		var textMidiMode, textMidiResolution, textCtrlButtonBank, textMidiMean, textSoftWithin;
 		var prefSaveGuiProps, buildCheckbox, buildNumTextBox, vHeight;
 		var cvcBounds, propsText, classVarsText;
+		var saveBut;
 		var fFact, specialHeight;
 		var prefs, rect, shortcuts;
 
@@ -490,7 +491,7 @@ CVCenterPreferences {
 				.action_({ window.close })
 			;
 
-			Button(saveCancel, saveCancelFlow.indentedRemaining.width@23)
+			saveBut = Button(saveCancel, saveCancelFlow.indentedRemaining.width@23)
 				.states_([["Save", Color.white, Color.red]])
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 14, true))
 				.action_({
@@ -537,6 +538,11 @@ CVCenterPreferences {
 					})
 				})
 			;
+
+			window.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
+				if(keycode == KeyDownActions.keyCodes[\return]) { saveBut.doAction };
+				// if(keycode == KeyDownActions.keyCodes[\esc]) { window.close };
+			})
 		});
 		window.front;
 	}

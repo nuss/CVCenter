@@ -266,6 +266,11 @@ OSCCommands {
 					makeField.(cmdList);
 				})
 			}, AppClock);
+
+			window.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
+				if(keycode == KeyDownActions.keyCodes[\return]) { saveBut.doAction };
+				if(keycode == KeyDownActions.keyCodes[\esc]) { window.close };
+			})
 		});
 
 		window.front;
