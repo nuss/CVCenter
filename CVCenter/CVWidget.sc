@@ -296,6 +296,58 @@ CVWidget {
 			this.shortcuts.put(
 				\esc,
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[\esc])
+			);
+			scFunc =
+			"// start or stop OSC calibration
+			{ |view|
+				block { |break|
+					CVCenter.all.keys.do({ |key|
+						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
+							break.value(
+								switch(CVCenter.cvWidgets[key].class,
+									CVWidgetMS, {
+										if(
+											CVCenter.cvWidgets[key].msSize.collect(
+												CVCenter.cvWidgets[key].getCalibrate(_)
+											).select(_ == true).size == CVCenter.cvWidgets[key].msSize
+										) {
+											CVCenter.cvWidgets[key].msSize.do(
+												CVCenter.cvWidgets[key].setCalibrate(false, _)
+											)
+										} {
+											CVCenter.cvWidgets[key].msSize.do(
+												CVCenter.cvWidgets[key].setCalibrate(true, _)
+											)
+										}
+									},
+									CVWidget2D, {
+										if(
+											#[lo, hi].collect(
+												CVCenter.cvWidgets[key].getCalibrate(_)
+											).select(_ == true).size == 2
+										) {
+											#[lo, hi].do(CVCenter.cvWidgets[key].setCalibrate(false, _))
+										} {
+											#[lo, hi].do(CVCenter.cvWidgets[key].setCalibrate(true, _))
+										}
+									},
+									{
+										if(CVCenter.cvWidgets[key].getCalibrate == true) {
+											CVCenter.cvWidgets[key].setCalibrate(false)
+										} {
+											CVCenter.cvWidgets[key].setCalibrate(true)
+										}
+									}
+								)
+							)
+						}
+					})
+				};
+				true;
+			}";
+			this.shortcuts.put(
+				\c,
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])
 			)
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvwidget];
