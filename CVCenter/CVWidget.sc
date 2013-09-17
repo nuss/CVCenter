@@ -348,6 +348,46 @@ CVWidget {
 			this.shortcuts.put(
 				\c,
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])
+			);
+			this.shortcuts.put(
+				\c,
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])
+			);
+			scFunc =
+			"// reset current OSC calibration constraints and start OSC calibration
+			{ |view|
+				block { |break|
+					CVCenter.all.keys.do({ |key|
+						if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
+							break.value(
+								switch(CVCenter.cvWidgets[key].class,
+									CVWidgetMS, {
+										CVCenter.cvWidgets[key].msSize.do(
+											CVCenter.cvWidgets[key].setOscInputConstraints(Point(0.0001), _);
+											CVCenter.cvWidgets[key].setCalibrate(true, _)
+										)
+									},
+									CVWidget2D, {
+										#[lo, hi].do(
+											CVCenter.cvWidgets[key].setOscInputConstraints(Point(0.0001), _);
+											CVCenter.cvWidgets[key].setCalibrate(true, _)
+										)
+									},
+									{
+										CVCenter.cvWidgets[key]
+										.setOscInputConstraints(Point(0.0001))
+										.setCalibrate(true)
+									}
+								)
+							)
+						}
+					})
+				};
+				true;
+			}";
+			this.shortcuts.put(
+				\r,
+				(func: scFunc, keyCode: KeyDownActions.keyCodes[$r])
 			)
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvwidget];
