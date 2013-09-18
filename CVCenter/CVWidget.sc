@@ -349,10 +349,6 @@ CVWidget {
 				\c,
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])
 			);
-			this.shortcuts.put(
-				\c,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])
-			);
 			scFunc =
 			"// reset current OSC calibration constraints and start OSC calibration
 			{ |view|

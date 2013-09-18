@@ -165,8 +165,13 @@ CVCenter {
 			"// OSCCommands gui
 			{ OSCCommands.makeWindow }";
 			this.shortcuts.put(
-				\c,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])
+				'alt + c',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$c],
+					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
+					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+				)
 			);
 			scFunc =
 			"// CVCenterControllersMonitor OSC
