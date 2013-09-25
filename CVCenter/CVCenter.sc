@@ -1971,19 +1971,21 @@ CVCenter {
 					})
 				})
 			}.defer(0.1);
-			{
-				lib[\all][\shortcuts] !? {
-					CVCenter.shortcuts_(lib[\all][\shortcuts][\cvCenter]);
-					CVCenter.setShortcuts;
-					CVWidget.shortcuts_(lib[\all][\shortcuts][\cvWidget]);
-					CVCenter.cvWidgets.do(_.setShortcuts);
-					AbstractCVWidgetEditor.shortcuts_(lib[\all][\shortcuts][\cvWidgetEditor]);
-					KeyDownActions.globalShortcuts_(lib[\all][\shortcuts][\globalShortcuts]);
-					if(Server.default.serverRunning, {
-						KeyDownActions.globalShortcutsSync;
-					});
-				}
-			}.defer(0.2)
+			if(loadShortcuts, {
+				{
+					lib[\all][\shortcuts] !? {
+						CVCenter.shortcuts_(lib[\all][\shortcuts][\cvCenter]);
+						CVCenter.setShortcuts;
+						CVWidget.shortcuts_(lib[\all][\shortcuts][\cvWidget]);
+						CVCenter.cvWidgets.do(_.setShortcuts);
+						AbstractCVWidgetEditor.shortcuts_(lib[\all][\shortcuts][\cvWidgetEditor]);
+						KeyDownActions.globalShortcuts_(lib[\all][\shortcuts][\globalShortcuts]);
+						if(Server.default.serverRunning, {
+							KeyDownActions.globalShortcutsSync;
+						});
+					}
+				}.defer(0.2)
+			})
 		};
 
 		if(path.isNil, {
