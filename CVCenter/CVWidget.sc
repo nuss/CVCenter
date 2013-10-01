@@ -2220,7 +2220,10 @@ CVWidget {
 				wcm.midiDisplay.model.value_(
 					(src: "source", chan: "chan", ctrl: "ctrl", learn: "L")
 				).changedKeys(synchKeys);
-				midiOscEnv.midisrc = nil; midiOscEnv.midichan = nil; midiOscEnv.midinum = nil; midiOscEnv.midiRawNum = nil;
+				midiOscEnv.midisrc = nil;
+				midiOscEnv.midichan = nil;
+				midiOscEnv.midinum = nil;
+				midiOscEnv.midiRawNum = nil;
 			})
 		})
 	}

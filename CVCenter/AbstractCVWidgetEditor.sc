@@ -248,7 +248,7 @@ AbstractCVWidgetEditor {
 	setShortcuts {
 		var modsDict, arrModsDict, arrowKeys;
 
-		"%: setShortcuts triggered".postf(this);
+		// "%: setShortcuts triggered".postf(this);
 
 		switch(GUI.id,
 			\cocoa, {

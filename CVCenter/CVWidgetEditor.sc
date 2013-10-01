@@ -1033,12 +1033,13 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			switch(widget.class,
 				CVWidget2D, {
 					widget.editor[slot] = this;
-					// widget.guiEnv[slot].editor = widget.editor[slot];
+					widget.guiEnv[slot].editor = this;
 				},
 				CVWidgetMS, {
 					widget.editor.editors[slot] = this;
+					widget.guiEnv.editor = widget.editor.editors;
 				},
-				{ widget.editor = this }
+				{ widget.editor = this; widget.guiEnv.editor = this }
 			)
 		});
 
