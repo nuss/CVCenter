@@ -710,7 +710,9 @@ CVCenter {
 					childViews.pairsDo({ |child, childProps|
 						// "child, childProps: %, %\n".postf(child, childProps);
 						// [child.bounds, childProps.lastUpdateBounds].postln;
-						if(child.bounds.width != childProps.lastUpdateBounds.width, {
+						if(childProps.lastUpdateBounds.notNil and:{
+							child.bounds.width != childProps.lastUpdateBounds.width
+						}, {
 							childProps.tabs.keysDo({ |tab| this.prRegroupWidgets(tab) })
 						})
 					})
