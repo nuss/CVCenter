@@ -200,13 +200,31 @@ CVCenter {
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[$m])
 			);
 			scFunc =
-			"// close CVCenterControllersMonitor
-			{ if(CVCenterControllersMonitor.window.notNil and:{
-				CVCenterControllersMonitor.window.isClosed.not
-			}) { CVCenterControllersMonitor.window.close }}";
+			"// close all CVWidget(MS)Editors
+			AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
+				switch(CVCenter.cvWidgets[k].class,
+					CVWidgetKnob, {
+						v.editor.close
+					},
+					CVWidget2D, { #[lo, hi].do({ |sl|
+						v[sl].editor.close
+					}) },
+					CVWidgetMS, {
+						CVCenter.cvWidgets[k].msSize.do({ |i|
+							v[i].editor.close;
+						})
+					}
+				);
+				CVCenter.cvWidgets[k.asString.drop(-2).asSymbol] !? { v.editor.close };
+			})";
 			this.shortcuts.put(
-				\esc,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[\esc])
+				'shift + esc',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[\esc],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
+				)
 			);
 			scFunc =
 			"// History GUI: start History and open History window
