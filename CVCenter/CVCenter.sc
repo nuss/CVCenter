@@ -1363,8 +1363,16 @@ CVCenter {
 
 	*removeAtTab { |label|
 		var wdgts;
-		wdgts = this.widgetsAtTab(label);
-		this.removeAll(*wdgts);
+		wdgts = this.widgetsAtTab(label.asSymbol);
+		if(wdgts.isEmpty.not, { this.removeAll(*wdgts) });
+	}
+
+	*removeTab { |label|
+		var tabIndex = tabProperties[label.asSymbol].index;
+		this.removeAtTab;
+		tabs.removeAt(tabIndex);
+		tabProperties[label.asSymbol] = nil;
+		tabProperties.do({ |p| if(p.index > tabIndex, { p.index = p.index-1 }) });
 	}
 
 	*at { |key|
