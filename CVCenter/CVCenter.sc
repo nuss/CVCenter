@@ -762,8 +762,8 @@ CVCenter {
 
 	*removeAtTab { |label|
 		var wdgts;
-		wdgts = this.widgetsAtTab(label);
-		this.removeAll(*wdgts);
+		wdgts = this.widgetsAtTab(label.asSymbol);
+		if(wdgts.isEmpty.not, { this.removeAll(*wdgts) });
 	}
 
 	*at { |key|
