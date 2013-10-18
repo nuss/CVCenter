@@ -32,7 +32,7 @@ CVWidgetSpecsEditor {
 		var flow, lines, allEls, allWidth;
 		var cMatrix, specName, prefSpecName, made;
 
-		"args passed in: %\n".postf([displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment]);
+		// "args passed in: %\n".postf([displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment]);
 
 		object = obj;
 
@@ -74,6 +74,7 @@ CVWidgetSpecsEditor {
 		switch(object.class,
 			Synth, { windowTitle = "Synth('"++name++"')" },
 			Ndef, { windowTitle = object.asString },
+			Patch, { windowTitle = name.asString },
 			{ windowTitle = object.asString++", (node-ID:"+object.asNodeID++")" }
 		);
 
@@ -137,7 +138,7 @@ CVWidgetSpecsEditor {
 
 		makeLine = { |elem, cname, size, pairs2D, prefix|
 
-			"cname: %\n".postf(cname);
+			// "cname: %\n".postf(cname);
 
 			if(elem.type.notNil, {
 				switch(elem.type,
@@ -310,7 +311,7 @@ CVWidgetSpecsEditor {
 
 			pairs2D !? {
 				pairs2D.pairsDo({ |k, pair|
-					"pair: %, val: %, made: %\n".postf(pair, val, made);
+					// "pair: %, val: %, made: %\n".postf(pair, val, made);
 					if(pair.includes(cname) and:{
 						val.class !== Array and:{
 							made.includes(cname).not

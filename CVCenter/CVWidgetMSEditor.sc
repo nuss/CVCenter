@@ -1424,7 +1424,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				actionsList[name].removeBut = Button(tabView3, 60@15)
 					.font_(staticTextFont)
 					.states_([
-						["remove", Color.white, Color.red],
+						["remove", Color.white, Color.red]
 					])
 					.action_({ |ab|
 						widget.removeAction(name.asSymbol, slot.asSymbol);
