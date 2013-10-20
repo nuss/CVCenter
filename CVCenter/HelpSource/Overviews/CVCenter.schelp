@@ -14,20 +14,24 @@ LIST::
 subsection:: Widgets
 LIST::
 ## link::Classes/CVWidget:: - the abstract superclass of all CVWidgets. Implements some useful methods for all CVWidgets
-## link::Classes/CVWidgetKnob:: - a widget containing a knob to control one parameter at a time
-## link::Classes/CVWidget2D:: - a widget containing a 2D-slider to control two parameters at a time
+## link::Classes/CVWidgetKnob:: - a widget, containing a knob, allowing to control one parameter at a time
+## link::Classes/CVWidget2D:: - a widget, containing a 2D-slider, allowing to control two parameters at a time
+## link::Classes/CVWidgetMS:: - a widget, containing a Multislider, allowing to control an arbitrary number of parameters at a time
 ::
 
 subsection:: Utilities
 LIST::
-## link::Classes/CVCenterPreferences:: - save settings for CVCenter resp. CVWidgets to disk
+## link::Classes/CVCenterPreferences:: - edit and save settings for CVCenter resp. CVWidgets to disk: common preferences regarding MIDI and OSC as well as user defined shortcuts for CVCenter, CVWidget and CVWidgetEditor. Also "global" shortcuts that work independantly from any gui can be defined (these shortcuts are bound to ugens. Hence, either supernova or scsynth have to be running). 
+## link::Classes/CVCenterLoadDialog:: - a special gui (a dialog) for loading setups.
 ## link::Classes/OSCCommands:: - scan incoming OSC and save command-names to disk for later re-use
 ## link::Classes/CVCenterControllersMonitor::
+## link::Classes/KeyDownActions:: - a somewhat experimental approach to make shortcuts within views configurable via gui
 ::
 
 subsection:: Helpers
 LIST::
 ## link::Classes/CVWidgetEditor::
+## link::Classes/CVWidgetMSEditor:: - a special editor for CVWidgetMS
 ## link::Classes/CVWidgetSpecsEditor::
 ::
 
@@ -35,6 +39,7 @@ subsection:: Extensions to other Classes
 LIST::
 ## link::Classes/Synth#-cvcGui::
 ## link::Classes/NodeProxy#-cvcGui::
+## link::Classes/Patch#-cvcGui::
 ::
 
 EXAMPLES::

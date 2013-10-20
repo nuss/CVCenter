@@ -4,7 +4,7 @@ categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
 
 DESCRIPTION::
-CVCenter lets you collect an arbitrary number of link::Classes/CV::s (you need to have the Conductor-quark installed) and use them to easily create control-widgets for link::Classes/Synth::s, link::Classes/Ndef::s or link::Classes/Pattern::-keys. Or even more basically: any value that can be set at runtime. For each link::Classes/CV:: a widget will be created within the main CVCenter-GUI that combines an arbitrary number of link::Classes/TabbedView::s, filled with your widgets.
+CVCenter lets you collect an arbitrary number of link::Classes/CV::s (you need to have the Conductor-quark installed) and use them to easily create control-widgets for link::Classes/Synth::s, link::Classes/Ndef::s or link::Classes/Pattern::-keys. Or even more basically: any value that can be set at runtime. For each link::Classes/CV:: a widget will be created within the main CVCenter-GUI that combines an arbitrary number of link::Classes/TabbedView2::s, filled with your widgets.
 
 strong:: What's a CV? ::
 
@@ -314,6 +314,26 @@ A code::Rect::.
 
 returns:: this (CVCenter)
 
+METHOD:: alwaysOnTop
+Determine whether CVCenter resp. its childviews should always be on top of other views.
+
+argument:: bool
+a link::Classes/Boolean::
+
+returns:: this (CVCenter)
+
+METHOD:: numMsSlotsPerColumn
+A special method that allows the user to determine how many slots a multislider-widget shall display in 1 columns at max (even though this value refers to the maximum number od slots in one column a multislider-widget will always stretch over at least 2 colums). If this number gets exceeded a multislider widget will automatically stretch over 3 columns. default: code::15::.
+
+argument:: value
+an link::Classes/Integer:: indicating how many slots shall be displayed within one column. default: code::15::
+
+returns:: this (CVCenter)
+
+METHOD:: isClosed
+Returns true if no childviews exists (i.e. link::#*childViews:: is empty) and the main window is closed (closing the main window should automatically close all childviews as well).
+
+returns:: a link::Classes/Boolean::
 
 METHOD:: guiMoveTo
 Moves the GUI to a given position on screen.
@@ -373,7 +393,7 @@ returns:: this (CVCenter)
 
 
 METHOD:: loadSetup
-Loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup.
+Loads a saved setup and creates the CVCenter GUI with all widgets stored in the setup. For the user's convenience arguments for this method are defined explicitely, allowing the IDE to automatically list their names when the method's name gets typed. Also one may use the dialog provided by link::Classes/CVCenterLoadDialog:: that allows selecting options by checkboxes and dropdown-lists.
 
 argument:: path
 optional - expects the full path to the location where the setup shall be stored to disk. If given no file-open dialog will be displayed.
@@ -384,11 +404,42 @@ If CVCenter GUI has already been initialized and contains some widgets and code:
 argument:: autoConnectOSC
 If set to code::true:: OSC-responders will be initialized automatically. strong::default::: code::true::
 
+argument:: oscConnectToIP
+If set to code::true:: OSC-responders will be initialized with a link::Classes/NetAddr:: bound to the IP-address stored with the setup up (if the setup has been saved with an IP-address). If set to code::false:: the OSC-responders will listen to commands coming from any IP-address. However, if responders should listen to an explicit IP-address that is not the same as the one that was saved with the setup the link::Classes/CVCenterLoadDialog:: still allows the user to detect a valid IP-address to be used with all OSC-responders.
+By default code::oscConnectToIP:: is set to code::true::
+
+argument:: oscRestrictToPort
+If set to true all OSC-responders loaded from the setup will listen to the expliciit port stored with the setup (if a port has been saved with the setup). However, it is usually not recommended to restrict listening to a specific port as ports may easily change between sessions. Hence, this argument is set to code::false:: by default.
+
+argument:: activateCalibration
+If set to code::true:: the regarding widget will try to determine the range of incoming (OSC) values and adjust itself to it if necessary. However, this might not be the desired behaviour if the widget has already been calibrated when the setup was first saved. Hence, this argument is set to code::false:: by default.
+
+argument:: resetCalibration
+If set to code::true:: the calibration from invoming (OSC) values will start anew from code::0, 0:: (low constraint, high constraint). default: code::false::.
+
 argument:: autoConnectMIDI
 If set to code::true:: MIDI-responders will be initialized automatically. strong::default::: code::true::
 
+argument:: midiConnectSrc
+If set to true MIDI-responders will only listen to the ID stored with the setup (if an ID has been stored with the setup). default: code::false::.
+
+argument:: midiConnectChannel
+If set to true MIDI-responders will only listen to a channel stored with the setup (if a channel has been stored with the setup). default: code::false::.
+
+argument:: midiConnectCtrl
+If set to true MIDI-responders will only listen to a controller-nr. stored with the setup. default: code::true::.
+
 argument:: loadActions
 If set to code::true:: actions will be initialized automatically. strong::default::: code::true::
+
+argument:: midiSrcID
+Optional - all MIDI-responders will be initialized using this ID as an identification of the MIDI-device that is going to be used. Replaces any ID that has been saved with the setup.
+
+argument:: oscIPAddress
+Optional - all OSC-responders will be initialized using this IP-address. Replaces any IP-address stored with the setup.
+
+argument:: loadShortcuts
+If set to true currently active shortcuts in CVCenter, CVWidgets and CVWidgetEditors will be replaced by the shortcuts saved with the setup. By default saving a setup will always save all currently active shortcuts. default: code::true::
 
 returns:: this (CVCenter)
 
@@ -422,9 +473,63 @@ The main window of CVCenter
 returns:: an instance of link::Classes/Window::
 
 METHOD:: tabs
-A link::Classes/TabbedView::, containing the widgets
+A link::Classes/TabbedView2::, containing the widgets
 
-returns:: a link::Classes/TabbedView::
+returns:: a link::Classes/TabbedView2::
+
+METHOD:: childViews
+An link::Classes/IdentityDictionary:: keeping the parent windows of detached tabs: Any tab may be detached in this version of CVCenter as the GUI is now based on link::Classes/TabbedView2:: instead of link::Classes/TabbedView::. Moreover, tabs can be dragged between childviews (or the main window and a childview) by clicking its label and holding cmd (Mac) or ctrl (Linux, Windows).
+The structure of code::childViews:: is the following:
+
+code::
+IdentityDictionary[
+	parent window 1 (a TopView) -> (
+		tabs: (
+			tab 1 (a TabbedViewTab): (
+				widgets: [widget-name 1, widget-name 2, ... widget-name n]
+			),
+			tab 1 (a TabbedViewTab): (
+				widgets: [widget-name 1, widget-name 2, ... widget-name n]
+			),
+			...
+			tab n (a TabbedViewTab): (
+				widgets: [widget-name 1, widget-name 2, ... widget-name n]
+			)
+		)
+	),
+	parent window 2 (a TopView) -> (
+		tabs: (
+			tab 1 (a TabbedViewTab): (
+				widgets: [widget-name 1, widget-name 2, ... widget-name n]
+			),
+			tab 1 (a TabbedViewTab): (
+				widgets: [widget-name 1, widget-name 2, ... widget-name n]
+			),
+			...
+			tab n (a TabbedViewTab): (
+				widgets: [widget-name 1, widget-name 2, ... widget-name n]
+			)
+		)
+	),
+	...
+	parent window n (a TopView) -> (
+		tabs: (
+			tab 1 (a TabbedViewTab): (
+				widgets: [widget-name 1, widget-name 2, ... widget-name n]
+			),
+			tab 1 (a TabbedViewTab): (
+				widgets: [widget-name 1, widget-name 2, ... widget-name n]
+			),
+			...
+			tab n (a TabbedViewTab): (
+				widgets: [widget-name 1, widget-name 2, ... widget-name n]
+			)
+		)
+	)
+]
+::
+
+returns:: a link::Classes/IdentityDictionary::
 
 METHOD:: guix
 The x-position at which the GUI will be created - has no direct effect besides when being set ahead from initializing CVCenter.
@@ -457,6 +562,10 @@ PRIVATE:: prRemoveTab
 
 PRIVATE:: finishGui
 
+PRIVATE:: add
+
+PRIVATE:: findSpec
+
 
 INSTANCEMETHODS::
 
@@ -470,14 +579,14 @@ definitionList::
 ## o || See a list of already connected OSC-controllers (see also: link::Classes/CVCenterControllersMonitor::).
 ## m || See a list of already connected MIDI-controllers (see also: link::Classes/CVCenterControllersMonitor::).
 ## x || If the link::Classes/CVCenterControllersMonitor:: GUI is open, close it.
-## e || If link::Classes/MasterEQ:: from the link::Guides/Quarks##Quark:: code::wslib:: is installed, open it.
+## e || If link::Classes/MasterEQ:: from the link::Classes/Quark:: code::wslib:: is installed, open it.
 ## h || Start the link::Classes/History:: and open its GUI.
 ## <shift> + h || End the link::Classes/History::, close its GUI a and (if Patform.ideName != "scqt") open a new link::Classes/Document:: containing the recorded link::Classes/History::. note:: code::History.document:: will only work with GUI-systems that support link::Classes/Document::. When using the new SC-IDE consider using link::Classes/History#-saveCS#History.saveCS:: ( code::History.saveCS(path, forward)::)::
 ## n || Open an link::Classes/NdefMixer:: for the default link::Classes/Server::
 ## p || Open a new link::Classes/PdefAllGui::.
 ## <shift> + p || Open a new link::Classes/PdefnAllGui::.
 ## t || Open a new link::Classes/TdefAllGui::.
-## a || If the link::Guides/Quarks##Quark:: link::Classes/AllGui:: is installed open a new link::Classes/AllGui::.
+## a || If the link::Classes/Quark:: link::Classes/AllGui:: is installed open a new link::Classes/AllGui::.
 ::
 
 EXAMPLES::
