@@ -605,22 +605,30 @@ INSTANCEMETHODS::
 
 SECTION:: Shortcuts
 When CVCenter GUI is sent to front a number of shortcuts apply. Most of these shortcuts will open new windows. However, if the regarding window is already open (and maybe hidden under another window) it will rather be brought to front again than opened in another window.
+NOTE::All shortcuts are configurable by the user. They can be altered (actions as well as the action-triggering key-combinations), removed or new shortcuts can be added. This can be done manually by editing link::#*shortcuts:: (not recommended) or using the shortcuts-interface in the link::Classes/CVCenterPreferences##preferences-interface:: (persistent) or editing short-term shortcuts in the link::Classes/CVCenterShortcutsEditor##shortcuts-editor:: (shortcuts will be valid until next recompilation of the class-library). However, this is still an experimental feature. Especially in detached tabs shortcuts may not work as expected::
 definitionList::
-## right arrow-key || navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
-## left arrow-key || navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
+## arrow right || navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
+## arrow left || navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
+## alt arrow right || select and focus widgets in alphabetical order.
+## alt arrow left || select and focus widgets in reversed alphabetical order. 
 ## 0-9 || Select tabs and focus them. The numbers represent the order of the tabs.
-## c || Open the link::Classes/OSCCommands:: GUI. This will also trigger link::Classes/OSCCommands#*collect::
+## alt c || Open the link::Classes/OSCCommands:: GUI. This will also trigger link::Classes/OSCCommands#*collect::
 ## o || See a list of already connected OSC-controllers (see also: link::Classes/CVCenterControllersMonitor::).
 ## m || See a list of already connected MIDI-controllers (see also: link::Classes/CVCenterControllersMonitor::).
-## x || If the link::Classes/CVCenterControllersMonitor:: GUI is open, close it.
+## alt s || Open the shortcuts-editor. Shortcuts edited here will persist until the next library-recompilation (unless the option "write to preferences" is selected). 
+## shift esc || Close all open CVWidget(MS)Editors.
 ## e || If link::Classes/MasterEQ:: from the link::Classes/Quark:: code::wslib:: is installed, open it.
 ## h || Start the link::Classes/History:: and open its GUI.
-## <shift> + h || End the link::Classes/History::, close its GUI a and (if Patform.ideName != "scqt") open a new link::Classes/Document:: containing the recorded link::Classes/History::. note:: code::History.document:: will only work with GUI-systems that support link::Classes/Document::. When using the new SC-IDE consider using link::Classes/History#-saveCS#History.saveCS:: ( code::History.saveCS(path, forward)::)::
+## shift h || End the link::Classes/History::, close its GUI a and (if Patform.ideName != "scqt") open a new link::Classes/Document:: containing the recorded link::Classes/History::. note:: code::History.document:: will only work with GUI-systems that support link::Classes/Document::. When using the new SC-IDE consider using link::Classes/History#-saveCS#History.saveCS:: ( code::History.saveCS(path, forward)::)::
 ## n || Open an link::Classes/NdefMixer:: for the default link::Classes/Server::
-## p || Open a new link::Classes/PdefAllGui::.
-## <shift> + p || Open a new link::Classes/PdefnAllGui::.
+## shift p || Open a new link::Classes/PdefAllGui::.
+## alt p || Open a new link::Classes/PdefnAllGui::.
 ## t || Open a new link::Classes/TdefAllGui::.
 ## a || If the link::Classes/Quark:: link::Classes/AllGui:: is installed open a new link::Classes/AllGui::.
+## s || Save the current CVCenter setup to disk.
+## l || Load a CVCenter setup from disks.
+## p || Open the CVCenter prferences dialog.
+## d || Detach the tab currently focused tab in the CVCenter GUI 
 ::
 
 EXAMPLES::
@@ -671,7 +679,7 @@ a.free;
 CVCenter.removeAll;
 ::
 
-subsection:: Creating CVWidgets within CVCenter GUI from running Synths, NodeProxies, Ndefs and ProxySpaces
+subsection:: Auto-generating CVWidgets within CVCenter GUI from running Synths, NodeProxies, Ndefs and ProxySpaces and Instr/Patch
 
 code::
 // a SynthDef, including some arrayed controls
@@ -692,7 +700,7 @@ metadata: (
 		ringtimes1: [1, 20],
 		ringtimes2: [1, 20]
 	)
-)).add; // must be 'added' if the GUI shall be auto-created
+)).add; // must be 'added' if the GUI shall be auto-generated
 )
 
 (
@@ -769,6 +777,27 @@ p[\sawTest].cvcGui;
 p[\sawTest].clear(10);
 p.clean;
 p.pop;
+CVCenter.removeAll;
+
+
+/////////////////////////////////// Instr/Patch support ////////////////////////////////////////////////
+
+(
+Instr(\saw, { |amp = 0.5|
+	Splay.ar(LFSaw.ar(NamedControl.kr(\freq, [ 110, 112, 222, 334, 556 ]), 0, amp));
+});
+
+Instr(\rlpf, { |in, ffreq = 1000, famp = 1, rq = 0.1|
+    RLPF.ar(in, ffreq, rq) * famp;
+});
+)
+
+i = Instr(\saw) <>> Instr(\rlpf);
+p = i.play;
+p.cvcGui;
+
+// clean up when done
+p.stop;
 CVCenter.removeAll;
 ::
 
