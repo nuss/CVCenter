@@ -22,10 +22,11 @@ LIST::
 subsection:: Utilities
 LIST::
 ## link::Classes/CVCenterPreferences:: - edit and save settings for CVCenter resp. CVWidgets to disk: common preferences regarding MIDI and OSC as well as user defined shortcuts for CVCenter, CVWidget and CVWidgetEditor. Also "global" shortcuts that work independantly from any gui can be defined (these shortcuts are bound to ugens. Hence, either supernova or scsynth have to be running). 
+## link::Classes/CVCenterShortcutsEditor:: - edit shortcuts for CVCenter, all variants of CVWidget, CVWidget(MS)Editor. 
 ## link::Classes/CVCenterLoadDialog:: - a special gui (a dialog) for loading setups.
 ## link::Classes/OSCCommands:: - scan incoming OSC and save command-names to disk for later re-use
-## link::Classes/CVCenterControllersMonitor::
 ## link::Classes/KeyDownActions:: - a somewhat experimental approach to make shortcuts within views configurable via gui
+## link::Classes/CVCenterControllersMonitor::
 ::
 
 subsection:: Helpers

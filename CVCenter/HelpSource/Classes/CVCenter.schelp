@@ -238,13 +238,20 @@ widget-keys, given as link::Classes/String::s or link::Classes/Symbol::s. If no 
 returns:: this (CVCenter)
 
 METHOD:: removeAtTab
-Remove link::Classes/CVWidget::s under a given tab and remove the tab (if there's currently more than one tab) or rename it to "default" (if the given tab is the only tab in the CVCenter GUI).
+Remove link::Classes/CVWidget::s under a given tab and remove the tab.
 
 argument:: label
 The name of the tab as link::Classes/String:: or link::Classes/Symbol::
 
 returns:: this (CVCenter)
 
+METHOD:: removeTab
+Remove link::Classes/CVWidget::s under a given tab and remove the tab.
+
+argument:: label
+The name of the tab as link::Classes/String:: or link::Classes/Symbol::
+
+returns:: this (CVCenter)
 
 METHOD:: addActionAt
 Add an action given in code::action:: to a widget's CV given in code::key:: under the name code::name::
@@ -531,6 +538,24 @@ IdentityDictionary[
 
 returns:: a link::Classes/IdentityDictionary::
 
+METHOD:: shortcuts
+An link::Classes/IdentityDictionary:: containing all currently defined shortcuts for CVCenter. Though this is a getter/setter it is recomended to add/remove shortcuts via the GUI within the link::Classes/CVCenterPreferences##preferences-interface:: (changes will become active after recompilation of the class-library) or the link::Classes/CVCenterShortcutsEditor##shortcuts-interface:: (changes become active immediatly but get reset after recompilation of the class-library).
+
+See link::Classes/KeyDownActions:: for more information about the internal structure of the code::shortcuts:: dictionary resp. the workings of shortcuts in general. Also have a look at the list of link::#Shortcuts#default shortcuts:: that can be modified by the user at any time. 
+
+returns:: an link::Classes/IdentityDictionary::
+
+METHOD:: setShortcuts
+Though link::#*shortcuts:: is a getter/setter classvar shortcuts will not be updated by simply adding or removing them from the link::#*shortcuts:: classvar - that will happen only after calling this method explicitely.
+
+returns:: this (CVCenter)
+
+METHOD:: scv
+An link::Classes/Event:: containing various objects that do not necessarily belong to CVCenter but are related to it. E.g. when a shortcut opens a window that window may be added to scv so other shortcuts can refer to it later. 
+Basically code::scv:: has been introduced as the concept of configurable shortcuts seperate shortcut-actions from CVCenter. Hence, variables in these actions can't get initialized belonging to CVCenter automatically. However, a classvar holding a dictionary that can be filled up later solves the problem.
+
+returns:: an link::Classes/Event::
+
 METHOD:: guix
 The x-position at which the GUI will be created - has no direct effect besides when being set ahead from initializing CVCenter.
 
@@ -566,6 +591,15 @@ PRIVATE:: add
 
 PRIVATE:: findSpec
 
+PRIVATE:: prAddTab
+
+PRIVATE:: prAddWidget
+
+PRIVATE:: prefPane
+
+PRIVATE:: tabProperties
+
+PRIVATE:: widgetStates
 
 INSTANCEMETHODS::
 
