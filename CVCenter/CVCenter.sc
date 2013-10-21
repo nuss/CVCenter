@@ -401,6 +401,76 @@ CVCenter {
 				\d,
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[$d])
 			);
+			scFunc =
+			"// activate OSC calibration for all widgets
+			{ CVCenter.cvWidgets.do({ |wdgt|
+				switch(wdgt.class,
+					CVWidget2D, {
+						#[lo, hi].do({ |sl| wdgt.setCalibrate(true, sl) });
+					},
+					CVWidgetMS, {
+						wdgt.msSize.do({ |i| wdgt.setCalibrate(true, i) });
+					},
+					{ wdgt.setCalibrate(true) }
+				)
+			}) }";
+			this.shortcuts.put(
+				'shift + c',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$c],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
+				)
+			);
+			scFunc =
+			"// deactivate OSC calibration for all widgets
+			{ CVCenter.cvWidgets.do({ |wdgt|
+				switch(wdgt.class,
+					CVWidget2D, {
+						#[lo, hi].do({ |sl| wdgt.setCalibrate(false, sl) });
+					},
+					CVWidgetMS, {
+						wdgt.msSize.do({ |i| wdgt.setCalibrate(false, i) });
+					},
+					{ wdgt.setCalibrate(false) }
+				)
+			}) }";
+			this.shortcuts.put(
+				'alt + shift + c',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$c],
+					modifierQt: KeyDownActions.modifiersQt['alt + shift'],
+					modifierCocoa: KeyDownActions.modifiersCocoa['alt + shift']
+				)
+			);
+			scFunc =
+			"// reset and restart OSC calibration for all widgets
+			{ CVCenter.cvWidgets.do({ |wdgt|
+				switch(wdgt.class,
+					CVWidget2D, {
+						#[lo, hi].do({ |sl|
+							wdgt.setOscInputConstraints(Point(0.0001, 0.0001), sl).setCalibrate(true, sl);
+						})
+					},
+					CVWidgetMS, {
+						wdgt.msSize.do({ |i|
+							wdgt.setOscInputConstraints(Point(0.0001, 0.0001), i).setCalibrate(true, i);
+						})
+					},
+					{ wdgt.setOscInputConstraints(Point(0.0001, 0.0001)).setCalibrate(true) }
+				)
+			}) }";
+			this.shortcuts.put(
+				'shift + r',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$r],
+					modifierQt: KeyDownActions.modifiersQt['shift'],
+					modifierCocoa: KeyDownActions.modifiersCocoa['shift']
+				)
+			);
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvcenter];
 		});

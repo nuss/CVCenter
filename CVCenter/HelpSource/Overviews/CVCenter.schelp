@@ -26,14 +26,17 @@ LIST::
 ## link::Classes/CVCenterLoadDialog:: - a special gui (a dialog) for loading setups.
 ## link::Classes/OSCCommands:: - scan incoming OSC and save command-names to disk for later re-use
 ## link::Classes/KeyDownActions:: - a somewhat experimental approach to make shortcuts within views configurable via gui
+## link::Classes/KeyDownActionsEditor:: - an embeddable editor for shortcuts.
+## link::Classes/KeyCodesEditor:: - key-codes may differ from platform to platform, from keyboard to keyboard. This embeddable editor allows adjusting them.
 ## link::Classes/CVCenterControllersMonitor::
 ::
 
 subsection:: Helpers
 LIST::
-## link::Classes/CVWidgetEditor::
+## link::Classes/AbstractCVWidgetEditor:: - the abstract superclass of CVWidgetEditor and CVWidgetMSEditor
+## link::Classes/CVWidgetEditor:: - an editor for a CVWidget
 ## link::Classes/CVWidgetMSEditor:: - a special editor for CVWidgetMS
-## link::Classes/CVWidgetSpecsEditor::
+## link::Classes/CVWidgetSpecsEditor:: - when generating CVWidgets from running synths, NodeProxies, Patches etc. this interface allows adding suitable ControlSpecs before a CVWidget gets instantiated.
 ::
 
 subsection:: Extensions to other Classes
