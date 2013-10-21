@@ -603,6 +603,16 @@ An link::Classes/Event:: containing certain elements of the GUI.
 
 returns:: an link::Classes/Event::
 
+METHOD:: focusElements
+CVWidgets cannot gain focus themselves. However, their elements (buttons, slider, textfields etc.) can. code::focusElements:: returns a collection of elements which, when focused (indicated by the green border), function as the widget's shortcut transmitters.
+
+returns:: an link::Classes/Array:: of GUI elements
+
+METHOD:: msSize
+Though this is an instance var defined in CVWidget it applies to CVWidgetMS only: It returns the snumber of slots of the multi-slider of a link::Classes/CVWidgetMS::.
+
+returns:: an link::Classes/Integer::
+
 METHOD:: front
 Sends the widget's window to front.
 
@@ -613,12 +623,16 @@ Every widget has one or more editors that will open in a new window ( link::Clas
 
 returns:: a link::Classes/CVWidgetEditor:: or an link::Classes/Event::, containing a reference two 2 or more link::Classes/CVWidgetEditor::s
 
-private:: bgColor
+METHOD:: background
+Get the background-color of a widget. Setter-methods are implemented within CVWidget-subclasses: 
+link::Classes/CVWidgetKnob#background::, link::Classes/CVWidget2D#background::, link::Classes/CVWidgetMS#background::.
+
+returns:: a link::Classes/Color::
 
 METHOD:: widgetBg
-A link::Classes/UserView:: upon which all other elements of the GUI will be placed
+A link::Classes/CompositeView:: upon which all other elements of the GUI will be placed
 
-returns:: a link::Classes/UserView::
+returns:: a link::Classes/CompositeView::
 
 METHOD:: label
 A button, containing the name of the widget. When clicked the widget will switch to a link::Classes/TextView:: that can be used to write down notices.
