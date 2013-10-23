@@ -27,7 +27,16 @@ returns:: code::this:: (CVWidget)
 METHOD:: midiSources
 An link::Classes/Event::, containing all currently registered link::Classes/MIDIEndPoint::s and their correspondant numeric IDs. The IDs can be used to identify a device when creating a MIDI-responder though this is usually not necessary as the inbuilt learn functionality will take care of this automatically.
 
-returns:: an link::Classes/Event:: 
+returns:: an link::Classes/Event::
+
+METHOD:: shortcuts
+An link::Classes/IdentityDictionary:: containing all currently defined shortcuts for any CVWidget. Though this is a getter/setter it is recomended to add/remove shortcuts via the GUI within the link::Classes/CVCenterPreferences##preferences-interface:: (changes will become active after recompilation of the class-library) or the link::Classes/CVCenterShortcutsEditor##shortcuts-interface:: (changes become active immediatly but get reset after recompilation of the class-library).
+
+NOTE:: For added shortcuts to become active the user will have to call link::setShortcuts:: on any currently existing CVWidget. This procedure will be handled automatically behind the scenes if a shortcut has been added via CVCenter's inbuilt shortcut-editor.::
+
+See link::Classes/KeyDownActions:: for more information about the internal structure of the code::shortcuts:: dictionary resp. the workings of shortcuts in general. Also have a look at the list of link::#Shortcuts#default shortcuts:: that can be modified by the user at any time. 
+
+returns:: an link::Classes/IdentityDictionary::
 
 INSTANCEMETHODS::
 
@@ -629,10 +638,31 @@ Every widget has one or more editors that will open in a new window ( link::Clas
 returns:: a link::Classes/CVWidgetEditor:: or an link::Classes/Event::, containing a reference two 2 or more link::Classes/CVWidgetEditor::s
 
 METHOD:: background
-Get the background-color of a widget. Setter-methods are implemented within CVWidget-subclasses: 
+Get/Set the background-color of a widget. Setter-methods are implemented within CVWidget-subclasses: 
 link::Classes/CVWidgetKnob#background::, link::Classes/CVWidget2D#background::, link::Classes/CVWidgetMS#background::.
 
 returns:: a link::Classes/Color::
+
+METHOD:: stringColor
+Get/Set the string-color of a widget. Setter-methods are implemented within CVWidget-subclasses: 
+link::Classes/CVWidgetKnob#stringColor::, link::Classes/CVWidget2D#stringColor::, link::Classes/CVWidgetMS#stringColor::.
+
+returns:: a link::Classes/Color::
+
+METHOD:: name
+Get the name of a widget. This corresponds with the key under which the widget's CV(s) is/are stored in link::Classes/CVCenter#*all::.
+
+returns:: a link::Classes/Symbol::
+
+METHOD:: parent
+Get the parent view of a CVWidget
+
+returns:: a link::Classes/Window:: or a link::CLasses/View:: resp. a subclass of it
+
+METHOD:: setShortcuts
+Though link::#*shortcuts:: is a getter/setter classvar shortcuts will not be updated by simply adding or removing them from the link::#*shortcuts:: classvar - that will happen only after calling this method explicitely.
+
+returns:: code::this:: (a CVWidget)
 
 METHOD:: widgetBg
 A link::Classes/CompositeView:: upon which all other elements of the GUI will be placed
@@ -689,28 +719,53 @@ METHOD:: isClosed
 
 returns:: code::true:: if the widget has been closed, otherwise code::false::
 
+SECTION:: Shortcuts
+When CVWidgets get created within CVCenter GUI a number of shortcuts apply after a widget has gained focus (i.e. rather than the widget itself one of its GUI-elements gained focus which will be indicated by a green border around the regarding element).
+NOTE::All shortcuts are configurable by the user. Handling shortcuts is basically handled by a class named link::Classes/KeyDownActions::. They can be altered (actions as well as the action-triggering key-combinations), removed or new shortcuts can be added. This can be done manually by editing link::#*shortcuts:: (not recommended) or using the link::Classes/KeyDownActionsEditor:: in the link::Classes/CVCenterPreferences##preferences-interface:: (persistent) or editing short-term shortcuts in the link::Classes/CVCenterShortcutsEditor##shortcuts-editor:: (shortcuts will be valid until next recompilation of the class-library). However, this is still an experimental feature. Especially in detached tabs shortcuts may not work as expected::
+definitionList::
+## alt arrow right || Select next widget in alphabetical order
+## alt arrow left || Select previous widget in alphabetical order
+## s || Open the CVWidgetEitor of the focused widget and focus its Specs-tab
+## m || Open the CVWidgetEitor of the focused widget and focus its MIDI-tab
+## o || Open the CVWidgetEitor of the focused widget and focus its OSC-tab
+## a || Open the CVWidgetEitor of the focused widget and focus its Actions-tab
+::
+
 EXAMPLES::
 subsection:: basic usage
 code::
-// create some simple CVWidget
+// create a CVWidget2D
 ~twoDee = CVWidget2D.new.front;
+// and a multi-slider widget
+~ms = CVWidgetMS(numSliders: 5).front;
 
 // define an action to be executed when the knob is turned
 ~twoDee.addAction(\post, { |cv| "current value[lo]: %\n".postf(cv.value) }, \lo);
 ~twoDee.addAction(\post, { |cv| "current value[hi]: %\n".postf(cv.value) }, \hi);
+~ms.addAction(\post, { |cv| "~ms current value: %\n".postf(cv.value) });
 
 // some noise
 (
 Server.default.waitForBoot{
-	~noise = { |trigFreq=10, freqMod=0|
-		var trig, seq, freq;
-		trig = Impulse.kr(trigFreq);
-		seq = Drand([Dseq((1..5).mirror1, 1), Drand((4..10), 8)], 2000);
-		freq = Demand.kr(trig, 0, seq * 100);
-		SinOsc.ar(freq + [0,0.7]).cubed.cubed.scaleneg(freqMod) * 0.1;
-	}.play
+    ~noise = { |freq=#[1, 3, 4, 7, 11 ], trigFreq=10, freqMod=0|
+        var trig, seq, freqvar;
+        trig = Impulse.kr(trigFreq);
+		seq = Drand([Dseq(freq, 1), Drand((1..4).collect(Array.geom(5, _, 3)), 8)], 2000);
+        freqvar = Demand.kr(trig, 0, seq * 100);
+		Splay.ar(SinOsc.ar(freqvar + [0,0.7]).scaleneg(freqMod)).tanh;
+    }.play
 }
 )
+
+// add an action to ~ms that sets freq dynamically
+~ms.addAction(\setFreq, { |cv| ~noise.setn(\freq, cv.value) });
+
+// change ~ms' spec
+// move the sliders to hear the difference  
+// between various specs
+~ms.setSpec(\lofreq);
+~ms.setSpec(\widefreq);
+~ms.setSpec(\freq);
 
 // add another action to set trigFreq in ~noise
 ~twoDee.addAction(\trigFreq, { |cv| ~noise.set(\trigFreq, cv.value) }, \lo);
@@ -732,28 +787,44 @@ Server.default.waitForBoot{
 // method-call, providing true as its parameter
 ~twoDee.activateAction(\post, false, \lo);
 ~twoDee.activateAction(\post, false, \hi);
+~ms.activateAction(\post, false);
 
-~noise.free;
-~twoDee.close;
+~noise.release;
+[~twoDee, ~ms].do(_.close;
 ::
 
 subsection:: reusable widgets
 By default windows created in SC lack the ability to be opened again once they're closed (even evaluating the variable under which the window has been created will still return the window). The following section describes a workaround in CVWidget (resp. link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D::) that enables the user to keep a widget's responders and open and close it as many times as the user needs to ( strong::open:: is implemented in link::Classes/CVWidgetKnob#-open#CVWidgetKnob:: and link::Classes/CVWidget2D#-open#CVWidget2D::).
 code::
 // create some widgets
-// if a widget is made 'persistent' its OSC-/MID-responders
+// if a widget is made 'persistent' its OSC-/MIDI-responders
 // will not be removed when the widget gets closed
-~knob = CVWidgetKnob(bounds: Rect(490, 0, 80, 210), persistent: true).front;
-~twoDee = CVWidget2D(bounds: Rect(330, 0, 140, 210), persistent: true).front;
+~knob = CVWidgetKnob(bounds: Rect(100, 100, 80, 210), persistent: true).front;
+~twoDee = CVWidget2D(bounds: Rect(180, 100, 140, 210), persistent: true).front;
+~ms = CVWidgetMS(bounds: Rect(320, 100, 140, 210), persistant: true).front;
 
 // make some noise
-Server.default.waitForBoot{ ~noise = { SinOsc.ar(\freq.kr([0, 0]), mul: \amp.kr) }.play };
+(
+Server.default.waitForBoot{ ~noise = { 
+    Splay.ar(
+        SinOsc.ar(\freq.kr(Array.fib(5, 5, 3)*20), \phase.kr([0, 0]), mul: \amp.kr)
+    )
+}.play }
+);
 
 // set various properties of the widgets
+(
+~ms.msSize.do({ |i| 
+	~ms.setMidiMode(1, i).setCtrlButtonBank(16, i)
+});
+~ms.addAction(\setFreq, { |cv| ~noise.set(\freq, cv.value) });
+)
+
 ~knob.setMidiMode(1).setCtrlButtonBank(16).addAction(\setAmp, { |cv| ~noise.set(\amp, cv.value) });
-#[lo, hi].do({ |hilo| ~twoDee.setSpec(#[20, 220, \exp], hilo).setOscMapping(\linexp, hilo).setMidiMode(1, hilo).setCtrlButtonBank(16, hilo) });
-~twoDee.addAction(\setFreq, { |cv| ~noise.setn(\freq, [cv.value, ~twoDee.widgetCV.hi.value]) }, \lo);
-~twoDee.addAction(\setFreq, { |cv| ~noise.setn(\freq, [~twoDee.widgetCV.lo.value, cv.value]) }, \hi);
+
+#[lo, hi].do({ |hilo| ~twoDee.setSpec(\phase, hilo).setMidiMode(1, hilo).setCtrlButtonBank(16, hilo) });
+~twoDee.addAction(\phaseIt, { |cv| ~noise.setn(\phase, [cv.value, ~twoDee.widgetCV.hi.value]) }, \lo);
+~twoDee.addAction(\phaseIt, { |cv| ~noise.setn(\phase, [~twoDee.widgetCV.lo.value, cv.value]) }, \hi);
 
 // close the widgets and open them again
 // note: rather than simply opening them you should re-assign while opening them
@@ -761,4 +832,5 @@ Server.default.waitForBoot{ ~noise = { SinOsc.ar(\freq.kr([0, 0]), mul: \amp.kr)
 // actions, responders etc. of the old one
 ~knob = ~knob.open;
 ~twoDee = ~twoDee.open;
+~ms = ~ms.open;
 ::

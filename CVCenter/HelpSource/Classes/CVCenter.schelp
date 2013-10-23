@@ -607,10 +607,10 @@ SECTION:: Shortcuts
 When CVCenter GUI is sent to front a number of shortcuts apply. Most of these shortcuts will open new windows. However, if the regarding window is already open (and maybe hidden under another window) it will rather be brought to front again than opened in another window.
 NOTE::All shortcuts are configurable by the user. Handling shortcuts is basically handled by a class named link::Classes/KeyDownActions::. They can be altered (actions as well as the action-triggering key-combinations), removed or new shortcuts can be added. This can be done manually by editing link::#*shortcuts:: (not recommended) or using the link::Classes/KeyDownActionsEditor:: in the link::Classes/CVCenterPreferences##preferences-interface:: (persistent) or editing short-term shortcuts in the link::Classes/CVCenterShortcutsEditor##shortcuts-editor:: (shortcuts will be valid until next recompilation of the class-library). However, this is still an experimental feature. Especially in detached tabs shortcuts may not work as expected::
 definitionList::
-## arrow right || navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
-## arrow left || navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
-## alt arrow right || select and focus first widget in alphabetical order, activating widget-shortcuts. Repeating the same shortcut will select and focus the next widget in alphabetical order.
-## alt arrow left || select and focus last widget in alphabetical order, activating widget-shortcuts. Repeating the same shortcut will select and focus the previous widget in alphabetical order. 
+## arrow right || Navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
+## arrow left || Navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
+## alt arrow right || Select and focus first widget in alphabetical order, activating widget-shortcuts. Repeating the same shortcut will select and focus the next widget in alphabetical order.
+## alt arrow left || Select and focus last widget in alphabetical order, activating widget-shortcuts. Repeating the same shortcut will select and focus the previous widget in alphabetical order. 
 ## 0-9 || Select tabs and focus them. The numbers represent the order of the tabs.
 ## s || Save the current CVCenter setup to disk.
 ## l || Load a CVCenter setup from disks.
