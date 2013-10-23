@@ -729,6 +729,9 @@ definitionList::
 ## m || Open the CVWidgetEitor of the focused widget and focus its MIDI-tab
 ## o || Open the CVWidgetEitor of the focused widget and focus its OSC-tab
 ## a || Open the CVWidgetEitor of the focused widget and focus its Actions-tab
+## c || Start or stop OSC calibration
+## r || Reset and restart OSC calibration
+## esc || Move focus from the currently focused widget back to the containing view in the CVCenter GUI
 ::
 
 EXAMPLES::
