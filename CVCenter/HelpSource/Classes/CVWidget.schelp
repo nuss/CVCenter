@@ -24,6 +24,11 @@ Also see link::#Models and Controllers, internal bookkeeping:: and link::#Extend
 
 returns:: code::this:: (CVWidget)
 
+METHOD:: midiSources
+An link::Classes/Event::, containing all currently registered link::Classes/MIDIEndPoint::s and their correspondant numeric IDs. The IDs can be used to identify a device when creating a MIDI-responder though this is usually not necessary as the inbuilt learn functionality will take care of this automatically.
+
+returns:: an link::Classes/Event:: 
+
 INSTANCEMETHODS::
 
 METHOD:: setup
