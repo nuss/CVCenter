@@ -843,5 +843,49 @@ Pdef(\hiHat,
 )
 )
 
-Pdef(\hiHat).play(t);
+Pdef(\hiHat).play;
+Pdef(\hiHat).stop;
+::
+subsection::Using CVWidgetMS in Patterns::
+multi-slider widgets can be used in patterns as well. However, their usage differs.
+code::
+// a synth, utilizing an arrayed control
+(
+SynthDef(\poly, { |atk=0.02, level=0.7, rel=1.5, curve=(-4), freqMod=1, gate=1|
+	var env, son;
+	env = EnvGen.kr(Env.perc(atk, rel, level, curve), gate, doneAction: 2);
+	son = SinOsc.ar(\freq.kr(Array.fib(5, 1.5, 7))).cubed.cubed.scaleneg(freqMod) * env;
+	Out.ar(0, Splay.ar(son).tanh);
+}).add;
+)
+
+// for the arrayed control create a CVWidgetMS *ahead* from using it in the pattern
+// otherwise we get a conflist due to the different clocks for GUI related things
+// (AppClock - the widget creation in CVCenter GUI) and the pattern playing on TempoClock
+CVCenter.use(\freq, \freq!5);
+
+// the pattern
+(
+Pdef(\poly,
+	Pbind(*[
+		instrument: \poly,
+		// CVCenter.at() returns the CV at the specified key in CVCenter.all
+		// a multi-dimensional cannot be embedded in the pattern like other CVs
+		// it's value must be yielded by a Routine.
+		// hence, we have to use a Prout - can also be shortened to p {}
+		// we also have to take care of proper multi-channel expansion
+		// so we apply .collect([_]) and yield the result
+		freq: Prout({ loop{ CVCenter.at(\freq).collect([_]).yield }}) - Pseq([20, -10, -30], inf),
+		dur: Prand(#[0.3, 0.5], inf),
+		curve: CVCenter.use(\curve, #[-4.0, 4.0].asSpec),
+		rel: Pwhite(0.8, 2.0),
+		atk: Pwhite(0.01, 0.03),
+		freqMod: CVCenter.use(\freqMod, \pan),
+		level: 0.2
+	])
+)
+)
+
+Pdef(\poly).play;
+Pdef(\poly).stop;
 ::
