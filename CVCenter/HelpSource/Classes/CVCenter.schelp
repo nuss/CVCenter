@@ -846,7 +846,7 @@ Pdef(\hiHat,
 Pdef(\hiHat).play;
 Pdef(\hiHat).stop;
 ::
-subsection::Using CVWidgetMS in Patterns::
+subsection::Using CVWidgetMS in Patterns
 multi-slider widgets can be used in patterns as well. However, their usage differs.
 code::
 // a synth, utilizing an arrayed control
