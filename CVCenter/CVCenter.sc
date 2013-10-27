@@ -1488,7 +1488,7 @@ CVCenter {
 		// CVWidgetMS
 		// if spec.asSpec returns nil make it a default ControlSpec by calling as Spec again
 		if(spec.isArray.not, { thisSpec = spec.asSpec.asSpec }, {
-			if(spec.select({ |sp| sp.respondsTo(\asSpec)}).size == spec.size, {
+			if(spec.select({ |sp| sp.class == Symbol }).size > 0, {
 				thisSpec = ControlSpec(
 					spec.collect({ |sp| sp.asSpec.asSpec.minval }),
 					spec.collect({ |sp| sp.asSpec.asSpec.maxval }),
