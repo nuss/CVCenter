@@ -1485,26 +1485,30 @@ CVCenter {
 
 		// "thisSlot: %\n".postf(thisSlot);
 
-		// CVWidgetMS
-		// if spec.asSpec returns nil make it a default ControlSpec by calling as Spec again
-		if(spec.isArray.not, { thisSpec = spec.asSpec.asSpec }, {
-			if(spec.select({ |sp| sp.class == Symbol }).size > 0, {
-				thisSpec = ControlSpec(
-					spec.collect({ |sp| sp.asSpec.asSpec.minval }),
-					spec.collect({ |sp| sp.asSpec.asSpec.maxval }),
-					spec[0].asSpec.asSpec.warp,
-					spec.collect({ |sp| sp.asSpec.asSpec.step }),
-					spec.collect({ |sp| sp.asSpec.asSpec.default })
-				);
-				if(thisSpec.hasZeroCrossing, { thisSpec.warp_(\lin) });
-				if(spec.asBag.contents.size == 1, {
-					if((specName = Spec.specs.findKeyForValue(spec[0].asSpec)).notNil, {
-						Spec.add((specName++"_"++spec.size).asSymbol, thisSpec);
+		if(spec.class == ControlSpec, { thisSpec = spec }, {
+			// CVWidgetMS
+			// if spec.asSpec returns nil make it a default ControlSpec by calling as Spec again
+			if(spec.isArray.not, { thisSpec = spec.asSpec.asSpec }, {
+				if(spec.select({ |sp| sp.respondsTo(\asSpec) and:{
+					sp.asSpec.class == ControlSpec }
+				}).size == spec.size, {
+					thisSpec = ControlSpec(
+						spec.collect({ |sp| sp.asSpec.asSpec.minval }),
+						spec.collect({ |sp| sp.asSpec.asSpec.maxval }),
+						spec[0].asSpec.asSpec.warp,
+						spec.collect({ |sp| sp.asSpec.asSpec.step }),
+						spec.collect({ |sp| sp.asSpec.asSpec.default })
+					);
+					if(thisSpec.hasZeroCrossing, { thisSpec.warp_(\lin) });
+					if(spec.asBag.contents.size == 1, {
+						if((specName = Spec.specs.findKeyForValue(spec[0].asSpec)).notNil, {
+							Spec.add((specName++"_"++spec.size).asSymbol, thisSpec);
+						})
 					})
-				})
-			}, { thisSpec = spec.asSpec.asSpec })
-		}, {
-			Error("Could not create a valid ControlSpec from given value '%'".format(spec)).throw;
+				}, { thisSpec = spec.asSpec.asSpec })
+			}, {
+				Error("Could not create a valid ControlSpec from given value '%'".format(spec)).throw;
+			})
 		});
 
 		case
