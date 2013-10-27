@@ -1486,14 +1486,15 @@ CVCenter {
 		// "thisSlot: %\n".postf(thisSlot);
 
 		// CVWidgetMS
-		if(spec.isArray.not, { thisSpec = spec.asSpec }, {
-			if(spec.select({ |sp| sp.asSpec.class == ControlSpec }).size > 0, {
+		// if spec.asSpec returns nil make it a default ControlSpec by calling as Spec again
+		if(spec.isArray.not, { thisSpec = spec.asSpec.asSpec }, {
+			if(spec.select({ |sp| sp.respondsTo(\asSpec)}).size == spec.size, {
 				thisSpec = ControlSpec(
-					spec.collect({ |sp| sp.asSpec.minval }),
-					spec.collect({ |sp| sp.asSpec.maxval }),
-					spec[0].asSpec.warp,
-					spec.collect({ |sp| sp.asSpec.step }),
-					spec.collect({ |sp| sp.asSpec.default })
+					spec.collect({ |sp| sp.asSpec.asSpec.minval }),
+					spec.collect({ |sp| sp.asSpec.asSpec.maxval }),
+					spec[0].asSpec.asSpec.warp,
+					spec.collect({ |sp| sp.asSpec.asSpec.step }),
+					spec.collect({ |sp| sp.asSpec.asSpec.default })
 				);
 				if(thisSpec.hasZeroCrossing, { thisSpec.warp_(\lin) });
 				if(spec.asBag.contents.size == 1, {
@@ -1501,7 +1502,9 @@ CVCenter {
 						Spec.add((specName++"_"++spec.size).asSymbol, thisSpec);
 					})
 				})
-			})
+			}, { thisSpec = spec.asSpec.asSpec })
+		}, {
+			Error("Could not create a valid ControlSpec from given value '%'".format(spec)).throw;
 		});
 
 		case
@@ -1517,6 +1520,8 @@ CVCenter {
 			widgetStates[thisKey] ?? { widgetStates.put(thisKey, ()) };
 			widgetStates[thisKey][thisSlot] ?? { widgetStates[thisKey].put(thisSlot, ()) };
 		};
+
+		"thisSpec: %\n".postf(thisSpec);
 
 		if(value.notNil, {
 			case
