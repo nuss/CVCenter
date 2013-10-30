@@ -27,11 +27,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 	var midiView0, midiView1, oscView0, oscView1;
 	var oscFlow0, <oscFlow1, midiFlow0, <midiFlow1;
 
-	*new { |widget, widgetName, tab|
-		^super.new.init(widget, widgetName, tab);
+	*new { |widget, tab|
+		^super.new.init(widget, tab);
 	}
 
-	init { |widget, widgetName, tab|
+	init { |widget, tab|
 		var cvString;
 		// var oscTabs, midiTabs;
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
@@ -97,7 +97,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 		#oscEditBtns, oscCalibBtns, midiEditGroups = List()!3;
 
-		name = (widgetName.asString++"MS").asSymbol;
+		// name = (widget.name.asString++"MS").asSymbol;
+		name = widget.name;
 		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
 		xySlots ?? { xySlots = [] };
 		msEditorEnv = ();
@@ -146,7 +147,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			};
 
-			window = Window("Widget Editor:"+widgetName, Rect(
+			window = Window("Widget Editor:"+name, Rect(
 				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 400, 253
 			));
 
@@ -159,7 +160,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				nextX = xySlots.last[0].x+405; nextY = xySlots.last[0].y;
 			});
 
-			allEditors.put(name, (editor: this, window: window, name: widgetName));
+			allEditors.put(name, (editor: this, window: window, name: name));
 			thisEditor = allEditors[name];
 
 			if(Quarks.isInstalled("wslib"), { window.background_(Color.white) });
@@ -1158,7 +1159,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 							if(widget.editor.editors[sindex].isNil or:{
 								widget.editor.editors[sindex].isClosed
 							}, {
-								CVWidgetEditor(widget, widget.label.states[0][0], 1, sindex);
+								CVWidgetEditor(widget, 1, sindex);
 							}, {
 								widget.editor.editors[sindex].front(1)
 							});

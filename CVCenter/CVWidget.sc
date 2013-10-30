@@ -118,7 +118,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor.msEditor.isNil or:{
 											CVCenter.cvWidgets[key].editor.msEditor.isClosed }
 										) {
-											CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 0)
+											CVWidgetMSEditor(CVCenter.cvWidgets[key], 0)
 										} {
 											CVCenter.cvWidgets[key].editor.msEditor.front(0)
 										}
@@ -127,7 +127,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor[slot].isNil or:{
 											CVCenter.cvWidgets[key].editor[slot].isClosed }
 										) {
-											CVWidgetEditor(CVCenter.cvWidgets[key], key, 0, slot)
+											CVWidgetEditor(CVCenter.cvWidgets[key], 0, slot)
 										} {
 											CVCenter.cvWidgets[key].editor[slot].front(0)
 										}
@@ -136,7 +136,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor.isNil or:{
 											CVCenter.cvWidgets[key].editor.isClosed }
 										) {
-											CVWidgetEditor(CVCenter.cvWidgets[key], key, 0)
+											CVWidgetEditor(CVCenter.cvWidgets[key], 0)
 										} {
 											CVCenter.cvWidgets[key].editor.front(0)
 										}
@@ -164,7 +164,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor.msEditor.isNil or:{
 											CVCenter.cvWidgets[key].editor.msEditor.isClosed }
 										) {
-											CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 1)
+											CVWidgetMSEditor(CVCenter.cvWidgets[key], 1)
 										} {
 											CVCenter.cvWidgets[key].editor.msEditor.front(1)
 										}
@@ -173,7 +173,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor[slot].isNil or:{
 											CVCenter.cvWidgets[key].editor[slot].isClosed }
 										) {
-											CVWidgetEditor(CVCenter.cvWidgets[key], key, 1, slot)
+											CVWidgetEditor(CVCenter.cvWidgets[key], 1, slot)
 										} {
 											CVCenter.cvWidgets[key].editor[slot].front(1)
 										}
@@ -182,7 +182,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor.isNil or:{
 											CVCenter.cvWidgets[key].editor.isClosed }
 										) {
-											CVWidgetEditor(CVCenter.cvWidgets[key], key, 1)
+											CVWidgetEditor(CVCenter.cvWidgets[key], 1)
 										} {
 											CVCenter.cvWidgets[key].editor.front(1)
 										}
@@ -210,7 +210,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor.msEditor.isNil or:{
 											CVCenter.cvWidgets[key].editor.msEditor.isClosed }
 										) {
-											CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 2)
+											CVWidgetMSEditor(CVCenter.cvWidgets[key], 2)
 										} {
 											CVCenter.cvWidgets[key].editor.msEditor.front(2)
 										}
@@ -219,7 +219,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor[slot].isNil or:{
 											CVCenter.cvWidgets[key].editor[slot].isClosed }
 										) {
-											CVWidgetEditor(CVCenter.cvWidgets[key], key, 2, slot)
+											CVWidgetEditor(CVCenter.cvWidgets[key], 2, slot)
 										} {
 											CVCenter.cvWidgets[key].editor[slot].front(2)
 										}
@@ -228,7 +228,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor.isNil or:{
 											CVCenter.cvWidgets[key].editor.isClosed }
 										) {
-											CVWidgetEditor(CVCenter.cvWidgets[key], key, 2)
+											CVWidgetEditor(CVCenter.cvWidgets[key], 2)
 										} {
 											CVCenter.cvWidgets[key].editor.front(2)
 										}
@@ -256,7 +256,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor.msEditor.isNil or:{
 											CVCenter.cvWidgets[key].editor.msEditor.isClosed }
 										) {
-											CVWidgetMSEditor(CVCenter.cvWidgets[key], key, 3)
+											CVWidgetMSEditor(CVCenter.cvWidgets[key], 3)
 										} {
 											CVCenter.cvWidgets[key].editor.msEditor.front(3)
 										}
@@ -265,7 +265,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor[slot].isNil or:{
 											CVCenter.cvWidgets[key].editor[slot].isClosed }
 										) {
-											CVWidgetEditor(CVCenter.cvWidgets[key], key, 3, slot)
+											CVWidgetEditor(CVCenter.cvWidgets[key], 3, slot)
 										} {
 											CVCenter.cvWidgets[key].editor[slot].front(3)
 										}
@@ -274,7 +274,7 @@ CVWidget {
 										if(CVCenter.cvWidgets[key].editor.isNil or:{
 											CVCenter.cvWidgets[key].editor.isClosed }
 										) {
-											CVWidgetEditor(CVCenter.cvWidgets[key], key, 3)
+											CVWidgetEditor(CVCenter.cvWidgets[key], 3)
 										} {
 											CVCenter.cvWidgets[key].editor.front(3)
 										}

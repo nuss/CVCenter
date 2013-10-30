@@ -183,7 +183,7 @@ CVWidgetKnob : CVWidget {
 			.states_([["edit Spec", Color.white, Color(1.0, 0.3)]])
 			.action_({ |btn|
 				if(this.editor.isNil or:{ this.editor.isClosed }, {
-					CVWidgetEditor(this, name, 0);
+					CVWidgetEditor(this, 0);
 				}, {
 					this.editor.front(0)
 				});
@@ -204,7 +204,7 @@ CVWidgetKnob : CVWidget {
 			.states_([["MIDI", stringColor, background]])
 			.action_({ |ms|
 				if(this.editor.isNil or:{ this.editor.isClosed }, {
-					CVWidgetEditor(this, name, 1);
+					CVWidgetEditor(this, 1);
 				}, {
 					this.editor.front(1)
 				});
@@ -346,7 +346,7 @@ CVWidgetKnob : CVWidget {
 			])
 			.action_({ |oscb|
 				if(this.editor.isNil or:{ this.editor.isClosed }, {
-					CVWidgetEditor(this, name, 2);
+					CVWidgetEditor(this, 2);
 				}, {
 					this.editor.front(2)
 				});
@@ -414,7 +414,7 @@ CVWidgetKnob : CVWidget {
 			])
 			.action_({ |ab|
 				if(this.editor.isNil or:{ this.editor.isClosed }, {
-					CVWidgetEditor(this, name, 3);
+					CVWidgetEditor(this, 3);
 				}, {
 					this.editor.front(3)
 				});

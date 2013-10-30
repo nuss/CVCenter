@@ -215,7 +215,7 @@ CVCenter {
 						})
 					}
 				);
-				CVCenter.cvWidgets[k.asString.drop(-2).asSymbol] !? {
+				CVCenter.cvWidgets[k] !? {
 					v.editor !? { v.editor.close }
 				}
 			})";

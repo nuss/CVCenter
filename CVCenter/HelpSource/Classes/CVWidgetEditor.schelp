@@ -1,10 +1,10 @@
 CLASS:: CVWidgetEditor
 summary:: a GUI for editing widgets and their parameters: specs, MIDI, OSC, actions...
 categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
-related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/SimpleController, Classes/ControlSpec, Classes/OSCCommands
+related:: Classes/AbstractCVWidgetEditor, Classes/CVWidgetMSEditor, Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CVWidgetMS, Classes/CCResponder, Classes/OSCresponderNode, Classes/SimpleController, Classes/ControlSpec, Classes/OSCCommands
 
 DESCRIPTION::
-The interface defined within link::Classes/CVWidget:: resp. its subclasses link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D:: defines a number of methods that can also be triggered via their GUI. However these GUIs don't offer enough space to display all options a widget incorporates. Therefore each widget has an inbuilt editor which is defined within CVWidgetEditor.
+The interface defined within link::Classes/CVWidget:: resp. its subclasses link::Classes/CVWidgetKnob::, link::Classes/CVWidget2D:: and CVWidgetMS defines a number of methods which can be triggered via their GUI. However these GUIs don't offer enough space to display all options a widget incorporates. Therefore each widget has an inbuilt editor which is defined within CVWidgetEditor.
 note::CVWidgetEditor is not supposed to be used directly. Rather editors should always be instantiated from within the widget it belongs to.::
 
 
@@ -12,17 +12,14 @@ CLASSMETHODS::
 
 private:: allEditors
 METHOD:: new
-Opens a new editor for the widget specified by code::widgetName::
-
+Opens a new editor for code::widget::
 
 argument:: widget
-the widget-object: either a link::Classes/CVWidgetKnob:: or a link::Classes/CVWidget2D::
-
-argument:: widgetName
-a link::Classes/Symbol::, reflecting the widget's name
+the widget-object: either a link::Classes/CVWidgetKnob::, a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS::. If widget is a link::Classes/CVWidgetMSEditor::.
+ the tabs "Spec" and "Actions" will be missing as those properties are common to all slots of a link::Classes/CVWidgetMS:: and can be edited in the widget's link::Classes/CVWidgetMSEditor::.
 
 argument:: tab
-an link::Classes/Integer:: specifying which tab of the editor shall be focused when the editor opens. Each editor contains 4 tabs ( see also link::Classes/TabbedView::): "Specs", "MIDI", "OSC" and "Action", each addressed by an integer value from code::0:: to code::3::
+an link::Classes/Integer::, specifying which tab of the editor shall be focused opening the editor. Each editor contains 4 tabs ( see also link::Classes/TabbedView2::): "Specs", "MIDI", "OSC" and "Actions", each addressed by an integer value from code::0:: to code::3::
 
 argument:: slot
 if the widget is a link::Classes/CVWidget2D:: this parameter is necessary to reflect the widget's slot for which the editor will be created.
@@ -38,12 +35,12 @@ The editor's window
 returns:: a link::Classes/Window::
 
 METHOD:: tabs
-The editor's tabs, defined by a link::Classes/TabbedView:: 
+The editor's tabs, defined by a link::Classes/TabbedView2:: 
 
-returns:: a link::Classes/TabbedView::
+returns:: a link::Classes/TabbedView2::
 
 METHOD:: front
-Open resp.bring the an editor-window to front, focusing the tab given by code::tab::
+Bring the an editor-window to front, focusing the tab given by code::tab::. The editor has already to be open. code::CVWidgetEditor.new:: will call code::front:: internally.
 
 argument:: tab
 an link::Classes/Integer:: providing the tab-index code::0-3::
@@ -58,7 +55,7 @@ code::aCVWidget2D.editor[\lo].close::
 returns:: a code::CVWidgetEditor::
 
 METHOD:: isClosed
-returns code::true:: if the editor is not code::nil:: yet it's been closed closed.
+returns code::true:: if the editor is not code::nil:: yet it's been closed.
 
 returns:: a link::Classes/Boolean::
 

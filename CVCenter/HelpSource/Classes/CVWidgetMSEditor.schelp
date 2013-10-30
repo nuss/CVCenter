@@ -1,0 +1,116 @@
+TITLE:: CVWidgetMSEditor
+summary:: a GUI for editing widgets and their parameters: specs, MIDI, OSC, actions...
+categories:: Undocumented classes
+related:: Classes/AbstractCVWidgetEditor, Classes/CVWidgetEditor, Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CVWidgetMS, Classes/CCResponder, Classes/OSCresponderNode, Classes/SimpleController, Classes/ControlSpec, Classes/OSCCommands
+
+DESCRIPTION::
+A special editor for link::Classes/CVWidgetMS::: As this widget allows connecting to an arbitrary number of control-slots at once this editor is designed to allow the user to make batch-connections as well as it provides the possibility to edit each slot individually. MIDI and OSC tabs within the interface are divided into an area that allows batch editing and an area that comprehends links to  link::Classes/CVWidgetEditor::s for each slot. Each slot can be connected to an external OSC- or MIDI-controller individually.
+
+
+CLASSMETHODS::
+
+METHOD:: new
+Open a new editor for code::widget::
+
+argument:: widget
+the widget-object: must be a link::CVWidgetMS::.
+
+argument:: tab
+an link::Classes/Integer::, specifying which tab of the editor shall be focused upon opening the editor. Each editor contains 4 tabs ( see also link::Classes/TabbedView2::): "Spec", "MIDI", "OSC" and "Actions", each addressed by an integer value from code::0:: to code::3::
+
+returns:: a code::CVWidgetMSEditor::
+
+INSTANCEMETHODS::
+subsection:: Common GUI properties and methods
+subsection:: The "MIDI"-Tab
+
+METHOD:: midiTabs
+Every editor provides the possibility to either batch-edit or edit MIDI-connections individually. For convenience these 2 possibilities are represented within 2 tabs:
+
+image::CVWidgetMSEditor_midi_batch_connected.png::
+the batch-edititng tab
+
+image::CVWidgetMSEditor_midi_indiv.png::
+the tab representing MIDI-connections for individual sliders (editable).
+
+returns:: (describe returnvalue here)
+
+METHOD:: oscTabs
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: midiFlow1
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+private:: init
+private:: amendActionsList
+
+METHOD:: msMidiIndexStartField
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: oscEditBtns
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: midiEditGroups
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: close
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: midiDisconnectorBut
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: intStartIndexField
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: oscCalibBtns
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: extOscCtrlArrayField
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: extMidiCtrlArrayField
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: midiConnectorBut
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: oscDisconnectorBut
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: oscFlow1
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+
+EXAMPLES::
+
+code::
+(some example code)
+::

@@ -246,7 +246,7 @@ CVWidget2D : CVWidget {
 		specBut.lo = Button(parent)
 			.action_({ |btn|
 				if(editor.lo.isNil or:{ editor.lo.isClosed }, {
-					editor.lo = CVWidgetEditor(this, name, 0, \lo);
+					editor.lo = CVWidgetEditor(this, 0, \lo);
 					guiEnv.lo.editor = editor.lo;
 				}, {
 					editor.lo.front(0)
@@ -262,7 +262,7 @@ CVWidget2D : CVWidget {
 		specBut.hi = Button(parent)
 			.action_({ |btn|
 				if(editor.hi.isNil or:{ editor.hi.isClosed }, {
-					editor.hi = CVWidgetEditor(this, name, 0, \hi);
+					editor.hi = CVWidgetEditor(this, 0, \hi);
 					guiEnv.hi.editor = editor.hi;
 				}, {
 					editor.hi.front(0)
@@ -279,7 +279,7 @@ CVWidget2D : CVWidget {
 		midiHead.lo = Button(parent)
 			.action_({ |btn|
 				if(editor.lo.isNil or:{ editor.lo.isClosed }, {
-					editor.hi = CVWidgetEditor(this, name, 1, \lo);
+					editor.hi = CVWidgetEditor(this, 1, \lo);
 					guiEnv.lo.editor = editor.lo;
 				}, {
 					editor.lo.front(1)
@@ -295,7 +295,7 @@ CVWidget2D : CVWidget {
 		midiHead.hi = Button(parent)
 			.action_({ |btn|
 				if(editor.hi.isNil or:{ editor.hi.isClosed }, {
-					editor.hi = CVWidgetEditor(this, name, 1, \hi);
+					editor.hi = CVWidgetEditor(this, 1, \hi);
 					guiEnv.hi.editor = editor.hi;
 				}, {
 					editor.hi.front(1)
@@ -532,7 +532,7 @@ CVWidget2D : CVWidget {
 			])
 			.action_({ |oscb|
 				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {
-					editor.put(v[0], CVWidgetEditor(this, name, 2, v[0]));
+					editor.put(v[0], CVWidgetEditor(this, 2, v[0]));
 					guiEnv[v[0]].editor = editor[v[0]];
 				}, {
 					editor[v[0]].front(2)
@@ -610,7 +610,7 @@ CVWidget2D : CVWidget {
 			])
 			.action_({ |ab|
 				if(editor[v[0]].isNil or:{ editor[v[0]].isClosed }, {
-					editor.put(v[0], CVWidgetEditor(this, name, 3, v[0]));
+					editor.put(v[0], CVWidgetEditor(this, 3, v[0]));
 					guiEnv[v[0]].editor = editor[v[0]];
 				}, {
 					editor[v[0]].front(3)

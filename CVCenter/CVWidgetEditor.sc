@@ -20,11 +20,11 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 	var <specConstraintsText, <calibNumBoxes;
 	var editorSlot;
 
-	*new { |widget, widgetName, tab, slot|
-		^super.new.init(widget, widgetName, tab, slot)
+	*new { |widget, tab, slot|
+		^super.new.init(widget, tab, slot)
 	}
 
-	init { |widget, widgetName, tab, slot|
+	init { |widget, tab, slot|
 		var cvString, slotHiLo;
 		var staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
 		var msrc = "source", mchan = "channel", mctrl = "ctrl", margs;
@@ -79,7 +79,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
 		};
 
-		name = widgetName.asSymbol;
+		name = widget.name;
 		nextX ?? { nextX = 0 }; nextY ?? { nextY = 0 };
 		xySlots ?? { xySlots = [] };
 		editorEnv = ();
@@ -142,7 +142,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				})
 			};
 
-			window = Window("Widget Editor:"+widgetName++slotHiLo, Rect(
+			window = Window("Widget Editor:"+name++slotHiLo, Rect(
 				gapNextX ?? { nextX }, gapNextY ?? { nextY }, 270, 253
 			));
 
@@ -157,13 +157,13 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			});
 
 			if(slot.isNil, {
-				allEditors.put(name, (editor: this, window: window, name: widgetName))
+				allEditors.put(name, (editor: this, window: window, name: name))
 			}, {
-				tmp = (); tmp.put(slot, (editor: this, window: window, name: widgetName));
+				tmp = (); tmp.put(slot, (editor: this, window: window, name: name));
 				if(allEditors[name].isNil, {
 					allEditors.put(name, tmp);
 				}, {
-					allEditors[name].put(slot, (editor: this, window: window, name: widgetName));
+					allEditors[name].put(slot, (editor: this, window: window, name: name));
 				});
 			});
 
