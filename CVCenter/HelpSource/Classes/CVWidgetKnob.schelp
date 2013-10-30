@@ -132,6 +132,21 @@ returns:: a link::Classes/Button::
 
 private:: init
 
+ETHOD:: background
+Get or set the background-color of the widget. Tne setter for this method is implemented within CVWidgetMS while the getter is implemented as a global getter for all CVWidgets in link::Classes/CVWidget::. 
+
+argument:: color
+a link::Classes/Color::
+
+returns:: a link::Classes/Color:: (getter) or code::this:: (a code::CVWidgetMS::) (setter)
+
+METHOD:: stringColor
+Get or set the string-color of the widget. Tne setter for this method is implemented within CVWidgetMS while the getter is implemented as a global getter for all CVWidgets in link::Classes/CVWidget::. 
+
+argument:: color
+a link::Classes/Color::
+
+returns:: a link::Classes/Color:: (getter) or code::this:: (a code::CVWidgetMS::) (setter)
 
 EXAMPLES::
 

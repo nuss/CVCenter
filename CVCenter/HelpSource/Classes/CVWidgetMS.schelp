@@ -36,6 +36,7 @@ definitionList::
 ## softWithin || see link::Classes/CVWidget#-setSoftWithin::. default: an link::Classes/Array:: with a size given in argument code::numSliders::, all slots filled with code::0.1::
 ## ctrlButtonBank || see link::Classes/CVWidget#-setCtrlButtonBank::. default: an link::Classes/Array:: with a size given in argument code::numSliders::, all slots filled with code::nil::
 ## calibrate || see link::Classes/CVWidget#-setCalibrate::. default: an link::Classes/Array:: with a size given in argument code::numSliders::, all slots filled with code::true::
+::
 
 argument:: controllersAndModels
 if a widget wraps a link::Classes/CV:: that has been created within some CVWidget the models and controllers of that other widget can be added here. However, it is emphasis::not:: recommended to do so as there are specific methods that allow you to recreate widgets that have already been closed. See also link::Classes/CVWidget#-wdgtControllersAndModels::
@@ -47,7 +48,7 @@ argument:: persistent
 a multi-purpose argument: usually you will not set anything here. It is used with the link::#-open:: method resp. link::Classes/CVCenter::. Within these it is used to pass in OSC-/MIDI-responders resp. the widgets MIDI-/OSC-environment. See also link::Classes/CVWidget#-midiOscEnv::
 
 argument:: numSliders
-an link::Classes/Integer:: determining how many sliders the link::Classes/MultiSlider:: shall have
+an link::Classes/Integer:: determining how many sliders the link::Classes/MultiSliderView:: shall have
 
 argument:: server
 only used for link::Classes/SwingOSC:: compatability (untested)
@@ -75,93 +76,58 @@ returns:: a code::CVWidgetMS::
 subsection:: GUI-elements
 
 METHOD:: mSlider
-A link::Classes/MultiSlider::, displaying or setting the current value of the widget's link::Classes/CV::.
+A link::Classes/MultiSliderView::, displaying or setting the current value of the widget's link::Classes/CV::.
 
-returns:: a link::Classes/MultiSlider::
+returns:: a link::Classes/MultiSliderView::
 
 METHOD:: numVal
 A link::Classes/TextView::, displaying or setting the current value of the widget's link::Classes/CV:: as an link::Classes/Array:: of numbers (truncated to 2 decimal places).
 
-returns:: an link::Classes/Array:: of link::Classes/Number::s
-
-METHOD:: background
-(describe method here)
-
-argument:: color
-(describe argument here)
-
-returns:: (describe returnvalue here)
+returns:: a link::Classes/TextView::
 
 METHOD:: midiBut
-(describe method here)
+A link::Classes/Button:: that opens the MIDI-tab of the widget's link::Classes/CVWidgetMSEditor:: (also executed by link::Classes/CVWidget#Shortcuts#shortcut:: 'm')
 
-returns:: (describe returnvalue here)
-
-METHOD:: msEditor
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: calibViews
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: actionsBut
-(describe method here)
-
-returns:: (describe returnvalue here)
+returns:: a link::Classes/Button::
 
 METHOD:: oscBut
-(describe method here)
+A link::Classes/Button:: that opens the OSC-tab of the widget's link::Classes/CVWidgetMSEditor:: (also executed by link::Classes/CVWidget#Shortcuts#shortcut:: 'o')
 
-returns:: (describe returnvalue here)
-
-METHOD:: init
-(describe method here)
-
-argument:: bounds
-(describe argument here)
-
-argument:: action
-(describe argument here)
-
-argument:: setupArgs
-(describe argument here)
-
-argument:: controllersAndModels
-(describe argument here)
-
-argument:: cvcGui
-(describe argument here)
-
-argument:: persistent
-(describe argument here)
-
-argument:: numSliders
-(describe argument here)
-
-argument:: server
-(describe argument here)
-
-returns:: (describe returnvalue here)
+returns:: a link::Classes/Button::
 
 METHOD:: specBut
-(describe method here)
+A link::Classes/Button:: that opens the Spec-tab of the widget's link::Classes/CVWidgetMSEditor:: (also executed by link::Classes/CVWidget#Shortcuts#shortcut:: 's')
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/Button::
 
-METHOD:: stringColor
-(describe method here)
+METHOD:: actionsBut
+A link::Classes/Button:: that opens the Actions-tab of the widget's link::Classes/CVWidgetMSEditor:: (also executed by link::Classes/CVWidget#Shortcuts#shortcut:: 'a')
+
+returns:: a link::Classes/Button::
+
+METHOD:: calibViews
+A link::Classes/List:: of link::Classes/View::s, each displaying the current link::Classes/CVWidget#getCalibration#(OSC) calibration::-status of one slider within the multi-slider of the widget: green means calibration is active, red means it's currently off. The views are displayed as a bar beneath the multi-slider of the widget. 
+
+returns:: a link::Classes/List:: of link::Classes/View::s
+
+private:: init
+
+METHOD:: background
+Get or set the background-color of the widget. Tne setter for this method is implemented within CVWidgetMS while the getter is implemented as a global getter for all CVWidgets in link::Classes/CVWidget::. 
 
 argument:: color
-(describe argument here)
+a link::Classes/Color::
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/Color:: (getter) or code::this:: (a code::CVWidgetMS::) (setter)
 
+METHOD:: stringColor
+Get or set the string-color of the widget. Tne setter for this method is implemented within CVWidgetMS while the getter is implemented as a global getter for all CVWidgets in link::Classes/CVWidget::. 
+
+argument:: color
+a link::Classes/Color::
+
+returns:: a link::Classes/Color:: (getter) or code::this:: (a code::CVWidgetMS::) (setter)
 
 EXAMPLES::
 
-code::
-(some example code)
-::
+See examples in link::Classes/CVWidget#examples::

@@ -1,7 +1,6 @@
 CVWidgetMS : CVWidget {
 	var <mSlider, <calibViews, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
 	var numOscResponders, numMidiResponders;
-	var <msEditor;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
@@ -424,7 +423,7 @@ CVWidgetMS : CVWidget {
 			actionsBut: actionsBut
 		);
 
-		focusElements = allGuiEls.copy.removeAll([widgetBg, calibViews, nameField]).postln;
+		focusElements = allGuiEls.copy.removeAll([widgetBg, calibViews, nameField]);
 
 		msSize.do({ |slot| this.initControllerActions(slot) });
 

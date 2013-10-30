@@ -1,7 +1,7 @@
 CLASS:: CVWidget
 summary:: The abstract superclass for all CVWidgets
 categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
-related:: Classes/CVCenter, Classes/CV, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/ControlSpec, Classes/SimpleController
+related:: Classes/CVCenter, Classes/CV, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CVWidgetMS, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode, Classes/ControlSpec, Classes/SimpleController
 
 DESCRIPTION::
 CVWidget is the abstract superclass of all CVWidgets (currently: link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D::). However, it implements a couple of useful methods that are common to all its subclasses.
@@ -439,6 +439,9 @@ private:: prInitOscConnect
 private:: prInitOscDisplay
 private:: prInitOscInputRange
 private:: prInitActionsControl
+private:: background
+private:: stringColor
+
 
 subsection:: Extending the API
 warning::The following features are experimental and one should study the internal workings of CVWidget closely before using them - especially the structure of controllers and models: link::#-wdgtControllersAndModels::.
@@ -636,18 +639,6 @@ METHOD:: editor
 Every widget has one or more editors that will open in a new window ( link::Classes/CVWidgetKnob:: 1 editor, link::Classes/CVWidget2D:: 2 editors - code::\lo:: and code::\hi::). This method returns a reference to them.
 
 returns:: a link::Classes/CVWidgetEditor:: or an link::Classes/Event::, containing a reference two 2 or more link::Classes/CVWidgetEditor::s
-
-METHOD:: background
-Get/Set the background-color of a widget. Setter-methods are implemented within CVWidget-subclasses: 
-link::Classes/CVWidgetKnob#background::, link::Classes/CVWidget2D#background::, link::Classes/CVWidgetMS#background::.
-
-returns:: a link::Classes/Color::
-
-METHOD:: stringColor
-Get/Set the string-color of a widget. Setter-methods are implemented within CVWidget-subclasses: 
-link::Classes/CVWidgetKnob#stringColor::, link::Classes/CVWidget2D#stringColor::, link::Classes/CVWidgetMS#stringColor::.
-
-returns:: a link::Classes/Color::
 
 METHOD:: name
 Get the name of a widget. This corresponds with the key under which the widget's CV(s) is/are stored in link::Classes/CVCenter#*all::.
