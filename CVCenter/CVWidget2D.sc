@@ -92,11 +92,11 @@ CVWidget2D : CVWidget {
 		// [parent, widgetCV, name].postln;
 
 		if(widgetCV.isNil, {
-			"widgetCV.isNil".postln;
+			// "widgetCV.isNil".postln;
 			widgetCV = ();
 			widgetCV.lo = CV.new; widgetCV.hi = CV.new;
 		}, {
-			#[lo, hi].do({ |hilo| widgetCV[hilo].postln ?? { widgetCV.put(hilo, nil.asSpec) } });
+			#[lo, hi].do({ |hilo| widgetCV[hilo] ?? { widgetCV.put(hilo, nil.asSpec) } });
 		});
 
 		numVal = (); specBut = ();

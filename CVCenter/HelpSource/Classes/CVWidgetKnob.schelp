@@ -1,18 +1,18 @@
 CLASS:: CVWidgetKnob
 summary:: a control-widget that can either be embedded in other views or opened as a standalone-widget, offering easy connections with external MIDI-/OSC-hard- and software.
 categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
-related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
+related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidget2D, Classes/CVWidgetMS, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
 
 DESCRIPTION::
-A CVWidgetKnob is widget that can be used to set e.g. controls in running link::Classes/Synth::s, link::Classes/Ndef::s, link::Classes/ProxySpace:: slots, link::Classes/NodeProxy::s and other other values that can be set at runtime. Also it may be used in connection with link::Classes/Pattern::s. Contrary to link::Classes/CVWidget2D:: it holds only one link::Classes/CV::.
+A CVWidgetKnob is widget that can be used to set e.g. controls in running link::Classes/Synth::s, link::Classes/Ndef::s, link::Classes/ProxySpace:: slots, link::Classes/NodeProxy::s, link::Classes/Patch::es and other other values that can be set at runtime. Also it may be used in connection with link::Classes/Pattern::s. Contrary to link::Classes/CVWidget2D:: it holds only one link::Classes/CV::.
 
 CLASSMETHODS::
 
 METHOD:: new
-Create a new CVWidgetKnob. To display the widget on screen you must call code::front:: on the resulting object.
+Create a new CVWidgetKnob. To display the widget on screen you must call link::Classes/CVWidget#front#front:: on the resulting object.
 
 argument:: parent
-an instance of link::Classes/Window:: - optional. If none is given the it will be created internally.
+an instance of link::Classes/Window:: or link::Classes/View:: - optional. If none is given the it will be created internally.
 
 argument:: cv
 an instance of link::Classes/CV:: - optional. If none is given it will be created internally.
@@ -39,7 +39,7 @@ definitionList::
 ::
 
 argument:: controllersAndModels
-if a widget wraps a link::Classes/CV:: that has been created within some the CVWidget the models and controllers of that other widget can be added here. However, it is emphasis::not:: recommended to do so as there are specific methods that allow you to recreate widgets that have already been closed. See also link::Classes/CVWidget#-wdgtControllersAndModels::
+if a widget wraps a link::Classes/CV:: that has been created within some CVWidget the models and controllers of that other widget can be added here. However, it is emphasis::not:: recommended to do so as there are specific methods that allow you to recreate widgets that have already been closed. See also link::Classes/CVWidget#-wdgtControllersAndModels::
 
 argument:: cvcGui
 a multi-purpose argument: usually you will not set anything here. It is used with the link::#-open:: method resp. CVCenter. Within these it is used to pass in OSC-/MIDI-responders resp. the widgets MIDI-/OSC-environment. See also link::Classes/CVWidget#-midiOscEnv::
@@ -50,7 +50,8 @@ if set to code::true:: the widget's OSC-/MIDI-responders will not be removed whe
 argument:: server
 only used for link::Classes/SwingOSC:: compatability (untested)
 
-returns:: this (a CVWidgetKnob)
+returns:: only used for link::Classes/SwingOSC:: compatability (untested)
+this (a code::CVWidgetKnob::)
 
 
 INSTANCEMETHODS::
@@ -62,7 +63,7 @@ code::x = x.open // the old widget was stored in x which will afterwards hold th
 
 See example in link::Classes/CVWidget#reusable_widgets::
 
-argument:: parent
+argument:: window
 a link::Classes/Window:: or nil - if none is provided the window will be created internally
 
 argument:: wdgtBounds
@@ -73,7 +74,7 @@ returns:: a code::CVCWidgetKnob::
 subsection:: GUI-elements
 
 METHOD:: knob
-A link::Classes/Knob:: displaying or setting the current value of the widget's link::Classes/CV::.
+A link::Classes/Knob::, displaying or setting the current value of the widget's link::Classes/CV::.
 
 returns:: a link::Classes/Knob::
 

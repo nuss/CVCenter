@@ -1,21 +1,21 @@
 CLASS:: CVWidget2D
 summary:: a control-widget that can either be embedded in other views or opened as a standalone-widget, offering easy connections with external MIDI-/OSC-hard- and software.
 categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
-related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidget2D, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
+related:: Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidgetMS, Classes/CV, Classes/CCResponder, Classes/OSCresponderNode
 
 DESCRIPTION::
-A CVWidget2D is widget that can be used to set e.g. controls in running link::Classes/Synth::s, link::Classes/Ndef::s, link::Classes/ProxySpace:: slots, link::Classes/NodeProxy::s and other other values that can be set at runtime. Also it may be used in connection with link::Classes/Pattern::s. Contrary to link::Classes/CVWidgetKnob:: it holds two link::Classes/CV::s.
+A CVWidget2D is widget that can be used to set e.g. controls in running link::Classes/Synth::s, link::Classes/Ndef::s, link::Classes/ProxySpace:: slots, link::Classes/NodeProxy::s, link::Classes/Patch::es and other other values that can be set at runtime. Also it may be used in connection with link::Classes/Pattern::s. Contrary to link::Classes/CVWidgetKnob:: and link::Classes/CVWidgetMS:: it holds two link::Classes/CV::s.
 
 CLASSMETHODS::
 
 METHOD:: new
-Create a new CVWidget2D. To display the widget on screen you must call code::front:: on the resulting object.
+Create a new CVWidget2D. To display the widget on screen you must call link::Classes/CVWidget#front#front:: on the resulting object.
 
 argument:: parent
-an instance of link::Classes/Window:: - optional. If none is given the it will be created internally.
+an instance of link::Classes/Window:: or link::Classes/View:: - optional. If none is given the it will be created internally.
 
-argument:: cvs
-an link::Classes/Array:: of link::Classes/CV::s - optional. If none is given it will be created internally. The array may hold code::2:: link::Classes/CV::s.
+argument:: widgetCV
+an link::Classes/Event:: of link::Classes/CV::s - optional. If none is given it will be created internally. The array may hold code::2:: link::Classes/CV::s, on in slot code::\lo:: the other in slot code::\hi::.
 
 argument:: name
 a link::Classes/String:: or a link::Classes/Symbol:: - optional. If none is given the widget will be named "knob".
@@ -39,7 +39,7 @@ definitionList::
 ::
 
 argument:: controllersAndModels
-if a widget wraps a link::Classes/CV:: that has been created within some the CVWidget the models and controllers of that other widget can be added here. CVWidget2D expects the parameters to be passed in in an link::Classes/Event:: containing the keys code::\lo:: and code::\hi::: code::(lo: wdgtControllersAndModels-lo, hi: wdgtControlersAndModels-hi)::. However, it is emphasis::not:: recommended to do so as there are specific methods that allow you to recreate widgets that have already been closed. See also link::Classes/CVWidget#-wdgtControllersAndModels::. 
+if a widget wraps a link::Classes/CV:: that has been created within some CVWidget the models and controllers of that other widget can be added here. CVWidget2D expects the parameters to be passed in in an link::Classes/Event:: containing the keys code::\lo:: and code::\hi::: code::(lo: wdgtControllersAndModels-lo, hi: wdgtControlersAndModels-hi)::. However, it is emphasis::not:: recommended to do so as there are specific methods that allow you to recreate widgets that have already been closed. See also link::Classes/CVWidget#-wdgtControllersAndModels::. 
 
 argument:: cvcGui
 a multi-purpose argument: usually you will not set anything here. It is used with the link::#-open:: method resp. link::Classes/CVCenter::. Within these it is used to pass in OSC-/MIDI-responders resp. the widgets MIDI-/OSC-environment. See also link::Classes/CVWidget#-midiOscEnv::
@@ -50,7 +50,8 @@ if set to code::true:: the widget's OSC-/MIDI-responders will not be removed whe
 argument:: server
 only used for link::Classes/SwingOSC:: compatability (untested)
 
-returns:: this (a CVWidget2D)
+returns:: only used for link::Classes/SwingOSC:: compatability (untested)
+this (a code::CVWidget2D::)
 
 
 INSTANCEMETHODS::
@@ -62,13 +63,13 @@ code::x = x.open // the old widget was stored in x which will afterwards hold th
 
 See example in link::Classes/CVWidget#reusable_widgets::
 
-argument:: parent
+argument:: window
 a link::Classes/Window:: or code::nil:: - if none is provided the window will be created internally
 
 argument:: wdgtBounds
 a link::Classes/Rect:: or code::nil:: - if none is provided the bounds of the old widget will be used.
 
-returns:: a link::Classes/CVWidgetKnob::
+returns:: a code::CVWidget2D::
 
 subsection:: GUI-elements
 warning::Opposite to link::Classes/CVWidgetKnob:: many elements of the GUI are returned as link::Classes/Event::s containing a code::\lo:: and a code::\hi:: element. Basically all of the following elements are strong::getters:: but not strong::setters::. However, it is possible to change the value returned in code::\lo:: or code::\hi:: as they are simply values within an link::Classes/Event:: - strong::do not attempt to do so or unexpected things will happen!::

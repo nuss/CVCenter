@@ -1525,7 +1525,7 @@ CVCenter {
 			widgetStates[thisKey][thisSlot] ?? { widgetStates[thisKey].put(thisSlot, ()) };
 		};
 
-		"thisSpec: %\n".postf(thisSpec);
+		// "thisSpec: %\n".postf(thisSpec);
 
 		if(value.notNil, {
 			case
