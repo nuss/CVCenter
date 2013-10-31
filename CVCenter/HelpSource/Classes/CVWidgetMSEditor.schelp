@@ -26,25 +26,46 @@ subsection:: The "MIDI"-Tab
 
 METHOD:: midiTabs
 Every editor provides the possibility to either batch-edit or edit MIDI-connections individually. For convenience these 2 possibilities are represented within 2 tabs:
+numberedlist::
+## the batch-editing tab.
+## the tab containing editable MIDI-connections for each slot in the widget's multi-slider. 
+::
 
-image::CVWidgetMSEditor_midi_batch_connected.png::
-the batch-edititng tab
+returns:: a link::Classes/TabbedView2::
 
-image::CVWidgetMSEditor_midi_indiv.png::
-the tab representing MIDI-connections for individual sliders (editable).
+subsection:: Batch-connecting external MIDI hardware
+The CVWidgetMSEditor provides the possibility to batch-connect an number of sliders to external hardware at once. Here's a little howto.
+image::midi_batch_connect.png::
+The numbered fields in the above screenshot provide the following:
+numberedlist::
+## strong::MIDI init-button:: (link::Classes/AbstractCVWidgetEditor#midiInitBut::) - after MIDI has successfully been initialized the originally red button will turn green and the
+## strong::MIDI-source:: (link::Classes/AbstractCVWidgetEditor#midiSourceSelect::) - a dropdown-menu that will let the user select among possible MIDI-sources
+## strong::MIDI-source field:: (link::AbstractCVWidgetEditor#midiSrcField::) - when a MIDI-source has been selected its numeric ID will be filled into this field. I.e. any connection made within the batch of connection will listen to this particular device. However, this is emphasis::optional:: - if no device has been selected responders will listen to any available device.
+## strong::MIDI-channel:: (link::Classes/AbstractCVWidgetEditor#midiChanField::) - another optional field. If no value is set responders will listen on any channel.
+## strong::multi-slider offset index:: (link::#msMidiIndexStartField::) - the index of the slider in the multi-slider at which the batch-connection should begin. This affects the multi-slider in the widget only, strong::not:: the external hardware.
+## strong::array of external controllers to be connected:: (link::#extMidiCtrlArrayField::) - within this array the external controller numbers get set. That can be a successive range of values (e.g. code::(0..8)::) or even concetenated arrays (e.g. code::(0..3)++[5, 6, 8, 9]::).
+::
 
-returns:: (describe returnvalue here)
+Behind the scenes a batch-connection is accomplished by an algorithm like the following:
+code::
+<array of ctrl.-nrs.>.do({ |ctrlNum, sl|
+	<widget>.midiConnect(<MIDI device ID>, <MIDI channel>, ctrlNum, sl+<multi-slider offset index>)
+})
+::
+The above code should guarantee that not only controllers get connected to successive sliders but also an offset is possible.
+
+For further reference: link::Classes/CVWidget#midiConnect::
 
 METHOD:: oscTabs
-(describe method here)
+Like the MIDI-tab the OSC-tab is organized in 2 tabs:
+numberedlist::
+## the batch-editing tab.
+## the tab containing editable MIDI-connections for each slot in the widget's multi-slider. 
+::
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/TabbedView2::
 
-METHOD:: midiFlow1
-(describe method here)
-
-returns:: (describe returnvalue here)
-
+private:: midiFlow1
 private:: init
 private:: amendActionsList
 
