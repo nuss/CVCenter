@@ -136,7 +136,7 @@ code::
 A multi-dimensional OSC-message like this may be addessed in batch-connections by the placeholder code::%::. Opposite to the possibility of using a number of different OSC command-names - as described in (7) - the command-name here is fixed but successive slots are addresses. Hence, the values in strong::external OSC-controller numbers:: (6) will represent the slots within the OSC-message (starting at code::1::). See the OSC batch-connection examples below for a better understanding what's happening behind the scenes.
 ::
 
-As already mentioned there are 2 different scenarious in which batch-connecting a CVWidgetMS may mke sense:
+As already mentioned there are 2 different scenarios in which batch-connecting a CVWidgetMS may makes sense:
 numberedlist::
 ## a number of OSC commands which differ in one number: code::'/name/1', '/name/2', '/name/3',..., '/name/n':: - these may belong e.g. to a multi-slider on a mobile based controller and there's exactly one value sent in slot code::1:: of the OSC-message. The underlying connection mechanism would be the following:
 code::
@@ -162,12 +162,29 @@ code::
 	)
 })
 ::
-For further reference also have a look at link::Classes/CVWidget#oscConnect::
 ::
+For further reference also have a look at link::Classes/CVWidget#oscConnect::
 
 subsection:: The "Spec"-tab
+This is the place to edit the parent widget's link::Classes/ControlSpec:: (resp. the ControlSpec of the link::Classes/CV:: wrapped by the widget). In the textfield (link::Classes/AbstractCVWidgetEditor#specField::) you may either edit the current spec or enter a new one. This can be done by either entering a full ControlSpec-definition (e.g. code::ControlSpec(10, 100, \exp)::) or an link::Classes/Array:: that will automatically be expanded to a ControlSpec (e.g. #[10, 100, \exp]) or a link::Classes/Symbol:: symbolising an existing ControlSpec (e.g. code::\freq::).
+note::If a emphasis::one-dimensional:: ControlSpec gets provided (as argued in the previous sentence) the ControlSpec will automatically expand to the size of the widget's multi-slider (see also: link::Classes/CVWidget#msSize::). I.e. if the multi-slider incorporates 5 sliders a spec like 
+code::
+ControlSpec(10, 100, \exp)
+:: 
+will become 
+code::
+ControlSpec([10, 10, 10, 10, 10], [100, 100, 100, 100, 100], \exp, [0.0, 0.0, 0.0, 0.0, 0.0], [0, 0, 0, 0, 0])
+::
+::
+
+In the drop-down menu below the textfield you may select any of the listed ControlSpecs. If it's a one-dimensional ControlSpec the same mechanism as in the textfield will apply. Also expanded ControlSpecs will be listed under a name that reflects the specs size - e.g. code::\freq:: expanded to size 7 will be listed as code::'freq_7'::  
 
 subsection:: The "Actions"-tab
+Even though a link::Classes/CVWidgetMS:: may have many sliders it has only one link::Classes/CV::. As a consequence all actions apply to all sliders (unlike in a link::Classes/CVWidget2D:: which incorporates 2 CVs). However, a CVWidget2D may still have an arbitrary number of actions assigned to it. Remember that the value of the CV will be an link::Classes/Array:: of values rather than a single value. E.g. an action setting a control of a running synth will rather user a code::setn:: than code::set:::
+code::
+// example action
+{ |cv| mySynth.setn(\freq, cv.value) }
+::
 
 METHOD:: close
 Close the editor.
