@@ -5,6 +5,11 @@ related:: Classes/AbstractCVWidgetEditor, Classes/CVWidgetEditor, Classes/CVCent
 
 DESCRIPTION::
 A special editor for link::Classes/CVWidgetMS::: As this widget allows connecting to an arbitrary number of control-slots at once this editor is designed to allow the user to make batch-connections as well as it provides the possibility to edit each slot individually. MIDI and OSC tabs within the interface are divided into an area that allows batch editing and an area that comprehends links to  link::Classes/CVWidgetEditor::s for each slot. Each slot can be connected to an external OSC- or MIDI-controller individually.
+note::
+list::
+## Since CVWidgetMSEditor and link::Classes/CVWidgetEditor:: share a number of properties these are implemented within their superclass link::Classes/AbstractCVWidgetEditor::.
+## CVWidgetMSEditor is not supposed to be used directly. Rather editors should always be instantiated from within the widget it belongs to.
+::
 
 
 CLASSMETHODS::
