@@ -63,13 +63,21 @@ returns:: an link::Classes/Event::
 subsection:: GUI properties and elements
 The following methods return representations of elements that are common to link::Classes/CVWidgetEditor:: as well as link::Classes/CVWidgetMSEditor:: 
 
-METHOD:: portRestrictor
-A checkbox, forcing the OSC-responder to listen to a specific port only.
+METHOD:: window
+The link::Classes/Window:: object the editor is embedded into.
 
-returns:: a link::Classes/CheckBox:: (Qt) or a link::Classes/Button:: faking a checkbox (Cocao)
+returns:: a link::Classes/Window::
 
-METHOD:: nameField
-A link::Classes/TextField::, allowing to set an OSC command-name (e.g. code::/my/cmd/name::). This field will get filled out with a meaningful name if one's selected from the 'command-names' drop-down.
+subsection:: The "Spec"-tab
+
+METHOD:: specField
+A link::Classes/TextField:: that let's the user define a custom link::Classes/ControlSpec::. This can be done in various ways:
+list::
+## strong::providing a regular ControlSpec::: code::ControlSpec(20, 20000, \exp, 0.0, 440, " Hz")::)
+## strong::providing the name of a predefined spec as a Symbol::: code::\freq:: - further internal processing will call code::.asSpec:: on it.
+## strong::providing an Array::: code::#[20, 20000, \exp, 0.0, 440, " Hz"]:: - further internal processing will call code::.asSpec:: on it.
+::
+note:: If the widget is a link::Classes/CVWidgetMS:: values entered in this field may get treated differently as multi-slider widgets wrap multi-dimensional specs. hence, if you enter e.g. code::\freq:: as spec strong::it will automatically expand to an adequate multi-dimensional ControlSpec::.::
 
 returns:: a link::Classes/TextField::
 
@@ -78,13 +86,15 @@ a link::Classes/PopUpMenu:: (drop-down), allowing to select from the list of pre
 
 returns:: a link::Classes/PopUpMenu::
 
+METHOD:: specsListSpecs
+The link::Classes/List:: of currently available link::Classes/ControlSpec::s
+
+returns:: a link::Classes/List:: of link::Classes/ControlSpec::s
+
+subsection:: The "MIDI"-tab
+
 METHOD:: midiSrcField
 (...)
-
-returns:: (describe returnvalue here)
-
-METHOD:: alwaysPosField
-(describe method here)
 
 returns:: (describe returnvalue here)
 
@@ -98,27 +108,12 @@ METHOD:: midiModeSelect
 
 returns:: (describe returnvalue here)
 
-METHOD:: calibBut
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: cmdListMenu
+METHOD:: ctrlButtonBankField
 (describe method here)
 
 returns:: (describe returnvalue here)
 
 METHOD:: midiCtrlField
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: connectorBut
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: specField
 (describe method here)
 
 returns:: (describe returnvalue here)
@@ -138,32 +133,51 @@ METHOD:: midiChanField
 
 returns:: (describe returnvalue here)
 
-METHOD:: window
-(describe method here)
+subsection:: The "OSC"-tab
 
-returns:: (describe returnvalue here)
+METHOD:: portRestrictor
+A checkbox, forcing the OSC-responder to listen to a specific port only.
+
+returns:: a link::Classes/CheckBox:: (Qt) or a link::Classes/Button::, faking a checkbox (Cocao)
 
 METHOD:: deviceListMenu
 (describe method here)
 
 returns:: (describe returnvalue here)
 
-METHOD:: specsListSpecs
-(describe method here)
+METHOD:: nameField
+A link::Classes/TextField::, allowing to set an OSC command-name (e.g. code::/my/cmd/name::). This field will get filled out with a meaningful name if one's selected from the 'command-names' drop-down.
 
-returns:: (describe returnvalue here)
-
-METHOD:: actionsList
-(describe method here)
-
-returns:: (describe returnvalue here)
+returns:: a link::Classes/TextField::
 
 METHOD:: indexField
 (describe method here)
 
 returns:: (describe returnvalue here)
 
-METHOD:: ctrlButtonBankField
+METHOD:: alwaysPosField
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: connectorBut
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: calibBut
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: cmdListMenu
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+subsection:: The "Actions"-tab
+
+METHOD:: actionsList
 (describe method here)
 
 returns:: (describe returnvalue here)
