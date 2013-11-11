@@ -91,47 +91,60 @@ The link::Classes/List:: of currently available link::Classes/ControlSpec::s
 
 returns:: a link::Classes/List:: of link::Classes/ControlSpec::s
 
-subsection:: The "MIDI"-tab
-
-METHOD:: midiSrcField
-(...)
-
-returns:: (describe returnvalue here)
+subsection:: The "MIDI"-tab: widget-settings
 
 METHOD:: midiResolutionNB
-(describe method here)
+A link::Classes/NumberBox::, allowing the user to set the widget's code::midiResolution:: (link::Classes/CVWidget#getMidiResolution::, link::Classes/CVWidget#setMidiResolution::).
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/NumberBox::
 
 METHOD:: midiModeSelect
-(describe method here)
+A link::Classes/PopUpMenu::, allowing the user to set the widget's code::midiMode:: (link::Classes/CVWidget#getMidiMode::, link::Classes/CVWidget#setMidiMode::).
 
-returns:: (describe returnvalue here)
-
-METHOD:: ctrlButtonBankField
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: midiCtrlField
-(describe method here)
-
-returns:: (describe returnvalue here)
+returns:: a link::Classes/PopUpMenu::
 
 METHOD:: midiMeanNB
-(describe method here)
+A link::Classes/NumberBox::, allowing the user to set the widget's code::midiMean:: (link::Classes/CVWidget#getMidiMean::, link::Classes/CVWidget#setMidiMean::)
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/NumberBox::
+
+METHOD:: softWithinNB
+A link::Classes/NumberBox::, allowing the user to set the widget's code::softWithin:: (link::Classes/CVWidget#getSoftWithin::, link::Classes/CVWidget#setSoftWithin::)
+
+returns:: a link::Classes/NumberBox::
+
+METHOD:: ctrlButtonBankField
+A link::Classes/TextField::, allowing the user to set the widget's code::ctrlButtonBank:: value (link::Classes/CVWidget#getCtrlButtonBank::, link::Classes/CVWidget#setCtrlButtonBank::).
+
+returns:: a link::Classes/TextField::
+
+subsection:: The "MIDI"-tab: MIDI-connecting
 
 METHOD:: midiSourceSelect
-(describe method here)
+If MIDI is active (indicated by the button "restart MIDI") one can select among available MIDI-devices here. The numerical source-ID gets inserted into link::#midiSrcField::.
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/PopUpMenu::
+
+METHOD:: midiLearnBut
+A link::Classes/Button:: that, if clicked, either triggers the MIDI-learn functionality (button-label: "L") or creates a link::Classes/CCResponder:: for the values entered in -midiSrc, -midiChan or/and -midiCtrl (button-label: "C"). If a CCResponder is present the button-label gets changed to "X" - upon clicking the responder gets removed again.
+
+returns:: A link::Classes/Button::
+
+METHOD:: midiSrcField
+
+A link::Classes/TextField:: that allows the user to set a MIDI source-ID. If selected from link::#midiSourceSelect:: this field should get filled automatically.
+
+returns:: a link::Classes/TextField::
 
 METHOD:: midiChanField
-(describe method here)
+A link::Classes/TextField:: that allows the user to set a MIDI-channel resp. the field will show the channel if a MIDI-connection is present. 
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/TextField::
+
+METHOD:: midiCtrlField
+A link::Classes/TextField:: that allows the user to set a MIDI-contoller resp. the field will show the controller-Nr. if a MIDI-connection is present. 
+
+returns:: a link::Classes/TextField::
 
 subsection:: The "OSC"-tab
 
@@ -187,17 +200,7 @@ METHOD:: mappingSelect
 
 returns:: (describe returnvalue here)
 
-METHOD:: midiLearnBut
-(describe method here)
-
-returns:: (describe returnvalue here)
-
 METHOD:: deviceDropDown
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: softWithinNB
 (describe method here)
 
 returns:: (describe returnvalue here)
