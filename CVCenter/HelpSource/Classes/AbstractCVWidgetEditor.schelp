@@ -120,6 +120,11 @@ returns:: a link::Classes/TextField::
 
 subsection:: The "MIDI"-tab: MIDI-connecting
 
+METHOD:: midiInitBut
+A link::Classes/Button::, either starting or restarting MIDI. Also the button displays the current MIDI-state.  
+
+returns:: a link::Classen/Button::
+
 METHOD:: midiSourceSelect
 If MIDI is active (indicated by the button "restart MIDI") one can select among available MIDI-devices here. The numerical source-ID gets inserted into link::#midiSrcField::.
 
@@ -154,9 +159,14 @@ A checkbox, forcing the OSC-responder to listen to a specific port only.
 returns:: a link::Classes/CheckBox:: (Qt) or a link::Classes/Button::, faking a checkbox (Cocao)
 
 METHOD:: deviceListMenu
-(describe method here)
+A link::Classes/PopUpMenu::, displaying physical devices or apps stored to disc under a certain name. Devices can be stored after hitting the green "new" button on the right side of the interface. For more information have a look at link::Classes/OSCCommands::.
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/PopUpMenu::
+
+METHOD:: cmdListMenu
+A link::Classes/PopUpMenu::, allowing the user to select among possible command-names. The selected one will be filled into link::#nameField:: automatically. 
+
+returns:: a link::Classes/PopUpMenu::
 
 METHOD:: nameField
 A link::Classes/TextField::, allowing to set an OSC command-name (e.g. code::/my/cmd/name::). This field will get filled out with a meaningful name if one's selected from the 'command-names' drop-down.
@@ -164,29 +174,24 @@ A link::Classes/TextField::, allowing to set an OSC command-name (e.g. code::/my
 returns:: a link::Classes/TextField::
 
 METHOD:: indexField
-(describe method here)
+a link::Classes/NumberBox::, allowing the user to select the slot of OSC-message. The widget's link::Classes/CV::'s value will get set to the value in that slot. 
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/NumberBox::
 
 METHOD:: alwaysPosField
-(describe method here)
+A link::Classes/StaticText:: displaying an auto-correction value for the incoming value. Auto-correction means that incoming values will always be shifted into positive, allowing input-mappings expontial to linear or exponential to exponential even though the (real) input-range is zero-crossing.  
 
-returns:: (describe returnvalue here)
-
-METHOD:: connectorBut
-(describe method here)
-
-returns:: (describe returnvalue here)
+returns:: link::Classes/StaticText::
 
 METHOD:: calibBut
-(describe method here)
+A link::Classes/Button:: which starts/stops OSC-calibration. Calibration means that the constraints of the incoming value in the OSC-message are constantly being checked and readjusted if necessary.
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/Button::
 
-METHOD:: cmdListMenu
-(describe method here)
+METHOD:: connectorBut
+A link::Classes/Button:: to connect and disconnect. Behind the scenes this button triggers link::Classes/CVWidget#oscConnect:: or link::Classes/CVWidget#oscDisconnect::.
 
-returns:: (describe returnvalue here)
+returns:: a link::Classes/Button::
 
 subsection:: The "Actions"-tab
 
@@ -206,11 +211,6 @@ METHOD:: deviceDropDown
 returns:: (describe returnvalue here)
 
 METHOD:: tabs
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: midiInitBut
 (describe method here)
 
 returns:: (describe returnvalue here)
