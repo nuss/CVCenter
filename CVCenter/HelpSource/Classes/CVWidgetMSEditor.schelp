@@ -1,6 +1,6 @@
 TITLE:: CVWidgetMSEditor
 summary:: a GUI for editing widgets and their parameters: specs, MIDI, OSC, actions...
-categories:: Undocumented classes
+categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/AbstractCVWidgetEditor, Classes/CVWidgetEditor, Classes/CVCenter, Classes/CV, Classes/CVWidget, Classes/CVWidgetKnob, Classes/CVWidget2D, Classes/CVWidgetMS, Classes/CCResponder, Classes/OSCresponderNode, Classes/SimpleController, Classes/ControlSpec, Classes/OSCCommands
 
 DESCRIPTION::
