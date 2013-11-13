@@ -10,9 +10,9 @@ CLASSMETHODS::
 METHOD:: allEditors
 An link::Classes/Event:: containing the currently opened editors, widget-names are kept in the keys:
 definitionlist::
-## CVWidgetKnob || - the editor itself is stored in code::allEditors[\editor]::
-## CVWidget2D || - both, code::\lo:: and code::\hi::, have their own editor: code::allEditors[\hi or \lo][\editor]::
-## CVWidgetMS || - the global editor (a link::Classes/CVWidgetMSEditor::) and the sub-editors (all link::Classes/CVWidgetEditor::s) are stored in code::allEditors::: in code::allEditors[<index>][\editor]:: all sub-editors (link::Classes/CVWidgetEditor::s for each slot) are stored, code::allEditors[\editor]:: keeps the global link::Classes/CVWidgetMSEditor::.
+## CVWidgetKnob || - the editor itself is stored in code::allEditors[<widget-name>][\editor]::
+## CVWidget2D || - both, code::\lo:: and code::\hi::, have their own editor: code::allEditors[<widget-name>][\hi or \lo][\editor]::
+## CVWidgetMS || - the global editor (a link::Classes/CVWidgetMSEditor::) and the sub-editors (all link::Classes/CVWidgetEditor::s) are stored in code::allEditors::: in code::allEditors[<widget-name>][<index>][\editor]:: all sub-editors (link::Classes/CVWidgetEditor::s for each slot) are stored, code::allEditors[<widget-name>][\editor]:: keeps the global link::Classes/CVWidgetMSEditor::.
 ::  
 
 returns:: an link::Classes/IdentityDictionary::
@@ -20,7 +20,9 @@ returns:: an link::Classes/IdentityDictionary::
 METHOD:: shortcuts
 An link::Classes/IdentityDictionary:: containing all currently defined shortcuts for any CVWidget(MS)Editor. Though this is a getter/setter it is recomended to add/remove shortcuts via the GUI within the link::Classes/CVCenterPreferences##preferences-interface:: (changes will become active after recompilation of the class-library) or the link::Classes/CVCenterShortcutsEditor##shortcuts-interface:: (changes become active immediatly but get reset after recompilation of the class-library).
 
-note:: In order to change an existing shortcut it is not enough to update the shortcuts-classvar. The user will also have to call link::#setShortcuts:: once.::
+note:: In order to change an existing shortcut it is not enough to update the shortcuts-classvar. The user will also have to call link::#-setShortcuts:: once.::
+
+See a list of predefined shortcuts in the link::#Shortcuts:: section of this document. 
 
 returns:: an link::Classes/IdentityDictionary::
 
@@ -50,7 +52,7 @@ returns:: a link::Classes/Boolean::
 subsection:: Shortcuts-related methods
 
 METHOD:: setShortcuts
-After the link::#*shortcust:: have been set this method must be called in order to make them active (if shortcuts have been set via GUI this will be handled internally).
+After the link::#*shortcuts:: have been set this method must be called in order to make them active (if shortcuts have been set via GUI this will be handled internally).
 
 returns:: a link::Classes/CVWidgetEditor:: or a link::Classes/CVWidgetMSEditor::
 
@@ -67,6 +69,11 @@ METHOD:: window
 The link::Classes/Window:: object the editor is embedded into.
 
 returns:: a link::Classes/Window::
+
+METHOD:: tabs
+A link::Classes/TabbedView2::, containing the tabs "Spec", "MIDI", "OSC" and "Actions". Each one can be reached via code::tabs.views:: which contains the individual link::Classes/TabbedViewTab::s.
+
+returns:: a link::Classes/TabbedView2::
 
 subsection:: The "Spec"-tab
 
@@ -94,27 +101,27 @@ returns:: a link::Classes/List:: of link::Classes/ControlSpec::s
 subsection:: The "MIDI"-tab: widget-settings
 
 METHOD:: midiResolutionNB
-A link::Classes/NumberBox::, allowing the user to set the widget's code::midiResolution:: (link::Classes/CVWidget#getMidiResolution::, link::Classes/CVWidget#setMidiResolution::).
+A link::Classes/NumberBox::, allowing the user to set the widget's code::midiResolution:: (link::Classes/CVWidget#-getMidiResolution::, link::Classes/CVWidget#-setMidiResolution::).
 
 returns:: a link::Classes/NumberBox::
 
 METHOD:: midiModeSelect
-A link::Classes/PopUpMenu::, allowing the user to set the widget's code::midiMode:: (link::Classes/CVWidget#getMidiMode::, link::Classes/CVWidget#setMidiMode::).
+A link::Classes/PopUpMenu::, allowing the user to set the widget's code::midiMode:: (link::Classes/CVWidget#-getMidiMode::, link::Classes/CVWidget#-setMidiMode::).
 
 returns:: a link::Classes/PopUpMenu::
 
 METHOD:: midiMeanNB
-A link::Classes/NumberBox::, allowing the user to set the widget's code::midiMean:: (link::Classes/CVWidget#getMidiMean::, link::Classes/CVWidget#setMidiMean::)
+A link::Classes/NumberBox::, allowing the user to set the widget's code::midiMean:: (link::Classes/CVWidget#-getMidiMean::, link::Classes/CVWidget#-setMidiMean::)
 
 returns:: a link::Classes/NumberBox::
 
 METHOD:: softWithinNB
-A link::Classes/NumberBox::, allowing the user to set the widget's code::softWithin:: (link::Classes/CVWidget#getSoftWithin::, link::Classes/CVWidget#setSoftWithin::)
+A link::Classes/NumberBox::, allowing the user to set the widget's code::softWithin:: (link::Classes/CVWidget#-getSoftWithin::, link::Classes/CVWidget#-setSoftWithin::)
 
 returns:: a link::Classes/NumberBox::
 
 METHOD:: ctrlButtonBankField
-A link::Classes/TextField::, allowing the user to set the widget's code::ctrlButtonBank:: value (link::Classes/CVWidget#getCtrlButtonBank::, link::Classes/CVWidget#setCtrlButtonBank::).
+A link::Classes/TextField::, allowing the user to set the widget's code::ctrlButtonBank:: value (link::Classes/CVWidget#-getCtrlButtonBank::, link::Classes/CVWidget#-setCtrlButtonBank::).
 
 returns:: a link::Classes/TextField::
 
@@ -123,10 +130,10 @@ subsection:: The "MIDI"-tab: MIDI-connecting
 METHOD:: midiInitBut
 A link::Classes/Button::, either starting or restarting MIDI. Also the button displays the current MIDI-state.  
 
-returns:: a link::Classen/Button::
+returns:: a link::Classes/Button::
 
 METHOD:: midiSourceSelect
-If MIDI is active (indicated by the button "restart MIDI") one can select among available MIDI-devices here. The numerical source-ID gets inserted into link::#midiSrcField::.
+If MIDI is active (indicated by the button "restart MIDI") one can select among available MIDI-devices here. The numerical source-ID gets inserted into link::#-midiSrcField::.
 
 returns:: a link::Classes/PopUpMenu::
 
@@ -137,7 +144,7 @@ returns:: A link::Classes/Button::
 
 METHOD:: midiSrcField
 
-A link::Classes/TextField:: that allows the user to set a MIDI source-ID. If selected from link::#midiSourceSelect:: this field should get filled automatically.
+A link::Classes/TextField:: that allows the user to set a MIDI source-ID. If selected from link::#-midiSourceSelect:: this field should get filled automatically.
 
 returns:: a link::Classes/TextField::
 
@@ -163,8 +170,13 @@ A link::Classes/PopUpMenu::, displaying physical devices or apps stored to disc 
 
 returns:: a link::Classes/PopUpMenu::
 
+METHOD:: deviceDropDown
+(describe method here)
+
+returns:: (describe returnvalue here)
+
 METHOD:: cmdListMenu
-A link::Classes/PopUpMenu::, allowing the user to select among possible command-names. The selected one will be filled into link::#nameField:: automatically. 
+A link::Classes/PopUpMenu::, allowing the user to select among possible command-names. The selected one will be filled into link::#-nameField:: automatically. 
 
 returns:: a link::Classes/PopUpMenu::
 
@@ -183,41 +195,45 @@ A link::Classes/StaticText:: displaying an auto-correction value for the incomin
 
 returns:: link::Classes/StaticText::
 
+METHOD:: mappingSelect
+(describe method here)
+
+returns:: (describe returnvalue here)
+
 METHOD:: calibBut
 A link::Classes/Button:: which starts/stops OSC-calibration. Calibration means that the constraints of the incoming value in the OSC-message are constantly being checked and readjusted if necessary.
 
 returns:: a link::Classes/Button::
 
 METHOD:: connectorBut
-A link::Classes/Button:: to connect and disconnect. Behind the scenes this button triggers link::Classes/CVWidget#oscConnect:: or link::Classes/CVWidget#oscDisconnect::.
+A link::Classes/Button:: to connect and disconnect. Behind the scenes this button triggers link::Classes/CVWidget#-oscConnect:: or link::Classes/CVWidget#-oscDisconnect::.
 
 returns:: a link::Classes/Button::
 
 subsection:: The "Actions"-tab
 
-METHOD:: actionsList
-(describe method here)
+METHOD:: actionsUIs
+An link::Classes/Event:: that contains all elements of a graphical editor for each action.
 
-returns:: (describe returnvalue here)
-
-METHOD:: mappingSelect
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: deviceDropDown
-(describe method here)
-
-returns:: (describe returnvalue here)
-
-METHOD:: tabs
-(describe method here)
-
-returns:: (describe returnvalue here)
-
+returns:: an link::Classes/Event::
 
 EXAMPLES::
 
 code::
-(some example code)
+w = CVWidgetKnob(nil, nil, "test").front;
+e = CVWidgetEditor(w, 1); // open the 'MIDI'-tab
 ::
+
+subsection:: Shortcuts
+
+Within every CVWidget(MS)Editor a number of shortcuts apply. All of these are configurable by the user. For more Information have a look at link::Classes/KeyDownActions::, link::Classes/CVCenterPreferences:: or link::Classes/CVCenterShortcutsEditor::
+
+definitionList::
+## s || Focus the "Spec"-tab.
+## m || Focus the "MIDI"-tab.
+## o || Focus the "OSC"-tab.
+## a || Focus the "Actions"-tab. 
+## c || Open the link::Classes/OSCCommands:: window and start collecting incomming OSC-commands.
+## esc || Close the editor.
+::
+

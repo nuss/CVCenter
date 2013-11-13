@@ -676,10 +676,10 @@ CVWidget {
 			}, {
 				switch(activate,
 					true, {
-						thisEditor.actionsList[name.asSymbol].activate.value_(1);
+						thisEditor.actionsUIs[name.asSymbol].activate.value_(1);
 					},
 					false, {
-						thisEditor.actionsList[name.asSymbol].activate.value_(0);
+						thisEditor.actionsUIs[name.asSymbol].activate.value_(0);
 					}
 				)
 			})

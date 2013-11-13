@@ -88,7 +88,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
 		thisCmdNames ?? { thisCmdNames = [nil] };
 
-		actionsList ?? { actionsList = () };
+		actionsUIs ?? { actionsUIs = () };
 
 		if(slot.notNil, {
 			switch(widget.class,
@@ -925,11 +925,11 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 				wdgtActions.pairsDo({ |name, action|
 
-					actionsList = actionsList.put(name, ());
+					actionsUIs = actionsUIs.put(name, ());
 
 					flow3.shift(0, 5);
 
-					actionsList[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
+					actionsUIs[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
 						.font_(staticTextFont)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.string_(""+name.asString)
@@ -937,7 +937,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(5, 0);
 
-					actionsList[name].activate = Button(tabView3, 60@15)
+					actionsUIs[name].activate = Button(tabView3, 60@15)
 						.font_(staticTextFont)
 						.states_([
 							["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -953,16 +953,16 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					switch(action.asArray[0][1],
 						true, {
-							actionsList[name].activate.value_(1);
+							actionsUIs[name].activate.value_(1);
 						},
 						false, {
-							actionsList[name].activate.value_(0);
+							actionsUIs[name].activate.value_(0);
 						}
 					);
 
 					flow3.shift(5, 0);
 
-					actionsList[name].removeBut = Button(tabView3, 60@15)
+					actionsUIs[name].removeBut = Button(tabView3, 60@15)
 						.font_(staticTextFont)
 						.states_([
 							["remove", Color.white, Color.red],
@@ -974,7 +974,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(0, 0);
 
-					actionsList[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
+					actionsUIs[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.font_(textFieldFont)
 						.string_(action.asArray[0][0].replace("\t", "    "))
@@ -1059,12 +1059,12 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			switch(addRemove,
 				\add, {
 
-					actionsList.put(name, ());
+					actionsUIs.put(name, ());
 					tabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height+76);
 
 					flow3.shift(0, 5);
 
-					actionsList[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
+					actionsUIs[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
 						.font_(staticTextFont)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.string_(""+name.asString)
@@ -1072,7 +1072,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(5, 0);
 
-					actionsList[name].activate = Button(tabView3, 60@15)
+					actionsUIs[name].activate = Button(tabView3, 60@15)
 						.font_(staticTextFont)
 						.states_([
 							["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -1088,16 +1088,16 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					switch(active,
 						true, {
-							actionsList[name].activate.value_(1);
+							actionsUIs[name].activate.value_(1);
 						},
 						false, {
-							actionsList[name].activate.value_(0);
+							actionsUIs[name].activate.value_(0);
 						}
 					);
 
 					flow3.shift(5, 0);
 
-					actionsList[name].removeBut = Button(tabView3, 60@15)
+					actionsUIs[name].removeBut = Button(tabView3, 60@15)
 						.font_(staticTextFont)
 						.states_([
 							["remove", Color.white, Color.red],
@@ -1109,7 +1109,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(0, 0);
 
-					actionsList[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
+					actionsUIs[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.font_(textFieldFont)
 						.string_(action.asArray[0][0])
@@ -1118,15 +1118,15 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					;
 				},
 				\remove, {
-					actTop = actionsList[name].nameField.bounds.top;
+					actTop = actionsUIs[name].nameField.bounds.top;
 					[
-						actionsList[name].nameField,
-						actionsList[name].activate,
-						actionsList[name].removeBut,
-						actionsList[name].actionView
+						actionsUIs[name].nameField,
+						actionsUIs[name].activate,
+						actionsUIs[name].removeBut,
+						actionsUIs[name].actionView
 					].do(_.remove);
-					actionsList.removeAt(name);
-					actionsList.pairsDo({ |actName, it|
+					actionsUIs.removeAt(name);
+					actionsUIs.pairsDo({ |actName, it|
 						if(it.nameField.bounds.top > actTop, {
 							#[nameField, activate, removeBut, actionView].do({ |name|
 								it[name].bounds_(Rect(
