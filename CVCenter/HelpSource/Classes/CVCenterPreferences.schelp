@@ -12,7 +12,7 @@ CLASSMETHODS::
 METHOD:: dialog
 Opens the GUI that lets user edit the preferences.
 
-returns:: this (code::CenterPreferences::)
+returns:: this (code::CVCenterPreferences::)
 
 METHOD:: window
 The link::Classes/Window:: holding all elements of the dialog.
@@ -58,7 +58,7 @@ CVCenter was written with a Doepfer Pocket Dial in mind which provides 16 fader-
 argument:: removeResponders
 a link::Classes/Boolean:: or an link::Classes/Integer:: ( code::0:: or code::1::). This argument sets link::Classes/CVWidget#*removeResponders::, indicating whether MIDI- and OSC-responders shall be removed upon hitting Cmd/Ctrl-period. If it is set to code::0:: or code::false:: unreferenced ghost-responders are left that may be hard to remove.
 
-argument:: initMidiOnStartup
+argument:: initMidiOnStartUp
 a link::Classes/Boolean:: or an link::Classes/Integer::, defining whether MIDI will get started on start-up.
 
 argument:: shortcuts
@@ -69,7 +69,7 @@ code::
 ::
 
 In the above code code::cvCenterEditor, cvWidgetEditor, cvwidgeteditor:: represent the link::Classes/KeyDownActionsEditor::s, each kept in a tab of a link::Classes/TabbedView2::. Calling link::Classes/KeyDownActionsEditor#-result#result:: returns three link::Classes/IdentityDictionary::s containing the regarding GUI's shortcuts.
-Currently shortcuts can be edited for link::CLasses/CVCenter::, link::Classes/CVWidgetEditor:: and link::Classes/CVWidget::.
+Currently shortcuts can be edited for link::Classes/CVCenter::, link::Classes/CVWidgetEditor:: and link::Classes/CVWidget::.
 More information about editing shortcuts with the editor: link::Classes/CVCenterShortcutsEditor::.
 
 argument:: globalShortcuts
