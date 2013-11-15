@@ -990,7 +990,7 @@ CVWidget {
 	setCalibrate { |bool, slot|
 		var thisSlot, wcm;
 
-		// "setCalibrate called: %\n".postf(this.label.states[0][0]);
+		// "setCalibrate called: %\n".postf(this.name);
 
 		switch(this.class,
 			CVWidget2D, {
@@ -1128,7 +1128,7 @@ CVWidget {
 		var thisSlot, wcm;
 		var thisIP, intPort;
 
-		// "oscConnect called: %\n".postf(this.label.states[0][0]);
+		// "oscConnect called: %\n".postf(this.name);
 
 		switch(this.class,
 			CVWidget2D, {
@@ -1594,7 +1594,7 @@ CVWidget {
 
 		wcm.calibration.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitCalibration: %\n".postf(theChanger.value);
-			if(debug, { "widget '%' (%) at slot '%' calibration.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+			if(debug, { "widget '%' (%) at slot '%' calibration.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv[\editor][slot];
@@ -1740,7 +1740,7 @@ CVWidget {
 		};
 
 		wcm.cvSpec.controller.put(\default, { |theChanger, what, moreArgs|
-			if(debug, { "widget '%' (%) at slot '%' cvSpec.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+			if(debug, { "widget '%' (%) at slot '%' cvSpec.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			switch(this.class,
 				CVWidgetMS, {
@@ -1927,7 +1927,7 @@ CVWidget {
 											msEditors[btnIndex[i]].isClosed
 										}, {
 											msEditors[btnIndex[i]] = CVWidgetEditor(
-												this, this.label.states[0][0], 1, btnIndex[i]
+												this, this.name, 1, btnIndex[i]
 											);
 										}, {
 											msEditors[btnIndex[i]].front(1)
@@ -2111,7 +2111,7 @@ CVWidget {
 		};
 
 		wcm.midiConnection.controller.put(\default, { |theChanger, what, moreArgs|
-			if(debug, { "widget '%' (%) at slot '%' midiConnection.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+			if(debug, { "widget '%' (%) at slot '%' midiConnection.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			// "midiConnection.model: %\n".postf(theChanger);
 
@@ -2258,7 +2258,7 @@ CVWidget {
 		};
 
 		wcm.midiDisplay.controller.put(\default, { |theChanger, what, moreArgs|
-			if(debug, { "widget '%' (%) at slot '%' midiDisplay.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+			if(debug, { "widget '%' (%) at slot '%' midiDisplay.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = thisGuiEnv.editor[slot];
@@ -2737,7 +2737,7 @@ CVWidget {
 		};
 
 		wcm.midiOptions.controller.put(\default, { |theChanger, what, moreArgs|
-			if(debug, { "widget '%' (%) at slot '%' midiOptions.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+			if(debug, { "widget '%' (%) at slot '%' midiOptions.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			// "thisGuiEnv: %\n".postf(thisGuiEnv);
 			switch(this.class,
@@ -2851,7 +2851,7 @@ CVWidget {
 
 		wcm.oscConnection.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscConnect: %\n".postf(theChanger);
-			if(debug, { "widget '%' (%) at slot '%' oscConnection.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+			if(debug, { "widget '%' (%) at slot '%' oscConnection.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
@@ -2938,7 +2938,7 @@ CVWidget {
 					tmp = slot.asString++":"+tmp;
 				});
 
-				// "now synching oscDisplay: %[%]\n".postf(this.label.states[0][0], slot);
+				// "now synching oscDisplay: %[%]\n".postf(this.name, slot);
 				wcm.oscDisplay.model.value_(
 					(
 						but: [tmp, Color.white, Color.cyan(0.5)],
@@ -2988,9 +2988,9 @@ CVWidget {
 
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscDisplay: %\n".postf(theChanger);
-			if(debug, { "widget '%' (%) at slot '%' oscDisplay.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+			if(debug, { "widget '%' (%) at slot '%' oscDisplay.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
-			// "oscDisplay.controller in - %[%]: %\n".postf(this.label.states[0][0], slot, midiOscEnv);
+			// "oscDisplay.controller in - %[%]: %\n".postf(this.name, slot, midiOscEnv);
 
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
@@ -3042,7 +3042,7 @@ CVWidget {
 			if(parent.isClosed.not, {
 				if(this.class != CVWidgetMS, {
 					if(midiOscEnv.oscResponder.isNil, {
-						// this.label.states[0][0].postln;
+						// this.name.postln;
 						// "midiOscEnv.oscResponder is nil".postln;
 						tmp = background
 					}, { tmp = Color.cyan(0.5) });
@@ -3170,7 +3170,7 @@ CVWidget {
 					].do(_.enabled_(theChanger.value.editEnabled));
 				}
 			});
-			// "oscDisplay.controller out - %[%]: %\n".postf(this.label.states[0][0], slot, midiOscEnv);
+			// "oscDisplay.controller out - %[%]: %\n".postf(this.name, slot, midiOscEnv);
 		})
 	}
 
@@ -3184,7 +3184,7 @@ CVWidget {
 
 		wcm.oscInputRange.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscInputRange: %\n".postf(theChanger.value);
-			if(debug, { "widget '%' (%) at slot '%' oscInputRange.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+			if(debug, { "widget '%' (%) at slot '%' oscInputRange.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			midiOscEnv.calibConstraints = (lo: theChanger.value[0], hi: theChanger.value[1]);
 
@@ -3279,7 +3279,7 @@ CVWidget {
 
 		wcm.actions.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitActionsControl: %\n".postf(theChanger.value);
-			if(debug, { "widget '%' (%) at slot '%' actions.model: %\n".postf(this.label.states[0][0], this.class, slot, theChanger) });
+			if(debug, { "widget '%' (%) at slot '%' actions.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			if(parent.isClosed.not, {
 				thisGuiEnv.actionsBut.states_([[

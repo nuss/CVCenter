@@ -1,4 +1,4 @@
-/* (c) 2010-2012 Stefan Nussbaumer */
+/* (c) 2010-2013 Stefan Nussbaumer */
 /*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ CVSyncText : CVSync {
 		}}.defer(initDelay);
 	}
 
-	update { | changer, what ...moreArgs |
+	update { | changer, what ... moreArgs |
 		switch( what,
 			\synch, { defer { view.string = cv.value.collect(_.round(valRound)).asCompileString }; }
 		);
