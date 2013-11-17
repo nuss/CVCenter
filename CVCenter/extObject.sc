@@ -288,7 +288,7 @@
 
 				prefix !? { thisName = prefix.asString++(thisName.asString[0]).toUpper ++ thisName.asString[1..] };
 
-				"this: %, this.synth: %\n".postf(this, this.synth);
+					// "this: %, this.synth: %\n".postf(this, this.synth);
 
 				CVCenter.finishGui(this, cName, nil, (
 					cName: thisName,

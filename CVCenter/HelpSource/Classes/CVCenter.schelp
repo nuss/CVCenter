@@ -682,6 +682,7 @@ a.free;
 CVCenter.removeAll;
 ::
 
+anchor::cvcGui::
 subsection:: Auto-generating CVWidgets within CVCenter GUI from running Synths, NodeProxies, Ndefs and ProxySpaces and Instr/Patch
 
 code::
