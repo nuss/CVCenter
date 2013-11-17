@@ -16,7 +16,7 @@ LIST::
 ## link::Classes/CVWidget:: - the abstract superclass of all CVWidgets. Implements some useful methods for all CVWidgets
 ## link::Classes/CVWidgetKnob:: - a widget, containing a knob, allowing to control one parameter at a time
 ## link::Classes/CVWidget2D:: - a widget, containing a 2D-slider, allowing to control two parameters at a time
-## link::Classes/CVWidgetMS:: - a widget, containing a Multislider, allowing to control an arbitrary number of parameters at a time
+## link::Classes/CVWidgetMS:: - a widget, containing a multi-slider, allowing to control an arbitrary number of parameters at a time
 ::
 
 subsection:: Utilities
@@ -29,6 +29,7 @@ LIST::
 ## link::Classes/KeyDownActionsEditor:: - an embeddable editor for shortcuts.
 ## link::Classes/KeyCodesEditor:: - key-codes may differ from platform to platform, from keyboard to keyboard. This embeddable editor allows adjusting them.
 ## link::Classes/CVCenterControllersMonitor::
+## link::Classes/CVSyncText:: - allow link::Classes/StaticText::s, link::Classes/TextField::s and link::Classes/TextView::s to be hooked up with a link::Classes/CV::.
 ::
 
 subsection:: Helpers
