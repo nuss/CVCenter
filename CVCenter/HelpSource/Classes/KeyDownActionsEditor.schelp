@@ -1,0 +1,87 @@
+TITLE:: KeyDownActionsEditor
+summary:: an editor allowing to set keyboard-shortcuts resp. edit the actions connmected to the shortcuts.
+categories:: GUI, External Control>Keyboard
+related:: Classes/KeyDownActions, Classes/KeyCodesEditor
+
+DESCRIPTION::
+KeyDownActionsEditor allows you to define and edit an unlimited number of key-down actions for a given GUI-element. It's based on link::Classes/View#-keyDownAction:: but adds some WYSIWYG functionality within its GUI:
+
+screenshot from link::Classes/CVCenter::'s link::Classes/CVCenterShortcutsEditor##editor for temporary shortcuts::
+
+To edit or remove a shortcut you'll have to click the edit-button first. The shortcut-field (next to the label "shortcut:") will get set to whatever key you hit - also during editing the action - it's advisable to first edit the action and to set the key.
+
+CLASSMETHODS::
+
+private:: cachedScrollViewSC
+private:: initClass
+
+METHOD:: new
+Create a new KeyDownActionsEditor for the given shortcuts in code::shortcutsDict::
+
+argument:: parent
+a link::Classes/View:: - if none is provided it will get created internally
+
+argument:: name
+a link::Classes/String:: or a link::Classes/Symbol::, added to the window's title.
+
+argument:: bounds
+a link::Classes/Rect::, denoting position and size
+
+argument:: shortcutsDict
+a link::Classes/Dictionary:: shortcuts (keys and actions) to be displayed in the editor 
+
+argument:: showMods
+whether to expose modifier-keys in the editor (e.g. set to false for editing link::Classes/KeyDownActions#*globalShortcuts::)
+
+returns:: a KeyDownActionsEditor
+
+
+INSTANCEMETHODS::
+
+private:: init
+private:: editAreas
+private:: editButs
+private:: funcFields
+private:: shortcutFields
+private:: tmpShortcuts
+
+METHOD:: result
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: window
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+
+EXAMPLES::
+
+code::
+(
+// just an example dict
+// you shouldn't need to do this
+// note the mixed keys 
+
+~test = IdentityDictionary[
+	'alt + i' -> (
+		func: "{ \"'alt + i' or whatever was hit\".postln }",
+		keyCode: KeyDownActions.keyCodes[$i],
+		modifierQt: KeyDownActions.modifiersQt[\alt],
+		modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
+	),
+	$i -> (
+		func: "{ \"'i' or whatever was hit\".postln }",
+		keyCode: KeyDownActions.keyCodes[$i]
+	)
+];
+
+k = KeyDownActionsEditor(name: \test, shortcutsDict: ~test);
+)
+
+// retrieving the (current) result is not intgrated in the GUI
+// implementation left up to the user - as you please
+// here's the hook
+k.result;
+::

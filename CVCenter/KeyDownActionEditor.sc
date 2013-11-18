@@ -182,7 +182,7 @@ KeyDownActions {
 						$l -> 				37,
 						$; -> 				41,
 						$' -> 				39,
-						(92.asAscii) -> 	42,
+						(92.asAscii) -> 	42, // backslash
 						$` -> 				50,
 						$z -> 				6,
 						$x -> 				7,
@@ -447,11 +447,11 @@ KeyDownActionsEditor : KeyDownActions {
 		all = List.new;
 	}
 
-	*new { |parent, name, bounds, shortcutsDict, save=true, closeOnSave=false, showMods=true|
-		^super.new.init(parent, name, bounds, shortcutsDict, save, closeOnSave, showMods);
+	*new { |parent, name, bounds, shortcutsDict, showMods=true|
+		^super.new.init(parent, name, bounds, shortcutsDict, showMods);
 	}
 
-	init { |parent, name, bounds, shortcutsDict, save, closeOnSave, showMods|
+	init { |parent, name, bounds, shortcutsDict, showMods|
 		var scrollArea, scrollView, butArea, newBut, saveBut;
 		var removeButs, makeEditArea;
 		var scrollFlow, editFlows, butFlow;
