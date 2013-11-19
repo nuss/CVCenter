@@ -790,11 +790,11 @@ KeyCodesEditor : KeyDownActions {
 		all = List.new;
 	}
 
-	*new { |parent, bounds, closeOnSave=false|
-		^super.new.init(parent, bounds, closeOnSave);
+	*new { |parent, bounds|
+		^super.new.init(parent, bounds);
 	}
 
-	init { |parent, bounds, closeOnSave|
+	init { |parent, bounds|
 		var platform, scrollArea, scrollView, flow;
 		var editAreasBg, staticTextColor, staticTextFont, shortCutFont, textFieldFont;
 		var makeEditArea, editArea;
