@@ -1463,10 +1463,8 @@ CVCenter {
 		// if a 2D-widget under the given key exists force the given slot to become
 		// the other slot of the already existing widget
 		// also prevents misbehaviour in case of bogus slots
-		if(cvWidgets.notNil and:{
-			cvWidgets[thisKey].notNil and:{
-				cvWidgets[thisKey].class == CVWidget2D
-			}
+		if(cvWidgets[thisKey].notNil and:{
+			cvWidgets[thisKey].class == CVWidget2D
 		}, {
 			block { |break|
 				#[lo, hi].do({ |hilo|
@@ -1546,13 +1544,13 @@ CVCenter {
 
 		if(thisSlot.notNil and:{ (thisSlot === \lo).or(thisSlot === \hi) }, {
 			if(cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
-				if(widgetStates[thisKey][\hi][\made] == true, {
-					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
-					this.at(thisKey)[thisSlot].value_(thisVal);
-				});
-				if(widgetStates[thisKey][\lo][\made] == true, {
-					cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
-					this.at(thisKey)[thisSlot].value_(thisVal);
+				if(widgetStates[thisKey][\hi][\made] == true or:{
+					widgetStates[thisKey][\lo][\made] == true
+				}, {
+					widgetStates[thisKey][thisSlot][\made] ?? {
+						cvWidgets[thisKey].setSpec(thisSpec, thisSlot);
+						this.at(thisKey)[thisSlot].value_(thisVal);
+					}
 				});
 				widgetStates[thisKey][thisSlot][\made] = true;
 				^all[thisKey][thisSlot];
