@@ -15,7 +15,24 @@ METHOD:: collect
 Starts the collection-process when set to code::true::. Stop the process by calling the same method, argument code::play:: set to code::false::
 
 argument:: play
-a link::Classes/Boolean:: indicating whether the process shall be started or stopped - default: code::true::
+a link::Classes/Boolean::, indicating whether the process shall be started or stopped - default: code::true::
+
+returns:: this (OSCCommands)
+
+METHOD:: collectTempIPsAndCmds
+Collect OSC command-names and the sizes of their messages (i.e. how many slots are sent within the message). Command-names will be stored in link::#*tempIPsAndCmds::, an link::Classes/Event::, under a key thats made up of a combination of the IP-address and port: code::<IP-address>:<port>::.
+code::
+OSCCommands.collectTempIPsAndCmds // invoke collection
+OSCCommands.tempCollectRunning // should return true
+OSCCommands.tempIPsAndCmds // see what has come in already
+/* send some OSC to sclang... */
+OSCCommands.tempIPsAndCmds // now there should be something
+OSCCommands.collectTempIPsAndCmds(false) // stop collecting
+OSCCommands.tempCollectRunning // should return false now
+::
+
+argument:: play 
+a link::Classes/Boolean::, indicating whether the process shall be started or stopped - default: code::true::
 
 returns:: this (OSCCommands)
 
@@ -31,6 +48,11 @@ METHOD:: makeWindow
 Open the interactive GUI that shows the user all currently collected command-names resp. remove unwanted names.
 
 returns:: this (OSCCommands)
+
+METHOD:: window
+The link::Classes/Window:: created when calling link::#*makeWindow::.
+
+returns:: a link::Classes/Window::
 
 METHOD:: deviceCmds
 If a code::deviceName:: has been given return an link::Classes/Event:: with command-names stored to disk under the device-name code::deviceName::. Else return an link::Classes/Event:: with all currently stored commands resp. their keys.
@@ -53,6 +75,15 @@ Returnes a link::Classes/Set:: of all currently stored device-names.
 
 returns:: a link::Classes/Set::
 
+METHOD:: tempIPsAndCmds
+an link::Classes/Event:: keeping command-names and IP-addresses/ports collected by link::#*collectTempIPsAndCmds::
+
+returns:: an link::Classes/Event::
+
+METHOD:: tempCollectRunning
+Indicate whether a process invoked by link::#*collectTempIPsAndCmds:: is currently running or not.
+
+returns:: a link::Classes/Boolean::
 
 INSTANCEMETHODS::
 
