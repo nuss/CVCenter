@@ -1490,7 +1490,7 @@ CVCenter {
 			// if spec.asSpec returns nil make it a default ControlSpec by calling as Spec again
 			if(spec.isArray.not, { thisSpec = spec.asSpec.asSpec }, {
 				if(spec.select({ |sp| sp.respondsTo(\asSpec) and:{
-					sp.asSpec.class == ControlSpec }
+					sp.asSpec.isKindOf(ControlSpec) }
 				}).size == spec.size, {
 					thisSpec = ControlSpec(
 						spec.collect({ |sp| sp.asSpec.asSpec.minval }),
@@ -2265,10 +2265,10 @@ CVCenter {
 		var actionName = "default";
 		var wms, addActionFunc;
 
-		[obj, ctrlName, environment, more].postln;
+		// [obj, ctrlName, environment, more].postln;
 
 		varNames = obj.getObjectVarNames(environment);
-		"varNames: %\n".postf(varNames);
+		// "varNames: %\n".postf(varNames);
 		if(obj.class == Patch, { varNames = varNames.collect({ |v| v.asString++".synth" }) });
 
 		if(more.specEnterText.notNil and:{
