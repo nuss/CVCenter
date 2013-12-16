@@ -840,7 +840,7 @@ KeyDownActionsEditor : KeyDownActions {
 							}
 						}
 					;
-				:})
+				})
 			);
 			view.keyDownAction.postcs;
 		})
