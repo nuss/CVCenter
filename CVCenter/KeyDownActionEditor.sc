@@ -779,6 +779,73 @@ KeyDownActionsEditor : KeyDownActions {
 		^res;
 	}
 
+	setShortcuts { |view|
+		var thisMod, thisArrMod;
+		var modsDict, arrModsDict, arrowKeys;
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
+			}
+		);
+
+		arrowKeys = [
+			KeyDownActions.keyCodes['arrow up'],
+			KeyDownActions.keyCodes['arrow down'],
+			KeyDownActions.keyCodes['arrow left'],
+			KeyDownActions.keyCodes['arrow right']
+		];
+
+		view.keyDownAction_(nil);
+
+		this.result.do({ |keyDowns|
+
+			view.keyDownAction_(
+				view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+					switch(GUI.id,
+						\cocoa, {
+							thisMod = keyDowns.modifierCocoa;
+							thisArrMod = keyDowns.arrowsModifierCocoa;
+						},
+						\qt, {
+							thisMod = keyDowns.modifierQt;
+							thisArrMod = keyDowns.arrowsModifierQt;
+						}
+					);
+
+					case
+						{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+							if(keycode == keyDowns.keyCode and:{
+								thisMod.isNil and:{ thisArrMod.isNil }
+							}) {
+								keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+							};
+						}
+						{
+							(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
+								modifiers != modsDict[\none] and:{
+									modifiers != arrModsDict[\none]
+								}
+							}
+						} {
+							if(keycode == keyDowns.keyCode and:{
+								(modifiers == thisArrMod).or(modifiers == thisMod)
+							}) {
+								keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+							}
+						}
+					;
+				:})
+			);
+			view.keyDownAction.postcs;
+		})
+	}
+
 }
 
 KeyCodesEditor : KeyDownActions {

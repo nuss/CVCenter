@@ -856,8 +856,8 @@ CVCenter {
 			this.shortcuts.do({ |keyDowns|
 				v.keyDownAction_(
 					v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-					// window.view.keyDownAction_(
-					// window.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+						// window.view.keyDownAction_(
+						// window.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
 						var thisMod, thisArrMod;
 
 						// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
