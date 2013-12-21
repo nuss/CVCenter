@@ -99,9 +99,22 @@ CVCenterShortcutsEditor {
 					CVWidget.shortcuts_(cvWidgetEditor.result);
 					AbstractCVWidgetEditor.shortcuts_(cvWidgetEditorEditor.result);
 					KeyDownActions.globalShortcuts_(globalShortcutsEditor.result);
-					CVCenter.setShortcuts;
-					CVCenter.cvWidgets.do(_.setShortcuts);
-					AbstractCVWidgetEditor.allEditors.collect(_.editor).do(_.setShortcuts);
+					// CVCenter.setShortcuts;
+					// CVCenter.cvWidgets.do(_.setShortcuts);
+					if(CVCenter.window.notNIl and:{ CVCenter.window.isClosed.not }, {
+						[CVCenter.tabs.views, CVCenter.prefPane].do({ |view|
+							cvCenterEditor.setShortcuts(view);
+						});
+						CVCenter.cvWidgets.do({ |wdgt|
+							wdgt.focusElements.do({ |el|
+								cvWidgetEditor.setShortcuts(el)
+							})
+						})
+					});
+					// AbstractCVWidgetEditor.allEditors.collect(_.editor).do(_.setShortcuts);
+					AbstractCVWidgetEditor.allEditors.collect(_.editor).do({ |ed|
+						cvWidgetEditorEditor.setShortcuts(ed.tabs.view)
+					});
 					if(Server.default.serverRunning and:{
 						KeyDownActions.globalShortcutsEnabled;
 					}, {

@@ -218,7 +218,8 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			thisEditor[\tabs] = tabs;
 
-			this.setShortcuts;
+			// this.setShortcuts;
+			KeyDownActions.setShortcuts(tabs.view, this.class.shortcuts);
 
 			if(widget.class != CVWidgetMS, {
 				StaticText(tabView0, flow0.bounds.width-20@95)

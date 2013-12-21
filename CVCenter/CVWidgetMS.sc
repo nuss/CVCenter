@@ -430,7 +430,10 @@ CVWidgetMS : CVWidget {
 		widgetCV.connect(mSlider);
 		widgetCV.connect(numVal);
 
-		this.setShortcuts;
+		// this.setShortcuts;
+		focusElements.do({ |el|
+			KeyDownActions.setShortcuts(el, this.class.shortcuts);
+		});
 
 		oldBounds = parent.bounds;
 		if(parent.respondsTo(\name), { oldName = parent.name });

@@ -541,17 +541,12 @@ returns:: a link::Classes/IdentityDictionary::
 METHOD:: shortcuts
 An link::Classes/IdentityDictionary:: containing all currently defined shortcuts for CVCenter. Though this is a getter/setter it is recomended to add/remove shortcuts via the GUI within the link::Classes/CVCenterPreferences##preferences-interface:: (changes will become active after recompilation of the class-library) or the link::Classes/CVCenterShortcutsEditor##shortcuts-interface:: (changes become active immediatly but get reset after recompilation of the class-library).
 
-See link::Classes/KeyDownActions:: for more information about the internal structure of the code::shortcuts:: dictionary resp. the workings of shortcuts in general. Also have a look at the list of link::#Shortcuts#default shortcuts:: that can be modified by the user at any time. 
+See link::Classes/KeyDownActions:: for more information about the internal structure of the code::shortcuts:: dictionary resp. the workings of shortcuts in general. Also have a look at the list of link::#Shortcuts#default shortcuts:: that can be modified by the user at any time.
 
 returns:: an link::Classes/IdentityDictionary::
 
-METHOD:: setShortcuts
-Though link::#*shortcuts:: is a getter/setter classvar shortcuts will not be updated by simply adding or removing them from the link::#*shortcuts:: classvar - that will happen only after calling this method explicitely.
-
-returns:: code::this:: (CVCenter)
-
 METHOD:: scv
-An link::Classes/Event:: containing various objects that do not necessarily belong to CVCenter but are related to it. E.g. when a shortcut opens a window that window may be added to scv so other shortcuts can refer to it later. 
+An link::Classes/Event:: containing various objects that do not necessarily belong to CVCenter but are related to it. E.g. when a shortcut opens a window that window may be added to scv so other shortcuts can refer to it later.
 Basically code::scv:: has been introduced as the concept of configurable shortcuts seperate shortcut-actions from CVCenter. Hence, variables in these actions can't get initialized belonging to CVCenter automatically. However, a classvar holding a dictionary that can be filled up later solves the problem.
 
 returns:: an link::Classes/Event::
@@ -610,7 +605,7 @@ definitionList::
 ## arrow right || Navigate through the tabs of the CVCenter GUI - ascending. If the end has been reached the selection will wrap to the first tab.
 ## arrow left || Navigate through the tabs of the CVCenter GUI - descending. If the beginning has been reached the selection will wrap to the last tab.
 ## alt arrow right || Select and focus first widget in alphabetical order, activating widget-shortcuts. Repeating the same shortcut will select and focus the next widget in alphabetical order.
-## alt arrow left || Select and focus last widget in alphabetical order, activating widget-shortcuts. Repeating the same shortcut will select and focus the previous widget in alphabetical order. 
+## alt arrow left || Select and focus last widget in alphabetical order, activating widget-shortcuts. Repeating the same shortcut will select and focus the previous widget in alphabetical order.
 ## 0-9 || Select tabs and focus them. The numbers represent the order of the tabs.
 ## s || Save the current CVCenter setup to disk.
 ## l || Load a CVCenter setup from disks.
@@ -622,7 +617,7 @@ definitionList::
 ## alt c || Open the link::Classes/OSCCommands:: GUI. This will also trigger link::Classes/OSCCommands#*collect::
 ## o || See a list of already connected OSC-controllers (see also: link::Classes/CVCenterControllersMonitor::).
 ## m || See a list of already connected MIDI-controllers (see also: link::Classes/CVCenterControllersMonitor::).
-## alt s || Open the shortcuts-editor. Shortcuts edited here will persist until the next library-recompilation (unless the option "write to preferences" is selected). 
+## alt s || Open the shortcuts-editor. Shortcuts edited here will persist until the next library-recompilation (unless the option "write to preferences" is selected).
 ## shift esc || Close all open CVWidget(MS)Editors.
 ## e || If link::Classes/MasterEQ:: from the link::Classes/Quark:: code::wslib:: is installed, open it.
 ## h || Start the link::Classes/History:: and open its GUI.
@@ -872,8 +867,8 @@ Pdef(\poly,
 		instrument: \poly,
 		// rather than setting freq in hz we determine the degree in a scale
 		// instead of Prout{} the shortcut p{} can be used
-		note: PdegreeToKey( Prout({ loop { 
-			CVCenter.at(\degree).collect([_]).yield 
+		note: PdegreeToKey( Prout({ loop {
+			CVCenter.at(\degree).collect([_]).yield
 		}}), [Scale.choose, Scale.locrian].choose.postln),
 		// the list arg in a ListPattern can't simply be replaced by a Pattern
 		// so we use a little trick to update Pseq's list here
@@ -883,7 +878,7 @@ Pdef(\poly,
 		rel: Pwhite(0.8, 2.0),
 		atk: Pwhite(0.01, 0.03),
 		freqMod: Pwhite(
-			CVCenter.use(\freqModLo, \pan, slot: \lo), 
+			CVCenter.use(\freqModLo, \pan, slot: \lo),
 			CVCenter.use(\freqModLo, \pan, slot: \hi)
 		),
 		level: CVCenter.use(\amp),

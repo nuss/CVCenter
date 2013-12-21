@@ -245,81 +245,81 @@ AbstractCVWidgetEditor {
 		});
 	}
 
-	setShortcuts {
-		var modsDict, arrModsDict, arrowKeys;
-
-		// "%: setShortcuts triggered".postf(this);
-
-		switch(GUI.id,
-			\cocoa, {
-				modsDict = KeyDownActions.modifiersCocoa;
-				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-			},
-			\qt, {
-				modsDict = KeyDownActions.modifiersQt;
-				arrModsDict = KeyDownActions.arrowsModifiersQt;
-			}
-		);
-
-		arrowKeys = [
-			KeyDownActions.keyCodes['arrow up'],
-			KeyDownActions.keyCodes['arrow down'],
-			KeyDownActions.keyCodes['arrow left'],
-			KeyDownActions.keyCodes['arrow right']
-		];
-
-		tabs.view.keyDownAction_(nil);
-
-		this.class.shortcuts.do({ |keyDowns|
-			tabs.view.keyDownAction_(
-				tabs.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-					// window.view.keyDownAction_(
-					// window.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-					var thisMod, thisArrMod;
-
-					// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
-
-					switch(GUI.id,
-						\cocoa, {
-							thisMod = keyDowns.modifierCocoa;
-							thisArrMod = keyDowns.arrowsModifierCocoa;
-						},
-						\qt, {
-							thisMod = keyDowns.modifierQt;
-							thisArrMod = keyDowns.arrowsModifierQt;
-						}
-					);
-
-					case
-						{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-							// "no modifier: %\n".postf(modifiers);
-							if(keycode == keyDowns.keyCode and:{
-								thisMod.isNil and:{ thisArrMod.isNil }
-							}, {
-								// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
-								keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
-							});
-						}
-						{
-							(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
-								modifiers != modsDict[\none] and:{
-									modifiers != arrModsDict[\none]
-								}
-							}
-						} {
-							// "some modifier: %\n".postf(modifiers);
-							if(keycode == keyDowns.keyCode and:{
-								(modifiers == thisArrMod).or(modifiers == thisMod)
-							}, {
-								// "char: %, keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(char.cs, keyDowns.keyCode, keycode, thisMod, thisArrMod);
-								keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
-							})
-						}
-					;
-				})
-			)
-		})
-	}
+	// setShortcuts {
+	// 	var modsDict, arrModsDict, arrowKeys;
+	//
+	// 	// "%: setShortcuts triggered".postf(this);
+	//
+	// 	switch(GUI.id,
+	// 		\cocoa, {
+	// 			modsDict = KeyDownActions.modifiersCocoa;
+	// 			arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+	// 		},
+	// 		\qt, {
+	// 			modsDict = KeyDownActions.modifiersQt;
+	// 			arrModsDict = KeyDownActions.arrowsModifiersQt;
+	// 		}
+	// 	);
+	//
+	// 	arrowKeys = [
+	// 		KeyDownActions.keyCodes['arrow up'],
+	// 		KeyDownActions.keyCodes['arrow down'],
+	// 		KeyDownActions.keyCodes['arrow left'],
+	// 		KeyDownActions.keyCodes['arrow right']
+	// 	];
+	//
+	// 	tabs.view.keyDownAction_(nil);
+	//
+	// 	this.class.shortcuts.do({ |keyDowns|
+	// 		tabs.view.keyDownAction_(
+	// 			tabs.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+	// 				// window.view.keyDownAction_(
+	// 				// window.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+	// 				var thisMod, thisArrMod;
+	//
+	// 				// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
+	//
+	// 				switch(GUI.id,
+	// 					\cocoa, {
+	// 						thisMod = keyDowns.modifierCocoa;
+	// 						thisArrMod = keyDowns.arrowsModifierCocoa;
+	// 					},
+	// 					\qt, {
+	// 						thisMod = keyDowns.modifierQt;
+	// 						thisArrMod = keyDowns.arrowsModifierQt;
+	// 					}
+	// 				);
+	//
+	// 				case
+	// 				{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+	// 					// "no modifier: %\n".postf(modifiers);
+	// 					if(keycode == keyDowns.keyCode and:{
+	// 						thisMod.isNil and:{ thisArrMod.isNil }
+	// 						}, {
+	// 							// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
+	// 							keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+	// 					});
+	// 				}
+	// 				{
+	// 					(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
+	// 						modifiers != modsDict[\none] and:{
+	// 							modifiers != arrModsDict[\none]
+	// 						}
+	// 					}
+	// 				} {
+	// 					// "some modifier: %\n".postf(modifiers);
+	// 					if(keycode == keyDowns.keyCode and:{
+	// 						(modifiers == thisArrMod).or(modifiers == thisMod)
+	// 						}, {
+	// 							// "char: %, keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(char.cs, keyDowns.keyCode, keycode, thisMod, thisArrMod);
+	// 							keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+	// 					})
+	// 				}
+	// 				;
+	// 			})
+	// 		)
+	// 	})
+	// }
 
 
 	front { |tab|

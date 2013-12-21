@@ -51,7 +51,7 @@ returns:: An link::Classes/IdentityDictionary::
 
 METHOD:: setShortcuts
 Set the link::Classes/View#-keyDownAction#keyDownAction::s of the given link::Classes/View:: to the current values of the editor.
-note:: Though in most cases argument code::view:: will be an object of type link::Classes/View:: this doesn't necessarily have to be the case. At least the following classes do have a method code::keyDownAction:: implemented as well: link::Classes/ViewHolder2::, link::Classes/SplineGui::, link::Classes/ScaledUserView::, link::Classes/SMPTEView:: and possibly others as well well. A KeyDownActionsEditor may be used in connection with these too::
+note:: Though in most cases argument code::view:: will be an object of type link::Classes/View:: this doesn't necessarily have to be the case. At least the following classes do have a method code::keyDownAction:: implemented as well: link::Classes/ViewHolder2::, link::Classes/SplineGui::, link::Classes/ScaledUserView::, link::Classes/SMPTEView:: and possibly others as well well. A KeyDownActionsEditor may be used in connection with these too. Note also the corresponding class-method link::Classes/KeyDownActions#*setShortcuts:: which works independently from a given KeyDownActionsEditor::
 
 returns:: this (a code::KeyDownActionsEditor::)
 

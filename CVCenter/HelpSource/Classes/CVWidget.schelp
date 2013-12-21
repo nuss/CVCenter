@@ -32,9 +32,9 @@ returns:: an link::Classes/Event::
 METHOD:: shortcuts
 An link::Classes/IdentityDictionary:: containing all currently defined shortcuts for any CVWidget. Though this is a getter/setter it is recomended to add/remove shortcuts via the GUI within the link::Classes/CVCenterPreferences##preferences-interface:: (changes will become active after recompilation of the class-library) or the link::Classes/CVCenterShortcutsEditor##shortcuts-interface:: (changes become active immediatly but get reset after recompilation of the class-library).
 
-NOTE:: For added shortcuts to become active the user will have to call link::setShortcuts:: on any currently existing CVWidget. This procedure will be handled automatically behind the scenes if a shortcut has been added via CVCenter's inbuilt shortcut-editor.::
+NOTE:: For added shortcuts to become active the user will have to call link::Classes/KeyDownActions#*setShortcuts:: on any currently existing CVWidget. This procedure will be handled automatically behind the scenes if a shortcut has been added via CVCenter's inbuilt shortcut-editor.::
 
-See link::Classes/KeyDownActions:: for more information about the internal structure of the code::shortcuts:: dictionary resp. the workings of shortcuts in general. Also have a look at the list of link::#Shortcuts#default shortcuts:: that can be modified by the user at any time. 
+See link::Classes/KeyDownActions:: for more information about the internal structure of the code::shortcuts:: dictionary resp. the workings of shortcuts in general. Also have a look at the list of link::#Shortcuts#default shortcuts:: that can be modified by the user at any time.
 
 returns:: an link::Classes/IdentityDictionary::
 
@@ -650,11 +650,6 @@ Get the parent view of a CVWidget
 
 returns:: a link::Classes/Window:: or a link::CLasses/View:: resp. a subclass of it
 
-METHOD:: setShortcuts
-Though link::#*shortcuts:: is a getter/setter classvar shortcuts will not be updated by simply adding or removing them from the link::#*shortcuts:: classvar - that will happen only after calling this method explicitely.
-
-returns:: code::this:: (a CVWidget)
-
 METHOD:: widgetBg
 A link::Classes/CompositeView:: upon which all other elements of the GUI will be placed
 
@@ -755,7 +750,7 @@ Server.default.waitForBoot{
 ~ms.addAction(\setFreq, { |cv| ~noise.setn(\freq, cv.value) });
 
 // change ~ms' spec
-// move the sliders to hear the difference  
+// move the sliders to hear the difference
 // between various specs
 ~ms.setSpec(\lofreq);
 ~ms.setSpec(\widefreq);
@@ -799,16 +794,16 @@ code::
 
 // make some noise
 (
-Server.default.waitForBoot{ ~noise = { 
-    Splay.ar(
-        SinOsc.ar(\freq.kr(Array.fib(5, 5, 3)*20), \phase.kr([0, 0]), mul: \amp.kr)
-    )
+Server.default.waitForBoot{ ~noise = {
+    Splay.ar(
+        SinOsc.ar(\freq.kr(Array.fib(5, 5, 3)*20), \phase.kr([0, 0]), mul: \amp.kr)
+    )
 }.play }
 );
 
 // set various properties of the widgets
 (
-~ms.msSize.do({ |i| 
+~ms.msSize.do({ |i|
 	~ms.setMidiMode(1, i).setCtrlButtonBank(16, i)
 });
 ~ms.addAction(\setFreq, { |cv| ~noise.set(\freq, cv.value) });

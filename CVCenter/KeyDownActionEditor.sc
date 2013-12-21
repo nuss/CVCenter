@@ -436,6 +436,73 @@ KeyDownActions {
 
 	}
 
+	*setShortcuts { |view, shortcutsDict|
+		var thisMod, thisArrMod;
+		var modsDict, arrModsDict, arrowKeys;
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = this.modifiersCocoa;
+				arrModsDict = this.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = this.modifiersQt;
+				arrModsDict = this.arrowsModifiersQt;
+			}
+		);
+
+		arrowKeys = [
+			this.keyCodes['arrow up'],
+			this.keyCodes['arrow down'],
+			this.keyCodes['arrow left'],
+			this.keyCodes['arrow right']
+		];
+
+		view.keyDownAction_(nil);
+
+		shortcutsDict.do({ |keyDowns|
+			// "view: %\n".postf(view);
+			view.keyDownAction_(
+				view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+					switch(GUI.id,
+						\cocoa, {
+							thisMod = keyDowns.modifierCocoa;
+							thisArrMod = keyDowns.arrowsModifierCocoa;
+						},
+						\qt, {
+							thisMod = keyDowns.modifierQt;
+							thisArrMod = keyDowns.arrowsModifierQt;
+						}
+					);
+
+					case
+						{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+							if(keycode == keyDowns.keyCode and:{
+								thisMod.isNil and:{ thisArrMod.isNil }
+							}) {
+								keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+							};
+						}
+						{
+							(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
+								modifiers != modsDict[\none] and:{
+									modifiers != arrModsDict[\none]
+								}
+							}
+						} {
+							if(keycode == keyDowns.keyCode and:{
+								(modifiers == thisArrMod).or(modifiers == thisMod)
+							}) {
+								keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+							}
+						}
+					;
+				})
+			)
+		});
+		// [view, view.keyDownAction].postln
+	}
+
 }
 
 KeyDownActionsEditor : KeyDownActions {
@@ -841,8 +908,8 @@ KeyDownActionsEditor : KeyDownActions {
 						}
 					;
 				})
-			);
-			view.keyDownAction.postcs;
+			)
+
 		})
 	}
 

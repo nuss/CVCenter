@@ -267,7 +267,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			thisEditor.oscTabs = oscTabs;
 			thisEditor.midiTabs = midiTabs;
 
-			this.setShortcuts;
+			// this.setShortcuts;
+			KeyDownActions.setShortcuts(tabs.view, this.class.shortcuts);
 
 			maxNum = [
 				widget.getSpec.minval.size,

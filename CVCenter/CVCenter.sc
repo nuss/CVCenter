@@ -132,6 +132,7 @@ CVCenter {
 			scFunc =
 			"// select first widget
 			{
+				\"select first widget\".postln;
 				var labels = CVCenter.cvWidgets.order;
 				CVCenter.cvWidgets[labels.first].parent.front.focus;
 				CVCenter.cvWidgets[labels.first].label.focus;
@@ -672,7 +673,10 @@ CVCenter {
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 			;
 
-			this.setShortcuts;
+			// this.setShortcuts;
+			[tabs.views, prefPane].flat.do({ |view|
+				KeyDownActions.setShortcuts(view, this.shortcuts);
+			});
 
 			window.onClose_({
 				if(childViews.size > 0, {
@@ -827,83 +831,83 @@ CVCenter {
 		});
 	}
 
-	*setShortcuts {
-		var modsDict, arrModsDict, arrowKeys;
-
-		switch(GUI.id,
-			\cocoa, {
-				modsDict = KeyDownActions.modifiersCocoa;
-				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-			},
-			\qt, {
-				modsDict = KeyDownActions.modifiersQt;
-				arrModsDict = KeyDownActions.arrowsModifiersQt;
-			}
-		);
-
-		arrowKeys = [
-			KeyDownActions.keyCodes['arrow up'],
-			KeyDownActions.keyCodes['arrow down'],
-			KeyDownActions.keyCodes['arrow left'],
-			KeyDownActions.keyCodes['arrow right']
-		];
-
-		[tabs.views, prefPane].flat.do({ |v|
-			// reset keyDownAction - it's getting reassigned
-
-			v.keyDownAction_(nil);
-
-			this.shortcuts.do({ |keyDowns|
-				v.keyDownAction_(
-					v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-						// window.view.keyDownAction_(
-						// window.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-						var thisMod, thisArrMod;
-
-						// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
-
-						switch(GUI.id,
-							\cocoa, {
-								thisMod = keyDowns.modifierCocoa;
-								thisArrMod = keyDowns.arrowsModifierCocoa;
-							},
-							\qt, {
-								thisMod = keyDowns.modifierQt;
-								thisArrMod = keyDowns.arrowsModifierQt;
-							}
-						);
-
-						case
-							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-								// "no modifier: %\n".postf(modifiers);
-								if(keycode == keyDowns.keyCode and:{
-									thisMod.isNil and:{ thisArrMod.isNil }
-								}, {
-									// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
-									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
-								});
-							}
-							{
-								(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
-									modifiers != modsDict[\none] and:{
-										modifiers != arrModsDict[\none]
-									}
-								}
-							} {
-								// "some modifier: %\n".postf(modifiers);
-								if(keycode == keyDowns.keyCode and:{
-									(modifiers == thisArrMod).or(modifiers == thisMod)
-								}, {
-									// "char: %, keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(char.cs, keyDowns.keyCode, keycode, thisMod, thisArrMod);
-									keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
-								})
-							}
-						;
-					})
-				)
-			})
-		})
-	}
+	// *setShortcuts {
+	// 	var modsDict, arrModsDict, arrowKeys;
+	//
+	// 	switch(GUI.id,
+	// 		\cocoa, {
+	// 			modsDict = KeyDownActions.modifiersCocoa;
+	// 			arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+	// 		},
+	// 		\qt, {
+	// 			modsDict = KeyDownActions.modifiersQt;
+	// 			arrModsDict = KeyDownActions.arrowsModifiersQt;
+	// 		}
+	// 	);
+	//
+	// 	arrowKeys = [
+	// 		KeyDownActions.keyCodes['arrow up'],
+	// 		KeyDownActions.keyCodes['arrow down'],
+	// 		KeyDownActions.keyCodes['arrow left'],
+	// 		KeyDownActions.keyCodes['arrow right']
+	// 	];
+	//
+	// 	[tabs.views, prefPane].flat.do({ |v|
+	// 		// reset keyDownAction - it's getting reassigned
+	//
+	// 		v.keyDownAction_(nil);
+	//
+	// 		this.shortcuts.do({ |keyDowns|
+	// 			v.keyDownAction_(
+	// 				v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+	// 					// window.view.keyDownAction_(
+	// 					// window.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+	// 					var thisMod, thisArrMod;
+	//
+	// 					// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
+	//
+	// 					switch(GUI.id,
+	// 						\cocoa, {
+	// 							thisMod = keyDowns.modifierCocoa;
+	// 							thisArrMod = keyDowns.arrowsModifierCocoa;
+	// 						},
+	// 						\qt, {
+	// 							thisMod = keyDowns.modifierQt;
+	// 							thisArrMod = keyDowns.arrowsModifierQt;
+	// 						}
+	// 					);
+	//
+	// 					case
+	// 					{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+	// 						// "no modifier: %\n".postf(modifiers);
+	// 						if(keycode == keyDowns.keyCode and:{
+	// 							thisMod.isNil and:{ thisArrMod.isNil }
+	// 							}, {
+	// 								// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
+	// 								keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+	// 						});
+	// 					}
+	// 					{
+	// 						(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
+	// 							modifiers != modsDict[\none] and:{
+	// 								modifiers != arrModsDict[\none]
+	// 							}
+	// 						}
+	// 					} {
+	// 						// "some modifier: %\n".postf(modifiers);
+	// 						if(keycode == keyDowns.keyCode and:{
+	// 							(modifiers == thisArrMod).or(modifiers == thisMod)
+	// 							}, {
+	// 								// "char: %, keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(char.cs, keyDowns.keyCode, keycode, thisMod, thisArrMod);
+	// 								keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
+	// 						})
+	// 					}
+	// 					;
+	// 				})
+	// 			)
+	// 		})
+	// 	})
+	// }
 
 	*prAddTab { |label|
 		var labelColor, unfocusedColor;
@@ -2081,17 +2085,23 @@ CVCenter {
 			if(loadShortcuts, {
 				{
 					lib[\all][\shortcuts] !? {
-						CVCenter.shortcuts_(lib[\all][\shortcuts][\cvCenter]);
-						CVCenter.setShortcuts;
+						this.shortcuts_(lib[\all][\shortcuts][\cvCenter]);
+						[tabs.views, prefPane].flat.do({ |view|
+							KeyDownActions.setShortcuts(view, this.shortcuts);
+						});
 						CVWidget.shortcuts_(lib[\all][\shortcuts][\cvWidget]);
-						CVCenter.cvWidgets.do(_.setShortcuts);
+						cvWidgets.do({ |wdgt|
+							wdgt.focusElements.do({ |el|
+								KeyDownActions.setShortcuts(el, CVWidget.shortcuts);
+							})
+						});
 						AbstractCVWidgetEditor.shortcuts_(lib[\all][\shortcuts][\cvWidgetEditor]);
 						KeyDownActions.globalShortcuts_(lib[\all][\shortcuts][\globalShortcuts]);
 						if(Server.default.serverRunning, {
 							KeyDownActions.globalShortcutsSync;
 						});
 					}
-				}.defer(0.2)
+				}.defer(0.5)
 			})
 		};
 

@@ -477,7 +477,10 @@ CVWidgetKnob : CVWidget {
 		focusElements = allGuiEls.copy.removeAll([widgetBg, nameField, calibBut]);
 
 		this.initControllerActions;
-		this.setShortcuts;
+		// this.setShortcuts;
+		focusElements.do({ |el|
+			KeyDownActions.setShortcuts(el, this.class.shortcuts);
+		});
 
 		oldBounds = parent.bounds;
 		if(parent.respondsTo(\name), { oldName = parent.name });

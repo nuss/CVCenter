@@ -13,16 +13,16 @@ definitionlist::
 ## CVWidgetKnob || - the editor itself is stored in code::allEditors[<widget-name>][\editor]::
 ## CVWidget2D || - both, code::\lo:: and code::\hi::, have their own editor: code::allEditors[<widget-name>][\hi or \lo][\editor]::
 ## CVWidgetMS || - the global editor (a link::Classes/CVWidgetMSEditor::) and the sub-editors (all link::Classes/CVWidgetEditor::s) are stored in code::allEditors::: in code::allEditors[<widget-name>][<index>][\editor]:: all sub-editors (link::Classes/CVWidgetEditor::s for each slot) are stored, code::allEditors[<widget-name>][\editor]:: keeps the global link::Classes/CVWidgetMSEditor::.
-::  
+::
 
 returns:: an link::Classes/IdentityDictionary::
 
 METHOD:: shortcuts
 An link::Classes/IdentityDictionary:: containing all currently defined shortcuts for any CVWidget(MS)Editor. Though this is a getter/setter it is recomended to add/remove shortcuts via the GUI within the link::Classes/CVCenterPreferences##preferences-interface:: (changes will become active after recompilation of the class-library) or the link::Classes/CVCenterShortcutsEditor##shortcuts-interface:: (changes become active immediatly but get reset after recompilation of the class-library).
 
-note:: In order to change an existing shortcut it is not enough to update the shortcuts-classvar. The user will also have to call link::#-setShortcuts:: once.::
+note:: In order to change an existing shortcut it is not enough to update the shortcuts-classvar. The user will also have to call link::Classes/KeyDownActions#*setShortcuts:: once.::
 
-See a list of predefined shortcuts in the link::#Shortcuts:: section of this document. 
+See a list of predefined shortcuts in the link::#Shortcuts:: section of this document.
 
 returns:: an link::Classes/IdentityDictionary::
 
@@ -39,7 +39,7 @@ list::
 ## code::0:: - the "Spec"-tab
 ## code::1:: - the "MIDI"-tab
 ## code::2:: - the "OSC"-tab
-## code::3:: - the "Actions"-tab 
+## code::3:: - the "Actions"-tab
 ::
 
 returns:: a link::Classes/CVWidgetEditor:: or a link::Classes/CVWidgetMSEditor::
@@ -57,13 +57,13 @@ After the link::#*shortcuts:: have been set this method must be called in order 
 returns:: a link::Classes/CVWidgetEditor:: or a link::Classes/CVWidgetMSEditor::
 
 METHOD:: scv
-An link::Classes/Event:: containing various objects that do not necessarily belong to the widget-editor but are related to it. E.g. when a shortcut opens a window that window may be added to scv so other shortcuts can refer to it later. 
+An link::Classes/Event:: containing various objects that do not necessarily belong to the widget-editor but are related to it. E.g. when a shortcut opens a window that window may be added to scv so other shortcuts can refer to it later.
 Basically code::scv:: has been introduced as the concept of configurable shortcuts seperate shortcut-actions from the widget-editor. Hence, variables in these actions can't get initialized belonging to the widget-editor automatically. However, code::scv:: holding a dictionary that can be filled up later solves the problem.
 
 returns:: an link::Classes/Event::
 
 subsection:: GUI properties and elements
-The following methods return representations of elements that are common to link::Classes/CVWidgetEditor:: as well as link::Classes/CVWidgetMSEditor:: 
+The following methods return representations of elements that are common to link::Classes/CVWidgetEditor:: as well as link::Classes/CVWidgetMSEditor::
 
 METHOD:: window
 The link::Classes/Window:: object the editor is embedded into.
@@ -128,7 +128,7 @@ returns:: a link::Classes/TextField::
 subsection:: The "MIDI"-tab: MIDI-connecting
 
 METHOD:: midiInitBut
-A link::Classes/Button::, either starting or restarting MIDI. Also the button displays the current MIDI-state.  
+A link::Classes/Button::, either starting or restarting MIDI. Also the button displays the current MIDI-state.
 
 returns:: a link::Classes/Button::
 
@@ -149,12 +149,12 @@ A link::Classes/TextField:: that allows the user to set a MIDI source-ID. If sel
 returns:: a link::Classes/TextField::
 
 METHOD:: midiChanField
-A link::Classes/TextField:: that allows the user to set a MIDI-channel resp. the field will show the channel if a MIDI-connection is present. 
+A link::Classes/TextField:: that allows the user to set a MIDI-channel resp. the field will show the channel if a MIDI-connection is present.
 
 returns:: a link::Classes/TextField::
 
 METHOD:: midiCtrlField
-A link::Classes/TextField:: that allows the user to set a MIDI-contoller resp. the field will show the controller-Nr. if a MIDI-connection is present. 
+A link::Classes/TextField:: that allows the user to set a MIDI-contoller resp. the field will show the controller-Nr. if a MIDI-connection is present.
 
 returns:: a link::Classes/TextField::
 
@@ -176,7 +176,7 @@ METHOD:: deviceDropDown
 returns:: (describe returnvalue here)
 
 METHOD:: cmdListMenu
-A link::Classes/PopUpMenu::, allowing the user to select among possible command-names. The selected one will be filled into link::#-nameField:: automatically. 
+A link::Classes/PopUpMenu::, allowing the user to select among possible command-names. The selected one will be filled into link::#-nameField:: automatically.
 
 returns:: a link::Classes/PopUpMenu::
 
@@ -186,12 +186,12 @@ A link::Classes/TextField::, allowing to set an OSC command-name (e.g. code::/my
 returns:: a link::Classes/TextField::
 
 METHOD:: indexField
-a link::Classes/NumberBox::, allowing the user to select the slot of OSC-message. The widget's link::Classes/CV::'s value will get set to the value in that slot. 
+a link::Classes/NumberBox::, allowing the user to select the slot of OSC-message. The widget's link::Classes/CV::'s value will get set to the value in that slot.
 
 returns:: a link::Classes/NumberBox::
 
 METHOD:: alwaysPosField
-A link::Classes/StaticText:: displaying an auto-correction value for the incoming value. Auto-correction means that incoming values will always be shifted into positive, allowing input-mappings expontial to linear or exponential to exponential even though the (real) input-range is zero-crossing.  
+A link::Classes/StaticText:: displaying an auto-correction value for the incoming value. Auto-correction means that incoming values will always be shifted into positive, allowing input-mappings expontial to linear or exponential to exponential even though the (real) input-range is zero-crossing.
 
 returns:: link::Classes/StaticText::
 
@@ -232,7 +232,7 @@ definitionList::
 ## s || Focus the "Spec"-tab.
 ## m || Focus the "MIDI"-tab.
 ## o || Focus the "OSC"-tab.
-## a || Focus the "Actions"-tab. 
+## a || Focus the "Actions"-tab.
 ## c || Open the link::Classes/OSCCommands:: window and start collecting incomming OSC-commands.
 ## esc || Close the editor.
 ::
