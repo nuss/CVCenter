@@ -48,8 +48,6 @@ KeyDownActionsEditor : KeyDownActions {
 		shortCutFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12, true);
 		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 10);
 
-		// if(name.isNil) { thisName = view.class } { thisName = name };
-
 		bounds !? { thisBounds = bounds.asRect };
 
 		if(parent.isNil) {
@@ -290,28 +288,21 @@ KeyDownActionsEditor : KeyDownActions {
 			funcString !? { funcFields[myCount].string_(funcString) };
 		};
 
-			shortcutsDict !? {
-				order = shortcutsDict.order;
+		shortcutsDict !? {
+			order = shortcutsDict.order;
 
-				order.do({ |shortcut, i|
-					// "shortcut.keys: %, shortcutsDict[shortcut][\\func]: %\n".postf(shortcutsDict.keys, shortcutsDict[shortcut][\func]);
-					makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "));
-					tmpShortcuts[i] = shortcut -> (
-						func: shortcutsDict[shortcut][\func],
-						keyCode: shortcutsDict[shortcut][\keyCode],
-						modifierQt: shortcutsDict[shortcut][\modifierQt],
-						modifierCocoa: shortcutsDict[shortcut][\modifierCocoa],
-						arrowModifierQt: shortcutsDict[shortcut][\arrowModifierQt],
-						arrowModifierCocoa: shortcutsDict[shortcut][\arrowModifierCocoa]
-					)
-				})
-			};
-
-
-		// tmpShortcuts.do({ |it, i|
-		// 	"tmpShortcuts[%]: %\n".postf(i, it);
-		// 	"funcFields[%].string: %\n".postf(i, funcFields[i].string);
-		// });
+			order.do({ |shortcut, i|
+				makeEditArea.(shortcut, shortcutsDict[shortcut][\func].replace("\t", " "));
+				tmpShortcuts[i] = shortcut -> (
+					func: shortcutsDict[shortcut][\func],
+					keyCode: shortcutsDict[shortcut][\keyCode],
+					modifierQt: shortcutsDict[shortcut][\modifierQt],
+					modifierCocoa: shortcutsDict[shortcut][\modifierCocoa],
+					arrowModifierQt: shortcutsDict[shortcut][\arrowModifierQt],
+					arrowModifierCocoa: shortcutsDict[shortcut][\arrowModifierCocoa]
+				)
+			})
+		};
 
 		butArea.decorator = butFlow = FlowLayout(butArea.bounds, 7@4, 3@0);
 
@@ -328,7 +319,7 @@ KeyDownActionsEditor : KeyDownActions {
 					));
 				});
 				scrollFlow.reset;
-				makeEditArea.(funcString: "{ /*do something */ }");
+				makeEditArea.(funcString: "{ |view| /*do something */ }");
 			})
 		;
 		parent ?? { window.front };
