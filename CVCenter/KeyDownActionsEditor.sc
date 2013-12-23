@@ -50,7 +50,7 @@ KeyDownActionsEditor : KeyDownActions {
 
 		// if(name.isNil) { thisName = view.class } { thisName = name };
 
-		bounds !? { thisBounds = bounds };
+		bounds !? { thisBounds = bounds.asRect };
 
 		if(parent.isNil) {
 			window = Window("shortcut editor:"+name, thisBounds ?? { thisBounds = Rect(
@@ -58,8 +58,7 @@ KeyDownActionsEditor : KeyDownActions {
 				Window.screenBounds.height-600/2,
 				600, 600
 			) });
-			// view.onClose_({ window.close });
-		} { window = parent; thisBounds = window.bounds };
+		} { window = parent };
 
 		window.onClose_({
 			all.remove(this);
@@ -272,7 +271,7 @@ KeyDownActionsEditor : KeyDownActions {
 							scrollView.bounds.left,
 							scrollView.bounds.top,
 							scrollView.bounds.width,
-							scrollView.bounds.height-100
+							scrollView.bounds.height
 						))
 					})
 					.font_(staticTextFont)

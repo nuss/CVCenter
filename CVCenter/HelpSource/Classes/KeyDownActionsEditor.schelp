@@ -64,33 +64,36 @@ returns:: a link::Classes/Window::
 EXAMPLES::
 
 code::
+// the editor is a GUI element that can be initialised
+// as part of a composite view or a standalone
+k = KeyDownActionsEditor.new;
+
 (
 // just an example dict
 // you shouldn't need to do this
+// a KeyDownActionsEditor can be initialised without shortcuts as well
+// all shortcuts added via GUI will get stored in an IdentityDictionary
+// like the one below
 // note the mixed keys
 
-~test = IdentityDictionary[
-	'alt + i' -> (
-		func: "{ \"You just hit 'alt + i', no?\".postln }",
-		keyCode: KeyDownActions.keyCodes[$i],
-		modifierQt: KeyDownActions.modifiersQt[\alt],
-		modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
-	),
-	$i -> (
-		func: "{ \"You just hit 'i', no?\".postln }",
-		keyCode: KeyDownActions.keyCodes[$i]
-	)
+t = IdentityDictionary[
+    'alt + i' -> (
+		func: "{ |view| view.background_(Color.red) }",
+        keyCode: KeyDownActions.keyCodes[$i],
+        modifierQt: KeyDownActions.modifiersQt[\alt],
+        modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
+    ),
+    $i -> (
+		func: "{ |view| view.background_(Color.green) }",
+        keyCode: KeyDownActions.keyCodes[$i]
+    )
 ];
 
-k = KeyDownActionsEditor(name: \test, shortcutsDict: ~test);
-)
-
-// retrieving the (current) result is not intgrated in the GUI
-// implementation left up to the user - as you please
-// here's the hook
-k.result;
-
 // create a window and set its shortcuts to what is in k.result
-w = Window("shortcuts test").front;
-k.setShortcuts(w.view);
+w = Window("shortcuts test").onClose_({ f.close }).front;
+
+f = Window("Shortcuts Editor", 400@300).front;
+k = KeyDownActionsEditor(f, bounds: f.bounds.width@(f.bounds.height-40), shortcutsDict: t);
+b = Button(f, Rect(f.bounds.width-100, f.bounds.height-30, 90, 20)).states_([["set Shortcuts", Color.white, Color.red]]).action_({ |btn| k.result.postln; k.setShortcuts(w.view) });
+)
 ::
