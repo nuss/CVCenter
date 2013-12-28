@@ -139,7 +139,7 @@ returns:: an link::Classes/Event::
 
 private:: init
 
-ETHOD:: background
+METHOD:: background
 Get or set the background-color of the widget. Tne setter for this method is implemented within CVWidgetMS while the getter is implemented as a global getter for all CVWidgets in link::Classes/CVWidget::. 
 
 argument:: color

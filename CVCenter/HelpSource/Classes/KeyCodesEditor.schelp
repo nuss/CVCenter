@@ -32,9 +32,9 @@ a link::Classes/Boolean::, determining whether the result should be written to d
 returns:: an link::Classes/IdentityDictionary::
 
 METHOD:: window
-The links::Classes/Window:: of a keyCodesEditor instance.
+The link::Classes/Window:: of a keyCodesEditor instance.
 
-returns:: a links::Classes/Window::
+returns:: a link::Classes/Window::
 
 METHOD:: eas
 The strong::editing-areas::: keyCodes, modifiers, arrowsModifiers...
