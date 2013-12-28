@@ -65,7 +65,7 @@ argument:: mode
 an link::Classes/Integer::
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: the receiver
 
@@ -73,7 +73,7 @@ METHOD:: getMidiMode
 Get the current midiMode (0 or 1).
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: an link::Classes/Integer::
 
@@ -84,7 +84,7 @@ argument:: meanval
 an link::Classes/Integer::. default: code::64::
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns::  the receiver
 
@@ -92,7 +92,7 @@ METHOD:: getMidiMean
 Get the current midiMean value.
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: an link::Classes/Integer::
 
@@ -103,7 +103,7 @@ argument:: threshold
 a link::Classes/Float:: - default: code::0.1::.
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns::  the receiver
 
@@ -111,7 +111,7 @@ METHOD:: getSoftWithin
 Get the current softWithin value.
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: a link::Classes/Float::
 
@@ -123,7 +123,7 @@ argument:: numSliders
 an link::Classes/Integer::, representing the number of sliders in one bank.
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: the receiver
 
@@ -131,7 +131,7 @@ METHOD:: getCtrlButtonBank
 Get the current ctrlButtonBank value
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: an link::Classes/Integer::, representing the number of sliders in one bank.
 
@@ -148,7 +148,7 @@ higher values -> lower resolution
 default: code::1::
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: the receiver
 
@@ -156,7 +156,7 @@ METHOD:: getMidiResolution
 Get the current value midiResolution value.
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns::  a link::Classes/Float::
 
@@ -167,7 +167,7 @@ argument:: bool
 a link::Classes/Boolean::, indicating whether the calibration-process shall be started or stopped.
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: the receiver
 
@@ -175,7 +175,7 @@ METHOD:: getCalibrate
 Get the current calibration-status
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: a link::Classes/Boolean::
 
@@ -216,7 +216,7 @@ list::
 ::
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: the receiver
 
@@ -224,7 +224,7 @@ METHOD:: getOscMapping
 Get the current oscMapping-mode
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns::  a link::Classes/Symbol::, indicating the oscMapping-mode
 
@@ -248,7 +248,7 @@ code:: [ '/orientation', 178, 67, 78 ]::
 the first slot is the command-name and the subsequent slots are code::x::, code::y:: and code::z::. code::oscMsgIndex:: allows you to select which of those three values you want to use in your widget.
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: the receiver
 
@@ -256,7 +256,7 @@ METHOD:: oscDisconnect
 Disconnects the OSC-device/-application reps. removes the link::Classes/OSCresponder::
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: the receiver
 
@@ -273,7 +273,7 @@ argument:: num
 optional - the controller-number to which the program will listen
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: the receiver
 
@@ -281,7 +281,7 @@ METHOD:: midiDisconnect
 Terminate a MIDi-connection reps. remove the link::Classes/CCResponder::.
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: the receiver
 
@@ -292,7 +292,7 @@ argument:: constraintsHiLo
 a link::Classes/Point:: - e.g. code::Point(-20, 20):: or code::0@360::
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: the receiver
 
@@ -300,7 +300,7 @@ METHOD:: getOscInputConstraints
 Get the current oscInputConstraints. This will return code::nil:: as the widget is not connected and the calibration-mechanism hasn't set any values.
 
 argument:: slot
-only needed if the widget is a link::Classes/CVWidget2D:: - either code::\lo:: or code::\hi::
+only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
 
 returns:: code::nil:: or an link::Classes/Event:: containing the constraints in the keys code::\lo:: and code::\hi:: (not related to the \lo and \hi keys in a link::Classes/CVWidget2D::)
 
