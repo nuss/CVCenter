@@ -263,7 +263,7 @@ argument:: name
 a link::Classes/Symbol:: or a link::Classes/String:: - the name under which the action will be added. The action may be removed or deactivated again by referring to this name.
 
 argument:: action
-a code::Function:: or a link::Classes/String:: - if one or more arguments are added, the first will automatically be a representation of the CV. The function can also be provided as a string that compiles to a function when you call code::interpret:: on it.
+a link::Classes/Function:: or a link::Classes/String:: that compiles to a function - if one or more arguments are added, the first will automatically be a representation of the CV. The function can also be provided as a string that compiles to a function when you call code::interpret:: on it.
 
 argument:: slot
 a link::Classes/String:: or link::Classes/Symbol:: - either code::\hi:: or code::\lo::. Only needed if the widget is a link::Classes/CVWidget2D::

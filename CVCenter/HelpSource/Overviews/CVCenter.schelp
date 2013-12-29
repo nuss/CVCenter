@@ -1,6 +1,6 @@
 TITLE:: CVCenter
 SUMMARY:: a library aiming at the easy use of external hard- and software controllers within SuperCollider
-CATEGORIES:: Conductor, External Control>MIDI, External Control>OSC
+CATEGORIES:: Conductor, GUI, External Control>MIDI, External Control>OSC
 
 CVCenter is built upon on the concept of code::CV::s by Ron Kuivila. Its name-giving class CVCenter holds a collection of CVs and allows the user to easily create widgets that let her/him easily connect external MIDI- or OSC-controllers. CVs resp. widgets as their graphical representation can be created from Synth-, Ndef-, NodeProxy-controls resp. it can also be used in connection with slots of a ProxySpace or a Patch created from an Instr.
 As CVs enherit from Stream they may be used in Patterns as well (just like you would embed a regular Pattern in another).
@@ -21,8 +21,8 @@ LIST::
 
 subsection:: Utilities
 LIST::
-## link::Classes/CVCenterPreferences:: - edit and save settings for CVCenter resp. CVWidgets to disk: common preferences regarding MIDI and OSC as well as user defined shortcuts for CVCenter, CVWidget and CVWidgetEditor. Also "global" shortcuts that work independantly from any gui can be defined (these shortcuts are bound to ugens. Hence, either supernova or scsynth have to be running). 
-## link::Classes/CVCenterShortcutsEditor:: - edit shortcuts for CVCenter, all variants of CVWidget, CVWidget(MS)Editor. 
+## link::Classes/CVCenterPreferences:: - edit and save settings for CVCenter resp. CVWidgets to disk: common preferences regarding MIDI and OSC as well as user defined shortcuts for CVCenter, CVWidget and CVWidgetEditor. Also "global" shortcuts that work independantly from any gui can be defined (these shortcuts are bound to ugens. Hence, either supernova or scsynth have to be running).
+## link::Classes/CVCenterShortcutsEditor:: - edit shortcuts for CVCenter, all variants of CVWidget, CVWidget(MS)Editor.
 ## link::Classes/CVCenterLoadDialog:: - a special gui (a dialog) for loading setups.
 ## link::Classes/OSCCommands:: - scan incoming OSC and save command-names to disk for later re-use
 ## link::Classes/KeyDownActions:: - a somewhat experimental approach to make shortcuts within views configurable via gui
