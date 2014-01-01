@@ -2273,9 +2273,17 @@ CVCenter {
 		var varNames, thisSpec;
 		var activate = true;
 		var actionName = "default";
-		var wms, addActionFunc;
+		var wms, addActionFunc, setMsg, setnMsg;
 
 		// [obj, ctrlName, environment, more].postln;
+		// "obj.class: %\n".postf(obj.class);
+		if(obj.isKindOf(NodeProxy), {
+			setMsg = \xset;
+			setnMsg = \xsetn;
+		}, {
+			setMsg = \set;
+			setnMsg = \xsetn;
+		});
 
 		varNames = obj.getObjectVarNames(environment);
 		// "varNames: %\n".postf(varNames);
@@ -2310,10 +2318,10 @@ CVCenter {
 							if(j == 0, { activate = true }, { activate = false });
 							switch(more.type,
 								\w2d, {
-									this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', ["++wms++"]) }}", slot, activate);
+									this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++"."++setnMsg++"('"++ctrlName++"', ["++wms++"]) }}", slot, activate);
 								},
 								\w2dc, {
-									this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".set('"++more.controls[i]++"', cv.value) }}", slot, activate);
+									this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++"."++setMsg++"('"++more.controls[i]++"', cv.value) }}", slot, activate);
 								}
 							)
 						})
@@ -2336,7 +2344,7 @@ CVCenter {
 						varNames.do({ |v, j|
 							actionName = "default"++(j+1);
 							if(j == 0, { activate = true }, {activate = false });
-							this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', cv.value) }}", active: activate);
+							this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++"."++setnMsg++"('"++ctrlName++"', cv.value) }}", active: activate);
 						})
 					}, {
 						this.addActionAt(more.cName, \default, "{ |cv| Server('"++obj.server++"').sendBundle("++obj.server.latency++", ['/n_setn', "++obj.nodeID++", '"++ctrlName++"', "++more.slots.size++", cv.value]) }");
@@ -2352,7 +2360,7 @@ CVCenter {
 						actionName = "default"++(j+1);
 						if(j == 0, { activate = true }, { activate = false });
 						if(more.controls.notNil and:{ more.controls.size > 1 }, {
-							this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".set('"++ctrlName++"', cv.value) }}", active: activate);
+							this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++"."++setMsg++"('"++ctrlName++"', cv.value) }}", active: activate);
 						}, {
 							wms = [];
 							more.slots.size.do({ |i|
@@ -2362,7 +2370,7 @@ CVCenter {
 									wms = wms.add("CVCenter.at('"++more.cName.asString++(i+1)++"').value")
 								})
 							});
-							this.addActionAt(more.cName.asString++(j+1), actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', ["++(wms.join(", "))++"]) }}", active: activate);
+							this.addActionAt(more.cName.asString++(j+1), actionName, "{ |cv|"+v+"!? {"+v++"."++setnMsg++"('"++ctrlName++"', ["++(wms.join(", "))++"]) }}", active: activate);
 						})
 					}, {
 						this.addActionAt(more.cName, \default, "{ |cv| Server('"++obj.server++"').sendBundle("++obj.server.latency++", ['/n_setn', "++obj.nodeID++", '"++ctrlName++"', 1, cv.value]) }");
@@ -2376,7 +2384,7 @@ CVCenter {
 					if(varNames.size > 0, {
 						varNames.do({ |v, j|
 							if(j == 0, { activate = true }, { activate = false });
-							this.addActionAt(more.cName, \default++(j+1), "{ |cv|"+v+"!? {"+v++".set('"++ctrlName++"', cv.value) }}", active: activate);
+						this.addActionAt(more.cName, \default++(j+1), "{ |cv|"+v+"!? {"+v++"."++setMsg++"('"++ctrlName++"', cv.value) }}", active: activate);
 						})
 					}, {
 						this.addActionAt(more.cName, \default, "{ |cv| Server('"++obj.server++"').sendBundle("++obj.server.latency++", ['/n_setn', "++obj.nodeID++", '"++ctrlName++"', 1, cv.value]) }");
