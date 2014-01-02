@@ -2282,7 +2282,7 @@ CVCenter {
 			setnMsg = \xsetn;
 		}, {
 			setMsg = \set;
-			setnMsg = \xsetn;
+			setnMsg = \setn;
 		});
 
 		varNames = obj.getObjectVarNames(environment);
