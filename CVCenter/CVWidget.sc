@@ -1089,7 +1089,7 @@ CVWidget {
 		});
 
 		if(mapping.asSymbol === \linexp or:{ mapping.asSymbol === \expexp }, {
-			if(this.getSpec(thisSlot).hasZeroCrossing, { thisMapping = \linlin }, { thisMapping = mapping.asSymbol });
+			if(this.getSpec(thisSlot).safeHasZeroCrossing, { thisMapping = \linlin }, { thisMapping = mapping.asSymbol });
 		}, { thisMapping = mapping.asSymbol });
 
 		switch(this.class,
@@ -1751,7 +1751,7 @@ CVWidget {
 				{ specEditor = thisGuiEnv.editor }
 			);
 
-			if(theChanger.value.hasZeroCrossing, {
+			if(theChanger.value.safeHasZeroCrossing, {
 				// "has zero crossing".postln;
 				if(midiOscEnv.oscMapping === \linexp or:{
 					midiOscEnv.oscMapping === \expexp

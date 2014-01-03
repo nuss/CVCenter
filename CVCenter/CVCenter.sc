@@ -1503,7 +1503,7 @@ CVCenter {
 						spec.collect({ |sp| sp.asSpec.asSpec.step }),
 						spec.collect({ |sp| sp.asSpec.asSpec.default })
 					);
-					if(thisSpec.hasZeroCrossing, { thisSpec.warp_(\lin) });
+					if(thisSpec.safeHasZeroCrossing, { thisSpec.warp_(\lin) });
 					if(spec.asBag.contents.size == 1, {
 						if((specName = Spec.specs.findKeyForValue(spec[0].asSpec)).notNil, {
 							Spec.add((specName++"_"++spec.size).asSymbol, thisSpec);

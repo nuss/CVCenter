@@ -6,6 +6,15 @@
 
 +ControlSpec {
 
+	safeHasZeroCrossing {
+		// ^minval.sign != maxval.sign
+		if([minval, maxval, step, default].select(_.isArray).size == 0) {
+			^minval.sign != maxval.sign
+		} {
+			^minval.sign.mean != maxval.sign.mean
+		}
+	}
+
 	excludingZeroCrossing {
 		if(minval != 0 and:{ maxval != 0 }) {
 			^this.hasZeroCrossing
