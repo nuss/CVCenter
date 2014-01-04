@@ -7,12 +7,11 @@
 +ControlSpec {
 
 	safeHasZeroCrossing {
-		// ^minval.sign != maxval.sign
-		if([minval, maxval, step, default].select(_.isArray).size == 0) {
-			^minval.sign != maxval.sign
-		} {
-			^minval.sign.mean != maxval.sign.mean
-		}
+		var thisMinSign, thisMaxSign;
+		#thisMinSign, thisMaxSign = [minval, maxval].collect{ |val|
+			if(val.isArray) { val.sign.mean } { val.sign }
+		};
+		^thisMinSign != thisMaxSign or:{ (thisMinSign == 0).and(thisMaxSign == 0) };
 	}
 
 	excludingZeroCrossing {
