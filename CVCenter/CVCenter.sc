@@ -238,7 +238,7 @@ CVCenter {
 				CVCenter.scv.historyGui = History.makeWin(
 					Window.screenBounds.width-300@Window.screenBounds.height
 				);
-				CVCenter.scv.historyWin = CVCenter.scv.historyGui.w
+				CVCenter.scv.historyGui = CVCenter.scv.historyGui.parent;
 			};
 			if(CVCenter.scv.historyWin.notNil and:{
 				CVCenter.scv.historyWin.isClosed.not
@@ -383,7 +383,9 @@ CVCenter {
 			"// end History and open in new Document (Cocoa-IDE only)
 			{
 				History.end;
-				if(Platform.ideName != \"scqt\") { History.document };
+				if(Platform.ideName == \"scapp\" or:{
+					(Platform.ideName == \"scqt\").and(Main.versionAtLeast(3, 7))
+				}) { History.document };
 				if(CVCenter.scv.historyWin.notNil and:{
 					CVCenter.scv.historyWin.isClosed.not
 				}) { CVCenter.scv.historyWin.close }
