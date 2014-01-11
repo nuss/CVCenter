@@ -1815,7 +1815,7 @@ CVCenter {
 					defaultName: "Setup",
 					successFunc: successFunc
 				)
-			}, { QDialog.savePanel(successFunc) })
+			}, { Dialog.savePanel(successFunc) })
 		}, {
 			successFunc.(path);
 		});
@@ -2109,7 +2109,7 @@ CVCenter {
 
 		if(path.isNil, {
 			if(GUI.id === \qt, {
-				QDialog.getPaths(successFunc, allowsMultiple: false);
+				QDialog.openPanel(successFunc);
 			}, {
 				File.openDialog(
 					prompt: "Please choose a setup",
