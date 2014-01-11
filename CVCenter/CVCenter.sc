@@ -238,7 +238,7 @@ CVCenter {
 				CVCenter.scv.historyGui = History.makeWin(
 					Window.screenBounds.width-300@Window.screenBounds.height
 				);
-				CVCenter.scv.historyGui = CVCenter.scv.historyGui.parent;
+				CVCenter.scv.historyWin = CVCenter.scv.historyGui.parent;
 			};
 			if(CVCenter.scv.historyWin.notNil and:{
 				CVCenter.scv.historyWin.isClosed.not
