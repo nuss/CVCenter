@@ -231,7 +231,7 @@ CVCenter {
 								historyGui = History.makeWin(
 									Window.screenBounds.width-300 @ Window.screenBounds.height
 								);
-								historyWin = historyGui.w;
+								historyWin = historyGui.parent;
 							});
 							if(historyWin.notNil and:{ historyWin.isClosed.not }, { historyWin.front })
 						},
