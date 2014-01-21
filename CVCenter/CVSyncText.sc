@@ -31,6 +31,7 @@ CVSyncText : CVSync {
 			GUI.schemes.do({ |scheme|
 				#[textView, textField, staticText].collect({ |name|
 					if((class = scheme.perform(name)).notNil, {
+						if(Main.versionAtLeast(3, 7), { class = class.superclass });
 						CV.viewDictionary.put(class, connectDictionary[name]);
 					})
 				})
