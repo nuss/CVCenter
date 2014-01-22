@@ -39,14 +39,22 @@ CVWidget2D : CVWidget {
 		var thisName, thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, rightBarX, oscEditButHeight, right, left;
+		var rSliderClass, slider2DClass;
 		var text, tActions;
 
 		this.bgColor ?? { this.bgColor_(Color.white) };
 		synchKeys ?? { synchKeys = [\default] };
 
+		// GUI redirects have been removed in SC 3.7alpha. Hence, QSomeClass has become SomeClass
+		if(Main.versionAtLeast(3, 7), {
+			rSliderClass = RangeSlider; slider2DClass = Slider2D;
+		}, {
+			rSliderClass = QRangeSlider; slider2DClass = QSlider2D;
+		});
+
 		if(GUI.id === \qt, {
-			CV.viewDictionary[QSlider2D].props_(#[xValue, yValue]);
-			CV.viewDictionary[QRangeSlider].props_(#[loValue, hiValue]);
+			CV.viewDictionary[slider2DClass].props_(#[xValue, yValue]);
+			CV.viewDictionary[rSliderClass].props_(#[loValue, hiValue]);
 		});
 
 		setupArgs !? {
