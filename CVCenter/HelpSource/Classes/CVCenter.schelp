@@ -699,7 +699,7 @@ metadata: (
 		ringtimes1: [1, 20],
 		ringtimes2: [1, 20]
 	)
-)).add; // must be 'added' if the GUI shall be auto-generated
+)).add; // must use 'add' or 'store' if the GUI shall be auto-generated
 )
 
 (
@@ -862,6 +862,7 @@ CVCenter.use(\degree, #[0, 11, \lin, 1, 2]!5); // setting freq - where going to 
 CVCenter.use(\dur, #[0.125, 1.0, \lin, 0.025, 0.25]!7); // durations
 
 // the pattern
+(
 Pdef(\poly,
 	Pbind(*[
 		instrument: \poly,
@@ -869,9 +870,9 @@ Pdef(\poly,
 		// instead of Prout{} the shortcut p{} can be used
 		note: PdegreeToKey( Prout({ loop {
 			CVCenter.at(\degree).collect([_]).yield
-		}}), [Scale.choose, Scale.locrian].choose.postln),
+		}}), Scale.dorian),
 		// the list arg in a ListPattern can't simply be replaced by a Pattern
-		// so we use a little trick to update Pseq's list here
+		// using a custom key holding a Pfunc that updates the Pseq's internal list
 		dur: d = Pseq(0.125!7, inf),
 		durList: Pfunc({ d.list_(CVCenter.at(\dur).value) }),
 		curve: CVCenter.use(\curve, #[-4.0, 4.0].asSpec),
@@ -885,6 +886,7 @@ Pdef(\poly,
 	])//.trace
 )
 )
+
 Pdef(\poly).play;
 Pdef(\poly).stop;
 ::

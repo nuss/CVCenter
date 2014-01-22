@@ -36,7 +36,7 @@ CVWidget2D : CVWidget {
 		var thisXY, thisX, thisY, thisWidth, thisHeight, knobsize, widgetSpecsActions;
 		var msrc = "source", mchan = "chan", mctrl = "ctrl", margs;
 		var nextY, rightColumnX, oscEditButHeight, right, left;
-		var text, tActions;
+		var text, tActions, rSliderClass, slider2DClass;
 		var tmpWin;
 		// var modsDict, arrModsDict;
 
@@ -56,9 +56,15 @@ CVWidget2D : CVWidget {
 
 		synchKeys ?? { synchKeys = [\default] };
 
+		if(Main.versionAtLeast(3, 7), {
+			rSliderClass = RangeSlider; slider2DClass = Slider2D;
+		}, {
+			rSliderClass = QRangeSlider; slider2DClass = QSlider2D;
+		});
+
 		if(GUI.id === \qt, {
-			CV.viewDictionary[QSlider2D].props_(#[xValue, yValue]);
-			CV.viewDictionary[QRangeSlider].props_(#[loValue, hiValue]);
+			CV.viewDictionary[slider2DClass].props_(#[xValue, yValue]);
+			CV.viewDictionary[rSliderClass].props_(#[loValue, hiValue]);
 		});
 
 		setupArgs !? {
