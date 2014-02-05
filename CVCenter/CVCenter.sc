@@ -1171,8 +1171,8 @@ CVCenter {
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
 
-				if(msSize <= numMsSlotsPerColumn, { widgetwidth = 106 }, {
-					widgetwidth = (52*(msSize/numMsSlotsPerColumn).ceil)+1
+				if(msSize <= numMsSlotsPerColumn, { widgetwidth = 105 }, {
+					widgetwidth = msSize.div(numMsSlotsPerColumn)*53+52
 				});
 
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
