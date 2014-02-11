@@ -2164,46 +2164,36 @@ CVCenter {
 	}
 
 	*prRegroupWidgets { |tab|
-		var rowwidth, rowheight, colcount, colwidth, thisNextPos, order, orderedWidgets, orderedRemoveButs;
+		var thisNextPos, order, orderedRemoveButs;
 		var widgetwidth, widgetheight=160;
-		var wdgtMaxWidth;
 		var thisTabKey;
-
-		// "*prRegroupWidgets called: %\n".postf(tab.label);
-
-		wdgtMaxWidth = cvWidgets.collect({ |wdgt|
-			if(wdgt.isClosed.not, { wdgt.widgetProps.x+1 })
-		}).maxItem;
-
-		rowheight = widgetheight+1+15;
-		thisNextPos = Point(0, 0);
 
 		tab !? {
 			thisTabKey = tab.label.asSymbol;
 			order = cvWidgets.order;
-			orderedWidgets = cvWidgets.atAll(order);
 			orderedRemoveButs = removeButs.atAll(order);
 			order.do({ |k, i|
+				thisNextPos ?? { thisNextPos = Point(0, 0) };
 				if(cvWidgets[k].window === tab, {
-					if(thisNextPos != (Point(0, 0)), {
-						thisNextPos = tabProperties[thisTabKey].nextPos;
+					if(thisNextPos.x != 0, {
+						if(thisNextPos.x+(cvWidgets[k].widgetProps.x) >= (tab.bounds.width-15), {
+							thisNextPos = Point(0, thisNextPos.y
+								+(cvWidgets[k].widgetProps.y)
+								+(orderedRemoveButs[i].bounds.height)
+							);
+						}, {
+							thisNextPos = tabProperties[thisTabKey].nextPos;
+						})
 					});
-					orderedWidgets[i].widgetXY_(thisNextPos);
+					tabProperties[thisTabKey].nextPos = thisNextPos+Point(cvWidgets[k].widgetProps.x+1, 0);
+					cvWidgets[k].widgetXY_(thisNextPos);
 					orderedRemoveButs[i].bounds_(Rect(
 						thisNextPos.x,
 						thisNextPos.y+widgetheight,
 						orderedRemoveButs[i].bounds.width,
 						orderedRemoveButs[i].bounds.height
 					));
-					colwidth = orderedWidgets[i].widgetProps.x+1; // add a small gap to the right
-					rowwidth = tab.bounds.width/*-15*/;
-					if(thisNextPos.x+colwidth >= (rowwidth-colwidth/*-15*/), {
-						// jump to next row
-						tabProperties[thisTabKey].nextPos = thisNextPos = Point(0, thisNextPos.y+rowheight);
-					}, {
-						// add next widget to the right
-						tabProperties[thisTabKey].nextPos = thisNextPos = Point(thisNextPos.x+colwidth, thisNextPos.y);
-					})
+					thisNextPos = tabProperties[thisTabKey].nextPos;
 				})
 			})
 		}
