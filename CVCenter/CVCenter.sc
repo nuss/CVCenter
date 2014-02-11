@@ -2164,40 +2164,28 @@ CVCenter {
 	}
 
 	*prRegroupWidgets { |tab|
-		var maxRowWidth, rowheight, colcount, colwidth, lastRowWidth, lastRowY, thisNextPos, order, /*orderedWidgets, */orderedRemoveButs;
+		var thisNextPos, order, orderedRemoveButs;
 		var widgetwidth, widgetheight=160;
 		var thisTabKey;
-		var widgetsAtTab, rowWidgets = [], rowWidths = [];
-
-		// widgetsAtTab = this.widgetsAtTab(tab.label);
-
-		rowheight = widgetheight+1+15;
-		thisNextPos = Point(0, 0);
 
 		tab !? {
 			thisTabKey = tab.label.asSymbol;
 			order = cvWidgets.order;
-			// orderedWidgets = cvWidgets.atAll(order);
 			orderedRemoveButs = removeButs.atAll(order);
 			order.do({ |k, i|
+				thisNextPos ?? { thisNextPos = Point(0, 0) };
 				if(cvWidgets[k].window === tab, {
-					if(tabProperties[thisTabKey].nextPos != Point(0, 0), {
-						[k, cvWidgets[k], i, cvWidgets[k]].postln;
-						if(tabProperties[thisTabKey]
-							.nextPos+(cvWidgets[k].widgetProps.x)
-						>= (tab.bounds.width-15), {
-							"true: %, %\n".postf(k, i);
+					if(thisNextPos.x != 0, {
+						if(thisNextPos.x+(cvWidgets[k].widgetProps.x) >= (tab.bounds.width-15), {
 							thisNextPos = Point(0, thisNextPos.y
 								+(cvWidgets[k].widgetProps.y)
 								+(orderedRemoveButs[i].bounds.height)
 							);
 						}, {
-							"false: %, %\n".postf(k, i);
 							thisNextPos = tabProperties[thisTabKey].nextPos;
 						})
 					});
 					tabProperties[thisTabKey].nextPos = thisNextPos+Point(cvWidgets[k].widgetProps.x+1, 0);
-					// "tabProperties[thisTabKey]: %\n".postf(tabProperties[thisTabKey]);
 					cvWidgets[k].widgetXY_(thisNextPos);
 					orderedRemoveButs[i].bounds_(Rect(
 						thisNextPos.x,
@@ -2205,21 +2193,7 @@ CVCenter {
 						orderedRemoveButs[i].bounds.width,
 						orderedRemoveButs[i].bounds.height
 					));
-					// lastRowWidth = cvWidgets[k].bounds.left+(cvWidgets[k].bounds.width);
-					// lastRowY = thisNextPos.y;
-					// colwidth = cvWidgets[k].widgetProps.x+1; // add a small gap to the right
-					// // "colwidth: % (%, %, %)\n".postf(colwidth, thisTabKey, k, i);
-					// maxRowWidth = tab.bounds.width/*-15*/;
-					// // "lastRowWidth.x: %, colwidth: %, maxRowWidth: %\n".postf(lastRowWidth.x, colwidth, maxRowWidth);
-					// if(lastRowWidth >= (maxRowWidth-colwidth/*-15*/), {
-					// 	// jump to next row
-					// 	// "jumping to next row: %, lastRowWidth: %, maxRowWidth-colwidth: %\n".postf(k, lastRowWidth, maxRowWidth-colwidth);
-					// 	tabProperties[thisTabKey].nextPos = Point(0, thisNextPos.y+rowheight);
-					// 	}, {
-					// 		// "add next widget to the right: %, lastRowWidth: %, maxRowWidth-colwidth: %\n".postf(k, lastRowWidth, maxRowWidth-colwidth);
-					// 		tabProperties[thisTabKey].nextPos = Point(thisNextPos.x+colwidth, thisNextPos.y);
-					// });
-					// thisNextPos = tabProperties[thisTabKey].nextPos;
+					thisNextPos = tabProperties[thisTabKey].nextPos;
 				})
 			})
 		}
