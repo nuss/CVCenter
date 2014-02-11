@@ -4,7 +4,7 @@ For more info check out the CVCenter- resp. CVWidget-helpfile.
 
 Installation
 ------------
-1. get SuperCollider from http://sourceforge.net/projects/supercollider/files/ (or install SuperCollider from source. For more instructions see: http://supercollider.github.io/development/building.html or cunsult the specific READMEs that come with the program).
+1. get SuperCollider from http://sourceforge.net/projects/supercollider/files/ or install SuperCollider from source (For more instructions see: http://supercollider.github.io/development/building.html and consult the specific READMEs that come with the program).
 2. install the required extensions via the Quarks-mechanism:
 	- Conductor
 	- TabbedView2
