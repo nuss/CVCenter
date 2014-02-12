@@ -623,6 +623,8 @@ CVCenter {
 				.acceptsMouseOver_(true)
 			;
 
+			// "prefBut.bounds: %\n".postf(prefBut.bounds);
+
 			if(GUI.id !== \cocoa, {
 				prefBut.toolTip_("Edit the global preferences for CVCenter (resp.\nCVWidget). Preferences will be written to disk\nand become active upon library-recompile.")
 			});
@@ -634,6 +636,8 @@ CVCenter {
 				.states_([["save setup", Color.white, Color(0.15, 0.15, 0.15)]])
 				.action_({ |sb| this.saveSetup })
 			;
+
+			// "saveBut.bounds: %\n".postf(saveBut.bounds);
 
 			if(GUI.id !== \cocoa, {
 				saveBut.toolTip_("Save the current setup of CVCenter,\nincluding currently active OSC-/MIDI-\nresponders and actions.")
@@ -649,11 +653,15 @@ CVCenter {
 				})
 			;
 
+			// "loadBut.bounds: %\n".postf(loadBut.bounds);
+			// loadBut.bounds_(Rect(142, 0, 70, 20));
+
 			if(GUI.id !== \cocoa, {
 				loadBut.toolTip_("Load a CVCenter-setup from disk. You\nmay load OSC-/MIDI-responders and\nactions if the corresponding checkboxes\nto the right are checked accordingly.")
 			});
 
 			swFlow.shift(1, 0);
+
 
 			shortcutsBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -663,9 +671,13 @@ CVCenter {
 				})
 			;
 
+			// "shortcutsBut.bounds: %\n".postf(shortcutsBut.bounds);
+
 			swFlow.shift(5, 2);
 
 			activateGlobalShortcuts = buildCheckbox.(prefPane, KeyDownActions.globalShortcutsEnabled, { KeyDownActions.globalShortcutsEnabled_(activateGlobalShortcuts.value) });
+
+			// "activateGlobalShortcuts.bounds: %\n".postf(activateGlobalShortcuts.bounds);
 
 			swFlow.shift(3, -2);
 
@@ -674,6 +686,8 @@ CVCenter {
 				.stringColor_(Color.white)
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 			;
+
+			prefPane.children.collect({ |v| [v.class, v.bounds] }).postln;
 
 			// this.setShortcuts;
 			[tabs.views, prefPane].flat.do({ |view|
@@ -2119,6 +2133,21 @@ CVCenter {
 				})
 			})
 		}
+	}
+
+	// finish me
+	*prRegroupPrefPanel {
+		var children, nextBounds;
+
+		children = prefPane.children.collect(_.bounds);
+
+		children.do({ |child, i|
+			nextBounds ?? { nextBounds = Rect() };
+			if(child.left+child.width >= prefPane.width-15, {
+				prefPane[i].bounds_(Rect(0, child.top+21, child.width, child.height));
+				nextBounds = Rect();
+			})
+		});
 	}
 
 	*prRemoveTab { |key|
