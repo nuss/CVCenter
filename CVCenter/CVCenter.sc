@@ -17,7 +17,7 @@
 
 CVCenter {
 
-	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, /*<windowStates, */<tabs, <prefPane, removeButs;
+	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, /*<windowStates, */<tabs, <prefPane, swFlow, removeButs;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>shortcuts, <scv;
 	classvar <alwaysOnTop=false;
@@ -528,9 +528,9 @@ CVCenter {
 		var flow;
 		// var cvTabIndex, order, orderedCVs, msSize;
 		var updateRoutine, lastUpdate, lastUpdateBounds, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
-		var lastCtrlBtnsMode, swFlow;
+		var lastCtrlBtnsMode/*, swFlow*/;
 		var allTabs, thisTabLabel;
-		var prefBut, saveBut, loadBut, shortcutsBut, activateGlobalShortcuts;
+		var prefBut, saveBut, loadBut, shortcutsBut, globalShortcutsView, activateGlobalShortcuts;
 		var tmp, doMakeWdgt;
 		// var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
@@ -612,9 +612,8 @@ CVCenter {
 			flow.shift(0, 0);
 
 			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40)).hasBorder_(false);
-			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(0, 0));
+			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(1, 1));
 			prefPane.resize_(8).background_(Color.black);
-			// prefPane.bounds.postln;
 
 			prefBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -623,13 +622,9 @@ CVCenter {
 				.acceptsMouseOver_(true)
 			;
 
-			// "prefBut.bounds: %\n".postf(prefBut.bounds);
-
 			if(GUI.id !== \cocoa, {
 				prefBut.toolTip_("Edit the global preferences for CVCenter (resp.\nCVWidget). Preferences will be written to disk\nand become active upon library-recompile.")
 			});
-
-			swFlow.shift(1, 0);
 
 			saveBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -637,13 +632,9 @@ CVCenter {
 				.action_({ |sb| this.saveSetup })
 			;
 
-			// "saveBut.bounds: %\n".postf(saveBut.bounds);
-
 			if(GUI.id !== \cocoa, {
 				saveBut.toolTip_("Save the current setup of CVCenter,\nincluding currently active OSC-/MIDI-\nresponders and actions.")
 			});
-
-			swFlow.shift(1, 0);
 
 			loadBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -653,15 +644,9 @@ CVCenter {
 				})
 			;
 
-			// "loadBut.bounds: %\n".postf(loadBut.bounds);
-			// loadBut.bounds_(Rect(142, 0, 70, 20));
-
 			if(GUI.id !== \cocoa, {
 				loadBut.toolTip_("Load a CVCenter-setup from disk. You\nmay load OSC-/MIDI-responders and\nactions if the corresponding checkboxes\nto the right are checked accordingly.")
 			});
-
-			swFlow.shift(1, 0);
-
 
 			shortcutsBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -671,17 +656,17 @@ CVCenter {
 				})
 			;
 
-			// "shortcutsBut.bounds: %\n".postf(shortcutsBut.bounds);
+			globalShortcutsView = CompositeView(prefPane, Point(142, 20));
 
-			swFlow.shift(5, 2);
+			activateGlobalShortcuts = buildCheckbox.(
+				globalShortcutsView,
+				KeyDownActions.globalShortcutsEnabled, {
+					KeyDownActions.globalShortcutsEnabled_(activateGlobalShortcuts.value)
+		}).bounds_(Rect(5, 2, 15, 15));
 
-			activateGlobalShortcuts = buildCheckbox.(prefPane, KeyDownActions.globalShortcutsEnabled, { KeyDownActions.globalShortcutsEnabled_(activateGlobalShortcuts.value) });
+			activateGlobalShortcuts.bounds.postln;
 
-			// "activateGlobalShortcuts.bounds: %\n".postf(activateGlobalShortcuts.bounds);
-
-			swFlow.shift(3, -2);
-
-			StaticText(prefPane, Point(140, 20))
+			StaticText(globalShortcutsView, Rect(25, 0, 122, 20))
 				.string_("enable global shortcuts")
 				.stringColor_(Color.white)
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -815,6 +800,7 @@ CVCenter {
 				});
 				if(lastUpdateBounds.notNil and:{ window.bounds.width != lastUpdateBounds.width }, {
 					this.prRegroupWidgets(tabs.activeTab);
+					this.prRegroupPrefPane;
 				});
 				if(childViews.size > 0, {
 					childViews.pairsDo({ |child, childProps|
@@ -1034,8 +1020,6 @@ CVCenter {
 				cvcArgs = true;
 			});
 		}, { cvcArgs = true });
-
-		// "cvcArgs: %\n".postf(cvcArgs);
 
 		case
 			{ all[key].class === Event and:{
@@ -2115,7 +2099,7 @@ CVCenter {
 						if(thisNextPos.x+(cvWidgets[k].widgetProps.x) >= (tab.bounds.width-15), {
 							thisNextPos = Point(0, thisNextPos.y
 								+(cvWidgets[k].widgetProps.y)
-								+(orderedRemoveButs[i].bounds.height)
+								+(orderedRemoveButs[i].bounds.height+1)
 							);
 						}, {
 							thisNextPos = tabProperties[thisTabKey].nextPos;
@@ -2136,18 +2120,16 @@ CVCenter {
 	}
 
 	// finish me
-	*prRegroupPrefPanel {
-		var children, nextBounds;
-
-		children = prefPane.children.collect(_.bounds);
-
-		children.do({ |child, i|
-			nextBounds ?? { nextBounds = Rect() };
-			if(child.left+child.width >= prefPane.width-15, {
-				prefPane[i].bounds_(Rect(0, child.top+21, child.width, child.height));
-				nextBounds = Rect();
-			})
-		});
+	*prRegroupPrefPane {
+		var children;
+		children = prefPane.children;
+		swFlow.bounds.width_(prefPane.bounds.width);
+		swFlow.reset;
+		children.do({ |child| swFlow.place(child) });
+		if(children.collect(_.bounds).sum.height > 0, {
+			prefPane.bounds.height_(prefPane.bounds.height+children.collect(_.bounds).sum.height.div(21)-1*21);
+			tabs.view.bounds.height_(tabs.view.bounds.height-children.collect(_.bounds).sum.height.div(21)-1*21);
+		})
 	}
 
 	*prRemoveTab { |key|
