@@ -18,6 +18,7 @@
 CVCenter {
 
 	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, /*<windowStates, */<tabs, <prefPane, swFlow, removeButs;
+	classvar prefPaneBounds, tabsBounds;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>shortcuts, <scv;
 	classvar <alwaysOnTop=false;
@@ -132,7 +133,6 @@ CVCenter {
 			scFunc =
 			"// select first widget
 			{
-				\"select first widget\".postln;
 				var labels = CVCenter.cvWidgets.order;
 				CVCenter.cvWidgets[labels.first].parent.front.focus;
 				CVCenter.cvWidgets[labels.first].label.focus;
@@ -530,7 +530,7 @@ CVCenter {
 		var updateRoutine, lastUpdate, lastUpdateBounds, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
 		var lastCtrlBtnsMode/*, swFlow*/;
 		var allTabs, thisTabLabel;
-		var prefBut, saveBut, loadBut, shortcutsBut, globalShortcutsView, activateGlobalShortcuts;
+		var rows, prefBut, saveBut, loadBut, shortcutsBut, globalShortcutsView, activateGlobalShortcuts;
 		var tmp, doMakeWdgt;
 		// var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
@@ -579,13 +579,14 @@ CVCenter {
 			// });
 			if(Quarks.isInstalled("wslib") and:{ GUI.id !== \swing }, { window.background_(Color.black) });
 			window.view.background_(Color.black);
-			flow = FlowLayout(window.bounds.insetBy(4));
-			window.view.decorator = flow;
-			flow.margin_(Point(4, 0));
-			flow.gap_(Point(0, 4));
-			flow.shift;
+			// flow = FlowLayout(window.bounds.insetBy(4));
+			// window.view.decorator = flow;
+			// flow.margin_(Point(4, 0));
+			// flow.gap_(Point(0, 4));
+			// flow.shift;
+			tabsBounds = Rect(4, 4, window.view.bounds.width, window.view.bounds.height-35);
 
-			tabs = TabbedView2(window, Rect(0, 0, flow.bounds.width, flow.bounds.height-40))
+			tabs = TabbedView2(window, tabsBounds)
 				.tabCurve_(3)
 				.labelPadding_(10)
 				.alwaysOnTop_(alwaysOnTop)
@@ -605,13 +606,16 @@ CVCenter {
 				})
 			;
 
+			// tabs.view.backColor_(Color.rand);
+
 			tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
 				if(keycode == KeyDownActions.keyCodes[\esc], { prefPane.focus })
 			});
 
-			flow.shift(0, 0);
+			// flow.shift(0, 0);
 
-			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40)).hasBorder_(false);
+			prefPaneBounds = Rect(4, tabs.view.bounds.top+tabs.view.bounds.height, window.view.bounds.width, 35);
+			prefPane = ScrollView(window, prefPaneBounds).hasBorder_(false);
 			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(1, 1));
 			prefPane.resize_(8).background_(Color.black);
 
@@ -664,15 +668,28 @@ CVCenter {
 					KeyDownActions.globalShortcutsEnabled_(activateGlobalShortcuts.value)
 		}).bounds_(Rect(5, 2, 15, 15));
 
-			activateGlobalShortcuts.bounds.postln;
-
 			StaticText(globalShortcutsView, Rect(25, 0, 122, 20))
 				.string_("enable global shortcuts")
 				.stringColor_(Color.white)
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 			;
 
-			prefPane.children.collect({ |v| [v.class, v.bounds] }).postln;
+			// correct prefPane height if its contents span more than 1 line
+			rows = prefPane.children.collect({ |child| child.bounds.top }).asBag.contents.size;
+			if(rows > 1, {
+				prefPane.bounds_(Rect(
+					prefPaneBounds.left,
+					window.view.bounds.height-35-(rows-1*21),
+					prefPane.bounds.width,
+					prefPaneBounds.height+(rows-1*21)
+				));
+				tabs.view.bounds_(Rect(
+					tabsBounds.left,
+					tabsBounds.top,
+					tabs.view.bounds.width,
+					window.view.bounds.height-prefPane.bounds.height
+				))
+			});
 
 			// this.setShortcuts;
 			[tabs.views, prefPane].flat.do({ |view|
@@ -2121,15 +2138,29 @@ CVCenter {
 
 	// finish me
 	*prRegroupPrefPane {
-		var children;
+		var children, rows;
+
 		children = prefPane.children;
 		swFlow.bounds.width_(prefPane.bounds.width);
 		swFlow.reset;
-		children.do({ |child| swFlow.place(child) });
-		if(children.collect(_.bounds).sum.height > 0, {
-			prefPane.bounds.height_(prefPane.bounds.height+children.collect(_.bounds).sum.height.div(21)-1*21);
-			tabs.view.bounds.height_(tabs.view.bounds.height-children.collect(_.bounds).sum.height.div(21)-1*21);
-		})
+		children.do({ |child|
+			swFlow.place(child);
+			rows = children.collect({ |child| child.bounds.top }).asBag.contents.size;
+			prefPane.bounds_(Rect(
+				prefPaneBounds.left,
+				window.view.bounds.height-35-(rows-1*21),
+				prefPane.bounds.width,
+				prefPaneBounds.height+(rows-1*21)
+			));
+			tabs.view.bounds_(Rect(
+				tabsBounds.left,
+				tabsBounds.top,
+				tabs.view.bounds.width,
+				window.view.bounds.height-prefPane.bounds.height
+			))
+		});
+		// "tabsBounds.height: %, rows-1*21: %, tabs.view.bounds.height: %\n".postf(tabsBounds.height, rows-1*21, tabs.view.bounds.height);
+		// prefPane.bounds.postln;
 	}
 
 	*prRemoveTab { |key|
