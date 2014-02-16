@@ -27,7 +27,7 @@ CVCenter {
 	classvar <tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=160, colwidth, rowheight;
 	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin, eqWin;
-	classvar prefs, boundsOnShutDown;
+	classvar prefs, boundsOnShutDown, <snapShots, snapShotSelect;
 	// CVWidgetMS: how many slots at max for one column
 	classvar <>numMsSlotsPerColumn = 15;
 
@@ -41,6 +41,9 @@ CVCenter {
 		Class.initClassTree(CVWidget);
 		Class.initClassTree(KeyDownActions);
 		// windowStates = ();
+
+		snapShots = ();
+
 		prefs = CVCenterPreferences.readPreferences;
 
 		prefs !? {
@@ -531,6 +534,7 @@ CVCenter {
 		var lastCtrlBtnsMode/*, swFlow*/;
 		var allTabs, thisTabLabel;
 		var rows, prefBut, saveBut, loadBut, shortcutsBut, globalShortcutsView, activateGlobalShortcuts;
+		var snapShotBut, snapShotEdit;
 		var tmp, doMakeWdgt;
 		// var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
@@ -612,6 +616,12 @@ CVCenter {
 				if(keycode == KeyDownActions.keyCodes[\esc], { prefPane.focus })
 			});
 
+			this.add(\snapshot, ControlSpec(0, if(snapShots.size > 0, {
+				snapShots.size-1
+			}, {
+				0
+			}), step: 1.0, default: 0), tab: \default);
+
 			// flow.shift(0, 0);
 
 			prefPaneBounds = Rect(4, tabs.view.bounds.top+tabs.view.bounds.height, window.view.bounds.width, 35);
@@ -650,6 +660,39 @@ CVCenter {
 
 			if(GUI.id !== \cocoa, {
 				loadBut.toolTip_("Load a CVCenter-setup from disk. You\nmay load OSC-/MIDI-responders and\nactions if the corresponding checkboxes\nto the right are checked accordingly.")
+			});
+
+			//snapShotBut, snapShotSelect, snapShotEdit;
+
+			snapShotBut = Button(prefPane, Point(70, 20))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
+				.states_([
+					["snapshot", Color.black, Color(0.45, 0.65, 0.1)],
+					["snapshot", Color.white, Color(0.45, 0.65, 0.1)],
+				])
+				.action_({ |bt|
+					if(bt.value.asBoolean, { bt.value_(0) });
+					this.saveSnapshot(true);
+				})
+			;
+
+			// snapShotEdit = Button(prefPane, Point(20, 20))
+			// .font_(Font(Font.available("Arial") ? Font.defaultSansFace, 22))
+			// .states_([["✎", Color.black, Color(0.45, 0.65, 0.1)]])
+			// .action_({ |scb|
+			//
+			// })
+			// ;
+
+			snapShotSelect = PopUpMenu(prefPane, Point(120, 20))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
+				.items_(["select snapshot..."])
+				.background_(Color.black)
+				.stringColor_(Color(0.45, 0.65, 0.1))
+			;
+
+			if(snapShots.size > 0, {
+				snapShotSelect.items_(snapShotSelect.items ++ snapShots.keys.asArray)
 			});
 
 			shortcutsBut = Button(prefPane, Point(70, 20))
@@ -1619,6 +1662,50 @@ CVCenter {
 			}
 		});
 		^wdgts;
+	}
+
+	*saveSnapshot { |dialog=false|
+		var key, dialogWin, keyField;
+
+		key = Date.getDate.stamp;
+		all.collect(_.value);
+
+		if(dialog, {
+			dialogWin = Window("save snapshot", Rect(
+				Window.screenBounds.width-300/2, Window.screenBounds.height-50/2,
+				300, 50
+			));
+
+			dialogWin.view.background_(Color.black);
+
+			keyField = TextField(dialogWin, Rect(4, 4, 290, 20))
+				.string_(key)
+				.font_(Font(Font.available("Courier") ? Font.defaultMonoFace, 11))
+			;
+
+			Button(dialogWin, Rect(4, 26, 144, 20))
+				.states_([["cancel", Color.white, Color(0.1, 0.1, 0.1)]])
+				.action_({ dialogWin.close })
+			;
+
+			Button(dialogWin, Rect(151, 26, 144, 20))
+				.states_([["save snapshot", Color.white, Color.red]])
+				.action_({
+					snapShots.put(keyField.string.asSymbol, all.collect(_.value));
+					snapShotSelect.items_(snapShotSelect.items ++ keyField.string.asSymbol);
+					cvWidgets[\snapshot].setSpec(ControlSpec(0, snapShots.size, step: 1.0, default: 0));
+					dialogWin.close;
+				})
+			;
+
+			dialogWin.front;
+		}, {
+			snapShots.put(key, all.collect(_.value));
+		});
+
+		CVCenter.window.onClose_(
+			CVCenter.window.onClose.addFunc({ dialogWin !? { dialogWin.close }})
+		)
 	}
 
 	*saveSetup { |path|
