@@ -523,7 +523,10 @@ CVCenter {
 						})
 					});
 				})
-			})
+			});
+
+			all.put('select snapshot', SV(["select snapshot..."]));
+			all.put(\snapshot, CV(#[0, 1, \lin, 1.0]));
 		})
 	}
 
@@ -616,12 +619,6 @@ CVCenter {
 				if(keycode == KeyDownActions.keyCodes[\esc], { prefPane.focus })
 			});
 
-			this.add(\snapshot, ControlSpec(0, if(snapShots.size > 0, {
-				snapShots.size-1
-			}, {
-				0
-			}), step: 1.0, default: 0), tab: \default);
-
 			// flow.shift(0, 0);
 
 			prefPaneBounds = Rect(4, tabs.view.bounds.top+tabs.view.bounds.height, window.view.bounds.width, 35);
@@ -667,18 +664,19 @@ CVCenter {
 			snapShotBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 				.states_([
-					["snapshot", Color.black, Color(0.45, 0.65, 0.1)],
-					["snapshot", Color.white, Color(0.45, 0.65, 0.1)],
+					["snapshot", Color.black, Color.yellow],
+					["snapshot", Color.white, Color.yellow],
 				])
-				.action_({ |bt|
-					if(bt.value.asBoolean, { bt.value_(0) });
-					this.saveSnapshot(true);
-				})
+			// .action_({ |bt|
+			// 	if(bt.value.asBoolean, { bt.value_(0) });
+			// })
 			;
+
+			this.at(\snapshot).connect(snapShotBut);
 
 			// snapShotEdit = Button(prefPane, Point(20, 20))
 			// .font_(Font(Font.available("Arial") ? Font.defaultSansFace, 22))
-			// .states_([["✎", Color.black, Color(0.45, 0.65, 0.1)]])
+			// .states_([["✎", Color.black, Color.yellow]])
 			// .action_({ |scb|
 			//
 			// })
@@ -686,14 +684,11 @@ CVCenter {
 
 			snapShotSelect = PopUpMenu(prefPane, Point(120, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
-				.items_(["select snapshot..."])
 				.background_(Color.black)
-				.stringColor_(Color(0.45, 0.65, 0.1))
+				.stringColor_(Color.yellow)
 			;
 
-			if(snapShots.size > 0, {
-				snapShotSelect.items_(snapShotSelect.items ++ snapShots.keys.asArray)
-			});
+			this.at('select snapshot').connect(snapShotSelect);
 
 			shortcutsBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -709,7 +704,7 @@ CVCenter {
 				globalShortcutsView,
 				KeyDownActions.globalShortcutsEnabled, {
 					KeyDownActions.globalShortcutsEnabled_(activateGlobalShortcuts.value)
-		}).bounds_(Rect(5, 2, 15, 15));
+			}).bounds_(Rect(5, 2, 15, 15));
 
 			StaticText(globalShortcutsView, Rect(25, 0, 122, 20))
 				.string_("enable global shortcuts")
@@ -830,7 +825,24 @@ CVCenter {
 						this.prAddWidget(thisTabLabel, key: key)
 					})
 				})
-			})
+			});
+
+			cvWidgets['select snapshot'].addAction('select snapshot', { |cv|
+				if(cv.value > 0, {
+					this.snapShots[cv.items[cv.value]].pairsDo({ |k, v|
+						if(k != 'select snapshot' and:{
+							k != 'snapshot'
+						}, { this.at(k).value_(v) })
+					})
+			})});
+
+			cvWidgets[\snapshot].addAction('save snapshot with confirm', { |cv|
+				if(cv.value == 1, { defer { this.saveSnapshot(true) }; cv.value_(0) });
+			}, active: false);
+
+			cvWidgets[\snapshot].addAction('save snapshot no confirm', { |cv|
+				if(cv.value == 1, { defer { this.saveSnapshot(false) }; cv.value_(0) });
+			}, active: true)
 		});
 
 		window.front;
@@ -1667,7 +1679,7 @@ CVCenter {
 	*saveSnapshot { |dialog=false|
 		var key, dialogWin, keyField;
 
-		key = Date.getDate.stamp;
+		key = Date.getDate.stamp.asSymbol;
 		all.collect(_.value);
 
 		if(dialog, {
@@ -1692,8 +1704,11 @@ CVCenter {
 				.states_([["save snapshot", Color.white, Color.red]])
 				.action_({
 					snapShots.put(keyField.string.asSymbol, all.collect(_.value));
-					snapShotSelect.items_(snapShotSelect.items ++ keyField.string.asSymbol);
-					cvWidgets[\snapshot].setSpec(ControlSpec(0, snapShots.size, step: 1.0, default: 0));
+					this.at('select snapshot').items_(
+						this.at('select snapshot').items ++ keyField.string.asSymbol
+					);
+					// snapShotSelect.items_(snapShotSelect.items ++ keyField.string.asSymbol);
+					// cvWidgets[\snapshot].setSpec(ControlSpec(0, snapShots.size, step: 1.0, default: 0));
 					dialogWin.close;
 				})
 			;
@@ -1701,6 +1716,7 @@ CVCenter {
 			dialogWin.front;
 		}, {
 			snapShots.put(key, all.collect(_.value));
+			this.at('select snapshot').items_(this.at('select snapshot').items ++ key.asSymbol);
 		});
 
 		CVCenter.window.onClose_(
