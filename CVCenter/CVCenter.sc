@@ -523,11 +523,11 @@ CVCenter {
 						})
 					});
 				})
-			});
+			})
+		});
 
-			all.put('select snapshot', SV(["select snapshot..."]));
-			all.put(\snapshot, CV(#[0, 1, \lin, 1.0]));
-		})
+		all['select snapshot'] ?? { all.put('select snapshot', SV(["select snapshot..."])) };
+		all[\snapshot] ?? { all.put(\snapshot, CV(#[0, 1, \lin, 1.0])) };
 	}
 
 	*makeWindow { |tab...cvs|
@@ -672,6 +672,7 @@ CVCenter {
 			// })
 			;
 
+			"this.at(\snapshot): %\n".postf(this.at(\snapshot));
 			this.at(\snapshot).connect(snapShotBut);
 
 			// snapShotEdit = Button(prefPane, Point(20, 20))
@@ -688,6 +689,7 @@ CVCenter {
 				.stringColor_(Color.yellow)
 			;
 
+			"this.at('select snapshot'): %\n".postf(this.at('select snapshot'));
 			this.at('select snapshot').connect(snapShotSelect);
 
 			shortcutsBut = Button(prefPane, Point(70, 20))
@@ -1716,11 +1718,12 @@ CVCenter {
 			dialogWin.front;
 		}, {
 			snapShots.put(key, all.collect(_.value));
+			// this.at('select snapshot').items.postln;
 			this.at('select snapshot').items_(this.at('select snapshot').items ++ key.asSymbol);
 		});
 
-		CVCenter.window.onClose_(
-			CVCenter.window.onClose.addFunc({ dialogWin !? { dialogWin.close }})
+		window.onClose_(
+			window.onClose.addFunc({ dialogWin !? { dialogWin.close }})
 		)
 	}
 
