@@ -27,7 +27,7 @@ CVCenter {
 	classvar <tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=160, colwidth, rowheight;
 	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin, eqWin;
-	classvar prefs, boundsOnShutDown, <snapShots, snapShotSelect;
+	classvar prefs, boundsOnShutDown, <>dontSave, <snapShots, snapShotSelect;
 	// CVWidgetMS: how many slots at max for one column
 	classvar <>numMsSlotsPerColumn = 15;
 
@@ -42,6 +42,7 @@ CVCenter {
 		Class.initClassTree(KeyDownActions);
 		// windowStates = ();
 
+		this.dontSave_(['select snapshot', \snapshot]);
 		snapShots = ();
 
 		prefs = CVCenterPreferences.readPreferences;
@@ -310,7 +311,7 @@ CVCenter {
 			"// PdefnAllGui
 			{ if(CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
 				CVCenter.scv.pDefnGui = PdefnAllGui();
-				CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent
+				CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent;
 			};
 			if(CVCenter.scv.pDefnWin.notNil and:{
 				CVCenter.scv.pDefnWin.isClosed.not
@@ -836,14 +837,15 @@ CVCenter {
 							k != 'snapshot'
 						}, { this.at(k).value_(v) })
 					})
-			})});
+				})
+			});
 
 			cvWidgets[\snapshot].addAction('save snapshot with confirm', { |cv|
-				if(cv.value == 1, { defer { this.saveSnapshot(true) }; cv.value_(0) });
+				if(cv.value == 1, { defer { CVCenter.saveSnapshot(true) }; cv.value_(0) });
 			}, active: false);
 
 			cvWidgets[\snapshot].addAction('save snapshot no confirm', { |cv|
-				if(cv.value == 1, { defer { this.saveSnapshot(false) }; cv.value_(0) });
+				if(cv.value == 1, { defer { CVCenter.saveSnapshot(false) }; cv.value_(0) });
 			}, active: true)
 		});
 
@@ -1733,100 +1735,102 @@ CVCenter {
 			lib = Library();
 			lib.put( \all, ());
 			all.pairsDo({ |k, cv|
-				lib[\all].put(k, ());
-				switch(cvWidgets[k].class,
-					CVWidget2D, {
-						lib[\all][k].wdgtClass = CVWidget2D;
-						#[lo, hi].do({ |hilo|
-							lib[\all][k][hilo] = (
-								spec: cvWidgets[k].widgetCV[hilo].spec,
-								val: cvWidgets[k].widgetCV[hilo].value,
-								actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo] },
+				if(dontSave.includes(k).not, { // each slot in dontSave must be a Symbol
+					lib[\all].put(k, ());
+					switch(cvWidgets[k].class,
+						CVWidget2D, {
+							lib[\all][k].wdgtClass = CVWidget2D;
+							#[lo, hi].do({ |hilo|
+								lib[\all][k][hilo] = (
+									spec: cvWidgets[k].widgetCV[hilo].spec,
+									val: cvWidgets[k].widgetCV[hilo].value,
+									actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo] },
+									osc: (
+										addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
+											cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
+										},
+										cmdName: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
+											cvWidgets[k].midiOscEnv[hilo].oscResponder.cmdName
+										},
+										msgIndex: cvWidgets[k].midiOscEnv[hilo].oscMsgIndex,
+										calibConstraints: cvWidgets[k].getOscInputConstraints(hilo),
+										oscMapping: cvWidgets[k].getOscMapping(hilo)
+									),
+									midi: (
+										src: cvWidgets[k].midiOscEnv[hilo].midisrc,
+										chan: cvWidgets[k].midiOscEnv[hilo].midichan,
+										num: cvWidgets[k].midiOscEnv[hilo].midiRawNum,
+										midiMode: cvWidgets[k].getMidiMode(hilo),
+										midiMean: cvWidgets[k].getMidiMean(hilo),
+										softWithin: cvWidgets[k].getSoftWithin(hilo),
+										midiResolution: cvWidgets[k].getMidiResolution(hilo),
+										ctrlButtonBank: cvWidgets[k].getCtrlButtonBank(hilo)
+									)
+								)
+							})
+						},
+						CVWidgetKnob, {
+							lib[\all][k] = (
+								spec: cvWidgets[k].widgetCV.spec,
+								val: cvWidgets[k].widgetCV.value,
+								actions: cvWidgets[k].wdgtActions,
 								osc: (
-									addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
-										cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
+									addr: cvWidgets[k].midiOscEnv.oscResponder !? {
+										cvWidgets[k].midiOscEnv.oscResponder.addr
 									},
-									cmdName: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
-										cvWidgets[k].midiOscEnv[hilo].oscResponder.cmdName
+									cmdName: cvWidgets[k].midiOscEnv.oscResponder !? {
+										cvWidgets[k].midiOscEnv.oscResponder.cmdName
 									},
-									msgIndex: cvWidgets[k].midiOscEnv[hilo].oscMsgIndex,
-									calibConstraints: cvWidgets[k].getOscInputConstraints(hilo),
-									oscMapping: cvWidgets[k].getOscMapping(hilo)
+									msgIndex: cvWidgets[k].midiOscEnv.oscMsgIndex,
+									calibConstraints: cvWidgets[k].getOscInputConstraints,
+									oscMapping: cvWidgets[k].getOscMapping
 								),
 								midi: (
-									src: cvWidgets[k].midiOscEnv[hilo].midisrc,
-									chan: cvWidgets[k].midiOscEnv[hilo].midichan,
-									num: cvWidgets[k].midiOscEnv[hilo].midiRawNum,
-									midiMode: cvWidgets[k].getMidiMode(hilo),
-									midiMean: cvWidgets[k].getMidiMean(hilo),
-									softWithin: cvWidgets[k].getSoftWithin(hilo),
-									midiResolution: cvWidgets[k].getMidiResolution(hilo),
-									ctrlButtonBank: cvWidgets[k].getCtrlButtonBank(hilo)
-								)
+									src: cvWidgets[k].midiOscEnv.midisrc,
+									chan: cvWidgets[k].midiOscEnv.midichan,
+									num: cvWidgets[k].midiOscEnv.midiRawNum,
+									midiMode: cvWidgets[k].getMidiMode,
+									midiMean: cvWidgets[k].getMidiMean,
+									softWithin: cvWidgets[k].getSoftWithin,
+									midiResolution: cvWidgets[k].getMidiResolution,
+									ctrlButtonBank: cvWidgets[k].getCtrlButtonBank
+								),
+								wdgtClass: CVWidgetKnob
 							)
-						})
-					},
-					CVWidgetKnob, {
-						lib[\all][k] = (
-							spec: cvWidgets[k].widgetCV.spec,
-							val: cvWidgets[k].widgetCV.value,
-							actions: cvWidgets[k].wdgtActions,
-							osc: (
-								addr: cvWidgets[k].midiOscEnv.oscResponder !? {
-									cvWidgets[k].midiOscEnv.oscResponder.addr
-								},
-								cmdName: cvWidgets[k].midiOscEnv.oscResponder !? {
-									cvWidgets[k].midiOscEnv.oscResponder.cmdName
-								},
-								msgIndex: cvWidgets[k].midiOscEnv.oscMsgIndex,
-								calibConstraints: cvWidgets[k].getOscInputConstraints,
-								oscMapping: cvWidgets[k].getOscMapping
-							),
-							midi: (
-								src: cvWidgets[k].midiOscEnv.midisrc,
-								chan: cvWidgets[k].midiOscEnv.midichan,
-								num: cvWidgets[k].midiOscEnv.midiRawNum,
-								midiMode: cvWidgets[k].getMidiMode,
-								midiMean: cvWidgets[k].getMidiMean,
-								softWithin: cvWidgets[k].getSoftWithin,
-								midiResolution: cvWidgets[k].getMidiResolution,
-								ctrlButtonBank: cvWidgets[k].getCtrlButtonBank
-							),
-							wdgtClass: CVWidgetKnob
-						)
-					},
-					CVWidgetMS, {
-						lib[\all][k] = (
-							spec: cvWidgets[k].widgetCV.spec,
-							val: cvWidgets[k].widgetCV.value,
-							actions: cvWidgets[k].wdgtActions,
-							wdgtClass: CVWidgetMS,
-							osc: ()!cvWidgets[k].msSize,
-							midi: ()!cvWidgets[k].msSize
-						);
-						cvWidgets[k].msSize.do({ |sl|
-							// osc
-							cvWidgets[k].midiOscEnv[sl].oscResponder !? {
-								lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.addr;
-								lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.cmdName;
-							};
-							lib[\all][k].osc[sl].msgIndex = cvWidgets[k].midiOscEnv[sl].oscMsgIndex;
-							lib[\all][k].osc[sl].calibConstraints = cvWidgets[k].getOscInputConstraints(sl);
-							lib[\all][k].osc[sl].oscMapping = cvWidgets[k].getOscMapping(sl);
-							// midi
-							lib[\all][k].midi[sl].src = cvWidgets[k].midiOscEnv[sl].midisrc;
-							lib[\all][k].midi[sl].chan = cvWidgets[k].midiOscEnv[sl].midichan;
-							lib[\all][k].midi[sl].num = cvWidgets[k].midiOscEnv[sl].midiRawNum;
-							lib[\all][k].midi[sl].midiMode = cvWidgets[k].getMidiMode(sl);
-							lib[\all][k].midi[sl].midiMean = cvWidgets[k].getMidiMean(sl);
-							lib[\all][k].midi[sl].softWithin = cvWidgets[k].getSoftWithin(sl);
-							lib[\all][k].midi[sl].midiResolution = cvWidgets[k].getMidiResolution(sl);
-							lib[\all][k].midi[sl].ctrlButtonBank = cvWidgets[k].getCtrlButtonBank(sl);
-						})
-					}
-				);
-				lib[\all][k].notes = cvWidgets[k].nameField.string;
-				lib[\all][k].tabLabel = widgetStates[k].tabKey;
+						},
+						CVWidgetMS, {
+							lib[\all][k] = (
+								spec: cvWidgets[k].widgetCV.spec,
+								val: cvWidgets[k].widgetCV.value,
+								actions: cvWidgets[k].wdgtActions,
+								wdgtClass: CVWidgetMS,
+								osc: ()!cvWidgets[k].msSize,
+								midi: ()!cvWidgets[k].msSize
+							);
+							cvWidgets[k].msSize.do({ |sl|
+								// osc
+								cvWidgets[k].midiOscEnv[sl].oscResponder !? {
+									lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.addr;
+									lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.cmdName;
+								};
+								lib[\all][k].osc[sl].msgIndex = cvWidgets[k].midiOscEnv[sl].oscMsgIndex;
+								lib[\all][k].osc[sl].calibConstraints = cvWidgets[k].getOscInputConstraints(sl);
+								lib[\all][k].osc[sl].oscMapping = cvWidgets[k].getOscMapping(sl);
+								// midi
+								lib[\all][k].midi[sl].src = cvWidgets[k].midiOscEnv[sl].midisrc;
+								lib[\all][k].midi[sl].chan = cvWidgets[k].midiOscEnv[sl].midichan;
+								lib[\all][k].midi[sl].num = cvWidgets[k].midiOscEnv[sl].midiRawNum;
+								lib[\all][k].midi[sl].midiMode = cvWidgets[k].getMidiMode(sl);
+								lib[\all][k].midi[sl].midiMean = cvWidgets[k].getMidiMean(sl);
+								lib[\all][k].midi[sl].softWithin = cvWidgets[k].getSoftWithin(sl);
+								lib[\all][k].midi[sl].midiResolution = cvWidgets[k].getMidiResolution(sl);
+								lib[\all][k].midi[sl].ctrlButtonBank = cvWidgets[k].getCtrlButtonBank(sl);
+							})
+						}
+					);
+					lib[\all][k].notes = cvWidgets[k].nameField.string;
+					lib[\all][k].tabLabel = widgetStates[k].tabKey;
+				})
 			});
 
 			lib[\all].put(\shortcuts, (
@@ -2112,9 +2116,13 @@ CVCenter {
 								})
 							}
 						);
+
+						// "cvWidgets[%]: %\n".postf(key, cvWidgets[key]);
 						// "key: %, nameField: %\n".postf(key, cvWidgets[key].nameField);
-						cvWidgets[key].nameField.string_(v.notes);
-						if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
+						cvWidgets[key] !? {
+							cvWidgets[key].nameField.string_(v.notes);
+							if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
+						};
 
 						if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
 							CVCenterLoadDialog.window.close;
