@@ -672,7 +672,7 @@ CVCenter {
 			// })
 			;
 
-			"this.at(\snapshot): %\n".postf(this.at(\snapshot));
+			// "this.at(\snapshot): %\n".postf(this.at(\snapshot));
 			this.at(\snapshot).connect(snapShotBut);
 
 			// snapShotEdit = Button(prefPane, Point(20, 20))
@@ -689,7 +689,7 @@ CVCenter {
 				.stringColor_(Color.yellow)
 			;
 
-			"this.at('select snapshot'): %\n".postf(this.at('select snapshot'));
+			// "this.at('select snapshot'): %\n".postf(this.at('select snapshot'));
 			this.at('select snapshot').connect(snapShotSelect);
 
 			shortcutsBut = Button(prefPane, Point(70, 20))
@@ -1827,14 +1827,6 @@ CVCenter {
 				);
 				lib[\all][k].notes = cvWidgets[k].nameField.string;
 				lib[\all][k].tabLabel = widgetStates[k].tabKey;
-				// lib[\all][k].tabLabel = tabProperties.detectKey({ |prop| prop.index == widgetStates[k].tabIndex });
-				// lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
-				// if(cvWidgets[k].background != tabProperties[widgetStates[k].tabIndex].tabColor, {
-				// 	lib[\all][k].background = cvWidgets[k].background;
-				// });
-				// if(cvWidgets[k].stringColor != Color.black, {
-				// 	lib[\all][k].stringColor = cvWidgets[k].stringColor;
-				// })
 			});
 
 			lib[\all].put(\shortcuts, (
@@ -1843,6 +1835,8 @@ CVCenter {
 				cvWidgetEditor: AbstractCVWidgetEditor.shortcuts,
 				globalShortcuts: KeyDownActions.globalShortcuts
 			));
+
+			lib[\all].put(\snapshots, snapShots);
 
 			if(GUI.id === \cocoa, {
 				lib.writeTextArchive(*f);
@@ -1869,7 +1863,7 @@ CVCenter {
 			path, addToExisting=false,
 			autoConnectOSC=true, oscConnectToIP=true, oscRestrictToPort=false, activateCalibration=false, resetCalibration=false,
 			autoConnectMIDI=true, midiConnectSrc=false, midiConnectChannel=false, midiConnectCtrl=true,
-			loadActions=true, midiSrcID, oscIPAddress, loadShortcuts=true
+			loadActions=true, midiSrcID, oscIPAddress, loadShortcuts=true, loadSnapshots=true
 		|
 		var lib, successFunc;
 
@@ -2118,6 +2112,7 @@ CVCenter {
 								})
 							}
 						);
+						// "key: %, nameField: %\n".postf(key, cvWidgets[key].nameField);
 						cvWidgets[key].nameField.string_(v.notes);
 						if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
 
@@ -2147,7 +2142,19 @@ CVCenter {
 						});
 					}
 				}.defer(0.5)
-			})
+			});
+			// if(loadSnapshots, {
+			// 	{
+			// 		if(addToExisting.not, {
+			// 			snapShots = ();
+			// 			this.at(\snapshots).items_(["select snapshot..."]);
+			// 		});
+			// 		lib[\all][\snapshots].pairsDo({ |k, v|
+			// 			snapShots.put(k, v);
+			// 			this.at(\snapshots).items_(this.at(\snapshots).items.add(k));
+			// 		});
+			// 	}.defer(0.5)
+			// })
 		};
 
 		if(path.isNil, {
