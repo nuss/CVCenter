@@ -2117,8 +2117,6 @@ CVCenter {
 							}
 						);
 
-						// "cvWidgets[%]: %\n".postf(key, cvWidgets[key]);
-						// "key: %, nameField: %\n".postf(key, cvWidgets[key].nameField);
 						cvWidgets[key] !? {
 							cvWidgets[key].nameField.string_(v.notes);
 							if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
