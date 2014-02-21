@@ -1588,7 +1588,7 @@ CVCenter {
 			})
 		}, {
 			all[thisKey] ?? { all.put(thisKey, cvClass.new(thisSpec, thisVal)) };
-			if(cvClass === SV and:{ all[thisKey].items.ububble.isNil }, {
+			if(cvClass === SV and:{ all[thisKey].items.unbubble.isNil }, {
 				all[thisKey].items_(thisSVItems)
 			})
 		});
