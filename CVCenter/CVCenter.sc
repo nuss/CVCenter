@@ -2149,18 +2149,18 @@ CVCenter {
 					}
 				}.defer(0.5)
 			});
-			// if(loadSnapshots, {
-			// 	{
-			// 		if(addToExisting.not, {
-			// 			snapShots = ();
-			// 			this.at(\snapshots).items_(["select snapshot..."]);
-			// 		});
-			// 		lib[\all][\snapshots].pairsDo({ |k, v|
-			// 			snapShots.put(k, v);
-			// 			this.at(\snapshots).items_(this.at(\snapshots).items.add(k));
-			// 		});
-			// 	}.defer(0.5)
-			// })
+			if(loadSnapshots, {
+				{
+					if(addToExisting.not, {
+						snapShots = ();
+						this.at('select snapshot').items_(["select snapshot..."]);
+					});
+					lib[\all][\snapshots].pairsDo({ |k, v|
+						snapShots.put(k, v);
+						this.at('select snapshot').items_(this.at('select snapshot').items.add(k));
+					});
+				}.defer(0.5)
+			})
 		};
 
 		if(path.isNil, {
