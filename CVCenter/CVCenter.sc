@@ -27,7 +27,7 @@ CVCenter {
 	classvar <tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=160, colwidth, rowheight;
 	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin, eqWin;
-	classvar prefs, boundsOnShutDown, <>dontSave, <snapShots, snapShotSelect;
+	classvar prefs, boundsOnShutDown, <>dontSave, <systemWidgets, <snapShots, snapShotSelect;
 	// CVWidgetMS: how many slots at max for one column
 	classvar <>numMsSlotsPerColumn = 15;
 
@@ -43,6 +43,7 @@ CVCenter {
 		// windowStates = ();
 
 		this.dontSave_(['select snapshot', \snapshot]);
+		systemWidgets = ['select snapshot', \snapshot];
 		snapShots = ();
 
 		prefs = CVCenterPreferences.readPreferences;
@@ -825,7 +826,16 @@ CVCenter {
 							this.at(key)[slot].value_(tmp);
 						})
 					}, {
-						this.prAddWidget(thisTabLabel, key: key)
+						if(systemWidgets.includes(key).not, {
+							this.prAddWidget(thisTabLabel, key: key);
+						}, {
+							this.prAddWidget(\default, key: key);
+							case
+								{ (key == \snapshot).or(key == 'select snapshot') } {
+									cvWidgets[key].background_(Color.yellow);
+								}
+							;
+						});
 					})
 				})
 			});
