@@ -17,7 +17,8 @@
 
 CVCenter {
 
-	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, /*<windowStates, */<tabs, <prefPane, removeButs;
+	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, /*<windowStates, */<tabs, <prefPane, swFlow, removeButs;
+	classvar prefPaneBounds, tabsBounds;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>shortcuts, <scv;
 	classvar <alwaysOnTop=false;
@@ -26,7 +27,7 @@ CVCenter {
 	classvar <tabProperties, colors, nextColor;
 	classvar widgetwidth, widgetheight=160, colwidth, rowheight;
 	classvar nDefWin, pDefWin, pDefnWin, tDefWin, allWin, historyWin, eqWin;
-	classvar prefs, boundsOnShutDown;
+	classvar prefs, boundsOnShutDown, <>dontSave, <systemWidgets, <snapShots, snapShotSelect;
 	// CVWidgetMS: how many slots at max for one column
 	classvar <>numMsSlotsPerColumn = 15;
 
@@ -40,6 +41,11 @@ CVCenter {
 		Class.initClassTree(CVWidget);
 		Class.initClassTree(KeyDownActions);
 		// windowStates = ();
+
+		this.dontSave_(['select snapshot', \snapshot]);
+		systemWidgets = ['select snapshot', \snapshot];
+		snapShots = ();
+
 		prefs = CVCenterPreferences.readPreferences;
 
 		prefs !? {
@@ -132,7 +138,6 @@ CVCenter {
 			scFunc =
 			"// select first widget
 			{
-				\"select first widget\".postln;
 				var labels = CVCenter.cvWidgets.order;
 				CVCenter.cvWidgets[labels.first].parent.front.focus;
 				CVCenter.cvWidgets[labels.first].label.focus;
@@ -307,7 +312,7 @@ CVCenter {
 			"// PdefnAllGui
 			{ if(CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
 				CVCenter.scv.pDefnGui = PdefnAllGui();
-				CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent
+				CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent;
 			};
 			if(CVCenter.scv.pDefnWin.notNil and:{
 				CVCenter.scv.pDefnWin.isClosed.not
@@ -521,16 +526,20 @@ CVCenter {
 					});
 				})
 			})
-		})
+		});
+
+		all['select snapshot'] ?? { all.put('select snapshot', SV(["select snapshot..."])) };
+		all[\snapshot] ?? { all.put(\snapshot, CV(#[0, 1, \lin, 1.0])) };
 	}
 
 	*makeWindow { |tab...cvs|
 		var flow;
 		// var cvTabIndex, order, orderedCVs, msSize;
 		var updateRoutine, lastUpdate, lastUpdateBounds, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
-		var lastCtrlBtnsMode, swFlow;
+		var lastCtrlBtnsMode/*, swFlow*/;
 		var allTabs, thisTabLabel;
-		var prefBut, saveBut, loadBut, shortcutsBut, activateGlobalShortcuts;
+		var rows, prefBut, saveBut, loadBut, shortcutsBut, globalShortcutsView, activateGlobalShortcuts;
+		var snapShotBut, snapShotEdit;
 		var tmp, doMakeWdgt;
 		// var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
@@ -579,13 +588,14 @@ CVCenter {
 			// });
 			if(Quarks.isInstalled("wslib") and:{ GUI.id !== \swing }, { window.background_(Color.black) });
 			window.view.background_(Color.black);
-			flow = FlowLayout(window.bounds.insetBy(4));
-			window.view.decorator = flow;
-			flow.margin_(Point(4, 0));
-			flow.gap_(Point(0, 4));
-			flow.shift;
+			// flow = FlowLayout(window.bounds.insetBy(4));
+			// window.view.decorator = flow;
+			// flow.margin_(Point(4, 0));
+			// flow.gap_(Point(0, 4));
+			// flow.shift;
+			tabsBounds = Rect(4, 4, window.view.bounds.width, window.view.bounds.height-35);
 
-			tabs = TabbedView2(window, Rect(0, 0, flow.bounds.width, flow.bounds.height-40))
+			tabs = TabbedView2(window, tabsBounds)
 				.tabCurve_(3)
 				.labelPadding_(10)
 				.alwaysOnTop_(alwaysOnTop)
@@ -605,16 +615,18 @@ CVCenter {
 				})
 			;
 
+			// tabs.view.backColor_(Color.rand);
+
 			tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
 				if(keycode == KeyDownActions.keyCodes[\esc], { prefPane.focus })
 			});
 
-			flow.shift(0, 0);
+			// flow.shift(0, 0);
 
-			prefPane = ScrollView(window, Rect(0, 0, flow.bounds.width, 40)).hasBorder_(false);
-			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(0, 0));
+			prefPaneBounds = Rect(4, tabs.view.bounds.top+tabs.view.bounds.height, window.view.bounds.width, 35);
+			prefPane = ScrollView(window, prefPaneBounds).hasBorder_(false);
+			prefPane.decorator = swFlow = FlowLayout(prefPane.bounds, Point(0, 0), Point(1, 1));
 			prefPane.resize_(8).background_(Color.black);
-			// prefPane.bounds.postln;
 
 			prefBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -627,8 +639,6 @@ CVCenter {
 				prefBut.toolTip_("Edit the global preferences for CVCenter (resp.\nCVWidget). Preferences will be written to disk\nand become active upon library-recompile.")
 			});
 
-			swFlow.shift(1, 0);
-
 			saveBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 				.states_([["save setup", Color.white, Color(0.15, 0.15, 0.15)]])
@@ -638,8 +648,6 @@ CVCenter {
 			if(GUI.id !== \cocoa, {
 				saveBut.toolTip_("Save the current setup of CVCenter,\nincluding currently active OSC-/MIDI-\nresponders and actions.")
 			});
-
-			swFlow.shift(1, 0);
 
 			loadBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -653,7 +661,38 @@ CVCenter {
 				loadBut.toolTip_("Load a CVCenter-setup from disk. You\nmay load OSC-/MIDI-responders and\nactions if the corresponding checkboxes\nto the right are checked accordingly.")
 			});
 
-			swFlow.shift(1, 0);
+			//snapShotBut, snapShotSelect, snapShotEdit;
+
+			snapShotBut = Button(prefPane, Point(70, 20))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
+				.states_([
+					["snapshot", Color.black, Color.yellow],
+					["snapshot", Color.white, Color.yellow],
+				])
+			// .action_({ |bt|
+			// 	if(bt.value.asBoolean, { bt.value_(0) });
+			// })
+			;
+
+			// "this.at(\snapshot): %\n".postf(this.at(\snapshot));
+			this.at(\snapshot).connect(snapShotBut);
+
+			// snapShotEdit = Button(prefPane, Point(20, 20))
+			// .font_(Font(Font.available("Arial") ? Font.defaultSansFace, 22))
+			// .states_([["✎", Color.black, Color.yellow]])
+			// .action_({ |scb|
+			//
+			// })
+			// ;
+
+			snapShotSelect = PopUpMenu(prefPane, Point(120, 20))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
+				.background_(Color.black)
+				.stringColor_(Color.yellow)
+			;
+
+			// "this.at('select snapshot'): %\n".postf(this.at('select snapshot'));
+			this.at('select snapshot').connect(snapShotSelect);
 
 			shortcutsBut = Button(prefPane, Point(70, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -663,17 +702,36 @@ CVCenter {
 				})
 			;
 
-			swFlow.shift(5, 2);
+			globalShortcutsView = CompositeView(prefPane, Point(142, 20));
 
-			activateGlobalShortcuts = buildCheckbox.(prefPane, KeyDownActions.globalShortcutsEnabled, { KeyDownActions.globalShortcutsEnabled_(activateGlobalShortcuts.value) });
+			activateGlobalShortcuts = buildCheckbox.(
+				globalShortcutsView,
+				KeyDownActions.globalShortcutsEnabled, {
+					KeyDownActions.globalShortcutsEnabled_(activateGlobalShortcuts.value)
+			}).bounds_(Rect(5, 2, 15, 15));
 
-			swFlow.shift(3, -2);
-
-			StaticText(prefPane, Point(140, 20))
+			StaticText(globalShortcutsView, Rect(25, 0, 122, 20))
 				.string_("enable global shortcuts")
 				.stringColor_(Color.white)
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 			;
+
+			// correct prefPane height if its contents span more than 1 line
+			rows = prefPane.children.collect({ |child| child.bounds.top }).asBag.contents.size;
+			if(rows > 1, {
+				prefPane.bounds_(Rect(
+					prefPaneBounds.left,
+					window.view.bounds.height-35-(rows-1*21),
+					prefPane.bounds.width,
+					prefPaneBounds.height+(rows-1*21)
+				));
+				tabs.view.bounds_(Rect(
+					tabsBounds.left,
+					tabsBounds.top,
+					tabs.view.bounds.width,
+					window.view.bounds.height-prefPane.bounds.height
+				))
+			});
 
 			// this.setShortcuts;
 			[tabs.views, prefPane].flat.do({ |view|
@@ -768,10 +826,37 @@ CVCenter {
 							this.at(key)[slot].value_(tmp);
 						})
 					}, {
-						this.prAddWidget(thisTabLabel, key: key)
+						if(systemWidgets.includes(key).not, {
+							this.prAddWidget(thisTabLabel, key: key);
+						}, {
+							this.prAddWidget(\default, key: key);
+							case
+								{ (key == \snapshot).or(key == 'select snapshot') } {
+									cvWidgets[key].background_(Color.yellow);
+								}
+							;
+						});
 					})
 				})
-			})
+			});
+
+			cvWidgets['select snapshot'].addAction('select snapshot', { |cv|
+				if(cv.value > 0, {
+					this.snapShots[cv.items[cv.value]].pairsDo({ |k, v|
+						if(k != 'select snapshot' and:{
+							k != 'snapshot'
+						}, { this.at(k).value_(v) })
+					})
+				})
+			});
+
+			cvWidgets[\snapshot].addAction('save snapshot with confirm', { |cv|
+				if(cv.value == 1, { defer { CVCenter.saveSnapshot(true) }; cv.value_(0) });
+			}, active: false);
+
+			cvWidgets[\snapshot].addAction('save snapshot no confirm', { |cv|
+				if(cv.value == 1, { defer { CVCenter.saveSnapshot(false) }; cv.value_(0) });
+			}, active: true)
 		});
 
 		window.front;
@@ -801,6 +886,7 @@ CVCenter {
 				});
 				if(lastUpdateBounds.notNil and:{ window.bounds.width != lastUpdateBounds.width }, {
 					this.prRegroupWidgets(tabs.activeTab);
+					this.prRegroupPrefPane;
 				});
 				if(childViews.size > 0, {
 					childViews.pairsDo({ |child, childProps|
@@ -832,84 +918,6 @@ CVCenter {
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
 		});
 	}
-
-	// *setShortcuts {
-	// 	var modsDict, arrModsDict, arrowKeys;
-	//
-	// 	switch(GUI.id,
-	// 		\cocoa, {
-	// 			modsDict = KeyDownActions.modifiersCocoa;
-	// 			arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-	// 		},
-	// 		\qt, {
-	// 			modsDict = KeyDownActions.modifiersQt;
-	// 			arrModsDict = KeyDownActions.arrowsModifiersQt;
-	// 		}
-	// 	);
-	//
-	// 	arrowKeys = [
-	// 		KeyDownActions.keyCodes['arrow up'],
-	// 		KeyDownActions.keyCodes['arrow down'],
-	// 		KeyDownActions.keyCodes['arrow left'],
-	// 		KeyDownActions.keyCodes['arrow right']
-	// 	];
-	//
-	// 	[tabs.views, prefPane].flat.do({ |v|
-	// 		// reset keyDownAction - it's getting reassigned
-	//
-	// 		v.keyDownAction_(nil);
-	//
-	// 		this.shortcuts.do({ |keyDowns|
-	// 			v.keyDownAction_(
-	// 				v.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-	// 					// window.view.keyDownAction_(
-	// 					// window.view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-	// 					var thisMod, thisArrMod;
-	//
-	// 					// [view.cs, char.cs, modifiers.cs, unicode.cs, keycode.cs].postln;
-	//
-	// 					switch(GUI.id,
-	// 						\cocoa, {
-	// 							thisMod = keyDowns.modifierCocoa;
-	// 							thisArrMod = keyDowns.arrowsModifierCocoa;
-	// 						},
-	// 						\qt, {
-	// 							thisMod = keyDowns.modifierQt;
-	// 							thisArrMod = keyDowns.arrowsModifierQt;
-	// 						}
-	// 					);
-	//
-	// 					case
-	// 					{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-	// 						// "no modifier: %\n".postf(modifiers);
-	// 						if(keycode == keyDowns.keyCode and:{
-	// 							thisMod.isNil and:{ thisArrMod.isNil }
-	// 							}, {
-	// 								// "thisMod: %, thisArrMod: %\n".postf(thisMod, thisArrMod);
-	// 								keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
-	// 						});
-	// 					}
-	// 					{
-	// 						(char !== 0.asAscii).or(arrowKeys.includes(keycode)) and:{
-	// 							modifiers != modsDict[\none] and:{
-	// 								modifiers != arrModsDict[\none]
-	// 							}
-	// 						}
-	// 					} {
-	// 						// "some modifier: %\n".postf(modifiers);
-	// 						if(keycode == keyDowns.keyCode and:{
-	// 							(modifiers == thisArrMod).or(modifiers == thisMod)
-	// 							}, {
-	// 								// "char: %, keyDowns.keyCode: %, keyCode: %, thisMod: %, thisArrMod: %\n".postf(char.cs, keyDowns.keyCode, keycode, thisMod, thisArrMod);
-	// 								keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode)
-	// 						})
-	// 					}
-	// 					;
-	// 				})
-	// 			)
-	// 		})
-	// 	})
-	// }
 
 	*prAddTab { |label|
 		var labelColor, unfocusedColor;
@@ -1098,8 +1106,6 @@ CVCenter {
 				cvcArgs = true;
 			});
 		}, { cvcArgs = true });
-
-		// "cvcArgs: %\n".postf(cvcArgs);
 
 		case
 			{ all[key].class === Event and:{
@@ -1684,114 +1690,157 @@ CVCenter {
 		^wdgts;
 	}
 
+	*saveSnapshot { |dialog=false|
+		var key, dialogWin, keyField;
+
+		key = Date.getDate.stamp.asSymbol;
+		all.collect(_.value);
+
+		if(dialog, {
+			dialogWin = Window("save snapshot", Rect(
+				Window.screenBounds.width-300/2, Window.screenBounds.height-50/2,
+				300, 50
+			));
+
+			dialogWin.view.background_(Color.black);
+
+			keyField = TextField(dialogWin, Rect(4, 4, 290, 20))
+				.string_(key)
+				.font_(Font(Font.available("Courier") ? Font.defaultMonoFace, 11))
+			;
+
+			Button(dialogWin, Rect(4, 26, 144, 20))
+				.states_([["cancel", Color.white, Color(0.1, 0.1, 0.1)]])
+				.action_({ dialogWin.close })
+			;
+
+			Button(dialogWin, Rect(151, 26, 144, 20))
+				.states_([["save snapshot", Color.white, Color.red]])
+				.action_({
+					snapShots.put(keyField.string.asSymbol, all.collect(_.value));
+					this.at('select snapshot').items_(
+						this.at('select snapshot').items ++ keyField.string.asSymbol
+					);
+					// snapShotSelect.items_(snapShotSelect.items ++ keyField.string.asSymbol);
+					// cvWidgets[\snapshot].setSpec(ControlSpec(0, snapShots.size, step: 1.0, default: 0));
+					dialogWin.close;
+				})
+			;
+
+			dialogWin.front;
+		}, {
+			snapShots.put(key, all.collect(_.value));
+			// this.at('select snapshot').items.postln;
+			this.at('select snapshot').items_(this.at('select snapshot').items ++ key.asSymbol);
+		});
+
+		window.onClose_(
+			window.onClose.addFunc({ dialogWin !? { dialogWin.close }})
+		)
+	}
+
 	*saveSetup { |path|
 		var lib, successFunc;
 		successFunc = { |f|
 			lib = Library();
 			lib.put( \all, ());
 			all.pairsDo({ |k, cv|
-				lib[\all].put(k, ());
-				switch(cvWidgets[k].class,
-					CVWidget2D, {
-						lib[\all][k].wdgtClass = CVWidget2D;
-						#[lo, hi].do({ |hilo|
-							lib[\all][k][hilo] = (
-								spec: cvWidgets[k].widgetCV[hilo].spec,
-								val: cvWidgets[k].widgetCV[hilo].value,
-								actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo] },
+				if(dontSave.includes(k).not, { // each slot in dontSave must be a Symbol
+					lib[\all].put(k, ());
+					switch(cvWidgets[k].class,
+						CVWidget2D, {
+							lib[\all][k].wdgtClass = CVWidget2D;
+							#[lo, hi].do({ |hilo|
+								lib[\all][k][hilo] = (
+									spec: cvWidgets[k].widgetCV[hilo].spec,
+									val: cvWidgets[k].widgetCV[hilo].value,
+									actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo] },
+									osc: (
+										addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
+											cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
+										},
+										cmdName: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
+											cvWidgets[k].midiOscEnv[hilo].oscResponder.cmdName
+										},
+										msgIndex: cvWidgets[k].midiOscEnv[hilo].oscMsgIndex,
+										calibConstraints: cvWidgets[k].getOscInputConstraints(hilo),
+										oscMapping: cvWidgets[k].getOscMapping(hilo)
+									),
+									midi: (
+										src: cvWidgets[k].midiOscEnv[hilo].midisrc,
+										chan: cvWidgets[k].midiOscEnv[hilo].midichan,
+										num: cvWidgets[k].midiOscEnv[hilo].midiRawNum,
+										midiMode: cvWidgets[k].getMidiMode(hilo),
+										midiMean: cvWidgets[k].getMidiMean(hilo),
+										softWithin: cvWidgets[k].getSoftWithin(hilo),
+										midiResolution: cvWidgets[k].getMidiResolution(hilo),
+										ctrlButtonBank: cvWidgets[k].getCtrlButtonBank(hilo)
+									)
+								)
+							})
+						},
+						CVWidgetKnob, {
+							lib[\all][k] = (
+								spec: cvWidgets[k].widgetCV.spec,
+								val: cvWidgets[k].widgetCV.value,
+								actions: cvWidgets[k].wdgtActions,
 								osc: (
-									addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
-										cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
+									addr: cvWidgets[k].midiOscEnv.oscResponder !? {
+										cvWidgets[k].midiOscEnv.oscResponder.addr
 									},
-									cmdName: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
-										cvWidgets[k].midiOscEnv[hilo].oscResponder.cmdName
+									cmdName: cvWidgets[k].midiOscEnv.oscResponder !? {
+										cvWidgets[k].midiOscEnv.oscResponder.cmdName
 									},
-									msgIndex: cvWidgets[k].midiOscEnv[hilo].oscMsgIndex,
-									calibConstraints: cvWidgets[k].getOscInputConstraints(hilo),
-									oscMapping: cvWidgets[k].getOscMapping(hilo)
+									msgIndex: cvWidgets[k].midiOscEnv.oscMsgIndex,
+									calibConstraints: cvWidgets[k].getOscInputConstraints,
+									oscMapping: cvWidgets[k].getOscMapping
 								),
 								midi: (
-									src: cvWidgets[k].midiOscEnv[hilo].midisrc,
-									chan: cvWidgets[k].midiOscEnv[hilo].midichan,
-									num: cvWidgets[k].midiOscEnv[hilo].midiRawNum,
-									midiMode: cvWidgets[k].getMidiMode(hilo),
-									midiMean: cvWidgets[k].getMidiMean(hilo),
-									softWithin: cvWidgets[k].getSoftWithin(hilo),
-									midiResolution: cvWidgets[k].getMidiResolution(hilo),
-									ctrlButtonBank: cvWidgets[k].getCtrlButtonBank(hilo)
-								)
+									src: cvWidgets[k].midiOscEnv.midisrc,
+									chan: cvWidgets[k].midiOscEnv.midichan,
+									num: cvWidgets[k].midiOscEnv.midiRawNum,
+									midiMode: cvWidgets[k].getMidiMode,
+									midiMean: cvWidgets[k].getMidiMean,
+									softWithin: cvWidgets[k].getSoftWithin,
+									midiResolution: cvWidgets[k].getMidiResolution,
+									ctrlButtonBank: cvWidgets[k].getCtrlButtonBank
+								),
+								wdgtClass: CVWidgetKnob
 							)
-						})
-					},
-					CVWidgetKnob, {
-						lib[\all][k] = (
-							spec: cvWidgets[k].widgetCV.spec,
-							val: cvWidgets[k].widgetCV.value,
-							actions: cvWidgets[k].wdgtActions,
-							osc: (
-								addr: cvWidgets[k].midiOscEnv.oscResponder !? {
-									cvWidgets[k].midiOscEnv.oscResponder.addr
-								},
-								cmdName: cvWidgets[k].midiOscEnv.oscResponder !? {
-									cvWidgets[k].midiOscEnv.oscResponder.cmdName
-								},
-								msgIndex: cvWidgets[k].midiOscEnv.oscMsgIndex,
-								calibConstraints: cvWidgets[k].getOscInputConstraints,
-								oscMapping: cvWidgets[k].getOscMapping
-							),
-							midi: (
-								src: cvWidgets[k].midiOscEnv.midisrc,
-								chan: cvWidgets[k].midiOscEnv.midichan,
-								num: cvWidgets[k].midiOscEnv.midiRawNum,
-								midiMode: cvWidgets[k].getMidiMode,
-								midiMean: cvWidgets[k].getMidiMean,
-								softWithin: cvWidgets[k].getSoftWithin,
-								midiResolution: cvWidgets[k].getMidiResolution,
-								ctrlButtonBank: cvWidgets[k].getCtrlButtonBank
-							),
-							wdgtClass: CVWidgetKnob
-						)
-					},
-					CVWidgetMS, {
-						lib[\all][k] = (
-							spec: cvWidgets[k].widgetCV.spec,
-							val: cvWidgets[k].widgetCV.value,
-							actions: cvWidgets[k].wdgtActions,
-							wdgtClass: CVWidgetMS,
-							osc: ()!cvWidgets[k].msSize,
-							midi: ()!cvWidgets[k].msSize
-						);
-						cvWidgets[k].msSize.do({ |sl|
-							// osc
-							cvWidgets[k].midiOscEnv[sl].oscResponder !? {
-								lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.addr;
-								lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.cmdName;
-							};
-							lib[\all][k].osc[sl].msgIndex = cvWidgets[k].midiOscEnv[sl].oscMsgIndex;
-							lib[\all][k].osc[sl].calibConstraints = cvWidgets[k].getOscInputConstraints(sl);
-							lib[\all][k].osc[sl].oscMapping = cvWidgets[k].getOscMapping(sl);
-							// midi
-							lib[\all][k].midi[sl].src = cvWidgets[k].midiOscEnv[sl].midisrc;
-							lib[\all][k].midi[sl].chan = cvWidgets[k].midiOscEnv[sl].midichan;
-							lib[\all][k].midi[sl].num = cvWidgets[k].midiOscEnv[sl].midiRawNum;
-							lib[\all][k].midi[sl].midiMode = cvWidgets[k].getMidiMode(sl);
-							lib[\all][k].midi[sl].midiMean = cvWidgets[k].getMidiMean(sl);
-							lib[\all][k].midi[sl].softWithin = cvWidgets[k].getSoftWithin(sl);
-							lib[\all][k].midi[sl].midiResolution = cvWidgets[k].getMidiResolution(sl);
-							lib[\all][k].midi[sl].ctrlButtonBank = cvWidgets[k].getCtrlButtonBank(sl);
-						})
-					}
-				);
-				lib[\all][k].notes = cvWidgets[k].nameField.string;
-				lib[\all][k].tabLabel = widgetStates[k].tabKey;
-				// lib[\all][k].tabLabel = tabProperties.detectKey({ |prop| prop.index == widgetStates[k].tabIndex });
-				// lib[\all][k].tabLabel = tabProperties[widgetStates[k].tabIndex].tabLabel;
-				// if(cvWidgets[k].background != tabProperties[widgetStates[k].tabIndex].tabColor, {
-				// 	lib[\all][k].background = cvWidgets[k].background;
-				// });
-				// if(cvWidgets[k].stringColor != Color.black, {
-				// 	lib[\all][k].stringColor = cvWidgets[k].stringColor;
-				// })
+						},
+						CVWidgetMS, {
+							lib[\all][k] = (
+								spec: cvWidgets[k].widgetCV.spec,
+								val: cvWidgets[k].widgetCV.value,
+								actions: cvWidgets[k].wdgtActions,
+								wdgtClass: CVWidgetMS,
+								osc: ()!cvWidgets[k].msSize,
+								midi: ()!cvWidgets[k].msSize
+							);
+							cvWidgets[k].msSize.do({ |sl|
+								// osc
+								cvWidgets[k].midiOscEnv[sl].oscResponder !? {
+									lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.addr;
+									lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.cmdName;
+								};
+								lib[\all][k].osc[sl].msgIndex = cvWidgets[k].midiOscEnv[sl].oscMsgIndex;
+								lib[\all][k].osc[sl].calibConstraints = cvWidgets[k].getOscInputConstraints(sl);
+								lib[\all][k].osc[sl].oscMapping = cvWidgets[k].getOscMapping(sl);
+								// midi
+								lib[\all][k].midi[sl].src = cvWidgets[k].midiOscEnv[sl].midisrc;
+								lib[\all][k].midi[sl].chan = cvWidgets[k].midiOscEnv[sl].midichan;
+								lib[\all][k].midi[sl].num = cvWidgets[k].midiOscEnv[sl].midiRawNum;
+								lib[\all][k].midi[sl].midiMode = cvWidgets[k].getMidiMode(sl);
+								lib[\all][k].midi[sl].midiMean = cvWidgets[k].getMidiMean(sl);
+								lib[\all][k].midi[sl].softWithin = cvWidgets[k].getSoftWithin(sl);
+								lib[\all][k].midi[sl].midiResolution = cvWidgets[k].getMidiResolution(sl);
+								lib[\all][k].midi[sl].ctrlButtonBank = cvWidgets[k].getCtrlButtonBank(sl);
+							})
+						}
+					);
+					lib[\all][k].notes = cvWidgets[k].nameField.string;
+					lib[\all][k].tabLabel = widgetStates[k].tabKey;
+				})
 			});
 
 			lib[\all].put(\shortcuts, (
@@ -1800,6 +1849,8 @@ CVCenter {
 				cvWidgetEditor: AbstractCVWidgetEditor.shortcuts,
 				globalShortcuts: KeyDownActions.globalShortcuts
 			));
+
+			lib[\all].put(\snapshots, snapShots);
 
 			if(GUI.id === \cocoa, {
 				lib.writeTextArchive(*f);
@@ -1826,7 +1877,7 @@ CVCenter {
 			path, addToExisting=false,
 			autoConnectOSC=true, oscConnectToIP=true, oscRestrictToPort=false, activateCalibration=false, resetCalibration=false,
 			autoConnectMIDI=true, midiConnectSrc=false, midiConnectChannel=false, midiConnectCtrl=true,
-			loadActions=true, midiSrcID, oscIPAddress, loadShortcuts=true
+			loadActions=true, midiSrcID, oscIPAddress, loadShortcuts=true, loadSnapshots=true
 		|
 		var lib, successFunc;
 
@@ -2075,8 +2126,11 @@ CVCenter {
 								})
 							}
 						);
-						cvWidgets[key].nameField.string_(v.notes);
-						if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
+
+						cvWidgets[key] !? {
+							cvWidgets[key].nameField.string_(v.notes);
+							if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
+						};
 
 						if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
 							CVCenterLoadDialog.window.close;
@@ -2103,6 +2157,18 @@ CVCenter {
 							KeyDownActions.globalShortcutsSync;
 						});
 					}
+				}.defer(0.5)
+			});
+			if(loadSnapshots, {
+				{
+					if(addToExisting.not, {
+						snapShots = ();
+						this.at('select snapshot').items_(["select snapshot..."]);
+					});
+					lib[\all][\snapshots].pairsDo({ |k, v|
+						snapShots.put(k, v);
+						this.at('select snapshot').items_(this.at('select snapshot').items.add(k));
+					});
 				}.defer(0.5)
 			})
 		};
@@ -2179,7 +2245,7 @@ CVCenter {
 						if(thisNextPos.x+(cvWidgets[k].widgetProps.x) >= (tab.bounds.width-15), {
 							thisNextPos = Point(0, thisNextPos.y
 								+(cvWidgets[k].widgetProps.y)
-								+(orderedRemoveButs[i].bounds.height)
+								+(orderedRemoveButs[i].bounds.height+1)
 							);
 						}, {
 							thisNextPos = tabProperties[thisTabKey].nextPos;
@@ -2197,6 +2263,33 @@ CVCenter {
 				})
 			})
 		}
+	}
+
+	// finish me
+	*prRegroupPrefPane {
+		var children, rows;
+
+		children = prefPane.children;
+		swFlow.bounds.width_(prefPane.bounds.width);
+		swFlow.reset;
+		children.do({ |child|
+			swFlow.place(child);
+			rows = children.collect({ |child| child.bounds.top }).asBag.contents.size;
+			prefPane.bounds_(Rect(
+				prefPaneBounds.left,
+				window.view.bounds.height-35-(rows-1*21),
+				prefPane.bounds.width,
+				prefPaneBounds.height+(rows-1*21)
+			));
+			tabs.view.bounds_(Rect(
+				tabsBounds.left,
+				tabsBounds.top,
+				tabs.view.bounds.width,
+				window.view.bounds.height-prefPane.bounds.height
+			))
+		});
+		// "tabsBounds.height: %, rows-1*21: %, tabs.view.bounds.height: %\n".postf(tabsBounds.height, rows-1*21, tabs.view.bounds.height);
+		// prefPane.bounds.postln;
 	}
 
 	*prRemoveTab { |key|
