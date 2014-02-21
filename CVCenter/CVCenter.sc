@@ -1133,7 +1133,7 @@ CVCenter {
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
-					cvWidgets[key] = CVWidget2D(
+					cvWidgets[key] = d(
 						thisTab,
 						(lo: all[key].lo, hi: all[key].hi),
 						key,
@@ -1463,12 +1463,23 @@ CVCenter {
 		^all.at(key.asSymbol);
 	}
 
-	*add { |key, spec, value, tab, slot|
+	*add { |key, spec, value, tab, slot, svItems|
 		var thisKey, thisSpec, thisVal, thisSlot, thisTab, widget2DKey;
-		var specName;
+		var specName, cvClass, thisSVItems;
 
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		thisKey = key.asSymbol;
+
+		if(svItems.notNil, {
+			if(svItems.isKindOf(SequenceableCollection).not, {
+				Error("svItems must be a SequenceableCollection or an instance of one of its subclasses!").through;
+			}, {
+				thisSVItems = svItems.collect(_.asSymbol);
+				cvClass = SV;
+			})
+		}, {
+			cvClass = CV;
+		});
 
 		// "add called with key '%' and tab '%'\n".postf(key, tab);
 
@@ -1567,12 +1578,20 @@ CVCenter {
 				widgetStates[thisKey][thisSlot][\made] = true;
 				^all[thisKey][thisSlot];
 			}, {
-				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
+				all[thisKey] ?? { all.put(thisKey, (lo: cvClass.new, hi: cvClass.new)) };
 				all[thisKey][thisSlot].spec_(thisSpec);
+				if(cvClass === SV and:{
+					all[thisKey][thisSlot].items.unbubble.isNil
+				}, { all[thisKey][thisSlot].items_(thisSVItems) });
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				widgetStates[thisKey][thisSlot].made = true;
 			})
-		}, { all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) }});
+		}, {
+			all[thisKey] ?? { all.put(thisKey, cvClass.new(thisSpec, thisVal)) };
+			if(cvClass === SV and:{ all[thisKey].items.ububble.isNil }, {
+				all[thisKey].items_(thisSVItems)
+			})
+		});
 
 		if(window.isNil or:{ window.isClosed }, {
 			// "makeWindow: %, key: %\n".postf(thisTab, thisKey);
@@ -1598,8 +1617,8 @@ CVCenter {
 	}
 
 	// add a CV using spec inference
-	*use { |key, spec, value, tab, slot|
-		^this.add(key, spec ?? { this.findSpec(key) }, value, tab, slot)
+	*use { |key, spec, value, tab, slot, svItems|
+		^this.add(key, spec ?? { this.findSpec(key) }, value, tab, slot, svItems)
 	}
 
 	*setup {
