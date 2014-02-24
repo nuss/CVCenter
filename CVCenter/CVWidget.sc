@@ -2862,7 +2862,7 @@ CVWidget {
 			if(theChanger.value.size == 4, {
 // 				OSCresponderNode: t, r, msg
 // 				OSCfunc: msg, time, addr // for the future
-				oscResponderAction = { |t, r, msg|
+				oscResponderAction = { |t, r, msg, addr|
 //					"msg[theChanger[3]]: %\n".postf(msg[theChanger.value[3]]);
 					if(thisCalib, {
 						if(midiOscEnv.calibConstraints.isNil, {
