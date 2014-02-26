@@ -1133,7 +1133,7 @@ CVCenter {
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
-					cvWidgets[key] = d(
+					cvWidgets[key] = CVWidget2D(
 						thisTab,
 						(lo: all[key].lo, hi: all[key].hi),
 						key,

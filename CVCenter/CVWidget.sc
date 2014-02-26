@@ -24,7 +24,7 @@ CVWidget {
 	var prDefaultAction, <>wdgtActions, <background, <stringColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;
 	var prCalibrate, netAddr; // OSC-calibration enabled/disabled, NetAddr if not nil at instantiation
-	var visibleGuiEls, allGuiEls, <focusElements, isCVCWidget = false;
+	var visibleGuiEls, allGuiEls, <focusElements, <isCVCWidget = false;
 	var <widgetBg, <label, <nameField, wdgtInfo; // elements contained in any kind of CVWidget
 	var widgetXY, widgetProps, <>editor;
 	var <wdgtControllersAndModels, <midiOscEnv;
@@ -2871,6 +2871,7 @@ CVWidget {
 		wcm.oscConnection.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscConnect: %\n".postf(theChanger);
 			if(debug, { "widget '%' (%) at slot '%' oscConnection.model: %\n".postf(this.name, this.class, slot, theChanger) });
+			"% isCVCWidget: %".postf(this.name, this.isCVCWidget);
 
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
@@ -2882,12 +2883,14 @@ CVWidget {
 // 				OSCresponderNode: t, r, msg
 // 				OSCfunc: msg, time, addr // for the future
 				oscResponderAction = { |t, r, msg, addr|
+					// "msg: %\n".postf(msg);
 					// "msg[theChanger.value[3]]: %\n".postf(msg[theChanger.value[3]]);
 					midiOscEnv.oscReplyAddrs ?? { midiOscEnv.oscReplyAddrs = [] };
-					if(midiOscEnv.oscReplyAddrs.includes(addr).not, {
-						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.add(addr)
+					if(midiOscEnv.oscReplyAddrs.includesEqual(addr).not, {
+						// "new oscReplyAddr: %\n".postf(midiOscEnv.oscReplyAddrs.add(addr));
+						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.add(addr);
+						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.asBag.contents.keys.asArray;
 					});
-					midiOscEnv.oscReplyAddrs.postln;
 					if(thisCalib, {
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
