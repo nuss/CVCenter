@@ -689,7 +689,7 @@ CVWidget {
 	setMidiMode { |mode, slot|
 		var thisSlot, wcm;
 
-		if(mode.asInt != 0 and:{ mode.asInt != 1 }, {
+		if(mode.asInteger != 0 and:{ mode.asInteger != 1 }, {
 			Error("setMidiMode: 'mode' must either be 0 or 1!").throw;
 		});
 
@@ -699,7 +699,7 @@ CVWidget {
 				wcm = wdgtControllersAndModels[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[slot];
 			},
 			{ wcm = wdgtControllersAndModels }
@@ -738,7 +738,7 @@ CVWidget {
 
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInteger }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -751,7 +751,7 @@ CVWidget {
 	setMidiMean { |meanval, slot|
 		var thisSlot, thisMeanVal, wcm;
 
-		thisMeanVal = meanval.asInt;
+		thisMeanVal = meanval.asInteger;
 
 		switch(this.class,
 			CVWidget2D, {
@@ -759,7 +759,7 @@ CVWidget {
 				wcm = wdgtControllersAndModels[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 			},
 			{ wcm = wdgtControllersAndModels }
@@ -796,7 +796,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInteger }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -820,7 +820,7 @@ CVWidget {
 				wcm = wdgtControllersAndModels[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 			},
 			{ wcm = wdgtControllersAndModels }
@@ -857,7 +857,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInteger }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -880,17 +880,17 @@ CVWidget {
 				wcm = wdgtControllersAndModels[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 			},
 			{ wcm = wdgtControllersAndModels }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
-				if(numSliders.asString == "nil" or:{ numSliders.asInt === 0 }, {
+				if(numSliders.asString == "nil" or:{ numSliders.asInteger === 0 }, {
 					prCtrlButtonBank = nil;
 				}, {
-					prCtrlButtonBank = numSliders.asInt;
+					prCtrlButtonBank = numSliders.asInteger;
 				});
 				wcm.midiOptions.model.value_(
 					(
@@ -921,7 +921,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInteger }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -940,7 +940,7 @@ CVWidget {
 				wcm = wdgtControllersAndModels[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 			},
 			{ wcm = wdgtControllersAndModels }
@@ -977,7 +977,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInteger }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -998,7 +998,7 @@ CVWidget {
 				wcm = wdgtControllersAndModels[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 			},
 			{ wcm = wdgtControllersAndModels }
@@ -1024,7 +1024,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInteger }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -1070,7 +1070,7 @@ CVWidget {
 				wcm = wdgtControllersAndModels[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 			},
 			{ wcm = wdgtControllersAndModels }
@@ -1112,7 +1112,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInteger }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -1136,7 +1136,7 @@ CVWidget {
 				wcm = wdgtControllersAndModels[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 			},
 			{ wcm = wdgtControllersAndModels }
@@ -1160,7 +1160,7 @@ CVWidget {
 			if("^[0-9]{1,5}$".matchRegexp(intPort).not and:{ intPort != "nil" }, {
 				Error("Please provide a valid port or leave this field empty").throw;
 			}, {
-				intPort = intPort.asInt;
+				intPort = intPort.asInteger;
 			})
 		});
 
@@ -1199,7 +1199,7 @@ CVWidget {
 				wcm = wdgtControllersAndModels[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 			},
 			{ wcm = wdgtControllersAndModels }
@@ -1231,7 +1231,7 @@ CVWidget {
 				slot ?? {
 					Error("Missing 'slot'-argument. Maybe you forgot to explicitely provide the slot: e.g. <wdgt>.midiConnect(slot: 0)").throw;
 				};
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 			},
 			{ wcm = wdgtControllersAndModels }
@@ -1272,7 +1272,7 @@ CVWidget {
 				wcm = wdgtControllersAndModels[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot]
 			},
 			{ wcm = wdgtControllersAndModels }
@@ -1298,7 +1298,7 @@ CVWidget {
 				thisEditor = this.editor[thisSlot];
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
 				thisEditor = this.editor.editors[thisSlot];
 			},
@@ -1320,7 +1320,7 @@ CVWidget {
 		var thisSlot;
 		switch(this.class,
 			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInt }
+			CVWidgetMS, { thisSlot = slot.asInteger }
 		);
 		switch(this.class,
 			CVWidgetKnob, {
@@ -2267,13 +2267,13 @@ CVWidget {
 			});
 
 			MIDIClient.sources.do({ |source|
-				if(midiSources.values.includes(source.uid.asInt).not, {
+				if(midiSources.values.includes(source.uid.asInteger).not, {
 					// OSX/Linux specific tweek
 					if(source.name == source.device, {
-						midiSources.put(source.name.asSymbol, source.uid.asInt)
+						midiSources.put(source.name.asSymbol, source.uid.asInteger)
 					}, {
 						midiSources.put(
-							(source.device++":"+source.name).asSymbol, source.uid.asInt
+							(source.device++":"+source.name).asSymbol, source.uid.asInteger
 						)
 					})
 				})
