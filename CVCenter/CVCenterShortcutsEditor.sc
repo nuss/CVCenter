@@ -101,8 +101,8 @@ CVCenterShortcutsEditor {
 					KeyDownActions.globalShortcuts_(globalShortcutsEditor.result);
 					// CVCenter.setShortcuts;
 					// CVCenter.cvWidgets.do(_.setShortcuts);
-					if(CVCenter.window.notNIl and:{ CVCenter.window.isClosed.not }, {
-						[CVCenter.tabs.views, CVCenter.prefPane].do({ |view|
+					if(CVCenter.window.notNil and:{ CVCenter.window.isClosed.not }, {
+						[CVCenter.tabs.views, CVCenter.prefPane].flat.do({ |view|
 							cvCenterEditor.setShortcuts(view);
 						});
 						CVCenter.cvWidgets.do({ |wdgt|
