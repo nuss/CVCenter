@@ -101,16 +101,18 @@ CVCenterShortcutsEditor {
 					KeyDownActions.globalShortcuts_(globalShortcutsEditor.result);
 					// CVCenter.setShortcuts;
 					// CVCenter.cvWidgets.do(_.setShortcuts);
-					if(CVCenter.window.notNIl and:{ CVCenter.window.isClosed.not }, {
-						[CVCenter.tabs.views, CVCenter.prefPane].do({ |view|
-							cvCenterEditor.setShortcuts(view);
-						});
-						CVCenter.cvWidgets.do({ |wdgt|
-							wdgt.focusElements.do({ |el|
-								cvWidgetEditor.setShortcuts(el)
-							})
-						})
-					});
+				// if(CVCenter.window.notNil and:{ CVCenter.window.isClosed.not }, {
+				// 	"CVCenter.tabs.views before: %\n".postf(CVCenter.tabs.views);
+				// 	[CVCenter.tabs.views, CVCenter.prefPane].do({ |view|
+				// 		cvCenterEditor.setShortcuts(view);
+				// 	});
+				// 	"CVCenter.tabs.views after: %\n".postf(CVCenter.tabs.views);
+				// 	CVCenter.cvWidgets.do({ |wdgt|
+				// 		wdgt.focusElements.do({ |el|
+				// 			cvWidgetEditor.setShortcuts(el)
+				// 		})
+				// 	})
+				// });
 					// AbstractCVWidgetEditor.allEditors.collect(_.editor).do(_.setShortcuts);
 					AbstractCVWidgetEditor.allEditors.collect(_.editor).do({ |ed|
 						cvWidgetEditorEditor.setShortcuts(ed.tabs.view)
