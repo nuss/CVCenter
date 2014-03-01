@@ -1911,7 +1911,10 @@ CVCenter {
 			{
 				all !? {
 					if(addToExisting === false, {
-						this.removeAll;
+						// this.removeAll;
+						all.pairsDo({ |key, wdgt|
+							if(key !== \snapshot and:{ key !== 'select snapshot' }, { this.removeAt(key) });
+						})
 					})
 				};
 				lib[\all].pairsDo({ |key, v|
