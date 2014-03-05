@@ -27,7 +27,7 @@ CVWidget {
 	var visibleGuiEls, allGuiEls, <focusElements, <isCVCWidget = false;
 	var <widgetBg, <label, <nameField, wdgtInfo; // elements contained in any kind of CVWidget
 	var widgetXY, widgetProps, <>editor;
-	var <wdgtControllersAndModels, <midiOscEnv;
+	var <wdgtControllersAndModels, <midiOscEnv, <>oscReplyPort;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 	// extended API
@@ -2885,9 +2885,9 @@ CVWidget {
 				oscResponderAction = { |t, r, msg, addr|
 					// "msg: %\n".postf(msg);
 					// "msg[theChanger.value[3]]: %\n".postf(msg[theChanger.value[3]]);
+					this.oscReplyPort !? { addr.port_(this.oscReplyPort) };
 					midiOscEnv.oscReplyAddrs ?? { midiOscEnv.oscReplyAddrs = [] };
 					if(midiOscEnv.oscReplyAddrs.includesEqual(addr).not, {
-						// "new oscReplyAddr: %\n".postf(midiOscEnv.oscReplyAddrs.add(addr));
 						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.add(addr);
 						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.asBag.contents.keys.asArray;
 					});
