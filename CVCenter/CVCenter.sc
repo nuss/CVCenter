@@ -1042,18 +1042,18 @@ CVCenter {
 						);
 
 						case
-						{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-							// "no modifier".postln;
-							if(keycode == keyDowns.keyCode and:{
-								thisMod.isNil and:{ thisArrMod.isNil }
-							}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
-						}
-						{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-							// "some modifier...".postln;
-							if(keycode == keyDowns.keyCode and:{
-								(modifiers == thisArrMod).or(modifiers == thisMod)
-							}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
-						}
+							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+								// "no modifier".postln;
+								if(keycode == keyDowns.keyCode and:{
+									thisMod.isNil and:{ thisArrMod.isNil }
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+							}
+							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+								// "some modifier...".postln;
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == thisArrMod).or(modifiers == thisMod)
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+							}
 						;
 					})
 				)
