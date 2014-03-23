@@ -4,8 +4,8 @@ CVWidgetMS : CVWidget {
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
-	*new { |parent, widgetCV, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, numSliders=5, server|
-		^super.newCopyArgs(parent, widgetCV, name).init(
+	*new { |parent, widgetCV, name, connectMSlider, connectTextField, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, numSliders=5, server|
+		^super.newCopyArgs(parent, widgetCV, name, connectMSlider, connectTextField).init(
 			bounds,
 			defaultAction,
 			setup,
@@ -427,8 +427,10 @@ CVWidgetMS : CVWidget {
 
 		msSize.do({ |slot| this.initControllerActions(slot) });
 
-		widgetCV.connect(mSlider);
-		widgetCV.connect(numVal);
+		// widgetCV.connect(mSlider);
+		// widgetCV.connect(numVal);
+		if(connectS, { this.connectGUI(true, nil) });
+		if(connectTF, { this.connectGUI(nil, true) });
 
 		// this.setShortcuts;
 		focusElements.do({ |el|
@@ -493,6 +495,21 @@ CVWidgetMS : CVWidget {
 		}, {
 			"Either the widget you're trying to reopen hasn't been closed yet or it doesn't even exist.".warn;
 		})
+	}
+
+	connectGUI { |connectSlider = true, connectTextField = true|
+		connectSlider !? {
+			if(connectSlider, {
+				sliderConnection = widgetCV.cvWidgetConnect(mSlider);
+			}, { widgetCV.cvWidgetDisconnect(sliderConnection) });
+			connectS = connectSlider;
+		};
+		connectTextField !? {
+			if(connectTextField, {
+				textConnection = widgetCV.cvWidgetConnect(numVal);
+			}, { widgetCV.cvWidgetDisconnect(textConnection) });
+			connectTF = connectTextField;
+		};
 	}
 
 	background_ { |color|

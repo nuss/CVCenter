@@ -21,7 +21,7 @@ CVCenter {
 	classvar prefPaneBounds, tabsBounds;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>shortcuts, <scv;
-	classvar <alwaysOnTop=false;
+	classvar <alwaysOnTop = false;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight;
 	classvar <widgetStates;
 	classvar <tabProperties, colors, nextColor;
@@ -30,6 +30,7 @@ CVCenter {
 	classvar prefs, boundsOnShutDown, <>dontSave, <systemWidgets, <snapShots, snapShotSelect;
 	// CVWidgetMS: how many slots at max for one column
 	classvar <>numMsSlotsPerColumn = 15;
+	classvar <>connectSliders = true, <>connectTextFields = true;
 
 	*initClass {
 		var newPrefs, newBounds;
@@ -544,6 +545,7 @@ CVCenter {
 		// var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
 		var buildCheckbox;
+		var tmpConnectS, tmpConnectTF;
 		// TabbedView2 specific
 
 		// "adding tab within *makeWindow: %\n".postf(tab);
@@ -809,6 +811,13 @@ CVCenter {
 
 			all.pairsDo({ |key, cv|
 				// [key, cv].postln;
+				widgetStates !? {
+					widgetStates[key] !? {
+						tmpConnectS = widgetStates[key].slidersConnected;
+						tmpConnectTF = widgetStates[key].textFieldsConnected;
+					}
+				};
+
 				if((cvWidgets[key].notNil and:{ cvWidgets[key].isClosed }).or(
 					cvWidgets[key].isNil
 				), {
@@ -821,7 +830,9 @@ CVCenter {
 							this.prAddWidget(
 								thisTabLabel,
 								(key: key, slot: slot, spec: all[key][slot].spec),
-								key
+								key,
+								tmpConnectS ? this.connectSliders,
+								tmpConnectTF ? this.connectTextFields
 							);
 							this.at(key)[slot].value_(tmp);
 						})
@@ -1066,7 +1077,7 @@ CVCenter {
 		}
 	}
 
-	*prAddWidget { |tab, widget2DKey, key|
+	*prAddWidget { |tab, widget2DKey, key, connectS, connectTF|
 		var allCVKeys, widgetKeys, thisKeys;
 		var rowwidth, colcount;
 		var cvTabIndex, tabLabels;
@@ -1137,6 +1148,8 @@ CVCenter {
 						thisTab,
 						(lo: all[key].lo, hi: all[key].hi),
 						key,
+						connectS ? this.connectSliders,
+						connectTF ? this.connectTextFields,
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight),
 						setup: tmp.setup,
 						controllersAndModels: cvWidgets[key] !? {
@@ -1152,10 +1165,17 @@ CVCenter {
 						;
 					);
 					if(widgetStates[key].isNil, {
-						widgetStates.put(key, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
+						widgetStates.put(key, (
+							tabIndex: cvTabIndex,
+							tabKey: thisTabLabel,
+							slidersConnected: connectS ? this.connectSliders,
+							textFieldsConnected: connectTF ? this.connectTextFields
+						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
+						widgetStates[key].slidersConnected = connectS ? this.connectSliders;
+						widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
 					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
@@ -1186,6 +1206,8 @@ CVCenter {
 						thisTab,
 						all[key],
 						key,
+						connectS ? this.connectSliders,
+						connectTF ? this.connectTextFields,
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight),
 						setup: tmp.setup,
 						controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
@@ -1199,10 +1221,17 @@ CVCenter {
 						;
 					);
 					if(widgetStates[key].isNil, {
-						widgetStates.put(key, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
+						widgetStates.put(key, (
+							tabIndex: cvTabIndex,
+							tabKey: thisTabLabel,
+							slidersConnected: connectS ? this.connectSliders,
+							textFieldsConnected: connectTF ? this.connectTextFields
+						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
+						widgetStates[key].slidersConnected = connectS ? this.connectSliders;
+						widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
 					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
@@ -1225,6 +1254,8 @@ CVCenter {
 						thisTab,
 						all[key],
 						key,
+						connectS ? this.connectSliders,
+						connectTF ? this.connectTextFields,
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
 						setup: tmp.setup,
 						controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
@@ -1238,10 +1269,17 @@ CVCenter {
 						;
 					);
 					if(widgetStates[key].isNil, {
-						widgetStates.put(key, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
+						widgetStates.put(key, (
+							tabIndex: cvTabIndex,
+							tabKey: thisTabLabel,
+							slidersConnected: connectS ? this.connectSliders,
+							textFieldsConnected: connectTF ? this.connectTextFields
+						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
+						widgetStates[key].slidersConnected = connectS ? this.connectSliders;
+						widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
 					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
@@ -1463,7 +1501,7 @@ CVCenter {
 		^all.at(key.asSymbol);
 	}
 
-	*add { |key, spec, value, tab, slot, svItems|
+	*add { |key, spec, value, tab, slot, svItems, connectS, connectTF|
 		var thisKey, thisSpec, thisVal, thisSlot, thisTab, widget2DKey;
 		var specName, cvClass, thisSVItems;
 
@@ -1598,7 +1636,7 @@ CVCenter {
 			this.makeWindow(thisTab);
 		}, {
 			// "prAddWidget: %\n".postf(thisKey);
-			this.prAddWidget(thisTab, widget2DKey, thisKey);
+			this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
 		});
 
 		if(slot.notNil, {
@@ -1617,8 +1655,8 @@ CVCenter {
 	}
 
 	// add a CV using spec inference
-	*use { |key, spec, value, tab, slot, svItems|
-		^this.add(key, spec ?? { this.findSpec(key) }, value, tab, slot, svItems)
+	*use { |key, spec, value, tab, slot, svItems, connectS, connectTF|
+		^this.add(key, spec ?? { this.findSpec(key) }, value, tab, slot, svItems, connectS ? this.connectSliders, connectTF ? this.connectTextFields)
 	}
 
 	*setup {
