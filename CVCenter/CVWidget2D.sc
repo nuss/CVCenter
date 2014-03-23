@@ -20,8 +20,8 @@ CVWidget2D : CVWidget {
 	var <slider2d, <rangeSlider, <numVal, <specBut;
 	var <midiHead, <midiLearn, <midiSrc, <midiChan, <midiCtrl, <oscEditBut, <calibBut, <actionsBut;
 
-	*new { |parent, widgetCV, name, bounds, defaultActions, setup, controllersAndModels, cvcGui, persistent, server|
-		^super.newCopyArgs(parent, widgetCV, name).init(
+	*new { |parent, widgetCV, name, connectSliders, connectTextFields, bounds, defaultActions, setup, controllersAndModels, cvcGui, persistent, server|
+		^super.newCopyArgs(parent, widgetCV, name, connectSliders, connectTextFields).init(
 			bounds,
 			defaultActions,
 			setup,
@@ -637,9 +637,11 @@ CVWidget2D : CVWidget {
 		#[lo, hi].do({ |slot| if(prCalibrate[slot], { calibBut[slot].value_(0) }, { calibBut[slot].value_(1) }) });
 
 		// widgetCV
-		[slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
-		widgetCV.lo.connect(numVal.lo);
-		widgetCV.hi.connect(numVal.hi);
+		// [slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
+		// widgetCV.lo.connect(numVal.lo);
+		// widgetCV.hi.connect(numVal.hi);
+		if(connectS, { this.connectGUI(true, nil) });
+		if(connectTF, { this.connectGUI(nil, true) });
 
 		visibleGuiEls = [
 			slider2d,
@@ -752,6 +754,30 @@ CVWidget2D : CVWidget {
 		}, {
 			"Either the widget you're trying to reopen hasn't been closed yet or it doesn't even exist.".warn;
 		})
+	}
+
+	connectGUI { |connectSlider = true, connectTextField = true|
+		connectSlider !? {
+			if(connectSlider, {
+				[slider2d, rangeSlider].do{ |view|
+					sliderConnection = [widgetCV.lo, widgetCV.hi].cvWidgetConnect(view);
+				};
+			}, { [widgetCV.lo, widgetCV.hi].cvWidgetDisconnect(sliderConnection) });
+			connectS = connectSlider;
+		};
+		connectTextField !? {
+			if(connectTextField, {
+				textConnection = ();
+				#[lo, hi].do{ |hilo|
+					textConnection.put(hilo, widgetCV[hilo].cvWidgetConnect(numVal[hilo]))
+				}
+			}, {
+				#[lo, hi].do{ |hilo|
+					widgetCV[hilo].cvWidgetDisconnect(textConnection[hilo])
+				}
+			});
+			connectTF = connectTextField;
+		};
 	}
 
 	background_ { |color|

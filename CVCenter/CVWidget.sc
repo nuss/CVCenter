@@ -19,7 +19,8 @@ CVWidget {
 
 	classvar <>removeResponders = true, <>midiSources, <>shortcuts, prefs/*, midiStateObserver*/;
 	classvar <>debug = false;
-	var <parent, <widgetCV, <name;
+	var <parent, <widgetCV, <name, <connectS = true, <connectTF = true;
+	var sliderConnection, textConnection;
 	var <guiEnv;
 	var prDefaultAction, <>wdgtActions, <background, <stringColor, <alwaysPositive = 0.1;
 	var prMidiMode, prMidiMean, prCtrlButtonBank, prMidiResolution, prSoftWithin;

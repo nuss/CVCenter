@@ -21,8 +21,8 @@ CVWidgetKnob : CVWidget {
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
-	*new { |parent, widgetCV, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, server|
-		^super.newCopyArgs(parent, widgetCV, name).init(
+	*new { |parent, widgetCV, name, connectKnob, connectNumVal, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, server|
+		^super.newCopyArgs(parent, widgetCV, name, connectKnob, connectNumVal).init(
 			bounds,
 			defaultAction,
 			setup,
@@ -431,7 +431,10 @@ CVWidgetKnob : CVWidget {
 
 		if(prCalibrate, { calibBut.value_(0) }, { calibBut.value_(1) });
 
-		[knob, numVal].do({ |view| widgetCV.connect(view) });
+		if(connectS, { this.connectGUI(true, nil) });
+		if(connectTF, { this.connectGUI(nil, true) });
+		// [knob, numVal].do({ |view| widgetCV.connect(view) });
+
 		visibleGuiEls = [
 			knob,
 			numVal,
@@ -530,6 +533,21 @@ CVWidgetKnob : CVWidget {
 		}, {
 			"Either the widget you're trying to reopen hasn't been closed yet or it doesn't even exist.".warn;
 		})
+	}
+
+	connectGUI { |connectSlider = true, connectTextField = true|
+		connectSlider !? {
+			if(connectSlider, {
+				sliderConnection = widgetCV.cvWidgetConnect(knob);
+			}, { widgetCV.cvWidgetDisconnect(sliderConnection) });
+			connectS = connectSlider;
+		};
+		connectTextField !? {
+			if(connectTextField, {
+				textConnection = widgetCV.cvWidgetConnect(numVal);
+			}, { widgetCV.cvWidgetDisconnect(textConnection) });
+			connectTF = connectTextField;
+		};
 	}
 
 	background_ { |color|
