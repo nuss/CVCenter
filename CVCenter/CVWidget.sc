@@ -1526,25 +1526,12 @@ CVWidget {
 			}
 		);
 
-		// wdgtControllersAndModels.pairsDo({ |k, v|
-		// 	if(k == \slots, {
-		// 		v.pairsDo({ |kk, vv| [kk, vv].postcs; "\n\n\n".postln })
-		// 	}, { [k, v].postcs; "\n\n\n".postln })
-		// });
-
-		// midiStateObserver ?? {
-		// 	midiStateObserver = SimpleController(MIDIClient).put(\initialized, { |theChanger, what, moreArgs|
-		// 		"midi inited".postln;
-		// 		wcm.midiDisplay.model.value_(wcm.midiDisplay.model).changedKeys(synchKeys);
-		// 	});
-		// 	MIDIClient.addDependant(midiStateObserver);
-		// 	midiStateObserver.update;
-		//
-		// 	ShutDown.add({
-		// 		midiStateObserver.remove;
-		// 	});
-		// }
-
+		wdgtControllersAndModels.slidersTextConnection ?? {
+			wdgtControllersAndModels.slidersTextConnection = ()
+		};
+		wdgtControllersAndModels.slidersTextConnection.model ?? {
+			wdgtControllersAndModels.slidersTextConnection.model = Ref([true, true])
+		};
 
 	}
 
@@ -1599,13 +1586,14 @@ CVWidget {
 			prInitOscConnect,
 			prInitOscDisplay,
 			prInitOscInputRange,
-			prInitActionsControl
+			prInitActionsControl,
+			prInitSlidersTextConnection
 		].do({ |method|
 			this.perform(method, wcm, thisGuiEnv, midiOscEnv, thisWidgetCV, thisCalib, slot);
 		});
 	}
 
-	prInitCalibration { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+	prInitCalibration { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var thisEditor, numCalib;
 
 		wcm.calibration.controller ?? {
@@ -1617,9 +1605,9 @@ CVWidget {
 			if(debug, { "widget '%' (%) at slot '%' calibration.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			if(this.class == CVWidgetMS, {
-				thisEditor = thisGuiEnv[\editor][slot];
+				thisEditor = guiEnv[\editor][slot];
 			}, {
-				thisEditor = thisGuiEnv[\editor];
+				thisEditor = guiEnv[\editor];
 			});
 
 			// [slot, thisEditor.calibNumBoxes.lo, thisEditor.calibNumBoxes.hi].postln;
@@ -1628,9 +1616,9 @@ CVWidget {
 				true, {
 					if(this.class != CVWidgetMS, {
 						parent.isClosed.not.if {
-							thisGuiEnv.calibBut.value_(0);
+							guiEnv.calibBut.value_(0);
 							if(GUI.id !== \cocoa, {
-								thisGuiEnv.calibBut.toolTip_("Calibration is active.\nClick to deactivate.");
+								guiEnv.calibBut.toolTip_("Calibration is active.\nClick to deactivate.");
 							})
 						};
 					}, {
@@ -1655,29 +1643,29 @@ CVWidget {
 						numCalib = msSize.collect(this.getCalibrate(_)).select(_ == true).size;
 						// "numCalib on true: %\n".postf(numCalib);
 						if(numCalib == msSize, {
-							if(thisGuiEnv.msEditor.notNil and:{
-								thisGuiEnv.msEditor.isClosed.not
+							if(guiEnv.msEditor.notNil and:{
+								guiEnv.msEditor.isClosed.not
 							}, {
-								thisGuiEnv.msEditor.calibBut.states_([
+								guiEnv.msEditor.calibBut.states_([
 									["calibrating all", Color.black, Color.green],
 									["calibrate all", Color.white, Color.red]
 								]).value_(0);
-								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(0);
+								guiEnv.msEditor.oscCalibBtns[slot].value_(0);
 								if(GUI.id !== \cocoa, {
-									thisGuiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is active.\nClick to deactivate.");
+									guiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is active.\nClick to deactivate.");
 								})
 							})
 						}, {
-							if(thisGuiEnv.msEditor.notNil and:{
-								thisGuiEnv.msEditor.isClosed.not
+							if(guiEnv.msEditor.notNil and:{
+								guiEnv.msEditor.isClosed.not
 							}, {
-								thisGuiEnv.msEditor.calibBut.states_([
+								guiEnv.msEditor.calibBut.states_([
 									["partially calibrating", Color.black, Color.yellow],
 									["calibrate all", Color.white, Color.red]
 								]).value_(0);
-								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(0);
+								guiEnv.msEditor.oscCalibBtns[slot].value_(0);
 								if(GUI.id !== \cocoa, {
-									thisGuiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is active.\nClick to deactivate.");
+									guiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is active.\nClick to deactivate.");
 								})
 							})
 						})
@@ -1686,9 +1674,9 @@ CVWidget {
 				false, {
 					if(this.class != CVWidgetMS, {
 						parent.isClosed.not.if {
-							thisGuiEnv.calibBut.value_(1);
+							guiEnv.calibBut.value_(1);
 							if(GUI.id !== \cocoa, {
-								thisGuiEnv.calibBut.toolTip_("Calibration is inactive.\nClick to activate.");
+								guiEnv.calibBut.toolTip_("Calibration is inactive.\nClick to activate.");
 							})
 						};
 					}, {
@@ -1709,29 +1697,29 @@ CVWidget {
 					if(this.class == CVWidgetMS, {
 						numCalib = msSize.collect(this.getCalibrate(_)).select(_ == true).size;
 						if(numCalib == 0, {
-							if(thisGuiEnv.msEditor.notNil and:{
-								thisGuiEnv.msEditor.isClosed.not
+							if(guiEnv.msEditor.notNil and:{
+								guiEnv.msEditor.isClosed.not
 							}, {
-								thisGuiEnv.msEditor.calibBut.states_([
+								guiEnv.msEditor.calibBut.states_([
 									["calibrating all", Color.black, Color.green],
 									["calibrate all", Color.white, Color.red]
 								]).value_(1);
-								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(1);
+								guiEnv.msEditor.oscCalibBtns[slot].value_(1);
 								if(GUI.id !== \cocoa, {
-									thisGuiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is inactive.\nClick to activate.");
+									guiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is inactive.\nClick to activate.");
 								})
 							})
 						}, {
-							if(thisGuiEnv.msEditor.notNil and:{
-								thisGuiEnv.msEditor.isClosed.not
+							if(guiEnv.msEditor.notNil and:{
+								guiEnv.msEditor.isClosed.not
 							}, {
-								thisGuiEnv.msEditor.calibBut.states_([
+								guiEnv.msEditor.calibBut.states_([
 									["partially calibrating", Color.black, Color.yellow],
 									["calibrate all", Color.white, Color.red]
 								]).value_(0);
-								thisGuiEnv.msEditor.oscCalibBtns[slot].value_(1);
+								guiEnv.msEditor.oscCalibBtns[slot].value_(1);
 								if(GUI.id !== \cocoa, {
-									thisGuiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is inactive.\nClick to activate.");
+									guiEnv.msEditor.oscCalibBtns[slot].toolTip_("Calibration is inactive.\nClick to activate.");
 								})
 							})
 						})
@@ -1741,7 +1729,7 @@ CVWidget {
 		})
 	}
 
-	prInitSpecControl { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+	prInitSpecControl { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var tmp, tmpMapping;
 		var specSize, calibViewsWidth;
 		var specEditor, msEditors, oscIndex;
@@ -1764,11 +1752,11 @@ CVWidget {
 
 			switch(this.class,
 				CVWidgetMS, {
-					specEditor = thisGuiEnv.msEditor;
-					msEditors = thisGuiEnv.editor;
+					specEditor = guiEnv.msEditor;
+					msEditors = guiEnv.editor;
 					thisMidiOscEnv = this.midiOscEnv;
 				},
-				{ specEditor = thisGuiEnv.editor }
+				{ specEditor = guiEnv.editor }
 			);
 
 			if(theChanger.value.safeHasZeroCrossing, {
@@ -2098,9 +2086,9 @@ CVWidget {
 
 			if(this.class === CVWidgetKnob, {
 				if(argWidgetCV.spec.excludingZeroCrossing, {
-					thisGuiEnv.knob.centered_(true);
+					guiEnv.knob.centered_(true);
 				}, {
-					thisGuiEnv.knob.centered_(false);
+					guiEnv.knob.centered_(false);
 				})
 			});
 
@@ -2123,7 +2111,7 @@ CVWidget {
 		})
 	}
 
-	prInitMidiConnect { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+	prInitMidiConnect { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var ctrlString, meanVal, ccResponderAction, makeCCResponder;
 
 		wcm.midiConnection.controller ?? {
@@ -2248,7 +2236,7 @@ CVWidget {
 		})
 	}
 
-	prInitMidiDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+	prInitMidiDisplay { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var ctrlToolTip,typeText, r, p, sourceNames;
 		var midiInitFunc, thisEditor;
 		// CVWidgetMS
@@ -2281,9 +2269,9 @@ CVWidget {
 			if(debug, { "widget '%' (%) at slot '%' midiDisplay.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			if(this.class == CVWidgetMS, {
-				thisEditor = thisGuiEnv.editor[slot];
+				thisEditor = guiEnv.editor[slot];
 			}, {
-				thisEditor = thisGuiEnv.editor;
+				thisEditor = guiEnv.editor;
 			});
 
 			MIDIClient.sources.do({ |source|
@@ -2328,26 +2316,26 @@ CVWidget {
 					if(this.class != CVWidgetMS, {
 						defer {
 							if(parent.isClosed.not, {
-								thisGuiEnv.midiSrc.string_(theChanger.value.src.asString)
+								guiEnv.midiSrc.string_(theChanger.value.src.asString)
 									.background_(Color.red)
 									.stringColor_(Color.white)
 									.canFocus_(false)
 								;
-								thisGuiEnv.midiChan.string_((theChanger.value.chan+1).asString)
+								guiEnv.midiChan.string_((theChanger.value.chan+1).asString)
 									.background_(Color.red)
 									.stringColor_(Color.white)
 									.canFocus_(false)
 								;
-								thisGuiEnv.midiCtrl.string_(theChanger.value.ctrl)
+								guiEnv.midiCtrl.string_(theChanger.value.ctrl)
 									.background_(Color.red)
 									.stringColor_(Color.white)
 									.canFocus_(false)
 								;
 								if(slot.notNil, { typeText = " at '"++slot++"'" }, { typeText = "" });
-								thisGuiEnv.midiLearn.value_(1);
+								guiEnv.midiLearn.value_(1);
 								if(GUI.id !== \cocoa, {
-									thisGuiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
-									[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do({ |elem|
+									guiEnv.midiLearn.toolTip_("Click to remove the current\nMIDI-responder in this widget %.".format(typeText));
+									[guiEnv.midiSrc, guiEnv.midiChan, guiEnv.midiCtrl].do({ |elem|
 										if(theChanger.value.ctrl.class == String and:{
 											theChanger.value.ctrl.includes($:)
 										}, {
@@ -2389,20 +2377,20 @@ CVWidget {
 					});
 
 					if(this.class == CVWidgetMS, {
-						if(thisGuiEnv.msEditor.notNil and:{
-							thisGuiEnv.msEditor.isClosed.not
+						if(guiEnv.msEditor.notNil and:{
+							guiEnv.msEditor.isClosed.not
 						}, {
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.string_(
+							guiEnv.msEditor.midiEditGroups[slot].midiSrc.string_(
 								theChanger.value.src.asString
 							);
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.string_(
+							guiEnv.msEditor.midiEditGroups[slot].midiChan.string_(
 								(theChanger.value.chan+1).asString
 							);
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.string_(
+							guiEnv.msEditor.midiEditGroups[slot].midiCtrl.string_(
 								theChanger.value.ctrl
 							);
 							#[midiSrc, midiChan, midiCtrl].do({ |el|
-								thisGuiEnv.msEditor.midiEditGroups[slot].perform(el)
+								guiEnv.msEditor.midiEditGroups[slot].perform(el)
 									.background_(Color.red)
 									.stringColor_(Color.white)
 									.canFocus_(false)
@@ -2414,16 +2402,16 @@ CVWidget {
 									ctrlToolTip = ctrlToolTip[1]++" in bank "++ctrlToolTip[0];
 								}, { ctrlToolTip = theChanger.value.ctrl });
 								if(GUI.id !== \cocoa, {
-									thisGuiEnv.msEditor.midiEditGroups[slot].perform(el).toolTip_(
+									guiEnv.msEditor.midiEditGroups[slot].perform(el).toolTip_(
 										"currently connected to\ndevice-ID %,\non channel %,\ncontroller %".format(theChanger.value.src.asString, (theChanger.value.chan+1).asString, ctrlToolTip)
 									)
 								})
 							});
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiLearn.value_(1);
+							guiEnv.msEditor.midiEditGroups[slot].midiLearn.value_(1);
 							if(GUI.id !== \cocoa, {
 								[
-									thisGuiEnv.msEditor.midiConnectorBut,
-									thisGuiEnv.msEditor.midiDisconnectorBut
+									guiEnv.msEditor.midiConnectorBut,
+									guiEnv.msEditor.midiDisconnectorBut
 								].do({ |b|
 									if(b.enabled, {
 										b.toolTip_(
@@ -2441,23 +2429,23 @@ CVWidget {
 					if(this.class != CVWidgetMS, {
 						defer {
 							if(parent.isClosed.not, {
-								thisGuiEnv.midiLearn.states_([
+								guiEnv.midiLearn.states_([
 									["C", Color.white, Color(0.11, 0.38, 0.2)],
 									["X", Color.white, Color.red]
 								]).refresh;
 								if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
-								thisGuiEnv.midiLearn.value_(0);
+								guiEnv.midiLearn.value_(0);
 								if(GUI.id !== \cocoa, {
-									thisGuiEnv.midiLearn.toolTip_("Click to connect the widget% to\nthe slider(s) as given in the fields below.".format(typeText));
+									guiEnv.midiLearn.toolTip_("Click to connect the widget% to\nthe slider(s) as given in the fields below.".format(typeText));
 								});
 								r = [
-									thisGuiEnv.midiSrc.string != "source" and:{
-										try{ thisGuiEnv.midiSrc.string.interpret.isInteger }
+									guiEnv.midiSrc.string != "source" and:{
+										try{ guiEnv.midiSrc.string.interpret.isInteger }
 									},
-									thisGuiEnv.midiChan.string != "chan" and:{
-										try{ thisGuiEnv.midiChan.string.interpret.isInteger }
+									guiEnv.midiChan.string != "chan" and:{
+										try{ guiEnv.midiChan.string.interpret.isInteger }
 									},
-									thisGuiEnv.midiCtrl.string != "ctrl"
+									guiEnv.midiCtrl.string != "ctrl"
 								].collect({ |r| r });
 
 								if(GUI.id !== \cocoa, {
@@ -2467,7 +2455,7 @@ CVWidget {
 									if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
 									p = p++"\nto connect widget%to MIDI";
 
-									[thisGuiEnv.midiSrc, thisGuiEnv.midiChan, thisGuiEnv.midiCtrl].do(
+									[guiEnv.midiSrc, guiEnv.midiChan, guiEnv.midiCtrl].do(
 										_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
 									)
 								})
@@ -2507,34 +2495,34 @@ CVWidget {
 					});
 
 					if(this.class == CVWidgetMS, {
-						if(thisGuiEnv.msEditor.notNil and:{
-							thisGuiEnv.msEditor.isClosed.not
+						if(guiEnv.msEditor.notNil and:{
+							guiEnv.msEditor.isClosed.not
 						}, {
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiLearn
+							guiEnv.msEditor.midiEditGroups[slot].midiLearn
 								.states_([
 									["C", Color.white, Color(0.11, 0.38, 0.2)],
 									["X", Color.white, Color.red]
 								])
 								.value_(0)
 							;
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.string_(
+							guiEnv.msEditor.midiEditGroups[slot].midiSrc.string_(
 								theChanger.value.src
 							);
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.string_(
+							guiEnv.msEditor.midiEditGroups[slot].midiChan.string_(
 								theChanger.value.chan
 							);
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.string_(
+							guiEnv.msEditor.midiEditGroups[slot].midiCtrl.string_(
 								theChanger.value.ctrl
 							);
 
 							r = [
-								thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.string != "source" and:{
-									try{ thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.string.interpret.isInteger }
+								guiEnv.msEditor.midiEditGroups[slot].midiSrc.string != "source" and:{
+									try{ guiEnv.msEditor.midiEditGroups[slot].midiSrc.string.interpret.isInteger }
 								},
-								thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.string != "chan" and:{
-									try{ thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.string.interpret.isInteger }
+								guiEnv.msEditor.midiEditGroups[slot].midiChan.string != "chan" and:{
+									try{ guiEnv.msEditor.midiEditGroups[slot].midiChan.string.interpret.isInteger }
 								},
-								thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.string != "ctrl"
+								guiEnv.msEditor.midiEditGroups[slot].midiCtrl.string != "ctrl"
 							].collect({ |r| r });
 
 							if(GUI.id !== \cocoa, {
@@ -2544,9 +2532,9 @@ CVWidget {
 								if(r[2], { p = p++"controller nr. "++theChanger.value.ctrl });
 								p = p++"\nto connect widget%to MIDI";
 								[
-									thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc,
-									thisGuiEnv.msEditor.midiEditGroups[slot].midiChan,
-									thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl
+									guiEnv.msEditor.midiEditGroups[slot].midiSrc,
+									guiEnv.msEditor.midiEditGroups[slot].midiChan,
+									guiEnv.msEditor.midiEditGroups[slot].midiCtrl
 								].do(
 									_.toolTip_(p.format(slot !? { " at '"++slot++"' " } ?? { " " }))
 								)
@@ -2558,35 +2546,35 @@ CVWidget {
 					if(this.class != CVWidgetMS, {
 						defer {
 							if(parent.isClosed.not, {
-								thisGuiEnv.midiSrc
+								guiEnv.midiSrc
 									.string_(theChanger.value.src)
 									.background_(Color.white)
 									.stringColor_(Color.black)
 									.canFocus_(true)
 								;
-								thisGuiEnv.midiChan
+								guiEnv.midiChan
 									.string_(theChanger.value.chan)
 									.background_(Color.white)
 									.stringColor_(Color.black)
 									.canFocus_(true)
 								;
-								thisGuiEnv.midiCtrl
+								guiEnv.midiCtrl
 									.string_(theChanger.value.ctrl)
 									.background_(Color.white)
 									.stringColor_(Color.black)
 									.canFocus_(true)
 								;
-								thisGuiEnv.midiLearn.states_([
+								guiEnv.midiLearn.states_([
 									["L", Color.white, Color.blue],
 									["X", Color.white, Color.red]
 								])
 								.value_(0).refresh;
 								if(GUI.id !== \cocoa, {
 									if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
-									thisGuiEnv.midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
-									thisGuiEnv.midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%".format(typeText));
-									thisGuiEnv.midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%".format(typeText));
-									thisGuiEnv.midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%".format(typeText));
+									guiEnv.midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
+									guiEnv.midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%".format(typeText));
+									guiEnv.midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%".format(typeText));
+									guiEnv.midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%".format(typeText));
 								})
 							})
 						}
@@ -2619,26 +2607,26 @@ CVWidget {
 					});
 
 					if(this.class == CVWidgetMS, {
-						if(thisGuiEnv.msEditor.notNil and:{
-							thisGuiEnv.msEditor.isClosed.not
+						if(guiEnv.msEditor.notNil and:{
+							guiEnv.msEditor.isClosed.not
 						}, {
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.string_(
+							guiEnv.msEditor.midiEditGroups[slot].midiSrc.string_(
 								theChanger.value.src
 							);
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.string_(
+							guiEnv.msEditor.midiEditGroups[slot].midiChan.string_(
 								theChanger.value.chan
 							);
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.string_(
+							guiEnv.msEditor.midiEditGroups[slot].midiCtrl.string_(
 								theChanger.value.ctrl
 							);
 							#[midiSrc, midiChan, midiCtrl].do({ |el|
-								thisGuiEnv.msEditor.midiEditGroups[slot].perform(el)
+								guiEnv.msEditor.midiEditGroups[slot].perform(el)
 									.background_(Color.white)
 									.stringColor_(Color.black)
 									.canFocus_(true)
 								;
 							});
-							thisGuiEnv.msEditor.midiEditGroups[slot].midiLearn
+							guiEnv.msEditor.midiEditGroups[slot].midiLearn
 								.states_([
 									["L", Color.white, Color.blue],
 									["X", Color.white, Color.red]
@@ -2647,15 +2635,15 @@ CVWidget {
 							;
 							if(GUI.id !== \cocoa, {
 								if(slot.notNil, { typeText = " at '"++slot++"' " }, { typeText = " " });
-								thisGuiEnv.msEditor.midiEditGroups[slot].midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
-								thisGuiEnv.msEditor.midiEditGroups[slot].midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%".format(typeText));
-								thisGuiEnv.msEditor.midiEditGroups[slot].midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%".format(typeText));
-								thisGuiEnv.msEditor.midiEditGroups[slot].midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%".format(typeText));
+								guiEnv.msEditor.midiEditGroups[slot].midiLearn.toolTip_("Click and and move an arbitrary\nslider on your MIDI-device to\nconnect the widget%to that slider.".format(typeText));
+								guiEnv.msEditor.midiEditGroups[slot].midiSrc.toolTip_("Enter your MIDI-device's ID,\nhit 'return' and click 'C' to\nconnect all sliders of your\ndevice to this widget%".format(typeText));
+								guiEnv.msEditor.midiEditGroups[slot].midiChan.toolTip_("Enter a MIDI-channel, hit 'return'\nand click 'C' to connect all sliders\nin that channel to this widget%".format(typeText));
+								guiEnv.msEditor.midiEditGroups[slot].midiCtrl.toolTip_("Enter a MIDI-ctrl-nr., hit 'return'\nand click 'C' to connect the slider\nwith that number to this widget%".format(typeText));
 							});
 							if(GUI.id !== \cocoa, {
 								[
-									thisGuiEnv.msEditor.midiConnectorBut,
-									thisGuiEnv.msEditor.midiDisconnectorBut
+									guiEnv.msEditor.midiConnectorBut,
+									guiEnv.msEditor.midiDisconnectorBut
 								].do({ |b|
 									if(b.enabled, {
 										b.toolTip_(
@@ -2711,37 +2699,37 @@ CVWidget {
 						})
 					})
 				});
-				if(thisGuiEnv.msEditor.notNil and:{
-					thisGuiEnv.msEditor.isClosed.not
+				if(guiEnv.msEditor.notNil and:{
+					guiEnv.msEditor.isClosed.not
 				}, {
 						// midiOscEnv.postln;
 					if(this.midiOscEnv.collect({ |it| it[\cc] }).takeThese(_.isNil).size < msSize, {
-						thisGuiEnv.msEditor.midiConnectorBut.enabled_(true).states_([
-							[thisGuiEnv.msEditor.midiConnectorBut.states[0][0], thisGuiEnv.msEditor.midiConnectorBut.states[0][1], Color.red]
+						guiEnv.msEditor.midiConnectorBut.enabled_(true).states_([
+							[guiEnv.msEditor.midiConnectorBut.states[0][0], guiEnv.msEditor.midiConnectorBut.states[0][1], Color.red]
 						]);
 						[
-							thisGuiEnv.msEditor.midiSourceSelect,
-							thisGuiEnv.msEditor.midiSrcField,
-							thisGuiEnv.msEditor.midiChanField,
-							thisGuiEnv.msEditor.extMidiCtrlArrayField
+							guiEnv.msEditor.midiSourceSelect,
+							guiEnv.msEditor.midiSrcField,
+							guiEnv.msEditor.midiChanField,
+							guiEnv.msEditor.extMidiCtrlArrayField
 						].do(_.enabled_(true));
 					}, {
-						thisGuiEnv.msEditor.midiConnectorBut.enabled_(false).states_([
-							[thisGuiEnv.msEditor.midiConnectorBut.states[0][0], thisGuiEnv.msEditor.midiConnectorBut.states[0][1], Color.red(alpha: 0.5)]
+						guiEnv.msEditor.midiConnectorBut.enabled_(false).states_([
+							[guiEnv.msEditor.midiConnectorBut.states[0][0], guiEnv.msEditor.midiConnectorBut.states[0][1], Color.red(alpha: 0.5)]
 						]);
 						[
-							thisGuiEnv.msEditor.midiSourceSelect,
-							thisGuiEnv.msEditor.midiSrcField,
-							thisGuiEnv.msEditor.midiChanField,
-							thisGuiEnv.msEditor.extMidiCtrlArrayField
+							guiEnv.msEditor.midiSourceSelect,
+							guiEnv.msEditor.midiSrcField,
+							guiEnv.msEditor.midiChanField,
+							guiEnv.msEditor.extMidiCtrlArrayField
 						].do(_.enabled_(false));
 					});
 					if(this.midiOscEnv.collect({ |it| it[\cc] }).takeThese(_.isNil).size > 0, {
-						thisGuiEnv.msEditor.midiDisconnectorBut.enabled_(true).states_([
-							[thisGuiEnv.msEditor.midiDisconnectorBut.states[0][0], thisGuiEnv.msEditor.midiDisconnectorBut.states[0][1], Color.blue]
+						guiEnv.msEditor.midiDisconnectorBut.enabled_(true).states_([
+							[guiEnv.msEditor.midiDisconnectorBut.states[0][0], guiEnv.msEditor.midiDisconnectorBut.states[0][1], Color.blue]
 						])
-					}, { thisGuiEnv.msEditor.midiDisconnectorBut.enabled_(false).states_([
-						[thisGuiEnv.msEditor.midiDisconnectorBut.states[0][0], thisGuiEnv.msEditor.midiDisconnectorBut.states[0][1], Color.blue(alpha: 0.5)]
+					}, { guiEnv.msEditor.midiDisconnectorBut.enabled_(false).states_([
+						[guiEnv.msEditor.midiDisconnectorBut.states[0][0], guiEnv.msEditor.midiDisconnectorBut.states[0][1], Color.blue(alpha: 0.5)]
 					]) })
 				})
 			})
@@ -2749,7 +2737,7 @@ CVWidget {
 
 	}
 
-	prInitMidiOptions { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+	prInitMidiOptions { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var thisEditor, typeText, tmp;
 
 		wcm.midiOptions.controller ?? {
@@ -2759,12 +2747,12 @@ CVWidget {
 		wcm.midiOptions.controller.put(\default, { |theChanger, what, moreArgs|
 			if(debug, { "widget '%' (%) at slot '%' midiOptions.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
-			// "thisGuiEnv: %\n".postf(thisGuiEnv);
+			// "guiEnv: %\n".postf(guiEnv);
 			switch(this.class,
 				CVWidgetMS, {
-					thisEditor = thisGuiEnv.editor[slot];
+					thisEditor = guiEnv.editor[slot];
 				},
-				{ thisEditor = thisGuiEnv.editor }
+				{ thisEditor = guiEnv.editor }
 			);
 
 			if(thisEditor.notNil and:{
@@ -2777,17 +2765,17 @@ CVWidget {
 				thisEditor.ctrlButtonBankField.string_(theChanger.value.ctrlButtonBank);
 			});
 
-				// thisGuiEnv.postln;
+				// guiEnv.postln;
 			if(this.class != CVWidgetMS, {
 				if(parent.notNil and:{ parent.isClosed.not }, {
 					if(slot.notNil, { typeText = "'s '"++slot++"' slot" }, { typeText = "" });
 					if(GUI.id !== \cocoa, {
-						thisGuiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
+						guiEnv.midiHead.toolTip_(("Edit all MIDI-options\nof this widget%.\nmidiMode:"+theChanger.value.midiMode++"\nmidiMean:"+theChanger.value.midiMean++"\nmidiResolution:"+theChanger.value.midiResolution++"\nsoftWithin:"+theChanger.value.softWithin++"\nctrlButtonBank:"+theChanger.value.ctrlButtonBank).format(typeText));
 					})
 				})
 			}, {
-				// thisGuiEnv.msEditor.postln;
-				if(thisGuiEnv.msEditor.notNil and:{ thisGuiEnv.msEditor.isClosed.not }, {
+				// guiEnv.msEditor.postln;
+				if(guiEnv.msEditor.notNil and:{ guiEnv.msEditor.isClosed.not }, {
 					// [prMidiMode[slot], this.getMidiMode(slot)].postln;
 					(
 						midiModeSelect: prMidiMode,
@@ -2800,41 +2788,41 @@ CVWidget {
 						switch(field,
 							\midiModeSelect, {
 								if(tmp.minItem != tmp.maxItem, {
-									if(thisGuiEnv.msEditor.midiModeSelect.items.size == 2, {
-										thisGuiEnv.msEditor.midiModeSelect.items = thisGuiEnv.msEditor.midiModeSelect.items.add("--");
+									if(guiEnv.msEditor.midiModeSelect.items.size == 2, {
+										guiEnv.msEditor.midiModeSelect.items = guiEnv.msEditor.midiModeSelect.items.add("--");
 									});
-									thisGuiEnv.msEditor.midiModeSelect.value_(2)
+									guiEnv.msEditor.midiModeSelect.value_(2)
 								}, {
-									if(thisGuiEnv.msEditor.midiModeSelect.items.size == 3, {
-										thisGuiEnv.msEditor.midiModeSelect.items.remove(
-											thisGuiEnv.msEditor.midiModeSelect.items.last
+									if(guiEnv.msEditor.midiModeSelect.items.size == 3, {
+										guiEnv.msEditor.midiModeSelect.items.remove(
+											guiEnv.msEditor.midiModeSelect.items.last
 										);
-										thisGuiEnv.msEditor.midiModeSelect.items_(
-											thisGuiEnv.msEditor.midiModeSelect.items
+										guiEnv.msEditor.midiModeSelect.items_(
+											guiEnv.msEditor.midiModeSelect.items
 										)
 									});
-									thisGuiEnv.msEditor.midiModeSelect.value_(prVal[slot]);
+									guiEnv.msEditor.midiModeSelect.value_(prVal[slot]);
 								})
 							},
 							\ctrlButtonBankField, {
 								if((try { tmp.minItem == tmp.maxItem } ?? {
 									tmp.select(_.isNumber).size == tmp.size
 								}), {
-									thisGuiEnv.msEditor.ctrlButtonBankField.string_(prVal[slot]);
+									guiEnv.msEditor.ctrlButtonBankField.string_(prVal[slot]);
 								}, {
-									thisGuiEnv.msEditor.ctrlButtonBankField.string_("--")
+									guiEnv.msEditor.ctrlButtonBankField.string_("--")
 								})
 							},
 							{
 								if(tmp.minItem == tmp.maxItem, {
-									thisGuiEnv.msEditor.perform(field).string_(prVal[slot]);
+									guiEnv.msEditor.perform(field).string_(prVal[slot]);
 								}, {
-									thisGuiEnv.msEditor.perform(field).string_("--");
+									guiEnv.msEditor.perform(field).string_("--");
 								})
 							}
 						)
 					});
-					if(GUI.id !== \cocoa, { thisGuiEnv.midiBut.toolTip_(
+					if(GUI.id !== \cocoa, { guiEnv.midiBut.toolTip_(
 						"Edit all MIDI-options of this widget.\nmidiMode:"+(
 							msSize.collect(this.getMidiMode(_))
 						)++"\nmidiMean:"+(
@@ -2849,7 +2837,7 @@ CVWidget {
 					});
 					if(GUI.id !== \cocoa, {
 						msSize.do({ |sl|
-							thisGuiEnv.msEditor.midiEditGroups[sl].midiHead.toolTip_(
+							guiEnv.msEditor.midiEditGroups[sl].midiHead.toolTip_(
 								"Edit all MIDI-options for slot %:\nmidiMode: %\nmidiMean: %\nmidiResolution: %\nsoftWithin: %\nctrlButtonBank: %".format(
 									sl, this.getMidiMode(sl), this.getMidiMean(sl), this.getMidiResolution(sl), this.getSoftWithin(sl), this.getCtrlButtonBank(sl)
 								)
@@ -2861,7 +2849,7 @@ CVWidget {
 		})
 	}
 
-	prInitOscConnect { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+	prInitOscConnect { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var oscResponderAction, tmp;
 		var intSlots;
 
@@ -3005,7 +2993,7 @@ CVWidget {
 		})
 	}
 
-	prInitOscDisplay { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+	prInitOscDisplay { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var thisEditor, thisOscEditBut, p, tmp;
 		var numOscString, numOscResponders, oscButBg, oscButTextColor;
 		var msEditEnabled;
@@ -3027,9 +3015,9 @@ CVWidget {
 			);
 
 			if(this.class == CVWidgetMS, {
-				thisEditor = thisGuiEnv.editor[slot];
-				thisGuiEnv[\msEditor] !? {
-					thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot];
+				thisEditor = guiEnv.editor[slot];
+				guiEnv[\msEditor] !? {
+					thisOscEditBut = guiEnv.msEditor.oscEditBtns[slot];
 					if(GUI.id !== \cocoa, {
 						if(theChanger.value.but[0] == "edit OSC", {
 							if(slot.notNil, { p =  " in '"++slot++"'" }, { p = "" });
@@ -3044,27 +3032,27 @@ CVWidget {
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size > 0 and:{
 							this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size < msSize
 						}} {
-							thisGuiEnv.oscBut.toolTip_("partially connected - connected slots:\n"++this.midiOscEnv.selectIndex({ |it| it.oscResponder.notNil }))
+							guiEnv.oscBut.toolTip_("partially connected - connected slots:\n"++this.midiOscEnv.selectIndex({ |it| it.oscResponder.notNil }))
 						}
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == msSize } {
-							thisGuiEnv.oscBut.toolTip_("all slots connected.\nClick to edit.")
+							guiEnv.oscBut.toolTip_("all slots connected.\nClick to edit.")
 						}
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == 0 } {
-							thisGuiEnv.toolTip_("no OSC-responders present.\nClick to edit.")
+							guiEnv.toolTip_("no OSC-responders present.\nClick to edit.")
 						}
 					;
 				})
 			}, {
-				thisEditor = thisGuiEnv.editor;
+				thisEditor = guiEnv.editor;
 				if(GUI.id !== \cocoa, {
 					if(theChanger.value.but[0] == "edit OSC", {
 						if(slot.notNil, { p =  " in '"++slot++"'" }, { p = "" });
-						thisGuiEnv.oscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
+						guiEnv.oscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
 					}, {
-						thisGuiEnv.oscEditBut.toolTip_("Connected, listening to\n%, msg-slot %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
+						guiEnv.oscEditBut.toolTip_("Connected, listening to\n%, msg-slot %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
 					})
 				});
-				thisOscEditBut = thisGuiEnv.oscEditBut;
+				thisOscEditBut = guiEnv.oscEditBut;
 			});
 
 			if(parent.isClosed.not, {
@@ -3074,10 +3062,10 @@ CVWidget {
 						// "midiOscEnv.oscResponder is nil".postln;
 						tmp = background
 					}, { tmp = Color.cyan(0.5) });
-					thisGuiEnv.oscEditBut.states_([
+					guiEnv.oscEditBut.states_([
 						[theChanger.value.but[0], theChanger.value.but[1], tmp]
 					]);
-					thisGuiEnv.oscEditBut.refresh;
+					guiEnv.oscEditBut.refresh;
 				}, {
 					numOscResponders = this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size;
 					numOscString = "OSC ("++numOscResponders++"/"++msSize++")";
@@ -3100,41 +3088,41 @@ CVWidget {
 
 			if(this.class == CVWidgetMS, {
 				defer {
-					if(thisGuiEnv.msEditor.notNil and:{
-						thisGuiEnv.msEditor.isClosed.not
+					if(guiEnv.msEditor.notNil and:{
+						guiEnv.msEditor.isClosed.not
 					}, {
 						if(this.midiOscEnv.select({ |sl| sl.oscResponder.notNil }).size < msSize, {
-							thisGuiEnv.msEditor.connectorBut.enabled_(true).states_([
-								[thisGuiEnv.msEditor.connectorBut.states[0][0], thisGuiEnv.msEditor.connectorBut.states[0][1], Color.red]
+							guiEnv.msEditor.connectorBut.enabled_(true).states_([
+								[guiEnv.msEditor.connectorBut.states[0][0], guiEnv.msEditor.connectorBut.states[0][1], Color.red]
 							]);
-						}, { thisGuiEnv.msEditor.connectorBut.enabled_(false).states_([
-							[thisGuiEnv.msEditor.connectorBut.states[0][0], thisGuiEnv.msEditor.connectorBut.states[0][1], Color.red(alpha: 0.5)]
+						}, { guiEnv.msEditor.connectorBut.enabled_(false).states_([
+							[guiEnv.msEditor.connectorBut.states[0][0], guiEnv.msEditor.connectorBut.states[0][1], Color.red(alpha: 0.5)]
 						]) });
 						if(this.midiOscEnv.select({ |sl| sl.oscResponder.notNil }).size > 0, {
-							thisGuiEnv.msEditor.oscDisconnectorBut.enabled_(true).states_([
-								[thisGuiEnv.msEditor.oscDisconnectorBut.states[0][0], thisGuiEnv.msEditor.oscDisconnectorBut.states[0][1], Color.blue]
+							guiEnv.msEditor.oscDisconnectorBut.enabled_(true).states_([
+								[guiEnv.msEditor.oscDisconnectorBut.states[0][0], guiEnv.msEditor.oscDisconnectorBut.states[0][1], Color.blue]
 							])
-						}, { thisGuiEnv.msEditor.oscDisconnectorBut.enabled_(false).states_([
-							[thisGuiEnv.msEditor.oscDisconnectorBut.states[0][0], thisGuiEnv.msEditor.oscDisconnectorBut.states[0][1], Color.blue(alpha: 0.5)]
+						}, { guiEnv.msEditor.oscDisconnectorBut.enabled_(false).states_([
+							[guiEnv.msEditor.oscDisconnectorBut.states[0][0], guiEnv.msEditor.oscDisconnectorBut.states[0][1], Color.blue(alpha: 0.5)]
 						]) });
-						// thisGuiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
+						// guiEnv.msEditor.connectorBut.value_(theChanger.value.connectorButVal);
 						if(theChanger.value.ipField.notNil, {
 							if(theChanger.value.portField.notNil, {
-								thisGuiEnv.msEditor.portRestrictor.value_(1);
+								guiEnv.msEditor.portRestrictor.value_(1);
 								if(this.midiOscEnv.collect({ |it|
 									it.oscResponder !? { it.oscResponder.addr }
 								}).takeThese(_.isNil).asBag.contents.size > 1, {
-									thisGuiEnv.msEditor.deviceDropDown.items_(
-										["receiving OSC-messages from various addresses..."]++thisGuiEnv.msEditor.deviceDropDown.items[1..]
+									guiEnv.msEditor.deviceDropDown.items_(
+										["receiving OSC-messages from various addresses..."]++guiEnv.msEditor.deviceDropDown.items[1..]
 									)
 								}, {
 									if(theChanger.value.portField.notNil, {
-										thisGuiEnv.msEditor.deviceDropDown.items_(
-											["select IP-address:port... (optional)"]++thisGuiEnv.msEditor.deviceDropDown.items[1..]
+										guiEnv.msEditor.deviceDropDown.items_(
+											["select IP-address:port... (optional)"]++guiEnv.msEditor.deviceDropDown.items[1..]
 										)
 									}, {
-										thisGuiEnv.msEditor.deviceDropDown.items_(
-											["select IP-address... (optional)"]++thisGuiEnv.msEditor.deviceDropDown.items[1..]
+										guiEnv.msEditor.deviceDropDown.items_(
+											["select IP-address... (optional)"]++guiEnv.msEditor.deviceDropDown.items[1..]
 										)
 									})
 								})
@@ -3147,20 +3135,20 @@ CVWidget {
 							msEditEnabled = false;
 						});
 						[
-							thisGuiEnv.msEditor.deviceDropDown,
-							thisGuiEnv.msEditor.portRestrictor,
-							thisGuiEnv.msEditor.deviceListMenu,
-							thisGuiEnv.msEditor.cmdListMenu,
-							thisGuiEnv.msEditor.extOscCtrlArrayField,
-							thisGuiEnv.msEditor.intStartIndexField,
-							thisGuiEnv.msEditor.nameField,
-							thisGuiEnv.msEditor.indexField
+							guiEnv.msEditor.deviceDropDown,
+							guiEnv.msEditor.portRestrictor,
+							guiEnv.msEditor.deviceListMenu,
+							guiEnv.msEditor.cmdListMenu,
+							guiEnv.msEditor.extOscCtrlArrayField,
+							guiEnv.msEditor.intStartIndexField,
+							guiEnv.msEditor.nameField,
+							guiEnv.msEditor.indexField
 						].do(_.enabled_(msEditEnabled));
 
 						if(GUI.id !== \cocoa, {
 							[
-								thisGuiEnv.msEditor.connectorBut,
-								thisGuiEnv.msEditor.oscDisconnectorBut
+								guiEnv.msEditor.connectorBut,
+								guiEnv.msEditor.oscDisconnectorBut
 							].do({ |b|
 								if(b.enabled, {
 									b.toolTip_(
@@ -3202,7 +3190,7 @@ CVWidget {
 		})
 	}
 
-	prInitOscInputRange { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+	prInitOscInputRange { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var thisEditor, thisOscEditBut, p, tmp;
 		var mappingsDiffer;
 
@@ -3217,13 +3205,13 @@ CVWidget {
 			midiOscEnv.calibConstraints = (lo: theChanger.value[0], hi: theChanger.value[1]);
 
 			if(this.class == CVWidgetMS, {
-				thisEditor = thisGuiEnv.editor[slot];
-				thisGuiEnv.msEditor !? {
-					thisOscEditBut = thisGuiEnv.msEditor.oscEditBtns[slot];
+				thisEditor = guiEnv.editor[slot];
+				guiEnv.msEditor !? {
+					thisOscEditBut = guiEnv.msEditor.oscEditBtns[slot];
 				}
 			}, {
-				thisEditor = thisGuiEnv.editor;
-				thisOscEditBut = thisGuiEnv.oscEditBut;
+				thisEditor = guiEnv.editor;
+				thisOscEditBut = guiEnv.oscEditBut;
 			});
 
 			{
@@ -3241,8 +3229,8 @@ CVWidget {
 				});
 
 				if(this.class == CVWidgetMS, {
-					if(thisGuiEnv.msEditor.notNil and:{
-						thisGuiEnv.msEditor.isClosed.not
+					if(guiEnv.msEditor.notNil and:{
+						guiEnv.msEditor.isClosed.not
 					}, {
 						tmp = msSize.collect({ |sl| this.getOscMapping(sl) });
 						block { |break|
@@ -3261,11 +3249,11 @@ CVWidget {
 
 
 						if(mappingsDiffer, {
-							thisGuiEnv.msEditor.mappingSelect.value_(0);
+							guiEnv.msEditor.mappingSelect.value_(0);
 						}, {
-							thisGuiEnv.msEditor.mappingSelect.items.do({ |item, i|
+							guiEnv.msEditor.mappingSelect.items.do({ |item, i|
 								if(item.asSymbol === midiOscEnv.oscMapping, {
-									thisGuiEnv.msEditor.mappingSelect.value_(i);
+									guiEnv.msEditor.mappingSelect.value_(i);
 								})
 							})
 						})
@@ -3274,19 +3262,19 @@ CVWidget {
 
 				if(parent.isClosed.not, {
 					if(this.class != CVWidgetMS, {
-						if(thisGuiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
-							thisGuiEnv.oscEditBut.states_([[
-								thisGuiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
-								thisGuiEnv.oscEditBut.states[0][1],
-								thisGuiEnv.oscEditBut.states[0][2]
+						if(guiEnv.oscEditBut.states[0][0].split($\n)[0] != "edit OSC", {
+							guiEnv.oscEditBut.states_([[
+								guiEnv.oscEditBut.states[0][0].split($\n)[0]++"\n"++midiOscEnv.oscMapping.asString,
+								guiEnv.oscEditBut.states[0][1],
+								guiEnv.oscEditBut.states[0][2]
 							]]);
 							if(GUI.id !== \cocoa, {
-								p = thisGuiEnv.oscEditBut.toolTip.split($\n);
+								p = guiEnv.oscEditBut.toolTip.split($\n);
 								p[2] = "using '"++midiOscEnv.oscMapping.asString++"' in-output mapping";
 								p = p.join("\n");
-								thisGuiEnv.oscEditBut.toolTip_(p);
+								guiEnv.oscEditBut.toolTip_(p);
 							});
-							thisGuiEnv.oscEditBut.refresh;
+							guiEnv.oscEditBut.refresh;
 						})
 					})
 				})
@@ -3294,7 +3282,7 @@ CVWidget {
 		})
 	}
 
-	prInitActionsControl { |wcm, thisGuiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+	prInitActionsControl { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 
 		wcm.actions.controller ?? {
 			switch(this.class,
@@ -3310,14 +3298,37 @@ CVWidget {
 			if(debug, { "widget '%' (%) at slot '%' actions.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			if(parent.isClosed.not, {
-				thisGuiEnv.actionsBut.states_([[
+				guiEnv.actionsBut.states_([[
 					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
 					Color(0.08, 0.09, 0.14),
 					Color(0.32, 0.67, 0.76),
 				]]);
 				if(GUI.id !== \cocoa, {
-					thisGuiEnv.actionsBut.toolTip_(""++theChanger.value.activeActions++" of "++theChanger.value.numActions++" active.\nClick to edit")
+					guiEnv.actionsBut.toolTip_(""++theChanger.value.activeActions++" of "++theChanger.value.numActions++" active.\nClick to edit")
 				})
+			})
+		})
+	}
+
+	prInitSlidersTextConnection { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
+
+		wdgtControllersAndModels.slidersTextConnection.controller ?? {
+			wdgtControllersAndModels.slidersTextConnection.controller = SimpleController(
+				wdgtControllersAndModels.slidersTextConnection.model
+			);
+		};
+
+		wdgtControllersAndModels.slidersTextConnection.controller.put(\default, { |theChanger, what, moreArgs|
+			if(theChanger.value[0], {
+				// connect sliders
+			}, {
+				// disconnect sliders
+			});
+			if(theChanger.value[1], {
+				// connect textfields
+
+			}, {
+				// disconnect textfields
 			})
 		})
 	}

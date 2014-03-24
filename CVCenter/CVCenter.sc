@@ -1659,6 +1659,28 @@ CVCenter {
 		^this.add(key, spec ?? { this.findSpec(key) }, value, tab, slot, svItems, connectS ? this.connectSliders, connectTF ? this.connectTextFields)
 	}
 
+	*widgetConnectGUI { |key, connectSliders, connectTextFields|
+		var thisKey;
+		thisKey = key.asSymbol;
+		connectSliders !? {
+			connectSliders.isKindOf(Boolean).not.if{
+				Error("connectSliders must either be a Boolean or nil!").throw;
+			}
+		};
+		connectTextFields !? {
+			connectTextFields.isKindOf(Boolean).not.if{
+				Error("connectTextFields must either be a Boolean or nil!").throw;
+			}
+		};
+		widgetStates !? {
+			widgetStates[thisKey] !? {
+				cvWidgets[key].connectGUI(connectSliders, connectTextFields);
+				connectSliders !? { widgetStates[key].slidersConnected = connectSliders };
+				connectTextFields !? { widgetStates[key].textFieldsConnected = connectTextFields };
+			}
+		}
+	}
+
 	*setup {
 		^(
 			midiMode: this.midiMode,
