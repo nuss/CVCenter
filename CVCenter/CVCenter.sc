@@ -1681,6 +1681,7 @@ CVCenter {
 		}
 	}
 
+
 	*setup {
 		^(
 			midiMode: this.midiMode,
