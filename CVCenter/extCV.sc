@@ -6,6 +6,7 @@
 
 	cvWidgetDisconnect { |object|
 		object.remove;
+		// ^object = nil;
 	}
 
 }
@@ -18,6 +19,7 @@
 
 	cvWidgetDisconnect { |object|
 		object.remove;
+		// ^object = nil;
 	}
 
 }

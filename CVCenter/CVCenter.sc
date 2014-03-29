@@ -811,10 +811,10 @@ CVCenter {
 
 			all.pairsDo({ |key, cv|
 				// [key, cv].postln;
-				widgetStates !? {
-					widgetStates[key] !? {
-						tmpConnectS = widgetStates[key].slidersConnected;
-						tmpConnectTF = widgetStates[key].textFieldsConnected;
+				cvWidgets[key] !? {
+					cvWidgets[key].wdgtControllersAndModels !? { |wcm|
+						tmpConnectS = cvWidgets[key].wdgtControllersAndModels.slidersTextConnection.model.value[0];
+						tmpConnectTF = cvWidgets[key].wdgtControllersAndModels.slidersTextConnection.model.value[1];
 					}
 				};
 
@@ -831,8 +831,8 @@ CVCenter {
 								thisTabLabel,
 								(key: key, slot: slot, spec: all[key][slot].spec),
 								key,
-								tmpConnectS ? this.connectSliders,
-								tmpConnectTF ? this.connectTextFields
+								tmpConnectS ? this.connectSliders.postln,
+								tmpConnectTF ? this.connectTextFields.postln
 							);
 							this.at(key)[slot].value_(tmp);
 						})
@@ -1168,14 +1168,14 @@ CVCenter {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
 							tabKey: thisTabLabel,
-							slidersConnected: connectS ? this.connectSliders,
-							textFieldsConnected: connectTF ? this.connectTextFields
+						// slidersConnected: connectS ? this.connectSliders,
+						// textFieldsConnected: connectTF ? this.connectTextFields
 						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
-						widgetStates[key].slidersConnected = connectS ? this.connectSliders;
-						widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
+					// widgetStates[key].slidersConnected = connectS ? this.connectSliders;
+					// widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
 					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
@@ -1224,14 +1224,14 @@ CVCenter {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
 							tabKey: thisTabLabel,
-							slidersConnected: connectS ? this.connectSliders,
-							textFieldsConnected: connectTF ? this.connectTextFields
+						// slidersConnected: connectS ? this.connectSliders,
+						// textFieldsConnected: connectTF ? this.connectTextFields
 						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
-						widgetStates[key].slidersConnected = connectS ? this.connectSliders;
-						widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
+					// widgetStates[key].slidersConnected = connectS ? this.connectSliders;
+					// widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
 					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
@@ -1272,14 +1272,14 @@ CVCenter {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
 							tabKey: thisTabLabel,
-							slidersConnected: connectS ? this.connectSliders,
-							textFieldsConnected: connectTF ? this.connectTextFields
+						// slidersConnected: connectS ? this.connectSliders,
+						// textFieldsConnected: connectTF ? this.connectTextFields
 						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
-						widgetStates[key].slidersConnected = connectS ? this.connectSliders;
-						widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
+					// widgetStates[key].slidersConnected = connectS ? this.connectSliders;
+					// widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
 					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
@@ -1675,8 +1675,6 @@ CVCenter {
 		widgetStates !? {
 			widgetStates[thisKey] !? {
 				cvWidgets[key].connectGUI(connectSliders, connectTextFields);
-				connectSliders !? { widgetStates[key].slidersConnected = connectSliders };
-				connectTextFields !? { widgetStates[key].textFieldsConnected = connectTextFields };
 			}
 		}
 	}

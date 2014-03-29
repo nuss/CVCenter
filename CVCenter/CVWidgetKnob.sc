@@ -171,7 +171,29 @@ CVWidgetKnob : CVWidget {
 			.mode_(\vert)
 			.focusColor_(Color.green)
 		;
-		if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
+
+		activeSliderB = Button(parent, Rect(thisXY.x+thisWidth-9, thisXY.y+knobsize+5, 7, 7))
+			.states_([
+				["", Color.black, Color.red],
+				["", Color.black, Color.green]
+			])
+			.action_({ |b| this.connectGUI(b.value.asBoolean.postln) })
+		;
+
+		connectS !? { activeSliderB.value_(connectS.asInteger) };
+
+		// "model: %\n".postf(wdgtControllersAndModels.slidersTextConnection);
+
+		if(GUI.id !== \cocoa, {
+			if(wdgtControllersAndModels.slidersTextConnection.model.value[0], {
+				activeSliderB.toolTip_("deactivate CV-knob connection")
+			}, {
+				activeSliderB.toolTip_("activate CV-knob connection")
+			})
+		});
+
+		if(widgetCV.spec.excludingZeroCrossing, { knob.centered_(true) });
+		// if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
 		nextY = thisXY.y+thisHeight-112;
 		numVal = NumberBox(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(widgetCV.value).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9.5))
@@ -431,8 +453,6 @@ CVWidgetKnob : CVWidget {
 
 		if(prCalibrate, { calibBut.value_(0) }, { calibBut.value_(1) });
 
-		if(connectS, { this.connectGUI(true, nil) });
-		if(connectTF, { this.connectGUI(nil, true) });
 		// [knob, numVal].do({ |view| widgetCV.connect(view) });
 
 		visibleGuiEls = [
@@ -480,6 +500,9 @@ CVWidgetKnob : CVWidget {
 		focusElements = allGuiEls.copy.removeAll([widgetBg, nameField, calibBut]);
 
 		this.initControllerActions;
+
+		connectS !? { this.connectGUI(connectS, nil) };
+		connectTF !? { this.connectGUI(nil, connectTF) };
 		// this.setShortcuts;
 		focusElements.do({ |el|
 			KeyDownActions.setShortcuts(el, this.class.shortcuts);
@@ -503,6 +526,8 @@ CVWidgetKnob : CVWidget {
 				parent: window,
 				cv: widgetCV,
 				name: oldName,
+				connectKnob: wdgtControllersAndModels.slidersTextConnection.model.value[0],
+				connectNumVal: wdgtControllersAndModels.slidersTextConnection.model.value[1],
 				bounds: thisBounds,
 				setup: this.setup,
 				controllersAndModels: wdgtControllersAndModels,
@@ -535,20 +560,20 @@ CVWidgetKnob : CVWidget {
 		})
 	}
 
-	connectGUI { |connectSlider = true, connectTextField = true|
-		connectSlider !? {
-			if(connectSlider, {
-				sliderConnection = widgetCV.cvWidgetConnect(knob);
-			}, { widgetCV.cvWidgetDisconnect(sliderConnection) });
-			connectS = connectSlider;
-		};
-		connectTextField !? {
-			if(connectTextField, {
-				textConnection = widgetCV.cvWidgetConnect(numVal);
-			}, { widgetCV.cvWidgetDisconnect(textConnection) });
-			connectTF = connectTextField;
-		};
-	}
+	// connectGUI { |connectSlider = true, connectTextField = true|
+	// 	connectSlider !? {
+	// 		if(connectSlider, {
+	// 			sliderConnection = widgetCV.cvWidgetConnect(knob);
+	// 		}, { widgetCV.cvWidgetDisconnect(sliderConnection) });
+	// 		connectS = connectSlider;
+	// 	};
+	// 	connectTextField !? {
+	// 		if(connectTextField, {
+	// 			textConnection = widgetCV.cvWidgetConnect(numVal);
+	// 		}, { widgetCV.cvWidgetDisconnect(textConnection) });
+	// 		connectTF = connectTextField;
+	// 	};
+	// }
 
 	background_ { |color|
 		background = color;

@@ -20,6 +20,7 @@ CVWidget {
 	classvar <>removeResponders = true, <>midiSources, <>shortcuts, prefs/*, midiStateObserver*/;
 	classvar <>debug = false;
 	var <parent, <widgetCV, <name, <connectS = true, <connectTF = true;
+	var <activeSliderB, <activeTextB;
 	var sliderConnection, textConnection;
 	var <guiEnv;
 	var prDefaultAction, <>wdgtActions, <background, <stringColor, <alwaysPositive = 0.1;
@@ -685,6 +686,12 @@ CVWidget {
 				)
 			})
 		})
+	}
+
+	connectGUI { |connectSlider = true, connectTextField = true|
+		wdgtControllersAndModels.slidersTextConnection.model.value_(
+			[connectSlider, connectTextField]
+		).changedKeys(synchKeys)
 	}
 
 	setMidiMode { |mode, slot|
@@ -3319,17 +3326,61 @@ CVWidget {
 		};
 
 		wdgtControllersAndModels.slidersTextConnection.controller.put(\default, { |theChanger, what, moreArgs|
-			if(theChanger.value[0], {
-				// connect sliders
-			}, {
-				// disconnect sliders
-			});
-			if(theChanger.value[1], {
-				// connect textfields
+			if(debug, { "widget '%' (%) slidersTextConnection.model: %\n".postf(this.name, this.class, theChanger) });
+			"theChanger.value: %\n".postf(theChanger.value);
+			theChanger.value[0] !? {
+				if(theChanger.value[0], {
+					// connect sliders
+					switch(this.class,
+						CVWidget2D, {
+							[this.slider2d, this.rangeSlider].do({ |view|
+								sliderConnection = [widgetCV.lo, widgetCV.hi].cvWidgetConnect(view);
+							})
+						},
+						CVWidgetMS, {
+							sliderConnection = widgetCV.cvWidgetConnect(this.mSlider);
+						},
+						CVWidgetKnob, {
+							sliderConnection = widgetCV.cvWidgetConnect(this.knob);
+						}
+					)
+				}, {
+					// disconnect sliders
+					if(this.class == CVWidget2D, {
+						[widgetCV.lo, widgetCV.hi].cvWidgetDisconnect(sliderConnection);
+					}, {
+						widgetCV.cvWidgetDisconnect(sliderConnection);
+					});
+					sliderConnection = nil;
+				})
+			};
+			theChanger.value[1] !? {
+				if(theChanger.value[1], {
+					// connect textfields
+					if(this.class == CVWidget2D, {
+						textConnection = ();
+						#[lo, hi].do{ |hilo|
+							textConnection.put(hilo, widgetCV[hilo].cvWidgetConnect(this.numVal[hilo]));
+						}
+					}, {
+						textConnection = widgetCV.cvWidgetConnect(this.numVal);
+					})
+				}, {
+					// disconnect textfields
+					if(this.class == CVWidget2D, {
+						#[lo, hi].do{ |hilo|
+							widgetCV[hilo].cvWidgetDisconnect(textConnection[hilo]);
+						}
+					}, {
+						widgetCV.cvWidgetDisconnect(textConnection);
+					});
+					textConnection = nil;
+				})
+			};
 
-			}, {
-				// disconnect textfields
-			})
+			wdgtControllersAndModels.slidersTextConnection.model.value_(
+				[connectS = sliderConnection.notNil, connectTF = textConnection.notNil]
+			)
 		})
 	}
 

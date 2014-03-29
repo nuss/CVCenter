@@ -636,13 +636,6 @@ CVWidget2D : CVWidget {
 
 		#[lo, hi].do({ |slot| if(prCalibrate[slot], { calibBut[slot].value_(0) }, { calibBut[slot].value_(1) }) });
 
-		// widgetCV
-		// [slider2d, rangeSlider].do({ |view| [widgetCV.lo, widgetCV.hi].connect(view) });
-		// widgetCV.lo.connect(numVal.lo);
-		// widgetCV.hi.connect(numVal.hi);
-		if(connectS, { this.connectGUI(true, nil) });
-		if(connectTF, { this.connectGUI(nil, true) });
-
 		visibleGuiEls = [
 			slider2d,
 			rangeSlider,
@@ -697,7 +690,9 @@ CVWidget2D : CVWidget {
 			this.initControllerActions(slot);
 		});
 
-		// this.setShortcuts;
+		connectS !? { this.connectGUI(connectS, nil) };
+		connectTF !? { this.connectGUI(nil, connectTF) };
+
 		focusElements.do({ |el|
 			KeyDownActions.setShortcuts(el, this.class.shortcuts);
 		});
@@ -720,6 +715,8 @@ CVWidget2D : CVWidget {
 				parent: window,
 				cvs: [widgetCV.lo, widgetCV.hi],
 				name: oldName,
+				connectSliders: wdgtControllersAndModels.slidersTextConnection.model.value[0],
+				connectTextFields: wdgtControllersAndModels.slidersTextConnection.model.value[1],
 				bounds: thisBounds,
 				setup: this.setup,
 				controllersAndModels: wdgtControllersAndModels,
@@ -756,7 +753,7 @@ CVWidget2D : CVWidget {
 		})
 	}
 
-	connectGUI { |connectSlider = true, connectTextField = true|
+/*	connectGUI { |connectSlider = true, connectTextField = true|
 		connectSlider !? {
 			if(connectSlider, {
 				[slider2d, rangeSlider].do{ |view|
@@ -778,7 +775,7 @@ CVWidget2D : CVWidget {
 			});
 			connectTF = connectTextField;
 		};
-	}
+	}*/
 
 	background_ { |color|
 		background = color;

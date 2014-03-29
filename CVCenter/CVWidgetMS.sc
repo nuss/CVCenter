@@ -427,10 +427,8 @@ CVWidgetMS : CVWidget {
 
 		msSize.do({ |slot| this.initControllerActions(slot) });
 
-		// widgetCV.connect(mSlider);
-		// widgetCV.connect(numVal);
-		if(connectS, { this.connectGUI(true, nil) });
-		if(connectTF, { this.connectGUI(nil, true) });
+		connectS !? { this.connectGUI(connectS, nil) };
+		connectTF !? { this.connectGUI(nil, connectTF) };
 
 		// this.setShortcuts;
 		focusElements.do({ |el|
@@ -455,6 +453,8 @@ CVWidgetMS : CVWidget {
 				parent: window,
 				cv: widgetCV,
 				name: oldName,
+				connectMSlider: wdgtControllersAndModels.slidersTextConnection.model.value[0],
+				connectTextField: wdgtControllersAndModels.slidersTextConnection.model.value[1],
 				bounds: thisBounds,
 				setup: this.setup,
 				controllersAndModels: wdgtControllersAndModels,
@@ -497,20 +497,20 @@ CVWidgetMS : CVWidget {
 		})
 	}
 
-	connectGUI { |connectSlider = true, connectTextField = true|
-		connectSlider !? {
-			if(connectSlider, {
-				sliderConnection = widgetCV.cvWidgetConnect(mSlider);
-			}, { widgetCV.cvWidgetDisconnect(sliderConnection) });
-			connectS = connectSlider;
-		};
-		connectTextField !? {
-			if(connectTextField, {
-				textConnection = widgetCV.cvWidgetConnect(numVal);
-			}, { widgetCV.cvWidgetDisconnect(textConnection) });
-			connectTF = connectTextField;
-		};
-	}
+	// connectGUI { |connectSlider = true, connectTextField = true|
+	// 	connectSlider !? {
+	// 		if(connectSlider, {
+	// 			sliderConnection = widgetCV.cvWidgetConnect(mSlider);
+	// 		}, { widgetCV.cvWidgetDisconnect(sliderConnection) });
+	// 		connectS = connectSlider;
+	// 	};
+	// 	connectTextField !? {
+	// 		if(connectTextField, {
+	// 			textConnection = widgetCV.cvWidgetConnect(numVal);
+	// 		}, { widgetCV.cvWidgetDisconnect(textConnection) });
+	// 		connectTF = connectTextField;
+	// 	};
+	// }
 
 	background_ { |color|
 		background = color;
