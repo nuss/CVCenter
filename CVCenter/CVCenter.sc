@@ -831,8 +831,8 @@ CVCenter {
 								thisTabLabel,
 								(key: key, slot: slot, spec: all[key][slot].spec),
 								key,
-								tmpConnectS ? this.connectSliders.postln,
-								tmpConnectTF ? this.connectTextFields.postln
+								tmpConnectS ? this.connectSliders,
+								tmpConnectTF ? this.connectTextFields
 							);
 							this.at(key)[slot].value_(tmp);
 						})
