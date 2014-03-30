@@ -458,6 +458,8 @@ CVWidgetKnob : CVWidget {
 		visibleGuiEls = [
 			knob,
 			numVal,
+			activeSliderB,
+			// activeTextB,
 			specBut,
 			midiHead,
 			midiLearn,
@@ -474,6 +476,8 @@ CVWidgetKnob : CVWidget {
 			nameField,
 			knob,
 			numVal,
+			activeSliderB,
+			// activeTextB,
 			specBut,
 			midiHead,
 			midiLearn,
@@ -497,12 +501,16 @@ CVWidgetKnob : CVWidget {
 			midiLearn: midiLearn
 		);
 
-		focusElements = allGuiEls.copy.removeAll([widgetBg, nameField, calibBut]);
+		focusElements = allGuiEls.copy.removeAll([
+			widgetBg, nameField, calibBut, activeSliderB,activeTextB
+		]);
 
 		this.initControllerActions;
 
-		connectS !? { this.connectGUI(connectS, nil) };
-		connectTF !? { this.connectGUI(nil, connectTF) };
+		// "CVWidgetKnob.new: connectS: %, connectTF: %\n".postf(connectS, connectTF);
+
+		connectS !? { /*"connectSliders".postln; */this.connectGUI(connectS, nil) };
+		connectTF !? { /*"connectTextFields".postln; */this.connectGUI(nil, connectTF) };
 		// this.setShortcuts;
 		focusElements.do({ |el|
 			KeyDownActions.setShortcuts(el, this.class.shortcuts);

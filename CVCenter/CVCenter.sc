@@ -818,6 +818,8 @@ CVCenter {
 					}
 				};
 
+				// "tmpConnectS: %, tmpConnectTF: %\n".postf(tmpConnectS, tmpConnectTF);
+
 				if((cvWidgets[key].notNil and:{ cvWidgets[key].isClosed }).or(
 					cvWidgets[key].isNil
 				), {
@@ -838,9 +840,20 @@ CVCenter {
 						})
 					}, {
 						if(systemWidgets.includes(key).not, {
-							this.prAddWidget(thisTabLabel, key: key);
+							this.prAddWidget(
+								thisTabLabel,
+								key: key,
+								connectS: tmpConnectS ? this.connectSliders,
+								connectTF: tmpConnectTF ? this.connectTextFields
+							);
 						}, {
-							this.prAddWidget(\default, key: key);
+							// "tmpConnectS: %, tmpConnectTF: %, this.connectSliders: %, this.connectTextFields: %\n".postf(tmpConnectS, tmpConnectTF, this.connectSliders, this.connectTextFields);
+							this.prAddWidget(
+								\default,
+								key: key,
+								connectS: tmpConnectS ? this.connectSliders,
+								connectTF: tmpConnectTF ? this.connectTextFields
+							);
 							case
 								{ (key == \snapshot).or(key == 'select snapshot') } {
 									cvWidgets[key].background_(Color.yellow);
@@ -1249,6 +1262,9 @@ CVCenter {
 					),
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
+
+			// "connectS: %, connectTF: %\n".postf(connectS, connectTF);
+
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
 					cvWidgets[key] = CVWidgetKnob(
 						thisTab,
@@ -1272,14 +1288,10 @@ CVCenter {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
 							tabKey: thisTabLabel,
-						// slidersConnected: connectS ? this.connectSliders,
-						// textFieldsConnected: connectTF ? this.connectTextFields
 						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
-					// widgetStates[key].slidersConnected = connectS ? this.connectSliders;
-					// widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
 					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
