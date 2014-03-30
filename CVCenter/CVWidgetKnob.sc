@@ -507,10 +507,9 @@ CVWidgetKnob : CVWidget {
 
 		this.initControllerActions;
 
-		// "CVWidgetKnob.new: connectS: %, connectTF: %\n".postf(connectS, connectTF);
-
 		connectS !? { /*"connectSliders".postln; */this.connectGUI(connectS, nil) };
 		connectTF !? { /*"connectTextFields".postln; */this.connectGUI(nil, connectTF) };
+
 		// this.setShortcuts;
 		focusElements.do({ |el|
 			KeyDownActions.setShortcuts(el, this.class.shortcuts);

@@ -3378,8 +3378,13 @@ CVWidget {
 				})
 			};
 
+			// "theChanger.value: %\n".postf(theChanger.value);
+			theChanger.value[0].isKindOf(Boolean).if{ connectS = theChanger.value[0] };
+			theChanger.value[1].isKindOf(Boolean).if{ connectTF = theChanger.value[1] };
+			// "connectS: %, connectTF: %\n".postf(connectS, connectTF);
+
 			wdgtControllersAndModels.slidersTextConnection.model.value_(
-				[connectS = sliderConnection.notNil, connectTF = textConnection.notNil]
+				[sliderConnection.notNil, textConnection.notNil]
 			)
 		})
 	}
