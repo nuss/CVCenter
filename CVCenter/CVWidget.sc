@@ -3342,6 +3342,7 @@ CVWidget {
 						},
 						CVWidgetKnob, {
 							sliderConnection = widgetCV.cvWidgetConnect(this.knob);
+							this.activeSliderB.value_(1);
 						}
 					)
 				}, {
@@ -3350,6 +3351,7 @@ CVWidget {
 						[widgetCV.lo, widgetCV.hi].cvWidgetDisconnect(sliderConnection);
 					}, {
 						widgetCV.cvWidgetDisconnect(sliderConnection);
+						this.activeSliderB.value_(0);
 					});
 					sliderConnection = nil;
 				})
@@ -3364,6 +3366,7 @@ CVWidget {
 						}
 					}, {
 						textConnection = widgetCV.cvWidgetConnect(this.numVal);
+						this.activeTextB.value_(1);
 					})
 				}, {
 					// disconnect textfields
@@ -3373,6 +3376,7 @@ CVWidget {
 						}
 					}, {
 						widgetCV.cvWidgetDisconnect(textConnection);
+						this.activeTextB.value_(0);
 					});
 					textConnection = nil;
 				})

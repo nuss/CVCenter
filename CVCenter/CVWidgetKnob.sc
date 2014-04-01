@@ -177,7 +177,7 @@ CVWidgetKnob : CVWidget {
 				["", Color.black, Color.red],
 				["", Color.black, Color.green]
 			])
-			.action_({ |b| this.connectGUI(b.value.asBoolean.postln) })
+			.action_({ |b| this.connectGUI(b.value.asBoolean) })
 		;
 
 		connectS !? { activeSliderB.value_(connectS.asInteger) };
@@ -195,10 +195,32 @@ CVWidgetKnob : CVWidget {
 		if(widgetCV.spec.excludingZeroCrossing, { knob.centered_(true) });
 		// if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
 		nextY = thisXY.y+thisHeight-112;
+
 		numVal = NumberBox(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(widgetCV.value).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9.5))
 			.focusColor_(Color.green)
 		;
+
+		activeTextB = Button(parent, Rect(thisXY.x+thisWidth-9, nextY+7, 7, 7))
+			.states_([
+				["", Color.black, Color.red],
+				["", Color.black, Color.green]
+			])
+			.action_({ |b| this.connectGUI(connectTextField: b.value.asBoolean) })
+		;
+
+		connectTF !? { activeTextB.value_(connectTF.asInteger) };
+
+		// "model: %\n".postf(wdgtControllersAndModels.slidersTextConnection);
+
+		if(GUI.id !== \cocoa, {
+			if(wdgtControllersAndModels.slidersTextConnection.model.value[1], {
+				activeTextB.toolTip_("deactivate CV-numberbox connection")
+			}, {
+				activeTextB.toolTip_("activate CV-numberbox connection")
+			})
+		});
+
 		nextY = nextY+numVal.bounds.height;
 		specBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
