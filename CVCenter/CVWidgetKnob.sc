@@ -177,7 +177,7 @@ CVWidgetKnob : CVWidget {
 				["", Color.black, Color.red],
 				["", Color.black, Color.green]
 			])
-			.action_({ |b| this.connectGUI(b.value.asBoolean) })
+			.action_({ |b| this.connectGUI(b.value.asBoolean, nil) })
 		;
 
 		connectS !? { activeSliderB.value_(connectS.asInteger) };
@@ -186,9 +186,9 @@ CVWidgetKnob : CVWidget {
 
 		if(GUI.id !== \cocoa, {
 			if(wdgtControllersAndModels.slidersTextConnection.model.value[0], {
-				activeSliderB.toolTip_("deactivate CV-knob connection")
+				activeSliderB.toolTip_("deactivate CV-slider connection")
 			}, {
-				activeSliderB.toolTip_("activate CV-knob connection")
+				activeSliderB.toolTip_("activate CV-slider connection")
 			})
 		});
 
@@ -206,7 +206,7 @@ CVWidgetKnob : CVWidget {
 				["", Color.black, Color.red],
 				["", Color.black, Color.green]
 			])
-			.action_({ |b| this.connectGUI(connectTextField: b.value.asBoolean) })
+			.action_({ |b| this.connectGUI(nil, b.value.asBoolean) })
 		;
 
 		connectTF !? { activeTextB.value_(connectTF.asInteger) };
@@ -481,7 +481,7 @@ CVWidgetKnob : CVWidget {
 			knob,
 			numVal,
 			activeSliderB,
-			// activeTextB,
+			activeTextB,
 			specBut,
 			midiHead,
 			midiLearn,
@@ -499,7 +499,7 @@ CVWidgetKnob : CVWidget {
 			knob,
 			numVal,
 			activeSliderB,
-			// activeTextB,
+			activeTextB,
 			specBut,
 			midiHead,
 			midiLearn,
@@ -524,7 +524,7 @@ CVWidgetKnob : CVWidget {
 		);
 
 		focusElements = allGuiEls.copy.removeAll([
-			widgetBg, nameField, calibBut, activeSliderB,activeTextB
+			widgetBg, nameField, calibBut, activeSliderB, activeTextB
 		]);
 
 		this.initControllerActions;

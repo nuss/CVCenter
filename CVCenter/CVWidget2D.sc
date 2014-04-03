@@ -222,6 +222,26 @@ CVWidget2D : CVWidget {
 			.focusColor_(Color.green)
 		;
 
+		activeSliderB = Button(parent, Rect(thisXY.x+thisWidth-50, thisXY.y+slider2d.bounds.height+7, 7, 7))
+			.states_([
+				["", Color.black, Color.red],
+				["", Color.black, Color.green]
+			])
+			.action_({ |b| this.connectGUI(b.value.asBoolean, nil) })
+		;
+
+		connectS !? { activeSliderB.value_(connectS.asInteger) };
+
+		// "model: %\n".postf(wdgtControllersAndModels.slidersTextConnection);
+
+		if(GUI.id !== \cocoa, {
+			if(wdgtControllersAndModels.slidersTextConnection.model.value[0], {
+				activeSliderB.toolTip_("deactivate CV-slider connection")
+			}, {
+				activeSliderB.toolTip_("activate CV-slider connection")
+			})
+		});
+
 		nextY = nextY+slider2d.bounds.height;
 
 		rangeSlider = RangeSlider(parent, Rect(
@@ -247,6 +267,26 @@ CVWidget2D : CVWidget {
 				15
 			));
 			k.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9.5)).focusColor_(Color.green);
+		});
+
+		activeTextB = Button(parent, Rect(thisXY.x+thisWidth-50, nextY+7, 7, 7))
+			.states_([
+				["", Color.black, Color.red],
+				["", Color.black, Color.green]
+			])
+			.action_({ |b| this.connectGUI(nil, b.value.asBoolean) })
+		;
+
+		connectTF !? { activeTextB.value_(connectTF.asInteger) };
+
+		// "model: %\n".postf(wdgtControllersAndModels.slidersTextConnection);
+
+		if(GUI.id !== \cocoa, {
+			if(wdgtControllersAndModels.slidersTextConnection.model.value[1], {
+				activeTextB.toolTip_("deactivate CV-numberbox connection")
+			}, {
+				activeTextB.toolTip_("activate CV-numberbox connection")
+			})
 		});
 
 		specBut.lo = Button(parent)
@@ -639,7 +679,9 @@ CVWidget2D : CVWidget {
 		visibleGuiEls = [
 			slider2d,
 			rangeSlider,
+			activeSliderB,
 			numVal.lo, numVal.hi,
+			activeTextB,
 			specBut.lo, specBut.hi,
 			midiHead.lo, midiHead.hi,
 			midiLearn.lo, midiLearn.hi,
@@ -657,7 +699,9 @@ CVWidget2D : CVWidget {
 			nameField,
 			slider2d,
 			rangeSlider,
+			activeSliderB,
 			numVal.lo, numVal.hi,
+			activeTextB,
 			specBut.lo, specBut.hi,
 			midiHead.lo, midiHead.hi,
 			midiLearn.lo, midiLearn.hi,
@@ -669,7 +713,9 @@ CVWidget2D : CVWidget {
 			actionsBut.lo, actionsBut.hi
 		];
 
-		focusElements = allGuiEls.copy.removeAll([widgetBg, nameField, calibBut.lo, calibBut.hi]);
+		focusElements = allGuiEls.copy.removeAll([
+			widgetBg, nameField, calibBut.lo, calibBut.hi, activeSliderB, activeTextB
+		]);
 
 		#[lo, hi].do({ |slot|
 			guiEnv[slot] = (

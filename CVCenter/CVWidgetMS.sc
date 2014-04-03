@@ -211,6 +211,26 @@ CVWidgetMS : CVWidget {
 			.focusColor_(Color.green)
 		;
 
+		activeSliderB = Button(parent, Rect(thisXY.x+mSlider.bounds.width-8, thisXY.y+mSlider.bounds.height+8, 7, 7))
+			.states_([
+				["", Color.black, Color.red],
+				["", Color.black, Color.green]
+			])
+			.action_({ |b| this.connectGUI(b.value.asBoolean, nil) })
+		;
+
+		connectS !? { activeSliderB.value_(connectS.asInteger) };
+
+		// "model: %\n".postf(wdgtControllersAndModels.slidersTextConnection);
+
+		if(GUI.id !== \cocoa, {
+			if(wdgtControllersAndModels.slidersTextConnection.model.value[0], {
+				activeSliderB.toolTip_("deactivate CV-slider connection")
+			}, {
+				activeSliderB.toolTip_("activate CV-slider connection")
+			})
+		});
+
 		nextY = thisXY.y+mSlider.bounds.height+label.bounds.height+1;
 
 		calibViewsWidth = (thisWidth-2).div(msSize);
@@ -243,6 +263,26 @@ CVWidgetMS : CVWidget {
 			})
 			.focusColor_(Color.green)
 		;
+
+		activeTextB = Button(parent, Rect(thisXY.x+numVal.bounds.width-8, nextY+22, 7, 7))
+			.states_([
+				["", Color.black, Color.red],
+				["", Color.black, Color.green]
+			])
+			.action_({ |b| this.connectGUI(nil, b.value.asBoolean) })
+		;
+
+		connectTF !? { activeTextB.value_(connectTF.asInteger) };
+
+		// "model: %\n".postf(wdgtControllersAndModels.slidersTextConnection);
+
+		if(GUI.id !== \cocoa, {
+			if(wdgtControllersAndModels.slidersTextConnection.model.value[1], {
+				activeTextB.toolTip_("deactivate CV-numberbox connection")
+			}, {
+				activeTextB.toolTip_("activate CV-numberbox connection")
+			})
+		});
 
 		// nextY = thisXY.y+numVal.bounds.top+numVal.bounds.height+1;
 		nextY = numVal.bounds.top+numVal.bounds.height+1;
@@ -390,8 +430,10 @@ CVWidgetMS : CVWidget {
 
 		visibleGuiEls = [
 			mSlider,
+			activeSliderB,
 			calibViews,
 			numVal,
+			activeTextB,
 			midiBut,
 			specBut,
 			oscBut,
@@ -403,8 +445,10 @@ CVWidgetMS : CVWidget {
 			label,
 			nameField,
 			mSlider,
+			activeSliderB,
 			calibViews,
 			numVal,
+			activeTextB,
 			midiBut,
 			oscBut,
 			specBut,
@@ -423,7 +467,9 @@ CVWidgetMS : CVWidget {
 			actionsBut: actionsBut
 		);
 
-		focusElements = allGuiEls.copy.removeAll([widgetBg, calibViews, nameField]);
+		focusElements = allGuiEls.copy.removeAll([
+			widgetBg, calibViews, nameField, activeSliderB, activeTextB
+		]);
 
 		msSize.do({ |slot| this.initControllerActions(slot) });
 

@@ -3327,7 +3327,6 @@ CVWidget {
 
 		wdgtControllersAndModels.slidersTextConnection.controller.put(\default, { |theChanger, what, moreArgs|
 			if(debug, { "widget '%' (%) slidersTextConnection.model: %\n".postf(this.name, this.class, theChanger) });
-			"theChanger.value: %\n".postf(theChanger.value);
 			theChanger.value[0] !? {
 				if(theChanger.value[0], {
 					// connect sliders
@@ -3342,18 +3341,24 @@ CVWidget {
 						},
 						CVWidgetKnob, {
 							sliderConnection = widgetCV.cvWidgetConnect(this.knob);
-							this.activeSliderB.value_(1);
 						}
-					)
+					);
+					this.activeSliderB.value_(1);
+					if(GUI.id !== \cocoa, {
+						this.activeSliderB.toolTip_("deactivate CV-slider connection");
+					})
 				}, {
 					// disconnect sliders
 					if(this.class == CVWidget2D, {
 						[widgetCV.lo, widgetCV.hi].cvWidgetDisconnect(sliderConnection);
 					}, {
 						widgetCV.cvWidgetDisconnect(sliderConnection);
-						this.activeSliderB.value_(0);
 					});
+					this.activeSliderB.value_(0);
 					sliderConnection = nil;
+					if(GUI.id !== \cocoa, {
+						this.activeSliderB.toolTip_("activate CV-slider connection");
+					})
 				})
 			};
 			theChanger.value[1] !? {
@@ -3366,7 +3371,10 @@ CVWidget {
 						}
 					}, {
 						textConnection = widgetCV.cvWidgetConnect(this.numVal);
-						this.activeTextB.value_(1);
+					});
+					this.activeTextB.value_(1);
+					if(GUI.id !== \cocoa, {
+						this.activeTextB.toolTip_("deactivate CV-numberbox connection");
 					})
 				}, {
 					// disconnect textfields
@@ -3376,9 +3384,12 @@ CVWidget {
 						}
 					}, {
 						widgetCV.cvWidgetDisconnect(textConnection);
-						this.activeTextB.value_(0);
 					});
+					this.activeTextB.value_(0);
 					textConnection = nil;
+					if(GUI.id !== \cocoa, {
+						this.activeTextB.toolTip_("activate CV-numberbox connection");
+					})
 				})
 			};
 
@@ -3386,6 +3397,8 @@ CVWidget {
 			theChanger.value[0].isKindOf(Boolean).if{ connectS = theChanger.value[0] };
 			theChanger.value[1].isKindOf(Boolean).if{ connectTF = theChanger.value[1] };
 			// "connectS: %, connectTF: %\n".postf(connectS, connectTF);
+
+			// "this: %, sliderConnection: %, textConnection: %\n".postf(name, sliderConnection, textConnection);
 
 			wdgtControllersAndModels.slidersTextConnection.model.value_(
 				[sliderConnection.notNil, textConnection.notNil]
