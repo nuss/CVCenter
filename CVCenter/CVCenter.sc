@@ -1928,6 +1928,8 @@ CVCenter {
 							})
 						}
 					);
+					lib[\all][k].connectS = cvWidgets[k].connectS;
+					lib[\all][k].connectTF = cvWidgets[k].connectTF;
 					lib[\all][k].notes = cvWidgets[k].nameField.string;
 					lib[\all][k].tabLabel = widgetStates[k].tabKey;
 				})
@@ -1967,7 +1969,8 @@ CVCenter {
 			path, addToExisting=false,
 			autoConnectOSC=true, oscConnectToIP=true, oscRestrictToPort=false, activateCalibration=false, resetCalibration=false,
 			autoConnectMIDI=true, midiConnectSrc=false, midiConnectChannel=false, midiConnectCtrl=true,
-			loadActions=true, midiSrcID, oscIPAddress, loadShortcuts=true, loadSnapshots=true
+			loadActions=true, midiSrcID, oscIPAddress, loadShortcuts=true, loadSnapshots=true,
+			connectSliders=true, connectNumBoxes=true
 		|
 		var lib, successFunc;
 
@@ -2223,6 +2226,7 @@ CVCenter {
 						cvWidgets[key] !? {
 							cvWidgets[key].nameField.string_(v.notes);
 							if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
+							cvWidgets[key].connectGUI(v.connectS, v.connectTF);
 						};
 
 						if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
