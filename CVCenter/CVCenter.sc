@@ -2226,7 +2226,18 @@ CVCenter {
 						cvWidgets[key] !? {
 							cvWidgets[key].nameField.string_(v.notes);
 							if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
-							cvWidgets[key].connectGUI(v.connectS, v.connectTF);
+							if(connectSliders.notNil, {
+								if(connectSliders, { cvWidgets[key].connectGUI(true, nil)
+								}, { cvWidgets[key].connectGUI(false, nil) });
+							}, {
+								cvWidgets[key].connectGUI(v.connectS, nil)
+							});
+							if(connectNumBoxes.notNil, {
+								if(connectNumBoxes, { cvWidgets[key].connectGUI(nil, true)
+								}, { cvWidgets[key].connectGUI(nil, false) });
+							}, {
+								cvWidgets[key].connectGUI(nil, v.connectTF)
+							})
 						};
 
 						if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
