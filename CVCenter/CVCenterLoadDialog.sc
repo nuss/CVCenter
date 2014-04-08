@@ -17,6 +17,8 @@ CVCenterLoadDialog {
 		var loadOscResponders, loadOscIP, loadOscPort, activateCalibration, resetCalibration;
 		var textOscIP, textOscPort, textActivateCalibration, textResetCalibration;
 		var activateActions, textActivateActions, loadShortcuts, textLoadShortcuts;
+		var connectSliders, textConnectSliders, connectNumBoxes, textConnectNumBoxes, connectBg, connectFlow;
+		var sliderConnectionsInSetup, textConnectionsInSetup;
 		var cancelBut, loadBut;
 		var lineheight, linebreak, fFact;
 		var initCCSrc, initCCChan, initCCCtrl;
@@ -65,8 +67,8 @@ CVCenterLoadDialog {
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("load a new setup from disk", Rect(
 				(Window.screenBounds.width-500).div(2),
-				(Window.screenBounds.height-360).div(2),
-				500, 360
+				(Window.screenBounds.height-450).div(2),
+				500, 450
 			), false);
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, Point(7, 7), Point(3, 3));
@@ -79,13 +81,19 @@ CVCenterLoadDialog {
 			actionsBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 29));
 			flow.nextLine;
 			shortcutsBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 29));
-			[replaceBg, midiBg, oscBg, actionsBg, shortcutsBg].do({ |el| el.background_(Color(0.95, 0.95, 0.95)) });
+			flow.nextLine;
+			connectBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 90));
+
+			[replaceBg, midiBg, oscBg, actionsBg, shortcutsBg, connectBg].do({ |el|
+				el.background_(Color(0.95, 0.95, 0.95))
+			});
 
 			replaceBg.decorator = replaceFlow = FlowLayout(replaceBg.bounds, Point(7, 7), Point(3, 3));
 			midiBg.decorator = midiFlow = FlowLayout(midiBg.bounds, Point(7, 7), Point(3, 3));
 			oscBg.decorator = oscFlow = FlowLayout(oscBg.bounds, Point(7, 7), Point(3, 3));
 			actionsBg.decorator = actionsFlow = FlowLayout(actionsBg.bounds, Point(7, 7), Point(3, 3));
-			shortcutsBg.decorator = shortcutsFlow = FlowLayout(actionsBg.bounds, Point(7, 7), Point(3, 3));
+			shortcutsBg.decorator = shortcutsFlow = FlowLayout(shortcutsBg.bounds, Point(7, 7), Point(3, 3));
+			connectBg.decorator = connectFlow = FlowLayout(connectBg.bounds, Point(7, 7), Point(3, 3));
 			// replace existing widgets in CVCenter or not
 
 			replaceExisting = buildCheckbox.(true, replaceBg, Point(15, 15), staticTextFontBold);
@@ -422,7 +430,7 @@ CVCenterLoadDialog {
 				.string_("load all CVWidget-actions stored in the setup")
 			;
 
-			flow.nextLine;
+			// flow.nextLine;
 
 			loadShortcuts = buildCheckbox.(true, shortcutsBg, Point(15, 15), staticTextFontBold);
 
@@ -430,6 +438,45 @@ CVCenterLoadDialog {
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("load shortcuts stored in the setup")
+			;
+
+			StaticText(connectBg, Point(connectFlow.indentedRemaining.width, 20))
+				.font_(staticTextFontBold)
+				.string_("Widget-CV options")
+			;
+
+			sliderConnectionsInSetup = buildCheckbox.(true, connectBg, Point(15, 15), staticTextFontBold);
+
+			StaticText(connectBg, Point(connectFlow.bounds.width/2-18, 35))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("load CV-to-slider connections \nas stored in setup")
+			;
+
+			textConnectionsInSetup = buildCheckbox.(true, connectBg, Point(15, 15), staticTextFontBold);
+
+			StaticText(connectBg, Point(connectFlow.bounds.width/2-40, 35))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("load CV-to-numeric-fields connec-\ntions as stored in setup")
+			;
+
+			connectFlow.nextLine;
+
+			connectSliders = buildCheckbox.(true, connectBg, Point(15, 15), staticTextFontBold);
+
+			textConnectSliders = StaticText(connectBg, Point(connectFlow.bounds.width/2-18, 35))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("connect CV to slider")
+			;
+
+			connectNumBoxes = buildCheckbox.(true, connectBg, Point(15, 15), staticTextFontBold);
+
+			textConnectNumBoxes = StaticText(connectBg, Point(connectFlow.bounds.width/2-40, 35))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("connect CV to numeric text-fields")
 			;
 
 			// cancel or load a setup;
