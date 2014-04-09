@@ -2227,10 +2227,10 @@ CVCenter {
 							cvWidgets[key].nameField.string_(v.notes);
 							if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
 							if(connectSliders.notNil, {
-								if(connectSliders, { "connect sliders".postln; cvWidgets[key].connectGUI(true, nil)
-								}, { "don't connect sliders".postln; cvWidgets[key].connectGUI(false, nil) });
+								if(connectSliders, { cvWidgets[key].connectGUI(true, nil)
+								}, { cvWidgets[key].connectGUI(false, nil) });
 							}, {
-								"v.connectS: %\n".postf(v.connectS);
+								// "v.connectS: %\n".postf(v.connectS);
 								cvWidgets[key].connectGUI(v.connectS, nil)
 							});
 							if(connectNumBoxes.notNil, {
