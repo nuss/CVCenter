@@ -21,7 +21,7 @@ CVCenter {
 	classvar prefPaneBounds, tabsBounds;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>shortcuts, <scv;
-	classvar <alwaysOnTop=false;
+	classvar <alwaysOnTop = false;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight;
 	classvar <widgetStates;
 	classvar <tabProperties, colors, nextColor;
@@ -30,6 +30,7 @@ CVCenter {
 	classvar prefs, boundsOnShutDown, <>dontSave, <systemWidgets, <snapShots, snapShotSelect;
 	// CVWidgetMS: how many slots at max for one column
 	classvar <>numMsSlotsPerColumn = 15;
+	classvar <>connectSliders = true, <>connectTextFields = true;
 
 	*initClass {
 		var newPrefs, newBounds;
@@ -544,6 +545,7 @@ CVCenter {
 		// var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
 		var buildCheckbox;
+		var tmpConnectS, tmpConnectTF;
 		// TabbedView2 specific
 
 		// "adding tab within *makeWindow: %\n".postf(tab);
@@ -809,6 +811,15 @@ CVCenter {
 
 			all.pairsDo({ |key, cv|
 				// [key, cv].postln;
+				cvWidgets[key] !? {
+					cvWidgets[key].wdgtControllersAndModels !? { |wcm|
+						tmpConnectS = cvWidgets[key].wdgtControllersAndModels.slidersTextConnection.model.value[0];
+						tmpConnectTF = cvWidgets[key].wdgtControllersAndModels.slidersTextConnection.model.value[1];
+					}
+				};
+
+				// "tmpConnectS: %, tmpConnectTF: %\n".postf(tmpConnectS, tmpConnectTF);
+
 				if((cvWidgets[key].notNil and:{ cvWidgets[key].isClosed }).or(
 					cvWidgets[key].isNil
 				), {
@@ -821,15 +832,28 @@ CVCenter {
 							this.prAddWidget(
 								thisTabLabel,
 								(key: key, slot: slot, spec: all[key][slot].spec),
-								key
+								key,
+								tmpConnectS ? this.connectSliders,
+								tmpConnectTF ? this.connectTextFields
 							);
 							this.at(key)[slot].value_(tmp);
 						})
 					}, {
 						if(systemWidgets.includes(key).not, {
-							this.prAddWidget(thisTabLabel, key: key);
+							this.prAddWidget(
+								thisTabLabel,
+								key: key,
+								connectS: tmpConnectS ? this.connectSliders,
+								connectTF: tmpConnectTF ? this.connectTextFields
+							);
 						}, {
-							this.prAddWidget(\default, key: key);
+							// "tmpConnectS: %, tmpConnectTF: %, this.connectSliders: %, this.connectTextFields: %\n".postf(tmpConnectS, tmpConnectTF, this.connectSliders, this.connectTextFields);
+							this.prAddWidget(
+								\default,
+								key: key,
+								connectS: tmpConnectS ? this.connectSliders,
+								connectTF: tmpConnectTF ? this.connectTextFields
+							);
 							case
 								{ (key == \snapshot).or(key == 'select snapshot') } {
 									cvWidgets[key].background_(Color.yellow);
@@ -1042,18 +1066,18 @@ CVCenter {
 						);
 
 						case
-						{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-							// "no modifier".postln;
-							if(keycode == keyDowns.keyCode and:{
-								thisMod.isNil and:{ thisArrMod.isNil }
-							}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
-						}
-						{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-							// "some modifier...".postln;
-							if(keycode == keyDowns.keyCode and:{
-								(modifiers == thisArrMod).or(modifiers == thisMod)
-							}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
-						}
+							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+								// "no modifier".postln;
+								if(keycode == keyDowns.keyCode and:{
+									thisMod.isNil and:{ thisArrMod.isNil }
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+							}
+							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+								// "some modifier...".postln;
+								if(keycode == keyDowns.keyCode and:{
+									(modifiers == thisArrMod).or(modifiers == thisMod)
+								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+							}
 						;
 					})
 				)
@@ -1066,7 +1090,7 @@ CVCenter {
 		}
 	}
 
-	*prAddWidget { |tab, widget2DKey, key|
+	*prAddWidget { |tab, widget2DKey, key, connectS, connectTF|
 		var allCVKeys, widgetKeys, thisKeys;
 		var rowwidth, colcount;
 		var cvTabIndex, tabLabels;
@@ -1137,6 +1161,8 @@ CVCenter {
 						thisTab,
 						(lo: all[key].lo, hi: all[key].hi),
 						key,
+						connectS ? this.connectSliders,
+						connectTF ? this.connectTextFields,
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 105, widgetheight),
 						setup: tmp.setup,
 						controllersAndModels: cvWidgets[key] !? {
@@ -1152,10 +1178,17 @@ CVCenter {
 						;
 					);
 					if(widgetStates[key].isNil, {
-						widgetStates.put(key, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
+						widgetStates.put(key, (
+							tabIndex: cvTabIndex,
+							tabKey: thisTabLabel,
+						// slidersConnected: connectS ? this.connectSliders,
+						// textFieldsConnected: connectTF ? this.connectTextFields
+						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
+					// widgetStates[key].slidersConnected = connectS ? this.connectSliders;
+					// widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
 					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
@@ -1186,6 +1219,8 @@ CVCenter {
 						thisTab,
 						all[key],
 						key,
+						connectS ? this.connectSliders,
+						connectTF ? this.connectTextFields,
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight),
 						setup: tmp.setup,
 						controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
@@ -1199,10 +1234,17 @@ CVCenter {
 						;
 					);
 					if(widgetStates[key].isNil, {
-						widgetStates.put(key, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
+						widgetStates.put(key, (
+							tabIndex: cvTabIndex,
+							tabKey: thisTabLabel,
+						// slidersConnected: connectS ? this.connectSliders,
+						// textFieldsConnected: connectTF ? this.connectTextFields
+						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
+					// widgetStates[key].slidersConnected = connectS ? this.connectSliders;
+					// widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
 					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
 				});
@@ -1220,11 +1262,16 @@ CVCenter {
 					),
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
+
+			// "connectS: %, connectTF: %\n".postf(connectS, connectTF);
+
 				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
 					cvWidgets[key] = CVWidgetKnob(
 						thisTab,
 						all[key],
 						key,
+						connectS ? this.connectSliders,
+						connectTF ? this.connectTextFields,
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth = 52, widgetheight),
 						setup: tmp.setup,
 						controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
@@ -1238,7 +1285,10 @@ CVCenter {
 						;
 					);
 					if(widgetStates[key].isNil, {
-						widgetStates.put(key, (tabIndex: cvTabIndex, tabKey: thisTabLabel));
+						widgetStates.put(key, (
+							tabIndex: cvTabIndex,
+							tabKey: thisTabLabel,
+						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
@@ -1463,12 +1513,23 @@ CVCenter {
 		^all.at(key.asSymbol);
 	}
 
-	*add { |key, spec, value, tab, slot|
+	*add { |key, spec, value, tab, slot, svItems, connectS, connectTF|
 		var thisKey, thisSpec, thisVal, thisSlot, thisTab, widget2DKey;
-		var specName;
+		var specName, cvClass, thisSVItems;
 
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		thisKey = key.asSymbol;
+
+		if(svItems.notNil, {
+			if(svItems.isKindOf(SequenceableCollection).not, {
+				Error("svItems must be a SequenceableCollection or an instance of one of its subclasses!").through;
+			}, {
+				thisSVItems = svItems.collect(_.asSymbol);
+				cvClass = SV;
+			})
+		}, {
+			cvClass = CV;
+		});
 
 		// "add called with key '%' and tab '%'\n".postf(key, tab);
 
@@ -1567,19 +1628,27 @@ CVCenter {
 				widgetStates[thisKey][thisSlot][\made] = true;
 				^all[thisKey][thisSlot];
 			}, {
-				all[thisKey] ?? { all.put(thisKey, (lo: CV.new, hi: CV.new)) };
+				all[thisKey] ?? { all.put(thisKey, (lo: cvClass.new, hi: cvClass.new)) };
 				all[thisKey][thisSlot].spec_(thisSpec);
+				if(cvClass === SV and:{
+					all[thisKey][thisSlot].items.unbubble.isNil
+				}, { all[thisKey][thisSlot].items_(thisSVItems) });
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				widgetStates[thisKey][thisSlot].made = true;
 			})
-		}, { all[thisKey] ?? { all.put(thisKey, CV.new(thisSpec, thisVal)) }});
+		}, {
+			all[thisKey] ?? { all.put(thisKey, cvClass.new(thisSpec, thisVal)) };
+			if(cvClass === SV and:{ all[thisKey].items.unbubble.isNil }, {
+				all[thisKey].items_(thisSVItems)
+			})
+		});
 
 		if(window.isNil or:{ window.isClosed }, {
 			// "makeWindow: %, key: %\n".postf(thisTab, thisKey);
 			this.makeWindow(thisTab);
 		}, {
 			// "prAddWidget: %\n".postf(thisKey);
-			this.prAddWidget(thisTab, widget2DKey, thisKey);
+			this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
 		});
 
 		if(slot.notNil, {
@@ -1598,9 +1667,30 @@ CVCenter {
 	}
 
 	// add a CV using spec inference
-	*use { |key, spec, value, tab, slot|
-		^this.add(key, spec ?? { this.findSpec(key) }, value, tab, slot)
+	*use { |key, spec, value, tab, slot, svItems, connectS, connectTF|
+		^this.add(key, spec ?? { this.findSpec(key) }, value, tab, slot, svItems, connectS ? this.connectSliders, connectTF ? this.connectTextFields)
 	}
+
+	*widgetConnectGUI { |key, connectSliders, connectTextFields|
+		var thisKey;
+		thisKey = key.asSymbol;
+		connectSliders !? {
+			connectSliders.isKindOf(Boolean).not.if{
+				Error("connectSliders must either be a Boolean or nil!").throw;
+			}
+		};
+		connectTextFields !? {
+			connectTextFields.isKindOf(Boolean).not.if{
+				Error("connectTextFields must either be a Boolean or nil!").throw;
+			}
+		};
+		widgetStates !? {
+			widgetStates[thisKey] !? {
+				cvWidgets[key].connectGUI(connectSliders, connectTextFields);
+			}
+		}
+	}
+
 
 	*setup {
 		^(
@@ -1838,6 +1928,8 @@ CVCenter {
 							})
 						}
 					);
+					lib[\all][k].connectS = cvWidgets[k].connectS;
+					lib[\all][k].connectTF = cvWidgets[k].connectTF;
 					lib[\all][k].notes = cvWidgets[k].nameField.string;
 					lib[\all][k].tabLabel = widgetStates[k].tabKey;
 				})
@@ -1877,7 +1969,8 @@ CVCenter {
 			path, addToExisting=false,
 			autoConnectOSC=true, oscConnectToIP=true, oscRestrictToPort=false, activateCalibration=false, resetCalibration=false,
 			autoConnectMIDI=true, midiConnectSrc=false, midiConnectChannel=false, midiConnectCtrl=true,
-			loadActions=true, midiSrcID, oscIPAddress, loadShortcuts=true, loadSnapshots=true
+			loadActions=true, midiSrcID, oscIPAddress, loadShortcuts=true, loadSnapshots=true,
+			connectSliders, connectNumBoxes
 		|
 		var lib, successFunc;
 
@@ -2133,6 +2226,19 @@ CVCenter {
 						cvWidgets[key] !? {
 							cvWidgets[key].nameField.string_(v.notes);
 							if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
+							if(connectSliders.notNil, {
+								if(connectSliders, { cvWidgets[key].connectGUI(true, nil)
+								}, { cvWidgets[key].connectGUI(false, nil) });
+							}, {
+								// "v.connectS: %\n".postf(v.connectS);
+								cvWidgets[key].connectGUI(v.connectS, nil)
+							});
+							if(connectNumBoxes.notNil, {
+								if(connectNumBoxes, { cvWidgets[key].connectGUI(nil, true)
+								}, { cvWidgets[key].connectGUI(nil, false) });
+							}, {
+								cvWidgets[key].connectGUI(nil, v.connectTF)
+							})
 						};
 
 						if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
@@ -2268,7 +2374,6 @@ CVCenter {
 		}
 	}
 
-	// finish me
 	*prRegroupPrefPane {
 		var children, rows;
 

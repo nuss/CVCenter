@@ -17,6 +17,10 @@ CVCenterLoadDialog {
 		var loadOscResponders, loadOscIP, loadOscPort, activateCalibration, resetCalibration;
 		var textOscIP, textOscPort, textActivateCalibration, textResetCalibration;
 		var activateActions, textActivateActions, loadShortcuts, textLoadShortcuts;
+		var connectSliders, textConnectSliders, connectNumBoxes, textConnectNumBoxes, connectBg, connectFlow;
+		var sliderConnectionsInSetup, textConnectionsInSetup;
+		var doSliderConnection, doNumBoxConnection;
+		var loadSnapshots, loadSnapshotsBg, loadSnapshotsFlow;
 		var cancelBut, loadBut;
 		var lineheight, linebreak, fFact;
 		var initCCSrc, initCCChan, initCCCtrl;
@@ -65,8 +69,8 @@ CVCenterLoadDialog {
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("load a new setup from disk", Rect(
 				(Window.screenBounds.width-500).div(2),
-				(Window.screenBounds.height-360).div(2),
-				500, 360
+				(Window.screenBounds.height-480).div(2),
+				500, 480
 			), false);
 
 			window.view.decorator = flow = FlowLayout(window.view.bounds, Point(7, 7), Point(3, 3));
@@ -79,13 +83,22 @@ CVCenterLoadDialog {
 			actionsBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 29));
 			flow.nextLine;
 			shortcutsBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 29));
-			[replaceBg, midiBg, oscBg, actionsBg, shortcutsBg].do({ |el| el.background_(Color(0.95, 0.95, 0.95)) });
+			flow.nextLine;
+			connectBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 90));
+			flow.nextLine;
+			loadSnapshotsBg = CompositeView(window.view, Point(flow.indentedRemaining.width, 29));
+
+			[replaceBg, midiBg, oscBg, actionsBg, shortcutsBg, connectBg, loadSnapshotsBg].do({ |el|
+				el.background_(Color(0.95, 0.95, 0.95))
+			});
 
 			replaceBg.decorator = replaceFlow = FlowLayout(replaceBg.bounds, Point(7, 7), Point(3, 3));
 			midiBg.decorator = midiFlow = FlowLayout(midiBg.bounds, Point(7, 7), Point(3, 3));
 			oscBg.decorator = oscFlow = FlowLayout(oscBg.bounds, Point(7, 7), Point(3, 3));
 			actionsBg.decorator = actionsFlow = FlowLayout(actionsBg.bounds, Point(7, 7), Point(3, 3));
-			shortcutsBg.decorator = shortcutsFlow = FlowLayout(actionsBg.bounds, Point(7, 7), Point(3, 3));
+			shortcutsBg.decorator = shortcutsFlow = FlowLayout(shortcutsBg.bounds, Point(7, 7), Point(3, 3));
+			connectBg.decorator = connectFlow = FlowLayout(connectBg.bounds, Point(7, 7), Point(3, 3));
+			loadSnapshotsBg.decorator = loadSnapshotsFlow = FlowLayout(loadSnapshotsBg.bounds, Point(7, 7), Point(3, 3));
 			// replace existing widgets in CVCenter or not
 
 			replaceExisting = buildCheckbox.(true, replaceBg, Point(15, 15), staticTextFontBold);
@@ -130,7 +143,7 @@ CVCenterLoadDialog {
 			textMidiCtrl = StaticText(midiBg, Point(midiFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("initialize CCResponders with ctrl-nr.%stored in the setup".format(linebreak))
+				.string_("initialize CCResponders with ctrl-nr.% as stored in the setup".format(linebreak))
 			;
 
 			midiFlow.nextLine.shift(15, 0);
@@ -140,7 +153,7 @@ CVCenterLoadDialog {
 			textMidiChan = StaticText(midiBg, Point(midiFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("initialize CCResponders with channel-nr.%stored in the setup".format(linebreak))
+				.string_("initialize CCResponders with channel-nr.% as stored in the setup".format(linebreak))
 			;
 
 			midiFlow.nextLine.shift(15, 0);
@@ -150,7 +163,7 @@ CVCenterLoadDialog {
 			textMidiSrc = StaticText(midiBg, Point(midiFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("initialize CCResponders with source-ID%stored in the setup".format(linebreak))
+				.string_("initialize CCResponders with %source-ID as stored in the setup".format(linebreak))
 			;
 
 			midiFlow.nextLine.shift(15, 0);
@@ -337,7 +350,7 @@ CVCenterLoadDialog {
 			textOscIP = StaticText(oscBg, Point(oscFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("initialize OSCresponders with IP-%addresses stored in the setup".format(linebreak))
+				.string_("initialize OSCresponders with IP-%addresses as stored in the setup".format(linebreak))
 			;
 
 			oscFlow.nextLine.shift(15, 0);
@@ -347,7 +360,7 @@ CVCenterLoadDialog {
 			textOscPort = StaticText(oscBg, Point(oscFlow.indentedRemaining.width, lineheight.(2)))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("initialize OSCresponders with the port%stored in the setup".format(linebreak))
+				.string_("initialize OSCresponders with the port% as stored in the setup".format(linebreak))
 			;
 
 			oscFlow.nextLine.shift(15, 0);
@@ -419,20 +432,94 @@ CVCenterLoadDialog {
 			textActivateActions = StaticText(actionsBg, Point(actionsFlow.indentedRemaining.width, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("load all CVWidget-actions stored in the setup")
+				.string_("load all CVWidget-actions as stored in the setup")
 			;
 
-			flow.nextLine;
+			// flow.nextLine;
 
 			loadShortcuts = buildCheckbox.(true, shortcutsBg, Point(15, 15), staticTextFontBold);
 
 			textLoadShortcuts = StaticText(shortcutsBg, Point(shortcutsFlow.indentedRemaining.width, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("load shortcuts stored in the setup")
+				.string_("load shortcuts as stored in the setup")
+			;
+
+			StaticText(connectBg, Point(connectFlow.indentedRemaining.width, 20))
+				.font_(staticTextFontBold)
+				.string_("Widget-CV options")
+			;
+
+			sliderConnectionsInSetup = buildCheckbox.(true, connectBg, Point(15, 15), staticTextFontBold)
+				.action_({ |cb|
+					if(cb.value.asBoolean, {
+						connectSliders.enabled_(false);
+						textConnectSliders.stringColor_(Color(0.7, 0.7, 0.7));
+					}, {
+						connectSliders.enabled_(true);
+						textConnectSliders.stringColor_(staticTextColor);
+					})
+				})
+			;
+
+			StaticText(connectBg, Point(connectFlow.bounds.width/2-18, 35))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("load CV-to-slider connections \nas stored in setup")
+			;
+
+			textConnectionsInSetup = buildCheckbox.(true, connectBg, Point(15, 15), staticTextFontBold)
+				.action_({ |cb|
+					if(cb.value.asBoolean, {
+						connectNumBoxes.enabled_(false);
+						textConnectNumBoxes.stringColor_(Color(0.7, 0.7, 0.7));
+					}, {
+						connectNumBoxes.enabled_(true);
+						textConnectNumBoxes.stringColor_(staticTextColor);
+					})
+				})
+			;
+
+			StaticText(connectBg, Point(connectFlow.bounds.width/2-40, 35))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("load CV-to-numeric-fields connec-\ntions as stored in setup")
+			;
+
+			connectSliders = buildCheckbox.(true, connectBg, Point(15, 15), staticTextFontBold).enabled_(false);
+
+			connectFlow.shift(0, -10);
+
+			textConnectSliders = StaticText(connectBg, Point(connectFlow.bounds.width/2-18, 35))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("connect CV to slider")
+				.enabled_(false)
+			;
+
+			connectFlow.shift(0, 10);
+
+			connectNumBoxes = buildCheckbox.(true, connectBg, Point(15, 15), staticTextFontBold).enabled_(false);
+
+			connectFlow.shift(0, -10);
+
+			textConnectNumBoxes = StaticText(connectBg, Point(connectFlow.bounds.width/2-40, 35))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("connect CV to numeric text-fields")
+				.enabled_(false)
+			;
+
+			loadSnapshots = buildCheckbox.(true, loadSnapshotsBg, Point(15, 15), staticTextFontBold);
+
+			StaticText(loadSnapshotsBg, Point(loadSnapshotsFlow.indentedRemaining.width, 15))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("load snapshots as stored in the setup")
 			;
 
 			// cancel or load a setup;
+			flow.nextLine;
 
 			cancelBut = Button(window.view, Point(flow.bounds.width.div(2)-8, flow.indentedRemaining.height))
 				.states_([["Cancel", Color.black, Color.white]])
@@ -454,6 +541,7 @@ CVCenterLoadDialog {
 						initCalib = activateCalibration.value.asBoolean;
 						if(initCalib, { initCalibReset = resetCalibration.value.asBoolean });
 					});
+
 					if(loadMidiCC.value.asBoolean, {
 						if(midiSourceSelect.value == 0, {
 							initCCSrc = loadMidiSrc.value.asBoolean;
@@ -462,6 +550,12 @@ CVCenterLoadDialog {
 						});
 						initCCChan = loadMidiChan.value.asBoolean;
 						initCCCtrl = loadMidiCtrl.value.asBoolean;
+					});
+					if(sliderConnectionsInSetup.value.asBoolean == false, {
+						doSliderConnection = connectSliders.value.asBoolean
+					});
+					if(textConnectionsInSetup.value.asBoolean == false, {
+						doNumBoxConnection = connectNumBoxes.value.asBoolean
 					});
 					CVCenter.loadSetup(
 						addToExisting: replaceExisting.value.asBoolean.not,
@@ -474,7 +568,10 @@ CVCenterLoadDialog {
 						loadActions: activateActions.value.asBoolean,
 						loadShortcuts: loadShortcuts.value.asBoolean,
 						midiSrcID: midiSrcID,
-						oscIPAddress: oscIPAddress
+						oscIPAddress: oscIPAddress,
+						connectSliders: doSliderConnection,
+						connectNumBoxes: doNumBoxConnection,
+						loadSnapshots: loadSnapshots.value.asBoolean
 					)
 				})
 			;

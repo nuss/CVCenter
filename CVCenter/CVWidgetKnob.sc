@@ -21,8 +21,8 @@ CVWidgetKnob : CVWidget {
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
-	*new { |parent, widgetCV, name, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, server|
-		^super.newCopyArgs(parent, widgetCV, name).init(
+	*new { |parent, widgetCV, name, connectKnob, connectNumVal, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, server|
+		^super.newCopyArgs(parent, widgetCV, name, connectKnob, connectNumVal).init(
 			bounds,
 			defaultAction,
 			setup,
@@ -171,12 +171,56 @@ CVWidgetKnob : CVWidget {
 			.mode_(\vert)
 			.focusColor_(Color.green)
 		;
-		if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
+
+		activeSliderB = Button(parent, Rect(thisXY.x+thisWidth-9, thisXY.y+knobsize+5, 7, 7))
+			.states_([
+				["", Color.black, Color.red],
+				["", Color.black, Color.green]
+			])
+			.action_({ |b| this.connectGUI(b.value.asBoolean, nil) })
+		;
+
+		connectS !? { activeSliderB.value_(connectS.asInteger) };
+
+		// "model: %\n".postf(wdgtControllersAndModels.slidersTextConnection);
+
+		if(GUI.id !== \cocoa, {
+			if(wdgtControllersAndModels.slidersTextConnection.model.value[0], {
+				activeSliderB.toolTip_("deactivate CV-slider connection")
+			}, {
+				activeSliderB.toolTip_("activate CV-slider connection")
+			})
+		});
+
+		if(widgetCV.spec.excludingZeroCrossing, { knob.centered_(true) });
+		// if(widgetCV.spec.minval == widgetCV.spec.maxval.neg, { knob.centered_(true) });
 		nextY = thisXY.y+thisHeight-112;
+
 		numVal = NumberBox(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.value_(widgetCV.value).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9.5))
 			.focusColor_(Color.green)
 		;
+
+		activeTextB = Button(parent, Rect(thisXY.x+thisWidth-9, nextY+7, 7, 7))
+			.states_([
+				["", Color.black, Color.red],
+				["", Color.black, Color.green]
+			])
+			.action_({ |b| this.connectGUI(nil, b.value.asBoolean) })
+		;
+
+		connectTF !? { activeTextB.value_(connectTF.asInteger) };
+
+		// "model: %\n".postf(wdgtControllersAndModels.slidersTextConnection);
+
+		if(GUI.id !== \cocoa, {
+			if(wdgtControllersAndModels.slidersTextConnection.model.value[1], {
+				activeTextB.toolTip_("deactivate CV-numberbox connection")
+			}, {
+				activeTextB.toolTip_("activate CV-numberbox connection")
+			})
+		});
+
 		nextY = nextY+numVal.bounds.height;
 		specBut = Button(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 15))
 			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
@@ -431,10 +475,13 @@ CVWidgetKnob : CVWidget {
 
 		if(prCalibrate, { calibBut.value_(0) }, { calibBut.value_(1) });
 
-		[knob, numVal].do({ |view| widgetCV.connect(view) });
+		// [knob, numVal].do({ |view| widgetCV.connect(view) });
+
 		visibleGuiEls = [
 			knob,
 			numVal,
+			activeSliderB,
+			activeTextB,
 			specBut,
 			midiHead,
 			midiLearn,
@@ -451,6 +498,8 @@ CVWidgetKnob : CVWidget {
 			nameField,
 			knob,
 			numVal,
+			activeSliderB,
+			activeTextB,
 			specBut,
 			midiHead,
 			midiLearn,
@@ -474,9 +523,15 @@ CVWidgetKnob : CVWidget {
 			midiLearn: midiLearn
 		);
 
-		focusElements = allGuiEls.copy.removeAll([widgetBg, nameField, calibBut]);
+		focusElements = allGuiEls.copy.removeAll([
+			widgetBg, nameField, calibBut, activeSliderB, activeTextB
+		]);
 
 		this.initControllerActions;
+
+		connectS !? { /*"connectSliders".postln; */this.connectGUI(connectS, nil) };
+		connectTF !? { /*"connectTextFields".postln; */this.connectGUI(nil, connectTF) };
+
 		// this.setShortcuts;
 		focusElements.do({ |el|
 			KeyDownActions.setShortcuts(el, this.class.shortcuts);
@@ -500,6 +555,8 @@ CVWidgetKnob : CVWidget {
 				parent: window,
 				cv: widgetCV,
 				name: oldName,
+				connectKnob: wdgtControllersAndModels.slidersTextConnection.model.value[0],
+				connectNumVal: wdgtControllersAndModels.slidersTextConnection.model.value[1],
 				bounds: thisBounds,
 				setup: this.setup,
 				controllersAndModels: wdgtControllersAndModels,
@@ -531,6 +588,21 @@ CVWidgetKnob : CVWidget {
 			"Either the widget you're trying to reopen hasn't been closed yet or it doesn't even exist.".warn;
 		})
 	}
+
+	// connectGUI { |connectSlider = true, connectTextField = true|
+	// 	connectSlider !? {
+	// 		if(connectSlider, {
+	// 			sliderConnection = widgetCV.cvWidgetConnect(knob);
+	// 		}, { widgetCV.cvWidgetDisconnect(sliderConnection) });
+	// 		connectS = connectSlider;
+	// 	};
+	// 	connectTextField !? {
+	// 		if(connectTextField, {
+	// 			textConnection = widgetCV.cvWidgetConnect(numVal);
+	// 		}, { widgetCV.cvWidgetDisconnect(textConnection) });
+	// 		connectTF = connectTextField;
+	// 	};
+	// }
 
 	background_ { |color|
 		background = color;
