@@ -2374,7 +2374,6 @@ CVCenter {
 		}
 	}
 
-	// finish me
 	*prRegroupPrefPane {
 		var children, rows;
 
