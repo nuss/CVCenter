@@ -543,21 +543,6 @@ CVWidgetMS : CVWidget {
 		})
 	}
 
-	// connectGUI { |connectSlider = true, connectTextField = true|
-	// 	connectSlider !? {
-	// 		if(connectSlider, {
-	// 			sliderConnection = widgetCV.cvWidgetConnect(mSlider);
-	// 		}, { widgetCV.cvWidgetDisconnect(sliderConnection) });
-	// 		connectS = connectSlider;
-	// 	};
-	// 	connectTextField !? {
-	// 		if(connectTextField, {
-	// 			textConnection = widgetCV.cvWidgetConnect(numVal);
-	// 		}, { widgetCV.cvWidgetDisconnect(textConnection) });
-	// 		connectTF = connectTextField;
-	// 	};
-	// }
-
 	background_ { |color|
 		background = color;
 		widgetBg.background_(background);

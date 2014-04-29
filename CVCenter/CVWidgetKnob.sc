@@ -589,21 +589,6 @@ CVWidgetKnob : CVWidget {
 		})
 	}
 
-	// connectGUI { |connectSlider = true, connectTextField = true|
-	// 	connectSlider !? {
-	// 		if(connectSlider, {
-	// 			sliderConnection = widgetCV.cvWidgetConnect(knob);
-	// 		}, { widgetCV.cvWidgetDisconnect(sliderConnection) });
-	// 		connectS = connectSlider;
-	// 	};
-	// 	connectTextField !? {
-	// 		if(connectTextField, {
-	// 			textConnection = widgetCV.cvWidgetConnect(numVal);
-	// 		}, { widgetCV.cvWidgetDisconnect(textConnection) });
-	// 		connectTF = connectTextField;
-	// 	};
-	// }
-
 	background_ { |color|
 		background = color;
 		widgetBg.background_(background);

@@ -38,18 +38,6 @@ CVWidget2D : CVWidget {
 		var nextY, rightColumnX, oscEditButHeight, right, left;
 		var text, tActions, rSliderClass, slider2DClass;
 		var tmpWin;
-		// var modsDict, arrModsDict;
-
-		// switch(GUI.id,
-		// 	\cocoa, {
-		// 		modsDict = KeyDownActions.modifiersCocoa;
-		// 		arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-		// 	},
-		// 	\qt, {
-		// 		modsDict = KeyDownActions.modifiersQt;
-		// 		arrModsDict = KeyDownActions.arrowsModifiersQt;
-		// 	}
-		// );
 
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };
@@ -798,30 +786,6 @@ CVWidget2D : CVWidget {
 			"Either the widget you're trying to reopen hasn't been closed yet or it doesn't even exist.".warn;
 		})
 	}
-
-/*	connectGUI { |connectSlider = true, connectTextField = true|
-		connectSlider !? {
-			if(connectSlider, {
-				[slider2d, rangeSlider].do{ |view|
-					sliderConnection = [widgetCV.lo, widgetCV.hi].cvWidgetConnect(view);
-				};
-			}, { [widgetCV.lo, widgetCV.hi].cvWidgetDisconnect(sliderConnection) });
-			connectS = connectSlider;
-		};
-		connectTextField !? {
-			if(connectTextField, {
-				textConnection = ();
-				#[lo, hi].do{ |hilo|
-					textConnection.put(hilo, widgetCV[hilo].cvWidgetConnect(numVal[hilo]))
-				}
-			}, {
-				#[lo, hi].do{ |hilo|
-					widgetCV[hilo].cvWidgetDisconnect(textConnection[hilo])
-				}
-			});
-			connectTF = connectTextField;
-		};
-	}*/
 
 	background_ { |color|
 		background = color;
