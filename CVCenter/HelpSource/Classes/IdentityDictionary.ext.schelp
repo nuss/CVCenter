@@ -1,6 +1,6 @@
 instancemethods::
 
-method:: findKeyForEqualValue 
+method:: findKeyForEqualValue
 Same as link::#-findKeyForValue:: but searches for equal elements instead of only identical ones.
 
 argument:: argValue
@@ -22,7 +22,7 @@ returns:: this (a link::Classes/IdentityDictionary:: or an link::Classes/Event::
 
 method:: detect
 Answer the first item in the receiver for which function answers code::true::. The function is passed two arguments, the key and a value (the object that is being checked in the function).
-The is modelled after link::Classes/Collection#-detect::.
+The method is modelled after link::Classes/Collection#-detect::.
 code::
 a = (s: 7, h: 9);
 a.detect({ |val, key| val < 9 });
