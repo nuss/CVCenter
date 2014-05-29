@@ -1384,7 +1384,6 @@ CVWidget {
 
 	initControllersAndModels { |controllersAndModels, slot|
 		var wcm, tmp;
-		var midiStateObserver;
 
 		if(controllersAndModels.notNil, {
 			// "controllersAndModels not nil???".postln;
