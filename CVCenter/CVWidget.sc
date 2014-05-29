@@ -2960,6 +2960,8 @@ CVWidget {
 					tmp = slot.asString++":"+tmp;
 				});
 
+				this.prAddOSCFeedback(slot);
+
 				// "now synching oscDisplay: %[%]\n".postf(this.name, slot);
 				wcm.oscDisplay.model.value_(
 					(
@@ -2984,6 +2986,9 @@ CVWidget {
 
 				tmp = "edit OSC";
 				if(this.class == CVWidgetMS, { tmp = slot.asString++":"+tmp });
+
+				this.prRemoveOSCFeedback;
+
 				wcm.oscDisplay.model.value_(
 					(
 						but: [tmp, stringColor, background],
@@ -3404,6 +3409,36 @@ CVWidget {
 			)
 		})
 	}
+
+	prAddOSCFeedback { |slot|
+		var valueFBfunc, nameFBfunc;
+
+		// must not be an open function -> can be activated and deactivated
+		valueFBfunc = { |cv|
+			var wdgt;
+			// important: check if the OSC-cmd has more than 2 msg-slots
+			// one slot holding the cmd-name, subsequent slot(s) holding values
+			if(OSCCommands.tempIPsAndCmds.isEmpty.not, {
+				// what kind of widget?
+				wdgt = CVCenter.cvWidgets.detect{ |it, k|
+					if(it.widgetCV.class === Event) {
+						it.widgetCV.includes(cv)
+					} { it.widgetCV === cv }
+				};
+				switch(wdgt.class,
+					CVWidget2D, {},
+					CVWidgetMS, {},
+					{}
+				)
+			});
+			// wdgt.class.postln;
+		}.asCompileString;
+
+		// valueFBfunc.postln;
+		this.addAction('OSC-value feedback', valueFBfunc, slot, true);
+	}
+
+	prRemoveOSCFeedback {}
 
 	// EXPERIMENTAL: extended API
 	extend { |key, func ... controllers|
