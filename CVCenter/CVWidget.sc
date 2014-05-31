@@ -2629,7 +2629,7 @@ CVWidget {
 					tmp = slot.asString++":"+tmp;
 				});
 
-				this.prAddOSCFeedback(slot);
+				this.prAddOSCFeedback(theChanger.value[2], theChanger.value[0], theChanger.value[1], slot);
 
 				// "now synching oscDisplay: %[%]\n".postf(this.name, slot);
 				wcm.oscDisplay.model.value_(
@@ -3148,29 +3148,58 @@ CVWidget {
 		})
 	}
 
-	prAddOSCFeedback { |slot|
+	prAddOSCFeedback { |cmd, ip, port, slot|
 		var valueFBfunc, nameFBfunc;
 
 		// must not be an open function -> can be activated and deactivated
-		valueFBfunc = { |cv|
-			var wdgt;
+		valueFBfunc = ("{ |cv|
+			var wdgt, cmdSize, tmpCmdSize, count = 0;
+			var cmd, ip, port, slot;
+
+			cmd = \""++(cmd.asString)++"\";
+			ip = \""++(ip.asString)++"\";
+			port = "++(port.asString)++";
+			slot = \""++(slot.asString)++"\";
+
 			// important: check if the OSC-cmd has more than 2 msg-slots
 			// one slot holding the cmd-name, subsequent slot(s) holding values
-			if(OSCCommands.tempIPsAndCmds.isEmpty.not, {
+
+			if(OSCCommands.tempIPsAndCmds.isEmpty.not) {
 				// what kind of widget?
 				wdgt = CVCenter.cvWidgets.detect{ |it, k|
 					if(it.widgetCV.class === Event) {
 						it.widgetCV.includes(cv)
 					} { it.widgetCV === cv }
 				};
-				switch(wdgt.class,
-					CVWidget2D, {},
-					CVWidgetMS, {},
-					{}
-				)
-			});
+				block { |break|
+					OSCCommands.tempIPsAndCmds.pairsDo{ |key, val|
+						case
+							{ ip.interpret.notNil and:{ port.interpret.notNil }} {
+								if(key.asString == (ip++\":\"++port)) { cmdSize = val[cmd.asSymbol] };
+							}
+							{ ip.interpret.notNil and:{ port.interpret.isNil }} {
+								if(key.asString.contains(ip)) {
+									cmdSize = val[cmd.asSymbol];
+									if(count > 0) {
+										if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
+										tmpCmdSize = cmdSize; count = count + 1;
+									}
+								}
+							}
+							{ ip.interpret.isNil and:{ port.interpret.isNil }} {
+								cmdSize = val[cmd.asSymbol];
+								if(count > 0) {
+									if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
+									tmpCmdSize = cmdSize; count = count + 1;
+								}
+							}
+						;
+					}
+				};
+				cmdSize.postln;
+			};
 			// wdgt.class.postln;
-		}.asCompileString;
+		}");
 
 		// valueFBfunc.postln;
 		this.addAction('OSC-value feedback', valueFBfunc, slot, true);
