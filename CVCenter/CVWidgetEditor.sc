@@ -280,8 +280,8 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					editorEnv.specsListItems = specsList.items;
 					tmp = xySlots.detectIndex({ |n| n[1] == (name.asString++slotHiLo) });
 					xySlots[tmp][1] = 0;
-					OSCCommands.tempIPsAndCmds.keysDo(OSCCommands.tempIPsAndCmds[_] = nil);
-					if(allEditors.collect(_.isClosed).size == 0, { OSCCommands.collectTempIPsAndCmds(false) });
+					// OSCCommands.tempIPsAndCmds.keysDo(OSCCommands.tempIPsAndCmds[_] = nil);
+					// if(allEditors.collect(_.isClosed).size == 0, { OSCCommands.collectTempIPsAndCmds(false) });
 				})
 			});
 
@@ -993,7 +993,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				})
 			});
 
-			OSCCommands.collectTempIPsAndCmds;
+			// OSCCommands.collectTempIPsAndCmds;
 			deviceDropDown
 				.mouseDownAction_({ |dd|
 					dropDownIPs = OSCCommands.tempIPsAndCmds.keys.asArray;

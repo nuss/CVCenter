@@ -40,6 +40,7 @@ OSCCommands {
 		});
 
 		tempIPsAndCmds = ();
+		// this.collectTempIPsAndCmds;
 
 		localOscFunc = { |argAddr, argMsg|
 			if(tempIPsAndCmds.keys.includes(
