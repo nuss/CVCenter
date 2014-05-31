@@ -49,6 +49,7 @@ CVWidget {
 
 		StartUp.add({
 			Spec.add(\in, ControlSpec(0, Server.default.options.firstPrivateBus-1, \lin, 1.0, 0));
+			// OSCCommands.collectTempIPsAndCmds;
 		});
 
 		midiSources = ();
@@ -818,7 +819,7 @@ CVWidget {
 		)
 	}
 
-	oscConnect { |ip, port, name, oscMsgIndex=1, slot|
+	oscConnect { |ip, port, name, oscMsgIndex=1, slot, oscFeedbackPort|
 		var thisSlot, wcm;
 		var thisIP, intPort;
 
@@ -871,7 +872,8 @@ CVWidget {
 		}, {
 			if(midiOscEnv.oscResponder.notNil, { "Already connected!".warn });
 		});
-		wcm.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex]).changedKeys(synchKeys);
+
+		wcm.oscConnection.model.value_([thisIP, intPort, name.asSymbol, oscMsgIndex, oscFeedbackPort]).changedKeys(synchKeys);
 		switch(this.class,
 			CVWidgetKnob, {
 				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect }) });
@@ -2548,11 +2550,16 @@ CVWidget {
 				{ thisCalib = prCalibrate }
 			);
 
-			if(theChanger.value.size == 4, {
+			if(theChanger.value.size >= 4, {
 // 				OSCresponderNode: t, r, msg
 // 				OSCfunc: msg, time, addr // for the future
 				// oscResponderAction = { |t, r, msg, addr|
 				oscResponderAction = { |msg, time, addr|
+					midiOscEnv.oscReplyAddrs ?? { midiOscEnv.oscReplyAddrs = [] };
+					if(midiOscEnv.oscReplyAddrs.includesEqual(addr).not, {
+						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.add(addr);
+						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.asBag.contents.keys.asArray;
+					});
 					if(thisCalib, {
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
@@ -2629,7 +2636,7 @@ CVWidget {
 					tmp = slot.asString++":"+tmp;
 				});
 
-				this.prAddOSCFeedback(theChanger.value[2], theChanger.value[0], theChanger.value[1], slot);
+				this.addOSCFeedback(theChanger.value[2], theChanger.value[0], theChanger.value[1], slot, theChanger.value[1] ? CVCenter.globalOSCfeedbackPort);
 
 				// "now synching oscDisplay: %[%]\n".postf(this.name, slot);
 				wcm.oscDisplay.model.value_(
@@ -2661,6 +2668,8 @@ CVWidget {
 				if(this.class == CVWidgetMS, {
 					tmp = slot.asString++":"+tmp;
 				});
+
+				this.removeOSCFeedback;
 
 				// "now synching oscDisplay: %[%]\n".postf(this.name, slot);
 				wcm.oscDisplay.model.value_(
@@ -3148,18 +3157,19 @@ CVWidget {
 		})
 	}
 
-	prAddOSCFeedback { |cmd, ip, port, slot|
+	addOSCFeedback { |cmd, ip, port, slot, oscFeedbackPort|
 		var valueFBfunc, nameFBfunc;
 
 		// must not be an open function -> can be activated and deactivated
 		valueFBfunc = ("{ |cv|
-			var wdgt, cmdSize, tmpCmdSize, count = 0;
+			var wdgt, cmdSize, tmpCmdSize, fbPort, fbAddr, count = 0;
 			var cmd, ip, port, slot;
 
 			cmd = \""++(cmd.asString)++"\";
 			ip = \""++(ip.asString)++"\";
 			port = "++(port.asString)++";
 			slot = \""++(slot.asString)++"\";
+			fbPort = "++(oscFeedbackPort.asString)++";
 
 			// important: check if the OSC-cmd has more than 2 msg-slots
 			// one slot holding the cmd-name, subsequent slot(s) holding values
@@ -3174,10 +3184,12 @@ CVWidget {
 				block { |break|
 					OSCCommands.tempIPsAndCmds.pairsDo{ |key, val|
 						case
-							{ ip.interpret.notNil and:{ port.interpret.notNil }} {
+							{ ip.notNil and:{ port.interpret.notNil }} {
+								\"ip, port\".postln;
 								if(key.asString == (ip++\":\"++port)) { cmdSize = val[cmd.asSymbol] };
 							}
-							{ ip.interpret.notNil and:{ port.interpret.isNil }} {
+							{ ip.notNil and:{ port.interpret.isNil }} {
+								\"ip, no port\".postln;
 								if(key.asString.contains(ip)) {
 									cmdSize = val[cmd.asSymbol];
 									if(count > 0) {
@@ -3186,16 +3198,26 @@ CVWidget {
 									}
 								}
 							}
-							{ ip.interpret.isNil and:{ port.interpret.isNil }} {
+							{ ip.isNil and:{ port.interpret.isNil }} {
+								\"no ip, no port\".postln;
 								cmdSize = val[cmd.asSymbol];
 								if(count > 0) {
-									if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
+									if(cmdSize != tmpCmdSize) { \"cmdSize = nil\".postln; break.value(cmdSize = nil) };
 									tmpCmdSize = cmdSize; count = count + 1;
 								}
 							}
 						;
 					}
 				};
+			// fbAddr = CVCenter.oscFeedbackAddrs.detect{ |addr|
+			// addr.ip == ip and:{ addr.port == fbPort.interpret }
+			// } ?? { CVCenter.oscFeedbackAddrs.add(fbAddr = NetAddr(ip, fbPort.interpret)) }
+			//
+			// if(cmdSize == 1) {
+			// fbAddr.sendMsg(cmd.asSymbol, cv.input);
+			// } {
+			//
+			// };
 				cmdSize.postln;
 			};
 			// wdgt.class.postln;
@@ -3205,7 +3227,7 @@ CVWidget {
 		this.addAction('OSC-value feedback', valueFBfunc, slot, true);
 	}
 
-	prRemoveOSCFeedback {}
+	removeOSCFeedback {}
 
 	// EXPERIMENTAL: extended API
 	extend { |key, func ... controllers|
