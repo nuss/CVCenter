@@ -31,8 +31,6 @@ CVCenter {
 	// CVWidgetMS: how many slots at max for one column
 	classvar <>numMsSlotsPerColumn = 15;
 	classvar <>connectSliders = true, <>connectTextFields = true;
-	classvar <>globalOSCfeedbackPort = 9000;
-	classvar oscFeedbackAddrs;
 
 	*initClass {
 		var newPrefs, newBounds;
@@ -45,7 +43,6 @@ CVCenter {
 		Class.initClassTree(KeyDownActions);
 		Class.initClassTree(CVCenterShortcuts);
 		// windowStates = ();
-		oscFeedbackAddrs = List();
 
 		this.dontSave_(['select snapshot', \snapshot]);
 		systemWidgets = ['select snapshot', \snapshot];

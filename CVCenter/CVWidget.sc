@@ -19,6 +19,8 @@ CVWidget {
 
 	classvar <>removeResponders = true, <>midiSources, <>shortcuts, prefs/*, midiStateObserver*/;
 	classvar <>debug = false;
+	classvar <>globalOSCfeedbackPort = 9000;
+
 	var <parent, <widgetCV, <name, <connectS = true, <connectTF = true;
 	var <activeSliderB, <activeTextB;
 	var sliderConnection, textConnection;
@@ -40,6 +42,9 @@ CVWidget {
 	var lastMsgIndex, msMsgIndexDiffers = false, count = 0;
 	// CVWidgetMS
 	var msSize, <cvArray;
+	// OSC-feedback
+	var <>oscFeedbackPort;
+	var <>oscFeedbackAddrs;
 
 	*initClass {
 		var scFunc, scPrefs = false;
@@ -2636,7 +2641,7 @@ CVWidget {
 					tmp = slot.asString++":"+tmp;
 				});
 
-				this.addOSCFeedback(theChanger.value[2], theChanger.value[0], theChanger.value[1], slot, theChanger.value[1] ? CVCenter.globalOSCfeedbackPort);
+				this.addOSCFeedback(theChanger.value[2], theChanger.value[0], theChanger.value[1], slot, theChanger.value[1] ? this.class.globalOSCfeedbackPort);
 
 				// "now synching oscDisplay: %[%]\n".postf(this.name, slot);
 				wcm.oscDisplay.model.value_(
@@ -3181,44 +3186,55 @@ CVWidget {
 						it.widgetCV.includes(cv)
 					} { it.widgetCV === cv }
 				};
+
+				wdgt.oscFeedbackAddrs ?? { wdgt.oscFeedbackAddrs = Set() };
+
 				block { |break|
 					OSCCommands.tempIPsAndCmds.pairsDo{ |key, val|
 						case
-							{ ip.notNil and:{ port.interpret.notNil }} {
-								\"ip, port\".postln;
-								if(key.asString == (ip++\":\"++port)) { cmdSize = val[cmd.asSymbol] };
+							{ ip != \"nil\" and:{ port.interpret.notNil }} {
+								\"ip: %, port: %\\n\".postf(ip, port);
+								if(key.asString == (ip++\":\"++port)) {
+									cmdSize = val[cmd.asSymbol];
+									wdgt.oscFeedbackAddrs.add(NetAddr(ip, fbPort));
+								};
 							}
-							{ ip.notNil and:{ port.interpret.isNil }} {
-								\"ip, no port\".postln;
+							{ ip != \"nil\" and:{ port.interpret.isNil }} {
+								\"ip: %, no port\\n\".postf(ip);
 								if(key.asString.contains(ip)) {
 									cmdSize = val[cmd.asSymbol];
 									if(count > 0) {
 										if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
 										tmpCmdSize = cmdSize; count = count + 1;
+									};
+									cmdSize !? {
+										wdgt.oscFeedbackAddrs.add(NetAddr(key.asString.split($:)[0], fbPort));
 									}
 								}
 							}
-							{ ip.isNil and:{ port.interpret.isNil }} {
+							{ ip == \"nil\" and:{ port.interpret.isNil }} {
 								\"no ip, no port\".postln;
 								cmdSize = val[cmd.asSymbol];
 								if(count > 0) {
-									if(cmdSize != tmpCmdSize) { \"cmdSize = nil\".postln; break.value(cmdSize = nil) };
+									if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
 									tmpCmdSize = cmdSize; count = count + 1;
+								};
+								cmdSize !? {
+									wdgt.oscFeedbackAddrs.add(NetAddr(key.asString.split($:)[0], fbPort));
 								}
 							}
 						;
 					}
 				};
-			// fbAddr = CVCenter.oscFeedbackAddrs.detect{ |addr|
-			// addr.ip == ip and:{ addr.port == fbPort.interpret }
-			// } ?? { CVCenter.oscFeedbackAddrs.add(fbAddr = NetAddr(ip, fbPort.interpret)) }
-			//
+
 			// if(cmdSize == 1) {
+			// wdgt.oscFeedbackAddrs
 			// fbAddr.sendMsg(cmd.asSymbol, cv.input);
 			// } {
 			//
 			// };
-				cmdSize.postln;
+			// cmdSize.postln;
+				wdgt.oscFeedbackAddrs.postln;
 			};
 			// wdgt.class.postln;
 		}");
