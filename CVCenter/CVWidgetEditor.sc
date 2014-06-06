@@ -1059,64 +1059,65 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		if(widget.class != CVWidgetMS, {
 			switch(addRemove,
 				\add, {
+					actionsUIs[name] ?? {
+						actionsUIs.put(name, ());
+						tabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height+76);
 
-					actionsUIs.put(name, ());
-					tabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height+76);
+						flow3.shift(0, 5);
 
-					flow3.shift(0, 5);
+						actionsUIs[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
+							.font_(staticTextFont)
+							.background_(Color(1.0, 1.0, 1.0, 0.5))
+							.string_(""+name.asString)
+						;
 
-					actionsUIs[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
-						.font_(staticTextFont)
-						.background_(Color(1.0, 1.0, 1.0, 0.5))
-						.string_(""+name.asString)
-					;
+						flow3.shift(5, 0);
 
-					flow3.shift(5, 0);
+						actionsUIs[name].activate = Button(tabView3, 60@15)
+							.font_(staticTextFont)
+							.states_([
+								["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+								["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
+							])
+							.action_({ |rb|
+								switch(rb.value,
+									0, { widget.activateAction(name, false, slot) },
+									1, { widget.activateAction(name, true, slot) }
+								)
+							})
+						;
 
-					actionsUIs[name].activate = Button(tabView3, 60@15)
-						.font_(staticTextFont)
-						.states_([
-							["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
-							["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
-						])
-						.action_({ |rb|
-							switch(rb.value,
-								0, { widget.activateAction(name, false, slot) },
-								1, { widget.activateAction(name, true, slot) }
-							)
-						})
-					;
+						switch(active,
+							true, {
+								actionsUIs[name].activate.value_(1);
+							},
+							false, {
+								actionsUIs[name].activate.value_(0);
+							}
+						);
 
-					switch(active,
-						true, {
-							actionsUIs[name].activate.value_(1);
-						},
-						false, {
-							actionsUIs[name].activate.value_(0);
-						}
-					);
+						flow3.shift(5, 0);
 
-					flow3.shift(5, 0);
+						actionsUIs[name].removeBut = Button(tabView3, 60@15)
+							.font_(staticTextFont)
+							.states_([
+								["remove", Color.white, Color.red],
+							])
+							.action_({ |ab|
+								widget.removeAction(name.asSymbol, slot.asSymbol);
+							})
+						;
 
-					actionsUIs[name].removeBut = Button(tabView3, 60@15)
-						.font_(staticTextFont)
-						.states_([
-							["remove", Color.white, Color.red],
-						])
-						.action_({ |ab|
-							widget.removeAction(name.asSymbol, slot.asSymbol);
-						})
-					;
+						flow3.shift(0, 0);
 
-					flow3.shift(0, 0);
-
-					actionsUIs[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
-						.background_(Color(1.0, 1.0, 1.0, 0.5))
-						.font_(textFieldFont)
-						.string_(action.asArray[0][0])
-						.syntaxColorize
-						.editable_(false)
-					;
+						actionsUIs[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
+							.background_(Color(1.0, 1.0, 1.0, 0.5))
+							.font_(textFieldFont)
+							.string_(action.asArray[0][0])
+							.syntaxColorize
+							.editable_(false)
+						;
+					}
 				},
 				\remove, {
 					actTop = actionsUIs[name].nameField.bounds.top;
