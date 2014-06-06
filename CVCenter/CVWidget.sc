@@ -3503,7 +3503,7 @@ CVWidget {
 								},
 								CVWidgetMS, {
 									w.msSize.do{ |i|
-										model = w.wdgtControllersAndModels[i].oscConnection.model;
+										model = w.wdgtControllersAndModels.slots[i].oscConnection.model;
 										if(model.value !== false) {
 											if(model.value[2] === cmd.asSymbol) {
 												respondingCVs.add([w.name, model.value[3], w.widgetCV, i]);
@@ -3511,7 +3511,7 @@ CVWidget {
 											};
 											if(initedCmds.size == cmdSize) { break.value(doSend = true) };
 										}
-									}
+									};
 								},
 								CVWidgetKnob, {
 									model = w.wdgtControllersAndModels.oscConnection.model;
@@ -3521,7 +3521,7 @@ CVWidget {
 											initedCmds.add([model.value[2], model.value[3]]);
 										};
 										if(initedCmds.size == cmdSize) { break.value(doSend = true) };
-									}
+									};
 								}
 							)
 						}
