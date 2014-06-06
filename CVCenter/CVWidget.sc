@@ -205,7 +205,9 @@ CVWidget {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as third argument to addAction!").throw };
 				this.wdgtActions[slot.asSymbol] ?? { this.wdgtActions.put(slot.asSymbol, ()) };
 				// avoid duplicates
-				this.wdgtActions[slot.asSymbol][name.asSymbol] ?? { this.wdgtActions[slot.asSymbol].put(name.asSymbol, ()) };
+				this.wdgtActions[slot.asSymbol][name.asSymbol] ?? {
+					this.wdgtActions[slot.asSymbol].put(name.asSymbol, ());
+				};
 				if(this.wdgtActions[slot.asSymbol][name.asSymbol].size < 1, {
 					if(active == true, {
 						controller = widgetCV[slot.asSymbol].action_(act);
@@ -3197,17 +3199,18 @@ CVWidget {
 					OSCCommands.tempIPsAndCmds.pairsDo{ |key, val|
 						case
 							{ ip != \"nil\" and:{ port.interpret.notNil }} {
-								// \"ip: %, port: %\\n\".postf(ip, port);
+\"ip: %, port: %\\n\".postf(ip, port);
 								if(key.asString == (ip++\":\"++port)) {
 									cmdSize = val[cmd.asSymbol];
 									wdgt.oscFeedbackAddrs.add(NetAddr(ip, fbPort));
 								};
 							}
 							{ ip != \"nil\" and:{ port.interpret.isNil }} {
-								// \"ip: %, no port\\n\".postf(ip);
+\"ip: %, no port\\n\".postf(ip);
 								if(key.asString.contains(ip)) {
 									cmdSize = val[cmd.asSymbol];
 									if(count > 0) {
+\"happening here [1]?\".postln;
 										if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
 										tmpCmdSize = cmdSize; count = count + 1;
 									};
@@ -3217,9 +3220,10 @@ CVWidget {
 								}
 							}
 							{ ip == \"nil\" and:{ port.interpret.isNil }} {
-								// \"no ip, no port\".postln;
+\"no ip, no port\".postln;
 								cmdSize = val[cmd.asSymbol];
 								if(count > 0) {
+\"happening here [2]?\".postln;
 									if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
 									tmpCmdSize = cmdSize; count = count + 1;
 								};
