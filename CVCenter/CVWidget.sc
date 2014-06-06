@@ -3570,7 +3570,7 @@ CVWidget {
 		}");
 
 		// valueFBfunc.postln;
-		this.addAction('OSC-value feedback', valueFBfunc, slot, true);
+		this.addAction('OSC-value feedback', valueFBfunc, slot, false);
 	}
 
 	removeOSCFeedback { |slot| this.removeAction('OSC-value feedback', slot) }
