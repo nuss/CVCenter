@@ -3,6 +3,12 @@ CVWidgetMS : CVWidget {
 	var numOscResponders, numMidiResponders;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
+	// special var for OSC-feedback:
+	// a CVWidgetMS can only have added one action for all sliders
+	// however, each of them may be be listening to different OSC-command
+	// hence we need to know the current state of all sliders when
+	// start sending feedback to external device
+	var <msFeedbackCmds;
 
 	*new { |parent, widgetCV, name, connectMSlider, connectTextField, bounds, defaultAction, setup, controllersAndModels, cvcGui, persistent, numSliders=5, server|
 		^super.newCopyArgs(parent, widgetCV, name, connectMSlider, connectTextField).init(
@@ -30,6 +36,9 @@ CVWidgetMS : CVWidget {
 
 		synchKeys ?? { synchKeys = [\default] };
 		#numOscResponders, numMidiResponders = 0!2;
+
+		// used in CVWidget:-addOSCFeedback
+		msFeedbackCmds = nil!msSize;
 
 		calibViews = List();
 

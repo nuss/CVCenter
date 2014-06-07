@@ -2041,6 +2041,7 @@ CVWidget {
 				});
 
 				msSize = specSize;
+
 				// "msSize: %\n".postf(msSize);
 
 				if(Spec.findKeyForSpec(theChanger.value).notNil, {
@@ -3426,12 +3427,33 @@ CVWidget {
 			var wdgt, cmdSize, tmpCmdSize = 0, fbPort, fbAddr, count = 0;
 			var cmd, ip, port, slot, initedCmds, model, respondingCVs;
 			var doSend = false, orderedVals;
+			var wmsDoers; // are there an multislider widgets involved in the current command?
 
-			cmd = \""++(cmd.asString)++"\";
 			ip = \""++(ip.asString)++"\";
 			port = "++(port.asString)++";
-			slot = \""++(slot.asString)++"\";
+			switch(wdgt.class,
+				CVWidgetMS, { slot = "++slot.asString++" },
+				{ slot = '"++(slot.asString)++"'}
+			);
 			fbPort = "++(oscFeedbackPort.asString)++";
+
+			if(wdgt.class == CVWidgetMS) {
+				// check length wdgt.msFeedbackCmds first
+				case
+					{ wdgt.msSize > (wdgt.msFeedbackCmds.size) } {
+						wdgt.msFeedbackCmds.growClear(wdgt.msSize-wdgt.msFeedbackCmds.size)
+					}
+					{ wdgt.msSize < (wdgt.msFeedbackCmds.size) } {
+						(wdgt.msFeedbackCmds.size-wdgt.msSize).do(wdgt.msFeedbackCmds.pop)
+					}
+				;
+				if(wdgt.msFeedbackCmds.includes('"++(cmd.asString)++"').not) {
+					wdgt.msFeedbackCmds[slot] = '"++(cmd.asString)++"';
+					cmd = wdgt.msFeedbackCmds;
+				}
+			} {
+				cmd = '"++(cmd.asString)++"';
+			};
 
 			initedCmds = Set();
 			respondingCVs = List();
@@ -3477,10 +3499,11 @@ CVWidget {
 								// \"no ip, no port\".postln;
 								cmdSize = val[cmd.asSymbol];
 
-								if((count > 0).postln) {
+								if(count > 0) {
 									if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
 									tmpCmdSize = cmdSize; count = count + 1;
 								};
+// cmdSize.postln;
 								cmdSize !? {
 									wdgt.oscFeedbackAddrs.add(NetAddr(key.asString.split($:)[0], fbPort));
 								}
@@ -3511,6 +3534,7 @@ CVWidget {
 										if(model.value !== false) {
 											if(model.value[2] === cmd.asSymbol) {
 												respondingCVs.add([w.name, model.value[3], w.widgetCV, i]);
+// respondingCVs.postln;
 												initedCmds.add([model.value[2], model.value[3]]);
 											};
 											if(initedCmds.size == cmdSize) { break.value(doSend = true) };
@@ -3532,9 +3556,11 @@ CVWidget {
 					}
 				};
 
+// cmdSize.postln;
 				if(cmdSize > 1) {
 					orderedVals = nil!cmdSize;
 					respondingCVs.do{ |rcv|
+// rcv.postln;
 						switch(rcv.size,
 							4, { // wdgt is a CVWidgetMS
 								if(cv === rcv[2]) {
@@ -3542,6 +3568,7 @@ CVWidget {
 								} {
 									orderedVals[rcv[1]-1] = CVCenter.at(rcv[0]).input[rcv[3]];
 								};
+//orderedVals.postln;
 							},
 							{
 								if(cv === rcv[2]) {
@@ -3564,9 +3591,22 @@ CVWidget {
 				if(doSend) {
 					wdgt.oscFeedbackAddrs.do{ |addr|
 						if(cmdSize == 1) {
-							addr.sendMsg(cmd.asSymbol, cv.input)
+							if(wdgt.class == CVWidgetMS) {
+								cmd.postln;
+								cmd.do{ |icmd, i|
+									icmd !? { addr.sendMsg(icmd, cv.input[i]) }
+								}
+							} {
+								addr.sendMsg(cmd.asSymbol, cv.input)
+							}
 						} {
-							addr.sendMsg(cmd.asSymbol, *orderedVals)
+							if(wdgt.class == CVWidgetMS) {
+								cmd.do{ |icmd, i|
+									addr.sendMsg(icmd, cv.input[i])
+								}
+							} {
+								addr.sendMsg(cmd.asSymbol, *orderedVals)
+							}
 						}
 					}
 				}
