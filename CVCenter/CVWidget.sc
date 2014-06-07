@@ -3169,7 +3169,7 @@ CVWidget {
 
 		// must not be an open function -> can be activated and deactivated
 		valueFBfunc = ("{ |cv|
-			var wdgt, cmdSize, tmpCmdSize, fbPort, fbAddr, count = 0;
+			var wdgt, cmdSize, tmpCmdSize = 0, fbPort, fbAddr, count = 0;
 			var cmd, ip, port, slot, initedCmds, model, respondingCVs;
 			var doSend = false, orderedVals;
 
@@ -3210,7 +3210,7 @@ CVWidget {
 								if(key.asString.contains(ip)) {
 									cmdSize = val[cmd.asSymbol];
 									if(count > 0) {
-\"happening here [1]?\".postln;
+										// \"happening here [1]?\".postln;
 										if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
 										tmpCmdSize = cmdSize; count = count + 1;
 									};
@@ -3220,10 +3220,10 @@ CVWidget {
 								}
 							}
 							{ ip == \"nil\" and:{ port.interpret.isNil }} {
-\"no ip, no port\".postln;
+								// \"no ip, no port\".postln;
 								cmdSize = val[cmd.asSymbol];
-								if(count > 0) {
-\"happening here [2]?\".postln;
+
+								if((count > 0).postln) {
 									if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
 									tmpCmdSize = cmdSize; count = count + 1;
 								};

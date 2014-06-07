@@ -126,6 +126,8 @@ CVCenter {
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvcenter];
 		});
+
+		/* if globalShortcuts don't exist create and add the following */
 	}
 
 	*new { |cvs...setUpArgs|
