@@ -3,7 +3,7 @@ KeyDownActions {
 	// classvar <allEditors;
 	// classvar <viewActions;
 	classvar <>keyCodes, <>modifiersQt, <>modifiersCocoa, <>arrowsModifiersQt, <>arrowsModifiersCocoa;
-	classvar <>globalShortcuts, <globalShortcutsEnabled=true;
+	classvar <>globalShortcuts, <globalShortcutsEnabled=true, globalShortcutsEnableFunc;
 	classvar trackingSynth, syncResponder, trackingSynthID;
 	// var <window, <>actions;
 
@@ -18,6 +18,12 @@ KeyDownActions {
 		Class.initClassTree(GUI);
 		Class.initClassTree(SynthDescLib);
 		Class.initClassTree(SynthDef);
+
+		globalShortcutsEnableFunc = {
+			if(globalShortcutsEnabled) {
+				this.globalShortcutsSync;
+			}
+		};
 
 		Platform.case(
 			\osx, { platform = "OSX" },
@@ -424,11 +430,9 @@ KeyDownActions {
 					}).add
 				};
 				// [this.method, this.method.name].postln;
-				CmdPeriod.add({
-					if(globalShortcutsEnabled) {
-						this.globalShortcutsSync;
-					}
-				});
+				CmdPeriod.objects.includes(globalShortcutsEnableFunc).not.if{
+					CmdPeriod.add(globalShortcutsEnableFunc)
+				};
 				"\nglobal key-down actions enabled\n".inform;
 				trackingSynth.newMsg;
 			}.value);
