@@ -20,6 +20,7 @@ CVWidget {
 	classvar <>removeResponders = true, <>midiSources, <>shortcuts, prefs/*, midiStateObserver*/;
 	classvar <>debug = false;
 	classvar <>globalOSCfeedbackPort = 9000;
+	classvar multiSlotOSCcmds;
 
 	var <parent, <widgetCV, <name, <connectS = true, <connectTF = true;
 	var <activeSliderB, <activeTextB;
@@ -50,6 +51,8 @@ CVWidget {
 		var scFunc, scPrefs = false;
 
 		Class.initClassTree(KeyDownActions);
+
+		multiSlotOSCcmds = ();
 
 		StartUp.add({
 			midiSources = ();
@@ -3455,6 +3458,8 @@ CVWidget {
 				cmd = '"++(cmd.asString)++"';
 			};
 
+cmd.postln;
+
 			initedCmds = Set();
 			respondingCVs = List();
 
@@ -3473,18 +3478,29 @@ CVWidget {
 
 				block { |break|
 					OSCCommands.tempIPsAndCmds.pairsDo{ |key, val|
+[key, val].postln;
 						case
 							{ ip != \"nil\" and:{ port.interpret.notNil }} {
 \"ip: %, port: %\\n\".postf(ip, port);
 								if(key.asString == (ip++\":\"++port)) {
-									cmdSize = val[cmd.asSymbol];
+									switch(wdgt.class,
+										CVWidgetMS, {
+											cmdSize = wdgt.msSize.collect{ |w, i| val[cmd[i].asSymbol] }
+										},
+										{ cmdSize = val[cmd.asSymbol] }
+									);
 									wdgt.oscFeedbackAddrs.add(NetAddr(ip, fbPort));
 								};
 							}
 							{ ip != \"nil\" and:{ port.interpret.isNil }} {
 \"ip: %, no port\\n\".postf(ip);
 								if(key.asString.contains(ip)) {
-									cmdSize = val[cmd.asSymbol];
+									switch(wdgt.class,
+										CVWidgetMS, {
+											cmdSize = wdgt.msSize.collect{ |w, i| val[cmd[i].asSymbol] }
+										},
+										{ cmdSize = val[cmd.asSymbol] }
+									);
 									if(count > 0) {
 										// \"happening here [1]?\".postln;
 										if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
@@ -3496,8 +3512,14 @@ CVWidget {
 								}
 							}
 							{ ip == \"nil\" and:{ port.interpret.isNil }} {
-								// \"no ip, no port\".postln;
-								cmdSize = val[cmd.asSymbol];
+\"no ip, no port\".postln;
+								switch(wdgt.class,
+									CVWidgetMS, {
+cmdSize = wdgt.msSize.collect{ |w, i| val[cmd[i]].postln;  val[cmd[i].asSymbol] };
+cmdSize.postln;
+									},
+									{ cmdSize = val[cmd.asSymbol] }
+								);
 
 								if(count > 0) {
 									if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
@@ -3532,12 +3554,12 @@ CVWidget {
 									w.msSize.do{ |i|
 										model = w.wdgtControllersAndModels.slots[i].oscConnection.model;
 										if(model.value !== false) {
-											if(model.value[2] === cmd.asSymbol) {
+											if(model.value[2] === cmd[i].asSymbol) {
 												respondingCVs.add([w.name, model.value[3], w.widgetCV, i]);
 // respondingCVs.postln;
 												initedCmds.add([model.value[2], model.value[3]]);
 											};
-											if(initedCmds.size == cmdSize) { break.value(doSend = true) };
+											if(initedCmds.size == cmdSize[i]) { break.value(doSend = true) };
 										}
 									};
 								},
@@ -3568,7 +3590,7 @@ CVWidget {
 								} {
 									orderedVals[rcv[1]-1] = CVCenter.at(rcv[0]).input[rcv[3]];
 								};
-//orderedVals.postln;
+// orderedVals.postln;
 							},
 							{
 								if(cv === rcv[2]) {
@@ -3592,7 +3614,7 @@ CVWidget {
 					wdgt.oscFeedbackAddrs.do{ |addr|
 						if(cmdSize == 1) {
 							if(wdgt.class == CVWidgetMS) {
-								cmd.postln;
+// cmd.postln;
 								cmd.do{ |icmd, i|
 									icmd !? { addr.sendMsg(icmd, cv.input[i]) }
 								}
