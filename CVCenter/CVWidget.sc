@@ -20,7 +20,7 @@ CVWidget {
 	classvar <>removeResponders = true, <>midiSources, <>shortcuts, prefs/*, midiStateObserver*/;
 	classvar <>debug = false;
 	classvar <>globalOSCfeedbackPort = 9000;
-	classvar multiSlotOSCcmds;
+	classvar <multiSlotOSCcmds;
 
 	var <parent, <widgetCV, <name, <connectS = true, <connectTF = true;
 	var <activeSliderB, <activeTextB;
@@ -2545,13 +2545,14 @@ CVWidget {
 	prInitOscConnect { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var oscResponderAction, tmp;
 		var intSlots;
+		var at, thisVal, multiSlotKey;
 
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
 		};
 
 		wcm.oscConnection.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitOscConnect: %\n".postf(theChanger);
+			"prInitOscConnect: %\n".postf(theChanger);
 			if(debug, { "widget '%' (%) at slot '%' oscConnection.model: %\n".postf(this.name, this.class, slot, theChanger) });
 			// "% isCVCWidget: %\n".postf(this.name, this.isCVCWidget);
 
@@ -2646,6 +2647,47 @@ CVWidget {
 				if(this.class == CVWidgetMS, {
 					tmp = slot.asString++":"+tmp;
 				});
+
+				netAddr.postln;
+				netAddr !? { netAddr.port.postln };
+
+				if(netAddr.isNil, { at = OSCCommands.tempIPsAndCmds.keys }, {
+					case
+						{ netAddr.notNil and:{ netAddr.port.notNil and:{
+							OSCCommands.tempIPsAndCmds[(netAddr.ip++":"++netAddr.port).asSymbol].notNil
+					}}} {
+							at = (netAddr.ip++":"++netAddr.port).asSymbol;
+						}
+						{ netAddr.notNil and:{ netAddr.port.isNil and:{
+							(at = OSCCommands.tempIPsAndCmds.keys.select({ |k|
+								k.asString.split($:)[0] == netAddr.ip
+							})).size > 0
+					}}} { at }
+				});
+
+				at.do{ |k|
+					OSCCommands.tempIPsAndCmds[k].detect{ |val, key| thisVal = val; key === theChanger.value[2] } !? {
+						if(netAddr.isNil, { multiSlotKey = \all }, { multiSlotKey = netAddr.ip.asSymbol}) ;
+						multiSlotOSCcmds[multiSlotKey] ?? {
+							multiSlotOSCcmds.put(multiSlotKey, ());
+						};
+						multiSlotOSCcmds[multiSlotKey][theChanger.value[2]] ?? {
+							multiSlotOSCcmds[multiSlotKey].put(
+								multiSlotOSCcmds[multiSlotKey], nil!thisVal
+							)
+						};
+						// switch(this.class,
+						// 	CVWidgetKnob, {
+						// 		multiSlotOSCcmds[netAddr.ip][theChanger.value[2]][theChanger.value[3]] = this.name;
+						// 	},
+						// 	{
+						// 		multiSlotOSCcmds[netAddr.ip][theChanger.value[2]][theChanger.value[3]] = (this.name: slot);
+						// 	}
+						// )
+					}
+				};
+
+				"netAddr: %, multiSlotOSCcmds: %\n".postf(netAddr, multiSlotOSCcmds);
 
 				this.addOSCFeedback(theChanger.value[2], theChanger.value[0], theChanger.value[1], slot, theChanger.value[4] ? this.class.globalOSCfeedbackPort);
 
