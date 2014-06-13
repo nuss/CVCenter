@@ -45,7 +45,7 @@ CVWidget {
 	var msSize, <cvArray;
 	// OSC-feedback
 	var <>oscFeedbackPort;
-	var <>oscFeedbackAddrs;
+	var <>oscFeedbackAddrs, oscHasFired = false, multiSlotCmdsChecked = false;
 
 	*initClass {
 		var scFunc, scPrefs = false;
@@ -2545,7 +2545,6 @@ CVWidget {
 	prInitOscConnect { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var oscResponderAction, tmp;
 		var intSlots;
-		var at, thisVal, multiSlotKey;
 
 		wcm.oscConnection.controller ?? {
 			wcm.oscConnection.controller = SimpleController(wcm.oscConnection.model);
@@ -2627,7 +2626,8 @@ CVWidget {
 							),
 							argWidgetCV.value[(slot+1)..]
 						].flat);
-					})
+					});
+					oscHasFired = true;
 				};
 
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
@@ -2648,48 +2648,14 @@ CVWidget {
 					tmp = slot.asString++":"+tmp;
 				});
 
-				netAddr.postln;
-				netAddr !? { netAddr.port.postln };
+				/* add feedback actions */
 
-				if(netAddr.isNil, { at = OSCCommands.tempIPsAndCmds.keys }, {
-					case
-						{ netAddr.notNil and:{ netAddr.port.notNil and:{
-							OSCCommands.tempIPsAndCmds[(netAddr.ip++":"++netAddr.port).asSymbol].notNil
-					}}} {
-							at = (netAddr.ip++":"++netAddr.port).asSymbol;
-						}
-						{ netAddr.notNil and:{ netAddr.port.isNil and:{
-							(at = OSCCommands.tempIPsAndCmds.keys.select({ |k|
-								k.asString.split($:)[0] == netAddr.ip
-							})).size > 0
-					}}} { at }
-				});
+				// netAddr.postln;
+				// netAddr !? { netAddr.port.postln };
 
-				at.do{ |k|
-					OSCCommands.tempIPsAndCmds[k].detect{ |val, key| thisVal = val; key === theChanger.value[2] } !? {
-						if(netAddr.isNil, { multiSlotKey = \all }, { multiSlotKey = netAddr.ip.asSymbol}) ;
-						multiSlotOSCcmds[multiSlotKey] ?? {
-							multiSlotOSCcmds.put(multiSlotKey, ());
-						};
-						multiSlotOSCcmds[multiSlotKey][theChanger.value[2]] ?? {
-							multiSlotOSCcmds[multiSlotKey].put(
-								multiSlotOSCcmds[multiSlotKey], nil!thisVal
-							)
-						};
-						// switch(this.class,
-						// 	CVWidgetKnob, {
-						// 		multiSlotOSCcmds[netAddr.ip][theChanger.value[2]][theChanger.value[3]] = this.name;
-						// 	},
-						// 	{
-						// 		multiSlotOSCcmds[netAddr.ip][theChanger.value[2]][theChanger.value[3]] = (this.name: slot);
-						// 	}
-						// )
-					}
-				};
+				this.addOSCFeedback(theChanger.value[2], theChanger.value[3], theChanger.value[0], theChanger.value[1], slot, theChanger.value[4] ? this.class.globalOSCfeedbackPort);
 
-				"netAddr: %, multiSlotOSCcmds: %\n".postf(netAddr, multiSlotOSCcmds);
-
-				this.addOSCFeedback(theChanger.value[2], theChanger.value[0], theChanger.value[1], slot, theChanger.value[4] ? this.class.globalOSCfeedbackPort);
+				/* .... hopefully added feedback actions */
 
 				// "now synching oscDisplay: %[%]\n".postf(this.name, slot);
 				wcm.oscDisplay.model.value_(
@@ -3210,224 +3176,130 @@ CVWidget {
 		})
 	}
 
-	addOSCFeedback { |cmd, ip, port, slot, oscFeedbackPort|
-		var valueFBfunc, nameFBfunc;
+	addOSCFeedback { |cmd, cmdSlot, ip, port, slot, oscFeedbackPort|
+		var f1, f2, f3, valueFBfunc, nameFBfunc;
 
 		// must not be an open function -> can be activated and deactivated
-		valueFBfunc = ("{ |cv|
-			var wdgt, cmdSize, tmpCmdSize = 0, fbPort, fbAddr, count = 0;
-			var cmd, ip, port, slot, initedCmds, model, respondingCVs;
-			var doSend = false, orderedVals;
-			var wmsDoers; // are there an multislider widgets involved in the current command?
+		f1 = ("{ |cv|
+			var wdgt;
+			var cvSlot;
+			var cmd = '"++cmd++"';
+			var cmdSlot = "++cmdSlot++";
 
-			ip = \""++(ip.asString)++"\";
-			port = "++(port.asString)++";
-			switch(wdgt.class,
-				CVWidgetMS, { slot = "++slot.asString++" },
-				{ slot = '"++(slot.asString)++"'}
-			);
-			fbPort = "++(oscFeedbackPort.asString)++";
+			wdgt = CVCenter.cvWidgets.detect{ |it, k|
+				if(it.widgetCV.class === Event) {
+					it.widgetCV.includes(cv)
+				} { it.widgetCV === cv }
+			};\n\n")
+		;
 
-			if(wdgt.class == CVWidgetMS) {
-				// check length wdgt.msFeedbackCmds first
-				case
-					{ wdgt.msSize > (wdgt.msFeedbackCmds.size) } {
-						wdgt.msFeedbackCmds.growClear(wdgt.msSize-wdgt.msFeedbackCmds.size)
-					}
-					{ wdgt.msSize < (wdgt.msFeedbackCmds.size) } {
-						(wdgt.msFeedbackCmds.size-wdgt.msSize).do(wdgt.msFeedbackCmds.pop)
-					}
-				;
-				if(wdgt.msFeedbackCmds.includes('"++(cmd.asString)++"').not) {
-					wdgt.msFeedbackCmds[slot] = '"++(cmd.asString)++"';
-					cmd = wdgt.msFeedbackCmds;
-				}
-			} {
-				cmd = '"++(cmd.asString)++"';
-			};
+		// "f1: %\n".postf(f1);
 
-cmd.postln;
+		switch(slot.class,
+			Integer, { f2 = "cvSlot = "++slot++";\n\n" },
+			Symbol, { f2 = "cvSlot = '"++slot++"';\n\n" }
+		);
 
-			initedCmds = Set();
-			respondingCVs = List();
+		// "f2: %\n".postf(f2);
 
-			// important: check if the OSC-cmd has more than 2 msg-slots
-			// one slot holding the cmd-name, subsequent slot(s) holding values
+		f3 = "wdgt.recordMultiSlotCmds(cmd, cmdSlot, cvSlot);
+			wdgt.class.multiSlotOSCcmds.postln;
+		}";
 
-			if(OSCCommands.tempIPsAndCmds.isEmpty.not) {
-				// what kind of widget?
-				wdgt = CVCenter.cvWidgets.detect{ |it, k|
-					if(it.widgetCV.class === Event) {
-						it.widgetCV.includes(cv)
-					} { it.widgetCV === cv }
-				};
+		// "f3: %\n".postf(f3);
 
-				wdgt.oscFeedbackAddrs ?? { wdgt.oscFeedbackAddrs = Set() };
-
-				block { |break|
-					OSCCommands.tempIPsAndCmds.pairsDo{ |key, val|
-[key, val].postln;
-						case
-							{ ip != \"nil\" and:{ port.interpret.notNil }} {
-\"ip: %, port: %\\n\".postf(ip, port);
-								if(key.asString == (ip++\":\"++port)) {
-									switch(wdgt.class,
-										CVWidgetMS, {
-											cmdSize = wdgt.msSize.collect{ |w, i| val[cmd[i].asSymbol] }
-										},
-										{ cmdSize = val[cmd.asSymbol] }
-									);
-									wdgt.oscFeedbackAddrs.add(NetAddr(ip, fbPort));
-								};
-							}
-							{ ip != \"nil\" and:{ port.interpret.isNil }} {
-\"ip: %, no port\\n\".postf(ip);
-								if(key.asString.contains(ip)) {
-									switch(wdgt.class,
-										CVWidgetMS, {
-											cmdSize = wdgt.msSize.collect{ |w, i| val[cmd[i].asSymbol] }
-										},
-										{ cmdSize = val[cmd.asSymbol] }
-									);
-									if(count > 0) {
-										// \"happening here [1]?\".postln;
-										if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
-										tmpCmdSize = cmdSize; count = count + 1;
-									};
-									cmdSize !? {
-										wdgt.oscFeedbackAddrs.add(NetAddr(key.asString.split($:)[0], fbPort));
-									}
-								}
-							}
-							{ ip == \"nil\" and:{ port.interpret.isNil }} {
-\"no ip, no port\".postln;
-								switch(wdgt.class,
-									CVWidgetMS, {
-cmdSize = wdgt.msSize.collect{ |w, i| val[cmd[i]].postln;  val[cmd[i].asSymbol] };
-cmdSize.postln;
-									},
-									{ cmdSize = val[cmd.asSymbol] }
-								);
-
-								if(count > 0) {
-									if(cmdSize != tmpCmdSize) { break.value(cmdSize = nil) };
-									tmpCmdSize = cmdSize; count = count + 1;
-								};
-// cmdSize.postln;
-								cmdSize !? {
-									wdgt.oscFeedbackAddrs.add(NetAddr(key.asString.split($:)[0], fbPort));
-								}
-							}
-						;
-					}
-				};
-
-				if(cmdSize == 1) { doSend = true } {
-					block { |break|
-						CVCenter.cvWidgets.do{ |w|
-							switch(w.class,
-								CVWidget2D, {
-									#[lo, hi].do{ |slot|
-										model = w.wdgtControllersAndModels[slot].oscConnection.model;
-										if(model.value !== false) {
-											if(model.value[2] === cmd.asSymbol) {
-												respondingCVs.add([w.name, model.value[3], w.widgetCV[slot]]);
-												initedCmds.add([model.value[2], model.value[3]]);
-											};
-											if(initedCmds.size == cmdSize) { break.value(doSend = true) };
-										}
-									}
-								},
-								CVWidgetMS, {
-									w.msSize.do{ |i|
-										model = w.wdgtControllersAndModels.slots[i].oscConnection.model;
-										if(model.value !== false) {
-											if(model.value[2] === cmd[i].asSymbol) {
-												respondingCVs.add([w.name, model.value[3], w.widgetCV, i]);
-// respondingCVs.postln;
-												initedCmds.add([model.value[2], model.value[3]]);
-											};
-											if(initedCmds.size == cmdSize[i]) { break.value(doSend = true) };
-										}
-									};
-								},
-								CVWidgetKnob, {
-									model = w.wdgtControllersAndModels.oscConnection.model;
-									if(model.value !== false) {
-										if(model.value[2] === cmd.asSymbol) {
-											respondingCVs.add([w.name, model.value[3], w.widgetCV]);
-											initedCmds.add([model.value[2], model.value[3]]);
-										};
-										if(initedCmds.size == cmdSize) { break.value(doSend = true) };
-									};
-								}
-							)
-						}
-					}
-				};
-
-// cmdSize.postln;
-				if(cmdSize > 1) {
-					orderedVals = nil!cmdSize;
-					respondingCVs.do{ |rcv|
-// rcv.postln;
-						switch(rcv.size,
-							4, { // wdgt is a CVWidgetMS
-								if(cv === rcv[2]) {
-									orderedVals[rcv[1]-1] = cv.input[rcv[3]];
-								} {
-									orderedVals[rcv[1]-1] = CVCenter.at(rcv[0]).input[rcv[3]];
-								};
-// orderedVals.postln;
-							},
-							{
-								if(cv === rcv[2]) {
-									orderedVals[rcv[1]-1] = cv.input;
-								} {
-									switch(CVCenter.cvWidgets[rcv[0]].class,
-										CVWidget2D, {
-											orderedVals[rcv[1]-1] = CVCenter.at(rcv[0]).detect{ |scv|
-												scv === rcv[2]
-											}.input;
-										},
-										{ orderedVals[rcv[1]-1] = CVCenter.at(rcv[0]).input }
-									)
-								}
-							}
-						)
-					}
-				};
-
-				if(doSend) {
-					wdgt.oscFeedbackAddrs.do{ |addr|
-						if(cmdSize == 1) {
-							if(wdgt.class == CVWidgetMS) {
-// cmd.postln;
-								cmd.do{ |icmd, i|
-									icmd !? { addr.sendMsg(icmd, cv.input[i]) }
-								}
-							} {
-								addr.sendMsg(cmd.asSymbol, cv.input)
-							}
-						} {
-							if(wdgt.class == CVWidgetMS) {
-								cmd.do{ |icmd, i|
-									addr.sendMsg(icmd, cv.input[i])
-								}
-							} {
-								addr.sendMsg(cmd.asSymbol, *orderedVals)
-							}
-						}
-					}
-				}
-			}
-		}");
-
-		// valueFBfunc.postln;
+		valueFBfunc = f1++f2++f3;
+		//
+		// // valueFBfunc.postln;
 		this.addAction('OSC-value feedback', valueFBfunc, slot, false);
 	}
 
 	removeOSCFeedback { |slot| this.removeAction('OSC-value feedback', slot) }
+
+	recordMultiSlotCmds { |cmd, cmdSlot, cvSlot|
+		var at, thisVal, multiSlotKey;
+		var iterators;
+
+		// "oscHasFired: %, multiSlotCmdsChecked: %\n".postf(oscHasFired, multiSlotCmdsChecked);
+
+		if(oscHasFired.and(multiSlotCmdsChecked == false), {
+			if(netAddr.isNil, { at = OSCCommands.tempIPsAndCmds.keys }, {
+				case
+					{ netAddr.notNil and:{ netAddr.port.notNil and:{
+						OSCCommands.tempIPsAndCmds[(netAddr.ip++":"++netAddr.port).asSymbol].notNil
+					}}} {
+						at = (netAddr.ip++":"++netAddr.port).asSymbol;
+					}
+					{ netAddr.notNil and:{ netAddr.port.isNil and:{
+						(at = OSCCommands.tempIPsAndCmds.keys.select({ |k|
+							k.asString.split($:)[0] == netAddr.ip
+						})).size > 0
+					}}} { at }
+				;
+			});
+
+			// "at: %\n".postf(at);
+
+			at.do{ |k|
+				OSCCommands.tempIPsAndCmds[k].detect{ |val, key| thisVal = val; key === cmd } !? {
+					// when does cmd have to in 'all'? when not?
+					iterators = List[\all];
+					netAddr !? { iterators.add(netAddr.ip.asSymbol) };
+
+					iterators.do{ |mskey|
+						this.class.multiSlotOSCcmds[mskey] ?? {
+							"this.class.multiSlotOSCcmds[%] does not exist\n".postf(mskey);
+							this.class.multiSlotOSCcmds.put(mskey, ());
+						};
+
+						this.class.multiSlotOSCcmds[mskey][cmd] ?? {
+							"multiSlotOSCcmds[%][%] does not exist\n".postf(mskey, cmd);
+							this.class.multiSlotOSCcmds[mskey].put(cmd, nil!thisVal)
+						};
+
+						if(this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1].notNil, {
+							"Some other widget is already listening to command '%', slot '%'. OSC-feedback will not work".format(cmd, cmdSlot).warn;
+						}, {
+							switch(this.class,
+								CVWidgetKnob, {
+									this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1] = this.name;
+								},
+								{
+									this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1] = (this.name -> cvSlot);
+								}
+							)
+						})
+					}
+				}
+			};
+
+			"netAddr: %, multiSlotOSCcmds: %\n".postf(netAddr, this.class);
+			oscHasFired = false;
+			multiSlotCmdsChecked = true;
+		})
+	}
+
+	sendOSCvalueFeedback { |cmd, what|
+		var doers;
+
+		// make me more elegant
+		if(netAddr.notNil, {
+			if((doers = this.class.multiSlotOSCcmds[cmd].select{ |w| w.notNil }).size == doers.size, {
+				doers.collect{ |w|
+					if(w.class == Association, {
+						switch(w.value.class,
+							CVWidgetMS, { CVCenter.at(w.key).input[w.value] },
+							CVWidget2D, { CVCenter.at(w.key)[w.value].input }
+						)
+					}, {
+						CVCenter.at(w).input
+					})
+				}
+			})
+		})
+
+
+	}
 
 	// EXPERIMENTAL: extended API
 	extend { |key, func ... controllers|
