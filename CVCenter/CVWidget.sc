@@ -3497,7 +3497,8 @@ CVWidget {
 			at.do{ |k|
 				OSCCommands.tempIPsAndCmds[k].detect{ |val, key| thisVal = val; key === cmd } !? {
 					// when does cmd have to in 'all'? when not?
-					iterators = List[\all];
+					iterators = List[];
+					netAddr ?? { iterators.add(\all) };
 					netAddr !? { iterators.add(netAddr.ip.asSymbol) };
 
 					iterators.do{ |mskey|
@@ -3508,18 +3509,40 @@ CVWidget {
 
 						this.class.multiSlotOSCcmds[mskey][cmd] ?? {
 							"multiSlotOSCcmds[%][%] does not exist\n".postf(mskey, cmd);
-							this.class.multiSlotOSCcmds[mskey].put(cmd, nil!thisVal)
+							if(mskey == \all, {
+								this.class.multiSlotOSCcmds.keysDo({ |k|
+									this.class.multiSlotOSCcmds[k].put(cmd, nil!thisVal)
+								})
+							}, {
+								this.class.multiSlotOSCcmds[mskey].put(cmd, nil!thisVal);
+							})
 						};
 
-						if(this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1].notNil, {
+						if(this.class.multiSlotOSCcmds.detect({ |atAddr|
+							atAddr[cmd][cmdSlot-1].notNil
+						}).notNil, {
 							"Some other widget is already listening to command '%', slot '%'. OSC-feedback will not work".format(cmd, cmdSlot).warn;
+						// if(this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1].notNil, {
+						// 	"Some other widget is already listening to command '%', slot '%'. OSC-feedback will not work".format(cmd, cmdSlot).warn;
 						}, {
 							switch(this.class,
 								CVWidgetKnob, {
-									this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1] = this.name;
+									if(mskey == \all, {
+										this.class.multiSlotOSCcmds.keysDo({ |k|
+											this.class.multiSlotOSCcmds[k][cmd][cmdSlot-1] = this.name;
+										})
+									}, {
+										this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1] = this.name;
+									})
 								},
 								{
-									this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1] = (this.name -> cvSlot);
+									if(mskey == \all, {
+										this.class.multiSlotOSCcmds.keysDo({ |k|
+											this.class.multiSlotOSCcmds[k][cmd][cmdSlot-1] = (this.name -> cvSlot);
+										})
+									}, {
+										this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1] = (this.name -> cvSlot);
+									})
 								}
 							)
 						})
