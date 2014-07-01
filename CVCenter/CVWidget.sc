@@ -45,7 +45,7 @@ CVWidget {
 	var msSize, <cvArray;
 	// OSC-feedback
 	var <>oscFeedbackPort;
-	var <>oscFeedbackAddrs, oscHasFired = false, multiSlotCmdsChecked = false;
+	var <>oscFeedbackAddrs, oscHasFired = false, multiSlotCmdsChecked = false, numIPs = 0, ipsContainingCmd;
 
 	*initClass {
 		var scFunc, scPrefs = false;
@@ -3218,11 +3218,21 @@ CVWidget {
 
 	recordMultiSlotCmds { |cmd, cmdSlot, cvSlot|
 		var at, thisVal, multiSlotKey;
-		var iterators;
+		var iterators, thisIPs, thisIPsContainingCmd;
 
+		thisIPsContainingCmd = OSCCommands.tempIPsAndCmds.select{ |cmds| cmds[cmd].notNil };
+		thisIPs = OSCCommands.tempIPsAndCmds.keys.collectAs({ |addr| addr.asString.split($:)[0] }, Set);
 		// "oscHasFired: %, multiSlotCmdsChecked: %\n".postf(oscHasFired, multiSlotCmdsChecked);
 
-		if(oscHasFired.and(multiSlotCmdsChecked == false), {
+		// update multiSlotCmdsChecked if
+		// -> a numeber of devices has changed (thisIPs.size != numIPs
+		// -> the given cmd has been added to an already existing device (
+		if(((thisIPs.size != numIPs).or(thisIPsContainingCmd != ipsContainingCmd)) or:{
+			oscHasFired.and(multiSlotCmdsChecked == false)
+		}, {
+			numIPs = thisIPs.size;
+			ipsContainingCmd = thisIPsContainingCmd;
+
 			if(netAddr.isNil, { at = OSCCommands.tempIPsAndCmds.keys }, {
 				case
 					{ netAddr.notNil and:{ netAddr.port.notNil and:{
@@ -3238,7 +3248,7 @@ CVWidget {
 				;
 			});
 
-			// "at: %\n".postf(at);
+			("at:"+at).postln;
 
 			at.do{ |k|
 				OSCCommands.tempIPsAndCmds[k].detect{ |val, key| thisVal = val; key === cmd } !? {
@@ -3249,28 +3259,32 @@ CVWidget {
 
 					iterators.do{ |mskey|
 						this.class.multiSlotOSCcmds[mskey] ?? {
-							"this.class.multiSlotOSCcmds[%] does not exist\n".postf(mskey);
+							("this.class.multiSlotOSCcmds["++mskey+"] does not exist").postln;
 							this.class.multiSlotOSCcmds.put(mskey, ());
 						};
 
-						this.class.multiSlotOSCcmds[mskey][cmd] ?? {
-							"multiSlotOSCcmds[%][%] does not exist\n".postf(mskey, cmd);
-							if(mskey == \all, {
-								this.class.multiSlotOSCcmds.keysDo({ |k|
-									this.class.multiSlotOSCcmds[k].put(cmd, nil!thisVal)
-								})
-							}, {
-								this.class.multiSlotOSCcmds[mskey].put(cmd, nil!thisVal);
+						("this.multiSlotOSCcmds["++mskey++"]["++cmd++"] does not exist").postln;
+						if(mskey == \all, {
+							this.class.multiSlotOSCcmds.keysDo({ |k|
+								this.class.multiSlotOSCcmds[k][cmd] ?? {
+									this.class.multiSlotOSCcmds[k].put(cmd, nil!thisVal);
+								}
 							})
-						};
-
-						if(this.class.multiSlotOSCcmds.detect({ |atAddr|
-							atAddr[cmd][cmdSlot-1].notNil
-						}).notNil, {
-							"Some other widget is already listening to command '%', slot '%'. OSC-feedback will not work".format(cmd, cmdSlot).warn;
-						// if(this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1].notNil, {
-						// 	"Some other widget is already listening to command '%', slot '%'. OSC-feedback will not work".format(cmd, cmdSlot).warn;
 						}, {
+							this.class.multiSlotOSCcmds[mskey][cmd] ?? {
+								this.class.multiSlotOSCcmds[mskey].put(cmd, nil!thisVal);
+							}
+						});
+
+						this.class.multiSlotOSCcmds.postln;
+							// if(this.class.multiSlotOSCcmds.detect({ |atAddr|
+							// 	atAddr[cmd][cmdSlot-1].notNil
+							// 	}).notNil, {
+							// 		("Some other widget is already listening to command '"++cmd++"', slot '"++cmdSlot++"'. OSC-feedback will not work").postln;
+							// 		// if(this.class.multiSlotOSCcmds[mskey][cmd][cmdSlot-1].notNil, {
+							// 		// 	"Some other widget is already listening to command '%', slot '%'. OSC-feedback will not work".format(cmd, cmdSlot).warn;
+							// 	}, {
+							("mskey:"+mskey).postln;
 							switch(this.class,
 								CVWidgetKnob, {
 									if(mskey == \all, {
@@ -3284,6 +3298,7 @@ CVWidget {
 								{
 									if(mskey == \all, {
 										this.class.multiSlotOSCcmds.keysDo({ |k|
+											("key:"+this.class.multiSlotOSCcmds[k]).postln;
 											this.class.multiSlotOSCcmds[k][cmd][cmdSlot-1] = (this.name -> cvSlot);
 										})
 									}, {
@@ -3291,12 +3306,11 @@ CVWidget {
 									})
 								}
 							)
-						})
+							// })
 					}
 				}
 			};
 
-			"netAddr: %, multiSlotOSCcmds: %\n".postf(netAddr, this.class);
 			oscHasFired = false;
 			multiSlotCmdsChecked = true;
 		})
