@@ -39,6 +39,8 @@ CVWidgetKnob : CVWidget {
 		var nextY, knobX, knobY;
 		var text, tActions;
 
+		feedbackCmds = Set();
+
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };
 
