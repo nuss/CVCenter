@@ -39,6 +39,8 @@ CVWidget2D : CVWidget {
 		var text, tActions, rSliderClass, slider2DClass;
 		var tmpWin;
 
+		feedbackCmds = Set();
+
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };
 

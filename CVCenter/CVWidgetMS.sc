@@ -31,6 +31,8 @@ CVWidgetMS : CVWidget {
 		var calibViewsWidth, calibViewsNextX;
 		var text, tActions;
 
+		feedbackCmds = Set();
+
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };
 
