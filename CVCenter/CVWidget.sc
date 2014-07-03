@@ -3474,25 +3474,24 @@ CVWidget {
 	recordMultiSlotCmds { |cmd, cmdSlot, cvSlot|
 		var at, thisVal, multiSlotKey;
 		var iterators, thisIPs, thisIPsContainingCmd;
+		var ipsOrIpsContainingCmdsDontMatch;
+		var ipsAndIpsContainingCmdsMatching;
 
 		thisIPsContainingCmd = OSCCommands.tempIPsAndCmds.select{ |cmds| cmds[cmd].notNil };
 		thisIPs = OSCCommands.tempIPsAndCmds.keys.collectAs({ |addr| addr.asString.split($:)[0] }, Set);
 
-		// [thisIPsContainingCmd, ipsContainingCmd].postln;
-		// [thisIPs, numIPs].postln;
-		// feedbackCmds.postln;
+		ipsOrIpsContainingCmdsDontMatch = ((thisIPs.size != numIPs).or(thisIPsContainingCmd != ipsContainingCmd));
+		ipsAndIpsContainingCmdsMatching = ((thisIPs.size == numIPs).and(thisIPsContainingCmd == ipsContainingCmd));
 
 		// update multiSlotCmdsChecked if
 		// -> a number of devices has changed (thisIPs.size != numIPs
 		// -> the given cmd has been added to an already existing device (
-		if((thisIPs.size != numIPs).or(thisIPsContainingCmd != ipsContainingCmd).or(
-			(thisIPs.size == numIPs).and(thisIPsContainingCmd == ipsContainingCmd).and(
-				feedbackCmds.includes(cmd -> cmdSlot).not
-			)
-		), {
+		if(ipsOrIpsContainingCmdsDontMatch or:{ ipsAndIpsContainingCmdsMatching and:{
+			feedbackCmds.includes([cmd, cmdSlot]).not
+		}}, {
 			numIPs = thisIPs.size;
 			ipsContainingCmd = thisIPsContainingCmd;
-			feedbackCmds.add(cmdSlot -> cmd);
+			feedbackCmds.add([cmd, cmdSlot]);
 
 			if(netAddr.isNil, { at = OSCCommands.tempIPsAndCmds.keys }, {
 				case
@@ -3517,7 +3516,10 @@ CVWidget {
 						iterators.add(k.asString.split($:)[0].asSymbol);
 					}, { iterators.add(netAddr.ip.asSymbol) });
 
+					("iterators:"+iterators).postln;
+
 					iterators.do{ |mskey|
+						("mskey:"+mskey).postln;
 						multiSlotOSCcmds[mskey] ?? {
 							multiSlotOSCcmds.put(mskey, ());
 						};
@@ -3601,9 +3603,10 @@ CVWidget {
 		};
 
 		block { |break|
-			multiSlotOSCcmds.all.notNil !? {
+			multiSlotOSCcmds.all !? {
 				multiSlotOSCcmds.all.detect{ |cmdSlots| cmdSlots.includes(nil) } ?? {
 					multiSlotOSCcmds.all.do{ |arr|
+						("here we are: all,"+arr).postln;
 						if(arr.size < 2, {
 							switch(arr.unbubble.class,
 								Association, {
@@ -3635,6 +3638,7 @@ CVWidget {
 				if(ip !== \all, {
 					msCmd.detect{ |cmdSlots| cmdSlots.includes(nil) } ?? {
 						msCmd.do{ |arr|
+							("here we are:"+[ip, arr]).postln;
 							oscFeedbackAddrs.detect{ |addr| tmpAddr = addr; ip.asString == addr.ip } !? {
 								if(arr.size < 2, {
 									switch(arr.unbubble.class,
