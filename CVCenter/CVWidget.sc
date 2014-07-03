@@ -2653,6 +2653,7 @@ CVWidget {
 
 				// netAddr.postln;
 				// netAddr !? { netAddr.port.postln };
+				theChanger.value.postln;
 
 				this.addOSCFeedback(theChanger.value[2], theChanger.value[3], theChanger.value[0], theChanger.value[1], slot, theChanger.value[4] ? this.class.globalOSCfeedbackPort, \value);
 				this.addOSCFeedback(theChanger.value[2], theChanger.value[3], theChanger.value[0], theChanger.value[1], slot, theChanger.value[4] ? this.class.globalOSCfeedbackPort, \name);
@@ -3223,10 +3224,9 @@ CVWidget {
 		thisIPsContainingCmd = OSCCommands.tempIPsAndCmds.select{ |cmds| cmds[cmd].notNil };
 		thisIPs = OSCCommands.tempIPsAndCmds.keys.collectAs({ |addr| addr.asString.split($:)[0] }, Set);
 
-
-		[thisIPsContainingCmd, ipsContainingCmd].postln;
-		[thisIPs, numIPs].postln;
-		feedbackCmds.postln;
+		// [thisIPsContainingCmd, ipsContainingCmd].postln;
+		// [thisIPs, numIPs].postln;
+		// feedbackCmds.postln;
 
 		// update multiSlotCmdsChecked if
 		// -> a number of devices has changed (thisIPs.size != numIPs
@@ -3255,8 +3255,6 @@ CVWidget {
 				;
 			});
 
-			("at:"+at).postln;
-
 			at.do{ |k|
 				OSCCommands.tempIPsAndCmds[k].detect{ |val, key| thisVal = val; key === cmd } !? {
 					iterators = List[];
@@ -3264,8 +3262,6 @@ CVWidget {
 						iterators.add(\all);
 						iterators.add(k.asString.split($:)[0].asSymbol);
 					}, { iterators.add(netAddr.ip.asSymbol) });
-
-					iterators.postln;
 
 					iterators.do{ |mskey|
 						multiSlotOSCcmds[mskey] ?? {
@@ -3296,7 +3292,6 @@ CVWidget {
 							},
 							{
 								if(mskey == \all, {
-									("adding for cmdSlot"+ cmdSlot).postln;
 									multiSlotOSCcmds.keysDo({ |k|
 										multiSlotOSCcmds[k][cmd][cmdSlot-1] = (this.name -> cvSlot);
 									})
@@ -3307,9 +3302,7 @@ CVWidget {
 						)
 					}
 				}
-			};
-
-			multiSlotOSCcmds.postln;
+			}
 		})
 	}
 
@@ -3318,10 +3311,14 @@ CVWidget {
 
 		getInput = { |name, slot|
 			var input;
-			switch(CVCenter.cvWidgets[name].class,
+
+			switch(this.class,
 				CVWidgetMS, {
 					switch(what,
-						\value, { input = CVCenter.at(name).input[slot] },
+						\value, {
+							// ("name:"+name).postln;
+							input = CVCenter.at(name).input[slot]
+						},
 						\name, { input = name.asString++"["++slot++"]" }
 					)
 				},
@@ -3354,13 +3351,26 @@ CVWidget {
 				multiSlotOSCcmds.all.detect{ |cmdSlots| cmdSlots.includes(nil) } ?? {
 					multiSlotOSCcmds.all.do{ |arr|
 						if(arr.size < 2, {
-							break.value(
-								oscFeedbackAddrs.do(_.sendMsg(cmd, getInput.(arr.unbubble)))
+							switch(arr.unbubble.class,
+								Association, {
+									if(arr.unbubble.key == this.name, { break.value(
+										oscFeedbackAddrs.do{ |addr|
+											addr.sendMsg(cmd, getInput.(this.name, cvSlot))
+										})
+									})
+								},
+								{ break.value(oscFeedbackAddrs.do(_.sendMsg(cmd, getInput.(this.name)))) }
 							)
 						}, {
 							break.value(
+								("arr.size > 1:"+arr).postln;
 								msg = nil!arr.size;
-								arr.do{ |assoc, i| msg[i] = getInput.(assoc.key, assoc.value) };
+								arr.do{ |nameOrAssoc, i|
+									switch(nameOrAssoc.class,
+										Association, { msg[i] = getInput.(nameOrAssoc.key, nameOrAssoc.value) },
+										{ msg[i] = getInput.(nameOrAssoc) }
+									)
+								};
 								oscFeedbackAddrs.do(_.sendMsg(cmd, *msg))
 							)
 						})
@@ -3373,10 +3383,24 @@ CVWidget {
 						msCmd.do{ |arr|
 							oscFeedbackAddrs.detect{ |addr| tmpAddr = addr; ip.asString == addr.ip } !? {
 								if(arr.size < 2, {
-									tmpAddr.sendMsg(cmd, getInput.(arr.unbubble))
+									switch(arr.unbubble.class,
+										Association, {
+											if(arr.unbubble.key == this.name, { break.value(
+												tmpAddr.sendMsg(cmd, getInput.(this.name, cvSlot))
+											) })
+										},
+										{ tmpAddr.sendMsg(cmd, getInput.(arr.unbubble)) }
+									)
 								},{
 									msg = nil!arr.size;
-									arr.do{ |assoc, i| msg[i] = getInput.(assoc.key, assoc.value) };
+									arr.do{ |nameOrAssoc, i|
+										switch(nameOrAssoc.class,
+											Association, {
+												msg[i] = getInput.(nameOrAssoc.key, nameOrAssoc.value)
+											},
+											{ msg[i] = getInput.(nameOrAssoc) }
+										)
+									};
 									tmpAddr.sendMsg(cmd, *msg)
 								})
 							}
