@@ -3606,12 +3606,11 @@ CVWidget {
 			multiSlotOSCcmds.all !? {
 				multiSlotOSCcmds.all.detect{ |cmdSlots| cmdSlots.includes(nil) } ?? {
 					multiSlotOSCcmds.all.do{ |arr|
-						("here we are: all,"+arr).postln;
 						if(arr.size < 2, {
 							switch(arr.unbubble.class,
 								Association, {
-									if(arr.unbubble.key == this.name, { break.value(
-										oscFeedbackAddrs.do{ |addr|
+									if(arr.unbubble.key == this.name and:{ arr.unbubble.value == cvSlot }, {
+										break.value(oscFeedbackAddrs.do{ |addr|
 											addr.sendMsg(cmd, getInput.(this.name, cvSlot))
 										})
 									})
@@ -3638,12 +3637,13 @@ CVWidget {
 				if(ip !== \all, {
 					msCmd.detect{ |cmdSlots| cmdSlots.includes(nil) } ?? {
 						msCmd.do{ |arr|
-							("here we are:"+[ip, arr]).postln;
 							oscFeedbackAddrs.detect{ |addr| tmpAddr = addr; ip.asString == addr.ip } !? {
 								if(arr.size < 2, {
 									switch(arr.unbubble.class,
 										Association, {
-											if(arr.unbubble.key == this.name, { break.value(
+											if(arr.unbubble.key == this.name and:{
+												arr.unbubble.value == cvSlot
+											}, { break.value(
 												tmpAddr.sendMsg(cmd, getInput.(this.name, cvSlot))
 											) })
 										},
