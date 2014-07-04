@@ -35,7 +35,7 @@ CVWidgetMS : CVWidget {
 		var text, tActions;
 		var reference = [];
 
-		feedbackCmds = Set();
+		#msFeedbackCmds, feedbackCmds = Set()!2;
 
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };

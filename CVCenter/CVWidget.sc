@@ -2647,6 +2647,9 @@ CVWidget {
 				tmp = theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString;
 				if(this.class == CVWidgetMS, {
 					tmp = slot.asString++":"+tmp;
+					this.msFeedbackCmds.includes([theChanger.value[2], theChanger.value[3]]).not.if{
+						this.msFeedbackCmds.add([theChanger.value[2], theChanger.value[3]])
+					}
 				});
 
 				/* add feedback actions */
@@ -3185,6 +3188,8 @@ CVWidget {
 	addOSCFeedback { |cmd, cmdSlot, ip, port, slot, oscFeedbackPort, what|
 		var f1, f2, f3, valueFBfunc, nameFBfunc;
 
+		("cmd, cmdSlot:"+[cmd, cmdSlot]).postln;
+
 		// must not be an open function -> can be activated and deactivated
 		f1 = ("{ |cv|
 			var wdgt;
@@ -3210,6 +3215,9 @@ CVWidget {
 			wdgt.sendOSCFeedback(cmd, cmdSlot, cvSlot, fbPort, what);
 		}";
 
+		// f3 = "wdgt.sendOSCFeedback(cmd, cmdSlot, cvSlot, fbPort, what);
+		// }";
+
 		valueFBfunc = f1++(f2 ? "")++f3;
 
 		this.addAction(("OSC feedback:"+what).asSymbol, valueFBfunc, slot, false);
@@ -3228,6 +3236,9 @@ CVWidget {
 
 		ipsOrIpsContainingCmdsDontMatch = ((thisIPs.size != numIPs).or(thisIPsContainingCmd != ipsContainingCmd));
 		ipsAndIpsContainingCmdsMatching = ((thisIPs.size == numIPs).and(thisIPsContainingCmd == ipsContainingCmd));
+
+		// ("cmd, cmdSlot:"+[cmd, cmdSlot]++", feedbackCmds:"+feedbackCmds).postln;
+		// if(this.class == CVWidgetMS, { });
 
 		// update multiSlotCmdsChecked if
 		// -> a number of devices has changed (thisIPs.size != numIPs
@@ -3312,32 +3323,32 @@ CVWidget {
 		var tmpAddr, msg, getInput;
 
 		getInput = { |name, slot|
-			var input;
+			var output;
 
-			switch(this.class,
+			switch(CVCenter.cvWidgets[name].class,
 				CVWidgetMS, {
 					switch(what,
 						\value, {
 							// ("name:"+name).postln;
-							input = CVCenter.at(name).input[slot]
+							output = CVCenter.at(name).input[slot]
 						},
-						\name, { input = name.asString++"["++slot++"]" }
+						\name, { output = name.asString++"["++slot++"]" }
 					)
 				},
 				CVWidget2D, {
 					switch(what,
-						\value, { input = CVCenter.at(name)[slot].input },
-						\name, { input = name.asString++"["++slot++"]" }
+						\value, { output = CVCenter.at(name)[slot].input },
+						\name, { output = name.asString++"["++slot++"]" }
 					)
 				},
 				{
 					switch(what,
-						\value, { input = CVCenter.at(name).input },
-						\name, { input = name.asString }
+						\value, { output = CVCenter.at(name).input },
+						\name, { output = name.asString }
 					)
 				}
 			);
-			input
+			output
 		};
 
 		multiSlotOSCcmds.keysDo{ |addr|
