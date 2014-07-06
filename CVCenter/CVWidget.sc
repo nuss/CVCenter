@@ -388,6 +388,25 @@ CVWidget {
 		})
 	}
 
+	actionActive { |actionName, slot|
+		var thisWdgtActions, thisAction;
+
+		if(this.class == CVWidget2D, {
+			if(slot.isNil, {
+				"the given widget is a CVWidget2D but no slot was provided".warn;
+				^nil;
+			}, {
+				thisWdgtActions = this.wdgtActions[slot.asSymbol];
+			})
+		}, {
+			thisWdgtActions = this.wdgtActions;
+		});
+
+		if((thisAction = thisWdgtActions[actionName.asSymbol]).notNil, {
+			^thisAction.values.flatten.last;
+		}, { ^nil })
+	}
+
 	connectGUI { |connectSlider = true, connectTextField = true|
 		wdgtControllersAndModels.slidersTextConnection.model.value_(
 			[connectSlider, connectTextField]
@@ -838,12 +857,14 @@ CVWidget {
 			CVWidget2D, {
 				thisSlot = slot.asSymbol;
 				wcm = wdgtControllersAndModels[thisSlot];
+				this.oscFeedbackPort.put(thisSlot, oscFeedbackPort);
 			},
 			CVWidgetMS, {
 				thisSlot = slot.asInteger;
 				wcm = wdgtControllersAndModels.slots[thisSlot];
+				this.oscFeedbackPort[thisSlot] = oscFeedbackPort;
 			},
-			{ wcm = wdgtControllersAndModels }
+			{ wcm = wdgtControllersAndModels; this.oscFeedbackPort = oscFeedbackPort }
 		);
 
 		ip !? { thisIP = ip.asString.replace(" ", "") };
@@ -3241,22 +3262,22 @@ CVWidget {
 		if(msg.size > 2, {
 			multiSlotOSCcmds[sentFromIP] ?? { multiSlotOSCcmds.put(sentFromIP, ()) };
 			if(netAddr.isNil, {
-				multiSlotOSCcmds.keysDo{ |k|
-					multiSlotOSCcmds[k][msg[0]] ?? {
-						multiSlotOSCcmds[k].put(msg[0], Set()!(msg.size-1))
+				multiSlotOSCcmds.keysDo{ |ip|
+					multiSlotOSCcmds[ip][msg[0]] ?? {
+						multiSlotOSCcmds[ip].put(msg[0], Set()!(msg.size-1))
 					};
 					// multiSlotOSCcmds[k][msg[0]][cmdSlot] ?? {
 						if(cvSlot.notNil, {
-							multiSlotOSCcmds[k][msg[0]][cmdSlot].add([this.name, cvSlot]);
+							multiSlotOSCcmds[ip][msg[0]][cmdSlot].add([this.name, cvSlot]);
 						}, {
-							multiSlotOSCcmds[k][msg[0]][cmdSlot].add(this.name);
+							multiSlotOSCcmds[ip][msg[0]][cmdSlot].add(this.name);
 						})
 				// }
 				};
 			}, {
 				multiSlotOSCcmds[netAddr.ip.asSymbol] ?? { multiSlotOSCcmds.put(netAddr.ip.asSymbol, ()) };
 				multiSlotOSCcmds[netAddr.ip.asSymbol][msg[0]] ?? {
-					multiSlotOSCcmds[netAddr.ip.asSymbol].put(msg[0], Set()!msg.size-1)
+					multiSlotOSCcmds[netAddr.ip.asSymbol].put(msg[0], Set()!(msg.size-1))
 				};
 				// multiSlotOSCcmds[netAddr.ip.asSymbol][msg[0]][cmdSlot] ?? {
 					if(cvSlot.notNil, {
@@ -3271,11 +3292,21 @@ CVWidget {
 	}
 
 	sendOSCFeedback { |cmd, cmdSlot, cvSlot, port, what|
-		var tmpAddr, msg, getInput, thisWdgtActions;
+		var tmpAddr, msg, getInput, thisWdgtActions, cvVals;
+		var thisOscResponder;
 
 		if(this.class == CVWidget2D, {
 			thisWdgtActions = this.wdgtActions[cvSlot]
 		}, { thisWdgtActions = this.wdgtActions });
+
+		switch(this.class,
+			CVWidget2D, {
+				midiOscEnv[cvSlot].oscResponder !? { thisOscResponder = midiOscEnv[cvSlot].oscResponder }
+			},
+			CVWidgetKnob, {
+				midiOscEnv.oscResponder  !? { thisOscResponder = midiOscEnv.oscResponder }
+			}
+		);
 
 		getInput = { |name, slot|
 			var output;
@@ -3306,14 +3337,39 @@ CVWidget {
 			output
 		};
 
-		if(thisWdgtActions[("OSC feedback:"+what).asSymbol].values.flatten.last == true, {
-			multiSlotOSCcmds.keysDo{ |addr|
-				if(oscFeedbackAddrs.includes(tmpAddr = NetAddr(addr.asString, port)).not, {
-					oscFeedbackAddrs.add(tmpAddr);
-				})
+		cmd.do{ |cmd, i|
+			if(this.class == CVWidgetMS, {
+				("midiOscEnv:"+midiOscEnv).postln;
+				midiOscEnv[i].oscResponder !? { thisOscResponder = midiOscEnv[i].oscResponder }
+			});
+			multiSlotOSCcmds.pairsDo{ |ip, msCmds|
+				msCmds.keys.includes(cmd).if{
+					// ("msCmds:"+msCmds).postln;
+					msCmds[cmd].detect(_.isEmpty) ?? {
+						if(oscFeedbackAddrs.includes(tmpAddr = NetAddr(ip.asString, port)).not, {
+							oscFeedbackAddrs.add(tmpAddr);
+						});
+						cvVals = msCmds[cmd].collect{ |pairs|
+							// [pairs, pairs.class].postln;
+							pairs.collectAs({ |pair|
+								switch(pair.class,
+									Array, { getInput.(pair[0], pair[1]) },
+									Symbol, { getInput.(pair) }
+								)
+							}, Array)
+						};
+						("cvVals:"+cvVals).postln;
+						cvVals.flop.do{ |vals|
+							if(thisOscResponder.addr.notNil, {
+								tmpAddr.sendMsg(cmd, *vals)
+							}, {
+								oscFeedbackAddrs.do(_.sendMsg(cmd, *vals))
+							})
+						}
+					}
+				}
 			}
-		});
-
+		}
 	}
 
 	// extended API
