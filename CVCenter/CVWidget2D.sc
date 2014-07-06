@@ -40,6 +40,7 @@ CVWidget2D : CVWidget {
 		var tmpWin;
 
 		feedbackCmds = Set();
+		oscFeedbackPort = ();
 
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };

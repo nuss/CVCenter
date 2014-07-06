@@ -32,7 +32,7 @@ CVWidgetMS : CVWidget {
 		var text, tActions;
 
 		// #msFeedbackCmds, feedbackCmds = Set()!2;
-		msFeedbackCmds = nil!numSliders;
+		#msFeedbackCmds, oscFeedbackPort = (nil!numSliders)!2;
 
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };
