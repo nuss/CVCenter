@@ -31,16 +31,14 @@ CVWidgetMS : CVWidget {
 		var calibViewsWidth, calibViewsNextX;
 		var text, tActions;
 
-		#msFeedbackCmds, feedbackCmds = Set()!2;
+		// #msFeedbackCmds, feedbackCmds = Set()!2;
+		msFeedbackCmds = nil!numSliders;
 
 		background ?? { background = Color.white };
 		stringColor ?? { stringColor = Color.black };
 
 		synchKeys ?? { synchKeys = [\default] };
 		#numOscResponders, numMidiResponders = 0!2;
-
-		// used in CVWidget:-addOSCFeedback
-		msFeedbackCmds = nil!msSize;
 
 		calibViews = List();
 
