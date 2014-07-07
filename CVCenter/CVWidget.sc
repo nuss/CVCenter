@@ -3487,10 +3487,13 @@ CVWidget {
 			};\n\n")
 		;
 
-		switch(slot.class,
-			Integer, { f2 = "cvSlot = "++slot++";\n\n" },
-			Symbol, { f2 = "cvSlot = '"++slot++"';\n\n" }
-		);
+		// switch(slot.class,
+		// 	Integer, { f2 = "cvSlot = "++slot++";\n\n" },
+		// 	Symbol, { f2 = "cvSlot = '"++slot++"';\n\n" }
+		// );
+
+		if(slot.class == Symbol, { f2 = "\t\t\tcvSlot = '"++slot++"';\n\n" });
+
 		if(this.class == CVWidgetMS, {
 			f3 = "\t\t\tcmd = CVCenter.cvWidgets['"++this.name++"'].msFeedbackCmds.collect{ |it|
 				if(it.notNil, { it[0] }, { it })
@@ -3540,7 +3543,7 @@ CVWidget {
 
 	sendOSCFeedback { |cmd, cmdSlot, cvSlot, port, what|
 		var tmpAddr, msg, getInput, thisWdgtActions, cvVals;
-		var thisOscResponder;
+		var thisOscResponder, thisCVSlot;
 
 		// [cmd, cmdSlot, cvSlot, port, what].postln;
 
@@ -3557,26 +3560,26 @@ CVWidget {
 			}
 		);
 
-		getInput = { |name, slot|
+		getInput = { |wName, slot|
 			var output;
 
-			switch(CVCenter.cvWidgets[name].class,
+			switch(CVCenter.cvWidgets[wName].class,
 				CVWidgetMS, {
 					switch(what,
-						\value, { output = CVCenter.at(name).input[slot] },
-						\name, { output = name.asString++"["++slot++"]" }
+						\value, { output = CVCenter.at(wName).input[slot] },
+						\name, { output = wName.asString++"["++slot++"]" }
 					)
 				},
 				CVWidget2D, {
 					switch(what,
-						\value, { output = CVCenter.at(name)[slot].input },
-						\name, { output = name.asString++"["++slot++"]" }
+						\value, { output = CVCenter.at(wName)[slot].input },
+						\name, { output = wName.asString++"["++slot++"]" }
 					)
 				},
 				{
 					switch(what,
-						\value, { output = CVCenter.at(name).input },
-						\name, { output = name.asString }
+						\value, { output = CVCenter.at(wName).input },
+						\name, { output = wName.asString }
 					)
 				}
 			);
@@ -3590,19 +3593,20 @@ CVWidget {
 				});
 
 				if(multiSlotOSCcmds.values.asSet.detect{ |msCmd| msCmd.keys.includes(slcmd) }.isNil, {
-					("not in multi-slot cmds:"+slcmd).postln;
+					// ("not in multi-slot cmds:"+slcmd).postln;
+					if(CVCenter.cvWidgets[name].class == CVWidgetMS, { thisCVSlot = i }, { thisCVSlot = cvSlot });
 					if(thisOscResponder.addr.notNil, {
 						if(oscFeedbackAddrs.includes(tmpAddr = NetAddr(thisOscResponder.addr.ip, port)).not, {
 							oscFeedbackAddrs.add(tmpAddr);
 						});
-						("send to "++tmpAddr++":"+slcmd).postln;
-						tmpAddr.sendMsg(slcmd, getInput.(name, cvSlot));
+						// ("send to "++tmpAddr++":"+[name, cvSlot, slcmd, i]).postln;
+						tmpAddr.sendMsg(slcmd, getInput.(name, thisCVSlot));
 					}, {
-						("send to all:"+slcmd).postln;
-						oscFeedbackAddrs.do(_.sendMsg(slcmd, getInput.(name, cvSlot)));
+						// ("send to all:"+[name, cvSlot, slcmd, i]).postln;
+						oscFeedbackAddrs.do(_.sendMsg(slcmd, getInput.(name, thisCVSlot)));
 					})
 				}, {
-					("in multi-slot cmds:"+slcmd).postln;
+					// ("in multi-slot cmds:"+slcmd).postln;
 					multiSlotOSCcmds.pairsDo{ |ip, msCmds|
 						msCmds.keys.includes(slcmd).if{
 							// ("msCmds:"+msCmds).postln;
