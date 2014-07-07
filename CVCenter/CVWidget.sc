@@ -3040,8 +3040,7 @@ CVWidget {
 					this.msFeedbackCmds[slot] = nil;
 				});
 
-				this.removeOSCFeedback(slot, \value);
-				this.removeOSCFeedback(slot, \name);
+				this.removeOSCFeedback(slot);
 
 				wcm.oscDisplay.model.value_(
 					(
@@ -3510,7 +3509,17 @@ CVWidget {
 		this.addAction(("OSC feedback:"+what).asSymbol, valueFBfunc, slot, false);
 	}
 
-	removeOSCFeedback { |slot, what| this.removeAction(("OSC-feedback"+what).asSymbol, slot) }
+	removeOSCFeedback { |slot|
+		var toBeRemoved;
+
+		if(slot.isNil, { toBeRemoved = this.name }, { toBeRemoved = [this.name, slot] });
+		multiSlotOSCcmds.do{ |cmdSets|
+			cmdSets.do{ |cmdSet|
+				cmdSet.select{ |set| set.includes(toBeRemoved) }.do(_.remove(toBeRemoved));
+			};
+		};
+		#[value, name].do{ |what| this.removeAction(("OSC-feedback"+what).asSymbol, slot) };
+	}
 
 	recordMultiSlotCmds { |cvSlot, cmdSlot, sentFromIP, msg|
 		if(msg.size > 2, {
