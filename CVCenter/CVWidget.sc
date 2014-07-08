@@ -394,7 +394,7 @@ CVWidget {
 		if(this.class == CVWidget2D, {
 			if(slot.isNil, {
 				"the given widget is a CVWidget2D but no slot was provided".warn;
-				^nil;
+				^false;
 			}, {
 				thisWdgtActions = this.wdgtActions[slot.asSymbol];
 			})
@@ -404,7 +404,7 @@ CVWidget {
 
 		if((thisAction = thisWdgtActions[actionName.asSymbol]).notNil, {
 			^thisAction.values.flatten.last;
-		}, { ^nil })
+		}, { ^false })
 	}
 
 	connectGUI { |connectSlider = true, connectTextField = true|
@@ -3263,10 +3263,14 @@ CVWidget {
 				cmdSet.select{ |set| set.includes(toBeRemoved) }.do(_.remove(toBeRemoved));
 			};
 		};
-		#[value, name].do{ |what| this.removeAction(("OSC-feedback"+what).asSymbol, slot) };
+		#[value, name].do{ |what| this.removeAction(("OSC feedback"+what).asSymbol, slot) };
 	}
 
 	recordMultiSlotCmds { |cvSlot, cmdSlot, sentFromIP, msg|
+		var action;
+
+		action = if(this.actionActive('OSC feedback: value', cvSlot) || this.actionActive('OSC feedback: name', cvSlot), { action = \add }, { action = \remove });
+
 		if(msg.size > 2, {
 			multiSlotOSCcmds[sentFromIP] ?? { multiSlotOSCcmds.put(sentFromIP, ()) };
 			if(netAddr.isNil, {
@@ -3275,9 +3279,9 @@ CVWidget {
 						multiSlotOSCcmds[ip].put(msg[0], Set()!(msg.size-1))
 					};
 					if(cvSlot.notNil, {
-						multiSlotOSCcmds[ip][msg[0]][cmdSlot].add([this.name, cvSlot]);
+						multiSlotOSCcmds[ip][msg[0]][cmdSlot].perform(action, [this.name, cvSlot]);
 					}, {
-						multiSlotOSCcmds[ip][msg[0]][cmdSlot].add(this.name);
+						multiSlotOSCcmds[ip][msg[0]][cmdSlot].perform(action, this.name);
 					})
 				};
 			}, {
@@ -3286,9 +3290,9 @@ CVWidget {
 					multiSlotOSCcmds[netAddr.ip.asSymbol].put(msg[0], Set()!(msg.size-1))
 				};
 				if(cvSlot.notNil, {
-					multiSlotOSCcmds[netAddr.ip.asSymbol][msg[0]][cmdSlot].add([this.name, cvSlot]);
+					multiSlotOSCcmds[netAddr.ip.asSymbol][msg[0]][cmdSlot].perform(action, [this.name, cvSlot]);
 				}, {
-					multiSlotOSCcmds[netAddr.ip.asSymbol][msg[0]][cmdSlot].add(this.name);
+					multiSlotOSCcmds[netAddr.ip.asSymbol][msg[0]][cmdSlot].perform(action, this.name);
 				})
 			});
 			// "multiSlotOSCcmds: %\n".postf(multiSlotOSCcmds);
