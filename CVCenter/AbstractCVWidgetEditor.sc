@@ -27,6 +27,7 @@ AbstractCVWidgetEditor {
 	var <deviceDropDown, <portRestrictor, /*<ipField, <portField, */<nameField, <indexField;
 	var inputConstraintLoField, inputConstraintHiField, <alwaysPosField;
 	var <mappingSelect, <connectorBut;
+	var <feedbackPortField;
 	var actionName, enterAction, enterActionBut, <actionsUIs;
 	var name;
 	var tabView0, tabView1, tabView2, tabView3;
