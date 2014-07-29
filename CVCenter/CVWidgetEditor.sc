@@ -788,23 +788,38 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			StaticText(tabView2, flow2.bounds.width-15@15)
+			StaticText(tabView2, Point(flow2.bounds.width-15, 15))
 				.font_(staticTextFont)
 				.string_("Input to Output mapping")
 			;
 
 			flow2.shift(0, 0);
 
-			specConstraintsText = StaticText(tabView2, flow2.bounds.width-15@15)
+			specConstraintsText = StaticText(tabView2, Point(flow2.bounds.width-85, 15))
 				.font_(staticTextFont)
 				.background_(Color.white)
 			;
 
 			if(widget.class == CVWidgetMS, {
-				specConstraintsText.string_(" current widget-spec constraints lo / hi:"+widget.getSpec.minval.wrapAt(slot)+"/"+widget.getSpec.maxval.wrapAt(slot))
+				specConstraintsText.string_(" current spec constraints lo / hi:"+widget.getSpec.minval.wrapAt(slot)+"/"+widget.getSpec.maxval.wrapAt(slot))
 			}, {
-				specConstraintsText.string_(" current widget-spec constraints lo / hi:"+widget.getSpec(slot).minval+"/"+widget.getSpec(slot).maxval)
+				specConstraintsText.string_(" current spec constraints lo / hi:"+widget.getSpec(slot).minval+"/"+widget.getSpec(slot).maxval)
 			});
+
+			flow2.shift(0, -15);
+
+			StaticText(tabView2, Point(65, 15))
+				.font_(staticTextFont)
+				.string_("feedback-port")
+			;
+
+			flow2.nextLine;
+
+			feedbackPortField = NumberBox(tabView2, Point(65, 15))
+				.font_(textFieldFont)
+				.normalColor_(textFieldFontColor)
+				.value_(widget.oscFeedbackPort ? widget.class.globalOSCfeedbackPort)
+			;
 
 			flow2.shift(5, 0);
 
