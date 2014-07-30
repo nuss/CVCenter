@@ -28,7 +28,7 @@ Installation
 
 	Using Windows the mechanism should apply as well. However, the author of this document currently doesn't know what the result of the query will be...
 
-Note: if you're on Linux you will need to have installed SuperCollider >= 3.5 as CVCenter depends on QtGUI. Under MacOSX CVCenter *should* be compatible with SC >= 3.4 resp. QtGUI as well as Cocoa. 
+Note: if you're on Linux you will need to have installed SuperCollider >= 3.5 as CVCenter depends on QtGUI. Under MacOSX CVCenter *should* be compatible with SC >= 3.4 resp. QtGUI as well as Cocoa.
 
 Using CVCenter with the current stable version of SuperCollider
 ---------------------------------------------------------------
