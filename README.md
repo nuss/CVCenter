@@ -28,3 +28,19 @@ Installation
 Note: if you're on Linux you will need to have installed SuperCollider >= 3.5 as CVCenter depends on QtGUI. Under MacOSX CVCenter *should* be compatible with SC >= 3.4 resp. QtGUI as well as Cocoa. 
 Under Windows it's recommended to use the latest version of SuperCollider as it comes with full Qt-support and the new SC-IDE. Get it here: http://sourceforge.net/projects/supercollider/files/Windows/3.6/SuperCollider-3.6.6-win32.exe/download
 
+Using CVCenter with the current development-version of SuperCollider (3.7alph0)
+-------------------------------------------------------------------------------
+Using CVCenter with SC 3.7 and higher requires a fix due to the removal of GUI redirects in SC 3.7 (Cocoa is no longer supported. Hence, redirects have been removed). The fix is not yet contained within version of Conductor that can be installed via SC's quarks repository. You may install a modified version of the Conductor library by cloning it as a submodule of CVCenter:
+
+1. on a fresh installation of CVCenter by cloning the repository *recursively*:
+
+		$ git clone --recursive git@github.com:nuss/CVCenter.git
+
+2. if you have already installed CVCenter by cloning the repository issue the following commands from within your CVCenter directory
+
+		$ git submodule init
+		$ git submodule update
+
+3. for subsequent updates via git
+
+		$ git pull && git submodule update
