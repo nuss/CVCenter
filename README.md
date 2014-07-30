@@ -34,7 +34,7 @@ Using CVCenter with SC 3.7 and higher requires a fix due to the removal of GUI r
 
 1. on a fresh installation of CVCenter by cloning the repository *recursively*:
 
-		$ git clone --recursive git@github.com:nuss/CVCenter.git
+		$ git clone --recursive https://github.com/nuss/CVCenter.git
 
 2. if you have already installed CVCenter by cloning the repository issue the following commands from within your CVCenter directory
 
