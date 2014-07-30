@@ -39,6 +39,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var connectIP, connectPort;
 		var mouseOverFunc;
 		var modsDict, arrModsDict, arrowKeys;
+		var thisFeedbackPort;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -806,19 +807,32 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				specConstraintsText.string_(" current spec constraints lo / hi:"+widget.getSpec(slot).minval+"/"+widget.getSpec(slot).maxval)
 			});
 
-			flow2.shift(0, -15);
+			flow2.shift(5, -17);
 
-			StaticText(tabView2, Point(65, 15))
+			StaticText(tabView2, Point(60, 15))
 				.font_(staticTextFont)
 				.string_("feedback-port")
 			;
 
-			flow2.nextLine;
+			flow2.nextLine.shift(specConstraintsText.bounds.width+5, 0);
+
+			if(slot.notNil, {
+				thisFeedbackPort = widget.oscFeedbackPort[slot];
+			}, {
+				thisFeedbackPort = widget.oscFeedbackPort;
+			});
 
 			feedbackPortField = NumberBox(tabView2, Point(65, 15))
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
-				.value_(widget.oscFeedbackPort ? widget.class.globalOSCfeedbackPort)
+				.value_(thisFeedbackPort ? widget.class.globalOSCfeedbackPort)
+				.action_({ |f|
+					switch(this.class,
+						CVWidgetMS, { widget.oscFeedbackPort[slot] = f.value },
+						CVWidget2D, { widget.oscFeedbackPort.put(slot, f.value) },
+						{ widget.oscFeedbackPort = f.value }
+					)
+				})
 			;
 
 			flow2.shift(5, 0);
@@ -864,8 +878,9 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 								connectIP,
 								connectPort,
 								nameField.string,
-								indexField.value.asInt,
-								slot
+								indexField.value.asInteger,
+								slot,
+								feedbackPortField.value.asInteger
 							);
 						},
 						0, { widget.oscDisconnect(slot) }
