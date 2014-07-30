@@ -57,6 +57,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		var numCalibActive;
 		var modsDict, arrModsDict, arrowKeys;
 		var funcString;
+		var thisOSCFeedbackPort;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -1009,11 +1010,39 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			StaticText(oscView0, Point(60, 42))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("msg.-slot (use\n% as\nplaceholder)")
+				.string_("msg-slot (use\n% as\nplaceholder)")
 //				.background_(Color.white)
 			;
 
 			StaticText(oscView0, Point(oscFlow0.bounds.width/2-10, 15))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("OSC-feedback ports")
+			;
+
+			oscFlow0.shift(5, 0);
+
+			feedbackPortField = TextField(oscView0, Point(oscFlow0.bounds.width-115, 15))
+				.font_(textFieldFont)
+				.action_({ |f|
+					switch(f.string.interpret.class,
+						Integer, { widget.oscFeedbackPort = f.string.interpret!widget.msSize },
+						Array, {
+							f.string.interpret.do{ |port, i|
+								widget.oscFeedbackPort[i%widget.oscFeedbackPort.size] = port.asInteger;
+							}
+						}
+					)
+				})
+			;
+
+			if(widget.oscFeedbackPort.includes(nil), {
+				feedbackPortField.string_((widget.class.globalOSCfeedbackPort!widget.msSize).asCompileString);
+			}, {
+				feedbackPortField.string_(widget.oscFeedbackPort)
+			});
+
+			StaticText(oscView0, oscFlow0.bounds.width/2-10@15)
 				.font_(staticTextFont)
 				.string_("Input to Output mapping")
 			// .background_(Color.white)
@@ -1148,6 +1177,19 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					});
 					if(oscConnectCondition >= 2, {
 					// "ok, we're ready to rock: %".postf(extOscCtrlArrayField.string.interpret);
+						switch(feedbackPortField.string.interpret.class,
+							Integer, {
+								thisOSCFeedbackPort = feedbackPortField.string.interpret!widget.msSize;
+							},
+							Array, {
+								thisOSCFeedbackPort = widget.class.globalOSCfeedbackPort!widget.msSize;
+								feedbackPortField.string.interpret.do{ |port, i|
+									if(port.notNil and:{ port.asInteger > 0 and:{ port.asInteger < 65536 }}, {
+										thisOSCFeedbackPort[i%thisOSCFeedbackPort.size] = port.asInteger;
+									})
+								}
+							}
+						);
 						extOscCtrlArrayField.string.interpret.do({ |ext, i|
 							if(deviceDropDown.value > 0, {
 								connectIP = tmpIP.asString.split($:)[0];
@@ -1183,7 +1225,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 										port: connectPort,
 										name: connectName,
 										oscMsgIndex: connectOscMsgIndex,
-										slot: connectIndexStart
+										slot: connectIndexStart,
+										oscFeedbackPort: thisOSCFeedbackPort[i] ?? {
+											widget.class.globalOSCfeedbackPort[i]
+										}
 									)
 								})
 							})

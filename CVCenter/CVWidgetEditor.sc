@@ -843,9 +843,12 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			feedbackPortField = NumberBox(tabView2, Point(65, 15))
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
+				.clipLo_(1)
+				.clipHi_(65535)
+				.step_(1)
 				.value_(thisFeedbackPort ? widget.class.globalOSCfeedbackPort)
 				.action_({ |f|
-					switch(this.class,
+					switch(widget.class,
 						CVWidgetMS, { widget.oscFeedbackPort[slot] = f.value },
 						CVWidget2D, { widget.oscFeedbackPort.put(slot, f.value) },
 						{ widget.oscFeedbackPort = f.value }
