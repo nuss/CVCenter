@@ -873,7 +873,7 @@ Pdef(\poly,
 		}}), Scale.dorian),
 		// the list arg in a ListPattern can't simply be replaced by a Pattern
 		// using a custom key holding a Pfunc that updates the Pseq's internal list
-		dur: d = Pseq(0.125!7, inf),
+		dur: d = Pseq(0.125!5, inf),
 		durList: Pfunc({ d.list_(CVCenter.at(\dur).value) }),
 		curve: CVCenter.use(\curve, #[-4.0, 4.0].asSpec),
 		rel: Pwhite(0.8, 2.0),
