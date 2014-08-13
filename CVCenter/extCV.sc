@@ -9,6 +9,10 @@
 		// ^object = nil;
 	}
 
+	cvSplit {
+		Routine { value.yield }
+	}
+
 }
 
 +Array {

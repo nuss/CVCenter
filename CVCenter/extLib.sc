@@ -4,25 +4,6 @@
 
 }
 
-+ControlSpec {
-
-	safeHasZeroCrossing {
-		var thisMinSign, thisMaxSign;
-		#thisMinSign, thisMaxSign = [minval, maxval].collect{ |val|
-			if(val.isArray) { val.sign.mean } { val.sign }
-		};
-		^thisMinSign != thisMaxSign or:{ (thisMinSign == 0).and(thisMaxSign == 0) };
-	}
-
-	excludingZeroCrossing {
-		if(minval != 0 and:{ maxval != 0 }) {
-			^this.hasZeroCrossing
-		}
-		^false
-	}
-
-}
-
 +Array {
 
 	cvCenterBuildCVConnections { | server, nodeID, node, cvcKeys, setActive |

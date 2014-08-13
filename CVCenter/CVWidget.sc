@@ -270,10 +270,11 @@ CVWidget {
 		switch(this.class,
 			CVWidgetKnob, { thisEditor = this.guiEnv.editor },
 			CVWidget2D, { thisEditor = this.guiEnv[slot.asSymbol].editor },
-			CVWidgetMS, { thisEditor = this.guiEnv.msEditor }
+			CVWidgetMS, { thisEditor = this.guiEnv.msEditor.postln }
 		);
 
 		name ?? { Error("Please provide the action's name!").throw };
+
 		switch(this.class,
 			CVWidget2D, {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as second argument to removeAction!").throw };
@@ -1531,12 +1532,7 @@ CVWidget {
 
 						// "do I get here?".postln;
 
-				specSize = [
-					thisSpec.minval.size,
-					thisSpec.maxval.size,
-					thisSpec.step.size,
-					thisSpec.default.size
-				].maxItem;
+				specSize = thisSpec.size;
 
 				if(specSize < msSize, {
 					this.mSlider.indexThumbSize_(this.mSlider.bounds.width/specSize);
