@@ -283,8 +283,6 @@ CVWidgetMS : CVWidget {
 
 		connectTF !? { activeTextB.value_(connectTF.asInteger) };
 
-		// "model: %\n".postf(wdgtControllersAndModels.slidersTextConnection);
-
 		if(GUI.id !== \cocoa, {
 			if(wdgtControllersAndModels.slidersTextConnection.model.value[1], {
 				activeTextB.toolTip_("deactivate CV-numberbox connection")
