@@ -1224,7 +1224,8 @@ CVCenter {
 						Rect(thisNextPos.x, thisNextPos.y, widgetwidth, widgetheight),
 						setup: tmp.setup,
 						controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
-						cvcGui: cvcArgs
+						cvcGui: cvcArgs,
+						numSliders: msSize
 					);
 					removeButs.put(key,
 						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))

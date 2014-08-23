@@ -9,6 +9,10 @@
 		// ^object = nil;
 	}
 
+	cvSplit { |clock|
+		^value.collect { |v, i| CV(spec.split[i]).value_(v) }
+	}
+
 }
 
 +Array {
