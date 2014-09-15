@@ -10,6 +10,7 @@ list::
 ## Since CVWidgetEditor and link::Classes/CVWidgetMSEditor:: share a number of properties these are implemented within their superclass link::Classes/AbstractCVWidgetEditor::.
 ## CVWidgetEditor is not supposed to be used directly. Rather editors should always be instantiated from within the widget it belongs to.
 ::
+::
 
 
 CLASSMETHODS::
@@ -19,7 +20,7 @@ Opens a new editor for code::widget::
 note:: If widget is a link::Classes/CVWidgetMS:: the tabs "Spec" and "Actions" will be missing as those properties can be edited in the widget's link::Classes/CVWidgetMSEditor::.::
 
 ARGUMENT:: widget
-the widget-object: either a link::Classes/CVWidgetKnob::, a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS::. 
+the widget-object: either a link::Classes/CVWidgetKnob::, a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS::.
 
 ARGUMENT:: tab
 an link::Classes/Integer::, specifying which tab of the editor shall be focused opening the editor. Each editor contains 4 tabs ( see also link::Classes/TabbedView2::): "Specs", "MIDI", "OSC" and "Actions", each addressed by an integer value from code::0:: to code::3::
