@@ -1650,7 +1650,7 @@ CVCenter {
 			// "makeWindow: %, key: %\n".postf(thisTab, thisKey);
 			this.makeWindow(thisTab);
 		}, {
-			// "prAddWidget: %\n".postf(thisKey);
+			// "prAddWidget: %, %\n".postf(thisKey, widget2DKey);
 			this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
 		});
 
