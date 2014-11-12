@@ -1649,7 +1649,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					})
 				});
 				flow3.top_(flow3.top-76);
-
 			}
 		)
 
