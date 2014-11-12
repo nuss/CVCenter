@@ -26,6 +26,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 	var <oscTabs, <midiTabs;
 	var midiView0, midiView1, oscView0, oscView1;
 	var oscFlow0, <oscFlow1, midiFlow0, <midiFlow1;
+	var cTabView3;
 
 	*new { |widget, tab|
 		^super.new.init(widget, tab);
@@ -201,15 +202,23 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				tabs.views[2].view,
 				tabs.views[2].view.bounds.width@tabs.views[2].view.bounds.height
 			);
-			tabView3 = CompositeView(
+			// actions
+			// ScrollView, decorator placed within a ContainerView whithin it
+			tabView3 = ScrollView(
 				tabs.views[3].view,
-				tabs.views[3].view.bounds.width@tabs.views[3].view.bounds.height
-			);
+				Point(tabs.views[3].view.bounds.width, tabs.views[3].view.bounds.height)
+			)
+				.hasHorizontalScroller_(false)
+				.autohidesScrollers_(true)
+			// .hasBorder_(false)
+			;
+
+			cTabView3 = CompositeView(tabView3, Point(tabView3.bounds.width, tabView3.bounds.height));
 
 			tabView0.decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabView1.decorator = flow1 = FlowLayout(window.view.bounds, 0@1, 3@3);
 			tabView2.decorator = flow2 = FlowLayout(window.view.bounds, 0@1, 3@3);
-			tabView3.decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			cTabView3.decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 
 			midiTabs = TabbedView2(tabView1, Rect(0, 1, tabView1.bounds.width-4, tabView1.bounds.height-4))
 				.resize_(5).dragTabs_(false)
@@ -332,10 +341,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			}, {
 				specsListSpecs = msEditorEnv.specsListSpecs;
 			});
-
-			// "Spec.specs: %\n".postf(Spec.specs);
-
-			// Spec.specs.pairsDo({ |name, spec| [name, spec].postln });
 
 			if(msEditorEnv.specsListItems.notNil, {
 				specsList.items_(msEditorEnv.specsListItems);
@@ -1264,7 +1269,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				oscFlow1.shift(0, (oscEditBtns[sindex].bounds.height-10).neg);
 			});
 
-			actionName = TextField(tabView3, flow3.bounds.width-100@20)
+			actionName = TextField(cTabView3, flow3.bounds.width-100@20)
 				.string_("action-name")
 				.font_(textFieldFont)
 			;
@@ -1275,7 +1280,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			flow3.shift(5, 0);
 
-			enterActionBut = Button(tabView3, 57@20)
+			enterActionBut = Button(cTabView3, 57@20)
 				.font_(staticTextFont)
 				.states_([
 					["add Action", Color.white, Color.blue],
@@ -1289,7 +1294,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			;
 
-			enterAction = TextView(tabView3, flow3.bounds.width-35@50)
+			enterAction = TextView(cTabView3, flow3.bounds.width-35@50)
 				.background_(Color.white)
 				.font_(textFieldFont)
 				.string_("{ |cv| /* do something */ }")
@@ -1303,13 +1308,16 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			wdgtActions = widget.wdgtActions;
 
+			// "num wdgtActions: %\n".postf(wdgtActions.size);
+			// "widgetActions: %\n".postf(wdgtActions.cs);
+
 			wdgtActions.pairsDo({ |name, action|
 
 				actionsUIs = actionsUIs.put(name, ());
 
 				flow3.shift(0, 5);
 
-				actionsUIs[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
+				actionsUIs[name].nameField = StaticText(cTabView3, flow3.bounds.width-173@15)
 					.font_(staticTextFont)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.string_(""+name.asString)
@@ -1317,7 +1325,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				actionsUIs[name].activate = Button(tabView3, 60@15)
+				actionsUIs[name].activate = Button(cTabView3, 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -1342,7 +1350,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				actionsUIs[name].removeBut = Button(tabView3, 60@15)
+				actionsUIs[name].removeBut = Button(cTabView3, 60@15)
 					.font_(staticTextFont)
 					.states_([
 						["remove", Color.white, Color.red],
@@ -1354,13 +1362,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(0, 0);
 
-				actionsUIs[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
+				actionsUIs[name].actionView = TextView(cTabView3, flow3.bounds.width-35@50)
 					.background_(Color(1.0, 1.0, 1.0, 0.5))
 					.font_(textFieldFont)
 					.string_(action.asArray[0][0].replace("\t", "    "))
 					.syntaxColorize
 					.editable_(false)
 				;
+
 			});
 
 			window.onClose_({
@@ -1432,11 +1441,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			\add, {
 				actionsUIs[name] ?? {
 					actionsUIs.put(name, ());
-					tabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height+76);
+					// tabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height+76);
 
 					flow3.shift(0, 5);
 
-					actionsUIs[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
+					actionsUIs[name].nameField = StaticText(cTabView3, flow3.bounds.width-173@15)
 						.font_(staticTextFont)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.string_(""+name.asString)
@@ -1444,7 +1453,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(5, 0);
 
-					actionsUIs[name].activate = Button(tabView3, 60@15)
+					actionsUIs[name].activate = Button(cTabView3, 60@15)
 						.font_(staticTextFont)
 						.states_([
 							["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -1469,7 +1478,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(5, 0);
 
-					actionsUIs[name].removeBut = Button(tabView3, 60@15)
+					actionsUIs[name].removeBut = Button(cTabView3, 60@15)
 						.font_(staticTextFont)
 						.states_([
 							["remove", Color.white, Color.red]
@@ -1481,7 +1490,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(0, 0);
 
-					actionsUIs[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
+					actionsUIs[name].actionView = TextView(cTabView3, flow3.bounds.width-35@50)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.font_(textFieldFont)
 						.string_(action.asArray[0][0])
@@ -1513,7 +1522,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					})
 				});
 				flow3.top_(flow3.top-76);
-				tabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height-76);
+				// cTabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height-76);
 			}
 		)
 
