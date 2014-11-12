@@ -3120,6 +3120,7 @@ CVWidget {
 					// connect sliders
 					switch(this.class,
 						CVWidget2D, {
+							sliderConnection ? sliderConnection = ();
 							[this.slider2d, this.rangeSlider].do({ |view|
 								sliderConnection ?? { sliderConnection = () };
 								switch (view.class,
