@@ -209,7 +209,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			)
 				.hasHorizontalScroller_(false)
 				.autohidesScrollers_(true)
-			// .hasBorder_(false)
+				.hasBorder_(false)
 			;
 
 			cTabView3 = CompositeView(tabView3, Point(tabView3.bounds.width, tabView3.bounds.height));
@@ -1325,6 +1325,22 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					.editable_(false)
 				;
 
+				if(actionsUIs[name].actionView.bounds.top > 256, {
+					tabView3.bounds_(Point(
+						tabView3.bounds.width,
+						actionsUIs[name].actionView.bounds.top-26
+					))
+				}, {
+					tabView3.bounds_(Point(
+						tabView3.bounds.width,
+						230
+					))
+				});
+				cTabView3.bounds_(tabView3.bounds);
+
+				"tabView3, cTabView3 bounds: %, %\n".postf(tabView3.bounds, cTabView3.bounds);
+				"actionsUIs['%'].actionView.bounds: %\n".postf(name, actionsUIs[name].actionView.bounds);
+
 			});
 
 			window.onClose_({
@@ -1453,6 +1469,20 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						.editable_(false)
 					;
 
+					if(actionsUIs[name].actionView.bounds.top > 256, {
+						tabView3.bounds_(Point(
+							tabView3.bounds.width,
+							actionsUIs[name].actionView.bounds.top-26
+						))
+					}, {
+						tabView3.bounds_(Point(
+							tabView3.bounds.width,
+							230
+						))
+					});
+
+					cTabView3.bounds_(tabView3.bounds);
+
 				}
 			},
 			\remove, {
@@ -1477,7 +1507,21 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					})
 				});
 				flow3.top_(flow3.top-76);
-				// cTabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height-76);
+
+				// if(actionsUIs[name].actionView.bounds.top > 256, {
+				// 	tabView3.bounds_(Point(
+				// 		tabView3.bounds.width,
+				// 		actionsUIs[name].actionView.bounds.top-26
+				// 	))
+				// 	}, {
+				// 		tabView3.bounds_(Point(
+				// 			tabView3.bounds.width,
+				// 			230
+				// 		))
+				// });
+				//
+				// cTabView3.bounds_(tabView3.bounds);
+
 			}
 		)
 
