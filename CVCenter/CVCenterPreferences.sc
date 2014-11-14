@@ -437,7 +437,6 @@ CVCenterPreferences {
 			globalShortcutsTab = scTabs.add("global shortcuts", scroll: false);
 
 			cvCenterEditor = KeyDownActionsEditor(
-				// cvCenterTab, nil, cvCenterTab.bounds, prefs !? { prefs.shortcuts.cvcenter ?? { "no shortcts for CVCenter in preferences".postln; CVCenter.shortcuts }}, false
 				cvCenterTab, nil, cvCenterTab.bounds,
 				if(prefs.notNil and:{
 					prefs[\shortcuts].notNil and:{
@@ -446,7 +445,7 @@ CVCenterPreferences {
 				}, {
 					prefs[\shortcuts][\cvcenter]
 				}, { CVCenter.shortcuts }),
-				false
+				true
 			);
 			cvWidgetEditor = KeyDownActionsEditor(
 				cvWidgetTab, nil, cvWidgetTab.bounds,
@@ -457,7 +456,7 @@ CVCenterPreferences {
 				}, {
 					prefs[\shortcuts][\cvwidget]
 				}, { CVWidget.shortcuts }),
-				false
+				true
 			);
 			cvWidgetEditorEditor = KeyDownActionsEditor(
 				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds,
@@ -468,7 +467,7 @@ CVCenterPreferences {
 				}, {
 					prefs[\shortcuts][\cvwidgeteditor]
 				}, { AbstractCVWidgetEditor.shortcuts }),
-				false
+				true
 			);
 			// "prefs.globalShortcuts: %\n".postf(prefs.globalShortcuts);
 			globalShortcutsEditorTab = KeyDownActionsEditor(

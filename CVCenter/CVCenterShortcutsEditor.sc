@@ -64,13 +64,13 @@ CVCenterShortcutsEditor {
 			// keyCodesAndModsTab = tabs.add("keycodes and modifiers", scroll: false);
 
 			cvCenterEditor = KeyDownActionsEditor(
-				cvCenterTab, nil, cvCenterTab.bounds, CVCenter.shortcuts, false
+				cvCenterTab, nil, cvCenterTab.bounds, CVCenter.shortcuts, true
 			);
 			cvWidgetEditor = KeyDownActionsEditor(
-				cvWidgetTab, nil, cvWidgetTab.bounds, CVWidget.shortcuts, false
+				cvWidgetTab, nil, cvWidgetTab.bounds, CVWidget.shortcuts, true
 			);
 			cvWidgetEditorEditor = KeyDownActionsEditor(
-				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, false
+				cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds, AbstractCVWidgetEditor.shortcuts, true
 			);
 			globalShortcutsEditor = KeyDownActionsEditor(
 				globalShortcutsTab, nil, globalShortcutsTab.bounds, KeyDownActions.globalShortcuts, false, false, false
