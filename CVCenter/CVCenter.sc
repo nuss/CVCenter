@@ -123,6 +123,7 @@ CVCenter {
 
 		if (scPrefs == false, {
 			this.shortcuts = CVCenterShortcuts.shortcuts;
+
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvcenter];
 		});
