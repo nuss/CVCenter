@@ -396,7 +396,45 @@ CVWidget {
 			this.shortcuts.put(
 				\r,
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[$r])
-			)
+			);
+			scFunc =
+			"// connect or disconnect sliders
+			{ |view|
+				CVCenter.all.keys.do({ |key|
+					if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
+						CVCenter.cvWidgets[key].connectGUI(CVCenter.cvWidgets[key].connectS.not, nil);
+					}
+				});
+				true;
+			}";
+			this.shortcuts.put(
+				'shift + s',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$s],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
+				)
+			);
+			scFunc =
+			"// connect or disconnect textfields
+			{ |view|
+				CVCenter.all.keys.do({ |key|
+					if(CVCenter.cvWidgets[key].focusElements.includes(view)) {
+						CVCenter.cvWidgets[key].connectGUI(nil, CVCenter.cvWidgets[key].connectTF.not);
+					}
+				});
+				true;
+			}";
+			this.shortcuts.put(
+				'shift + t',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$t],
+					modifierQt: KeyDownActions.modifiersQt[\shift],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
+				)
+			);
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvwidget];
 		})
