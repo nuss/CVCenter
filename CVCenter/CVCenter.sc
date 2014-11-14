@@ -176,8 +176,8 @@ CVCenter {
 				(
 					func: scFunc,
 					keyCode: KeyDownActions.keyCodes[$c],
-					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
-					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
+					modifierQt: KeyDownActions.modifiersQt[\alt],
+					modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
 				)
 			);
 			scFunc =
