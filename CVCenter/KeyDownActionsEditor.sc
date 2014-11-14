@@ -168,7 +168,6 @@ KeyDownActionsEditor : KeyDownActions {
 													}
 												}
 											}) {
-											// "mods should be considered".postln;
 												shortcutField.string_(
 													" "++ mods ++ join ++
 													keyCodes.findKeyForValue(keycode)
