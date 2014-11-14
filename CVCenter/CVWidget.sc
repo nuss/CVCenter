@@ -408,10 +408,10 @@ CVWidget {
 				true;
 			}";
 			this.shortcuts.put(
-				'shift + s',
+				'shift + b',
 				(
 					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$s],
+					keyCode: KeyDownActions.keyCodes[$b],
 					modifierQt: KeyDownActions.modifiersQt[\shift],
 					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
 				)
@@ -427,10 +427,10 @@ CVWidget {
 				true;
 			}";
 			this.shortcuts.put(
-				'shift + t',
+				'shift + v',
 				(
 					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$t],
+					keyCode: KeyDownActions.keyCodes[$v],
 					modifierQt: KeyDownActions.modifiersQt[\shift],
 					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
 				)

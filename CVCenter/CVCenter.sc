@@ -482,6 +482,34 @@ CVCenter {
 					modifierCocoa: KeyDownActions.modifiersCocoa['shift']
 				)
 			);
+			scFunc =
+			"// connect/disconnect textfields in all widgets
+			{ CVCenter.cvWidgets.do({ |wdgt|
+				wdgt.connectGUI(nil, wdgt.connectTF.not)
+			})}";
+			this.shortcuts.put(
+				'alt + shift + v',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$v],
+					modifierQt: KeyDownActions.modifiersQt['alt + shift'],
+					modifierCocoa: KeyDownActions.modifiersCocoa['alt + shift']
+				)
+			);
+			scFunc =
+			"// connect/disconnect sliders in all widgets
+			{ CVCenter.cvWidgets.do({ |wdgt|
+				wdgt.connectGUI(wdgt.connectS.not, nil)
+			})}";
+			this.shortcuts.put(
+				'alt + shift + b',
+				(
+					func: scFunc,
+					keyCode: KeyDownActions.keyCodes[$b],
+					modifierQt: KeyDownActions.modifiersQt['alt + shift'],
+					modifierCocoa: KeyDownActions.modifiersCocoa['alt + shift']
+				)
+			);
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvcenter];
 		});
