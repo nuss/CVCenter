@@ -1188,6 +1188,9 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 								widget.removeAction(name.asSymbol, slot.asSymbol);
 							})
 						;
+
+						flow3.shift(0, 0);
+
 						actionsUIs[name].actionView = TextView(cTabView3, Point(flow3.bounds.width-35, 50))
 							.background_(Color(1.0, 1.0, 1.0, 0.5))
 							.font_(textFieldFont)
