@@ -150,7 +150,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			// window.acceptsMouseOver_(true);
 
-			xySlots = xySlots.add([nextX@nextY, name++slotHiLo]);
+			xySlots = xySlots.add([Point(nextX, nextY), name++slotHiLo]);
 			// [xySlots, nextX, nextY].postln;
 			if(nextX+275 > Window.screenBounds.width, {
 				nextX = shiftXY ?? { 0 }; nextY = xySlots.last[0].y+280;
@@ -219,10 +219,10 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			cTabView3 = CompositeView(tabView3, Point(tabView3.bounds.width, tabView3.bounds.height));
 
-			tabView0.decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			tabView1.decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			tabView2.decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			cTabView3.decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			tabView0.decorator = flow0 = FlowLayout(window.view.bounds, Point(7, 7), Point(3, 3));
+			tabView1.decorator = flow1 = FlowLayout(window.view.bounds, Point(7, 7), Point(3, 3));
+			tabView2.decorator = flow2 = FlowLayout(window.view.bounds, Point(7, 7), Point(3, 3));
+			cTabView3.decorator = flow3 = FlowLayout(window.view.bounds, Point(7, 7), Point(3, 3));
 
 			thisEditor[\tabs] = tabs;
 
@@ -230,7 +230,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			KeyDownActions.setShortcuts(tabs.view, this.class.shortcuts);
 
 			if(widget.class != CVWidgetMS, {
-				StaticText(tabView0, flow0.bounds.width-20@95)
+				StaticText(tabView0, Point(flow0.bounds.width-20, 95))
 					.font_(staticTextFont)
 					.stringColor_(staticTextColor)
 					.string_("Enter a ControlSpec in the textfield:\ne.g. ControlSpec(20, 20000, \\exp, 0.0, 440, \"Hz\")\nor \\freq.asSpec \nor [20, 20000, \\exp].asSpec.\nOr select a suitable ControlSpec from the List below.\nIf you don't know what this all means have a look\nat the ControlSpec-helpfile.")
@@ -240,7 +240,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 				cvString = cvString[1..cvString.size-1].join(" ");
 
-				specField = TextField(tabView0, flow0.bounds.width-20@15)
+				specField = TextField(tabView0, Point(flow0.bounds.width-20, 15))
 					.font_(staticTextFont)
 					.string_(cvString)
 					.action_({ |tf|
@@ -250,7 +250,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 				flow0.shift(0, 5);
 
-				specsList = PopUpMenu(tabView0, flow0.bounds.width-20@20)
+				specsList = PopUpMenu(tabView0, Point(flow0.bounds.width-20, 20))
 					.action_({ |sl|
 						widget.setSpec(specsListSpecs[sl.value], slot);
 					})
@@ -295,7 +295,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			// MIDI editing
 
-			StaticText(tabView1, flow1.bounds.width/2+40@15)
+			StaticText(tabView1, Point(flow1.bounds.width/2+40, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-mode: 0-127 or in/decremental")
@@ -305,7 +305,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			midiModes = ["0-127", "+/-"];
 
-			midiModeSelect = PopUpMenu(tabView1, flow1.bounds.width/2-70@15)
+			midiModeSelect = PopUpMenu(tabView1, Point(flow1.bounds.width/2-70, 15))
 				.font_(staticTextFont)
 				.items_(midiModes)
 				.value_(thisMidiMode)
@@ -318,7 +318,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				midiModeSelect.toolTip_("Set the mode according to the output\nof your MIDI-device: 0-127 if it outputs\nabsolute values or +/- for in- resp.\ndecremental values")
 			});
 
-			StaticText(tabView1, flow1.bounds.width/2+60@15)
+			StaticText(tabView1, Point(flow1.bounds.width/2+60, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-mean (in/decremental mode only)")
@@ -326,7 +326,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow1.shift(5, 0);
 
-			midiMeanNB = NumberBox(tabView1, flow1.bounds.width/2-90@15)
+			midiMeanNB = NumberBox(tabView1, Point(flow1.bounds.width/2-90, 15))
 				.font_(staticTextFont)
 				.value_(thisMidiMean)
 				.action_({ |mb|
@@ -340,7 +340,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				midiMeanNB.toolTip_("If your device outputs in-/decremental\nvalues often a slider's output in neutral\nposition will not be 0. E.g. it could be 64")
 			});
 
-			StaticText(tabView1, flow1.bounds.width/2+60@15)
+			StaticText(tabView1, Point(flow1.bounds.width/2+60, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("min. snap-distance for the slider (0-127 only)")
@@ -348,7 +348,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow1.shift(5, 0);
 
-			softWithinNB = NumberBox(tabView1, flow1.bounds.width/2-90@15)
+			softWithinNB = NumberBox(tabView1, Point(flow1.bounds.width/2-90, 15))
 				.font_(staticTextFont)
 				.value_(thisSoftWithin)
 				.action_({ |mb|
@@ -363,7 +363,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				softWithinNB.toolTip_("If your device outputs absolute values\nyou can set here a threshold to the\ncurrent CV-value within which a slider\nwill react and set a new value. This avoids\njumps if a new value set by a slider\nis far away from the previous value")
 			});
 
-			StaticText(tabView1, flow1.bounds.width/2+60@15)
+			StaticText(tabView1, Point(flow1.bounds.width/2+60, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("MIDI-resolution (+/- only)")
@@ -371,7 +371,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow1.shift(5, 0);
 
-			midiResolutionNB = NumberBox(tabView1, flow1.bounds.width/2-90@15)
+			midiResolutionNB = NumberBox(tabView1, Point(flow1.bounds.width/2-90, 15))
 				.font_(staticTextFont)
 				.value_(thisMidiResolution)
 				.action_({ |mb|
@@ -386,7 +386,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				midiResolutionNB.toolTip_("Higher values mean lower\nresolution and vice versa.")
 			});
 
-			StaticText(tabView1, flow1.bounds.width/2+60@15)
+			StaticText(tabView1, Point(flow1.bounds.width/2+60, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("number of sliders per bank")
@@ -394,7 +394,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow1.shift(5, 0);
 
-			ctrlButtonBankField = TextField(tabView1, flow1.bounds.width/2-90@15)
+			ctrlButtonBankField = TextField(tabView1, Point(flow1.bounds.width/2-90, 15))
 				.font_(staticTextFont)
 				.string_(thisCtrlButtonBank)
 				.action_({ |mb|
@@ -414,7 +414,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow1.shift(0, 10);
 
-			midiInitBut = Button(tabView1, 60@15)
+			midiInitBut = Button(tabView1, Point(60, 15))
 				.font_(staticTextFont)
 				.action_({ |mb|
 					if(MIDIClient.initialized, {
@@ -432,7 +432,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				midiInitBut.states_([["init MIDI", Color.white, Color.red]]);
 			});
 
-			midiSourceSelect = PopUpMenu(tabView1, flow1.indentedRemaining.width-10@15)
+			midiSourceSelect = PopUpMenu(tabView1, Point(flow1.indentedRemaining.width-10, 15))
 				.items_(["select device port..."])
 				.font_(staticTextFont)
 				.action_({ |ms|
@@ -447,13 +447,13 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				})
 			;
 
-			StaticText(tabView1, flow1.bounds.width-20@15)
+			StaticText(tabView1, Point(flow1.bounds.width-20, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("(learn | connect) / source-ID (device) / chan / ctrl-nr.")
 			;
 
-			midiLearnBut = Button(tabView1, 15@15)
+			midiLearnBut = Button(tabView1, Point(15, 15))
 				.font_(staticTextFont)
 				.states_([
 					["L", Color.white, Color.blue],
@@ -486,7 +486,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow1.shift(0, 0);
 
-			midiSrcField = TextField(tabView1, flow1.bounds.width-165@15)
+			midiSrcField = TextField(tabView1, Point(flow1.bounds.width-165, 15))
 				.font_(staticTextFont)
 				.string_(msrc)
 				.background_(Color.white)
@@ -512,7 +512,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow1.shift(0, 0);
 
-			midiChanField = TextField(tabView1, 60@15)
+			midiChanField = TextField(tabView1, Point(60, 15))
 				.font_(staticTextFont)
 				.string_(mchan)
 				.background_(Color.white)
@@ -538,7 +538,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow1.shift(0, 0);
 
-			midiCtrlField = TextField(tabView1, 60@15)
+			midiCtrlField = TextField(tabView1, Point(60, 15))
 				.font_(staticTextFont)
 				.string_(mctrl)
 				.background_(Color.white)
@@ -562,12 +562,12 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				})
 			;
 
-			deviceDropDown = PopUpMenu(tabView2, flow2.bounds.width-95@15)
+			deviceDropDown = PopUpMenu(tabView2, Point(flow2.bounds.width-95, 15))
 				.items_(["select IP-address... (optional)"])
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 			;
 
-			StaticText(tabView2, 60@15)
+			StaticText(tabView2, Point(60, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("restrict to port ")
@@ -580,7 +580,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				)
 			});
 
-			portRestrictor = buildCheckbox.(false, tabView2, 15@15, Font(Font.available("Arial") ? Font.defaultSansFace, 10, true));
+			portRestrictor = buildCheckbox.(false, tabView2, Point(15, 15), Font(Font.available("Arial") ? Font.defaultSansFace, 10, true));
 			portRestrictor.action_({ |bt|
 				switch(bt.value.asBoolean,
 					true, {
@@ -600,7 +600,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				portRestrictor.toolTip_("If clicked listening within in responders that get\ncreated after selecting an IP-address from the\ndrop-down on the left will also be restricted to\nthe port from which messages are sent.")
 			});
 
-			StaticText(tabView2, flow2.bounds.width-20@40)
+			StaticText(tabView2, Point(flow2.bounds.width-20, 40))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("OSC command-name, e.g.: /my/cmd/name / OSC\nmessage slot: Either choose from a list of command-names\n(as set by the selected device) or add your custom one ")
@@ -608,7 +608,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			deviceListMenu = PopUpMenu(tabView2, flow2.bounds.width/2-40@15)
+			deviceListMenu = PopUpMenu(tabView2, Point(flow2.bounds.width/2-40, 15))
 				.items_(["select device..."])
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 				.action_({ |m|
@@ -642,7 +642,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			cmdListMenu = PopUpMenu(tabView2, flow2.bounds.width/2-11@15)
+			cmdListMenu = PopUpMenu(tabView2, Point(flow2.bounds.width/2-11, 15))
 				.items_(["command-names..."])
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 				.mouseDownAction_({ |m|
@@ -685,7 +685,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			addDeviceBut = Button(tabView2, 29@15)
+			addDeviceBut = Button(tabView2, Point(29, 15))
 				.states_([
 					["new", Color.white, Color(0.15, 0.5, 0.15)]
 				])
@@ -697,7 +697,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				addDeviceBut.toolTip_("Scan for incoming OSC-messages\nresp. their command-names. These\ncan be saved to disk together with a\ndevice-name. You may then quickly\nselect devices + command-names\nfrom the dropdowns on the left.")
 			});
 
-			nameField = TextField(tabView2, flow2.bounds.width-60@15)
+			nameField = TextField(tabView2, Point(flow2.bounds.width-60, 15))
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
@@ -710,7 +710,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow2.shift(5, 0);
 
-			indexField = NumberBox(tabView2, 36@15)
+			indexField = NumberBox(tabView2, Point(36, 15))
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.clipLo_(1)
@@ -727,13 +727,13 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			StaticText(tabView2, flow2.bounds.width-15@15)
+			StaticText(tabView2, Point(flow2.bounds.width-15, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("OSC-input constraints + compensation")
 			;
 
-			inputConstraintLoField = NumberBox(tabView2, flow2.bounds.width/2-76@15)
+			inputConstraintLoField = NumberBox(tabView2, Point(flow2.bounds.width/2-76, 15))
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(wcm.oscInputRange.model.value[0])
@@ -742,7 +742,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			// flow2.shift(5, 0);
 
-			inputConstraintHiField = NumberBox(tabView2, flow2.bounds.width/2-76@15)
+			inputConstraintHiField = NumberBox(tabView2, Point(flow2.bounds.width/2-76, 15))
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.value_(wcm.oscInputRange.model.value[1])
@@ -755,7 +755,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			// flow2.shift(5, 0);
 
-			alwaysPosField = StaticText(tabView2, 32@15)
+			alwaysPosField = StaticText(tabView2, Point(32, 15))
 				.font_(staticTextFont)
 				.string_(" +"++widget.alwaysPositive)
 				.stringColor_(Color(0.5))
@@ -768,7 +768,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			// flow2.shift(5, 0);
 
-			calibBut = Button(tabView2, 60@15)
+			calibBut = Button(tabView2, Point(60, 15))
 				.font_(staticTextFont)
 				.states_([
 					["calibrating", Color.black, Color.green],
@@ -780,13 +780,13 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				calibBut.toolTip_("As the range of incoming values may be unknown the\ncalibration provides a way to detect the constraints\nof incoming values. It may be useful in some cases\nto deactivate the mechanismand restrict the input to\na limited range.")
 			});
 
-			oscResetCalibBut = Button(tabView2, flow2.indentedRemaining.width@15)
+			oscResetCalibBut = Button(tabView2, Point(flow2.indentedRemaining.width, 15))
 				.font_(staticTextFont)
 				.states_([
 					["reset", Color.black, Color(0.9, 0.7, 0.14)],
 				])
 				.action_({ |rb|
-					widget.setOscInputConstraints(0.0001@0.0001, slot).setCalibrate(true, slot)
+				widget.setOscInputConstraints(Point(0.0001, 0.0001), slot).setCalibrate(true, slot)
 				})
 			;
 
@@ -849,7 +849,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			mappingSelectItems = ["linlin", "linexp", "explin", "expexp"];
 
-			mappingSelect = PopUpMenu(tabView2, flow2.bounds.width-15@20)
+			mappingSelect = PopUpMenu(tabView2, Point(flow2.bounds.width-15, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 12))
 				.items_(mappingSelectItems)
 				.action_({ |ms|
@@ -869,7 +869,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			connectorBut = Button(tabView2, flow2.bounds.width-15@25)
+			connectorBut = Button(tabView2, Point(flow2.bounds.width-15, 25))
 				.font_(staticTextFont)
 				.states_([
 					["connect OSC-controller", Color.white, Color.blue],
@@ -919,7 +919,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			);
 
 			if(widget.class != CVWidgetMS, {
-				actionName = TextField(cTabView3, flow3.bounds.width-100@20)
+				actionName = TextField(cTabView3, Point(flow3.bounds.width-100, 20))
 					.string_("action-name")
 					.font_(textFieldFont)
 				;
@@ -930,7 +930,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				enterActionBut = Button(cTabView3, 57@20)
+				enterActionBut = Button(cTabView3, Point(57, 20))
 					.font_(staticTextFont)
 					.states_([
 						["add Action", Color.white, Color.blue],
@@ -946,7 +946,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(0, 0);
 
-				enterAction = TextView(cTabView3, flow3.bounds.width-35@50)
+				enterAction = TextView(cTabView3, Point(flow3.bounds.width-35, 50))
 					.background_(Color.white)
 					.font_(textFieldFont)
 					.string_("{ |cv| /* do something */ }")
@@ -970,7 +970,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(0, 5);
 
-					actionsUIs[name].nameField = StaticText(cTabView3, flow3.bounds.width-173@15)
+					actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-173, 15))
 						.font_(staticTextFont)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.string_(""+name.asString)
@@ -978,7 +978,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(5, 0);
 
-					actionsUIs[name].activate = Button(cTabView3, 60@15)
+					actionsUIs[name].activate = Button(cTabView3, Point(60, 15))
 						.font_(staticTextFont)
 						.states_([
 							["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -1003,7 +1003,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(5, 0);
 
-					actionsUIs[name].removeBut = Button(cTabView3, 60@15)
+					actionsUIs[name].removeBut = Button(cTabView3, Point(60, 15))
 						.font_(staticTextFont)
 						.states_([
 							["remove", Color.white, Color.red],
@@ -1015,7 +1015,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(0, 0);
 
-					actionsUIs[name].actionView = TextView(cTabView3, flow3.bounds.width-35@50)
+					actionsUIs[name].actionView = TextView(cTabView3, Point(flow3.bounds.width-35, 50))
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.font_(textFieldFont)
 						.string_(action.asArray[0][0].replace("\t", "    "))
@@ -1121,7 +1121,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 						flow3.shift(0, 5);
 
-						actionsUIs[name].nameField = StaticText(cTabView3, flow3.bounds.width-173@15)
+						actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-173, 15))
 							.font_(staticTextFont)
 							.background_(Color(1.0, 1.0, 1.0, 0.5))
 							.string_(""+name.asString)
@@ -1129,7 +1129,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 						flow3.shift(5, 0);
 
-						actionsUIs[name].activate = Button(cTabView3, 60@15)
+						actionsUIs[name].activate = Button(cTabView3, Point(60, 15))
 							.font_(staticTextFont)
 							.states_([
 								["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -1154,7 +1154,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 						flow3.shift(5, 0);
 
-						actionsUIs[name].removeBut = Button(cTabView3, 60@15)
+						actionsUIs[name].removeBut = Button(cTabView3, Point(60, 15))
 							.font_(staticTextFont)
 							.states_([
 								["remove", Color.white, Color.red],
@@ -1166,7 +1166,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 						flow3.shift(0, 0);
 
-						actionsUIs[name].actionView = TextView(cTabView3, flow3.bounds.width-35@50)
+						actionsUIs[name].actionView = TextView(cTabView3, Point(flow3.bounds.width-35, 50))
 							.background_(Color(1.0, 1.0, 1.0, 0.5))
 							.font_(textFieldFont)
 							.string_(action.asArray[0][0])
