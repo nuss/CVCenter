@@ -1177,7 +1177,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 								}
 							);
 						});
-
 						flow3.shift(0, 0);
 
 						actionsUIs[name].removeBut = Button(cTabView3, Point(60, 15))
