@@ -19,6 +19,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 	var <specConstraintsText, <calibNumBoxes;
 	var editorSlot;
+	var cTabView3;
 
 	*new { |widget, tab, slot|
 		^super.new.init(widget, tab, slot)
@@ -206,15 +207,21 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				tabs.views[2].view,
 				Point(tabs.views[2].view.bounds.width, tabs.views[2].view.bounds.height)
 			);
-			tabView3 = CompositeView(
+			tabView3 = ScrollView(
 				tabs.views[3].view,
 				Point(tabs.views[3].view.bounds.width, tabs.views[3].view.bounds.height)
-			);
+			)
+				.hasHorizontalScroller_(false)
+				.autohidesScrollers_(true)
+				.hasBorder_(false)
+			;
+
+			cTabView3 = CompositeView(tabView3, Point(tabView3.bounds.width, tabView3.bounds.height));
 
 			tabView0.decorator = flow0 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabView1.decorator = flow1 = FlowLayout(window.view.bounds, 7@7, 3@3);
 			tabView2.decorator = flow2 = FlowLayout(window.view.bounds, 7@7, 3@3);
-			tabView3.decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
+			cTabView3.decorator = flow3 = FlowLayout(window.view.bounds, 7@7, 3@3);
 
 			thisEditor[\tabs] = tabs;
 
@@ -879,7 +886,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			);
 
 			if(widget.class != CVWidgetMS, {
-				actionName = TextField(tabView3, flow3.bounds.width-100@20)
+				actionName = TextField(cTabView3, flow3.bounds.width-100@20)
 					.string_("action-name")
 					.font_(textFieldFont)
 				;
@@ -890,7 +897,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				enterActionBut = Button(tabView3, 57@20)
+				enterActionBut = Button(cTabView3, 57@20)
 					.font_(staticTextFont)
 					.states_([
 						["add Action", Color.white, Color.blue],
@@ -906,7 +913,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(0, 0);
 
-				enterAction = TextView(tabView3, flow3.bounds.width-35@50)
+				enterAction = TextView(cTabView3, flow3.bounds.width-35@50)
 					.background_(Color.white)
 					.font_(textFieldFont)
 					.string_("{ |cv| /* do something */ }")
@@ -930,7 +937,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(0, 5);
 
-					actionsUIs[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
+					actionsUIs[name].nameField = StaticText(cTabView3, flow3.bounds.width-173@15)
 						.font_(staticTextFont)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.string_(""+name.asString)
@@ -938,7 +945,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(5, 0);
 
-					actionsUIs[name].activate = Button(tabView3, 60@15)
+					actionsUIs[name].activate = Button(cTabView3, 60@15)
 						.font_(staticTextFont)
 						.states_([
 							["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
@@ -963,7 +970,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(5, 0);
 
-					actionsUIs[name].removeBut = Button(tabView3, 60@15)
+					actionsUIs[name].removeBut = Button(cTabView3, 60@15)
 						.font_(staticTextFont)
 						.states_([
 							["remove", Color.white, Color.red],
@@ -975,13 +982,29 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(0, 0);
 
-					actionsUIs[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
+					actionsUIs[name].actionView = TextView(cTabView3, flow3.bounds.width-35@50)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.font_(textFieldFont)
 						.string_(action.asArray[0][0].replace("\t", "    "))
 						.syntaxColorize
 						.editable_(false)
 					;
+
+					if(actionsUIs[name].actionView.bounds.top > 180, {
+						tabView3.bounds_(Point(
+							tabView3.bounds.width,
+							actionsUIs[name].actionView.bounds.top+50
+						))
+					}, {
+						tabView3.bounds_(Point(
+							tabView3.bounds.width,
+							230
+						))
+					});
+					cTabView3.bounds_(tabView3.bounds);
+
+					// "tabView3, cTabView3 bounds: %, %\n".postf(tabView3.bounds, cTabView3.bounds);
+					// "actionsUIs['%'].actionView.bounds: %\n".postf(name, actionsUIs[name].actionView.bounds);
 				})
 			});
 
@@ -1059,64 +1082,76 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		if(widget.class != CVWidgetMS, {
 			switch(addRemove,
 				\add, {
+					actionsUIs[name] ?? {
+						actionsUIs.put(name, ());
+						cTabView3.bounds = Point(cTabView3.bounds.width, cTabView3.bounds.height+76);
 
-					actionsUIs.put(name, ());
-					tabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height+76);
+						flow3.shift(0, 5);
 
-					flow3.shift(0, 5);
+						actionsUIs[name].nameField = StaticText(cTabView3, flow3.bounds.width-173@15)
+							.font_(staticTextFont)
+							.background_(Color(1.0, 1.0, 1.0, 0.5))
+							.string_(""+name.asString)
+						;
 
-					actionsUIs[name].nameField = StaticText(tabView3, flow3.bounds.width-173@15)
-						.font_(staticTextFont)
-						.background_(Color(1.0, 1.0, 1.0, 0.5))
-						.string_(""+name.asString)
-					;
+						flow3.shift(5, 0);
 
-					flow3.shift(5, 0);
+						actionsUIs[name].activate = Button(cTabView3, 60@15)
+							.font_(staticTextFont)
+							.states_([
+								["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+								["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
+							])
+							.action_({ |rb|
+								switch(rb.value,
+									0, { widget.activateAction(name, false, slot) },
+									1, { widget.activateAction(name, true, slot) }
+								)
+							})
+						;
 
-					actionsUIs[name].activate = Button(tabView3, 60@15)
-						.font_(staticTextFont)
-						.states_([
-							["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
-							["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
-						])
-						.action_({ |rb|
-							switch(rb.value,
-								0, { widget.activateAction(name, false, slot) },
-								1, { widget.activateAction(name, true, slot) }
-							)
-						})
-					;
+						switch(active,
+							true, {
+								actionsUIs[name].activate.value_(1);
+							},
+							false, {
+								actionsUIs[name].activate.value_(0);
+							}
+						);
 
-					switch(active,
-						true, {
-							actionsUIs[name].activate.value_(1);
-						},
-						false, {
-							actionsUIs[name].activate.value_(0);
-						}
-					);
+						flow3.shift(0, 0);
 
-					flow3.shift(5, 0);
+						actionsUIs[name].removeBut = Button(cTabView3, 60@15)
+							.font_(staticTextFont)
+							.states_([
+								["remove", Color.white, Color.red],
+							])
+							.action_({ |ab|
+								widget.removeAction(name.asSymbol, slot.asSymbol);
+							})
+						;
+						actionsUIs[name].actionView = TextView(cTabView3, flow3.bounds.width-35@50)
+							.background_(Color(1.0, 1.0, 1.0, 0.5))
+							.font_(textFieldFont)
+							.string_(action.asArray[0][0])
+							.syntaxColorize
+							.editable_(false)
+						;
 
-					actionsUIs[name].removeBut = Button(tabView3, 60@15)
-						.font_(staticTextFont)
-						.states_([
-							["remove", Color.white, Color.red],
-						])
-						.action_({ |ab|
-							widget.removeAction(name.asSymbol, slot.asSymbol);
-						})
-					;
+						if(actionsUIs[name].actionView.bounds.top > 180, {
+							tabView3.bounds_(Point(
+								tabView3.bounds.width,
+								actionsUIs[name].actionView.bounds.top+50
+							))
+						}, {
+							tabView3.bounds_(Point(
+								tabView3.bounds.width,
+								230
+							))
+						});
 
-					flow3.shift(0, 0);
-
-					actionsUIs[name].actionView = TextView(tabView3, flow3.bounds.width-35@50)
-						.background_(Color(1.0, 1.0, 1.0, 0.5))
-						.font_(textFieldFont)
-						.string_(action.asArray[0][0])
-						.syntaxColorize
-						.editable_(false)
-					;
+						cTabView3.bounds_(tabView3.bounds);
+					}
 				},
 				\remove, {
 					actTop = actionsUIs[name].nameField.bounds.top;
@@ -1140,7 +1175,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 						})
 					});
 					flow3.top_(flow3.top-76);
-					tabView3.bounds = Point(tabView3.bounds.width, tabView3.bounds.height-76);
+					cTabView3.bounds = Point(cTabView3.bounds.width, cTabView3.bounds.height-76);
 				}
 			)
 		})
