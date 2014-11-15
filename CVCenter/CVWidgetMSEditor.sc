@@ -939,7 +939,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 //				.background_(Color.white)
 			;
 
-			StaticText(oscView0, oscFlow0.bounds.width/2-10@15)
+			StaticText(oscView0, Point(oscFlow0.bounds.width/2-10, 15))
 				.font_(staticTextFont)
 				.string_("Input to Output mapping")
 			// .background_(Color.white)
