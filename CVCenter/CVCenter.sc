@@ -120,18 +120,22 @@ CVCenter {
 		if(scPrefs == false, {
 			scFunc =
 			"// next tab
-			{ CVCenter.tabs.focus(
-				(CVCenter.tabs.activeTab.index+1).wrap(0, CVCenter.tabs.tabViews.size-1)
-			)}";
+			{
+				CVCenter.tabs.focus(
+					(CVCenter.tabs.activeTab.index+1).wrap(0, CVCenter.tabs.tabViews.size-1)
+				)
+			}";
 			this.shortcuts.put(
 				'arrow right',
 				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow right'])
 			);
 			scFunc =
 			"// previous tab
-			{ CVCenter.tabs.focus(
-				(CVCenter.tabs.activeTab.index-1).wrap(0, CVCenter.tabs.tabViews.size-1)
-			)}";
+			{
+				CVCenter.tabs.focus(
+					(CVCenter.tabs.activeTab.index-1).wrap(0, CVCenter.tabs.tabViews.size-1)
+				)
+			}";
 			this.shortcuts.put(
 				'arrow left',
 				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow left'])
