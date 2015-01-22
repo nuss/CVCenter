@@ -432,7 +432,7 @@ CVCenterLoadDialog {
 			textActivateActions = StaticText(actionsBg, Point(actionsFlow.indentedRemaining.width, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
-				.string_("load all CVWidget-actions as stored in the setup")
+				.string_("activate all CVWidget-actions as stored in the setup or load them inactivated")
 			;
 
 			// flow.nextLine;
