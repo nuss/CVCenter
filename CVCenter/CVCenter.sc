@@ -17,7 +17,7 @@
 
 CVCenter {
 
-	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, /*<windowStates, */<tabs, <prefPane, swFlow, removeButs;
+	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, <tabs, <prefPane, swFlow, removeButs;
 	classvar prefPaneBounds, tabsBounds;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
 	classvar <>shortcuts, <scv;
@@ -41,7 +41,6 @@ CVCenter {
 		Class.initClassTree(CVCenterPreferences);
 		Class.initClassTree(CVWidget);
 		Class.initClassTree(KeyDownActions);
-		// windowStates = ();
 
 		this.dontSave_(['select snapshot', \snapshot]);
 		systemWidgets = ['select snapshot', \snapshot];
