@@ -1,18 +1,18 @@
 /* (c) Stefan Nussbaumer */
 /*
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 3 of the License, or
- (at your option) any later version.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
 /* automatic GUI-creation from SynthDefs, Ndefs ... */
@@ -44,52 +44,52 @@
 		});
 
 		case
-			{ this.isKindOf(Node) } {
-				environment !? {
-					envs = interpreterVars.select({ |n|
-						thisProcess.interpreter.perform(n) === environment;
-					});
-					currentEnvironment.pairsDo({ |k, v|
-						if(v === environment, { envs = envs.add("~"++(k.asString)) });
-					});
-					environment.pairsDo({ |k, v|
-						if(v === this, {
-							envs = envs.collect({ |ev| ev = ev++"['"++k++"']" });
-						})
+		{ this.isKindOf(Node) } {
+			environment !? {
+				envs = interpreterVars.select({ |n|
+					thisProcess.interpreter.perform(n) === environment;
+				});
+				currentEnvironment.pairsDo({ |k, v|
+					if(v === environment, { envs = envs.add("~"++(k.asString)) });
+				});
+				environment.pairsDo({ |k, v|
+					if(v === this, {
+						envs = envs.collect({ |ev| ev = ev++"['"++k++"']" });
 					})
-				};
-				varNames = varNames++envs;
-			}
-			{ this.isKindOf(NodeProxy) and:{ this.class != Ndef }} {
-				// the NodeProxy passed in could be part of a ProxySpace
-				if(varNames.size < 1, {
-					pSpaces = pSpaces ++ interpreterVars.select({ |n|
-						thisProcess.interpreter.perform(n).class === ProxySpace;
+				})
+			};
+			varNames = varNames++envs;
+		}
+		{ this.isKindOf(NodeProxy) and:{ this.class != Ndef }} {
+			// the NodeProxy passed in could be part of a ProxySpace
+			if(varNames.size < 1, {
+				pSpaces = pSpaces ++ interpreterVars.select({ |n|
+					thisProcess.interpreter.perform(n).class === ProxySpace;
+				});
+				if(currentEnvironment.class !== ProxySpace, {
+					currentEnvironment.pairsDo({ |k, v|
+						if(v.class === ProxySpace, { pSpaces = pSpaces.add("~"++k) });
+					})
+				});
+				pSpaces.do({ |p|
+					if(p.class === Symbol, {
+						proxySpace = thisProcess.interpreter.perform(p);
 					});
-					if(currentEnvironment.class !== ProxySpace, {
-						currentEnvironment.pairsDo({ |k, v|
-							if(v.class === ProxySpace, { pSpaces = pSpaces.add("~"++k) });
-						})
+					if(p.class === String, {
+						proxySpace = p.interpret;
 					});
-					pSpaces.do({ |p|
-						if(p.class === Symbol, {
-							proxySpace = thisProcess.interpreter.perform(p);
-						});
-						if(p.class === String, {
-							proxySpace = p.interpret;
-						});
-						if(proxySpace.respondsTo(\envir), {
-							proxySpace.envir.pairsDo({ |k, v|
-								if(v === this, {
-									varNames = varNames.add(p.asString++"['"++k++"']");
-								})
+					if(proxySpace.respondsTo(\envir), {
+						proxySpace.envir.pairsDo({ |k, v|
+							if(v === this, {
+								varNames = varNames.add(p.asString++"['"++k++"']");
 							})
 						})
 					})
 				})
+			})
 
-			}
-			{ this.class == Ndef } { varNames = varNames.add(this.asString) }
+		}
+		{ this.class == Ndef } { varNames = varNames.add(this.asString) }
 		;
 		^varNames;
 	}
@@ -250,14 +250,14 @@
 
 				prefix !? { thisName = prefix.asString++(thisName.asString[0]).toUpper ++ thisName.asString[1..] };
 
+
 				CVCenter.finishGui(this, cName, nil, (
 					cName: thisName,
 					type: thisType,
-					enterTab: if (tab.notNil) { tab.asSymbol } { name },
+					enterTab: this.instr.asSymbol,
 					controls: thisControls,
 					slots: thisSlots,
-					specSelect: thisSpec,
-					completionFunc: if (displayDialog.not) { completionFunc }
+					specSelect: thisSpec
 				))
 			})
 		})
