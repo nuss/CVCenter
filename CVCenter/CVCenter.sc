@@ -516,8 +516,6 @@ CVCenter {
 		}, {
 			this.shortcuts = prefs[\shortcuts][\cvcenter];
 		});
-
-		/* if globalShortcuts don't exist create and add the following */
 	}
 
 	*new { |cvs...setUpArgs|
@@ -613,21 +611,8 @@ CVCenter {
 
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight)).alwaysOnTop_(alwaysOnTop).acceptsMouseOver_(true);
-			// windowStates.put(window, true);
-			// window.toFrontAction_({
-			// 	windowStates[window] = true;
-			// 	"main window focused: %\n".postf([windowStates[window], windowStates]);
-			// }).endFrontAction_({
-			// 	"window.endFrontAction triggered".postln;
-			// 	windowStates[window] = false;
-			// });
 			if(Quarks.isInstalled("wslib") and:{ GUI.id !== \swing }, { window.background_(Color.black) });
 			window.view.background_(Color.black);
-			// flow = FlowLayout(window.bounds.insetBy(4));
-			// window.view.decorator = flow;
-			// flow.margin_(Point(4, 0));
-			// flow.gap_(Point(0, 4));
-			// flow.shift;
 			tabsBounds = Rect(4, 4, window.view.bounds.width, window.view.bounds.height-35);
 
 			tabs = TabbedView2(window, tabsBounds)
@@ -704,21 +689,10 @@ CVCenter {
 					["snapshot", Color.black, Color.yellow],
 					["snapshot", Color.white, Color.yellow],
 				])
-			// .action_({ |bt|
-			// 	if(bt.value.asBoolean, { bt.value_(0) });
-			// })
 			;
 
 			// "this.at(\snapshot): %\n".postf(this.at(\snapshot));
 			this.at(\snapshot).connect(snapShotBut);
-
-			// snapShotEdit = Button(prefPane, Point(20, 20))
-			// .font_(Font(Font.available("Arial") ? Font.defaultSansFace, 22))
-			// .states_([["✎", Color.black, Color.yellow]])
-			// .action_({ |scb|
-			//
-			// })
-			// ;
 
 			snapShotSelect = PopUpMenu(prefPane, Point(120, 20))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
@@ -778,8 +752,6 @@ CVCenter {
 					childViews.keysDo(_.close)
 				});
 				childViews.clear;
-				// windowStates.removeAt(window);
-				// tabProperties.do({ |prop| prop.nextPos_(Point(0, 0)) });
 				tabProperties.clear;
 				prefs !? {
 					if(prefs[\saveGuiProperties] == 1, {
@@ -902,7 +874,11 @@ CVCenter {
 					this.snapShots[cv.items[cv.value]].pairsDo({ |k, v|
 						if(k != 'select snapshot' and:{
 							k != 'snapshot'
-						}, { this.at(k).value_(v) })
+						}, {
+							if(this.at(k).class == Event) {
+								#[lo, hi].do({ |slot| this.at(k)[slot].value_(v[slot]) })
+							} { this.at(k).value_(v) }
+						})
 					})
 				})
 			});
@@ -1681,7 +1657,7 @@ CVCenter {
 			// "makeWindow: %, key: %\n".postf(thisTab, thisKey);
 			this.makeWindow(thisTab);
 		}, {
-			// "prAddWidget: %, %\n".postf(thisKey, widget2DKey);
+			// "prAddWidget: %\n".postf(thisKey);
 			this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
 		});
 
@@ -1815,10 +1791,9 @@ CVCenter {
 	}
 
 	*saveSnapshot { |dialog=false|
-		var key, dialogWin, keyField;
+		var key, dialogWin, keyField, cv2D;
 
 		key = Date.getDate.stamp.asSymbol;
-		all.collect(_.value);
 
 		if(dialog, {
 			dialogWin = Window("save snapshot", Rect(
@@ -1841,20 +1816,21 @@ CVCenter {
 			Button(dialogWin, Rect(151, 26, 144, 20))
 				.states_([["save snapshot", Color.white, Color.red]])
 				.action_({
-					snapShots.put(keyField.string.asSymbol, all.collect(_.value));
+					snapShots.put(keyField.string.asSymbol, all.collect({ |cv|
+						if(cv.class == Event) { (lo: cv.lo.value, hi: cv.hi.value) } { cv.value }
+					}));
 					this.at('select snapshot').items_(
 						this.at('select snapshot').items ++ keyField.string.asSymbol
 					);
-					// snapShotSelect.items_(snapShotSelect.items ++ keyField.string.asSymbol);
-					// cvWidgets[\snapshot].setSpec(ControlSpec(0, snapShots.size, step: 1.0, default: 0));
 					dialogWin.close;
 				})
 			;
 
 			dialogWin.front;
 		}, {
-			snapShots.put(key, all.collect(_.value));
-			// this.at('select snapshot').items.postln;
+			snapShots.put(key, all.collect({ |cv|
+				if(cv.class == Event) { (lo: cv.lo.value, hi: cv.hi.value) } { cv.value }
+			}));
 			this.at('select snapshot').items_(this.at('select snapshot').items ++ key.asSymbol);
 		});
 
