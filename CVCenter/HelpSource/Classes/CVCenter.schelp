@@ -869,7 +869,7 @@ Pdef(\poly,
 		// rather than setting freq in hz we determine the degree in a scale
 		// instead of Prout{} the shortcut p{} can be used
 		note: PdegreeToKey( Prout({ loop {
-			CVCenter.at(\degree).collect([_]).yield
+			CVCenter.at(\degree).embedInStream
 		}}), Scale.dorian),
 		// the list arg in a ListPattern can't simply be replaced by a Pattern
 		// using a custom key holding a Pfunc that updates the Pseq's internal list
