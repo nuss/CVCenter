@@ -817,7 +817,7 @@ CVCenter {
 			all.pairsDo({ |key, cv|
 				// [key, cv].postln;
 				cvWidgets[key] !? {
-					cvWidgets[key].wdgtControllersAndModels !? { |wcm|
+					cvWidgets[key].wdgtControllersAndModels !? {
 						tmpConnectS = cvWidgets[key].wdgtControllersAndModels.slidersTextConnection.model.value[0];
 						tmpConnectTF = cvWidgets[key].wdgtControllersAndModels.slidersTextConnection.model.value[1];
 					}
