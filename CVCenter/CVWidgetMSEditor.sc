@@ -1246,9 +1246,11 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				connectorBut.enabled_(true).states_([
 					[connectorBut.states[0][0], connectorBut.states[0][1], Color.red]
 				])
-			}, { connectorBut.enabled_(false).states_([
-				[connectorBut.states[0][0], connectorBut.states[0][1], Color.red(alpha: 0.5)]
-			]) });
+			}, {
+				connectorBut.enabled_(false).states_([
+					[connectorBut.states[0][0], connectorBut.states[0][1], Color.red(alpha: 0.5)]
+				])
+			});
 
 			oscDisconnectorBut = Button(oscView0, Point(oscFlow0.indentedRemaining.width-7, 25))
 				.font_(staticTextFont)
