@@ -1573,7 +1573,7 @@ CVCenter {
 			// if spec.asSpec returns nil make it a default ControlSpec by calling as Spec again
 			if(spec.isArray.not, { thisSpec = spec.asSpec.asSpec }, {
 				if(spec.select({ |sp| sp.respondsTo(\asSpec) and:{
-					sp.asSpec.isKindOf(ControlSpec) }
+					sp.asSpec.asSpec.isKindOf(ControlSpec) }
 				}).size == spec.size, {
 					thisSpec = ControlSpec(
 						spec.collect({ |sp| sp.asSpec.asSpec.minval }),
@@ -1588,7 +1588,9 @@ CVCenter {
 							Spec.add((specName++"_"++spec.size).asSymbol, thisSpec);
 						})
 					})
-				}, { thisSpec = spec.asSpec.asSpec })
+				}, {
+					Error("Could not create a valid ControlSpec from given values '%'".format(spec)).throw;
+				})
 			}, {
 				Error("Could not create a valid ControlSpec from given value '%'".format(spec)).throw;
 			})
