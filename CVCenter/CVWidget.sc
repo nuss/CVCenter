@@ -53,11 +53,12 @@ CVWidget {
 		Class.initClassTree(KeyDownActions);
 
 		multiSlotOSCcmds = ();
+
 		oscFeedbackAddrs = Set();
+		midiSources = ();
 
 		StartUp.add({
-			midiSources = ();
-			if(Quarks.isInstalled("cruciallib"), {
+			if(Quarks.isInstalled("crucial-library"), {
 				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
 			});
 			OSCCommands.collectTempIPsAndCmds;
