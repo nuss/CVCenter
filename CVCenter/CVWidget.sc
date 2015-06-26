@@ -46,8 +46,9 @@ CVWidget {
 
 		Class.initClassTree(KeyDownActions);
 
+		midiSources = ();
+
 		StartUp.add({
-			midiSources = ();
 			if(Quarks.isInstalled("cruciallib"), {
 				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
 			})
