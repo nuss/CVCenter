@@ -49,7 +49,7 @@ CVWidget {
 		midiSources = ();
 
 		StartUp.add({
-			if(Quarks.isInstalled("cruciallib"), {
+			if(Quarks.isInstalled("crucial-library"), {
 				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
 			})
 		});
