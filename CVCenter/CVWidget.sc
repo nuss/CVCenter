@@ -54,7 +54,9 @@ CVWidget {
 		Class.initClassTree(CVWidgetShortcuts);
 
 		multiSlotOSCcmds = ();
+
 		oscFeedbackAddrs = Set();
+		midiSources = ();
 
 		StartUp.add({
 			Spec.add(\in, ControlSpec(0, Server.default.options.firstPrivateBus-1, \lin, 1.0, 0));
