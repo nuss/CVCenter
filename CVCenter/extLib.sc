@@ -168,7 +168,7 @@
 
 }
 
-+Collection {
++SequenceableCollection {
 
 	selectIndexAs { |function, class|
 		var res = class.new(this.size);
@@ -218,7 +218,7 @@
 
 	flipKeys { |...oldNewPairs|
 		oldNewPairs.pairsDo({ |o, n|
-			if(this.at(o).notNil and:{ o !== n }, {
+			if(o !== n, {
 				this.put(n, this.at(o));
 				this.removeAt(o);
 			})
