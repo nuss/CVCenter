@@ -38,7 +38,7 @@ CVWidget {
 	// extended API
 	var <synchKeys, synchedActions;
 	// special bookkeeping for CVWidgetMS
-	var msCmds, msSlots;
+	var msCmds, msSlots, msTooltipLines;
 	var slotCmdName, lastIntSlots, msSlotsChecked = false;
 	var lastMsgIndex, msMsgIndexDiffers = false, count = 0;
 	// CVWidgetMS
@@ -3077,6 +3077,8 @@ CVWidget {
 
 				this.removeOSCFeedback(slot);
 
+				if(this.class == CVWidgetMS, { tmp = slot.asString++":"+tmp });
+				// "now synching oscDisplay: %[%]\n".postf(this.name, slot);
 				wcm.oscDisplay.model.value_(
 					(
 						but: [tmp, stringColor, background],
@@ -3096,6 +3098,7 @@ CVWidget {
 		var thisEditor, thisOscEditBut, p, tmp;
 		var numOscString, numOscResponders, oscButBg, oscButTextColor;
 		var msEditEnabled;
+		var msConnectionsMsg;
 
 		wcm.oscDisplay.controller ?? {
 			wcm.oscDisplay.controller = SimpleController(wcm.oscDisplay.model);
@@ -3128,13 +3131,34 @@ CVWidget {
 				};
 				if(GUI.id !== \cocoa, {
 					case
-						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size > 0 and:{
-							this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size < msSize
-						}} {
-							guiEnv.oscBut.toolTip_("partially connected - connected slots:\n"++this.midiOscEnv.selectIndex({ |it| it.oscResponder.notNil }))
-						}
-						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == msSize } {
-							guiEnv.oscBut.toolTip_("all slots connected.\nClick to edit.")
+						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size > 0} {
+							msTooltipLines ?? { msTooltipLines = nil!this.msSize };
+
+							// a CVWidgetMS may grow or shrink
+							if(this.msSize < msTooltipLines.size) {
+								msTooltipLines = msTooltipLines[..this.msSize-1];
+							};
+							if(this.msSize > msTooltipLines.size) {
+								(msTooltipLines.size-this.msSize).do({
+									msTooltipLines = msTooltipLines.add(nil)
+								})
+							};
+
+							msTooltipLines[slot] = "%: %[%], mapping: %".format(
+								slot,
+								theChanger.value.nameField,
+								theChanger.value.index,
+								this.midiOscEnv[slot].oscMapping
+							);
+
+							// TODO: check removed OSC-connections
+
+							msConnectionsMsg = "OSC-connections:";
+							msTooltipLines.do({ |line| line !? {
+								msConnectionsMsg = msConnectionsMsg++"\n"++line;
+							}});
+
+							guiEnv.oscBut.toolTip_(msConnectionsMsg);
 						}
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == 0 } {
 							guiEnv.toolTip_("no OSC-responders present.\nClick to edit.")
