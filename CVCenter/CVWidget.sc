@@ -3022,7 +3022,12 @@ CVWidget {
 				// if(this.class == CVWidgetMS, { msSlots[slot] = nil; msCmds[slot] = nil });
 
 				tmp = "edit OSC";
-				if(this.class == CVWidgetMS, { tmp = slot.asString++":"+tmp });
+
+				if(this.class == CVWidgetMS, {
+					tmp = slot.asString++":"+tmp;
+				});
+
+				// if(this.class == CVWidgetMS, { tmp = slot.asString++":"+tmp });
 				// "now synching oscDisplay: %[%]\n".postf(this.name, slot);
 				wcm.oscDisplay.model.value_(
 					(
@@ -3089,16 +3094,23 @@ CVWidget {
 								})
 							};
 
-							msTooltipLines[slot] = "%: %[%], mapping: %".format(
-								slot,
-								theChanger.value.nameField,
-								theChanger.value.index,
-								this.midiOscEnv[slot].oscMapping
-							);
+							msConnectionsMsg = "OSC-responders:";
 
-							// TODO: check removed OSC-connections
+							if(theChanger.value !== false) {
+								msTooltipLines[slot] = "%: %[%], mapping: %".format(
+									slot,
+									theChanger.value.nameField,
+									theChanger.value.index,
+									this.midiOscEnv[slot].oscMapping
+								)
+							};
 
-							msConnectionsMsg = "OSC-connections:";
+							if(this.midiOscEnv[slot].oscResponder.isNil and:{
+								msTooltipLines[slot].notNil
+							}) {
+								msTooltipLines[slot] = nil;
+							};
+
 							msTooltipLines.do({ |line| line !? {
 								msConnectionsMsg = msConnectionsMsg++"\n"++line;
 							}});
@@ -3106,7 +3118,8 @@ CVWidget {
 							guiEnv.oscBut.toolTip_(msConnectionsMsg);
 						}
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == 0 } {
-							guiEnv.toolTip_("no OSC-responders present.\nClick to edit.")
+							msTooltipLines = nil!this.msSize;
+							guiEnv.oscBut.toolTip_("no OSC-responders present.\nClick to edit.");
 						}
 					;
 				})
