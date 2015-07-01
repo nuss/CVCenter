@@ -3273,7 +3273,7 @@ CVWidget {
 
 	prInitOscInputRange { |wcm, guiEnv, midiOscEnv, argWidgetCV, thisCalib, slot|
 		var thisEditor, thisOscEditBut, p, tmp;
-		var mappingsDiffer;
+		var mappingsDiffer, msTooltip;
 
 		wcm.oscInputRange.controller ?? {
 			wcm.oscInputRange.controller = SimpleController(wcm.oscInputRange.model);
@@ -3287,6 +3287,14 @@ CVWidget {
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = guiEnv.editor[slot];
+				defer {
+					if(guiEnv.oscBut.toolTip != "no OSC-responders present.\nClick to edit.") {
+						msTooltipLines[slot] = msTooltipLines[slot].split($:)[..1].join($:)++":"+this.getOscMapping(slot);
+						msTooltip = "OSC-responders:";
+						msTooltipLines.do({ |line| line !? { msTooltip = msTooltip++"\n"++line }});
+						guiEnv.oscBut.toolTip_(msTooltip);
+					}
+				};
 				guiEnv.msEditor !? {
 					thisOscEditBut = guiEnv.msEditor.oscEditBtns[slot];
 				}
