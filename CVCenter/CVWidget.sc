@@ -2491,7 +2491,7 @@ CVWidget {
 									if(b.enabled, {
 										b.toolTip_(
 											"Currently connected to external MIDI-controllers: %".format(
-												this.midiOscEnv.selectIndex({ |sl| sl.cc.notNil })
+												this.midiOscEnv.selectIndices({ |sl| sl.cc.notNil })
 											)
 										)
 									})
@@ -2723,7 +2723,7 @@ CVWidget {
 									if(b.enabled, {
 										b.toolTip_(
 											"Currently connected to external MIDI-controllers: %".format(
-												if((tmp = this.midiOscEnv.selectIndex({ |sl| sl.cc.notNil })).size > 0, { tmp }, { "none" })
+												if((tmp = this.midiOscEnv.selectIndices({ |sl| sl.cc.notNil })).size > 0, { tmp }, { "none" })
 											)
 										)
 									})
@@ -2750,7 +2750,7 @@ CVWidget {
 						midiButTextColor, // text
 						midiButBg // background
 					]]);
-					if((tmp = this.midiOscEnv.selectIndex({ |sl| sl.cc.notNil })).size > 0, {
+					if((tmp = this.midiOscEnv.selectIndices({ |sl| sl.cc.notNil })).size > 0, {
 						if(GUI.id !== \cocoa, {
 							this.midiBut.toolTip_(
 								"Currently connected to external MIDI-controllers: %".format(tmp)
@@ -3284,7 +3284,7 @@ CVWidget {
 								if(b.enabled, {
 									b.toolTip_(
 										"Currently connected to external OSC-controllers: %".format(
-											if((tmp = this.midiOscEnv.selectIndex({ |sl| sl.oscResponder.notNil })).size > 0, { tmp }, { "none" })
+											if((tmp = this.midiOscEnv.selectIndices({ |sl| sl.oscResponder.notNil })).size > 0, { tmp }, { "none" })
 										)
 									)
 								})
