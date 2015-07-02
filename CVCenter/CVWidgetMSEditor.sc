@@ -711,7 +711,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					if(b.enabled, {
 						b.toolTip_(
 							"Currently connected to external MIDI-controllers: %".format(
-								if((tmp = widget.midiOscEnv.selectIndex({ |sl| sl.cc.notNil })).size > 0, { tmp }, { "none" })
+								if((tmp = widget.midiOscEnv.selectIndices({ |sl| sl.cc.notNil })).size > 0, { tmp }, { "none" })
 							)
 						)
 					})
@@ -1147,7 +1147,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					if(b.enabled, {
 						b.toolTip_(
 							"Currently connected to external OSC-controllers: %".format(
-								if((tmp = widget.midiOscEnv.selectIndex({ |sl| sl.oscResponder.notNil })).size > 0, { tmp }, { "none" })
+								if((tmp = widget.midiOscEnv.selectIndices({ |sl| sl.oscResponder.notNil })).size > 0, { tmp }, { "none" })
 							)
 						)
 					})
