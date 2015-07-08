@@ -44,15 +44,15 @@ CVWidget {
 	*initClass {
 		var scFunc, scPrefs = false;
 
-		Class.initClassTree(KeyDownActions);
+		StartUp.add({
+			Class.initClassTree(KeyDownActions);
+			Class.initClassTree(StaticIntegerSpec);
+			\StaticIntegerSpec.asClass !? {
+				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
+			};
+		});
 
 		midiSources = ();
-
-		StartUp.add({
-			if(Quarks.isInstalled("crucial-library"), {
-				Spec.add(\in, StaticIntegerSpec(0, Server.default.options.firstPrivateBus-1, 0));
-			})
-		});
 
 		prefs = CVCenterPreferences.readPreferences;
 		// "prefs[\shortcuts][\cvwidget]: %\n".postf(prefs[\shortcuts][\cvwidget]);
