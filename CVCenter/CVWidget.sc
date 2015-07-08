@@ -54,7 +54,6 @@ CVWidget {
 		Class.initClassTree(CVWidgetShortcuts);
 
 		multiSlotOSCcmds = ();
-
 		oscFeedbackAddrs = Set();
 		midiSources = ();
 
@@ -62,8 +61,6 @@ CVWidget {
 			Spec.add(\in, ControlSpec(0, Server.default.options.firstPrivateBus-1, \lin, 1.0, 0));
 			// OSCCommands.collectTempIPsAndCmds;
 		});
-
-		midiSources = ();
 
 		prefs = CVCenterPreferences.readPreferences;
 		// "prefs[\shortcuts][\cvwidget]: %\n".postf(prefs[\shortcuts][\cvwidget]);
