@@ -1,4 +1,4 @@
-/* (c) 2010-2013 Stefan Nussbaumer */
+/* (c) Stefan Nussbaumer */
 /*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -150,7 +150,7 @@ OSCCommands {
 				nextFields = cmds.keys.difference(fields.keys);
 				nextFields.do({ |nf|
 					fields.put(nf, ());
-					fields[nf].cmdName = StaticText(window, 390@20)
+					fields[nf].cmdName = StaticText(window, Point(390, 20))
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 					;
 					if(cmds[nf] == 1, {
@@ -158,8 +158,7 @@ OSCCommands {
 					}, {
 						fields[nf].cmdName.string_(nf.asString+"("++cmds[nf]+"slots)");
 					});
-					// flow.shift(0, 0);
-					fields[nf].removeBut = Button(window, flow.indentedRemaining.width-20@20)
+					fields[nf].removeBut = Button(window, Point(flow.indentedRemaining.width-20, 20))
 						.states_([
 							["remove", Color.white, Color.blue],
 							["add", Color.white, Color.red],
@@ -183,48 +182,16 @@ OSCCommands {
 				cmdList.clear;
 			});
 
-			window.view.decorator = flow = FlowLayout(window.view.bounds, 7@7, 3@3);
+			window.view.decorator = flow = FlowLayout(
+				window.view.bounds, Point(7, 7), Point(3, 3));
 
-			progress = StaticText(window, flow.indentedRemaining.width@30).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 20, true));
+			progress = StaticText(window, Point(flow.indentedRemaining.width, 30))
+				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 20, true))
+			;
 
 			flow.nextLine.shift(0, 0);
 
-			progressStates = Pseq([
-				"collecting",
-				"collecting .",
-				"collecting . .",
-				"collecting . . .",
-				"collecting . . . .",
-				"collecting . . . . .",
-				"collecting . . . . . .",
-				"collecting . . . . . . .",
-				"collecting . . . . . . . .",
-				"collecting . . . . . . . . .",
-				"collecting . . . . . . . . . .",
-				"collecting . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
-				"collecting . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
-			], inf).asStream;
+			progressStates = Pseq(34.collect{ |i| "collecting" + ($.!i).join(' ') }, inf).asStream;
 			progressRoutine = fork({
 				loop({
 					progress.string_(progressStates.next);
@@ -232,18 +199,14 @@ OSCCommands {
 				})
 			}, AppClock);
 
-			StaticText(window, 260@40).string_("Collecting command-names will stop as soon as you close this window or save the device's commands. You can only save the command-names after setting a device-name.").font_(staticTextFont);
+			StaticText(window, Point(260, 40)).string_("Collecting command-names will stop as soon as you close this window or save the device's commands. You can only save the command-names after setting a device-name.").font_(staticTextFont);
 
-			// flow.shift(0, 0);
-
-			deviceNameField = TextField(window, 144@40)
+			deviceNameField = TextField(window, Point(144, 40))
 				.font_(Font(Font.available("Courier New") ? Font.defaultSansFace, 15))
 				.string_("< device-name >")
 			;
 
-			// flow.shift(0, 0);
-
-			saveBut = Button(window, flow.indentedRemaining.width-20@40)
+			saveBut = Button(window, Point(flow.indentedRemaining.width-20, 40))
 				.states_([["save", Color.white, Color(0.15, 0.5, 0.15)]])
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 15, true))
 				.action_({ |b|
