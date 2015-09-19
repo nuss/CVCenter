@@ -262,7 +262,7 @@ OSCCommands {
 	}
 
 	*makeWindow {
-		this.deprecated(thisMethod, this.findMethod(\foo));
+		this.deprecated(thisMethod, this.findMethod(\makeWindow));
 		^this.front;
 	}
 
