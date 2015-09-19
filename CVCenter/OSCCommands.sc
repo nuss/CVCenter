@@ -40,6 +40,7 @@ OSCCommands {
 		});
 
 		tempIPsAndCmds = ();
+		// this.collectTempIPsAndCmds;
 
 		localOscFunc = { |argAddr, argMsg|
 			if (tempIPsAndCmds.keys.includes(
@@ -261,7 +262,7 @@ OSCCommands {
 	}
 
 	*makeWindow {
-		this.deprecated(thisMethod, this.findMethod(\foo));
+		this.deprecated(thisMethod, this.findMethod(\makeWindow));
 		^this.front;
 	}
 
