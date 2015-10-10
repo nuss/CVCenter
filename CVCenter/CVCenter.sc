@@ -69,7 +69,7 @@ CVCenter {
 						newPrefs[\keyCodesAndMods]
 					)
 				};
-				if(prefs[\saveGuiProperties] == 1 or:{
+				if (prefs[\saveGuiProperties] == 1 or:{
 					prefs[\saveGuiProperties] == 2
 				}, {
 					this.guix_(prefs[\guiProperties] !? { prefs[\guiProperties].left });
@@ -77,8 +77,8 @@ CVCenter {
 					this.guiwidth_(prefs[\guiProperties] !? { prefs[\guiProperties].width });
 					this.guiheight_(prefs[\guiProperties] !? { prefs[\guiProperties].height });
 				});
-				if(prefs[\saveGuiProperties] == 1, {
-					if(\UI.asClass.isNil, {
+				if (prefs[\saveGuiProperties] == 1, {
+					if (\UI.asClass.isNil, {
 						ShutDown.add(shutDownFunc);
 					}, {
 						UI.registerForShutdown(shutDownFunc);
@@ -86,8 +86,8 @@ CVCenter {
 				})
 			};
 			prefs[\initMidiOnStartUp] !? {
-				if(prefs[\initMidiOnStartUp], {
-					if(MIDIClient.initialized.not, {
+				if (prefs[\initMidiOnStartUp], {
+					if (MIDIClient.initialized.not, {
 						Class.initClassTree(MIDIClient);
 						Class.initClassTree(MIDIEndPoint);
 						MIDIClient.init;
@@ -96,7 +96,7 @@ CVCenter {
 				})
 			};
 			prefs[\saveClassVars] !? {
-				if(prefs[\saveClassVars], {
+				if (prefs[\saveClassVars], {
 					prefs[\midiMode] !? { this.midiMode_(prefs[\midiMode]) };
 					prefs[\midiResolution] !? { this.midiResolution_(prefs[\midiResolution]) };
 					prefs[\midiMean] !? { this.midiMean_(prefs[\midiMean]) };
@@ -116,7 +116,7 @@ CVCenter {
 		// "prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
 		prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvcenter] !? { scPrefs = true }}};
 
-		if(scPrefs == false, {
+		if (scPrefs == false, {
 			scFunc =
 			"// next tab
 			{
@@ -240,8 +240,8 @@ CVCenter {
 			);
 			scFunc =
 			"// History GUI: start History and open History window
-			{ if(History.started === false) { History.start };
-			if(CVCenter.scv.historyWin.isNil or:{
+			{ if (History.started === false) { History.start };
+			if (CVCenter.scv.historyWin.isNil or:{
 				CVCenter.scv.historyWin.isClosed
 			}) {
 				CVCenter.scv.historyGui = History.makeWin(
@@ -249,7 +249,7 @@ CVCenter {
 				);
 				CVCenter.scv.historyWin = CVCenter.scv.historyGui.parent;
 			};
-			if(CVCenter.scv.historyWin.notNil and:{
+			if (CVCenter.scv.historyWin.notNil and:{
 				CVCenter.scv.historyWin.isClosed.not
 			}) { CVCenter.scv.historyWin.front }}";
 			this.shortcuts.put(
@@ -258,11 +258,11 @@ CVCenter {
 			);
 			scFunc =
 			"// NdefMixer
-			{ if(CVCenter.scv.nDefWin.isNil or:{ CVCenter.scv.nDefWin.isClosed }) {
+			{ if (CVCenter.scv.nDefWin.isNil or:{ CVCenter.scv.nDefWin.isClosed }) {
 				CVCenter.scv.nDefGui = NdefMixer(Server.default);
 				CVCenter.scv.nDefWin = CVCenter.scv.nDefGui.parent
 			};
-			if(CVCenter.scv.nDefWin.notNil and:{
+			if (CVCenter.scv.nDefWin.notNil and:{
 				CVCenter.scv.nDefWin.isClosed.not
 			}) {
 				CVCenter.scv.nDefWin.front
@@ -294,11 +294,11 @@ CVCenter {
 			);
 			scFunc =
 			"// PdefAllGui
-			{ if(CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
+			{ if (CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
 				CVCenter.scv.pDefGui = PdefAllGui();
 				CVCenter.scv.pDefWin = CVCenter.scv.pDefGui.parent
 			};
-			if(CVCenter.scv.pDefWin.notNil and:{
+			if (CVCenter.scv.pDefWin.notNil and:{
 				CVCenter.scv.pDefWin.isClosed.not
 			}) {
 				CVCenter.scv.pDefWin.front
@@ -314,11 +314,11 @@ CVCenter {
 			);
 			scFunc =
 			"// PdefnAllGui
-			{ if(CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
+			{ if (CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
 				CVCenter.scv.pDefnGui = PdefnAllGui();
 				CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent;
 			};
-			if(CVCenter.scv.pDefnWin.notNil and:{
+			if (CVCenter.scv.pDefnWin.notNil and:{
 				CVCenter.scv.pDefnWin.isClosed.not
 			}) {
 				CVCenter.scv.pDefnWin.front
@@ -334,11 +334,11 @@ CVCenter {
 			);
 			scFunc =
 			"// TdefAllGui
-			{ if(CVCenter.scv.tDefWin.isNil or:{ CVCenter.scv.tDefWin.isClosed }) {
+			{ if (CVCenter.scv.tDefWin.isNil or:{ CVCenter.scv.tDefWin.isClosed }) {
 				CVCenter.scv.tDefGui = TdefAllGui();
 				CVCenter.scv.tDefWin = CVCenter.scv.tDefGui.parent
 			};
-			if(CVCenter.scv.tDefWin.notNil and:{
+			if (CVCenter.scv.tDefWin.notNil and:{
 				CVCenter.scv.tDefWin.isClosed.not
 			}) {
 				CVCenter.scv.tDefWin.front
@@ -349,12 +349,12 @@ CVCenter {
 			);
 			scFunc =
 			"// AllGui
-			{ if(\\AllGui.asClass.notNil) {
-				if(CVCenter.scv.allWin.isNil or:{ CVCenter.scv.allWin.isClosed }) {
+			{ if (\\AllGui.asClass.notNil) {
+				if (CVCenter.scv.allWin.isNil or:{ CVCenter.scv.allWin.isClosed }) {
 					CVCenter.scv.allGui = \\AllGui.asClass.new;
 					CVCenter.scv.allWin = CVCenter.scv.allGui.parent;
 				};
-				if(CVCenter.scv.allWin.notNil and:{
+				if (CVCenter.scv.allWin.notNil and:{
 					CVCenter.scv.allWin.isClosed.not
 				}) { CVCenter.scv.allWin.front };
 			}}";
@@ -364,14 +364,14 @@ CVCenter {
 			);
 			scFunc =
 			"// MasterEQ
-			{ if(\\MasterEQ.asClass.notNil) {
-				if(CVCenter.scv.eqWin.isNil or:{ CVCenter.scv.eqWin.isClosed }){
+			{ if (\\MasterEQ.asClass.notNil) {
+				if (CVCenter.scv.eqWin.isNil or:{ CVCenter.scv.eqWin.isClosed }){
 					CVCenter.scv.eqGui = \\MasterEQ.asClass.new(
 						Server.default.options.firstPrivateBus, Server.default
 					);
 					CVCenter.scv.eqWin = CVCenter.scv.eqGui.window;
 				};
-				if(CVCenter.scv.eqWin.notNil and:{
+				if (CVCenter.scv.eqWin.notNil and:{
 					CVCenter.scv.eqWin.isClosed.not
 				}) { CVCenter.scv.eqWin.front };
 			}}";
@@ -392,10 +392,10 @@ CVCenter {
 			"// end History and open in new Document (Cocoa-IDE only)
 			{
 				History.end;
-				if(Platform.ideName == \"scapp\" or:{
+				if (Platform.ideName == \"scapp\" or:{
 					(Platform.ideName == \"scqt\").and(Main.versionAtLeast(3, 7))
 				}) { History.document };
-				if(CVCenter.scv.historyWin.notNil and:{
+				if (CVCenter.scv.historyWin.notNil and:{
 					CVCenter.scv.historyWin.isClosed.not
 				}) { CVCenter.scv.historyWin.close }
 			}";
@@ -521,11 +521,11 @@ CVCenter {
 	*new { |cvs...setUpArgs|
 		var r, g, b;
 
-		if(all.size == 0, {
+		if (all.size == 0, {
 			r = g = b = (0.6, 0.65 .. 0.75);
 			colors = List();
 
-			if(setUpArgs.size > 0, {
+			if (setUpArgs.size > 0, {
 				this.prSetup(setUpArgs);
 			});
 
@@ -539,10 +539,10 @@ CVCenter {
 
 			nextColor = Pxrand(colors, inf).asStream;
 
-			if(cvs.isNil, {
+			if (cvs.isNil, {
 				nextCVKey = 1;
 			}, {
-				if(cvs.isKindOf(Dictionary).not and:{
+				if (cvs.isKindOf(Dictionary).not and:{
 					cvs.isKindOf(IdentityDictionary).not and:{
 						cvs.isKindOf(Event).not
 					}
@@ -550,7 +550,7 @@ CVCenter {
 					Error("Arguments for CVCenter have to be either a Dictionary, an IdentityDictionary or an Event.").throw;
 				}, {
 					cvs.keysValuesDo({ |k, v|
-						if("^cv[0-9]".matchRegexp(k.asString).not, {
+						if ("^cv[0-9]".matchRegexp(k.asString).not, {
 							all.put(k.asSymbol, v.asSpec);
 						}, {
 							"Your given key-name matches the reserved names for new keys in the CVCenter. Please choose a different name.".warn;
@@ -584,7 +584,7 @@ CVCenter {
 		// function for building cross-platform checkboxes
 		buildCheckbox = { |view, active, action|
 			var cBox;
-			if(GUI.id === \cocoa, {
+			if (GUI.id === \cocoa, {
 				cBox = Button(view, 15@15)
 					.states_([
 						["", Color.white, Color.white],
@@ -592,7 +592,7 @@ CVCenter {
 					])
 					.font_(Font(Font.available("Arial Black") ? Font.defaultSansFace, 10, true))
 				;
-				if(active, { cBox.value_(1) }, { cBox.value_(0) });
+				if (active, { cBox.value_(1) }, { cBox.value_(0) });
 			}, {
 				cBox = \CheckBox.asClass.new(view, 15@15).value_(active);
 			});
@@ -609,9 +609,9 @@ CVCenter {
 		this.guiwidth ?? { this.guiwidth_(prefs !? { prefs[\guiProperties] !? { prefs[\guiProperties].width }} ?? { 500 }) };
 		this.guiheight ?? { this.guiheight_(prefs !? { prefs[\guiProperties] !? { prefs[\guiProperties].height }} ?? { 265 }) };
 
-		if(window.isNil or:{ window.isClosed }, {
+		if (window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter", Rect(this.guix, this.guiy, this.guiwidth, this.guiheight)).alwaysOnTop_(alwaysOnTop).acceptsMouseOver_(true);
-			if(Quarks.isInstalled("wslib") and:{ GUI.id !== \swing }, { window.background_(Color.black) });
+			if (Quarks.isInstalled("wslib") and:{ GUI.id !== \swing }, { window.background_(Color.black) });
 			window.view.background_(Color.black);
 			tabsBounds = Rect(4, 4, window.view.bounds.width, window.view.bounds.height-35);
 
@@ -625,9 +625,9 @@ CVCenter {
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 12, true))
 				.dragTabs_(true)
 				.refreshAction_({ |me|
-					if(tabProperties.size == me.tabViews.size, {
+					if (tabProperties.size == me.tabViews.size, {
 						me.tabViews.do({ |tab, i|
-							if(tabProperties[tab.label.asSymbol].notNil, {
+							if (tabProperties[tab.label.asSymbol].notNil, {
 								tabProperties[tab.label.asSymbol].index = i
 							})
 						})
@@ -638,7 +638,7 @@ CVCenter {
 			// tabs.view.backColor_(Color.rand);
 
 			tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
-				if(keycode == KeyDownActions.keyCodes[\esc], { prefPane.focus })
+				if (keycode == KeyDownActions.keyCodes[\esc], { prefPane.focus })
 			});
 
 			// flow.shift(0, 0);
@@ -655,7 +655,7 @@ CVCenter {
 				.acceptsMouseOver_(true)
 			;
 
-			if(GUI.id !== \cocoa, {
+			if (GUI.id !== \cocoa, {
 				prefBut.toolTip_("Edit the global preferences for CVCenter (resp.\nCVWidget). Preferences will be written to disk\nand become active upon library-recompile.")
 			});
 
@@ -665,7 +665,7 @@ CVCenter {
 				.action_({ |sb| this.saveSetup })
 			;
 
-			if(GUI.id !== \cocoa, {
+			if (GUI.id !== \cocoa, {
 				saveBut.toolTip_("Save the current setup of CVCenter,\nincluding currently active OSC-/MIDI-\nresponders and actions.")
 			});
 
@@ -677,7 +677,7 @@ CVCenter {
 				})
 			;
 
-			if(GUI.id !== \cocoa, {
+			if (GUI.id !== \cocoa, {
 				loadBut.toolTip_("Load a CVCenter-setup from disk. You\nmay load OSC-/MIDI-responders and\nactions if the corresponding checkboxes\nto the right are checked accordingly.")
 			});
 
@@ -727,7 +727,7 @@ CVCenter {
 
 			// correct prefPane height if its contents span more than 1 line
 			rows = prefPane.children.collect({ |child| child.bounds.top }).asBag.contents.size;
-			if(rows > 1, {
+			if (rows > 1, {
 				prefPane.bounds_(Rect(
 					prefPaneBounds.left,
 					window.view.bounds.height-35-(rows-1*21),
@@ -748,15 +748,15 @@ CVCenter {
 			});
 
 			window.onClose_({
-				if(childViews.size > 0, {
+				if (childViews.size > 0, {
 					childViews.keysDo(_.close)
 				});
 				childViews.clear;
 				tabProperties.clear;
 				prefs !? {
-					if(prefs[\saveGuiProperties] == 1, {
+					if (prefs[\saveGuiProperties] == 1, {
 						newPrefs = CVCenterPreferences.readPreferences;
-						if(newPrefs[\saveGuiProperties] == 1, {
+						if (newPrefs[\saveGuiProperties] == 1, {
 							this.guix_(prefs[\guiProperties].left)
 							.guiy_(prefs[\guiProperties].top)
 							.guiwidth_(prefs[\guiProperties].width)
@@ -801,11 +801,11 @@ CVCenter {
 				})
 			});
 
-			if(cvWidgets.collect({ |w| w.notNil and:{ w.isClosed.not } }).size > 0, {
+			if (cvWidgets.collect({ |w| w.notNil and:{ w.isClosed.not } }).size > 0, {
 				allTabs = widgetStates.collectAs(_.tabKey, Array);
 			}, {
 				allTabs = [];
-				if(tab.notNil, {
+				if (tab.notNil, {
 					allTabs = allTabs.add(tab.asSymbol)
 				}, { allTabs = allTabs.add(\default) })
 			});
@@ -825,13 +825,13 @@ CVCenter {
 
 				// "tmpConnectS: %, tmpConnectTF: %\n".postf(tmpConnectS, tmpConnectTF);
 
-				if((cvWidgets[key].notNil and:{ cvWidgets[key].isClosed }).or(
+				if ((cvWidgets[key].notNil and:{ cvWidgets[key].isClosed }).or(
 					cvWidgets[key].isNil
 				), {
 					widgetStates[key] !? {
 						widgetStates[key].tabKey !? { thisTabLabel = widgetStates[key].tabKey }
 					};
-					if(all[key].class == Event, {
+					if (all[key].class == Event, {
 						#[lo, hi].do({ |slot|
 							tmp = all[key][slot].value;
 							this.prAddWidget(
@@ -844,7 +844,7 @@ CVCenter {
 							this.at(key)[slot].value_(tmp);
 						})
 					}, {
-						if(systemWidgets.includes(key).not, {
+						if (systemWidgets.includes(key).not, {
 							this.prAddWidget(
 								thisTabLabel,
 								key: key,
@@ -870,12 +870,12 @@ CVCenter {
 			});
 
 			cvWidgets['select snapshot'].addAction('select snapshot', { |cv|
-				if(cv.value > 0, {
+				if (cv.value > 0, {
 					this.snapShots[cv.items[cv.value]].pairsDo({ |k, v|
-						if(k != 'select snapshot' and:{
+						if (k != 'select snapshot' and:{
 							k != 'snapshot'
 						}, {
-							if(this.at(k).class == Event) {
+							if (this.at(k).class == Event) {
 								#[lo, hi].do({ |slot| this.at(k)[slot].value_(v[slot]) })
 							} { this.at(k).value_(v) }
 						})
@@ -884,30 +884,30 @@ CVCenter {
 			});
 
 			cvWidgets[\snapshot].addAction('save snapshot with confirm', { |cv|
-				if(cv.value == 1, { defer { CVCenter.saveSnapshot(true) }; cv.value_(0) });
+				if (cv.value == 1, { defer { CVCenter.saveSnapshot(true) }; cv.value_(0) });
 			}, active: false);
 
 			cvWidgets[\snapshot].addAction('save snapshot no confirm', { |cv|
-				if(cv.value == 1, { defer { CVCenter.saveSnapshot(false) }; cv.value_(0) });
+				if (cv.value == 1, { defer { CVCenter.saveSnapshot(false) }; cv.value_(0) });
 			}, active: true)
 		});
 
 		window.front;
 
 		skipJacks = SkipJack.all.collect({ |r| r === updateRoutine });
-		if(skipJacks.includes(true).not, {
+		if (skipJacks.includes(true).not, {
 			updateRoutine = SkipJack({
 				lastUpdate ?? { lastUpdate = all.size };
 				lastSetUp !? {
-					if(this.setup != lastSetUp, {
+					if (this.setup != lastSetUp, {
 						this.prSetup(this.setup);
 					})
 				};
-				if(all.size != lastUpdate, {
-					if(all.size > lastUpdate and:{ cvWidgets.size <= lastUpdate }, {
+				if (all.size != lastUpdate, {
+					if (all.size > lastUpdate and:{ cvWidgets.size <= lastUpdate }, {
 						this.prAddWidget;
 					});
-					if(all.size < lastUpdate, {
+					if (all.size < lastUpdate, {
 						removedKeys = cvWidgets.keys.difference(all.keys);
 						removedKeys.do({ |k|
 							this.removeAt(k);
@@ -917,35 +917,35 @@ CVCenter {
 					});
 					lastUpdate = all.size;
 				});
-				if(lastUpdateBounds.notNil and:{ window.bounds.width != lastUpdateBounds.width }, {
+				if (lastUpdateBounds.notNil and:{ window.bounds.width != lastUpdateBounds.width }, {
 					this.prRegroupWidgets(tabs.activeTab);
 					this.prRegroupPrefPane;
 				});
-				if(childViews.size > 0, {
+				if (childViews.size > 0, {
 					childViews.pairsDo({ |child, childProps|
 						// "child, childProps: %, %\n".postf(child, childProps);
 						// [child.bounds, childProps.lastUpdateBounds].postln;
-						if(childProps.lastUpdateBounds.notNil and:{
+						if (childProps.lastUpdateBounds.notNil and:{
 							child.bounds.width != childProps.lastUpdateBounds.width
 						}, {
 							childProps.tabs.keysDo({ |tab| this.prRegroupWidgets(tab) })
 						})
 					})
 				});
-				if(window.bounds != lastUpdateBounds, {
+				if (window.bounds != lastUpdateBounds, {
 					prefs !? {
-						if(prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
+						if (prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
 					};
 					// prefs[\guiProperties].postln;
 				});
 				lastUpdateBounds = window.bounds;
-				if(childViews.size > 0, {
+				if (childViews.size > 0, {
 					childViews.pairsDo({ |child, childProps|
 						childProps.put(\lastUpdateBounds, child.bounds)
 					})
 				});
 				prefs !? {
-					if(prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
+					if (prefs[\saveGuiProperties] == 1, { boundsOnShutDown = lastUpdateBounds });
 				};
 				lastSetUp = this.setup;
 			}, 0.5, { window.isClosed }, "CVCenter-Updater");
@@ -958,7 +958,7 @@ CVCenter {
 		var thisTab, thisTabLabel, thisIndex;
 		var cachedView, oldChildView;
 
-		if(label.notNil, { thisTabLabel = label.asSymbol }, {
+		if (label.notNil, { thisTabLabel = label.asSymbol }, {
 			Error("*prAddTab has been called without providing a label for the tab").throw;
 		});
 
@@ -973,7 +973,7 @@ CVCenter {
 			}
 		);
 
-		if(tabProperties[thisTabLabel].notNil, {
+		if (tabProperties[thisTabLabel].notNil, {
 			labelColor = tabProperties[thisTabLabel].tabColor;
 		}, {
 			labelColor = nextColor.next;
@@ -995,7 +995,7 @@ CVCenter {
 					childViews[view.parent.parent] !? {
 						oldChildView = childViews[view.parent.parent][\tabs][view];
 					};
-					if(tabs.tabViews.includes(view), {
+					if (tabs.tabViews.includes(view), {
 						cachedView = (widgets: this.widgetsAtTab(thisTabLabel));
 					}, {
 						childViews.do({ |child|
@@ -1014,13 +1014,13 @@ CVCenter {
 								case
 									{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
 										// "no modifier".postln;
-										if(keycode == keyDowns.keyCode and:{
+										if (keycode == keyDowns.keyCode and:{
 											thisMod.isNil and:{ thisArrMod.isNil }
 										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
 									}
 									{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
 										// "some modifier...".postln;
-										if(keycode == keyDowns.keyCode and:{
+										if (keycode == keyDowns.keyCode and:{
 											(modifiers == thisArrMod).or(modifiers == thisMod)
 										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
 									}
@@ -1034,8 +1034,8 @@ CVCenter {
 						view.tabbedView.window.background_(Color.black).alwaysOnTop_(alwaysOnTop);
 					};
 					cachedView !? {
-						if(tabs.tabViews.includes(view).not, {
-							if(childViews[view.parent.parent].isNil, {
+						if (tabs.tabViews.includes(view).not, {
+							if (childViews[view.parent.parent].isNil, {
 								childViews.put(view.parent.parent, ());
 							});
 							childViews[view.parent.parent][\tabs] ?? {
@@ -1048,7 +1048,7 @@ CVCenter {
 							child.name_("CVCenter: "++childProps[\tabs].keys.collectAs({ |tab| tab.label }, Array));
 						});
 					};
-					childViews.pairsDo({ |child, childProps| if(childProps.tabs.size < 1, { childViews.removeAt(child) }) });
+					childViews.pairsDo({ |child, childProps| if (childProps.tabs.size < 1, { childViews.removeAt(child) }) });
 				})
 			;
 
@@ -1077,13 +1077,13 @@ CVCenter {
 						case
 							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
 								// "no modifier".postln;
-								if(keycode == keyDowns.keyCode and:{
+								if (keycode == keyDowns.keyCode and:{
 									thisMod.isNil and:{ thisArrMod.isNil }
 								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
 							}
 							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
 								// "some modifier...".postln;
-								if(keycode == keyDowns.keyCode and:{
+								if (keycode == keyDowns.keyCode and:{
 									(modifiers == thisArrMod).or(modifiers == thisMod)
 								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
 							}
@@ -1112,14 +1112,14 @@ CVCenter {
 
 		// "prAddWidget called: %, %, %\n".postf(tab, widget2DKey, key);
 
-		if(tabProperties.notNil, {
+		if (tabProperties.notNil, {
 			allTabs = (tabs.tabViews++childViews.collect({ |view| view.tabs.keys.asArray })).flat;
 		}, { allTabs = [] });
 
 		// "allTabs: %\n".postf(allTabs);
 
-		if(tab.notNil, { thisTabLabel = tab.asSymbol }, {
-			if(tabs.activeTab.notNil, { thisTabLabel = tabs.activeTab.label }, { thisTabLabel = \default });
+		if (tab.notNil, { thisTabLabel = tab.asSymbol }, {
+			if (tabs.activeTab.notNil, { thisTabLabel = tabs.activeTab.label }, { thisTabLabel = \default });
 		});
 
 		// "tabProperties: %\n".postf(tabProperties);
@@ -1132,8 +1132,8 @@ CVCenter {
 
 		rowheight = widgetheight+1+15; // add a small gap between rows
 
-		if(cvWidgets[key].notNil, {
-			if(cvWidgets[key].midiOscEnv.notNil, {
+		if (cvWidgets[key].notNil, {
+			if (cvWidgets[key].midiOscEnv.notNil, {
 				cvcArgs = (midiOscEnv: cvWidgets[key].midiOscEnv);
 			}, {
 				cvcArgs = true;
@@ -1147,25 +1147,25 @@ CVCenter {
 				tmp = (
 					setup: (
 						lo: (
-							midiMode: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMode(\lo) }, { this.midiMode }),
-							midiResolution: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution(\lo) }, { this.midiResolution }),
-							midiMean: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMean(\lo) }, { this.midiMean }),
-							ctrlButtonBank: if(cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank(\lo) }, { this.ctrlButtonBank }),
-							softWithin: if(cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin(\lo) }, { this.softWithin }),
-							calibrate: if(cvWidgets[key].notNil, { cvWidgets[key].getCalibrate(\lo) }, { true })
+							midiMode: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiMode(\lo) }, { this.midiMode }),
+							midiResolution: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution(\lo) }, { this.midiResolution }),
+							midiMean: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiMean(\lo) }, { this.midiMean }),
+							ctrlButtonBank: if (cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank(\lo) }, { this.ctrlButtonBank }),
+							softWithin: if (cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin(\lo) }, { this.softWithin }),
+							calibrate: if (cvWidgets[key].notNil, { cvWidgets[key].getCalibrate(\lo) }, { true })
 						),
 						hi: (
-							midiMode: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMode(\hi) }, { this.midiMode }),
-							midiResolution: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution(\hi) }, { this.midiResolution }),
-							midiMean: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMean(\hi) }, { this.midiMean }),
-							ctrlButtonBank: if(cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank(\hi) }, { this.ctrlButtonBank }),
-							softWithin: if(cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin(\hi) }, { this.softWithin }),
-							calibrate: if(cvWidgets[key].notNil, { cvWidgets[key].getCalibrate(\hi) }, { true })
+							midiMode: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiMode(\hi) }, { this.midiMode }),
+							midiResolution: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution(\hi) }, { this.midiResolution }),
+							midiMean: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiMean(\hi) }, { this.midiMean }),
+							ctrlButtonBank: if (cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank(\hi) }, { this.ctrlButtonBank }),
+							softWithin: if (cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin(\hi) }, { this.softWithin }),
+							calibrate: if (cvWidgets[key].notNil, { cvWidgets[key].getCalibrate(\hi) }, { true })
 						),
 					),
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
-				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
+				if (cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
 					cvWidgets[key] = CVWidget2D(
 						thisTab,
 						(lo: all[key].lo, hi: all[key].hi),
@@ -1186,7 +1186,7 @@ CVCenter {
 							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 						;
 					);
-					if(widgetStates[key].isNil, {
+					if (widgetStates[key].isNil, {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
 							tabKey: thisTabLabel,
@@ -1208,22 +1208,22 @@ CVCenter {
 				tmp = (
 					setup: msSize.collect({ |sl|
 						(
-							midiMode: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMode(sl) }, { this.midiMode }),
-							midiResolution: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution(sl) }, { this.midiResolution }),
-							midiMean: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMean(sl) }, { this.midiMean }),
-							ctrlButtonBank: if(cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank(sl) }, {this.ctrlButtonBank }),
-							softWithin: if(cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin(sl) }, { this.softWithin }),
-							calibrate: if(cvWidgets[key].notNil, { cvWidgets[key].getCalibrate(sl) }, { true })
+							midiMode: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiMode(sl) }, { this.midiMode }),
+							midiResolution: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution(sl) }, { this.midiResolution }),
+							midiMean: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiMean(sl) }, { this.midiMean }),
+							ctrlButtonBank: if (cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank(sl) }, {this.ctrlButtonBank }),
+							softWithin: if (cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin(sl) }, { this.softWithin }),
+							calibrate: if (cvWidgets[key].notNil, { cvWidgets[key].getCalibrate(sl) }, { true })
 						)
 					}),
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
 
-				if(msSize <= numMsSlotsPerColumn, { widgetwidth = 105 }, {
+				if (msSize <= numMsSlotsPerColumn, { widgetwidth = 105 }, {
 					widgetwidth = msSize.div(numMsSlotsPerColumn)*53+52
 				});
 
-				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
+				if (cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
 					cvWidgets[key] = CVWidgetMS(
 						thisTab,
 						all[key],
@@ -1243,7 +1243,7 @@ CVCenter {
 							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 						;
 					);
-					if(widgetStates[key].isNil, {
+					if (widgetStates[key].isNil, {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
 							tabKey: thisTabLabel,
@@ -1263,19 +1263,19 @@ CVCenter {
 			{
 				tmp = (
 					setup: (
-						midiMode: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMode }, { this.midiMode }),
-						midiResolution: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution }, { this.midiResolution }),
-						midiMean: if(cvWidgets[key].notNil, { cvWidgets[key].getMidiMean }, { this.midiMean }),
-						ctrlButtonBank: if(cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank }, { this.ctrlButtonBank }),
-						softWithin: if(cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin }, { this.softWithin }),
-						calibrate: if(cvWidgets[key].notNil, { cvWidgets[key].getCalibrate }, { true }),
+						midiMode: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiMode }, { this.midiMode }),
+						midiResolution: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiResolution }, { this.midiResolution }),
+						midiMean: if (cvWidgets[key].notNil, { cvWidgets[key].getMidiMean }, { this.midiMean }),
+						ctrlButtonBank: if (cvWidgets[key].notNil, { cvWidgets[key].getCtrlButtonBank }, { this.ctrlButtonBank }),
+						softWithin: if (cvWidgets[key].notNil, { cvWidgets[key].getSoftWithin }, { this.softWithin }),
+						calibrate: if (cvWidgets[key].notNil, { cvWidgets[key].getCalibrate }, { true }),
 					),
 					wdgtActions: cvWidgets[key] !? { cvWidgets[key].wdgtActions }
 				);
 
 			// "connectS: %, connectTF: %\n".postf(connectS, connectTF);
 
-				if(cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
+				if (cvWidgets[key].isNil or:{ cvWidgets[key].isClosed }, {
 					cvWidgets[key] = CVWidgetKnob(
 						thisTab,
 						all[key],
@@ -1294,7 +1294,7 @@ CVCenter {
 							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 						;
 					);
-					if(widgetStates[key].isNil, {
+					if (widgetStates[key].isNil, {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
 							tabKey: thisTabLabel,
@@ -1354,7 +1354,7 @@ CVCenter {
 
 		colwidth = widgetwidth+1; // add a small gap between widgets
 		rowwidth = thisTab.bounds.width-15;
-		if(thisNextPos.x+colwidth >= (rowwidth-colwidth-15), {
+		if (thisNextPos.x+colwidth >= (rowwidth-colwidth-15), {
 			// jump to next row
 			thisNextPos = tabProperties[thisTabLabel].nextPos; //old
 		}, {
@@ -1367,7 +1367,7 @@ CVCenter {
 		};
 
 		tabs.activeTab !? {
-			if(tabs.activeTab.index == cvTabIndex, {
+			if (tabs.activeTab.index == cvTabIndex, {
 				// "tabs.activeTab.index == cvTabIndex".postln;
 				this.prRegroupWidgets(tabs.activeTab)
 			}/*, {
@@ -1381,22 +1381,22 @@ CVCenter {
 	*put { |...args|
 		var inputArgs, overwrite=false, tmp;
 		inputArgs = args;
-		if(inputArgs.size.odd, {
+		if (inputArgs.size.odd, {
 			overwrite = inputArgs.pop;
-			if(overwrite.isKindOf(Boolean).not, {
+			if (overwrite.isKindOf(Boolean).not, {
 				overwrite = nil;
 			});
 		});
 		this.new;
 		inputArgs.pairsDo({ |key, cv|
-			if(cv.isKindOf(CV).not and:{ cv.isKindOf(Array).not }, {
+			if (cv.isKindOf(CV).not and:{ cv.isKindOf(Array).not }, {
 				Error("CVCenter expects a single CV or an array of CVs as input!").throw;			});
 			[cv].flat.do({ |cv|
-				if(cv.isKindOf(CV).not, {
+				if (cv.isKindOf(CV).not, {
 					Error("The value provided for key '"++key.asString++"' doesn't appear to be a CV.\nPlease choose a valid input!").throw;
 				})
 			});
-			if(cv.isKindOf(Array) and:{ cv.size == 2 }, {
+			if (cv.isKindOf(Array) and:{ cv.size == 2 }, {
 				tmp = cv.copy;
 				#[lo, hi].do({ |key, i|
 					cv.isKindOf(Event).not.if { cv = () };
@@ -1404,10 +1404,10 @@ CVCenter {
 				})
 			});
 
-			if(overwrite, {
+			if (overwrite, {
 				all.put(key.asSymbol, cv);
 			}, {
-				if(all.matchAt(key.asSymbol).isNil, {
+				if (all.matchAt(key.asSymbol).isNil, {
 					all.put(key.asSymbol, cv);
 				}, {
 					("There is already a CV stored under the name '"++key.asString++"'. \nPlease choose a different key-name!").warn;
@@ -1423,7 +1423,7 @@ CVCenter {
 		all.removeAt(thisKey);
 		cvWidgets[thisKey].class.switch(
 			CVWidgetKnob, {
-				if(cvWidgets[thisKey].editor.notNil and:{ cvWidgets[thisKey].editor.isClosed.not }, {
+				if (cvWidgets[thisKey].editor.notNil and:{ cvWidgets[thisKey].editor.isClosed.not }, {
 					cvWidgets[thisKey].editor.close;
 				});
 				cvWidgets[thisKey].midiOscEnv.cc !? {
@@ -1437,7 +1437,7 @@ CVCenter {
 			},
 			CVWidget2D, {
 				#[lo, hi].do({ |hilo|
-					if(cvWidgets[thisKey].editor[hilo].notNil and:{ cvWidgets[thisKey].editor[hilo].isClosed.not }, {
+					if (cvWidgets[thisKey].editor[hilo].notNil and:{ cvWidgets[thisKey].editor[hilo].isClosed.not }, {
 						cvWidgets[thisKey].editor[hilo].close;
 					});
 					cvWidgets[thisKey].midiOscEnv[hilo].cc !? {
@@ -1451,13 +1451,13 @@ CVCenter {
 				})
 			},
 			CVWidgetMS, {
-				if(cvWidgets[thisKey].editor.msEditor.notNil and:{
+				if (cvWidgets[thisKey].editor.msEditor.notNil and:{
 					cvWidgets[thisKey].editor.msEditor.isClosed.not
 				}, {
 					cvWidgets[thisKey].editor.msEditor.close;
 				});
 				cvWidgets[thisKey].msSize.do({ |sl|
-					if(cvWidgets[thisKey].editor.editors[sl].notNil and:{
+					if (cvWidgets[thisKey].editor.editors[sl].notNil and:{
 						cvWidgets[thisKey].editor.editors[sl].isClosed.not
 					}, {
 						cvWidgets[thisKey].editor.editors[sl].close
@@ -1478,18 +1478,18 @@ CVCenter {
 		removeButs[thisKey].remove;
 		removeButs.removeAt(thisKey);
 
-		if(window.notNil and:{
+		if (window.notNil and:{
 			window.isClosed.not
 		}, {
-			if(this.widgetsAtTab(widgetStates[thisKey][\tabKey]).size == 0, {
+			if (this.widgetsAtTab(widgetStates[thisKey][\tabKey]).size == 0, {
 				this.prRemoveTab(thisTabKey);
 			})
 		});
 
-		if(this.widgetsAtTab(widgetStates[thisKey][\tabKey]).size == 0, {
-			if(tabProperties.size > 1, {
+		if (this.widgetsAtTab(widgetStates[thisKey][\tabKey]).size == 0, {
+			if (tabProperties.size > 1, {
 				widgetStates.do({ |ws|
-					if(ws.tabIndex > widgetStates[thisKey].tabIndex, { ws.tabIndex = ws.tabIndex-1 });
+					if (ws.tabIndex > widgetStates[thisKey].tabIndex, { ws.tabIndex = ws.tabIndex-1 });
 				})
 			})
 		});
@@ -1498,7 +1498,7 @@ CVCenter {
 	}
 
 	*removeAll { |...keys|
-		if(keys.size < 1, {
+		if (keys.size < 1, {
 			all.keys.do(this.removeAt(_));
 		}, {
 			keys.do(this.removeAt(_));
@@ -1508,7 +1508,7 @@ CVCenter {
 	*removeAtTab { |label|
 		var wdgts;
 		wdgts = this.widgetsAtTab(label.asSymbol);
-		if(wdgts.isEmpty.not, { this.removeAll(*wdgts) });
+		if (wdgts.isEmpty.not, { this.removeAll(*wdgts) });
 	}
 
 	*removeTab { |label|
@@ -1516,7 +1516,7 @@ CVCenter {
 		this.removeAtTab;
 		tabs.removeAt(tabIndex);
 		tabProperties[label.asSymbol] = nil;
-		tabProperties.do({ |p| if(p.index > tabIndex, { p.index = p.index-1 }) });
+		tabProperties.do({ |p| if (p.index > tabIndex, { p.index = p.index-1 }) });
 	}
 
 	*at { |key|
@@ -1530,8 +1530,8 @@ CVCenter {
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		thisKey = key.asSymbol;
 
-		if(svItems.notNil, {
-			if(svItems.isKindOf(SequenceableCollection).not, {
+		if (svItems.notNil, {
+			if (svItems.isKindOf(SequenceableCollection).not, {
 				Error("svItems must be a SequenceableCollection or an instance of one of its subclasses!").through;
 			}, {
 				thisSVItems = svItems.collect(_.asSymbol);
@@ -1546,12 +1546,12 @@ CVCenter {
 		// if a 2D-widget under the given key exists force the given slot to become
 		// the other slot of the already existing widget
 		// also prevents misbehaviour in case of bogus slots
-		if(cvWidgets[thisKey].notNil and:{
+		if (cvWidgets[thisKey].notNil and:{
 			cvWidgets[thisKey].class == CVWidget2D
 		}, {
 			block { |break|
 				#[lo, hi].do({ |hilo|
-					if(widgetStates[thisKey].notNil and:{
+					if (widgetStates[thisKey].notNil and:{
 						widgetStates[thisKey][hilo].isNil
 					}, { break.value(thisSlot = hilo) })
 				})
@@ -1559,22 +1559,23 @@ CVCenter {
 		});
 
 		// above test didn't apply. so we can assume no widget exists under the given key
-		if(slot.notNil and:{ thisSlot.isNil }, {
+		if (slot.notNil and:{ thisSlot.isNil }, {
 			thisSlot = slot.asString.toLower.asSymbol;
-			if(#[lo, hi].detect({ |sbl| sbl === thisSlot }).class !== Symbol, {
+			if (#[lo, hi].detect({ |sbl| sbl === thisSlot }).class !== Symbol, {
 				Error("Looks like you wanted to create a multi-dimensional widget. However, the given slot-value '%' is not valid!".format(slot)).throw;
 			})
 		});
 
 		// "thisSlot: %\n".postf(thisSlot);
 
-		if(spec.class == ControlSpec, { thisSpec = spec }, {
+		if (spec.class == ControlSpec, { thisSpec = spec }, {
 			// CVWidgetMS
 			// if spec.asSpec returns nil make it a default ControlSpec by calling as Spec again
-			if(spec.isArray.not, { thisSpec = spec.asSpec.asSpec }, {
-				if(spec.select({ |sp| sp.respondsTo(\asSpec) and:{
-					sp.asSpec.asSpec.isKindOf(ControlSpec) }
-				}).size == spec.size, {
+			if (spec.isArray.not, { thisSpec = spec.asSpec.asSpec }, {
+				// protect from arrays containing nils
+				if (spec.indicesOfEqual(nil).size == spec.size or: {
+					spec.asSet.size == 1
+				}) {
 					thisSpec = ControlSpec(
 						spec.collect({ |sp| sp.asSpec.asSpec.minval }),
 						spec.collect({ |sp| sp.asSpec.asSpec.maxval }),
@@ -1582,15 +1583,18 @@ CVCenter {
 						spec.collect({ |sp| sp.asSpec.asSpec.step }),
 						spec.collect({ |sp| sp.asSpec.asSpec.default })
 					);
-					if(thisSpec.safeHasZeroCrossing, { thisSpec.warp_(\lin) });
-					if(spec.asBag.contents.size == 1, {
-						if((specName = Spec.specs.findKeyForValue(spec[0].asSpec)).notNil, {
-							Spec.add((specName++"_"++spec.size).asSymbol, thisSpec);
-						})
-					})
-				}, {
-					Error("Could not create a valid ControlSpec from given values '%'".format(spec)).throw;
-				})
+				} {
+					thisSpec = spec.asSpec;
+				};
+				if (thisSpec.safeHasZeroCrossing) { thisSpec.warp_(\lin) };
+				// protect from arrays containing nils
+				if (spec.indicesOfEqual(nil).size == spec.size or: {
+					spec.asSet.size == 1
+				}) {
+					if ((specName = Spec.specs.findKeyForValue(spec[0].asSpec)).notNil) {
+						Spec.add((specName++"_"++spec.size).asSymbol, thisSpec);
+					}
+				}
 			}, {
 				Error("Could not create a valid ControlSpec from given value '%'".format(spec)).throw;
 			})
@@ -1612,7 +1616,7 @@ CVCenter {
 
 		// "thisSpec: %\n".postf(thisSpec);
 
-		if(value.notNil, {
+		if (value.notNil, {
 			case
 				{ value.isNumber } { thisVal = value }
 				{ value.isArray and:{ value.select(_.isNumber).size == value.size }} { thisVal = value }
@@ -1623,13 +1627,13 @@ CVCenter {
 		});
 
 		// make sure the default value is suitable for multidimensional ControlSpecs
-		if([thisSpec.minval, thisSpec.maxval, thisSpec.step, thisSpec.default].select(_.isArray).size > 0, {
+		if ([thisSpec.minval, thisSpec.maxval, thisSpec.step, thisSpec.default].select(_.isArray).size > 0, {
 			thisVal = thisVal.asArray;
 		});
 
-		if(thisSlot.notNil and:{ (thisSlot === \lo).or(thisSlot === \hi) }, {
-			if(cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
-				if(widgetStates[thisKey][\hi][\made] == true or:{
+		if (thisSlot.notNil and:{ (thisSlot === \lo).or(thisSlot === \hi) }, {
+			if (cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
+				if (widgetStates[thisKey][\hi][\made] == true or:{
 					widgetStates[thisKey][\lo][\made] == true
 				}, {
 					widgetStates[thisKey][thisSlot][\made] ?? {
@@ -1642,7 +1646,7 @@ CVCenter {
 			}, {
 				all[thisKey] ?? { all.put(thisKey, (lo: cvClass.new, hi: cvClass.new)) };
 				all[thisKey][thisSlot].spec_(thisSpec);
-				if(cvClass === SV and:{
+				if (cvClass === SV and:{
 					all[thisKey][thisSlot].items.unbubble.isNil
 				}, { all[thisKey][thisSlot].items_(thisSVItems) });
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
@@ -1650,12 +1654,12 @@ CVCenter {
 			})
 		}, {
 			all[thisKey] ?? { all.put(thisKey, cvClass.new(thisSpec, thisVal)) };
-			if(cvClass === SV and:{ all[thisKey].items.unbubble.isNil }, {
+			if (cvClass === SV and:{ all[thisKey].items.unbubble.isNil }, {
 				all[thisKey].items_(thisSVItems)
 			})
 		});
 
-		if(window.isNil or:{ window.isClosed }, {
+		if (window.isNil or:{ window.isClosed }, {
 			// "makeWindow: %, key: %\n".postf(thisTab, thisKey);
 			this.makeWindow(thisTab);
 		}, {
@@ -1663,7 +1667,7 @@ CVCenter {
 			this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
 		});
 
-		if(slot.notNil, {
+		if (slot.notNil, {
 			^all[thisKey][thisSlot];
 		}, {
 			^all[thisKey];
@@ -1717,13 +1721,13 @@ CVCenter {
 	*alwaysOnTop_ { |bool|
 		alwaysOnTop = bool.asBoolean;
 		window !? { window.alwaysOnTop_(alwaysOnTop) };
-		if(childViews.size > 0, {
+		if (childViews.size > 0, {
 			childViews.keys.do(_.alwaysOnTop_(alwaysOnTop));
 		})
 	}
 
 	*guiMoveTo { |point|
-		if(point.isKindOf(Point).not, {
+		if (point.isKindOf(Point).not, {
 			Error("guiMoveTo expects a Point in the form of e.g. Point(0, 0)").throw;
 		});
 		this.guix_(point.x);
@@ -1732,7 +1736,7 @@ CVCenter {
 	}
 
 	*guiChangeDimensions { |point|
-		if(point.isKindOf(Point).not, {
+		if (point.isKindOf(Point).not, {
 			Error("guiMoveTo expects a Point in the form of e.g. Point(0, 0)").throw;
 		});
 		this.guiwidth_(point.x);
@@ -1753,7 +1757,7 @@ CVCenter {
 	}
 
 	*isClosed {
-		if(this.childViews.size == 0 and:{
+		if (this.childViews.size == 0 and:{
 			this.window.isNil.or(this.window.notNil and:{ this.window.isClosed })
 		}, { ^true });
 		^false;
@@ -1786,7 +1790,7 @@ CVCenter {
 		var index, wdgts = [];
 		all.keys.do({ |key|
 			widgetStates[key] !? {
-				if(widgetStates[key].tabKey == label.asSymbol, { wdgts = wdgts.add(key) });
+				if (widgetStates[key].tabKey == label.asSymbol, { wdgts = wdgts.add(key) });
 			}
 		});
 		^wdgts;
@@ -1797,7 +1801,7 @@ CVCenter {
 
 		key = Date.getDate.stamp.asSymbol;
 
-		if(dialog, {
+		if (dialog, {
 			dialogWin = Window("save snapshot", Rect(
 				Window.screenBounds.width-300/2, Window.screenBounds.height-50/2,
 				300, 50
@@ -1819,7 +1823,7 @@ CVCenter {
 				.states_([["save snapshot", Color.white, Color.red]])
 				.action_({
 					snapShots.put(keyField.string.asSymbol, all.collect({ |cv|
-						if(cv.class == Event) { (lo: cv.lo.value, hi: cv.hi.value) } { cv.value }
+						if (cv.class == Event) { (lo: cv.lo.value, hi: cv.hi.value) } { cv.value }
 					}));
 					this.at('select snapshot').items_(
 						this.at('select snapshot').items ++ keyField.string.asSymbol
@@ -1831,7 +1835,7 @@ CVCenter {
 			dialogWin.front;
 		}, {
 			snapShots.put(key, all.collect({ |cv|
-				if(cv.class == Event) { (lo: cv.lo.value, hi: cv.hi.value) } { cv.value }
+				if (cv.class == Event) { (lo: cv.lo.value, hi: cv.hi.value) } { cv.value }
 			}));
 			this.at('select snapshot').items_(this.at('select snapshot').items ++ key.asSymbol);
 		});
@@ -1847,7 +1851,7 @@ CVCenter {
 			lib = Library();
 			lib.put( \all, ());
 			all.pairsDo({ |k, cv|
-				if(dontSave.includes(k).not, { // each slot in dontSave must be a Symbol
+				if (dontSave.includes(k).not, { // each slot in dontSave must be a Symbol
 					lib[\all].put(k, ());
 					switch(cvWidgets[k].class,
 						CVWidget2D, {
@@ -1956,15 +1960,15 @@ CVCenter {
 
 			lib[\all].put(\snapshots, snapShots);
 
-			if(GUI.id === \cocoa, {
+			if (GUI.id === \cocoa, {
 				lib.writeTextArchive(*f);
 			}, {
 				lib.writeTextArchive(f);
 			});
 			lib = nil;
 		};
-		if(path.isNil, {
-			if(GUI.id !== \qt, {
+		if (path.isNil, {
+			if (GUI.id !== \qt, {
 				File.saveDialog(
 					prompt: "Save your current setup to a file",
 					defaultName: "Setup",
@@ -1987,24 +1991,24 @@ CVCenter {
 		var lib, successFunc;
 
 		successFunc = { |f|
-			if(GUI.id === \qt, {
+			if (GUI.id === \qt, {
 				lib = Library.readTextArchive(*f);
 			}, {
 				lib = Library.readTextArchive(f);
 			});
-			if(this.childViews.size > 0, { childViews.keysDo(_.close) });
+			if (this.childViews.size > 0, { childViews.keysDo(_.close) });
 
 			{
 				all !? {
-					if(addToExisting === false, {
+					if (addToExisting === false, {
 						// this.removeAll;
 						all.pairsDo({ |key, wdgt|
-							if(key !== \snapshot and:{ key !== 'select snapshot' }, { this.removeAt(key) });
+							if (key !== \snapshot and:{ key !== 'select snapshot' }, { this.removeAt(key) });
 						})
 					})
 				};
 				lib[\all].pairsDo({ |key, v|
-					if(key !== \shortcuts, {
+					if (key !== \shortcuts, {
 						switch(v.wdgtClass,
 							CVWidget2D, {
 								#[lo, hi].do({ |hilo|
@@ -2015,26 +2019,26 @@ CVCenter {
 										.setMidiResolution(v[hilo].midi.midiResolution, hilo)
 										.setCtrlButtonBank(v[hilo].midi.ctrlButtonBank, hilo)
 									;
-									if(loadActions, {
+									if (loadActions, {
 										v[hilo].actions !? {
 											v[hilo].actions.pairsDo({ |ak, av|
 												this.addActionAt(key, ak, av.asArray[0][0], hilo, av.asArray[0]	[1]);
 											})
 										}
 									});
-									if(autoConnectOSC, {
-										if(v[hilo].osc.notNil and:{ v[hilo].osc.cmdName.notNil }, {
+									if (autoConnectOSC, {
+										if (v[hilo].osc.notNil and:{ v[hilo].osc.cmdName.notNil }, {
 											cvWidgets[key].oscConnect(
-												if(oscIPAddress.isNil, {
+												if (oscIPAddress.isNil, {
 													oscConnectToIP !? {
-														if(oscConnectToIP, { v[hilo].osc.addr !? { v[hilo].osc.addr.ip }})
+														if (oscConnectToIP, { v[hilo].osc.addr !? { v[hilo].osc.addr.ip }})
 													}
 												}, {
 													oscIPAddress.asString.split($:)[0]
 												}),
-												if(oscIPAddress.isNil, {
+												if (oscIPAddress.isNil, {
 													oscRestrictToPort !? {
-														if(oscConnectToIP and:{ oscRestrictToPort }, {
+														if (oscConnectToIP and:{ oscRestrictToPort }, {
 															v[hilo].osc.addr !? { v[hilo].osc.addr.port }
 														})
 													}
@@ -2047,7 +2051,7 @@ CVCenter {
 											);
 
 											cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo);
-											if(activateCalibration and:{ resetCalibration }, {
+											if (activateCalibration and:{ resetCalibration }, {
 												cvWidgets[key].setOscInputConstraints(Point(0.0001, 0.0001), hilo);
 												cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
 													[Point(0.0001, 0.0001)]
@@ -2060,20 +2064,20 @@ CVCenter {
 													[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
 												).changedKeys(cvWidgets[key].synchKeys)
 											});
-											if(activateCalibration, { cvWidgets[key].setCalibrate(true, hilo) });
+											if (activateCalibration, { cvWidgets[key].setCalibrate(true, hilo) });
 										})
 									});
-									if(autoConnectMIDI, {
-										if(v[hilo].midi.notNil and:{ v[hilo].midi.num.notNil }, {
+									if (autoConnectMIDI, {
+										if (v[hilo].midi.notNil and:{ v[hilo].midi.num.notNil }, {
 											try {
 												cvWidgets[key].midiConnect(
-													if(midiSrcID.isNil, {
-														if(midiConnectSrc, { v[hilo].midi.src })
+													if (midiSrcID.isNil, {
+														if (midiConnectSrc, { v[hilo].midi.src })
 													}, {
 														midiSrcID.asInt
 													}),
-													if(midiConnectChannel, { v[hilo].midi.chan }),
-													if(midiConnectCtrl, { v[hilo].midi.num }),
+													if (midiConnectChannel, { v[hilo].midi.chan }),
+													if (midiConnectCtrl, { v[hilo].midi.num }),
 													hilo
 												)
 											}
@@ -2089,26 +2093,26 @@ CVCenter {
 									.setMidiResolution(v.midi.midiResolution)
 									.setCtrlButtonBank(v.midi.ctrlButtonBank)
 								;
-								if(loadActions, {
+								if (loadActions, {
 									v.actions !? {
 										v.actions.pairsDo({ |ak, av|
 											this.addActionAt(key, ak, av.asArray[0][0], active: av.asArray[0][1]);
 										})
 									}
 								});
-								if(autoConnectOSC, {
+								if (autoConnectOSC, {
 									v.osc.cmdName !? {
 										cvWidgets[key].oscConnect(
-											if(oscIPAddress.isNil, {
+											if (oscIPAddress.isNil, {
 												oscConnectToIP !? {
-													if(oscConnectToIP, { v.osc.addr !? { v.osc.addr.ip }})
+													if (oscConnectToIP, { v.osc.addr !? { v.osc.addr.ip }})
 												}
 											}, {
 												oscIPAddress.asString.split($:)[0]
 											}),
-											if(oscIPAddress.isNil, {
+											if (oscIPAddress.isNil, {
 												oscRestrictToPort !? {
-													if(oscConnectToIP and:{ oscRestrictToPort }, {
+													if (oscConnectToIP and:{ oscRestrictToPort }, {
 														v.osc.addr !? { v.osc.addr.port }
 													})
 												}
@@ -2119,7 +2123,7 @@ CVCenter {
 											v.osc.msgIndex
 										);
 										cvWidgets[key].setOscMapping(v.osc.oscMapping);
-										if(activateCalibration and:{ resetCalibration }, {
+										if (activateCalibration and:{ resetCalibration }, {
 											cvWidgets[key].setOscInputConstraints(
 												Point(0.0001, 0.0001)
 											);
@@ -2134,20 +2138,20 @@ CVCenter {
 												[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
 											).changedKeys(cvWidgets[key].synchKeys);
 										});
-										if(activateCalibration, { cvWidgets[key].setCalibrate(true) });
+										if (activateCalibration, { cvWidgets[key].setCalibrate(true) });
 									}
 								});
-								if(autoConnectMIDI, {
+								if (autoConnectMIDI, {
 									v.midi.num !? {
 										try {
 											cvWidgets[key].midiConnect(
-												if(midiSrcID.isNil, {
-													if(midiConnectSrc, { v.midi.src })
+												if (midiSrcID.isNil, {
+													if (midiConnectSrc, { v.midi.src })
 												}, {
 													midiSrcID.asInt
 												}),
-												if(midiConnectChannel, { v.midi.chan }),
-												if(midiConnectCtrl, { v.midi.num }),
+												if (midiConnectChannel, { v.midi.chan }),
+												if (midiConnectCtrl, { v.midi.num }),
 											)
 										}
 									}
@@ -2163,27 +2167,27 @@ CVCenter {
 										.setCtrlButtonBank(v.midi[sl].ctrlButtonBank, sl)
 									;
 								});
-								if(loadActions, {
+								if (loadActions, {
 									v.actions !? {
 										v.actions.pairsDo({ |ak, av|
 											this.addActionAt(key, ak, av.asArray[0][0], active: av.asArray[0][1]);
 										})
 									}
 								});
-								if(autoConnectOSC, {
+								if (autoConnectOSC, {
 									cvWidgets[key].msSize.do({ |sl|
 										v.osc[sl].cmdName !? {
 											cvWidgets[key].oscConnect(
-												if(oscIPAddress.isNil, {
+												if (oscIPAddress.isNil, {
 													oscConnectToIP !? {
-														if(oscConnectToIP, { v.osc[sl].addr !? { v.osc[sl].addr.ip }})
+														if (oscConnectToIP, { v.osc[sl].addr !? { v.osc[sl].addr.ip }})
 													}
 												}, {
 													oscIPAddress.asString.split($:)[0]
 												}),
-												if(oscIPAddress.isNil, {
+												if (oscIPAddress.isNil, {
 													oscRestrictToPort !? {
-														if(oscConnectToIP and:{ oscRestrictToPort }, {
+														if (oscConnectToIP and:{ oscRestrictToPort }, {
 															v.osc[sl].addr !? { v.osc[sl].addr.port }
 														})
 													}
@@ -2195,7 +2199,7 @@ CVCenter {
 												sl
 											);
 											cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl);
-											if(activateCalibration and:{ resetCalibration }, {
+											if (activateCalibration and:{ resetCalibration }, {
 												cvWidgets[key].setOscInputConstraints(
 													Point(0.0001, 0.0001), sl
 												);
@@ -2210,22 +2214,22 @@ CVCenter {
 													[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
 												).changedKeys(cvWidgets[key].synchKeys);
 											});
-											if(activateCalibration, { cvWidgets[key].setCalibrate(true, sl) });
+											if (activateCalibration, { cvWidgets[key].setCalibrate(true, sl) });
 										}
 									})
 								});
-								if(autoConnectMIDI, {
+								if (autoConnectMIDI, {
 									cvWidgets[key].msSize.do({ |sl|
 										v.midi[sl].num !? {
 											try {
 												cvWidgets[key].midiConnect(
-													if(midiSrcID.isNil, {
-														if(midiConnectSrc, { v.midi[sl].src })
+													if (midiSrcID.isNil, {
+														if (midiConnectSrc, { v.midi[sl].src })
 													}, {
 														midiSrcID.asInt
 													}),
-													if(midiConnectChannel, { v.midi[sl].chan }),
-													if(midiConnectCtrl, { v.midi[sl].num }),
+													if (midiConnectChannel, { v.midi[sl].chan }),
+													if (midiConnectCtrl, { v.midi[sl].num }),
 													slot: sl
 												)
 											}
@@ -2237,29 +2241,29 @@ CVCenter {
 
 						cvWidgets[key] !? {
 							cvWidgets[key].nameField.string_(v.notes);
-							if(GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
-							if(connectSliders.notNil, {
-								if(connectSliders, { cvWidgets[key].connectGUI(true, nil)
+							if (GUI.id !== \cocoa, { cvWidgets[key].label.toolTip_(v.notes) });
+							if (connectSliders.notNil, {
+								if (connectSliders, { cvWidgets[key].connectGUI(true, nil)
 								}, { cvWidgets[key].connectGUI(false, nil) });
 							}, {
 								// "v.connectS: %\n".postf(v.connectS);
 								cvWidgets[key].connectGUI(v.connectS, nil)
 							});
-							if(connectNumBoxes.notNil, {
-								if(connectNumBoxes, { cvWidgets[key].connectGUI(nil, true)
+							if (connectNumBoxes.notNil, {
+								if (connectNumBoxes, { cvWidgets[key].connectGUI(nil, true)
 								}, { cvWidgets[key].connectGUI(nil, false) });
 							}, {
 								cvWidgets[key].connectGUI(nil, v.connectTF)
 							})
 						};
 
-						if(CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
+						if (CVCenterLoadDialog.window.notNil and:{ CVCenterLoadDialog.window.isClosed.not }, {
 							CVCenterLoadDialog.window.close;
 						})
 					})
 				})
 			}.defer(0.1);
-			if(loadShortcuts, {
+			if (loadShortcuts, {
 				{
 					lib[\all][\shortcuts] !? {
 						this.shortcuts_(lib[\all][\shortcuts][\cvCenter]);
@@ -2274,15 +2278,15 @@ CVCenter {
 						});
 						AbstractCVWidgetEditor.shortcuts_(lib[\all][\shortcuts][\cvWidgetEditor]);
 						KeyDownActions.globalShortcuts_(lib[\all][\shortcuts][\globalShortcuts]);
-						if(Server.default.serverRunning, {
+						if (Server.default.serverRunning, {
 							KeyDownActions.globalShortcutsSync;
 						});
 					}
 				}.defer(0.5)
 			});
-			if(loadSnapshots, {
+			if (loadSnapshots, {
 				{
-					if(addToExisting.not, {
+					if (addToExisting.not, {
 						snapShots = ();
 						this.at('select snapshot').items_(["select snapshot..."]);
 					});
@@ -2294,8 +2298,8 @@ CVCenter {
 			})
 		};
 
-		if(path.isNil, {
-			if(GUI.id === \qt, {
+		if (path.isNil, {
+			if (GUI.id === \qt, {
 				QDialog.openPanel(successFunc);
 			}, {
 				File.openDialog(
@@ -2317,7 +2321,7 @@ CVCenter {
 		this.ctrlButtonBank_(setupDict[\ctrlButtonBank]);
 //		setupDict[\ctrlButtonBank] !? { this.ctrlButtonBank_(setupDict[\ctrlButtonBank]) };
 		setupDict[\softWithin] !? { this.softWithin_(setupDict[\softWithin]) };
-		if(window.notNil and:{ window.notClosed }, {
+		if (window.notNil and:{ window.notClosed }, {
 			cvWidgets.pairsDo({ |k, wdgt|
 				switch(wdgt.class,
 					CVWidgetKnob, {
@@ -2361,9 +2365,9 @@ CVCenter {
 			orderedRemoveButs = removeButs.atAll(order);
 			order.do({ |k, i|
 				thisNextPos ?? { thisNextPos = Point(0, 0) };
-				if(cvWidgets[k].window === tab, {
-					if(thisNextPos.x != 0, {
-						if(thisNextPos.x+(cvWidgets[k].widgetProps.x) >= (tab.bounds.width-15), {
+				if (cvWidgets[k].window === tab, {
+					if (thisNextPos.x != 0, {
+						if (thisNextPos.x+(cvWidgets[k].widgetProps.x) >= (tab.bounds.width-15), {
 							thisNextPos = Point(0, thisNextPos.y
 								+(cvWidgets[k].widgetProps.y)
 								+(orderedRemoveButs[i].bounds.height+1)
@@ -2415,7 +2419,7 @@ CVCenter {
 	*prRemoveTab { |key|
 		var index;
 
-		if(window.isClosed.not and:{
+		if (window.isClosed.not and:{
 			tabs.tabViews.detect({ |tab| tab.label.asSymbol == key.asSymbol }).notNil
 		}, {
 			index = tabs.tabViews.detect({ |tab| tab.label.asSymbol == key.asSymbol }).index;
@@ -2423,7 +2427,7 @@ CVCenter {
 		});
 		childViews.pairsDo({ |child, childProps|
 			childProps.tabs.keysDo({ |view|
-				if(view.label.asSymbol == key.asSymbol, {
+				if (view.label.asSymbol == key.asSymbol, {
 					child.close;
 					index = tabProperties[key].index;
 					tabs.removeAt(index);
@@ -2431,10 +2435,10 @@ CVCenter {
 			})
 		});
 		tabProperties.do({ |prop|
-			if(prop.index > index, { prop.index = prop.index-1 })
+			if (prop.index > index, { prop.index = prop.index-1 })
 		});
 		tabProperties.removeAt(key);
-		widgetStates.do({ |w| if(w.tabIndex > index, { w.tabIndex = w.tabIndex-1 }) });
+		widgetStates.do({ |w| if (w.tabIndex > index, { w.tabIndex = w.tabIndex-1 }) });
 	}
 
 	/* utilities */
@@ -2444,26 +2448,26 @@ CVCenter {
 	*connectToNode { |node, kvArray, environment|
 		var cvcKeys = [], nodeVars, activate;
 
-		if(node.class !== Symbol and:{ node.class !== String }, {
+		if (node.class !== Symbol and:{ node.class !== String }, {
 			nodeVars = node.getObjectVarNames(environment)
 		});
 
 		// "nodeVars: %\n".postf(nodeVars);
 		forBy(1, kvArray.size - 1, 2, { |i|
-			if(kvArray[i].isArray and:{ kvArray[i].isString.not }, {
+			if (kvArray[i].isArray and:{ kvArray[i].isString.not }, {
 				cvcKeys = cvcKeys.add(kvArray[i]);
 				kvArray.put(i, kvArray[i].collect({ |key| this.at(key.asSymbol) }));
 			}, {
 				kvArray.put(i, this.at(kvArray[i].asSymbol));
 			});
 		});
-		if(nodeVars.notNil and:{ nodeVars.size > 0 }, {
+		if (nodeVars.notNil and:{ nodeVars.size > 0 }, {
 			nodeVars.do({ |n, i|
-				if(i == 0, { activate = true }, { activate = false });
+				if (i == 0, { activate = true }, { activate = false });
 				kvArray.cvCenterBuildCVConnections(n.asString.interpret.server, n.asString.interpret.nodeID, n, cvcKeys, activate);
 			})
 		}, {
-			if(node.class == String or:{ node.class == Symbol }, {
+			if (node.class == String or:{ node.class == Symbol }, {
 				kvArray.cvCenterBuildCVConnections(node.interpret.server, node.interpret.nodeID, node, cvcKeys)
 			}, {
 				kvArray.cvCenterBuildCVConnections(node.server, node.nodeID)
@@ -2484,9 +2488,9 @@ CVCenter {
 
 		varNames = obj.getObjectVarNames(environment);
 		// "varNames: %\n".postf(varNames);
-		if(obj.class == Patch, { varNames = varNames.collect({ |v| v.asString++".synth" }) });
+		if (obj.class == Patch, { varNames = varNames.collect({ |v| v.asString++".synth" }) });
 
-		if(more.specEnterText.notNil and:{
+		if (more.specEnterText.notNil and:{
 			more.specEnterText.interpret.asSpec.isKindOf(ControlSpec)
 		}, {
 			thisSpec = more.specEnterText.interpret.asSpec;
@@ -2498,31 +2502,31 @@ CVCenter {
 //		"varNames: %\n".postf(varNames);
 //		"more: %\n".postf(more);
 
-		if(more.type.notNil, {
-			if(more.type === \w2d or:{ more.type === \w2dc }, {
+		if (more.type.notNil, {
+			if (more.type === \w2d or:{ more.type === \w2dc }, {
 				#[lo, hi].do({ |slot, i|
 					this.add(more.cName, thisSpec, more.slots[i], more.enterTab, slot);
-					if(more.type == \w2d, {
-						if(slot === \lo, {
+					if (more.type == \w2d, {
+						if (slot === \lo, {
 							wms = "cv.value, CVCenter.at('"++more.cName++"').hi.value";
 						}, {
 							wms = "CVCenter.at('"++more.cName++"').lo.value, cv.value";
 						})
 					});
-					if(varNames.size > 0, {
+					if (varNames.size > 0, {
 						varNames.do({ |v, j|
 							actionName = "default"++(j+1);
-							if(j == 0, { activate = true }, { activate = false });
+							if (j == 0, { activate = true }, { activate = false });
 							switch(more.type,
 								\w2d, {
 									this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', ["++wms++"]) }}", slot, activate);
-									if(obj.isKindOf(NodeProxy), {
+									if (obj.isKindOf(NodeProxy), {
 										this.addActionAt(more.cName, actionName+"(xsetn)", "{ |cv|"+v+"!? {"+v++".xsetn('"++ctrlName++"', ["++wms++"]) }}", slot, false);
 									});
 								},
 								\w2dc, {
 									this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".set('"++more.controls[i]++"', cv.value) }}", slot, activate);
-									if(obj.isKindOf(NodeProxy), {
+									if (obj.isKindOf(NodeProxy), {
 										this.addActionAt(more.cName, actionName+"(xset)", "{ |cv|"+v+"!? {"+v++".xset('"++more.controls[i]++"', cv.value) }}", slot, false);
 									});
 								}
@@ -2540,15 +2544,15 @@ CVCenter {
 					})
 				})
 			}, {
-				if(more.type === \wms, {
+				if (more.type === \wms, {
 					// "varNames: %, more: %\n".postf(varNames, more);
 					this.add(more.cName, thisSpec!more.slots.size, more.slots, more.enterTab);
-					if(varNames.size > 0, {
+					if (varNames.size > 0, {
 						varNames.do({ |v, j|
 							actionName = "default"++(j+1);
-							if(j == 0, { activate = true }, {activate = false });
+							if (j == 0, { activate = true }, {activate = false });
 							this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', cv.value) }}", active: activate);
-							if(obj.isKindOf(NodeProxy), {
+							if (obj.isKindOf(NodeProxy), {
 								this.addActionAt(more.cName, actionName+"(xsetn)", "{ |cv|"+v+"!? {"+v++".xsetn('"++ctrlName++"', cv.value) }}", active: false);
 							});
 						})
@@ -2560,27 +2564,27 @@ CVCenter {
 		}, {
 			// "varNames: %, more: %\n".postf(varNames, more);
 			addActionFunc = {
-				if(varNames.size > 0, {
+				if (varNames.size > 0, {
 					varNames.do({ |v, j|
 					// "varNames: %\n".postf(v);
 						actionName = "default"++(j+1);
-						if(j == 0, { activate = true }, { activate = false });
-						if(more.controls.notNil and:{ more.controls.size > 1 }, {
+						if (j == 0, { activate = true }, { activate = false });
+						if (more.controls.notNil and:{ more.controls.size > 1 }, {
 							this.addActionAt(more.cName, actionName, "{ |cv|"+v+"!? {"+v++".set('"++ctrlName++"', cv.value) }}", active: activate);
-							if(obj.isKindOf(NodeProxy), {
+							if (obj.isKindOf(NodeProxy), {
 								this.addActionAt(more.cName, actionName+"(xset)", "{ |cv|"+v+"!? {"+v++".xset('"++ctrlName++"', cv.value) }}", active: false);
 							});
 						}, {
 							wms = [];
 							more.slots.size.do({ |i|
-								if(this.at((more.cName.asString++(i+1)).asSymbol) === this.at((more.cName.asString++(i+1)).asSymbol), {
+								if (this.at((more.cName.asString++(i+1)).asSymbol) === this.at((more.cName.asString++(i+1)).asSymbol), {
 									wms = wms.add("cv.value");
 								}, {
 									wms = wms.add("CVCenter.at('"++more.cName.asString++(i+1)++"').value")
 								})
 							});
 							this.addActionAt(more.cName.asString++(j+1), actionName, "{ |cv|"+v+"!? {"+v++".setn('"++ctrlName++"', ["++(wms.join(", "))++"]) }}", active: activate);
-							if(obj.isKindOf(NodeProxy), {
+							if (obj.isKindOf(NodeProxy), {
 								this.addActionAt(more.cName.asString++(j+1), actionName+"(xsetn)", "{ |cv|"+v+"!? {"+v++".xsetn('"++ctrlName++"', ["++(wms.join(", "))++"]) }}", active: false);
 							});
 						})
@@ -2593,11 +2597,11 @@ CVCenter {
 			case
 				{ more.slots.size == 1 } {
 					this.add(more.cName, thisSpec, more.slots[0], more.enterTab);
-					if(varNames.size > 0, {
+					if (varNames.size > 0, {
 						varNames.do({ |v, j|
-							if(j == 0, { activate = true }, { activate = false });
+							if (j == 0, { activate = true }, { activate = false });
 							this.addActionAt(more.cName, actionName++(j+1), "{ |cv|"+v+"!? {"+v++".set('"++ctrlName++"', cv.value) }}", active: activate);
-							if(obj.isKindOf(NodeProxy), {
+							if (obj.isKindOf(NodeProxy), {
 								this.addActionAt(more.cName, actionName++(j+1)+"(xset)", "{ |cv|"+v+"!? {"+v++".xset('"++ctrlName++"', cv.value) }}", active: false);
 							})
 						})
