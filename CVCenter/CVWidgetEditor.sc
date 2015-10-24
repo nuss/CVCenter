@@ -689,7 +689,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					["new", Color.white, Color(0.15, 0.5, 0.15)]
 				])
 				.font_(staticTextFont)
-				.action_({ OSCCommands.makeWindow })
+				.action_({ OSCCommands.front })
 			;
 
 			if(GUI.id !== \cocoa, {

@@ -359,8 +359,8 @@ KeyDownActions {
 
 		if(globalShortcuts.isNil) {
 			scFunc =
-			"// bring all Windows to front and call CVCenter.makeWindow *afterwards*
-			{ Window.allWindows.do(_.front); CVCenter.makeWindow }";
+			"// bring all Windows to front and call CVCenter.front *afterwards*
+			{ Window.allWindows.do(_.front); CVCenter.front }";
 			this.globalShortcuts.put(
 				'fn + F1',
 				(func: scFunc, keyCode: KeyDownActions.keyCodes['fn + F1'])

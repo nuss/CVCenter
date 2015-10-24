@@ -173,7 +173,7 @@ CVCenter {
 			);
 			scFunc =
 			"// OSCCommands gui
-			{ OSCCommands.makeWindow }";
+			{ OSCCommands.front }";
 			this.shortcuts.put(
 				'alt + c',
 				(
@@ -564,7 +564,12 @@ CVCenter {
 		all[\snapshot] ?? { all.put(\snapshot, CV(#[0, 1, \lin, 1.0])) };
 	}
 
-	*makeWindow { |tab...cvs|
+	*makeWindow {
+		this.deprecated(thisMethod, this.class.findMethod(\front));
+		^this.front;
+	}
+
+	*front { |tab...cvs|
 		var flow;
 		// var cvTabIndex, order, orderedCVs, msSize;
 		var updateRoutine, lastUpdate, lastUpdateBounds, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
@@ -579,7 +584,7 @@ CVCenter {
 		var tmpConnectS, tmpConnectTF;
 		// TabbedView2 specific
 
-		// "adding tab within *makeWindow: %\n".postf(tab);
+		// "adding tab within *front: %\n".postf(tab);
 
 		// function for building cross-platform checkboxes
 		buildCheckbox = { |view, active, action|
@@ -1656,8 +1661,8 @@ CVCenter {
 		});
 
 		if (window.isNil or:{ window.isClosed }, {
-			// "makeWindow: %, key: %\n".postf(thisTab, thisKey);
-			this.makeWindow(thisTab);
+			// "front: %, key: %\n".postf(thisTab, thisKey);
+			this.front(thisTab);
 		}, {
 			// "prAddWidget: %\n".postf(thisKey);
 			this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
