@@ -236,7 +236,7 @@ AbstractCVWidgetEditor {
 			);
 			scFunc =
 			"// collect OSC-commands resp. open the collector's GUI
-			{ OSCCommands.makeWindow }";
+			{ OSCCommands.front }";
 			this.shortcuts.put(
 				\c,
 				(func: scFunc, keyCode: KeyDownActions.keyCodes[$c])

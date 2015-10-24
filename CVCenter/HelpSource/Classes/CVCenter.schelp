@@ -665,12 +665,12 @@ CVCenter.addActionAt(\test2D, \setFreq2, { |cv| a !? { a.set(\freq2, cv.value) }
 
 // CVCenter will not open another gui if one is already present
 // if the GUI is in the background it will be sent to front
-CVCenter.makeWindow;
+CVCenter.front;
 
 // close the GUI and open it again
 // all widgets should just work as before
 CVCenter.window.close;
-CVCenter.makeWindow;
+CVCenter.front;
 
 // free the synth and remove all widgets
 a.free;
