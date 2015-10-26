@@ -3289,7 +3289,10 @@ CVWidget {
 			if(this.class == CVWidgetMS, {
 				thisEditor = guiEnv.editor[slot];
 				defer {
-					if(guiEnv.oscBut.toolTip != "no OSC-responders present.\nClick to edit.") {
+					if(guiEnv.oscBut.toolTip != "no OSC-responders present.\nClick to edit." and:{
+						msTooltipLines[slot].notNil
+					}) {
+						"msTooltipLines[slot]: %\n".postf(msTooltipLines[slot]);
 						msTooltipLines[slot] = msTooltipLines[slot].split($:)[..1].join($:)++":"+this.getOscMapping(slot);
 						msTooltip = "OSC-responders:";
 						msTooltipLines.do({ |line| line !? { msTooltip = msTooltip++"\n"++line }});
