@@ -859,8 +859,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
-				.string_("(1.."++maxNum++")")
+				.focusLostAction_({ |tf| widget.oscRememberInputs.extOscCtrlArrayField = tf.string })
 			;
+
+			if (widget.oscRememberInputs.extOscCtrlArrayField.notNil) {
+				extOscCtrlArrayField.string_(widget.oscRememberInputs.extOscCtrlArrayField);
+			} {
+				extOscCtrlArrayField.string_("(1.."++maxNum++")");
+			};
 
 			if(GUI.id !== \cocoa, {
 				extOscCtrlArrayField.toolTip_(
@@ -872,8 +878,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
-				.string_("/my/cmd/name/%")
+				.focusLostAction_({ |tf| widget.oscRememberInputs.nameField = tf.string })
 			;
+
+			if (widget.oscRememberInputs.nameField.notNil) {
+				nameField.string_(widget.oscRememberInputs.nameField);
+			} {
+				nameField.string_("/my/cmd/name/%");
+			};
 
 			if(GUI.id !== \cocoa, {
 				nameField.toolTip_(
@@ -891,8 +903,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.alt_scale_(1)
 				.step_(1.0)
 				.scroll_step_(1)
-				.value_(0)
+				.focusLostAction_({ |nb| widget.oscRememberInputs.intStartIndexField = nb.value })
 			;
+
+			if (widget.oscRememberInputs.intStartIndexField.notNil) {
+				intStartIndexField.value_(widget.oscRememberInputs.intStartIndexField);
+			} {
+				intStartIndexField.value_(0);
+			};
 
 			if(GUI.id !== \cocoa, {
 				intStartIndexField.toolTip_(
@@ -902,8 +920,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			indexField = TextField(oscView0, Point(60, 15))
 				.font_(textFieldFont)
-				.string_("int or %")
+				.focusLostAction_({ |tf| widget.oscRememberInputs.indexField = tf.value })
 			;
+
+			if (widget.oscRememberInputs.indexField.notNil) {
+				indexField.string_(widget.oscRememberInputs.indexField);
+			} {
+				indexField.string_("int or %");
+			};
 
 			if(GUI.id !== \cocoa, {
 				indexField.toolTip_(
