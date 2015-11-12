@@ -2923,8 +2923,9 @@ CVWidget {
 					this.oscReplyPort !? { addr.port_(this.oscReplyPort) };
 					midiOscEnv.oscReplyAddrs ?? { midiOscEnv.oscReplyAddrs = [] };
 					if(midiOscEnv.oscReplyAddrs.includesEqual(addr).not, {
-						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.add(addr);
-						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.asBag.contents.keys.asArray;
+						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.add(addr).asSet.asArray;
+						// midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.asBag.contents.keys.asArray;
+						// midiOscEnv.oscReplyAddrs.postln;
 					});
 					if(thisCalib, {
 						if(midiOscEnv.calibConstraints.isNil, {

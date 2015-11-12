@@ -1508,20 +1508,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				});
 				flow3.top_(flow3.top-76);
 
-				// if(actionsUIs[name].actionView.bounds.top > 256, {
-				// 	tabView3.bounds_(Point(
-				// 		tabView3.bounds.width,
-				// 		actionsUIs[name].actionView.bounds.top-26
-				// 	))
-				// 	}, {
-				// 		tabView3.bounds_(Point(
-				// 			tabView3.bounds.width,
-				// 			230
-				// 		))
-				// });
-				//
-				// cTabView3.bounds_(tabView3.bounds);
-
 			}
 		)
 
