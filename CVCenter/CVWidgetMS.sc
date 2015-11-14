@@ -1,6 +1,7 @@
 CVWidgetMS : CVWidget {
 	var <mSlider, <calibViews, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
 	var numOscResponders, numMidiResponders;
+	var <midiOscRememberBatchConnection;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 	// special var for OSC-feedback:
@@ -39,6 +40,8 @@ CVWidgetMS : CVWidget {
 
 		synchKeys ?? { synchKeys = [\default] };
 		#numOscResponders, numMidiResponders = 0!2;
+
+		midiOscRememberBatchConnection = ();
 
 		calibViews = List();
 

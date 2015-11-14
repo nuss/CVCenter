@@ -607,8 +607,16 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
-				.string_(msrc)
+				.focusLostAction_({ |tf|
+				 	widget.midiOscRememberBatchConnection.midiSrcField = tf.string;
+				})
 			;
+
+			if (widget.midiOscRememberBatchConnection.midiSrcField.notNil) {
+				midiSrcField.string_(widget.midiOscRememberBatchConnection.midiSrcField);
+			} {
+				midiSrcField.string_(msrc);
+			};
 
 			if(GUI.id !== \cocoa, {
 				midiSrcField.toolTip_(
@@ -620,8 +628,16 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
-				.string_(mchan)
+				.focusLostAction_({ |tf|
+				 	widget.midiOscRememberBatchConnection.midiChanField = tf.string;
+				})
 			;
+
+			if (widget.midiOscRememberBatchConnection.midiChanField.notNil) {
+				midiChanField.string_(widget.midiOscRememberBatchConnection.midiChanField);
+			} {
+				midiChanField.string_(mchan);
+			};
 
 			if(GUI.id !== \cocoa, {
 				midiChanField.toolTip_(
@@ -633,7 +649,6 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(textFieldFont)
 				.background_(textFieldBg)
 				.stringColor_(textFieldFontColor)
-				.value_(0)
 				.clipLo_(0)
 				.clipHi_(widget.msSize-1)
 				.shift_scale_(1)
@@ -641,7 +656,16 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.alt_scale_(1)
 				.step_(1.0)
 				.scroll_step_(1.0)
+				.focusLostAction_({ |nb|
+				 	widget.midiOscRememberBatchConnection.msMidiIndexStartField = nb.value;
+				})
 			;
+
+			if (widget.midiOscRememberBatchConnection.msMidiIndexStartField.notNil) {
+				msMidiIndexStartField.string_(widget.midiOscRememberBatchConnection.msMidiIndexStartField);
+			} {
+				msMidiIndexStartField.value_(0);
+			};
 
 			if(GUI.id !== \cocoa, {
 				msMidiIndexStartField.toolTip_("The (multi-)slider index at which to start connecting");
@@ -651,8 +675,16 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
-				.string_("(0.."++(maxNum-1)++")")
+				.focusLostAction_({ |tf|
+					widget.midiOscRememberBatchConnection.extMidiCtrlArrayField = tf.string;
+				})
 			;
+
+			if (widget.midiOscRememberBatchConnection.extMidiCtrlArrayField.notNil) {
+				extMidiCtrlArrayField.string_(widget.midiOscRememberBatchConnection.extMidiCtrlArrayField);
+			} {
+				extMidiCtrlArrayField.string_("(0.."++(maxNum-1)++")");
+			};
 
 			if(GUI.id !== \cocoa, {
 				extMidiCtrlArrayField.toolTip_(
@@ -679,7 +711,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						extMidiCtrlArrayField.string.interpret.do({ |ctrlNum, sl|
 							widget.midiConnect(midiUid, midiChan, ctrlNum.asInt, sl+msMidiIndexStartField.value)
 						})
-					})
+					});
+					// remember batch/connections
+					widget.midiOscRememberBatchConnection.midiSrcField = midiSrcField.string;
+					widget.midiOscRememberBatchConnection.midiChanField = midiChanField.string;
+					widget.midiOscRememberBatchConnection.msMidiIndexStartField = msMidiIndexStartField.value;
+					widget.midiOscRememberBatchConnection.extMidiCtrlArrayField = extMidiCtrlArrayField.string;
 				})
 			;
 
@@ -860,8 +897,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
-				.string_("(1.."++maxNum++")")
+				.focusLostAction_({ |tf| widget.midiOscRememberBatchConnection.extOscCtrlArrayField = tf.string })
 			;
+
+			if (widget.midiOscRememberBatchConnection.extOscCtrlArrayField.notNil) {
+				extOscCtrlArrayField.string_(widget.midiOscRememberBatchConnection.extOscCtrlArrayField);
+			} {
+				extOscCtrlArrayField.string_("(1.."++maxNum++")");
+			};
 
 			if(GUI.id !== \cocoa, {
 				extOscCtrlArrayField.toolTip_(
@@ -873,8 +916,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(textFieldFont)
 				.stringColor_(textFieldFontColor)
 				.background_(textFieldBg)
-				.string_("/my/cmd/name/%")
+				.focusLostAction_({ |tf| widget.midiOscRememberBatchConnection.nameField = tf.string })
 			;
+
+			if (widget.midiOscRememberBatchConnection.nameField.notNil) {
+				nameField.string_(widget.midiOscRememberBatchConnection.nameField);
+			} {
+				nameField.string_("/my/cmd/name/%");
+			};
 
 			if(GUI.id !== \cocoa, {
 				nameField.toolTip_(
@@ -892,8 +941,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.alt_scale_(1)
 				.step_(1.0)
 				.scroll_step_(1)
-				.value_(0)
+				.focusLostAction_({ |nb| widget.midiOscRememberBatchConnection.intStartIndexField = nb.value })
 			;
+
+			if (widget.midiOscRememberBatchConnection.intStartIndexField.notNil) {
+				intStartIndexField.value_(widget.midiOscRememberBatchConnection.intStartIndexField);
+			} {
+				intStartIndexField.value_(0);
+			};
 
 			if(GUI.id !== \cocoa, {
 				intStartIndexField.toolTip_(
@@ -903,8 +958,14 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 			indexField = TextField(oscView0, Point(60, 15))
 				.font_(textFieldFont)
-				.string_("int or %")
+				.focusLostAction_({ |tf| widget.midiOscRememberBatchConnection.indexField = tf.string })
 			;
+
+			if (widget.midiOscRememberBatchConnection.indexField.notNil) {
+				indexField.string_(widget.midiOscRememberBatchConnection.indexField);
+			} {
+				indexField.string_("int or %");
+			};
 
 			if(GUI.id !== \cocoa, {
 				indexField.toolTip_(
@@ -1159,7 +1220,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 								})
 							})
 						})
-					})
+					});
+					// remember batch-connections
+					widget.midiOscRememberBatchConnection.extOscCtrlArrayField = extOscCtrlArrayField.string;
+					widget.midiOscRememberBatchConnection.nameField = nameField.string;
+					widget.midiOscRememberBatchConnection.intStartIndexField = intStartIndexField.value;
+					widget.midiOscRememberBatchConnection.indexField = indexField.string;
 				})
 			;
 

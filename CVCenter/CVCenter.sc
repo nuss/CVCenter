@@ -1925,6 +1925,7 @@ CVCenter {
 								val: cvWidgets[k].widgetCV.value,
 								actions: cvWidgets[k].wdgtActions,
 								wdgtClass: CVWidgetMS,
+								midiOscRememberBatchConnection: cvWidgets[k].midiOscRememberBatchConnection,
 								osc: ()!cvWidgets[k].msSize,
 								midi: ()!cvWidgets[k].msSize
 							);
@@ -2164,6 +2165,11 @@ CVCenter {
 							},
 							CVWidgetMS, {
 								this.add(key, v.spec, v.val, v.tabLabel);
+								v.midiOscRememberBatchConnection !? {
+									v.midiOscRememberBatchConnection.pairsDo({ |k, v|
+										cvWidgets[key].midiOscRememberBatchConnection[k] = v;
+									});
+								};
 								cvWidgets[key].msSize.do({ |sl|
 									cvWidgets[key].setMidiMode(v.midi[sl].midiMode, sl)
 										.setMidiMean(v.midi[sl].midiMean, sl)
