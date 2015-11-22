@@ -74,23 +74,25 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			cBox;
 		};
 
-		switch(GUI.id,
-			\cocoa, {
-				modsDict = KeyDownActions.modifiersCocoa;
-				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-			},
-			\qt, {
-				modsDict = KeyDownActions.modifiersQt;
-				arrModsDict = KeyDownActions.arrowsModifiersQt;
-			}
-		);
+		\KeyDownActions.asClass !? {
+			switch(GUI.id,
+				\cocoa, {
+					modsDict = KeyDownActions.modifiersCocoa;
+					arrModsDict = \KeyDownActions.asClass.arrowsModifiersCocoa;
+				},
+				\qt, {
+					modsDict = \KeyDownActions.asClass.modifiersQt;
+					arrModsDict = \KeyDownActions.asClass.arrowsModifiersQt;
+				}
+			);
 
-		arrowKeys = [
-			KeyDownActions.keyCodes['arrow up'],
-			KeyDownActions.keyCodes['arrow down'],
-			KeyDownActions.keyCodes['arrow left'],
-			KeyDownActions.keyCodes['arrow right']
-		];
+			arrowKeys = [
+				\KeyDownActions.asClass.keyCodes['arrow up'],
+				\KeyDownActions.asClass.keyCodes['arrow down'],
+				\KeyDownActions.asClass.keyCodes['arrow left'],
+				\KeyDownActions.asClass.keyCodes['arrow right']
+			];
+		};
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
@@ -277,7 +279,21 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			thisEditor.midiTabs = midiTabs;
 
 			// this.setShortcuts;
-			KeyDownActions.setShortcuts(tabs.view, this.class.shortcuts);
+			if (\KeyDownActions.asClass.notNil) {
+				\KeyDownActions.asClass.setShortcuts(tabs.view, this.class.shortcuts);
+			} {
+				thisEditor[\tabs].view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
+					//				[view, char, modifiers, unicode, keycode].postln;
+					switch(unicode,
+						111, { thisEditor[\tabs].focus(2) }, // "o" -> osc
+						109, { thisEditor[\tabs].focus(1) }, // "m" -> midi
+						97, { thisEditor[\tabs].focus(3) }, // "a" -> actions
+						115, { thisEditor[\tabs].focus(0) }, // "s" -> specs
+						// 120, { this.close(slot) }, // "x" -> close editor
+						99, { OSCCommands.makeWindow } // "c" -> collect OSC-commands resp. open the collector's GUI
+					)
+				})
+			};
 
 			maxNum = [
 				widget.getSpec.minval.size,
@@ -300,7 +316,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(staticTextFontBold)
 				.stringColor_(staticTextColor)
 //				.background_(Color.white)
-				.string_("NOTE: You may enter a Spec whose minvals, maxvals, step-sizes and/or default values%are arrays of the size of the number of sliders in the multislider. However, a spec%may also be provided by its name, e.g. 'freq' and its parameters will internally%expanded to arrays of the required size. If you enter a Spec whose minvals, maxvals,%step-sizes and/or default values are arrays of a different size than in the current%spec the widget will get redimensioned to the size of the largest of these arrays.".format(tmp, tmp, tmp, tmp, tmp))
+				.string_("NOTE: You may enter a Spec whose minvals, maxvals, step-sizes and/or default values%are arrays of the size of the number of sliders in the multislider. However, a spec%may also be provided by its name, e.g. 'freq' and its parameters will internally%expand to arrays of the required size. If you enter a Spec whose minvals, maxvals,%step-sizes and/or default values are arrays of a different size than in the current%spec the widget will get redimensioned to the size of the largest of these arrays.".format(tmp, tmp, tmp, tmp, tmp))
 			;
 
 			// flow0.shift(0, 2);

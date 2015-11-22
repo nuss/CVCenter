@@ -1,4 +1,4 @@
-/* (c) 2010-2013 Stefan Nussbaumer */
+/* (c) Stefan Nussbaumer */
 /*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ CVCenter {
 
 		Class.initClassTree(CVCenterPreferences);
 		Class.initClassTree(CVWidget);
-		Class.initClassTree(KeyDownActions);
+		Class.initClassTree(\KeyDownActions.asClass);
 
 		this.dontSave_(['select snapshot', \snapshot]);
 		systemWidgets = ['select snapshot', \snapshot];
@@ -116,406 +116,408 @@ CVCenter {
 		// "prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
 		prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvcenter] !? { scPrefs = true }}};
 
-		if (scPrefs == false, {
-			scFunc =
-			"// next tab
-			{
-				CVCenter.tabs.focus(
-					(CVCenter.tabs.activeTab.index+1).wrap(0, CVCenter.tabs.tabViews.size-1)
-				)
-			}";
-			this.shortcuts.put(
-				'arrow right',
-				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow right'])
-			);
-			scFunc =
-			"// previous tab
-			{
-				CVCenter.tabs.focus(
-					(CVCenter.tabs.activeTab.index-1).wrap(0, CVCenter.tabs.tabViews.size-1)
-				)
-			}";
-			this.shortcuts.put(
-				'arrow left',
-				(func: scFunc, keyCode: KeyDownActions.keyCodes['arrow left'])
-			);
-			scFunc =
-			"// select first widget
-			{
-				var labels = CVCenter.cvWidgets.order;
-				CVCenter.cvWidgets[labels.first].parent.front.focus;
-				CVCenter.cvWidgets[labels.first].label.focus;
-			}";
-			this.shortcuts.put(
-				'alt + arrow right',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes['arrow right'],
-					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
-					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
-				)
-			);
-			scFunc =
-			"// select last widget
-			{
-				var labels = CVCenter.cvWidgets.order;
-				CVCenter.cvWidgets[labels.last].parent.front.focus;
-				CVCenter.cvWidgets[labels.last].label.focus;
-			}";
-			this.shortcuts.put(
-				'alt + arrow left',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes['arrow left'],
-					modifierQt: KeyDownActions.arrowsModifiersQt[\alt],
-					modifierCocoa: KeyDownActions.arrowsModifiersCocoa[\alt]
-				)
-			);
-			scFunc =
-			"// OSCCommands gui
-			{ OSCCommands.front }";
-			this.shortcuts.put(
-				'alt + c',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$c],
-					modifierQt: KeyDownActions.modifiersQt[\alt],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
-				)
-			);
-			scFunc =
-			"// CVCenterControllersMonitor OSC
-			{ CVCenterControllersMonitor(1) }";
-			this.shortcuts.put(
-				\o,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$o])
-			);
-			scFunc =
-			"// set temporary shortcuts
-			{ CVCenterShortcutsEditor.dialog }";
-			this.shortcuts.put(
-				'alt + s',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$s],
-					modifierQt: KeyDownActions.modifiersQt[\alt],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
-				)
-			);
-			scFunc =
-			"// CVCenterControllersMonitor MIDI
-			{ CVCenterControllersMonitor(0) }";
-			this.shortcuts.put(
-				\m,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$m])
-			);
-			scFunc =
-			"// close all CVWidget(MS)Editors
-			AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
-				switch(CVCenter.cvWidgets[k].class,
-					CVWidgetKnob, {
-						v.editor !? { v.editor.close }
-					},
-					CVWidget2D, { #[lo, hi].do({ |sl|
-						v[sl] !? { v[sl].editor !? { v[sl].editor.close }}
-					}) },
-					CVWidgetMS, {
-						CVCenter.cvWidgets[k].msSize.do({ |i|
-							v[i] !? { v[i].editor !? { v[i].editor.close }}
-						})
-					}
-				);
-				CVCenter.cvWidgets[k] !? {
-					v.editor !? { v.editor.close }
-				}
-			})";
-			this.shortcuts.put(
-				'shift + esc',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[\esc],
-					modifierQt: KeyDownActions.modifiersQt[\shift],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
-				)
-			);
-			scFunc =
-			"// History GUI: start History and open History window
-			{ if (History.started === false) { History.start };
-			if (CVCenter.scv.historyWin.isNil or:{
-				CVCenter.scv.historyWin.isClosed
-			}) {
-				CVCenter.scv.historyGui = History.makeWin(
-					Window.screenBounds.width-300@Window.screenBounds.height
-				);
-				CVCenter.scv.historyWin = CVCenter.scv.historyGui.parent;
-			};
-			if (CVCenter.scv.historyWin.notNil and:{
-				CVCenter.scv.historyWin.isClosed.not
-			}) { CVCenter.scv.historyWin.front }}";
-			this.shortcuts.put(
-				\h,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$h])
-			);
-			scFunc =
-			"// NdefMixer
-			{ if (CVCenter.scv.nDefWin.isNil or:{ CVCenter.scv.nDefWin.isClosed }) {
-				CVCenter.scv.nDefGui = NdefMixer(Server.default);
-				CVCenter.scv.nDefWin = CVCenter.scv.nDefGui.parent
-			};
-			if (CVCenter.scv.nDefWin.notNil and:{
-				CVCenter.scv.nDefWin.isClosed.not
-			}) {
-				CVCenter.scv.nDefWin.front
-			}}";
-			this.shortcuts.put(
-				\n,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$n])
-			);
-			scFunc =
-			"// save setup
-			{ CVCenter.saveSetup }";
-			this.shortcuts.put(
-				\s,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$s])
-			);
-			scFunc =
-			"// load setup
-			{ CVCenterLoadDialog.new }";
-			this.shortcuts.put(
-				\l,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$l])
-			);
-			scFunc =
-			"// open the preferences dialog
-			{ CVCenterPreferences.dialog }";
-			this.shortcuts.put(
-				\p,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$p])
-			);
-			scFunc =
-			"// PdefAllGui
-			{ if (CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
-				CVCenter.scv.pDefGui = PdefAllGui();
-				CVCenter.scv.pDefWin = CVCenter.scv.pDefGui.parent
-			};
-			if (CVCenter.scv.pDefWin.notNil and:{
-				CVCenter.scv.pDefWin.isClosed.not
-			}) {
-				CVCenter.scv.pDefWin.front
-			}}";
-			this.shortcuts.put(
-				'shift + p',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$p],
-					modifierQt: KeyDownActions.modifiersQt[\shift],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
-				)
-			);
-			scFunc =
-			"// PdefnAllGui
-			{ if (CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
-				CVCenter.scv.pDefnGui = PdefnAllGui();
-				CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent;
-			};
-			if (CVCenter.scv.pDefnWin.notNil and:{
-				CVCenter.scv.pDefnWin.isClosed.not
-			}) {
-				CVCenter.scv.pDefnWin.front
-			}}";
-			this.shortcuts.put(
-				'alt + p',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$p],
-					modifierQt: KeyDownActions.modifiersQt[\alt],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
-				)
-			);
-			scFunc =
-			"// TdefAllGui
-			{ if (CVCenter.scv.tDefWin.isNil or:{ CVCenter.scv.tDefWin.isClosed }) {
-				CVCenter.scv.tDefGui = TdefAllGui();
-				CVCenter.scv.tDefWin = CVCenter.scv.tDefGui.parent
-			};
-			if (CVCenter.scv.tDefWin.notNil and:{
-				CVCenter.scv.tDefWin.isClosed.not
-			}) {
-				CVCenter.scv.tDefWin.front
-			}}";
-			this.shortcuts.put(
-				\t,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$t])
-			);
-			scFunc =
-			"// AllGui
-			{ if (\\AllGui.asClass.notNil) {
-				if (CVCenter.scv.allWin.isNil or:{ CVCenter.scv.allWin.isClosed }) {
-					CVCenter.scv.allGui = \\AllGui.asClass.new;
-					CVCenter.scv.allWin = CVCenter.scv.allGui.parent;
-				};
-				if (CVCenter.scv.allWin.notNil and:{
-					CVCenter.scv.allWin.isClosed.not
-				}) { CVCenter.scv.allWin.front };
-			}}";
-			this.shortcuts.put(
-				\a,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$a])
-			);
-			scFunc =
-			"// MasterEQ
-			{ if (\\MasterEQ.asClass.notNil) {
-				if (CVCenter.scv.eqWin.isNil or:{ CVCenter.scv.eqWin.isClosed }){
-					CVCenter.scv.eqGui = \\MasterEQ.asClass.new(
-						Server.default.options.firstPrivateBus, Server.default
-					);
-					CVCenter.scv.eqWin = CVCenter.scv.eqGui.window;
-				};
-				if (CVCenter.scv.eqWin.notNil and:{
-					CVCenter.scv.eqWin.isClosed.not
-				}) { CVCenter.scv.eqWin.front };
-			}}";
-			this.shortcuts.put(
-				\e,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$e])
-			);
-			(0..9).do({ |i|
+		\KeyDownActions.asClass !? {
+			if (scPrefs == false, {
 				scFunc =
-				"// focus tab "++i++"
-				{ CVCenter.tabs.tabViews["++i++"] !? { CVCenter.tabs.focus("++i++") }}";
+				"// next tab
+				{
+					CVCenter.tabs.focus(
+						(CVCenter.tabs.activeTab.index+1).wrap(0, CVCenter.tabs.tabViews.size-1)
+					)
+				}";
 				this.shortcuts.put(
-					i.asSymbol,
-					(func: scFunc, keyCode: KeyDownActions.keyCodes[i.asString[0]])
+					'arrow right',
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes['arrow right'])
 				);
-			});
-			scFunc =
-			"// end History and open in new Document (Cocoa-IDE only)
-			{
-				History.end;
-				if (Platform.ideName == \"scapp\" or:{
-					(Platform.ideName == \"scqt\").and(Main.versionAtLeast(3, 7))
-				}) { History.document };
+				scFunc =
+				"// previous tab
+				{
+					CVCenter.tabs.focus(
+						(CVCenter.tabs.activeTab.index-1).wrap(0, CVCenter.tabs.tabViews.size-1)
+					)
+				}";
+				this.shortcuts.put(
+					'arrow left',
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes['arrow left'])
+				);
+				scFunc =
+				"// select first widget
+				{
+					var labels = CVCenter.cvWidgets.order;
+					CVCenter.cvWidgets[labels.first].parent.front.focus;
+					CVCenter.cvWidgets[labels.first].label.focus;
+				}";
+				this.shortcuts.put(
+					'alt + arrow right',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes['arrow right'],
+						modifierQt: \KeyDownActions.asClass.arrowsModifiersQt[\alt],
+						modifierCocoa: \KeyDownActions.asClass.arrowsModifiersCocoa[\alt]
+					)
+				);
+				scFunc =
+				"// select last widget
+				{
+					var labels = CVCenter.cvWidgets.order;
+					CVCenter.cvWidgets[labels.last].parent.front.focus;
+					CVCenter.cvWidgets[labels.last].label.focus;
+				}";
+				this.shortcuts.put(
+					'alt + arrow left',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes['arrow left'],
+						modifierQt: \KeyDownActions.asClass.arrowsModifiersQt[\alt],
+						modifierCocoa: \KeyDownActions.asClass.arrowsModifiersCocoa[\alt]
+					)
+				);
+				scFunc =
+				"// OSCCommands gui
+				{ OSCCommands.front }";
+				this.shortcuts.put(
+					'alt + c',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[$c],
+						modifierQt: \KeyDownActions.asClass.modifiersQt[\alt],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa[\alt]
+					)
+				);
+				scFunc =
+				"// CVCenterControllersMonitor OSC
+				{ CVCenterControllersMonitor(1) }";
+				this.shortcuts.put(
+					\o,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$o])
+				);
+				scFunc =
+				"// set temporary shortcuts
+				{ CVCenterShortcutsEditor.dialog }";
+				this.shortcuts.put(
+					'alt + s',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[$s],
+						modifierQt: \KeyDownActions.asClass.modifiersQt[\alt],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa[\alt]
+					)
+				);
+				scFunc =
+				"// CVCenterControllersMonitor MIDI
+				{ CVCenterControllersMonitor(0) }";
+				this.shortcuts.put(
+					\m,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$m])
+				);
+				scFunc =
+				"// close all CVWidget(MS)Editors
+				AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
+					switch(CVCenter.cvWidgets[k].class,
+						CVWidgetKnob, {
+							v.editor !? { v.editor.close }
+						},
+						CVWidget2D, { #[lo, hi].do({ |sl|
+							v[sl] !? { v[sl].editor !? { v[sl].editor.close }}
+						}) },
+						CVWidgetMS, {
+							CVCenter.cvWidgets[k].msSize.do({ |i|
+								v[i] !? { v[i].editor !? { v[i].editor.close }}
+							})
+						}
+					);
+					CVCenter.cvWidgets[k] !? {
+						v.editor !? { v.editor.close }
+					}
+				})";
+				this.shortcuts.put(
+					'shift + esc',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[\esc],
+						modifierQt: \KeyDownActions.asClass.modifiersQt[\shift],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa[\shift]
+					)
+				);
+				scFunc =
+				"// History GUI: start History and open History window
+				{ if (History.started === false) { History.start };
+				if (CVCenter.scv.historyWin.isNil or:{
+					CVCenter.scv.historyWin.isClosed
+				}) {
+					CVCenter.scv.historyGui = History.makeWin(
+						Window.screenBounds.width-300@Window.screenBounds.height
+					);
+					CVCenter.scv.historyWin = CVCenter.scv.historyGui.parent;
+				};
 				if (CVCenter.scv.historyWin.notNil and:{
 					CVCenter.scv.historyWin.isClosed.not
-				}) { CVCenter.scv.historyWin.close }
-			}";
-			this.shortcuts.put(
-				'shift + h',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$h],
-					modifierQt: KeyDownActions.modifiersQt[\shift],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
-				)
-			);
-			scFunc =
-			"// detach the currently focused tab from the main window
-			{ CVCenter.tabs.activeTab.detachTab }";
-			this.shortcuts.put(
-				\d,
-				(func: scFunc, keyCode: KeyDownActions.keyCodes[$d])
-			);
-			scFunc =
-			"// activate OSC calibration for all widgets
-			{ CVCenter.cvWidgets.do({ |wdgt|
-				switch(wdgt.class,
-					CVWidget2D, {
-						#[lo, hi].do({ |sl| wdgt.setCalibrate(true, sl) });
-					},
-					CVWidgetMS, {
-						wdgt.msSize.do({ |i| wdgt.setCalibrate(true, i) });
-					},
-					{ wdgt.setCalibrate(true) }
-				)
-			}) }";
-			this.shortcuts.put(
-				'shift + c',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$c],
-					modifierQt: KeyDownActions.modifiersQt[\shift],
-					modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
-				)
-			);
-			scFunc =
-			"// deactivate OSC calibration for all widgets
-			{ CVCenter.cvWidgets.do({ |wdgt|
-				switch(wdgt.class,
-					CVWidget2D, {
-						#[lo, hi].do({ |sl| wdgt.setCalibrate(false, sl) });
-					},
-					CVWidgetMS, {
-						wdgt.msSize.do({ |i| wdgt.setCalibrate(false, i) });
-					},
-					{ wdgt.setCalibrate(false) }
-				)
-			}) }";
-			this.shortcuts.put(
-				'alt + shift + c',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$c],
-					modifierQt: KeyDownActions.modifiersQt['alt + shift'],
-					modifierCocoa: KeyDownActions.modifiersCocoa['alt + shift']
-				)
-			);
-			scFunc =
-			"// reset and restart OSC calibration for all widgets
-			{ CVCenter.cvWidgets.do({ |wdgt|
-				switch(wdgt.class,
-					CVWidget2D, {
-						#[lo, hi].do({ |sl|
-							wdgt.setOscInputConstraints(Point(0.0001, 0.0001), sl).setCalibrate(true, sl);
-						})
-					},
-					CVWidgetMS, {
-						wdgt.msSize.do({ |i|
-							wdgt.setOscInputConstraints(Point(0.0001, 0.0001), i).setCalibrate(true, i);
-						})
-					},
-					{ wdgt.setOscInputConstraints(Point(0.0001, 0.0001)).setCalibrate(true) }
-				)
-			}) }";
-			this.shortcuts.put(
-				'shift + r',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$r],
-					modifierQt: KeyDownActions.modifiersQt['shift'],
-					modifierCocoa: KeyDownActions.modifiersCocoa['shift']
-				)
-			);
-			scFunc =
-			"// connect/disconnect textfields in all widgets
-			{ CVCenter.cvWidgets.do({ |wdgt|
-				wdgt.connectGUI(nil, wdgt.connectTF.not)
-			})}";
-			this.shortcuts.put(
-				'alt + shift + v',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$v],
-					modifierQt: KeyDownActions.modifiersQt['alt + shift'],
-					modifierCocoa: KeyDownActions.modifiersCocoa['alt + shift']
-				)
-			);
-			scFunc =
-			"// connect/disconnect sliders in all widgets
-			{ CVCenter.cvWidgets.do({ |wdgt|
-				wdgt.connectGUI(wdgt.connectS.not, nil)
-			})}";
-			this.shortcuts.put(
-				'alt + shift + b',
-				(
-					func: scFunc,
-					keyCode: KeyDownActions.keyCodes[$b],
-					modifierQt: KeyDownActions.modifiersQt['alt + shift'],
-					modifierCocoa: KeyDownActions.modifiersCocoa['alt + shift']
-				)
-			);
-		}, {
-			this.shortcuts = prefs[\shortcuts][\cvcenter];
-		});
+				}) { CVCenter.scv.historyWin.front }}";
+				this.shortcuts.put(
+					\h,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$h])
+				);
+				scFunc =
+				"// NdefMixer
+				{ if (CVCenter.scv.nDefWin.isNil or:{ CVCenter.scv.nDefWin.isClosed }) {
+					CVCenter.scv.nDefGui = NdefMixer(Server.default);
+					CVCenter.scv.nDefWin = CVCenter.scv.nDefGui.parent
+				};
+				if (CVCenter.scv.nDefWin.notNil and:{
+					CVCenter.scv.nDefWin.isClosed.not
+				}) {
+					CVCenter.scv.nDefWin.front
+				}}";
+				this.shortcuts.put(
+					\n,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$n])
+				);
+				scFunc =
+				"// save setup
+				{ CVCenter.saveSetup }";
+				this.shortcuts.put(
+					\s,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$s])
+				);
+				scFunc =
+				"// load setup
+				{ CVCenterLoadDialog.new }";
+				this.shortcuts.put(
+					\l,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$l])
+				);
+				scFunc =
+				"// open the preferences dialog
+				{ CVCenterPreferences.dialog }";
+				this.shortcuts.put(
+					\p,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$p])
+				);
+				scFunc =
+				"// PdefAllGui
+				{ if (CVCenter.scv.pDefWin.isNil or:{ CVCenter.scv.pDefWin.isClosed }) {
+					CVCenter.scv.pDefGui = PdefAllGui();
+					CVCenter.scv.pDefWin = CVCenter.scv.pDefGui.parent
+				};
+				if (CVCenter.scv.pDefWin.notNil and:{
+					CVCenter.scv.pDefWin.isClosed.not
+				}) {
+					CVCenter.scv.pDefWin.front
+				}}";
+				this.shortcuts.put(
+					'shift + p',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[$p],
+						modifierQt: \KeyDownActions.asClass.modifiersQt[\shift],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa[\shift]
+					)
+				);
+				scFunc =
+				"// PdefnAllGui
+				{ if (CVCenter.scv.pDefnWin.isNil or:{ CVCenter.scv.pDefnWin.isClosed }) {
+					CVCenter.scv.pDefnGui = PdefnAllGui();
+					CVCenter.scv.pDefnWin = CVCenter.scv.pDefnGui.parent;
+				};
+				if (CVCenter.scv.pDefnWin.notNil and:{
+					CVCenter.scv.pDefnWin.isClosed.not
+				}) {
+					CVCenter.scv.pDefnWin.front
+				}}";
+				this.shortcuts.put(
+					'alt + p',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[$p],
+						modifierQt: \KeyDownActions.asClass.modifiersQt[\alt],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa[\alt]
+					)
+				);
+				scFunc =
+				"// TdefAllGui
+				{ if (CVCenter.scv.tDefWin.isNil or:{ CVCenter.scv.tDefWin.isClosed }) {
+					CVCenter.scv.tDefGui = TdefAllGui();
+					CVCenter.scv.tDefWin = CVCenter.scv.tDefGui.parent
+				};
+				if (CVCenter.scv.tDefWin.notNil and:{
+					CVCenter.scv.tDefWin.isClosed.not
+				}) {
+					CVCenter.scv.tDefWin.front
+				}}";
+				this.shortcuts.put(
+					\t,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$t])
+				);
+				scFunc =
+				"// AllGui
+				{ if (\\AllGui.asClass.notNil) {
+					if (CVCenter.scv.allWin.isNil or:{ CVCenter.scv.allWin.isClosed }) {
+						CVCenter.scv.allGui = \\AllGui.asClass.new;
+						CVCenter.scv.allWin = CVCenter.scv.allGui.parent;
+					};
+					if (CVCenter.scv.allWin.notNil and:{
+						CVCenter.scv.allWin.isClosed.not
+					}) { CVCenter.scv.allWin.front };
+				}}";
+				this.shortcuts.put(
+					\a,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$a])
+				);
+				scFunc =
+				"// MasterEQ
+				{ if (\\MasterEQ.asClass.notNil) {
+					if (CVCenter.scv.eqWin.isNil or:{ CVCenter.scv.eqWin.isClosed }){
+						CVCenter.scv.eqGui = \\MasterEQ.asClass.new(
+							Server.default.options.firstPrivateBus, Server.default
+						);
+						CVCenter.scv.eqWin = CVCenter.scv.eqGui.window;
+					};
+					if (CVCenter.scv.eqWin.notNil and:{
+						CVCenter.scv.eqWin.isClosed.not
+					}) { CVCenter.scv.eqWin.front };
+				}}";
+				this.shortcuts.put(
+					\e,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$e])
+				);
+				(0..9).do({ |i|
+					scFunc =
+					"// focus tab "++i++"
+					{ CVCenter.tabs.tabViews["++i++"] !? { CVCenter.tabs.focus("++i++") }}";
+					this.shortcuts.put(
+						i.asSymbol,
+						(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[i.asString[0]])
+					);
+				});
+				scFunc =
+				"// end History and open in new Document (Cocoa-IDE only)
+				{
+					History.end;
+					if (Platform.ideName == \"scapp\" or:{
+						(Platform.ideName == \"scqt\").and(Main.versionAtLeast(3, 7))
+					}) { History.document };
+					if (CVCenter.scv.historyWin.notNil and:{
+						CVCenter.scv.historyWin.isClosed.not
+					}) { CVCenter.scv.historyWin.close }
+				}";
+				this.shortcuts.put(
+					'shift + h',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[$h],
+						modifierQt: \KeyDownActions.asClass.modifiersQt[\shift],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa[\shift]
+					)
+				);
+				scFunc =
+				"// detach the currently focused tab from the main window
+				{ CVCenter.tabs.activeTab.detachTab }";
+				this.shortcuts.put(
+					\d,
+					(func: scFunc, keyCode: \KeyDownActions.asClass.keyCodes[$d])
+				);
+				scFunc =
+				"// activate OSC calibration for all widgets
+				{ CVCenter.cvWidgets.do({ |wdgt|
+					switch(wdgt.class,
+						CVWidget2D, {
+							#[lo, hi].do({ |sl| wdgt.setCalibrate(true, sl) });
+						},
+						CVWidgetMS, {
+							wdgt.msSize.do({ |i| wdgt.setCalibrate(true, i) });
+						},
+						{ wdgt.setCalibrate(true) }
+					)
+				}) }";
+				this.shortcuts.put(
+					'shift + c',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[$c],
+						modifierQt: \KeyDownActions.asClass.modifiersQt[\shift],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa[\shift]
+					)
+				);
+				scFunc =
+				"// deactivate OSC calibration for all widgets
+				{ CVCenter.cvWidgets.do({ |wdgt|
+					switch(wdgt.class,
+						CVWidget2D, {
+							#[lo, hi].do({ |sl| wdgt.setCalibrate(false, sl) });
+						},
+						CVWidgetMS, {
+							wdgt.msSize.do({ |i| wdgt.setCalibrate(false, i) });
+						},
+						{ wdgt.setCalibrate(false) }
+					)
+				}) }";
+				this.shortcuts.put(
+					'alt + shift + c',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[$c],
+						modifierQt: \KeyDownActions.asClass.modifiersQt['alt + shift'],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa['alt + shift']
+					)
+				);
+				scFunc =
+				"// reset and restart OSC calibration for all widgets
+				{ CVCenter.cvWidgets.do({ |wdgt|
+					switch(wdgt.class,
+						CVWidget2D, {
+							#[lo, hi].do({ |sl|
+								wdgt.setOscInputConstraints(Point(0.0001, 0.0001), sl).setCalibrate(true, sl);
+							})
+						},
+						CVWidgetMS, {
+							wdgt.msSize.do({ |i|
+								wdgt.setOscInputConstraints(Point(0.0001, 0.0001), i).setCalibrate(true, i);
+							})
+						},
+						{ wdgt.setOscInputConstraints(Point(0.0001, 0.0001)).setCalibrate(true) }
+					)
+				}) }";
+				this.shortcuts.put(
+					'shift + r',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[$r],
+						modifierQt: \KeyDownActions.asClass.modifiersQt['shift'],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa['shift']
+					)
+				);
+				scFunc =
+				"// connect/disconnect textfields in all widgets
+				{ CVCenter.cvWidgets.do({ |wdgt|
+					wdgt.connectGUI(nil, wdgt.connectTF.not)
+				})}";
+				this.shortcuts.put(
+					'alt + shift + v',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[$v],
+						modifierQt: \KeyDownActions.asClass.modifiersQt['alt + shift'],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa['alt + shift']
+					)
+				);
+				scFunc =
+				"// connect/disconnect sliders in all widgets
+				{ CVCenter.cvWidgets.do({ |wdgt|
+					wdgt.connectGUI(wdgt.connectS.not, nil)
+				})}";
+				this.shortcuts.put(
+					'alt + shift + b',
+					(
+						func: scFunc,
+						keyCode: \KeyDownActions.asClass.keyCodes[$b],
+						modifierQt: \KeyDownActions.asClass.modifiersQt['alt + shift'],
+						modifierCocoa: \KeyDownActions.asClass.modifiersCocoa['alt + shift']
+					)
+				);
+			}, {
+				this.shortcuts = prefs[\shortcuts][\cvcenter];
+			});
+		}
 	}
 
 	*new { |cvs...setUpArgs|
@@ -578,7 +580,8 @@ CVCenter {
 		var rows, prefBut, saveBut, loadBut, shortcutsBut, globalShortcutsView, activateGlobalShortcuts;
 		var snapShotBut, snapShotEdit;
 		var tmp, doMakeWdgt;
-		// var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
+		// if KeyDownActions not present
+		var nDefGui, pDefGui, pDefnGui, tDefGui, allGui, historyGui, eqGui;
 		var prefs, newPrefs;
 		var buildCheckbox;
 		var tmpConnectS, tmpConnectTF;
@@ -642,9 +645,11 @@ CVCenter {
 
 			// tabs.view.backColor_(Color.rand);
 
-			tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
-				if (keycode == KeyDownActions.keyCodes[\esc], { prefPane.focus })
-			});
+			\KeyDownActions.asClass !? {
+				tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
+					if (keycode == \KeyDownActions.asClass.keyCodes[\esc], { prefPane.focus })
+				});
+			};
 
 			// flow.shift(0, 0);
 
@@ -718,11 +723,13 @@ CVCenter {
 
 			globalShortcutsView = CompositeView(prefPane, Point(142, 20));
 
-			activateGlobalShortcuts = buildCheckbox.(
-				globalShortcutsView,
-				KeyDownActions.globalShortcutsEnabled, {
-					KeyDownActions.globalShortcutsEnabled_(activateGlobalShortcuts.value)
-			}).bounds_(Rect(5, 2, 15, 15));
+			\KeyDownActions.asClass !? {
+				activateGlobalShortcuts = buildCheckbox.(
+					globalShortcutsView,
+					\KeyDownActions.asClass.globalShortcutsEnabled, {
+						\KeyDownActions.asClass.globalShortcutsEnabled_(activateGlobalShortcuts.value)
+				}).bounds_(Rect(5, 2, 15, 15));
+			};
 
 			StaticText(globalShortcutsView, Rect(25, 0, 122, 20))
 				.string_("enable global shortcuts")
@@ -749,7 +756,96 @@ CVCenter {
 
 			// this.setShortcuts;
 			[tabs.views, prefPane].flat.do({ |view|
-				KeyDownActions.setShortcuts(view, this.shortcuts);
+				if (\KeyDownActions.asClass.notNil) {
+					\KeyDownActions.asClass.setShortcuts(view, this.shortcuts);
+				} {
+					view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
+						// [view, char, modifiers, unicode, keycode].postcs;
+						switch(keycode,
+							// 16r1000014, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+							// 16r1000012, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
+							114, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+							113, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) },
+							// when and why have the keycodes been changed??
+							124, { tabs.focus((tabs.activeTab+1).wrap(0, tabs.views.size-1)) },
+							123, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
+						);
+						switch(unicode,
+							99, { OSCCommands.gui }, // "c" -> collect OSC-commands resp. open the collector's GUI
+							111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
+							109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
+							120, { // key "x" -> close window
+								if(CVCenterControllersMonitor.window.notNil and:{
+									CVCenterControllersMonitor.window.isClosed.not;
+								}, {
+									CVCenterControllersMonitor.window.close;
+								})
+							},
+							104, { // key "h" -> start History and open History window
+								if(History.started === false, { History.start });
+								if(historyWin.isNil or:{ historyWin.isClosed }, {
+									historyGui = History.makeWin(
+										Window.screenBounds.width-300 @ Window.screenBounds.height
+									);
+									historyWin = historyGui.parent;
+								});
+								if(historyWin.notNil and:{ historyWin.isClosed.not }, { historyWin.front })
+							},
+							110, {
+								if(nDefWin.isNil or:{ nDefWin.isClosed }, {
+									nDefGui = NdefMixer(Server.default); nDefWin = nDefGui.parent;
+								});
+								if(nDefWin.notNil and:{ nDefWin.isClosed.not }, { nDefWin.front });
+							}, // key "n" -> the NdefMixer for the default server
+							112, {
+								if(pDefWin.isNil or: { pDefWin.isClosed }, {
+									pDefGui = PdefAllGui(); pDefWin = pDefGui.parent;
+								});
+								if(pDefWin.notNil and:{ pDefWin.isClosed.not }, { pDefWin.front });
+							}, // key "p"
+							80, {
+								if(pDefnWin.isNil or: { pDefnWin.isClosed }, {
+									pDefnGui = PdefnAllGui(); pDefnWin = pDefnGui.parent;
+								});
+								if(pDefnWin.notNil and:{ pDefnWin.isClosed.not }, { pDefnWin.front });
+							}, // key shift+"p"
+							116, {
+								if(tDefWin.isNil or:{ tDefWin.isClosed }, {
+									tDefGui = TdefAllGui(); tDefWin = tDefGui.parent;
+								});
+								if(tDefWin.notNil and:{ tDefWin.isClosed.not }, { tDefWin.front });
+							}, // key "t"
+							97, {
+								if(\AllGui.asClass.notNil, {
+									if(allWin.isNil or:{ allWin.isClosed }, {
+										allGui = \AllGui.asClass.new; allWin = allGui.parent;
+									});
+									if(allWin.notNil and:{ allWin.isClosed.not }, { allWin.front })
+								})
+							}, // key "a"
+							101, {
+								if(\MasterEQ.asClass.notNil, {
+									if(eqWin.isNil or:{ eqWin.isClosed }, {
+										eqGui = \MasterEQ.asClass.new(Server.default.options.firstPrivateBus, Server.default);
+										eqWin = eqGui.window;
+									});
+									if(eqWin.notNil and: { eqWin.isClosed.not }, { eqWin.front });
+								})
+							} // key "e"
+						);
+						if((48..57).includes(unicode), { tabs.views[unicode-48] !? { tabs.focus(unicode-48) }});
+						if(modifiers == 131072 and:{ unicode == 72 and:{ History.started }}, {
+							// keys <shift> + "h" -> end History and open History in a new document
+							History.end;
+							if(Platform.ideName == "scapp" or:{
+								(Platform.ideName == "scqt").and(Main.versionAtLeast(3, 7))
+							}) { History.document };
+							if(CVCenter.scv.historyWin.notNil and:{
+								CVCenter.scv.historyWin.isClosed.not
+							}) { CVCenter.scv.historyWin.close }
+						})
+					})
+				}
 			});
 
 			window.onClose_({
@@ -963,16 +1059,18 @@ CVCenter {
 			Error("*prAddTab has been called without providing a label for the tab").throw;
 		});
 
-		switch(GUI.id,
-			\cocoa, {
-				modsDict = KeyDownActions.modifiersCocoa;
-				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-			},
-			\qt, {
-				modsDict = KeyDownActions.modifiersQt;
-				arrModsDict = KeyDownActions.arrowsModifiersQt;
-			}
-		);
+		\KeyDownActions.asClass !? {
+			switch(GUI.id,
+				\cocoa, {
+					modsDict = \KeyDownActions.asClass.modifiersCocoa;
+					arrModsDict = \KeyDownActions.asClass.arrowsModifiersCocoa;
+				},
+				\qt, {
+					modsDict = \KeyDownActions.asClass.modifiersQt;
+					arrModsDict = \KeyDownActions.asClass.arrowsModifiersQt;
+				}
+			)
+		};
 
 		if (tabProperties[thisTabLabel].notNil, {
 			labelColor = tabProperties[thisTabLabel].tabColor;
@@ -1004,31 +1102,34 @@ CVCenter {
 							child[\tabs].removeAt(view);
 						});
 					});
-					this.shortcuts.do({ |keyDowns|
-						// "onChangeParent view: %\n".postf(view.parent.parent);
-						view.keyDownAction_(
-							view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
-								var thisMod, thisArrMod;
-								thisMod = keyDowns.modifierQt;
-								thisArrMod = keyDowns.arrowsModifierQt;
 
-								case
-									{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-										// "no modifier".postln;
-										if (keycode == keyDowns.keyCode and:{
-											thisMod.isNil and:{ thisArrMod.isNil }
-										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
-									}
-									{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-										// "some modifier...".postln;
-										if (keycode == keyDowns.keyCode and:{
-											(modifiers == thisArrMod).or(modifiers == thisMod)
-										}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
-									}
-								;
-							})
-						)
-					})
+					\KeyDownActions.asClass !? {
+						this.shortcuts.do({ |keyDowns|
+							// "onChangeParent view: %\n".postf(view.parent.parent);
+							view.keyDownAction_(
+								view.keyDownAction.addFunc({ |view, char, modifiers, unicode, keycode|
+									var thisMod, thisArrMod;
+									thisMod = keyDowns.modifierQt;
+									thisArrMod = keyDowns.arrowsModifierQt;
+
+									case
+										{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+											// "no modifier".postln;
+											if (keycode == keyDowns.keyCode and:{
+												thisMod.isNil and:{ thisArrMod.isNil }
+											}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+										}
+										{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+											// "some modifier...".postln;
+											if (keycode == keyDowns.keyCode and:{
+												(modifiers == thisArrMod).or(modifiers == thisMod)
+											}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+										}
+									;
+								})
+							)
+						})
+					}
 				})
 				.onAfterChangeParent_({ |view|
 					view.tabbedView.window !? {
@@ -1059,39 +1160,42 @@ CVCenter {
 
 			this.window.name_("CVCenter: "++tabs.tabViews.collectAs(_.label, Array));
 
-			this.shortcuts.do({ |keyDowns|
-				thisTab.keyDownAction_(
-					thisTab.keyDownAction.add({ |view, char, modifiers, unicode, keycode|
-						var thisMod, thisArrMod;
+			\KeyDownActions.asClass !? {
+				this.shortcuts.do({ |keyDowns|
+					thisTab.keyDownAction_(
+						thisTab.keyDownAction.add({ |view, char, modifiers, unicode, keycode|
+							var thisMod, thisArrMod;
 
-						switch(GUI.id,
-							\cocoa, {
-								thisMod = keyDowns.modifierCocoa;
-								thisArrMod = keyDowns.arrowsModifierCocoa;
-							},
-							\qt, {
-								thisMod = keyDowns.modifierQt;
-								thisArrMod = keyDowns.arrowsModifierQt;
-							}
-						);
+							switch(GUI.id,
+								\cocoa, {
+									thisMod = keyDowns.modifierCocoa;
+									thisArrMod = keyDowns.arrowsModifierCocoa;
+								},
+								\qt, {
+									thisMod = keyDowns.modifierQt;
+									thisArrMod = keyDowns.arrowsModifierQt;
+								}
+							);
 
-						case
-							{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
-								// "no modifier".postln;
-								if (keycode == keyDowns.keyCode and:{
-									thisMod.isNil and:{ thisArrMod.isNil }
-								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
-							}
-							{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
-								// "some modifier...".postln;
-								if (keycode == keyDowns.keyCode and:{
-									(modifiers == thisArrMod).or(modifiers == thisMod)
-								}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
-							}
-						;
-					})
-				)
-			});
+							case
+								{ modifiers == modsDict[\none] or:{ modifiers == arrModsDict[\none] }} {
+									// "no modifier".postln;
+									if (keycode == keyDowns.keyCode and:{
+										thisMod.isNil and:{ thisArrMod.isNil }
+									}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) });
+								}
+								{ modifiers != modsDict[\none] and:{ modifiers != arrModsDict[\none] }} {
+									// "some modifier...".postln;
+									if (keycode == keyDowns.keyCode and:{
+										(modifiers == thisArrMod).or(modifiers == thisMod)
+									}, { keyDowns.func.interpret.value(view, char, modifiers, unicode, keycode) })
+								}
+							;
+						})
+					)
+				})
+			};
+
 			tabProperties[thisTabLabel] ?? {
 				tabProperties.put(thisTabLabel, (nextPos: Point(0, 0), index: tabProperties.size, tabColor: labelColor, detached: false));
 			};
@@ -1957,7 +2061,7 @@ CVCenter {
 				cvCenter: CVCenter.shortcuts,
 				cvWidget: CVWidget.shortcuts,
 				cvWidgetEditor: AbstractCVWidgetEditor.shortcuts,
-				globalShortcuts: KeyDownActions.globalShortcuts
+				globalShortcuts: \KeyDownActions.asClass !? { \KeyDownActions.asClass.globalShortcuts }
 			));
 
 			lib[\all].put(\snapshots, snapShots);
@@ -2270,23 +2374,23 @@ CVCenter {
 					})
 				})
 			}.defer(0.1);
-			if (loadShortcuts, {
+			if (\KeyDownActions.asClass.notNil and: { loadShortcuts }, {
 				{
 					lib[\all][\shortcuts] !? {
 						this.shortcuts_(lib[\all][\shortcuts][\cvCenter]);
 						[tabs.views, prefPane].flat.do({ |view|
-							KeyDownActions.setShortcuts(view, this.shortcuts);
+							\KeyDownActions.asClass.setShortcuts(view, this.shortcuts);
 						});
 						CVWidget.shortcuts_(lib[\all][\shortcuts][\cvWidget]);
 						cvWidgets.do({ |wdgt|
 							wdgt.focusElements.do({ |el|
-								KeyDownActions.setShortcuts(el, CVWidget.shortcuts);
+								\KeyDownActions.asClass.setShortcuts(el, CVWidget.shortcuts);
 							})
 						});
 						AbstractCVWidgetEditor.shortcuts_(lib[\all][\shortcuts][\cvWidgetEditor]);
-						KeyDownActions.globalShortcuts_(lib[\all][\shortcuts][\globalShortcuts]);
+						\KeyDownActions.asClass.globalShortcuts_(lib[\all][\shortcuts][\globalShortcuts]);
 						if (Server.default.serverRunning, {
-							KeyDownActions.globalShortcutsSync;
+							\KeyDownActions.asClass.globalShortcutsSync;
 						});
 					}
 				}.defer(0.5)

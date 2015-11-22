@@ -58,23 +58,25 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			cBox;
 		};
 
-		switch(GUI.id,
-			\cocoa, {
-				modsDict = KeyDownActions.modifiersCocoa;
-				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
-			},
-			\qt, {
-				modsDict = KeyDownActions.modifiersQt;
-				arrModsDict = KeyDownActions.arrowsModifiersQt;
-			}
-		);
+		\KeyDownActions.asClass !? {
+			switch(GUI.id,
+				\cocoa, {
+					modsDict = \KeyDownActions.asClass.modifiersCocoa;
+					arrModsDict = \KeyDownActions.asClass.arrowsModifiersCocoa;
+				},
+				\qt, {
+					modsDict = \KeyDownActions.asClass.modifiersQt;
+					arrModsDict = \KeyDownActions.asClass.arrowsModifiersQt;
+				}
+			);
 
-		arrowKeys = [
-			KeyDownActions.keyCodes['arrow up'],
-			KeyDownActions.keyCodes['arrow down'],
-			KeyDownActions.keyCodes['arrow left'],
-			KeyDownActions.keyCodes['arrow right']
-		];
+			arrowKeys = [
+				\KeyDownActions.asClass.keyCodes['arrow up'],
+				\KeyDownActions.asClass.keyCodes['arrow down'],
+				\KeyDownActions.asClass.keyCodes['arrow left'],
+				\KeyDownActions.asClass.keyCodes['arrow right']
+			];
+		};
 
 		widget ?? {
 			Error("CVWidgetEditor is a utility-GUI-class that can only be used in connection with an existing CVWidget").throw;
@@ -226,7 +228,21 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			thisEditor[\tabs] = tabs;
 
 			// this.setShortcuts;
-			KeyDownActions.setShortcuts(tabs.view, this.class.shortcuts);
+			if (\KeyDownActions.asClass.notNil) {
+				\KeyDownActions.asClass.setShortcuts(tabs.view, this.class.shortcuts);
+			} {
+				thisEditor[\tabs].view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
+					//				[view, char, modifiers, unicode, keycode].postln;
+					switch(unicode,
+						111, { thisEditor[\tabs].focus(2) }, // "o" -> osc
+						109, { thisEditor[\tabs].focus(1) }, // "m" -> midi
+						97, { thisEditor[\tabs].focus(3) }, // "a" -> actions
+						115, { thisEditor[\tabs].focus(0) }, // "s" -> specs
+						120, { this.close(slot) }, // "x" -> close editor
+						99, { OSCCommands.makeWindow } // "c" -> collect OSC-commands resp. open the collector's GUI
+					)
+				})
+			};
 
 			if(widget.class != CVWidgetMS, {
 				StaticText(tabView0, Point(flow0.bounds.width-20, 95))
