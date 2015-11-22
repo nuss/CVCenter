@@ -26,13 +26,14 @@ CVCenterPreferences {
 	*dialog {
 		var labelColors, labelStringColors, tabs, scTab, prefsTab, scTabs, flow1, flow2, saveCancel, saveCancelFlow;
 		var guiView, guiFlow, midiView, midiFlow, responderView, responderFlow;
+		var keyDownActionsView, keyDownActionsFlow;
 		var tabFont, staticTextFont, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg, tabsBg;
 		// shortcut-tabs
 		var prefShortcutsPath, prefShortCuts;
 		var cvCenterTab, cvWidgetTab, cvWidgetEditorTab, globalShortcutsTab, cvKeyCodesEditorTab;
 		var cvCenterEditor, cvWidgetEditor, cvWidgetEditorEditor, globalShortcutsEditorTab, cvCenterKeyCodesEditor;
 		var saveGuiPosition, leftText, left, topText, top, widthText, width, heightText, height;
-		var saveClassVars, removeResponders;
+		var saveClassVars, removeResponders, useKeyDownActions;
 		var initMidiOnStartUp, initMidiText;
 		var saveMidiMode, saveMidiResolution, saveCtrlButtonBank, saveMidiMean, saveSoftWithin;
 		var textMidiMode, textMidiResolution, textCtrlButtonBank, textMidiMean, textSoftWithin;
@@ -93,8 +94,8 @@ CVCenterPreferences {
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter: preferences", Rect(
 				Window.screenBounds.width/2-249,
-				Window.screenBounds.height/2-193,
-				498, 385
+				Window.screenBounds.height/2-208, // 193
+				498, 415 // 385
 			)).front;
 
 			tabs = TabbedView2(window, Rect(0, 1, window.bounds.width, window.bounds.height-33))
@@ -421,6 +422,30 @@ CVCenterPreferences {
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Remove all OSC-/MIDI-responders on cmd/ctrl-period.")
+			;
+
+			flow1.nextLine;
+
+			keyDownActionsView = CompositeView(prefsTab, Point(flow1.indentedRemaining.width, 29))
+				.background_(Color(0.95, 0.95, 0.95))
+			;
+
+			keyDownActionsView.decorator = keyDownActionsFlow = FlowLayout(
+				keyDownActionsView.bounds, Point(7, 7), Point(0, 1)
+			);
+
+			if(prefs.notNil and:{ prefs[\useKeyDownActions].notNil }, {
+				useKeyDownActions = buildCheckbox.(keyDownActionsView, prefs[\useKeyDownActions])
+			}, {
+				useKeyDownActions = buildCheckbox.(keyDownActionsView, true)
+			});
+
+			keyDownActionsFlow.shift(5, -2);
+
+			StaticText(keyDownActionsView, Point(keyDownActionsFlow.indentedRemaining.width, 20))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("Use KeyDownActions (configurable)")
 			;
 
 			\KeyDownActions.asClass !? {
