@@ -40,7 +40,7 @@ CVCenter {
 
 		Class.initClassTree(CVCenterPreferences);
 		Class.initClassTree(CVWidget);
-		Class.initClassTree(\KeyDownActions.asClass);
+		// Class.initClassTree(\KeyDownActions.asClass);
 
 		this.dontSave_(['select snapshot', \snapshot]);
 		systemWidgets = ['select snapshot', \snapshot];
@@ -713,29 +713,29 @@ CVCenter {
 			// "this.at('select snapshot'): %\n".postf(this.at('select snapshot'));
 			this.at('select snapshot').connect(snapShotSelect);
 
-			shortcutsBut = Button(prefPane, Point(70, 20))
-				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
-				.states_([["shortcuts", Color.white, Color.red]])
-				.action_({ |scb|
-					CVCenterShortcutsEditor.dialog;
-				})
-			;
-
-			globalShortcutsView = CompositeView(prefPane, Point(142, 20));
-
 			\KeyDownActions.asClass !? {
+				shortcutsBut = Button(prefPane, Point(70, 20))
+					.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
+					.states_([["shortcuts", Color.white, Color.red]])
+					.action_({ |scb|
+						CVCenterShortcutsEditor.dialog;
+					})
+				;
+
+				globalShortcutsView = CompositeView(prefPane, Point(142, 20));
+
 				activateGlobalShortcuts = buildCheckbox.(
 					globalShortcutsView,
 					\KeyDownActions.asClass.globalShortcutsEnabled, {
 						\KeyDownActions.asClass.globalShortcutsEnabled_(activateGlobalShortcuts.value)
 				}).bounds_(Rect(5, 2, 15, 15));
-			};
 
-			StaticText(globalShortcutsView, Rect(25, 0, 122, 20))
-				.string_("enable global shortcuts")
-				.stringColor_(Color.white)
-				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
-			;
+				StaticText(globalShortcutsView, Rect(25, 0, 122, 20))
+					.string_("enable global shortcuts")
+					.stringColor_(Color.white)
+					.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
+				;
+			};
 
 			// correct prefPane height if its contents span more than 1 line
 			rows = prefPane.children.collect({ |child| child.bounds.top }).asSet.size;

@@ -480,9 +480,11 @@ CVWidgetMS : CVWidget {
 		connectTF !? { this.connectGUI(nil, connectTF) };
 
 		// this.setShortcuts;
-		focusElements.do({ |el|
-			KeyDownActions.setShortcuts(el, this.class.shortcuts);
-		});
+		\KeyDownActions.asClass !? {
+			focusElements.do({ |el|
+				\KeyDownActions.asClass.setShortcuts(el, this.class.shortcuts);
+			})
+		};
 
 		oldBounds = parent.bounds;
 		if(parent.respondsTo(\name), { oldName = parent.name });

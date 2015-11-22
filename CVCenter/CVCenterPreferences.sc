@@ -440,7 +440,7 @@ CVCenterPreferences {
 				cvWidgetEditorTab = scTabs.add("CVWidget(MS)Editor", scroll: false);
 				globalShortcutsTab = scTabs.add("global shortcuts", scroll: false);
 
-				cvCenterEditor = \KeyDownActionsEditor.asClass(
+				cvCenterEditor = \KeyDownActionsEditor.asClass.new(
 					cvCenterTab, nil, cvCenterTab.bounds,
 					if(prefs.notNil and:{
 						prefs[\shortcuts].notNil and:{
@@ -451,7 +451,7 @@ CVCenterPreferences {
 					}, { CVCenter.shortcuts }),
 					true
 				);
-				cvWidgetEditor = \KeyDownActionsEditor.asClass(
+				cvWidgetEditor = \KeyDownActionsEditor.asClass.new(
 					cvWidgetTab, nil, cvWidgetTab.bounds,
 					if(prefs.notNil and:{
 						prefs[\shortcuts].notNil and:{
@@ -462,7 +462,7 @@ CVCenterPreferences {
 					}, { CVWidget.shortcuts }),
 					true
 				);
-				cvWidgetEditorEditor = \KeyDownActionsEditor.asClass(
+				cvWidgetEditorEditor = \KeyDownActionsEditor.asClass.new(
 					cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds,
 					if(prefs.notNil and:{
 						prefs[\shortcuts].notNil and:{
@@ -474,7 +474,7 @@ CVCenterPreferences {
 					true
 				);
 				// "prefs.globalShortcuts: %\n".postf(prefs.globalShortcuts);
-				globalShortcutsEditorTab = \KeyDownActionsEditor.asClass(
+				globalShortcutsEditorTab = \KeyDownActionsEditor.asClass.new(
 					globalShortcutsTab, nil, globalShortcutsTab.bounds,
 					if(prefs.notNil and:{
 						prefs[\globalShortcuts].notNil
@@ -484,7 +484,7 @@ CVCenterPreferences {
 					false, false, false
 				);
 
-				cvCenterKeyCodesEditor = \KeyCodesEditor.asClass(
+				cvCenterKeyCodesEditor = \KeyCodesEditor.asClass.new(
 					cvKeyCodesEditorTab, nil, false
 				);
 			};

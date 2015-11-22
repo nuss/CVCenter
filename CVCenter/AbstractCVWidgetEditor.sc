@@ -36,7 +36,7 @@ AbstractCVWidgetEditor {
 		var localOscFunc, scFunc;
 		var prefs, scPrefs = false;
 
-		Class.initClassTree(\KeyDownActions.asClass);
+		// Class.initClassTree(\KeyDownActions.asClass);
 		// Class.initClassTree(CVCenterPreferences);
 
 		prefs = CVCenterPreferences.readPreferences;
