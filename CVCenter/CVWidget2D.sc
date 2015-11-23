@@ -716,7 +716,7 @@ CVWidget2D : CVWidget {
 		connectS !? { this.connectGUI(connectS, nil) };
 		connectTF !? { this.connectGUI(nil, connectTF) };
 
-		\KeyDownActions.asClass !? {
+		if (\KeyDownActions.asClass.notNil and: { this.class.useKeyDownActions }) {
 			focusElements.do({ |el|
 				\KeyDownActions.asClass.setShortcuts(el, this.class.shortcuts);
 			})

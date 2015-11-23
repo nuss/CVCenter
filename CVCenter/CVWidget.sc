@@ -17,7 +17,7 @@
 
 CVWidget {
 
-	classvar <>removeResponders = true, <>midiSources, <>shortcuts, prefs/*, midiStateObserver*/;
+	classvar <>removeResponders = true, <>midiSources, <>shortcuts, <>useKeyDownActions, prefs;
 	classvar <>debug = false;
 	var <parent, <widgetCV, <name, <connectS = true, <connectTF = true;
 	var <activeSliderB, <activeTextB;
@@ -44,8 +44,6 @@ CVWidget {
 	*initClass {
 		var scFunc, scPrefs = false;
 
-		// Class.initClassTree(\KeyDownActions.asClass);
-
 		StartUp.add({
 			Class.initClassTree(\StaticIntegerSpec.asClass);
 			\StaticIntegerSpec.asClass !? {
@@ -56,12 +54,13 @@ CVWidget {
 		midiSources = ();
 
 		prefs = CVCenterPreferences.readPreferences;
+		this.useKeyDownActions_(prefs[\useKeyDownActions]);
 		// "prefs[\shortcuts][\cvwidget]: %\n".postf(prefs[\shortcuts][\cvwidget]);
-		prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvwidget] !? { scPrefs = true }}};
 
-		this.shortcuts = IdentityDictionary.new;
+		if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
+			prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvwidget] !? { scPrefs = true }}};
+			this.shortcuts = IdentityDictionary.new;
 
-		\KeyDownActions.asClass !? {
 			if(scPrefs == false, {
 				scFunc =
 				"// focus previous widget (alphabetically ordered)

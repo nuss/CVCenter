@@ -246,7 +246,11 @@ OSCCommands {
 			}, AppClock);
 
 			window.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
-				if (\KeyDownActions.asClass.notNil) {
+				if (\KeyDownActions.asClass.notNil and: {
+					\CVCenter.asClass.notNil and: {
+						\CVCenter.asClass.useKeyDownActions
+					}
+				}) {
 					if (keycode == \KeyDownActions.asClass.keyCodes[\return]) { saveBut.doAction };
 					if (keycode == \KeyDownActions.asClass.keyCodes[\esc]) { window.close };
 				} {

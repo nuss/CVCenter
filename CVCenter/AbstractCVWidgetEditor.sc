@@ -17,7 +17,7 @@
 
 AbstractCVWidgetEditor {
 
-	classvar <allEditors, <>shortcuts, xySlots, nextX, nextY, shiftXY;
+	classvar <allEditors, <>useKeyDownActions, <>shortcuts, xySlots, nextX, nextY, shiftXY;
 	var thisEditor, <window, <tabs, <scv, editorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
@@ -40,14 +40,16 @@ AbstractCVWidgetEditor {
 		// Class.initClassTree(CVCenterPreferences);
 
 		prefs = CVCenterPreferences.readPreferences;
-		prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvwidgeteditor] !? { scPrefs = true }}};
+		this.useKeyDownActions_(prefs[\useKeyDownActions]);
 
 		allEditors = IdentityDictionary.new;
-		this.shortcuts = IdentityDictionary.new;
 
 		// "prefs[\cvwidgeteditor]: %\n".postf(prefs[\shortcuts].cvwidgeteditor);
 
-		\KeyDownActions.asClass !? {
+		if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
+			prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvwidgeteditor] !? { scPrefs = true }}};
+			this.shortcuts = IdentityDictionary.new;
+
 			if(scPrefs == false, {
 				scFunc =
 				"// focus 'specs' tab

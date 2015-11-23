@@ -81,7 +81,7 @@ CVCenterControllersMonitor {
 			tabView1.decorator = flow1 = FlowLayout(window.view.bounds, Point(7, 7), Point(3, 3));
 
 			tabs.view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
-				if (\KeyDownActions.asClass.notNil) {
+				if (\KeyDownActions.asClass.notNil and: { CVCenter.useKeyDownActions }) {
 					switch (keycode,
 						\KeyDownActions.asClass.keyCodes[$o], { tabs.focus(1) }, // key "o" -> osc
 						\KeyDownActions.asClass.keyCodes[$m], { tabs.focus(0) }, // key "m" -> midi

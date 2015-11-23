@@ -58,7 +58,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			cBox;
 		};
 
-		\KeyDownActions.asClass !? {
+		if (\KeyDownActions.asClass.notNil and: { this.class.useKeyDownActions }) {
 			switch(GUI.id,
 				\cocoa, {
 					modsDict = \KeyDownActions.asClass.modifiersCocoa;
@@ -228,7 +228,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			thisEditor[\tabs] = tabs;
 
 			// this.setShortcuts;
-			if (\KeyDownActions.asClass.notNil) {
+			if (\KeyDownActions.asClass.notNil and: { this.class.useKeyDownActions }) {
 				\KeyDownActions.asClass.setShortcuts(tabs.view, this.class.shortcuts);
 			} {
 				thisEditor[\tabs].view.keyDownAction_({ |view, char, modifiers, unicode, keycode|

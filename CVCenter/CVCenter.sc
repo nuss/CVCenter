@@ -20,7 +20,7 @@ CVCenter {
 	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, <tabs, <prefPane, swFlow, removeButs;
 	classvar prefPaneBounds, tabsBounds;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
-	classvar <>shortcuts, <scv;
+	classvar <>useKeyDownActions, <>shortcuts, <scv;
 	classvar <alwaysOnTop = false;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight;
 	classvar <widgetStates;
@@ -66,7 +66,8 @@ CVCenter {
 						newPrefs[\initMidiOnStartUp],
 						newPrefs[\shortcuts],
 						newPrefs[\globalShortcuts],
-						newPrefs[\keyCodesAndMods]
+						newPrefs[\keyCodesAndMods],
+						newPrefs[\useKeyDownActions]
 					)
 				};
 				if (prefs[\saveGuiProperties] == 1 or:{
@@ -105,9 +106,9 @@ CVCenter {
 				})
 			};
 			prefs[\removeResponders] !? { CVWidget.removeResponders_(prefs[\removeResponders]) };
+			prefs[\useKeyDownActions] !? { this.useKeyDownActions_(prefs[\useKeyDownActions]) };
 		};
 
-		this.shortcuts = IdentityDictionary.new;
 		#all, cvWidgets, widgetStates, removeButs, tabProperties, childViews = IdentityDictionary.new!6;
 
 		// shortcuts
@@ -116,7 +117,8 @@ CVCenter {
 		// "prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
 		prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvcenter] !? { scPrefs = true }}};
 
-		\KeyDownActions.asClass !? {
+		if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
+			this.shortcuts = IdentityDictionary.new;
 			if (scPrefs == false, {
 				scFunc =
 				"// next tab
@@ -713,7 +715,7 @@ CVCenter {
 			// "this.at('select snapshot'): %\n".postf(this.at('select snapshot'));
 			this.at('select snapshot').connect(snapShotSelect);
 
-			\KeyDownActions.asClass !? {
+			if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
 				shortcutsBut = Button(prefPane, Point(70, 20))
 					.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 					.states_([["shortcuts", Color.white, Color.red]])
@@ -756,7 +758,7 @@ CVCenter {
 
 			// this.setShortcuts;
 			[tabs.views, prefPane].flat.do({ |view|
-				if (\KeyDownActions.asClass.notNil) {
+				if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
 					\KeyDownActions.asClass.setShortcuts(view, this.shortcuts);
 				} {
 					view.keyDownAction_({ |view, char, modifiers, unicode, keycode|
@@ -874,6 +876,7 @@ CVCenter {
 								newPrefs[\softWithin],
 								newPrefs[\ctrlButtonBank],
 								newPrefs[\removeResponders],
+								newPrefs[\useKeyDownActions],
 								newPrefs[\initMidiOnStartUp],
 								informString: "Your CVCenter-preferences have successfully been written to disk."
 							)
@@ -1059,7 +1062,9 @@ CVCenter {
 			Error("*prAddTab has been called without providing a label for the tab").throw;
 		});
 
-		\KeyDownActions.asClass !? {
+		"this.useKeyDownActions: %\n".postf(this.useKeyDownActions);
+
+		if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
 			switch(GUI.id,
 				\cocoa, {
 					modsDict = \KeyDownActions.asClass.modifiersCocoa;
@@ -1103,7 +1108,7 @@ CVCenter {
 						});
 					});
 
-					\KeyDownActions.asClass !? {
+					if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
 						this.shortcuts.do({ |keyDowns|
 							// "onChangeParent view: %\n".postf(view.parent.parent);
 							view.keyDownAction_(
@@ -1160,7 +1165,7 @@ CVCenter {
 
 			this.window.name_("CVCenter: "++tabs.tabViews.collectAs(_.label, Array));
 
-			\KeyDownActions.asClass !? {
+			if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
 				this.shortcuts.do({ |keyDowns|
 					thisTab.keyDownAction_(
 						thisTab.keyDownAction.add({ |view, char, modifiers, unicode, keycode|
@@ -2374,7 +2379,11 @@ CVCenter {
 					})
 				})
 			}.defer(0.1);
-			if (\KeyDownActions.asClass.notNil and: { loadShortcuts }, {
+			if (\KeyDownActions.asClass.notNil and: {
+				this.useKeyDownActions and: {
+					loadShortcuts
+				}
+			}, {
 				{
 					lib[\all][\shortcuts] !? {
 						this.shortcuts_(lib[\all][\shortcuts][\cvCenter]);

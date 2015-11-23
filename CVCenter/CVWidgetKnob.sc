@@ -533,7 +533,7 @@ CVWidgetKnob : CVWidget {
 		connectTF !? { /*"connectTextFields".postln; */this.connectGUI(nil, connectTF) };
 
 		// this.setShortcuts;
-		\KeyDownActions.asClass !? {
+		if (\KeyDownActions.asClass.notNil and: { this.class.useKeyDownActions }) {
 			focusElements.do({ |el|
 				\KeyDownActions.asClass.setShortcuts(el, this.class.shortcuts);
 			})

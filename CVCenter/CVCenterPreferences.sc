@@ -42,6 +42,7 @@ CVCenterPreferences {
 		var saveBut;
 		var fFact, specialHeight;
 		var prefs, rect, shortcuts;
+		var dialogHeight, dialogHalfHeight;
 
 		prefs = this.readPreferences;
 
@@ -91,11 +92,17 @@ CVCenterPreferences {
 
 		if(CVCenter.window.notNil and:{ CVCenter.window.isClosed.not }, { cvcBounds = CVCenter.bounds });
 
+		if (\KeyDownActions.asClass.notNil) {
+			dialogHeight = 415; dialogHalfHeight = 208;
+		} {
+			dialogHeight = 385; dialogHalfHeight = 193;
+		};
+
 		if(window.isNil or:{ window.isClosed }, {
 			window = Window("CVCenter: preferences", Rect(
 				Window.screenBounds.width/2-249,
-				Window.screenBounds.height/2-208, // 193
-				498, 415 // 385
+				Window.screenBounds.height/2-dialogHalfHeight,
+				498, dialogHeight
 			)).front;
 
 			tabs = TabbedView2(window, Rect(0, 1, window.bounds.width, window.bounds.height-33))
@@ -424,31 +431,32 @@ CVCenterPreferences {
 				.string_("Remove all OSC-/MIDI-responders on cmd/ctrl-period.")
 			;
 
-			flow1.nextLine;
-
-			keyDownActionsView = CompositeView(prefsTab, Point(flow1.indentedRemaining.width, 29))
-				.background_(Color(0.95, 0.95, 0.95))
-			;
-
-			keyDownActionsView.decorator = keyDownActionsFlow = FlowLayout(
-				keyDownActionsView.bounds, Point(7, 7), Point(0, 1)
-			);
-
-			if(prefs.notNil and:{ prefs[\useKeyDownActions].notNil }, {
-				useKeyDownActions = buildCheckbox.(keyDownActionsView, prefs[\useKeyDownActions])
-			}, {
-				useKeyDownActions = buildCheckbox.(keyDownActionsView, true)
-			});
-
-			keyDownActionsFlow.shift(5, -2);
-
-			StaticText(keyDownActionsView, Point(keyDownActionsFlow.indentedRemaining.width, 20))
-				.font_(staticTextFont)
-				.stringColor_(staticTextColor)
-				.string_("Use KeyDownActions (configurable)")
-			;
-
 			\KeyDownActions.asClass !? {
+
+				flow1.nextLine;
+
+				keyDownActionsView = CompositeView(prefsTab, Point(flow1.indentedRemaining.width, 29))
+				.background_(Color(0.95, 0.95, 0.95))
+				;
+
+				keyDownActionsView.decorator = keyDownActionsFlow = FlowLayout(
+					keyDownActionsView.bounds, Point(7, 7), Point(0, 1)
+				);
+
+				if(prefs.notNil, {
+					useKeyDownActions = buildCheckbox.(keyDownActionsView, prefs[\useKeyDownActions])
+				}, {
+					useKeyDownActions = buildCheckbox.(keyDownActionsView, true)
+				});
+
+				keyDownActionsFlow.shift(5, -2);
+
+				StaticText(keyDownActionsView, Point(keyDownActionsFlow.indentedRemaining.width, 20))
+					.font_(staticTextFont)
+					.stringColor_(staticTextColor)
+					.string_("Use KeyDownActions (configurable)")
+				;
+
 				scTabs = TabbedView2(scTab, Rect(0, 1, scTab.bounds.width, scTab.bounds.height))
 				.tabHeight_(17)
 				.tabCurve_(3)
@@ -541,10 +549,14 @@ CVCenterPreferences {
 								height.string.interpret.asInteger
 							)
 						});
-						\KeyDownActionsEditor.asClass.cachedScrollViewSC !? {
+						\KeyDownActionsEditor.asClass !? {
 							ScrollView.globalKeyDownAction_(\KeyDownActionsEditor.asClass.cachedScrollViewSC);
+							shortcuts = (
+								cvcenter:  cvCenterEditor.result,
+								cvwidget: cvWidgetEditor.result,
+								cvwidgeteditor: cvWidgetEditorEditor.result
+							);
 						};
-						shortcuts = (cvcenter:  cvCenterEditor.result, cvwidget: cvWidgetEditor.result, cvwidgeteditor: cvWidgetEditorEditor.result);
 						// "shortcuts.cvcenter['fn + F1']: %\n".postf(shortcuts.cvcenter['fn + F1']);
 						// "cvCenterEditor.result: %\n".postf(cvCenterEditor.result);
 						// "cvCenterKeyCodesEditor.result: %\n".postf(cvCenterKeyCodesEditor.result);
@@ -561,7 +573,8 @@ CVCenterPreferences {
 							initMidiOnStartUp.value,
 							shortcuts,
 							globalShortcutsEditorTab !? { globalShortcutsEditorTab.result },
-							cvCenterKeyCodesEditor !? { cvCenterKeyCodesEditor.result(false) }
+							cvCenterKeyCodesEditor !? { cvCenterKeyCodesEditor.result(false) },
+							useKeyDownActions !? { useKeyDownActions.value }
 						);
 						window.close;
 					})
@@ -578,8 +591,8 @@ CVCenterPreferences {
 		window.front;
 	}
 
-	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, shortcuts, globalShortcuts, keyCodesAndMods, informString, useKeyDownActions|
-		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders, thisInformString, thisInitMidi;
+	*writePreferences { |saveGuiProperties, guiProperties, saveClassVars, midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank, removeResponders, initMidiOnStartUp, shortcuts, globalShortcuts, keyCodesAndMods, useKeyDownActions, informString|
+		var prefsPath, prefs, thisGuiProperties, thisSaveClassVars, thisRemoveResponders, thisInformString, thisInitMidi, thisUseKeyDownActions;
 		var shortcutsPath, globalShortcutsPath, keyCodesPath;
 		var platform;
 
@@ -592,6 +605,7 @@ CVCenterPreferences {
 
 		thisSaveClassVars = saveClassVars.asBoolean;
 		thisRemoveResponders = removeResponders.asBoolean;
+		thisUseKeyDownActions = useKeyDownActions !? { useKeyDownActions.asBoolean };
 		thisInitMidi = initMidiOnStartUp.asBoolean;
 
 		guiProperties !? {
@@ -643,6 +657,8 @@ CVCenterPreferences {
 			#[midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].do(prefs.removeAt(_));
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);
+		prefs.put(\useKeyDownActions, thisUseKeyDownActions);
+
 		prefs.writeArchive(prefsPath);
 
 		if(informString.isNil, {

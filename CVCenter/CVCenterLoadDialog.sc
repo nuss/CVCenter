@@ -576,7 +576,7 @@ CVCenterLoadDialog {
 				})
 			;
 
-			\KeyDownActions.asClass !? {
+			if (\KeyDownActions.asClass.notNil and: { CVCenter.useKeyDownActions }) {
 				window.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
 					if(keycode == \KeyDownActions.asClass.keyCodes[\return]) { loadBut.doAction };
 					if(keycode == \KeyDownActions.asClass.keyCodes[\esc]) { window.close };
