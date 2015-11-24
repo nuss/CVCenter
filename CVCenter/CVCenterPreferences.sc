@@ -46,6 +46,8 @@ CVCenterPreferences {
 
 		prefs = this.readPreferences;
 
+		"prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
+
 		if(GUI.id === \cocoa, { fFact = 0.9 }, { fFact = 1 });
 
 		tabFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12, true);
@@ -443,10 +445,10 @@ CVCenterPreferences {
 					keyDownActionsView.bounds, Point(7, 7), Point(0, 1)
 				);
 
-				if(prefs.notNil, {
+				if(prefs.notNil and: { prefs[\useKeyDownActions].notNil }, {
 					useKeyDownActions = buildCheckbox.(keyDownActionsView, prefs[\useKeyDownActions])
 				}, {
-					useKeyDownActions = buildCheckbox.(keyDownActionsView, true)
+					useKeyDownActions = buildCheckbox.(keyDownActionsView, false)
 				});
 
 				keyDownActionsFlow.shift(5, -2);
@@ -458,14 +460,14 @@ CVCenterPreferences {
 				;
 
 				scTabs = TabbedView2(scTab, Rect(0, 1, scTab.bounds.width, scTab.bounds.height))
-				.tabHeight_(17)
-				.tabCurve_(3)
-				.labelColors_(Color.white!3)
-				.unfocusedColors_(Color.red!3)
-				.stringColors_(Color.white!3)
-				.stringFocusedColors_(Color.red!3)
-				.dragTabs_(false)
-				.font_(tabFont)
+					.tabHeight_(17)
+					.tabCurve_(3)
+					.labelColors_(Color.white!3)
+					.unfocusedColors_(Color.red!3)
+					.stringColors_(Color.white!3)
+					.stringFocusedColors_(Color.red!3)
+					.dragTabs_(false)
+					.font_(tabFont)
 				;
 
 				cvCenterTab = scTabs.add("CVCenter", scroll: false);
@@ -477,7 +479,9 @@ CVCenterPreferences {
 					cvCenterTab, nil, cvCenterTab.bounds,
 					if(prefs.notNil and:{
 						prefs[\shortcuts].notNil and:{
-							prefs[\shortcuts][\cvcenter].notNil
+							prefs[\shortcuts][\cvcenter].notNil and: {
+								prefs[\shortcuts][\cvcenter].size > 0
+							}
 						}
 					}, {
 						prefs[\shortcuts][\cvcenter]
@@ -488,7 +492,9 @@ CVCenterPreferences {
 					cvWidgetTab, nil, cvWidgetTab.bounds,
 					if(prefs.notNil and:{
 						prefs[\shortcuts].notNil and:{
-							prefs[\shortcuts][\cvwidget].notNil
+							prefs[\shortcuts][\cvwidget].notNil and: {
+								prefs[\shortcuts][\cvwidget].size > 0
+							}
 						}
 					}, {
 						prefs[\shortcuts][\cvwidget]
@@ -499,7 +505,9 @@ CVCenterPreferences {
 					cvWidgetEditorTab, nil, cvWidgetEditorTab.bounds,
 					if(prefs.notNil and:{
 						prefs[\shortcuts].notNil and:{
-							prefs[\shortcuts][\cvwidgeteditor].notNil
+							prefs[\shortcuts][\cvwidgeteditor].notNil and: {
+								prefs[\shortcuts][\cvwidgeteditor].size > 0
+							}
 						}
 					}, {
 						prefs[\shortcuts][\cvwidgeteditor]
@@ -552,7 +560,7 @@ CVCenterPreferences {
 						\KeyDownActionsEditor.asClass !? {
 							ScrollView.globalKeyDownAction_(\KeyDownActionsEditor.asClass.cachedScrollViewSC);
 							shortcuts = (
-								cvcenter:  cvCenterEditor.result,
+								cvcenter: cvCenterEditor.result,
 								cvwidget: cvWidgetEditor.result,
 								cvwidgeteditor: cvWidgetEditorEditor.result
 							);
@@ -657,7 +665,11 @@ CVCenterPreferences {
 			#[midiMode, midiResolution, midiMean, softWithin, ctrlButtonBank].do(prefs.removeAt(_));
 		});
 		prefs.put(\removeResponders, thisRemoveResponders);
-		prefs.put(\useKeyDownActions, thisUseKeyDownActions);
+		if (\KeyDownActions.asClass.notNil) {
+			prefs.put(\useKeyDownActions, thisUseKeyDownActions);
+		} {
+			prefs.put(\useKeyDownActions, false);
+		};
 
 		prefs.writeArchive(prefsPath);
 

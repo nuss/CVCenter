@@ -216,6 +216,21 @@ OSCCommands {
 			deviceNameField = TextField(window, Point(144, 40))
 				.font_(Font(Font.available("Courier New") ? Font.defaultMonoFace, 15))
 				.string_("< device-name >")
+				.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
+					if (\KeyDownActions.asClass.notNil and: {
+						\CVCenter.asClass.notNil and: {
+							\CVCenter.asClass.useKeyDownActions
+						}
+					}) {
+						if (keycode == \KeyDownActions.asClass.keyCodes[\return]) { saveBut.doAction };
+						if (keycode == \KeyDownActions.asClass.keyCodes[\esc]) { window.close };
+					} {
+						// "return" key
+						if (key == 16777220) { saveBut.doAction };
+						// "esc" key
+						if (key == 16777216) { window.close };
+					}
+				})
 			;
 
 			saveBut = Button(window, Point(flow.indentedRemaining.width-20, 40))

@@ -20,7 +20,7 @@ CVCenter {
 	classvar <all, nextCVKey, <cvWidgets, <window, <childViews, <tabs, <prefPane, swFlow, removeButs;
 	classvar prefPaneBounds, tabsBounds;
 	classvar <>midiMode, <>midiResolution, <>ctrlButtonBank, <>midiMean, <>softWithin;
-	classvar <>useKeyDownActions, <>shortcuts, <scv;
+	classvar <>useKeyDownActions = false, <>shortcuts, <scv;
 	classvar <alwaysOnTop = false;
 	classvar <>guix, <>guiy, <>guiwidth, <>guiheight;
 	classvar <widgetStates;
@@ -39,14 +39,15 @@ CVCenter {
 		var scFunc;
 
 		Class.initClassTree(CVCenterPreferences);
+		\KeyDownActions.asClass !? {
+			Class.initClassTree(\KeyDownActions.asClass);
+		};
 		Class.initClassTree(CVWidget);
 		// Class.initClassTree(\KeyDownActions.asClass);
 
 		this.dontSave_(['select snapshot', \snapshot]);
 		systemWidgets = ['select snapshot', \snapshot];
 		snapShots = ();
-
-		prefs = CVCenterPreferences.readPreferences;
 
 		prefs !? {
 			prefs[\saveGuiProperties] !? {
@@ -115,10 +116,15 @@ CVCenter {
 		scv = (); // environment holding various variables used in shortcut-functions;,
 
 		// "prefs[\shortcuts]: %\n".postf(prefs[\shortcuts]);
-		prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvcenter] !? { scPrefs = true }}};
+		prefs !? { prefs[\shortcuts] !? {
+			if (prefs[\shortcuts][\cvcenter].notNil and:{
+				prefs[\shortcuts][\cvcenter].size > 0
+			}) { scPrefs = true }
+		}};
 
 		if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
 			this.shortcuts = IdentityDictionary.new;
+
 			if (scPrefs == false, {
 				scFunc =
 				"// next tab
@@ -758,6 +764,7 @@ CVCenter {
 
 			// this.setShortcuts;
 			[tabs.views, prefPane].flat.do({ |view|
+				"view: %\n".postf(view);
 				if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
 					\KeyDownActions.asClass.setShortcuts(view, this.shortcuts);
 				} {
@@ -773,7 +780,7 @@ CVCenter {
 							123, { tabs.focus((tabs.activeTab-1).wrap(0, tabs.views.size-1)) }
 						);
 						switch(unicode,
-							99, { OSCCommands.gui }, // "c" -> collect OSC-commands resp. open the collector's GUI
+							99, { OSCCommands.front }, // "c" -> collect OSC-commands resp. open the collector's GUI
 							111, { CVCenterControllersMonitor(1) }, // key "o" -> osc
 							109, { CVCenterControllersMonitor(0) }, // key "m" -> midi
 							120, { // key "x" -> close window
@@ -1061,8 +1068,6 @@ CVCenter {
 		if (label.notNil, { thisTabLabel = label.asSymbol }, {
 			Error("*prAddTab has been called without providing a label for the tab").throw;
 		});
-
-		"this.useKeyDownActions: %\n".postf(this.useKeyDownActions);
 
 		if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
 			switch(GUI.id,

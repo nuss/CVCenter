@@ -17,7 +17,7 @@
 
 AbstractCVWidgetEditor {
 
-	classvar <allEditors, <>useKeyDownActions, <>shortcuts, xySlots, nextX, nextY, shiftXY;
+	classvar <allEditors, <>useKeyDownActions = false, <>shortcuts, xySlots, nextX, nextY, shiftXY;
 	var thisEditor, <window, <tabs, <scv, editorEnv, labelStringColors;
 	var <specField, <specsList, <specsListSpecs;
 	var <midiModeSelect, <midiMeanNB, <softWithinNB, <ctrlButtonBankField, <midiResolutionNB;
@@ -36,18 +36,26 @@ AbstractCVWidgetEditor {
 		var localOscFunc, scFunc;
 		var prefs, scPrefs = false;
 
-		// Class.initClassTree(\KeyDownActions.asClass);
+		\KeyDownActions.asClass !? {
+			Class.initClassTree(\KeyDownActions.asClass);
+		};
 		// Class.initClassTree(CVCenterPreferences);
 
-		prefs = CVCenterPreferences.readPreferences;
-		this.useKeyDownActions_(prefs[\useKeyDownActions]);
+		prefs !? { prefs[\useKeyDownActions] !? {
+			this.useKeyDownActions_(prefs[\useKeyDownActions]);
+		}};
 
 		allEditors = IdentityDictionary.new;
 
 		// "prefs[\cvwidgeteditor]: %\n".postf(prefs[\shortcuts].cvwidgeteditor);
 
+		prefs !? { prefs[\shortcuts] !? {
+			if (prefs[\shortcuts][\cvwidgeteditor].notNil and:{
+				prefs[\shortcuts][\cvwidgeteditor].size > 0
+			}) { scPrefs = true }
+		}};
+
 		if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
-			prefs !? { prefs[\shortcuts] !? { prefs[\shortcuts][\cvwidgeteditor] !? { scPrefs = true }}};
 			this.shortcuts = IdentityDictionary.new;
 
 			if(scPrefs == false, {
