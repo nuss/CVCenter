@@ -49,6 +49,8 @@ CVCenter {
 		systemWidgets = ['select snapshot', \snapshot];
 		snapShots = ();
 
+		prefs = CVCenterPreferences.readPreferences;
+
 		prefs !? {
 			prefs[\saveGuiProperties] !? {
 				shutDownFunc = {
@@ -123,9 +125,9 @@ CVCenter {
 		}};
 
 		if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
-			this.shortcuts = IdentityDictionary.new;
-
 			if (scPrefs == false, {
+				this.shortcuts = IdentityDictionary.new;
+
 				scFunc =
 				"// next tab
 				{
@@ -601,7 +603,7 @@ CVCenter {
 		buildCheckbox = { |view, active, action|
 			var cBox;
 			if (GUI.id === \cocoa, {
-				cBox = Button(view, 15@15)
+				cBox = Button(view, Point(15, 15))
 					.states_([
 						["", Color.white, Color.white],
 						["X", Color.black, Color.white],
@@ -610,7 +612,7 @@ CVCenter {
 				;
 				if (active, { cBox.value_(1) }, { cBox.value_(0) });
 			}, {
-				cBox = \CheckBox.asClass.new(view, 15@15).value_(active);
+				cBox = \CheckBox.asClass.new(view, Point(15, 15)).value_(active);
 			});
 			cBox.action_(action);
 		};
@@ -721,7 +723,7 @@ CVCenter {
 			// "this.at('select snapshot'): %\n".postf(this.at('select snapshot'));
 			this.at('select snapshot').connect(snapShotSelect);
 
-			if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
+			\KeyDownActions.asClass !? {
 				shortcutsBut = Button(prefPane, Point(70, 20))
 					.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 11))
 					.states_([["shortcuts", Color.white, Color.red]])
@@ -764,7 +766,6 @@ CVCenter {
 
 			// this.setShortcuts;
 			[tabs.views, prefPane].flat.do({ |view|
-				"view: %\n".postf(view);
 				if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
 					\KeyDownActions.asClass.setShortcuts(view, this.shortcuts);
 				} {
@@ -1474,7 +1475,7 @@ CVCenter {
 			thisNextPos = tabProperties[thisTabLabel].nextPos; //old
 		}, {
 			// add next widget to the right
-			tabProperties[thisTabLabel].nextPos = thisNextPos = thisNextPos.x+colwidth@(thisNextPos.y);
+			tabProperties[thisTabLabel].nextPos = thisNextPos = thisNextPos.x + Point(colwidth, (thisNextPos.y));
 		});
 
 		widget2DKey !? {
@@ -1505,7 +1506,8 @@ CVCenter {
 		this.new;
 		inputArgs.pairsDo({ |key, cv|
 			if (cv.isKindOf(CV).not and:{ cv.isKindOf(Array).not }, {
-				Error("CVCenter expects a single CV or an array of CVs as input!").throw;			});
+				Error("CVCenter expects a single CV or an array of CVs as input!").throw;
+			});
 			[cv].flat.do({ |cv|
 				if (cv.isKindOf(CV).not, {
 					Error("The value provided for key '"++key.asString++"' doesn't appear to be a CV.\nPlease choose a valid input!").throw;
@@ -1552,7 +1554,9 @@ CVCenter {
 			},
 			CVWidget2D, {
 				#[lo, hi].do({ |hilo|
-					if (cvWidgets[thisKey].editor[hilo].notNil and:{ cvWidgets[thisKey].editor[hilo].isClosed.not }, {
+					if (cvWidgets[thisKey].editor[hilo].notNil and:{
+						cvWidgets[thisKey].editor[hilo].isClosed.not
+					}, {
 						cvWidgets[thisKey].editor[hilo].close;
 					});
 					cvWidgets[thisKey].midiOscEnv[hilo].cc !? {
@@ -1799,7 +1803,12 @@ CVCenter {
 
 	// add a CV using spec inference
 	*use { |key, spec, value, tab, slot, svItems, connectS, connectTF|
-		^this.add(key, spec ?? { this.findSpec(key) }, value, tab, slot, svItems, connectS ? this.connectSliders, connectTF ? this.connectTextFields)
+		^this.add(
+			key, spec ?? { this.findSpec(key) },
+			value, tab, slot, svItems,
+			connectS ? this.connectSliders,
+			connectTF ? this.connectTextFields
+		)
 	}
 
 	*widgetConnectGUI { |key, connectSliders, connectTextFields|
@@ -1926,7 +1935,7 @@ CVCenter {
 
 			keyField = TextField(dialogWin, Rect(4, 4, 290, 20))
 				.string_(key)
-				.font_(Font(Font.available("Courier") ? Font.defaultMonoFace, 11))
+				.font_(Font(Font.available("Courier") ? Font.defaultMonoFace, 14))
 			;
 
 			Button(dialogWin, Rect(4, 26, 144, 20))
@@ -2501,7 +2510,7 @@ CVCenter {
 							thisNextPos = tabProperties[thisTabKey].nextPos;
 						})
 					});
-					tabProperties[thisTabKey].nextPos = thisNextPos+Point(cvWidgets[k].widgetProps.x+1, 0);
+					tabProperties[thisTabKey].nextPos = thisNextPos + Point(cvWidgets[k].widgetProps.x+1, 0);
 					cvWidgets[k].widgetXY_(thisNextPos);
 					orderedRemoveButs[i].bounds_(Rect(
 						thisNextPos.x,
@@ -2537,8 +2546,6 @@ CVCenter {
 				window.view.bounds.height-prefPane.bounds.height
 			))
 		});
-		// "tabsBounds.height: %, rows-1*21: %, tabs.view.bounds.height: %\n".postf(tabsBounds.height, rows-1*21, tabs.view.bounds.height);
-		// prefPane.bounds.postln;
 	}
 
 	*prRemoveTab { |key|
@@ -2691,7 +2698,7 @@ CVCenter {
 			addActionFunc = {
 				if (varNames.size > 0, {
 					varNames.do({ |v, j|
-					// "varNames: %\n".postf(v);
+						// "varNames: %\n".postf(v);
 						actionName = "default"++(j+1);
 						if (j == 0, { activate = true }, { activate = false });
 						if (more.controls.notNil and:{ more.controls.size > 1 }, {

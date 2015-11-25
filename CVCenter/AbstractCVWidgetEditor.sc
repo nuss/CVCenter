@@ -41,6 +41,8 @@ AbstractCVWidgetEditor {
 		};
 		// Class.initClassTree(CVCenterPreferences);
 
+		prefs = CVCenterPreferences.readPreferences;
+
 		prefs !? { prefs[\useKeyDownActions] !? {
 			this.useKeyDownActions_(prefs[\useKeyDownActions]);
 		}};
