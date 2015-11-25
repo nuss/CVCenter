@@ -46,7 +46,7 @@ KeyDownActionsEditor : KeyDownActions {
 		staticTextColor = Color(0.1, 0.1, 0.1);
 		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 10);
 		shortCutFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12, true);
-		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 10);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 14);
 
 		bounds !? { thisBounds = bounds.asRect };
 
@@ -80,7 +80,7 @@ KeyDownActionsEditor : KeyDownActions {
 			0, 0, scrollArea.bounds.width, scrollArea.bounds.height
 		));
 
-		scrollView.decorator = scrollFlow = FlowLayout(scrollView.bounds, 0@0, 1@0);
+		scrollView.decorator = scrollFlow = FlowLayout(scrollView.bounds, Point(0, 0), Point(1, 0));
 
 		makeEditArea = { |shortcut, funcString|
 			var editArea, shortcutText, shortcutField, editBut, removeBut, funcField, myCount;
@@ -101,12 +101,12 @@ KeyDownActionsEditor : KeyDownActions {
 				myCount+1 * 100
 			));
 
-			editArea.decorator = tmpEditFlow = FlowLayout(editArea.bounds, 7@7, 2@2);
+			editArea.decorator = tmpEditFlow = FlowLayout(editArea.bounds, Point(7, 7), Point(2, 2));
 
 			tmpShortcuts = tmpShortcuts.add(nil);
 
 			shortcutTexts = shortcutTexts.add(
-				shortcutText = StaticText(editArea, 40@15)
+				shortcutText = StaticText(editArea, Point(40, 15))
 					.string_("shortcut:")
 					.font_(staticTextFont)
 					.stringColor_(staticTextColor)
@@ -115,7 +115,7 @@ KeyDownActionsEditor : KeyDownActions {
 			);
 
 			shortcutFields = shortcutFields.add(
-				shortcutField = StaticText(editArea, tmpEditFlow.indentedRemaining.width-125@15)
+				shortcutField = StaticText(editArea, Point(tmpEditFlow.indentedRemaining.width-125, 15))
 					.background_(Color.white)
 					.font_(shortCutFont)
 					.stringColor_(staticTextColor)
@@ -128,7 +128,7 @@ KeyDownActionsEditor : KeyDownActions {
 			};
 
 			editButs = editButs.add(
-				editBut = Button(editArea, 60@15)
+				editBut = Button(editArea, Point(60, 15))
 					.states_([
 						["edit", staticTextColor],
 						["end edit", staticTextColor]
@@ -248,7 +248,7 @@ KeyDownActionsEditor : KeyDownActions {
 			);
 
 			removeButs = removeButs.add(
-				removeBut = Button(editArea, 60@15)
+				removeBut = Button(editArea, Point(60, 15))
 					.states_([["remove", staticTextColor]])
 					.action_({ |bt|
 						tmpIndex = editAreas.detectIndex({ |it| it == bt.parent });
@@ -305,9 +305,9 @@ KeyDownActionsEditor : KeyDownActions {
 			})
 		};
 
-		butArea.decorator = butFlow = FlowLayout(butArea.bounds, 7@4, 3@0);
+		butArea.decorator = butFlow = FlowLayout(butArea.bounds, Point(7, 4), Point(3, 0));
 
-		newBut = Button(butArea, 70@15)
+		newBut = Button(butArea, Point(70, 15))
 			.font_(staticTextFont)
 			.states_([["new action", staticTextColor]])
 			.action_({ |bt|

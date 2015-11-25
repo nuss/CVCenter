@@ -256,7 +256,7 @@ CVCenter {
 					CVCenter.scv.historyWin.isClosed
 				}) {
 					CVCenter.scv.historyGui = History.makeWin(
-						Window.screenBounds.width-300@Window.screenBounds.height
+						Point(Window.screenBounds.width-300, Window.screenBounds.height)
 					);
 					CVCenter.scv.historyWin = CVCenter.scv.historyGui.parent;
 				};
@@ -795,7 +795,7 @@ CVCenter {
 								if(History.started === false, { History.start });
 								if(historyWin.isNil or:{ historyWin.isClosed }, {
 									historyGui = History.makeWin(
-										Window.screenBounds.width-300 @ Window.screenBounds.height
+										Point(Window.screenBounds.width-300, Window.screenBounds.height)
 									);
 									historyWin = historyGui.parent;
 								});
@@ -2183,7 +2183,11 @@ CVCenter {
 												).changedKeys(cvWidgets[key].synchKeys);
 											}, {
 												cvWidgets[key].setOscInputConstraints(
-													v[hilo].osc.calibConstraints.lo @ 	v[hilo].osc.calibConstraints.hi, hilo
+													Point(
+														v[hilo].osc.calibConstraints.lo,
+														v[hilo].osc.calibConstraints.hi
+													),
+													hilo
 												);
 													cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
 													[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
@@ -2338,7 +2342,11 @@ CVCenter {
 												).changedKeys(cvWidgets[key].synchKeys);
 											}, {
 												cvWidgets[key].setOscInputConstraints(
-													v.osc[sl].calibConstraints.lo @ v.osc[sl].calibConstraints.hi, sl
+													Point(
+														v.osc[sl].calibConstraints.lo,
+														v.osc[sl].calibConstraints.hi
+													),
+													sl
 												);
 													cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
 													[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]

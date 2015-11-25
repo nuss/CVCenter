@@ -21,7 +21,7 @@ KeyCodesEditor : KeyDownActions {
 		staticTextColor = Color(0.1, 0.1, 0.1);
 		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 10);
 		shortCutFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12, true);
-		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 10);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 14);
 
 		Platform.case(
 			\osx, { platform = "OSX" },
@@ -56,7 +56,7 @@ KeyCodesEditor : KeyDownActions {
 			scrollArea.bounds.width, scrollArea.bounds.height
 		));
 
-		scrollView.decorator = flow = FlowLayout(scrollView.bounds, 8@8, 0@0);
+		scrollView.decorator = flow = FlowLayout(scrollView.bounds, Point(8, 8), Point(0, 0));
 
 		makeEditArea = { |dictName, dict, height|
 			var editArea, name, key;

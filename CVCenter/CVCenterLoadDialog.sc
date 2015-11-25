@@ -37,7 +37,7 @@ CVCenterLoadDialog {
 		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12 * fFact);
 		staticTextFontBold = Font(Font.available("Arial") ? Font.defaultSansFace, 12 * fFact, true);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 12);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 14);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 
@@ -214,7 +214,7 @@ CVCenterLoadDialog {
 				})
 			});
 
-			midiSourceSelect = PopUpMenu(midiBg, midiFlow.indentedRemaining.width@15)
+			midiSourceSelect = PopUpMenu(midiBg, Point(midiFlow.indentedRemaining.width, 15))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 				.items_(["select device port..."])
 				.action_({ |dd|
@@ -373,7 +373,7 @@ CVCenterLoadDialog {
 
 			oscFlow.nextLine.shift(15, 0);
 
-			oscIPSelect = PopUpMenu(oscBg, 130@15)
+			oscIPSelect = PopUpMenu(oscBg, Point(130, 15))
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
 				.items_(["select IP-address..."])
 				.mouseDownAction_({ |m|

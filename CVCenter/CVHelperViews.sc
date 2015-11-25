@@ -1,4 +1,4 @@
-/* (c) 2010-2013 Stefan Nussbaumer */
+/* (c) Stefan Nussbaumer */
 /*
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ CVMidiEditGroup {
 		var margs, msrc="source", mchan="chan", mctrl="ctrl";
 		var wcm, editor, tabIndex;
 		var staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 8.5);
-		var textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 7);
+		var textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 8);
 		var slotText = "";
 
 		if(bounds.class == Rect, { thisBounds = bounds });

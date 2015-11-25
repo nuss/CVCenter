@@ -50,7 +50,7 @@ CVWidgetSpecsEditor {
 
 		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 10);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 10);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 11);
 		selectFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 10, true);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
@@ -86,8 +86,8 @@ CVWidgetSpecsEditor {
 		), scroll: true);
 
 		window.view.decorator = flow = FlowLayout(window.bounds.insetBy(5));
-		flow.margin_(4@0);
-		flow.gap_(2@2);
+		flow.margin_(Point(4, 0));
+		flow.gap_(Point(2, 2));
 
 		flow.shift(0, 0);
 		StaticText(window, cNameRect)

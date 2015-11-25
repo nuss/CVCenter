@@ -145,12 +145,12 @@ OSCCommands {
 
 		if (Font.respondsTo(\available)) {
 			staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 10);
-			textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 9);
+			textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 10);
 			bigSansFont = Font(Font.available("Arial") ? Font.defaultSansFace, 15);
 			bigMonoFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 15);
 		} {
 			staticTextFont = Font(Font.defaultSansFace, 10);
-			textFieldFont = Font(Font.defaultMonoFace, 9);
+			textFieldFont = Font(Font.defaultMonoFace, 10);
 			bigSansFont = Font(Font.defaultSansFace, 15);
 			bigMonoFont = Font(Font.defaultMonoFace, 15);
 		};

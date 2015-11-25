@@ -112,12 +112,12 @@ CVWidgetMS : CVWidget {
 		action !? { this.addAction(\default, action) };
 
 		if(bounds.isNil, {
-			thisXY = 7@0;
+			thisXY = Point(7, 0);
 			thisX = 50; thisY = 50;
 			thisWidth = 122;
 			thisHeight = 196;
 		}, {
-			if(parent.isNil, { thisXY = 7@0 }, { thisXY = bounds.left@bounds.top });
+			if(parent.isNil, { thisXY = Point(7, 0) }, { thisXY = Point(bounds.left, bounds.top) });
 			thisX = bounds.left; thisY = bounds.top;
 			thisWidth = bounds.width;
 			thisHeight = bounds.height;

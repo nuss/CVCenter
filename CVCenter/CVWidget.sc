@@ -519,11 +519,11 @@ CVWidget {
 	}
 
 	widgetXY {
-		^widgetBg.bounds.left@widgetBg.bounds.top;
+		^Point(widgetBg.bounds.left, widgetBg.bounds.top);
 	}
 
 	widgetProps {
-		^widgetBg.bounds.width@widgetBg.bounds.height;
+		^Point(widgetBg.bounds.width, widgetBg.bounds.height);
 	}
 
 	bounds {
@@ -1747,7 +1747,10 @@ CVWidget {
 							nb.enabled_(true);
 							nb.action_({ |b|
 								this.setOscInputConstraints(
-									thisEditor.calibNumBoxes.lo.value @ thisEditor.calibNumBoxes.hi.value, slot;
+									Point(
+										thisEditor.calibNumBoxes.lo.value,
+										thisEditor.calibNumBoxes.hi.value
+									), slot;
 								)
 							})
 						})
@@ -1978,11 +1981,11 @@ CVWidget {
 						prCalibrate = prCalibrate.add(true);
 						if(specEditor.notNil and:{ specEditor.isClosed.not }, {
 							specEditor.midiEditGroups.add(
-								CVMidiEditGroup(specEditor.midiTabs.views[1], specEditor.midiFlow1.bounds.width/5-10@39, this, msSize+i);
+								CVMidiEditGroup(specEditor.midiTabs.views[1], Point(specEditor.midiFlow1.bounds.width/5-10, 39), this, msSize+i);
 							);
 							oscIndex = msSize+i;
 							specEditor.oscEditBtns.add(
-								Button(specEditor.oscTabs.views[1], specEditor.oscFlow1.bounds.width/5-10@25)
+								Button(specEditor.oscTabs.views[1], Point(specEditor.oscFlow1.bounds.width/5-10, 25))
 									.states_([
 										[oscIndex.asString++": edit OSC", Color.black, Color.white(0.2)]
 									])
@@ -2025,7 +2028,7 @@ CVWidget {
 							specEditor.oscFlow1.shift(-13, specEditor.oscEditBtns[oscIndex].bounds.height-10);
 
 							specEditor.oscCalibBtns.add(
-								Button(specEditor.oscTabs.views[1], 10@10)
+								Button(specEditor.oscTabs.views[1], Point(10, 10))
 									.states_([
 										["", Color.black, Color.green],
 										["", Color.white, Color.red]

@@ -34,7 +34,7 @@ CVCenterShortcutsEditor {
 		tabFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12, true);
 		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 12 * fFact);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 12);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 14);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 		tabsBg = Color(0.8, 0.8, 0.8);

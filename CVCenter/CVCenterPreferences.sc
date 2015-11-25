@@ -59,7 +59,7 @@ CVCenterPreferences {
 		buildCheckbox = { |view, active|
 			var cBox;
 			if(GUI.id === \cocoa, {
-				cBox = Button(view, 15@15)
+				cBox = Button(view, Point(15, 15))
 					.states_([
 						["", Color.white, Color.white],
 						["X", Color.black, Color.white],
@@ -68,7 +68,7 @@ CVCenterPreferences {
 				;
 				if(active, { cBox.value_(1) }, { cBox.value_(0) });
 			}, {
-				cBox = \CheckBox.asClass.new(view, 15@15).value_(active);
+				cBox = \CheckBox.asClass.new(view, Point(15, 15)).value_(active);
 			});
 			cBox;
 		};
@@ -134,11 +134,11 @@ CVCenterPreferences {
 
 			prefsTab.decorator = flow1 = FlowLayout(prefsTab.bounds, 7@7, 0@1);
 
-			guiView = CompositeView(prefsTab, flow1.indentedRemaining.width@57);
+			guiView = CompositeView(prefsTab, Point(flow1.indentedRemaining.width, 57));
 
 			guiView.decorator = guiFlow = FlowLayout(guiView.bounds, 7@7, 0@3);
 
-			saveGuiPosition = PopUpMenu(guiView, guiFlow.indentedRemaining.width@20)
+			saveGuiPosition = PopUpMenu(guiView, Point(guiFlow.indentedRemaining.width, 20))
 				.items_([
 					"No specific settings for CVCenter window-bounds",
 					"Remember CVCenter window-bounds on shutdown / window-close",
@@ -149,7 +149,7 @@ CVCenterPreferences {
 				.stringColor_(staticTextColor)
 			;
 
-			leftText = StaticText(guiView, guiFlow.bounds.width/10@20)
+			leftText = StaticText(guiView, Point(guiFlow.bounds.width/10, 20))
 				.string_("left: ")
 				.font_(staticTextFont)
 				.align_(\right)
@@ -163,7 +163,7 @@ CVCenterPreferences {
 
 			flow1.shift(0, 0);
 
-			topText = StaticText(guiView, guiFlow.bounds.width/10@20)
+			topText = StaticText(guiView, Point(guiFlow.bounds.width/10, 20))
 				.string_("top: ")
 				.font_(staticTextFont)
 				.align_(\right)
@@ -175,7 +175,7 @@ CVCenterPreferences {
 				}
 			}, kind: \text, width: 60);
 
-			widthText = StaticText(guiView, guiFlow.bounds.width/10@20)
+			widthText = StaticText(guiView, Point(guiFlow.bounds.width/10, 20))
 				.string_("width: ")
 				.font_(staticTextFont)
 				.align_(\right)
@@ -187,7 +187,7 @@ CVCenterPreferences {
 				}
 			}, kind: \text, width: 60);
 
-			heightText = StaticText(guiView, guiFlow.bounds.width/10@20)
+			heightText = StaticText(guiView, Point(guiFlow.bounds.width/10, 20))
 				.string_("height: ")
 				.font_(staticTextFont)
 				.align_(\right)
@@ -223,7 +223,7 @@ CVCenterPreferences {
 
 			flow1.nextLine;
 
-			midiView = CompositeView(prefsTab, flow1.indentedRemaining.width@vHeight)
+			midiView = CompositeView(prefsTab, Point(flow1.indentedRemaining.width, vHeight))
 				.background_(Color(0.95, 0.95, 0.95))
 			;
 
@@ -237,7 +237,7 @@ CVCenterPreferences {
 
 			midiFlow.shift(5, -2);
 
-			initMidiText = StaticText(midiView, midiFlow.indentedRemaining.width@20)
+			initMidiText = StaticText(midiView, Point(midiFlow.indentedRemaining.width, 20))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Initialize MIDI on startup.")
@@ -259,7 +259,7 @@ CVCenterPreferences {
 
 			midiFlow.shift(5, -2);
 
-			classVarsText = StaticText(midiView, midiFlow.indentedRemaining.width-100@20)
+			classVarsText = StaticText(midiView, Point(midiFlow.indentedRemaining.width-100, 20))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Remember CVCenter's MIDI-classvar-values on shutdown:")
@@ -280,7 +280,7 @@ CVCenterPreferences {
 
 			midiFlow.shift(5, 2);
 
-			textMidiMode = StaticText(midiView, midiFlow.indentedRemaining.width@20)
+			textMidiMode = StaticText(midiView, Point(midiFlow.indentedRemaining.width, 20))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Set CVCenter's midi-mode (0 or 1).")
@@ -300,7 +300,7 @@ CVCenterPreferences {
 
 			midiFlow.shift(5, 2);
 
-			textMidiResolution = StaticText(midiView, midiFlow.indentedRemaining.width@20)
+			textMidiResolution = StaticText(midiView, Point(midiFlow.indentedRemaining.width, 20))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Set CVCenter's midi-resolution. Applies only if midi-mode is 1.")
@@ -320,7 +320,7 @@ CVCenterPreferences {
 
 			midiFlow.shift(5, 2);
 
-			textMidiMean = StaticText(midiView, midiFlow.indentedRemaining.width@30)
+			textMidiMean = StaticText(midiView, Point(midiFlow.indentedRemaining.width, 30))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Set CVCenter's midi-mean: the default-output of your MIDI-device's\nsliders in neutral position. Applies only if midi-mode is 1.")
@@ -340,7 +340,7 @@ CVCenterPreferences {
 
 			midiFlow.shift(5, 2);
 
-			textSoftWithin = StaticText(midiView, midiFlow.bounds.width-100@42)
+			textSoftWithin = StaticText(midiView, Point(midiFlow.bounds.width-100, 42))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Set the soft-within threshold: the widget will only respond if the\ncurrent MIDI-output is within the widget's current value +/- threshold.\nApplies only if midi-mode is 0.");
@@ -361,7 +361,7 @@ CVCenterPreferences {
 
 			if(GUI.id === \cocoa, { specialHeight = 60 }, { specialHeight = 54 });
 
-			textCtrlButtonBank = StaticText(midiView, midiFlow.indentedRemaining.width@specialHeight)
+			textCtrlButtonBank = StaticText(midiView, Point(midiFlow.indentedRemaining.width, specialHeight))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Set the number of sliders on in one bank of your MIDI-device.\nSetting this number will display the selected slider in a widget not as\na single number but rather as combination of the selected bank and\nthe slider number (e.g.: 4:3 means bank nr. 4, slider nr. 3)")
@@ -411,7 +411,7 @@ CVCenterPreferences {
 
 			flow1.nextLine;
 
-			responderView = CompositeView(prefsTab, flow1.indentedRemaining.width@29)
+			responderView = CompositeView(prefsTab, Point(flow1.indentedRemaining.width, 29))
 				.background_(Color(0.95, 0.95, 0.95))
 			;
 
@@ -425,7 +425,7 @@ CVCenterPreferences {
 
 			responderFlow.shift(5, -2);
 
-			StaticText(responderView, responderFlow.indentedRemaining.width@20)
+			StaticText(responderView, Point(responderFlow.indentedRemaining.width, 20))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
 				.string_("Remove all OSC-/MIDI-responders on cmd/ctrl-period.")
@@ -528,13 +528,13 @@ CVCenterPreferences {
 				);
 			};
 
-			Button(saveCancel, saveCancelFlow.bounds.width/2-10@23)
+			Button(saveCancel, Point(saveCancelFlow.bounds.width/2-10, 23))
 				.states_([["Cancel", Color.black, Color.white]])
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 14, true))
 				.action_({ window.close })
 			;
 
-			saveBut = Button(saveCancel, saveCancelFlow.indentedRemaining.width@23)
+			saveBut = Button(saveCancel, Point(saveCancelFlow.indentedRemaining.width, 23))
 				.states_([["Save", Color.white, Color.red]])
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 14, true))
 				.action_({
