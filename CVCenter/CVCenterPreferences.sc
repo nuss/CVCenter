@@ -635,8 +635,10 @@ CVCenterPreferences {
 			prefs = ();
 		});
 
-		shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcuts";
-		shortcuts !? { shortcuts.writeArchive(shortcutsPath) };
+		\KeyDownActions.asClass !? {
+			shortcutsPath = this.filenameSymbol.asString.dirname +/+ "CVCenterShortcuts";
+			shortcuts !? { shortcuts.writeArchive(shortcutsPath) };
+		};
 
 		globalShortcutsPath = this.filenameSymbol.asString.dirname +/+ "globalShortcuts";
 		globalShortcuts !? { globalShortcuts.writeArchive(globalShortcutsPath) };
