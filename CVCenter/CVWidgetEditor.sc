@@ -119,7 +119,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 		staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 9.4);
 		staticTextColor = Color(0.2, 0.2, 0.2);
-		textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 9);
+		textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 11);
 		textFieldFontColor = Color.black;
 		textFieldBg = Color.white;
 

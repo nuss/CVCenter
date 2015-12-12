@@ -18,11 +18,11 @@
 CVWidgetSpecsEditor {
 	var <window;
 
-	*new { |displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment|
-		^super.new.init(displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment)
+	*new { |displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, tab, metadata, environment|
+		^super.new.init(displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, tab, metadata, environment)
 	}
 
-	init { |displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment|
+	init { |displayDialog, obj, name, controls, prefix, pairs2D, tab, metadata, environment|
 		var object;
 		var wdgtName, windowTitle;
 		var specsList, specsListSpecs, selectMatch, thisSpec;
@@ -278,15 +278,19 @@ CVWidgetSpecsEditor {
 				.background_(textFieldBg)
 			;
 
-			if(object.class == NodeProxy, {
-				if(object.isPlaying, {
-					elem.enterTab.string_("NodeProxy ("++object.asNodeID++")");
+			if (tab.notNil) {
+				elem.enterTab.string_(tab.asString);
+			} {
+				if(object.class == NodeProxy, {
+					if(object.isPlaying, {
+						elem.enterTab.string_("NodeProxy ("++object.asNodeID++")");
+					}, {
+						elem.enterTab.string_("NodeProxy");
+					})
 				}, {
-					elem.enterTab.string_("NodeProxy");
-				})
-			}, {
-				elem.enterTab.string_(name);
-			});
+					elem.enterTab.string_(name);
+				});
+			}
 
 		};
 

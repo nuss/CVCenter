@@ -98,14 +98,14 @@
 
 +Synth {
 
-	cvcGui { |displayDialog=true, prefix, pairs2D, environment|
+	cvcGui { |displayDialog=true, prefix, pairs2D, tab, environment|
 		var sDef, def, cDict = (), metadata;
 		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
 		sDef = SynthDescLib.global[this.defName.asSymbol];
 		sDef.metadata !? { sDef.metadata.specs !? { metadata = sDef.metadata.specs }};
 		sDef.controlDict.pairsDo({ |n, c| cDict.put(n, c.defaultValue) });
 		if(displayDialog, {
-			CVWidgetSpecsEditor(displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, metadata, environment);
+			CVWidgetSpecsEditor(displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, tab, metadata, environment);
 		}, {
 			cDict.pairsDo({ |cName, vals|
 				block { |break|
@@ -177,7 +177,7 @@
 
 +NodeProxy {
 
-	cvcGui { |displayDialog=true, prefix, pairs2D|
+	cvcGui { |displayDialog=true, prefix, pairs2D, tab|
 		var cDict = (), name;
 		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
 		this.getKeysValues.do({ |pair| cDict.put(pair[0], pair[1]) });
@@ -187,7 +187,7 @@
 			name = nil;
 		});
 		if(displayDialog, {
-			CVWidgetSpecsEditor(displayDialog, this, name, cDict, prefix, pairs2D);
+			CVWidgetSpecsEditor(displayDialog, this, name, cDict, prefix, pairs2D, tab);
 		}, {
 			cDict.pairsDo({ |cName, vals|
 				block { |break|
@@ -243,12 +243,12 @@
 
 +Patch {
 
-	cvcGui { |displayDialog=true, prefix, pairs2D|
+	cvcGui { |displayDialog=true, prefix, pairs2D, tab|
 		var cDict = (), name;
 		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
 		this.synthDef.allControlNames.do({ |cname| cDict.put(cname.name, cname.defaultValue) });
 		if(displayDialog, {
-			CVWidgetSpecsEditor(displayDialog, this, this.instr.asSymbol, cDict, prefix, pairs2D);
+			CVWidgetSpecsEditor(displayDialog, this, this.instr.asSymbol, cDict, prefix, pairs2D, tab);
 		}, {
 			cDict.pairsDo({ |cName, vals|
 				block { |break|
