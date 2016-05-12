@@ -187,6 +187,7 @@
 			name = nil;
 		});
 		if(displayDialog, {
+			// "cDict.keys: %\n".postf(cDict.keys);
 			CVWidgetSpecsEditor(displayDialog, this, name, cDict, prefix, pairs2D, tab);
 		}, {
 			cDict.pairsDo({ |cName, vals|

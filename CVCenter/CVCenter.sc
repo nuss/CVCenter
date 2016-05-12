@@ -1646,7 +1646,6 @@ CVCenter {
 		var thisKey, thisSpec, thisVal, thisSlot, thisTab, widget2DKey;
 		var specName, cvClass, thisSVItems;
 
-		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		thisKey = key.asSymbol;
 
 		if (svItems.notNil, {
@@ -1706,7 +1705,7 @@ CVCenter {
 					thisSpec = spec.asSpec;
 				};
 				if (thisSpec.safeHasZeroCrossing) { thisSpec.warp_(\lin) };
-// protect from arrays containing nils
+				// protect from arrays containing nils
 				if (spec.indicesOfEqual(nil).size == spec.size or: {
 					spec.asSet.size == 1
 				}) {
@@ -1803,6 +1802,10 @@ CVCenter {
 
 	// add a CV using spec inference
 	*use { |key, spec, value, tab, slot, svItems, connectS, connectTF|
+		var thisSpec;
+
+		key ? Error("Please provide a key when calling CVCenter.use.");
+
 		^this.add(
 			key, spec ?? { this.findSpec(key) },
 			value, tab, slot, svItems,
