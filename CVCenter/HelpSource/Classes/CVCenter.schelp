@@ -859,7 +859,6 @@ SynthDef(\poly, { |atk=0.02, level=0.7, rel=1.5, curve=(-4), freqMod=1, gate=1, 
 // otherwise we get a conflict due to the different clocks for GUI related things
 // (AppClock - the widget creation in CVCenter GUI) and the pattern playing on TempoClock
 CVCenter.use(\degree, #[0, 11, \lin, 1, 2]!5); // setting freq - where going to use the 'note'-event. Hence, we're calling the widget degree rather than freq.
-CVCenter.use(\legato, #[0, 100, \lin]!5)
 
 // the pattern
 (
