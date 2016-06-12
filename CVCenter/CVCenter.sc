@@ -1181,11 +1181,13 @@ CVCenter {
 						cvcGui: cvcArgs
 					);
 					removeButs.put(key,
-						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-							.states_([["remove", Color.white, Color(0.0, 0.15)]])
-							.action_({ |b| this.removeAt(key) })
-							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
-						;
+						defer {
+							Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+								.states_([["remove", Color.white, Color(0.0, 0.15)]])
+								.action_({ |b| this.removeAt(key) })
+								.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
+							;
+						}
 					);
 					if (widgetStates[key].isNil, {
 						widgetStates.put(key, (
@@ -1237,13 +1239,15 @@ CVCenter {
 						cvcGui: cvcArgs,
 						numSliders: msSize
 					);
-					removeButs.put(key,
-						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-							.states_([["remove", Color.white, Color(0.0, 0.15)]])
-							.action_({ |b| this.removeAt(key) })
-							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
-						;
-					);
+					defer {
+						removeButs.put(key,
+							Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+								.states_([["remove", Color.white, Color(0.0, 0.15)]])
+								.action_({ |b| this.removeAt(key) })
+								.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
+							;
+						)
+					};
 					if (widgetStates[key].isNil, {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
@@ -1257,7 +1261,7 @@ CVCenter {
 					// widgetStates[key].slidersConnected = connectS ? this.connectSliders;
 					// widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
-					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
+					defer { cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor) };
 				});
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
@@ -1288,13 +1292,15 @@ CVCenter {
 						controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
 						cvcGui: cvcArgs
 					);
-					removeButs.put(key,
-						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-							.states_([["remove", Color.white, Color(0.0, 0.15)]])
-							.action_({ |b| this.removeAt(key) })
-							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
-						;
-					);
+					defer {
+						removeButs.put(key,
+							Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+								.states_([["remove", Color.white, Color(0.0, 0.15)]])
+								.action_({ |b| this.removeAt(key) })
+								.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
+							;
+						)
+					};
 					if (widgetStates[key].isNil, {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
@@ -1304,7 +1310,7 @@ CVCenter {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
 					});
-					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
+					defer { cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor) };
 				});
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
@@ -1665,7 +1671,9 @@ CVCenter {
 			this.front(thisTab);
 		}, {
 			// "prAddWidget: %\n".postf(thisKey);
-			this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
+			if (cvWidgets[thisKey].isNil or: { cvWidgets[thisKey].class == CVWidget2D })  {
+				this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
+			}
 		});
 
 		if (slot.notNil, {

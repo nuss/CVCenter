@@ -2295,18 +2295,24 @@ CVWidget {
 		midiInitFunc = { |val|
 			if(val.editor.notNil and:{ val.editor.isClosed.not }, {
 				if(MIDIClient.initialized, {
-					val.editor.midiInitBut.states_([
-						["restart MIDI", Color.black, Color.green]
-					])
+					defer {
+						val.editor.midiInitBut.states_([
+							["restart MIDI", Color.black, Color.green]
+						])
+					}
 				}, {
-					val.editor.midiInitBut.states_([
-						["init MIDI", Color.white, Color.red]
-					])
+					defer {
+						val.editor.midiInitBut.states_([
+							["init MIDI", Color.white, Color.red]
+						])
+					}
 				});
 				sourceNames = midiSources.keys.asArray.sort;
-				val.editor.midiSourceSelect.items_(
-					[val.editor.midiSourceSelect.items[0]]++sourceNames
-				);
+				defer {
+					val.editor.midiSourceSelect.items_(
+						[val.editor.midiSourceSelect.items[0]]++sourceNames
+					);
+				}
 			})
 		};
 
@@ -3078,9 +3084,13 @@ CVWidget {
 					if(GUI.id !== \cocoa, {
 						if(theChanger.value.but[0] == "edit OSC", {
 							if(slot.notNil, { p =  " in '"++slot++"'" }, { p = "" });
-							thisOscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
+							defer {
+								thisOscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
+							}
 						}, {
-							thisOscEditBut.toolTip_("Connected, listening to\n%, msg-slot %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
+							defer {
+								thisOscEditBut.toolTip_("Connected, listening to\n%, msg-slot %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
+							}
 						})
 					});
 				};
@@ -3120,11 +3130,13 @@ CVWidget {
 								msConnectionsMsg = msConnectionsMsg++"\n"++line;
 							}});
 
-							guiEnv.oscBut.toolTip_(msConnectionsMsg);
+						defer { guiEnv.oscBut.toolTip_(msConnectionsMsg) };
 						}
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == 0 } {
 							msTooltipLines = nil!this.msSize;
-							guiEnv.oscBut.toolTip_("no OSC-responders present.\nClick to edit.");
+							defer {
+								guiEnv.oscBut.toolTip_("no OSC-responders present.\nClick to edit.");
+							}
 						}
 					;
 				})
@@ -3133,7 +3145,9 @@ CVWidget {
 				if(GUI.id !== \cocoa, {
 					if(theChanger.value.but[0] == "edit OSC", {
 						if(slot.notNil, { p =  " in '"++slot++"'" }, { p = "" });
-						guiEnv.oscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
+						defer {
+							guiEnv.oscEditBut.toolTip_("no OSC-responder present%.\nClick to edit.".format(p));
+						}
 					}, {
 						guiEnv.oscEditBut.toolTip_("Connected, listening to\n%, msg-slot %,\nusing '%' in-output mapping".format(theChanger.value.nameField, theChanger.value.index, midiOscEnv.oscMapping));
 					})
@@ -3148,10 +3162,12 @@ CVWidget {
 						// "midiOscEnv.oscResponder is nil".postln;
 						tmp = background
 					}, { tmp = Color.cyan(0.5) });
-					guiEnv.oscEditBut.states_([
-						[theChanger.value.but[0], theChanger.value.but[1], tmp]
-					]);
-					guiEnv.oscEditBut.refresh;
+					defer {
+						guiEnv.oscEditBut.states_([
+							[theChanger.value.but[0], theChanger.value.but[1], tmp]
+						]);
+						guiEnv.oscEditBut.refresh;
+					}
 				}, {
 					numOscResponders = this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size;
 					numOscString = "OSC ("++numOscResponders++"/"++msSize++")";
@@ -3164,11 +3180,13 @@ CVWidget {
 						oscButBg = background;
 						oscButTextColor = stringColor;
 					});
-					this.guiEnv[\oscBut].states_([[
-						numOscString,
-						oscButTextColor, // text
-						oscButBg // background
-					]]);
+					defer {
+						this.guiEnv[\oscBut].states_([[
+							numOscString,
+							oscButTextColor, // text
+							oscButBg // background
+						]]);
+					}
 				})
 			});
 
@@ -3394,13 +3412,17 @@ CVWidget {
 			if(debug, { "widget '%' (%) at slot '%' actions.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			if(parent.isClosed.not, {
-				guiEnv.actionsBut.states_([[
-					"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
-					Color(0.08, 0.09, 0.14),
-					Color(0.32, 0.67, 0.76),
-				]]);
+				defer {
+					guiEnv.actionsBut.states_([[
+						"actions ("++theChanger.value.activeActions++"/"++theChanger.value.numActions++")",
+						Color(0.08, 0.09, 0.14),
+						Color(0.32, 0.67, 0.76),
+					]]);
+				};
 				if(GUI.id !== \cocoa, {
-					guiEnv.actionsBut.toolTip_(""++theChanger.value.activeActions++" of "++theChanger.value.numActions++" active.\nClick to edit")
+					defer {
+						guiEnv.actionsBut.toolTip_(""++theChanger.value.activeActions++" of "++theChanger.value.numActions++" active.\nClick to edit")
+					}
 				})
 			})
 		})
