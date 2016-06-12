@@ -879,6 +879,10 @@ Pdef(\poly,
 			CVCenter.use(\freqModLo, \pan, slot: \lo),
 			CVCenter.use(\freqModLo, \pan, slot: \hi)
 		),
+		strum: Ptuple([
+			CVCenter.use(\strum, slot: \lo),
+			CVCenter.use(\strum, slot: \hi)
+		]),
 		level: CVCenter.use(\amp),
 	])//.trace
 )
