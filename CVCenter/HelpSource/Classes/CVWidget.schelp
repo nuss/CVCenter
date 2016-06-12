@@ -307,6 +307,8 @@ returns:: code::nil:: or an link::Classes/Event:: containing the constraints in 
 METHOD:: addAction
 Add an action to the widget's link::Classes/CV::.
 
+See also the related class method link::Classes/CVCenter#*addActionAt::
+
 argument:: name
 a link::Classes/Symbol:: or a link::Classes/String::, representing the name under which the action will be stored
 

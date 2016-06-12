@@ -562,6 +562,7 @@ CVWidget {
 		this.wdgtActions ?? { this.wdgtActions = () };
 		if(action.class === String, { act = action.interpret }, { act = action });
 		switch(this.class,
+			// CVWidget2D needs a special treatment as it's really a combination of 2 CVs
 			CVWidget2D, {
 				slot ?? { Error("Please provide either 'lo' or 'hi' as third argument to addAction!").throw };
 				this.wdgtActions[slot.asSymbol] ?? { this.wdgtActions.put(slot.asSymbol, ()) };
@@ -589,6 +590,8 @@ CVWidget {
 					})
 				})
 			},
+			// both, CVWidgetKnob and CVWidgetMS, take a single function.
+			// However, the CV's value of a CVWidgetMS is an arraz rather than a single value
 			{
 				this.wdgtActions[name.asSymbol] ?? {
 					this.wdgtActions.put(name.asSymbol, ());
