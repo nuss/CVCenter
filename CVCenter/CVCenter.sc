@@ -1180,21 +1180,21 @@ CVCenter {
 						},
 						cvcGui: cvcArgs
 					);
-					removeButs.put(key,
-						defer {
+					defer {
+						removeButs.put(key,
 							Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
 								.states_([["remove", Color.white, Color(0.0, 0.15)]])
 								.action_({ |b| this.removeAt(key) })
 								.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 							;
-						}
-					);
+						)
+					};
 					if (widgetStates[key].isNil, {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
 							tabKey: thisTabLabel,
-						// slidersConnected: connectS ? this.connectSliders,
-						// textFieldsConnected: connectTF ? this.connectTextFields
+							// slidersConnected: connectS ? this.connectSliders,
+							// textFieldsConnected: connectTF ? this.connectTextFields
 						))
 					}, {
 						widgetStates[key].tabIndex = cvTabIndex;
