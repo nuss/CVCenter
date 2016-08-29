@@ -1459,7 +1459,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				msEditorEnv.specsListItems = specsList.items;
 			});
 
-			// OSCCommands.collectTempIPsAndCmds;
+			OSCCommands.collectTempIPsAndCmds;
 			deviceDropDown
 				.mouseDownAction_({ |dd|
 					dropDownIPs = OSCCommands.tempIPsAndCmds.keys.asArray;
