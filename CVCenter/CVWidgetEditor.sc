@@ -240,7 +240,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 				cvString = cvString[1..cvString.size-1].join(" ");
 
-				specField = TextField(tabView0, Point(flow0.bounds.width-20, 15))
+				specField = TextField(tabView0, Point(flow0.bounds.width-2, 15))
 					.font_(staticTextFont)
 					.string_(cvString)
 					.action_({ |tf|
@@ -803,7 +803,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 			flow2.shift(0, 0);
 
-			specConstraintsText = StaticText(tabView2, Point(flow2.bounds.width-85, 15))
+			specConstraintsText = StaticText(tabView2, Point(flow2.bounds.width-15, 15))
 				.font_(staticTextFont)
 				.background_(Color.white)
 			;
@@ -1152,7 +1152,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 							}
 						);
 
-						flow3.shift(5, 0);
+						flow3.shift(0, 0);
 
 						actionsUIs[name].removeBut = Button(cTabView3, Point(60, 15))
 							.font_(staticTextFont)

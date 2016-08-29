@@ -60,7 +60,7 @@ METHOD:: use
 Use an arbitrary name for creating a new link::Classes/CVWidget:: (a link::Classes/CVWidgetKnob:: or a link::Classes/CVWidget2D::, depending on the argument code::slot::).
 note:: strong::This is the recommended way for creating new widgets.:: This method should be convenient in most situations. It simply creates a new link::Classes/CVWidget:: and returns the link::Classes/CV::. As link::Classes/CV:: inherits from code::Stream:: this method may directly be used in code::Pattern::s. Any reevaluation will leave a once created link::Classes/CV:: untouched.
 
-You may omit the arguments code::slot:: and code::tab:: when creating a link::Classes/CVWidget2D:: and its first slot has already been created. However, if the widget is used within patterns you always strong::must:: provide the slot as execution of the pattern depends on the right CV to be returned (if omitted the widget would return an event, composed of the \lo and \hi key).
+You may omit the arguments code::slot:: and code::tab:: when creating a link::Classes/CVWidget2D:: if its first slot has already been created. However, if the widget is used within patterns you always strong::must:: provide the slot as execution of the pattern depends on the right CV to be returned (if omitted the widget would return an event, composed of the \lo and \hi key).
 ::
 
 argument:: key
@@ -859,7 +859,10 @@ SynthDef(\poly, { |atk=0.02, level=0.7, rel=1.5, curve=(-4), freqMod=1, gate=1, 
 // otherwise we get a conflict due to the different clocks for GUI related things
 // (AppClock - the widget creation in CVCenter GUI) and the pattern playing on TempoClock
 CVCenter.use(\degree, #[0, 11, \lin, 1, 2]!5); // setting freq - where going to use the 'note'-event. Hence, we're calling the widget degree rather than freq.
+<<<<<<< HEAD
 CVCenter.use(\dur, #[0.125, 1.0, \lin, 0.025, 0.25]!5); // durations
+=======
+>>>>>>> master
 
 // the pattern
 (
@@ -871,10 +874,8 @@ Pdef(\poly,
 		note: PdegreeToKey( Prout({ loop {
 			CVCenter.at(\degree).embedInStream
 		}}), Scale.dorian),
-		// the list arg in a ListPattern can't simply be replaced by a Pattern
-		// using a custom key holding a Pfunc that updates the Pseq's internal list
-		dur: d = Pseq(0.125!5, inf),
-		durList: Pfunc({ d.list_(CVCenter.at(\dur).value) }),
+		// dur cannot be set individually for each channel
+        dur: CVCenter.use(\dur, #[0.1, 1]),
 		curve: CVCenter.use(\curve, #[-4.0, 4.0].asSpec),
 		rel: Pwhite(0.8, 2.0),
 		atk: Pwhite(0.01, 0.03),
@@ -882,6 +883,10 @@ Pdef(\poly,
 			CVCenter.use(\freqModLo, \pan, slot: \lo),
 			CVCenter.use(\freqModLo, \pan, slot: \hi)
 		),
+		strum: Ptuple([
+			CVCenter.use(\strum, slot: \lo),
+			CVCenter.use(\strum, slot: \hi)
+		]),
 		level: CVCenter.use(\amp),
 	])//.trace
 )

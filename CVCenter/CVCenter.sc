@@ -731,7 +731,7 @@ CVCenter {
 			;
 
 			// correct prefPane height if its contents span more than 1 line
-			rows = prefPane.children.collect({ |child| child.bounds.top }).asBag.contents.size;
+			rows = prefPane.children.collect({ |child| child.bounds.top }).asSet.size;
 			if (rows > 1, {
 				prefPane.bounds_(Rect(
 					prefPaneBounds.left,
@@ -918,7 +918,6 @@ CVCenter {
 							this.removeAt(k);
 						});
 						([tabs.activeTab]++childViews.collect({ |view| view.tabs.keys.asArray })).flat.do({ |view| this.prRegroupWidgets(view) });
-						// tmp = tabs.tabViews[0].label;
 					});
 					lastUpdate = all.size;
 				});
@@ -928,8 +927,6 @@ CVCenter {
 				});
 				if (childViews.size > 0, {
 					childViews.pairsDo({ |child, childProps|
-						// "child, childProps: %, %\n".postf(child, childProps);
-						// [child.bounds, childProps.lastUpdateBounds].postln;
 						if (childProps.lastUpdateBounds.notNil and:{
 							child.bounds.width != childProps.lastUpdateBounds.width
 						}, {
@@ -941,7 +938,6 @@ CVCenter {
 					prefs !? {
 						if (prefs[\saveGuiProperties] == 1, { prefs[\guiProperties] = window.bounds });
 					};
-					// prefs[\guiProperties].postln;
 				});
 				lastUpdateBounds = window.bounds;
 				if (childViews.size > 0, {
@@ -1185,11 +1181,13 @@ CVCenter {
 						cvcGui: cvcArgs
 					);
 					removeButs.put(key,
-						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-							.states_([["remove", Color.white, Color(0.0, 0.15)]])
-							.action_({ |b| this.removeAt(key) })
-							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
-						;
+						defer {
+							Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+								.states_([["remove", Color.white, Color(0.0, 0.15)]])
+								.action_({ |b| this.removeAt(key) })
+								.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
+							;
+						}
 					);
 					if (widgetStates[key].isNil, {
 						widgetStates.put(key, (
@@ -1241,13 +1239,17 @@ CVCenter {
 						cvcGui: cvcArgs,
 						numSliders: msSize
 					);
-					removeButs.put(key,
-						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-							.states_([["remove", Color.white, Color(0.0, 0.15)]])
-							.action_({ |b| this.removeAt(key) })
-							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
-						;
-					);
+
+					defer {
+						removeButs.put(key,
+							Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+								.states_([["remove", Color.white, Color(0.0, 0.15)]])
+								.action_({ |b| this.removeAt(key) })
+								.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
+							;
+						)
+					};
+
 					if (widgetStates[key].isNil, {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
@@ -1261,7 +1263,7 @@ CVCenter {
 					// widgetStates[key].slidersConnected = connectS ? this.connectSliders;
 					// widgetStates[key].textFieldsConnected = connectTF ? this.connectTextFields;
 					});
-					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
+					defer { cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor) };
 				});
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
@@ -1292,13 +1294,17 @@ CVCenter {
 						controllersAndModels: cvWidgets[key] !? { cvWidgets[key].wdgtControllersAndModels },
 						cvcGui: cvcArgs
 					);
-					removeButs.put(key,
-						Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
-							.states_([["remove", Color.white, Color(0.0, 0.15)]])
-							.action_({ |b| this.removeAt(key) })
-							.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
-						;
-					);
+
+					defer {
+						removeButs.put(key,
+							Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
+								.states_([["remove", Color.white, Color(0.0, 0.15)]])
+								.action_({ |b| this.removeAt(key) })
+								.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
+							;
+						)
+					};
+
 					if (widgetStates[key].isNil, {
 						widgetStates.put(key, (
 							tabIndex: cvTabIndex,
@@ -1308,7 +1314,7 @@ CVCenter {
 						widgetStates[key].tabIndex = cvTabIndex;
 						widgetStates[key].tabKey = thisTabLabel;
 					});
-					cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor);
+					defer { cvWidgets[key].background_(tabProperties[thisTabLabel].tabColor) };
 				});
 				tmp.wdgtActions !? { cvWidgets[key].wdgtActions = tmp.wdgtActions };
 			}
@@ -1537,7 +1543,7 @@ CVCenter {
 
 		if (svItems.notNil, {
 			if (svItems.isKindOf(SequenceableCollection).not, {
-				Error("svItems must be a SequenceableCollection or an instance of one of its subclasses!").through;
+				Error("svItems must be a SequenceableCollection or an instance of one of its subclasses!").throw;
 			}, {
 				thisSVItems = svItems.collect(_.asSymbol);
 				cvClass = SV;
@@ -1592,6 +1598,7 @@ CVCenter {
 					thisSpec = spec.asSpec;
 				};
 				if (thisSpec.safeHasZeroCrossing) { thisSpec.warp_(\lin) };
+
 				// protect from arrays containing nils
 				if (spec.indicesOfEqual(nil).size == spec.size or: {
 					spec.asSet.size == 1
@@ -1601,7 +1608,7 @@ CVCenter {
 					}
 				}
 			}, {
-				Error("Could not create a valid ControlSpec from given value '%'".format(spec)).throw;
+				Error("The given value '%' is an array but could not be converted to a valid ControlSpec".format(spec)).throw;
 			})
 		});
 
@@ -1669,7 +1676,9 @@ CVCenter {
 			this.front(thisTab);
 		}, {
 			// "prAddWidget: %\n".postf(thisKey);
-			this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
+			if (cvWidgets[thisKey].isNil or: { cvWidgets[thisKey].class == CVWidget2D })  {
+				this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
+			}
 		});
 
 		if (slot.notNil, {
@@ -1927,7 +1936,7 @@ CVCenter {
 								wdgtClass: CVWidgetMS,
 								midiOscRememberBatchConnection: cvWidgets[k].midiOscRememberBatchConnection,
 								osc: ()!cvWidgets[k].msSize,
-								midi: ()!cvWidgets[k].msSize
+								midi: ()!cvWidgets[k].msSize,
 							);
 							cvWidgets[k].msSize.do({ |sl|
 								// osc
@@ -2409,7 +2418,7 @@ CVCenter {
 		swFlow.reset;
 		children.do({ |child|
 			swFlow.place(child);
-			rows = children.collect({ |child| child.bounds.top }).asBag.contents.size;
+			rows = children.collect({ |child| child.bounds.top }).asSet.size;
 			prefPane.bounds_(Rect(
 				prefPaneBounds.left,
 				window.view.bounds.height-35-(rows-1*21),
