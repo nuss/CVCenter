@@ -793,7 +793,6 @@ CVCenter {
 						},
 						cvcGui: cvcArgs
 					);
-
 					defer {
 						removeButs.put(key,
 							Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
