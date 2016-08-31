@@ -19,7 +19,7 @@ CVWidget {
 
 	classvar <>removeResponders = true, <>midiSources, <>shortcuts, prefs/*, midiStateObserver*/;
 	classvar <>debug = false;
-	classvar <>globalOSCfeedbackPort = 9000;
+	classvar <>globalOSCfeedbackPort = 32000;
 	classvar <oscFeedbackAddrs, <multiSlotOSCcmds;
 
 	var <parent, <widgetCV, <name, <connectS = true, <connectTF = true;
