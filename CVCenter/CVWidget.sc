@@ -1531,7 +1531,12 @@ CVWidget {
 
 						// "do I get here?".postln;
 
-				specSize = thisSpec.size;
+				specSize = [
+					thisSpec.minval.size,
+					thisSpec.maxval.size,
+					thisSpec.step.size,
+					thisSpec.default.size
+				].maxItem;
 
 				if(specSize < msSize, {
 					this.mSlider.indexThumbSize_(this.mSlider.bounds.width/specSize);
