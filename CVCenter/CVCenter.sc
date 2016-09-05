@@ -1535,11 +1535,23 @@ CVCenter {
 	}
 
 	*add { |key, spec, value, tab, slot, svItems, connectS, connectTF|
-		var thisKey, thisSpec, thisVal, thisSlot, thisTab, widget2DKey;
+		var thisKey, thisSpec, thisVal, testSlot, thisSlot, thisTab, widget2DKey;
 		var specName, cvClass, thisSVItems;
 
 		key ?? { Error("You cannot use a CV in CVCenter without providing key").throw };
 		thisKey = key.asSymbol;
+
+		// return early if a CV under the given key already exists
+		all[thisKey] !? {
+			if (all[thisKey].class != Event) {
+				^all[thisKey];
+			} {
+				testSlot = slot.asSymbol;
+				if (all[thisKey].size == 2) {
+					^all[thisKey][testSlot];
+				}
+			}
+		};
 
 		if (svItems.notNil, {
 			if (svItems.isKindOf(SequenceableCollection).not, {
@@ -1698,7 +1710,13 @@ CVCenter {
 
 	// add a CV using spec inference
 	*use { |key, spec, value, tab, slot, svItems, connectS, connectTF|
-		^this.add(key, spec ?? { this.findSpec(key) }, value, tab, slot, svItems, connectS ? this.connectSliders, connectTF ? this.connectTextFields)
+		^this.add(
+			key,
+			spec ?? { this.findSpec(key) },
+			value, tab, slot, svItems,
+			connectS ?? { this.connectSliders },
+			connectTF ?? { this.connectTextFields }
+		)
 	}
 
 	*widgetConnectGUI { |key, connectSliders, connectTextFields|
