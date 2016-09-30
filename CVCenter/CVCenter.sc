@@ -2009,7 +2009,7 @@ CVCenter {
 								lib[\all][k][hilo] = (
 									spec: cvWidgets[k].widgetCV[hilo].spec,
 									val: cvWidgets[k].widgetCV[hilo].value,
-									actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo] },
+									actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo].select({ |k| k.values[0][0] != "{ \"open Function\" }" }) },
 									osc: (
 										addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
 											cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
@@ -2038,7 +2038,7 @@ CVCenter {
 							lib[\all][k] = (
 								spec: cvWidgets[k].widgetCV.spec,
 								val: cvWidgets[k].widgetCV.value,
-								actions: cvWidgets[k].wdgtActions,
+								actions: cvWidgets[k].wdgtActions.select({ |k| k.values[0][0] != "{ \"open Function\" }" }),
 								osc: (
 									addr: cvWidgets[k].midiOscEnv.oscResponder !? {
 										cvWidgets[k].midiOscEnv.oscResponder.addr
@@ -2067,7 +2067,7 @@ CVCenter {
 							lib[\all][k] = (
 								spec: cvWidgets[k].widgetCV.spec,
 								val: cvWidgets[k].widgetCV.value,
-								actions: cvWidgets[k].wdgtActions,
+								actions: cvWidgets[k].wdgtActions.select({ |k| k.values[0][0] != "{ \"open Function\" }" }),
 								wdgtClass: CVWidgetMS,
 								midiOscRememberBatchConnection: cvWidgets[k].midiOscRememberBatchConnection,
 								osc: ()!cvWidgets[k].msSize,
@@ -2091,7 +2091,10 @@ CVCenter {
 								lib[\all][k].midi[sl].softWithin = cvWidgets[k].getSoftWithin(sl);
 								lib[\all][k].midi[sl].midiResolution = cvWidgets[k].getMidiResolution(sl);
 								lib[\all][k].midi[sl].ctrlButtonBank = cvWidgets[k].getCtrlButtonBank(sl);
-							})
+							});
+							cvWidgets[k].cvArray !? {
+								lib[\all][k].isSplit = true;
+							}
 						}
 					);
 					lib[\all][k].connectS = cvWidgets[k].connectS;
@@ -2313,6 +2316,9 @@ CVCenter {
 							},
 							CVWidgetMS, {
 								this.add(key, v.spec, v.val, v.tabLabel);
+								v.isSplit !? {
+									if (v.isSplit) { cvWidgets[key].split }
+								};
 								v.midiOscRememberBatchConnection !? {
 									v.midiOscRememberBatchConnection.pairsDo({ |k, v|
 										cvWidgets[key].midiOscRememberBatchConnection[k] = v;

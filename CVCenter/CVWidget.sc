@@ -591,7 +591,7 @@ CVWidget {
 				})
 			},
 			// both, CVWidgetKnob and CVWidgetMS, take a single function.
-			// However, the CV's value of a CVWidgetMS is an arraz rather than a single value
+			// However, the CV's value of a CVWidgetMS is an array rather than a single value
 			{
 				this.wdgtActions[name.asSymbol] ?? {
 					this.wdgtActions.put(name.asSymbol, ());
@@ -3327,17 +3327,19 @@ CVWidget {
 				thisEditor = guiEnv.editor[slot];
 				defer {
 					if(guiEnv.oscBut.toolTip != "no OSC-responders present.\nClick to edit." and:{
-						msTooltipLines[slot].notNil
+						msTooltipLines.notNil and:{
+							msTooltipLines[slot].notNil
+						}
 					}) {
 						msTooltipLines[slot] = msTooltipLines[slot].split($:)[..1].join($:)++":"+this.getOscMapping(slot);
 						msTooltip = "OSC-responders:";
 						msTooltipLines.do({ |line| line !? { msTooltip = msTooltip++"\n"++line }});
-						guiEnv.oscBut.toolTip_(msTooltip);
+						defer { guiEnv.oscBut.toolTip_(msTooltip) };
 					}
 				};
 				guiEnv.msEditor !? {
 					thisOscEditBut = guiEnv.msEditor.oscEditBtns[slot];
-				}
+				};
 			}, {
 				thisEditor = guiEnv.editor;
 				thisOscEditBut = guiEnv.oscEditBut;
