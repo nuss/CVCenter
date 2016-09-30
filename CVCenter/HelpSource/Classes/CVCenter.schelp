@@ -858,11 +858,11 @@ SynthDef(\poly, { |atk=0.02, level=0.7, rel=1.5, curve=(-4), freqMod=1, gate=1, 
 // for the arrayed control create a CVWidgetMS *ahead* from using it in the pattern
 // otherwise we get a conflict due to the different clocks for GUI related things
 // (AppClock - the widget creation in CVCenter GUI) and the pattern playing on TempoClock
-CVCenter.use(\degree, #[0, 11, \lin, 1, 2]!5); // setting freq - where going to use the 'note'-event. Hence, we're calling the widget degree rather than freq.
-<<<<<<< HEAD
-CVCenter.use(\dur, #[0.125, 1.0, \lin, 0.025, 0.25]!5); // durations
-=======
->>>>>>> master
+// setting freq - where going to use the 'note'-event.
+// Hence, we're calling the widget degree rather than freq.
+CVCenter.use(\degree, #[0, 11, \lin, 1, 2]!5);
+// a CVWidgetMS for setting rythmic sequences
+CVCenter.use(\dur, #[0.1, 1, \lin, 0.1, 0.3]!10);
 
 // the pattern
 (
@@ -875,7 +875,7 @@ Pdef(\poly,
 			CVCenter.at(\degree).embedInStream
 		}}), Scale.dorian),
 		// dur cannot be set individually for each channel
-        dur: CVCenter.use(\dur, #[0.1, 1]),
+        dur: Pseq(CVCenter.cvWidgets[\dur].split, inf),
 		curve: CVCenter.use(\curve, #[-4.0, 4.0].asSpec),
 		rel: Pwhite(0.8, 2.0),
 		atk: Pwhite(0.01, 0.03),
@@ -883,10 +883,6 @@ Pdef(\poly,
 			CVCenter.use(\freqModLo, \pan, slot: \lo),
 			CVCenter.use(\freqModLo, \pan, slot: \hi)
 		),
-		strum: Ptuple([
-			CVCenter.use(\strum, slot: \lo),
-			CVCenter.use(\strum, slot: \hi)
-		]),
 		level: CVCenter.use(\amp),
 	])//.trace
 )

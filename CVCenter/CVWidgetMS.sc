@@ -2,6 +2,8 @@ CVWidgetMS : CVWidget {
 	var <mSlider, <calibViews, <numVal, <midiBut, <oscBut, <specBut, <actionsBut;
 	var numOscResponders, numMidiResponders;
 	var <midiOscRememberBatchConnection;
+	// split multidimensional CVs into single valued CVs
+	var <cvArray, splitSpec;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 	// special var for OSC-feedback:
@@ -580,6 +582,37 @@ CVWidgetMS : CVWidget {
 				[oscBut.states[0][0], stringColor, oscBut.states[0][2]]
 			])
 		})
+	}
+
+	// for convenient usage in patterns
+	split {
+		var spec = widgetCV.spec;
+		// no split yet set
+		if (cvArray.isNil or: { cvArray.size != msSize }) {
+			cvArray = widgetCV.split;
+			splitSpec = spec;
+			this.addAction(\setSplitValues, {
+				cvArray.do({ |cvi, i|
+					cvi.value_(widgetCV.value[i])
+				})
+			});
+		};
+		// update spec if spec of parent CVWidgetMS has changed
+		if (cvArray.notNil and:{ spec != splitSpec }) {
+			cvArray.do({ |cvi, i|
+				cvi.spec_(
+					ControlSpec(
+						if (spec.minval.isArray) { spec.minval.wrapAt(i) } { spec.minval },
+						if (spec.maxval.isArray) { spec.maxval.wrapAt(i) } { spec.maxval },
+						spec.warp,
+						if (spec.steo.isArray ) { spec.step.wrapAt(i) } { spec.step },
+						spec.default.wrapAt(i),
+						spec.grid !? { spec.grid }
+					)
+				)
+			})
+		}
+		^cvArray;
 	}
 
 }
