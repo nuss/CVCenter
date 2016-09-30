@@ -581,7 +581,7 @@ CVWidgetMS : CVWidget {
 
 	// for convenient usage in patterns
 	split {
-		var spec = widgetCV.spec;
+		var spec = widgetCV.spec, specs;
 		// no split yet set
 		if (cvArray.isNil or: { cvArray.size != msSize }) {
 			cvArray = widgetCV.split;
@@ -594,18 +594,8 @@ CVWidgetMS : CVWidget {
 		};
 		// update spec if spec of parent CVWidgetMS has changed
 		if (cvArray.notNil and:{ spec != splitSpec }) {
-			cvArray.do({ |cvi, i|
-				cvi.spec_(
-					ControlSpec(
-						if (spec.minval.isArray) { spec.minval.wrapAt(i) } { spec.minval },
-						if (spec.maxval.isArray) { spec.maxval.wrapAt(i) } { spec.maxval },
-						spec.warp,
-						if (spec.steo.isArray ) { spec.step.wrapAt(i) } { spec.step },
-						spec.default.wrapAt(i),
-						spec.grid !? { spec.grid }
-					)
-				)
-			})
+			specs = spec.split;
+			cvArray.do({ |cvi, i| cvi.spec_(specs[i]) })
 		}
 		^cvArray;
 	}
