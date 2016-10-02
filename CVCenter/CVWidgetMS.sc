@@ -3,7 +3,7 @@ CVWidgetMS : CVWidget {
 	var numOscResponders, numMidiResponders;
 	var <midiOscRememberBatchConnection;
 	// split multidimensional CVs into single valued CVs
-	var <cvArray, <isSplit = false, splitSpec;
+	var <cvArray, splitSpec;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 	// special var for OSC-feedback:
@@ -602,7 +602,6 @@ CVWidgetMS : CVWidget {
 			specs = spec.split;
 			cvArray.do({ |cvi, i| cvi.spec_(specs[i]) })
 		};
-		isSplit = true;
 		^cvArray;
 	}
 
