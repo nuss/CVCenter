@@ -2042,7 +2042,6 @@ CVCenter {
 				all !? {
 					if (addToExisting === false, {
 						toBeRemoved = all.reject({ |v, k| k === \snapshot or:{ k === 'select snapshot' }});
-						toBeRemoved.keys.postcs;
 						toBeRemoved.keysDo({ |key| this.removeAt(key) });
 					})
 				};
