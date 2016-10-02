@@ -1099,7 +1099,7 @@ CVWidget {
 			}
 		);
 		// CVWidgetMS: apply split again if is already split and spec has changed
-		if (this.class == CVWidgetMS and:{ this.isSplit }) {
+		if (this.class == CVWidgetMS and:{ this.cvArray.notNil }) {
 			this.split;
 		}
 	}
@@ -2605,6 +2605,8 @@ CVWidget {
 					if(this.class != CVWidgetMS, {
 						defer {
 							if(parent.isClosed.not, {
+								// nasty: if a setup is loaded after another setup has been loaded before setting
+								// the background color with .background_ will fail as <textView>.palette returns nil
 								guiEnv.midiSrc
 									.string_(theChanger.value.src)
 									.background_(Color.white)
