@@ -1127,7 +1127,11 @@ CVWidget {
 			{
 				wdgtControllersAndModels.cvSpec.model.value_(thisSpec).changedKeys(synchKeys);
 			}
-		)
+		);
+		// CVWidgetMS: apply split again if is already split and spec has changed
+		if (this.class == CVWidgetMS and:{ this.isSplit }) {
+			this.split;
+		}
 	}
 
 	getSpec { |slot|
