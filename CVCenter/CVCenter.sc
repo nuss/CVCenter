@@ -1545,6 +1545,7 @@ CVCenter {
 
 	*removeAt { |key|
 		var lastVal, thisKey, thisTabIndex, thisTabKey;
+
 		thisKey = key.asSymbol;
 		thisTabKey = widgetStates[thisKey].tabKey;
 		all.removeAt(thisKey);
@@ -2009,7 +2010,8 @@ CVCenter {
 								lib[\all][k][hilo] = (
 									spec: cvWidgets[k].widgetCV[hilo].spec,
 									val: cvWidgets[k].widgetCV[hilo].value,
-									actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo].select({ |k| k.values[0][0] != "{ \"open Function\" }" }) },
+									// actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo].select({ |k| k.values[0][0] != "{ \"open Function\" }" }) },
+									actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo] },
 									osc: (
 										addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
 											cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
@@ -2038,7 +2040,8 @@ CVCenter {
 							lib[\all][k] = (
 								spec: cvWidgets[k].widgetCV.spec,
 								val: cvWidgets[k].widgetCV.value,
-								actions: cvWidgets[k].wdgtActions.select({ |k| k.values[0][0] != "{ \"open Function\" }" }),
+								// actions: cvWidgets[k].wdgtActions.select({ |k| k.values[0][0] != "{ \"open Function\" }" }),
+								actions: cvWidgets[k].wdgtActions,
 								osc: (
 									addr: cvWidgets[k].midiOscEnv.oscResponder !? {
 										cvWidgets[k].midiOscEnv.oscResponder.addr
@@ -2067,7 +2070,8 @@ CVCenter {
 							lib[\all][k] = (
 								spec: cvWidgets[k].widgetCV.spec,
 								val: cvWidgets[k].widgetCV.value,
-								actions: cvWidgets[k].wdgtActions.select({ |k| k.values[0][0] != "{ \"open Function\" }" }),
+								// actions: cvWidgets[k].wdgtActions.select({ |k| k.values[0][0] != "{ \"open Function\" }" }),
+								actions: cvWidgets[k].wdgtActions,
 								wdgtClass: CVWidgetMS,
 								midiOscRememberBatchConnection: cvWidgets[k].midiOscRememberBatchConnection,
 								osc: ()!cvWidgets[k].msSize,
@@ -2141,7 +2145,7 @@ CVCenter {
 			loadActions=true, midiSrcID, oscIPAddress, loadShortcuts=true, loadSnapshots=true,
 			connectSliders, connectNumBoxes
 		|
-		var lib, successFunc;
+		var lib, successFunc, toBeRemoved;
 
 		successFunc = { |f|
 			if (GUI.id === \qt, {
@@ -2154,10 +2158,9 @@ CVCenter {
 			{
 				all !? {
 					if (addToExisting === false, {
-						// this.removeAll;
-						all.pairsDo({ |key, wdgt|
-							if (key !== \snapshot and:{ key !== 'select snapshot' }, { this.removeAt(key) });
-						})
+						toBeRemoved = all.reject({ |v, k| k === \snapshot or:{ k === 'select snapshot' }});
+						toBeRemoved.keys.postcs;
+						toBeRemoved.keysDo({ |key| this.removeAt(key) });
 					})
 				};
 				lib[\all].pairsDo({ |key, v|
@@ -2167,10 +2170,10 @@ CVCenter {
 								#[lo, hi].do({ |hilo|
 									this.add(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
 									cvWidgets[key].setMidiMode(v[hilo].midi.midiMode, hilo)
-										.setMidiMean(v[hilo].midi.midiMean, hilo)
-										.setSoftWithin(v[hilo].midi.softWithin, hilo)
-										.setMidiResolution(v[hilo].midi.midiResolution, hilo)
-										.setCtrlButtonBank(v[hilo].midi.ctrlButtonBank, hilo)
+									.setMidiMean(v[hilo].midi.midiMean, hilo)
+									.setSoftWithin(v[hilo].midi.softWithin, hilo)
+									.setMidiResolution(v[hilo].midi.midiResolution, hilo)
+									.setCtrlButtonBank(v[hilo].midi.ctrlButtonBank, hilo)
 									;
 									if (loadActions, {
 										v[hilo].actions !? {
@@ -2217,7 +2220,7 @@ CVCenter {
 													),
 													hilo
 												);
-													cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
+												cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
 													[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
 												).changedKeys(cvWidgets[key].synchKeys)
 											});
@@ -2316,9 +2319,6 @@ CVCenter {
 							},
 							CVWidgetMS, {
 								this.add(key, v.spec, v.val, v.tabLabel);
-								v.isSplit !? {
-									if (v.isSplit) { cvWidgets[key].split }
-								};
 								v.midiOscRememberBatchConnection !? {
 									v.midiOscRememberBatchConnection.pairsDo({ |k, v|
 										cvWidgets[key].midiOscRememberBatchConnection[k] = v;
@@ -2404,7 +2404,12 @@ CVCenter {
 											}
 										}
 									})
-								})
+								});
+								v.isSplit !? {
+									if (v.isSplit) {
+										cvWidgets[key].split;
+									}
+								};
 							}
 						);
 
@@ -2430,14 +2435,9 @@ CVCenter {
 							CVCenterLoadDialog.window.close;
 						})
 					})
-				})
-			}.defer(0.1);
-			if (\KeyDownActions.asClass.notNil and: {
-				this.useKeyDownActions and: {
-					loadShortcuts
-				}
-			}, {
-				{
+				});
+				0.1.wait;
+				if (loadShortcuts, {
 					lib[\all][\shortcuts] !? {
 						this.shortcuts_(lib[\all][\shortcuts][\cvCenter]);
 						[tabs.views, prefPane].flat.do({ |view|
@@ -2455,10 +2455,9 @@ CVCenter {
 							\KeyDownActions.asClass.globalShortcutsSync;
 						});
 					}
-				}.defer(0.5)
-			});
-			if (loadSnapshots, {
-				{
+				});
+				0.5.wait;
+				if (loadSnapshots, {
 					if (addToExisting.not, {
 						snapShots = ();
 						this.at('select snapshot').items_(["select snapshot..."]);
@@ -2467,8 +2466,8 @@ CVCenter {
 						snapShots.put(k, v);
 						this.at('select snapshot').items_(this.at('select snapshot').items.add(k));
 					});
-				}.defer(0.5)
-			})
+				})
+			}.fork(AppClock)
 		};
 
 		if (path.isNil, {
