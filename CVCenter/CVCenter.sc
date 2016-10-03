@@ -1628,8 +1628,10 @@ CVCenter {
 	}
 
 	*removeAll { |...keys|
+		var toBeRemoved = all.keys.reject({ |k| k === \snapshot or:{ k === 'select snapshot' }});
+
 		if (keys.size < 1, {
-			all.keys.do(this.removeAt(_));
+			toBeRemoved.do(this.removeAt(_));
 		}, {
 			keys.do(this.removeAt(_));
 		});
@@ -2157,10 +2159,7 @@ CVCenter {
 
 			{
 				all !? {
-					if (addToExisting === false, {
-						toBeRemoved = all.reject({ |v, k| k === \snapshot or:{ k === 'select snapshot' }});
-						toBeRemoved.keysDo({ |key| this.removeAt(key) });
-					})
+					if (addToExisting === false, { this.removeAll });
 				};
 				lib[\all].pairsDo({ |key, v|
 					if (key !== \shortcuts, {
