@@ -3,7 +3,7 @@ CVWidgetMS : CVWidget {
 	var numOscResponders, numMidiResponders;
 	var <midiOscRememberBatchConnection;
 	// split multidimensional CVs into single valued CVs
-	var <cvArray, splitSpec;
+	var splitSpec;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 
@@ -158,7 +158,7 @@ CVWidgetMS : CVWidget {
 							})
 						})
 					})
-				}
+				};
 			});
 			if(persistent == false or:{ persistent.isNil }, {
 				parent.onClose_(parent.onClose.addFunc({
@@ -584,16 +584,17 @@ CVWidgetMS : CVWidget {
 		if (cvArray.isNil or: { cvArray.size != msSize }) {
 			cvArray = widgetCV.split;
 			splitSpec = spec;
-			this.addAction(\setSplitValues, {
-				cvArray.do({ |cvi, i|
-					cvi.value_(widgetCV.value[i])
-				})
+			this.addAction(\setSplitValues, { |cv|
+				cvArray.do({ |cvi, i| cvi.value_(cv.value[i]) });
 			});
+			"split CV actions for % set!\n".postf(name)
 		};
 		// update spec if spec of parent CVWidgetMS has changed
 		if (cvArray.notNil and:{ spec != splitSpec }) {
 			specs = spec.split;
-			cvArray.do({ |cvi, i| cvi.spec_(specs[i]) })
+			cvArray.do({ |cvi, i| cvi.spec_(specs[i]) });
+			// specs have been set, update splitSpec
+			splitSpec = spec;
 		};
 		^cvArray;
 	}

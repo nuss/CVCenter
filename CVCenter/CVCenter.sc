@@ -1895,8 +1895,11 @@ CVCenter {
 								lib[\all][k][hilo] = (
 									spec: cvWidgets[k].widgetCV[hilo].spec,
 									val: cvWidgets[k].widgetCV[hilo].value,
-									// actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo].select({ |k| k.values[0][0] != "{ \"open Function\" }" }) },
-									actions: cvWidgets[k].wdgtActions !? { cvWidgets[k].wdgtActions[hilo] },
+									actions: cvWidgets[k].wdgtActions !? {
+										cvWidgets[k].wdgtActions[hilo].reject({ |k|
+											"open Function".matchRegexp(k.values[0][0])
+										})
+									},
 									osc: (
 										addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
 											cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
@@ -1925,8 +1928,9 @@ CVCenter {
 							lib[\all][k] = (
 								spec: cvWidgets[k].widgetCV.spec,
 								val: cvWidgets[k].widgetCV.value,
-								// actions: cvWidgets[k].wdgtActions.select({ |k| k.values[0][0] != "{ \"open Function\" }" }),
-								actions: cvWidgets[k].wdgtActions,
+								actions: cvWidgets[k].wdgtActions.reject({ |k|
+									"open Function".matchRegexp(k.values[0][0])
+								}),
 								osc: (
 									addr: cvWidgets[k].midiOscEnv.oscResponder !? {
 										cvWidgets[k].midiOscEnv.oscResponder.addr
@@ -1955,8 +1959,9 @@ CVCenter {
 							lib[\all][k] = (
 								spec: cvWidgets[k].widgetCV.spec,
 								val: cvWidgets[k].widgetCV.value,
-								// actions: cvWidgets[k].wdgtActions.select({ |k| k.values[0][0] != "{ \"open Function\" }" }),
-								actions: cvWidgets[k].wdgtActions,
+								actions: cvWidgets[k].wdgtActions.reject({ |k|
+									"open Function".matchRegexp(k.values[0][0])
+								}),
 								wdgtClass: CVWidgetMS,
 								midiOscRememberBatchConnection: cvWidgets[k].midiOscRememberBatchConnection,
 								osc: ()!cvWidgets[k].msSize,
