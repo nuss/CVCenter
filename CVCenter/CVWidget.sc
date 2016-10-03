@@ -42,7 +42,7 @@ CVWidget {
 	var slotCmdName, lastIntSlots, msSlotsChecked = false;
 	var lastMsgIndex, msMsgIndexDiffers = false, count = 0;
 	// CVWidgetMS
-	var <msSize;
+	var <msSize, <cvArray;
 	// OSC-feedback
 	var <>oscFeedbackPort;
 	var numIPs = 0, feedbackCmds, ipsContainingCmd;
@@ -670,7 +670,8 @@ CVWidget {
 							this, \remove, name.asSymbol;
 						)
 					})
-				}
+				};
+				if (name == \setSplitValues) { cvArray = nil };
 			}
 		);
 		controller.do({ |c| c = nil });
