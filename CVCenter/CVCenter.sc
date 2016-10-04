@@ -983,13 +983,13 @@ CVCenter {
 
 			cvWidgets['select snapshot'].addAction('select snapshot', { |cv|
 				if (cv.value > 0, {
-					this.snapShots[cv.items[cv.value]].pairsDo({ |k, v|
+					CVCenter.snapShots[cv.items[cv.value]].pairsDo({ |k, v|
 						if (k != 'select snapshot' and:{
 							k != 'snapshot'
 						}, {
-							if (this.at(k).class == Event) {
-								#[lo, hi].do({ |slot| this.at(k)[slot].value_(v[slot]) })
-							} { this.at(k).value_(v) }
+							if (CVCenter.at(k).class == Event) {
+								#[lo, hi].do({ |slot| CVCenter.at(k)[slot].value_(v[slot]) })
+							} { CVCenter.at(k).value_(v) }
 						})
 					})
 				})
@@ -1995,6 +1995,11 @@ CVCenter {
 		window.onClose_(
 			window.onClose.addFunc({ dialogWin !? { dialogWin.close }})
 		)
+	}
+
+	*deleteSnapshots {
+		this.at('select snapshot').items_(['select snapshot...']);
+		snapShots = ();
 	}
 
 	*saveSetup { |path|
