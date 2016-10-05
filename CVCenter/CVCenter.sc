@@ -1417,7 +1417,10 @@ CVCenter {
 								.action_({ |b| this.removeAt(key) })
 								.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 10))
 							;
-						)
+						);
+						if (key === \snapshot or:{ key === 'select snapshot'}) {
+							removeButs[key].enabled_(false);
+						}
 					};
 
 					if (widgetStates[key].isNil, {
@@ -1547,6 +1550,8 @@ CVCenter {
 		var lastVal, thisKey, thisTabIndex, thisTabKey;
 
 		thisKey = key.asSymbol;
+		// prevent removal of default widgets;
+		if (thisKey === \snapshot or: { thisKey === 'select snapshot'}) { ^this };
 		thisTabKey = widgetStates[thisKey].tabKey;
 		all.removeAt(thisKey);
 		cvWidgets[thisKey].class.switch(
