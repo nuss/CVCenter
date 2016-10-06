@@ -1235,7 +1235,7 @@ CVCenter {
 		// "allTabs: %\n".postf(allTabs);
 
 		if (tab.notNil, { thisTabLabel = tab.asSymbol }, {
-			if (tabs.activeTab.notNil, { thisTabLabel = tabs.activeTab.label }, { thisTabLabel = \default });
+			if (tabs.activeTab.notNil, { thisTabLabel = tabs.activeTab.label.asSymbol }, { thisTabLabel = \default });
 		});
 
 		// "tabProperties: %\n".postf(tabProperties);
@@ -1660,23 +1660,25 @@ CVCenter {
 		^all.at(key.asSymbol);
 	}
 
-	*add { |key, spec, value, tab, slot, svItems, connectS, connectTF|
+	*prAdd { |key, spec, value, tab, slot, svItems, connectS, connectTF|
 		var thisKey, thisSpec, thisVal, testSlot, thisSlot, thisTab, widget2DKey;
 		var specName, cvClass, thisSVItems;
 
 		thisKey = key.asSymbol;
 
 		// return early if a CV under the given key already exists
-		all[thisKey] !? {
-			if (all[thisKey].class != Event) {
-				^all[thisKey];
-			} {
-				testSlot = slot.asSymbol;
-				if (all[thisKey].size == 2) {
-					^all[thisKey][testSlot];
-				}
-			}
-		};
+		// all[thisKey] !? {
+		// 	if (all[thisKey].class !== Event) {
+		// 		^all[thisKey];
+		// 	} {
+		// 		testSlot = slot.asSymbol;
+		// 		if (all[thisKey].size == 2 and:{
+		// 			(widgetStates[thisKey][\hi].notNil).and(widgetStates[thisKey][\lo].notNil)
+		// 		}) {
+		// 			^all[thisKey][testSlot];
+		// 		}
+		// 	}
+		// };
 
 		if (svItems.notNil, {
 			if (svItems.isKindOf(SequenceableCollection).not, {
@@ -1781,6 +1783,7 @@ CVCenter {
 		});
 
 		if (thisSlot.notNil and:{ (thisSlot === \lo).or(thisSlot === \hi) }, {
+			// CVWidget2D
 			if (cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
 				if (widgetStates[thisKey][\hi][\made] == true or:{
 					widgetStates[thisKey][\lo][\made] == true
@@ -1802,6 +1805,7 @@ CVCenter {
 				widgetStates[thisKey][thisSlot].made = true;
 			})
 		}, {
+			// other CVWidgets
 			all[thisKey] ?? { all.put(thisKey, cvClass.new(thisSpec, thisVal)) };
 			if (cvClass === SV and:{ all[thisKey].items.unbubble.isNil }, {
 				all[thisKey].items_(thisSVItems)
@@ -1835,8 +1839,23 @@ CVCenter {
 
 	// add a CV using spec inference
 	*use { |key, spec, value, tab, slot, svItems, connectS, connectTF|
-		^this.add(
-			key,
+		var thisKey = key.asSymbol;
+		var thisSlot;
+
+		all[thisKey] !? {
+			if (all[thisKey].class !== Event) {
+				^all[thisKey];
+			} {
+				if (all[thisKey].size == 2 and:{
+					(widgetStates[thisKey][\hi].notNil).and(widgetStates[thisKey][\lo].notNil)
+				}) {
+					^all[thisKey][thisSlot];
+				}
+			}
+		};
+
+		^this.prAdd(
+			thisKey,
 			spec ?? { this.findSpec(key) },
 			value, tab, slot, svItems,
 			connectS ?? { this.connectSliders },
@@ -2181,7 +2200,7 @@ CVCenter {
 						switch(v.wdgtClass,
 							CVWidget2D, {
 								#[lo, hi].do({ |hilo|
-									this.add(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
+									this.prAdd(key, v[hilo].spec, v[hilo].val, v.tabLabel, hilo);
 									cvWidgets[key].setMidiMode(v[hilo].midi.midiMode, hilo)
 									.setMidiMean(v[hilo].midi.midiMean, hilo)
 									.setSoftWithin(v[hilo].midi.softWithin, hilo)
@@ -2259,7 +2278,7 @@ CVCenter {
 								})
 							},
 							CVWidgetKnob, {
-								this.add(key, v.spec, v.val, v.tabLabel);
+								this.prAdd(key, v.spec, v.val, v.tabLabel);
 								cvWidgets[key].setMidiMode(v.midi.midiMode)
 									.setMidiMean(v.midi.midiMean)
 									.setSoftWithin(v.midi.softWithin)
@@ -2331,7 +2350,7 @@ CVCenter {
 								})
 							},
 							CVWidgetMS, {
-								this.add(key, v.spec, v.val, v.tabLabel);
+								this.prAdd(key, v.spec, v.val, v.tabLabel);
 								v.midiOscRememberBatchConnection !? {
 									v.midiOscRememberBatchConnection.pairsDo({ |k, v|
 										cvWidgets[key].midiOscRememberBatchConnection[k] = v;
@@ -2688,7 +2707,7 @@ CVCenter {
 		if (more.type.notNil, {
 			if (more.type === \w2d or:{ more.type === \w2dc }, {
 				#[lo, hi].do({ |slot, i|
-					this.add(more.cName, thisSpec, more.slots[i], more.enterTab, slot);
+					this.prAdd(more.cName, thisSpec, more.slots[i], more.enterTab, slot);
 					if (more.type == \w2d, {
 						if (slot === \lo, {
 							wms = "cv.value, CVCenter.at('"++more.cName++"').hi.value";
@@ -2729,7 +2748,7 @@ CVCenter {
 			}, {
 				if (more.type === \wms, {
 					// "varNames: %, more: %\n".postf(varNames, more);
-					this.add(more.cName, thisSpec!more.slots.size, more.slots, more.enterTab);
+					this.prAdd(more.cName, thisSpec!more.slots.size, more.slots, more.enterTab);
 					if (varNames.size > 0, {
 						varNames.do({ |v, j|
 							actionName = "default"++(j+1);
@@ -2779,7 +2798,8 @@ CVCenter {
 
 			case
 				{ more.slots.size == 1 } {
-					this.add(more.cName, thisSpec, more.slots[0], more.enterTab);
+					this.prAdd(more.cName, thisSpec, more.slots[0], more.enterTab);
+					varNames.postln;
 					if (varNames.size > 0, {
 						varNames.do({ |v, j|
 							if (j == 0, { activate = true }, { activate = false });
@@ -2795,13 +2815,13 @@ CVCenter {
 				{ more.slots.size == 2 } {
 					// more.slots.postln;
 					[\Lo, \Hi].do({ |sl, k|
-						this.add(more.cName++sl, thisSpec, more.slots[k], more.enterTab);
+						this.prAdd(more.cName++sl, thisSpec, more.slots[k], more.enterTab);
 					});
 					addActionFunc.value;
 				}
 				{ more.slots.size > 2 } {
 					more.slots.size.do({ |sl|
-						this.add(more.cName++sl, thisSpec, more.slots[sl], more.enterTab);
+						this.prAdd(more.cName++sl, thisSpec, more.slots[sl], more.enterTab);
 					});
 					addActionFunc.value;
 				}
