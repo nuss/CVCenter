@@ -44,14 +44,14 @@ For a detailed description of the above listet arguments see the descriptions of
 returns:: code::this:: (CVCenter)
 
 
-METHOD:: makeWindow
+METHOD:: front
 Creates and fronts the CVCenter GUI if it's closed or nil. Sends the GUI to front if it's in the background. If CVs are passed in as key/value pairs it adds them as widgets to the GUI under the given tab if given or the one that's currently in front.
 
 argument:: tab
 a String or a Symbol, indicating the label of a tab. If none is provided the widgets will be added to "default" or any other tab that's currently in front. If an event containing the keys code::\hi:: and code::\hi:: gets passed in the widget will be a CVWidget2D.
 
 argument::  ... cvs
-key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV),  \wdgtNameN, a CV::
+key/value pairs: code::\wdgtName1, a CV, \wdgtName2, (lo: a CV, hi: a CV) ...  \wdgtNameN, a CV::
 
 returns:: code::this:: (CVCenter)
 
@@ -310,6 +310,23 @@ a link::Classes/String:: or link::Classes/Symbol:: - either code::\hi:: or code:
 
 returns:: code::this:: (CVCenter)
 
+METHOD:: snapShots
+Returns currently saved snapshots - an link::Classes/Event:: holding snapshots under the timestamp or custom name when they were saved as key and an link::Classes/IdentityDictionary:: of keys and values of all current link::Classes/CVWidget::s resp. their internal link::Classes/CV::(s) as values
+
+returns:: an link::Classes/Event::
+
+METHOD:: saveSnapshot
+Save a snapshot of all values of all link::Classes/CVWidget::s currently held in CVCenter. The snapshot will immediatly appear in the 'select snapshot' dropdown at the bottom of the CVCenter GUI. Selecting a snapshot will set the CVWidgets contained in the snapshot to its coresponding value in the snapshot.
+
+argument:: dialog
+a link::Classes/Boolean:: denoting whether the snapshot name can be set in a dialog (default: code::false:: - the snapshot's name will be the current timestamp)
+
+returns:: code::this:: (CVCenter)
+
+METHOD:: deleteSnapshots
+Deletes all currently saved snapshots
+
+returns:: code::this:: (CVCenter)
 
 subsection:: Setting GUI-properties
 
@@ -387,6 +404,20 @@ argument:: label
 a link::Classes/String:: or a link::Classes/Symbol:: representing the name of the selected tab
 
 returns:: an link::Classes/Array::
+
+METHOD:: widgetConnectGUI
+Drawing sliders in a widget while they're moved from outside (e.g. when they're set from some other application outside SuperCollider via OSC) may cost a lot of CPU power. Via this method the connection to sliders and number boxes can be suspended and hence CPU power may be freed for other processes.
+
+argument:: key
+a link::Classes/String:: or link::Classes/Symbol:: denoting the widget whose sliders, numberboxes shall be disconnected
+
+argument:: connectSliders
+a link::Classes/Boolean:: or code::nil::, telling CVCenter to connect or disconnect the slider(s) for the widget denoted by the argument code::key::
+
+argument:: connectTextFields
+a link::Classes/Boolean:: or code::nil::, telling CVCenter to connect or disconnect the number box(es) for the widget denoted by the argument code::key::
+
+returns:: code::this:: (CVCenter)
 
 subsection:: Saving and loading setups
 
@@ -582,7 +613,7 @@ PRIVATE:: prRemoveTab
 
 PRIVATE:: finishGui
 
-PRIVATE:: add
+PRIVATE:: prAdd
 
 PRIVATE:: findSpec
 
@@ -595,6 +626,20 @@ PRIVATE:: prefPane
 PRIVATE:: tabProperties
 
 PRIVATE:: widgetStates
+
+PRIVATE:: makeWindow
+
+PRIVATE:: prRegroupPrefPane
+
+PRIVATE:: connectSliders
+
+PRIVATE:: connectTextFields
+
+PRIVATE:: useKeyDownActions
+
+PRIVATE:: dontSave
+
+PRIVATE:: systemWidgets
 
 INSTANCEMETHODS::
 

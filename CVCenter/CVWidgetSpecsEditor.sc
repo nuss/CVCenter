@@ -223,7 +223,8 @@ CVWidgetSpecsEditor {
 								}, {
 									specsList = specsList.add(k.asString++":"+(spec.asSpec));
 									// make spec available for all subsequent selections
-									Spec.add(k, spec); 								});
+									Spec.add(k, spec);
+								});
 								elem.specSelect.items_(specsList);
 								specsListSpecs.includes(spec.asSpec).not.if{
 									specsListSpecs = specsListSpecs.add(spec.asSpec);
