@@ -642,15 +642,6 @@ CVCenter {
 				.clickbox_(15)
 				.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 12, true))
 				.dragTabs_(true)
-				.refreshAction_({ |me|
-					if (tabProperties.size == me.tabViews.size, {
-						me.tabViews.do({ |tab, i|
-							if (tabProperties[tab.label.asSymbol].notNil, {
-								tabProperties[tab.label.asSymbol].index = i
-							})
-						})
-					})
-				})
 			;
 
 			// tabs.view.backColor_(Color.rand);
@@ -1208,7 +1199,7 @@ CVCenter {
 			};
 
 			tabProperties[thisTabLabel] ?? {
-				tabProperties.put(thisTabLabel, (nextPos: Point(0, 0), index: tabProperties.size, tabColor: labelColor, detached: false));
+				tabProperties.put(thisTabLabel, (nextPos: Point(0, 0), tabColor: labelColor, detached: false));
 			};
 			thisTab.focus;
 			^thisTab;
@@ -1243,7 +1234,8 @@ CVCenter {
 		thisTab = allTabs.detect({ |ttab| ttab.label.asSymbol == thisTabLabel }) ?? {
 			thisTab = this.prAddTab(thisTabLabel);
 		};
-		cvTabIndex = tabProperties[thisTabLabel][\index];
+		// cvTabIndex = tabProperties[thisTabLabel][\index];
+		cvTabIndex = tabs.tabViews.detect { |tab| tab.label.asSymbol == thisTabLabel }.index;
 		thisNextPos = tabProperties[thisTabLabel].nextPos;
 
 		rowheight = widgetheight+1+15; // add a small gap between rows
@@ -1649,11 +1641,12 @@ CVCenter {
 	}
 
 	*removeTab { |label|
-		var tabIndex = tabProperties[label.asSymbol].index;
+		var thisTab = tabs.tabViews.detect{ |tab| tab.label.asSymbol == label.asSymbol };
 		this.removeAtTab;
-		tabs.removeAt(tabIndex);
-		tabProperties[label.asSymbol] = nil;
-		tabProperties.do({ |p| if (p.index > tabIndex, { p.index = p.index-1 }) });
+		thisTab !? {
+			tabs.removeAt(thisTab.index);
+			tabProperties[label.asSymbol] = nil;
+		}
 	}
 
 	*at { |key|
@@ -1665,20 +1658,6 @@ CVCenter {
 		var specName, cvClass, thisSVItems;
 
 		thisKey = key.asSymbol;
-
-		// return early if a CV under the given key already exists
-		// all[thisKey] !? {
-		// 	if (all[thisKey].class !== Event) {
-		// 		^all[thisKey];
-		// 	} {
-		// 		testSlot = slot.asSymbol;
-		// 		if (all[thisKey].size == 2 and:{
-		// 			(widgetStates[thisKey][\hi].notNil).and(widgetStates[thisKey][\lo].notNil)
-		// 		}) {
-		// 			^all[thisKey][testSlot];
-		// 		}
-		// 	}
-		// };
 
 		if (svItems.notNil, {
 			if (svItems.isKindOf(SequenceableCollection).not, {
@@ -2631,7 +2610,7 @@ CVCenter {
 			childProps.tabs.keysDo({ |view|
 				if (view.label.asSymbol == key.asSymbol, {
 					child.close;
-					index = tabProperties[key].index;
+					index = view.index;
 					tabs.removeAt(index);
 				});
 			})
