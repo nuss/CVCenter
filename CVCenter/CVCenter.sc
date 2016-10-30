@@ -1234,7 +1234,6 @@ CVCenter {
 		thisTab = allTabs.detect({ |ttab| ttab.label.asSymbol == thisTabLabel }) ?? {
 			thisTab = this.prAddTab(thisTabLabel);
 		};
-		// cvTabIndex = tabProperties[thisTabLabel][\index];
 		cvTabIndex = tabs.tabViews.detect { |tab| tab.label.asSymbol == thisTabLabel }.index;
 		thisNextPos = tabProperties[thisTabLabel].nextPos;
 
@@ -2614,9 +2613,6 @@ CVCenter {
 					tabs.removeAt(index);
 				});
 			})
-		});
-		tabProperties.do({ |prop|
-			if (prop.index > index, { prop.index = prop.index-1 })
 		});
 		tabProperties.removeAt(key);
 		widgetStates.do({ |w| if (w.tabIndex > index, { w.tabIndex = w.tabIndex-1 }) });
