@@ -29,7 +29,7 @@ CVWidget {
 	var visibleGuiEls, allGuiEls, <focusElements, <isCVCWidget = false;
 	var <widgetBg, <label, <nameField, wdgtInfo; // elements contained in any kind of CVWidget
 	var widgetXY, widgetProps, <>editor;
-	var <wdgtControllersAndModels, <midiOscEnv, <>oscReplyPort;
+	var <wdgtControllersAndModels, <midiOscEnv;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 	// extended API
@@ -1386,25 +1386,6 @@ CVWidget {
 				^midiOscEnv[thisSlot].calibConstraints;
 			}
 		)
-	}
-
-	setOSCfeedback { |cv, cmd, port, slot|
-		var constr, thisSlot, thisMidiOscEnv;
-		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInteger }
-		);
-		switch(this.class,
-			CVWidgetKnob, { thisMidiOscEnv = midiOscEnv },
-			{ thisMidiOscEnv = midiOscEnv[thisSlot] }
-		);
-		// what if more than 1 reply-address??
-		// keep an array of NetAddresses??
-		constr = Point(midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi);
-		midiOscEnv.oscReplyAddrs.do({ |addr|
-			if(addr.port != port, { addr.port_(port) });
-			addr.sendMsg(cmd, cv.input.linlin(0, 1, constr.x, constr.y));
-		})
 	}
 
 	front {
@@ -2934,15 +2915,6 @@ CVWidget {
 // 				OSCresponderNode: t, r, msg
 // 				OSCfunc: msg, time, addr // for the future
 				oscResponderAction = { |t, r, msg, addr|
-					// "msg: %\n".postf(msg);
-					// "msg[theChanger.value[3]]: %\n".postf(msg[theChanger.value[3]]);
-					this.oscReplyPort !? { addr.port_(this.oscReplyPort) };
-					midiOscEnv.oscReplyAddrs ?? { midiOscEnv.oscReplyAddrs = [] };
-					if(midiOscEnv.oscReplyAddrs.includesEqual(addr).not, {
-						midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.add(addr).asSet.asArray;
-						// midiOscEnv.oscReplyAddrs = midiOscEnv.oscReplyAddrs.asBag.contents.keys.asArray;
-						// midiOscEnv.oscReplyAddrs.postln;
-					});
 					if(thisCalib, {
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
