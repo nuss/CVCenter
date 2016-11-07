@@ -249,7 +249,6 @@ AbstractCVWidgetEditor {
 	front { |tab|
 		thisEditor.window.front;
 		tab !? {
-			// thisEditor[\tabs].stringFocusedColor_(labelStringColors[tab]);
 			thisEditor[\tabs].focus(tab);
 		}
 	}
