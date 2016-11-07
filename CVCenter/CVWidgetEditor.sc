@@ -1083,7 +1083,6 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 			)
 		});
 
-		// thisEditor.window.front(tab);
 		this.front(tab)
 	}
 
