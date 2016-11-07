@@ -2349,7 +2349,7 @@ CVWidget {
 				thisEditor = guiEnv.editor;
 			});
 
-			MIDIClient.sources.do({ |source|
+			MIDIClient.externalSources.do({ |source|
 				if(midiSources.values.includes(source.uid.asInteger).not, {
 					// OSX/Linux specific tweek
 					if(source.name == source.device, {
@@ -2358,7 +2358,7 @@ CVWidget {
 						midiSources.put(
 							(source.device++":"+source.name).asSymbol, source.uid.asInteger
 						)
-					})
+					});
 				})
 			});
 
