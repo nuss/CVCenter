@@ -49,10 +49,7 @@ CVWidget {
 		};
 
 		StartUp.add({
-			Class.initClassTree(\StaticIntegerSpec.asClass);
-			\StaticIntegerSpec.asClass !? {
-				Spec.add(\in, \StaticIntegerSpec.asClass.new(0, Server.default.options.firstPrivateBus-1, 0));
-			};
+			Spec.add(\in, ControlSpec(0, Server.default.options.firstPrivateBus-1, \lin, 1.0, 0));
 		});
 
 		midiSources = ();
