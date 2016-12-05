@@ -602,8 +602,6 @@ CVCenterPreferences {
 		var shortcutsPath, globalShortcutsPath, keyCodesPath;
 		var platform;
 
-		"shortcuts written to disc: %\n".postf(shortcuts);
-
 		Platform.case(
 			\linux, { platform = "Linux" },
 			\osx, { platform = "OSX" },
