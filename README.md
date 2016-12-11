@@ -6,9 +6,11 @@ Installation
 ------------
 1. get SuperCollider from https://supercollider.github.io/download or install SuperCollider from source (For more instructions see: http://supercollider.github.io/development/building.html and consult the specific READMEs that come with the program).
 2. install the required extensions via the Quarks-mechanism:
+
 	- TabbedView2
+	- cruciallib  
 	- wslib (optional)
-	- cruciallib (optional)  
+
 	see the Quarks-helpfile for more information on how to do this.
 3. CVCenter uses its own version of the Conductor library. **Do not use the version that can be installed via Quarks!** Instead use this repository (which is a submodule of CVCenter): https://github.com/nuss/Conductor
 4. after installing SuperCollider and the required extensions put all content of CVCenter (and Conductor - if you haven't cloned the library as a submodule with CVCenter) in your user-app-support directory. Execute the following line SuperCollider to see where that is:
