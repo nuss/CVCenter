@@ -8,7 +8,7 @@ Installation
 2. install the required extensions via the Quarks-mechanism:
 
 	- TabbedView2
-	- cruciallib  
+	- crucial-library
 	- wslib (optional)
 
 	see the Quarks-helpfile for more information on how to do this.
