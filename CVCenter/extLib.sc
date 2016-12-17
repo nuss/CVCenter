@@ -216,6 +216,10 @@
 		^nil
 	}
 
+}
+
++Dictionary {
+
 	flipKeys { |...oldNewPairs|
 		oldNewPairs.pairsDo({ |o, n|
 			if(o !== n, {
