@@ -33,6 +33,7 @@ CVWidgetMS : CVWidget {
 		var nextX, nextY, knobX, knobY;
 		var calibViewsWidth, calibViewsNextX;
 		var text, tActions;
+		var reference = [];
 
 		// #msFeedbackCmds, feedbackCmds = Set()!2;
 		#msFeedbackCmds, oscFeedbackPort = (nil!numSliders)!2;
@@ -482,6 +483,16 @@ CVWidgetMS : CVWidget {
 		focusElements = allGuiEls.copy.removeAll([
 			widgetBg, calibViews, nameField, activeSliderB, activeTextB
 		]);
+
+		this.getSpec.split.do{ |sp|
+			if(sp.excludingZeroCrossing, {
+				if(sp.minval < sp.maxval, { reference = reference.add(sp.minval.abs/(sp.maxval-sp.minval)) });
+				if(sp.minval > sp.maxval, { reference = reference.add(sp.maxval.abs/(sp.maxval-sp.minval).abs) });
+			});
+			if(sp.minval.isNegative and:{ sp.maxval.isNegative }, { reference = reference.add(1) });
+			if(sp.minval.isPositive and:{ sp.maxval.isPositive }, { reference = reference.add(0) });
+		};
+		mSlider.reference_(reference);
 
 		msSize.do({ |slot| this.initControllerActions(slot) });
 
