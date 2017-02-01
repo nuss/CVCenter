@@ -1768,7 +1768,6 @@ CVWidget {
 					if(tmp.minval.isNegative and:{ tmp.maxval.isNegative }, { reference = reference.add(1) });
 					if(tmp.minval.isPositive and:{ tmp.maxval.isPositive }, { reference = reference.add(0) });
 				});
-				// "reference: %\n".postf(reference);
 				this.mSlider.reference_(reference);
 			});
 
