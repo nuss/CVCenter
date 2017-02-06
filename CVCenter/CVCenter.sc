@@ -692,7 +692,7 @@ CVCenter {
 		tabProperties[thisTabLabel] ?? {
 			tabProperties.put(thisTabLabel, (nextPos: Point(0, 0), tabColor: labelColor, detached: false));
 		};
-		thisTab.focus;
+		thisTab !? { thisTab.focus };
 		^thisTab;
 	}
 
