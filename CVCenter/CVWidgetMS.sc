@@ -227,8 +227,6 @@ CVWidgetMS : CVWidget {
 
 		connectS !? { activeSliderB.value_(connectS.asInteger) };
 
-		// "model: %\n".postf(wdgtControllersAndModels.slidersTextConnection);
-
 		if(GUI.id !== \cocoa, {
 			if(wdgtControllersAndModels.slidersTextConnection.model.value[0], {
 				activeSliderB.toolTip_("deactivate CV-slider connection")
