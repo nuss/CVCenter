@@ -59,7 +59,7 @@ returns:: this (a code::CVWidgetMS::)
 INSTANCEMETHODS::
 
 METHOD:: split
-Split the internal multi-dimensional link::Classes/CV:: into an array of one-dimensional CVs. This is especially useful for the usage in link::Classes/Pattern::s. Once a CV has been split, it will return the split CVs in a variable code::cvArray::. Calling the method repeatedly will not try to split the CV again. Hence, it should be save to call code::split:: within Pattern code.
+Split the internal multi-dimensional link::Classes/CV:: into an array of one-dimensional CVs. This is especially useful for the usage in link::Classes/Pattern::s. Once a CV has been split, it will return the split CVs in a variable code::cvArray::. Calling the method repeatedly will not try to split the CV again. Hence, it should be safe to call code::split:: within Pattern code.
 
 code::
 // a CVWidgetMS holding a 5-dimensional CV
