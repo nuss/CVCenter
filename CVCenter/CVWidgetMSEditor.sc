@@ -447,7 +447,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			;
 
 			if(GUI.id !== \cocoa, {
-				softWithinNB.toolTip_("If your device outputs absolute values\nyou can set here a threshold to the\ncurrent CV-value within which a slider\nwill react and set a new value. This avoids\njumps if a new value set by a slider\nis far away from the previous value")
+				softWithinNB.toolTip_("If your device outputs absolute values\nyou can set here a threshold to the\ncurrent CV-value within which a slider\nwill react and set a new value. This avoids\njumps if a new value set by a slider\nis far away from the previous value.\nA value =< 0 deactivates snap-to.")
 			});
 
 			if(thisSoftWithin.select(_.isNumber).size == widget.msSize and:{

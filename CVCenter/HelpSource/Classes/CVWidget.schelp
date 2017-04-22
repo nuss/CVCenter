@@ -97,7 +97,7 @@ only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVW
 returns:: an link::Classes/Integer::
 
 METHOD:: setSoftWithin
-If code::midiMode:: has been set to code::0:: moving a widget-slider will set the CV to a new value. However, if a MIDI-slider is connected to that widget, moving the MIDI-slider will set the CV's value immediatly to the value that is stored in the MIDI-slider i.e. a "jump" will happen. code::softWithin:: will ease this behavior by setting the CV's value only if the slider gets within code::softWithin/2::. Applies only if midiMode is set to code::0::.
+If code::midiMode:: has been set to code::0:: moving a widget-slider will set the CV to a new value. However, if a MIDI-slider is connected to that widget, moving the MIDI-slider will set the CV's value immediatly to the value that is stored in the MIDI-slider i.e. a "jump" will happen. code::softWithin:: will ease this behavior by setting the CV's value only if the slider gets within code::softWithin/2::. A threshold code::=< 0:: will deactivate snap-to. Applies only if midiMode is set to code::0::.
 
 argument:: threshold
 a link::Classes/Float:: - default: code::0.1::.
@@ -108,7 +108,7 @@ only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVW
 returns::  the receiver
 
 METHOD:: getSoftWithin
-Get the current softWithin value.
+Get the current softWithin threshold.
 
 argument:: slot
 only needed if the widget is a link::Classes/CVWidget2D:: or a link::Classes/CVWidgetMS:: - either code::\lo:: or code::\hi:: (CVWidget2D) or an integer index (CVWidgetMS)
@@ -649,7 +649,7 @@ returns:: the receiver
 METHOD:: editor
 Every widget has one or more editors that will open in a new window ( link::Classes/CVWidgetKnob:: 1 editor, link::Classes/CVWidget2D:: 2 editors - code::\lo:: and code::\hi::). This method returns a reference to them.
 
-returns:: a link::Classes/CVWidgetEditor:: or an link::Classes/Event::, containing a reference two 2 or more link::Classes/CVWidgetEditor::s
+returns:: a link::Classes/CVWidgetEditor:: or an link::Classes/Event::, containing a reference to 2 or more link::Classes/CVWidgetEditor::s
 
 METHOD:: name
 Get the name of a widget. This corresponds with the key under which the widget's CV(s) is/are stored in link::Classes/CVCenter#*all::.
