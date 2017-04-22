@@ -4,7 +4,7 @@ categories:: GUI, Conductor, External Control>MIDI, External Control>OSC
 related:: Classes/CVCenter, Classes/CVWidget
 
 DESCRIPTION::
-CVCenterPreferences implements persistant preferences for link::Classes/CVCenter:: and parts of link::Classes/CVWidget:: (resp. its subclassses link::Classes/CVWidgetKnob:: and link::Classes/CVWidget2D::). Preferences may either be set via GUI or programmatically. They are stored in a file named strong::CVCenterPreferences:: in the same directory as the classfile.
+CVCenterPreferences implements persistant preferences for link::Classes/CVCenter:: and parts of link::Classes/CVWidget:: (respectively its subclassses link::Classes/CVWidgetKnob::, link::Classes/CVWidget2D:: and link::Classes/CVWidgetMS::). Preferences may either be set via GUI or programmatically. They are stored in a file named strong::CVCenterPreferences:: in the same directory as the classfile.
 
 
 CLASSMETHODS::
@@ -34,7 +34,7 @@ argument:: guiProperties
 a link::Classes/Rect:: an link::Classes/Array:: providing code::left::, code::top::, code::width::, code::height:: - will be ignored if 'saveProperties is set to code::0:: or code::1::
 
 argument:: saveClassVars
-a link::Classes/Boolean:: or an link::Classes/Integer:: ( code::0:: or code::1::), indicating whether CVCenter's classvars link::Classes/CVCenter#*midiMode#midiMode::, link::Classes/CVCenter#*midiResolution#midiResolution::, link::Classes/CVCenter#*midiMean#midiMean::, link::Classes/CVCenter#*softWithin#softWithin::, link::Classes/CVCenter#*ctrlButtonBank#ctrlButtonBank::. All these classvars have equivalent instancevars in CVWidget that will overwrite CVCenter's classvars if set. Thus the user may set global values here and tweak them within each CVWidget created in CVCenter.
+a link::Classes/Boolean:: or an link::Classes/Integer:: ( code::0:: or code::1::), indicating whether CVCenter's classvars link::Classes/CVCenter#*midiMode#midiMode::, link::Classes/CVCenter#*midiResolution#midiResolution::, link::Classes/CVCenter#*midiMean#midiMean::, link::Classes/CVCenter#*softWithin#softWithin::, link::Classes/CVCenter#*ctrlButtonBank#ctrlButtonBank::. All these classvars have equivalent instancevars in CVWidget that will override CVCenter's classvars if set. Thus the user may set global values here and tweak them within each CVWidget created in CVCenter.
 If set to code::0:: the arguments code::midiMode::, code::midiResolution::, code::midiMean::, code::softWithin:: and code::ctrlButtonBank:: will be ignored.
 
 argument:: midiMode
@@ -50,7 +50,7 @@ argument:: midiMean
 an link::Classes/Integer:: - only applies when midiMode is set to code::1:: - default: code::64::. The value stands for the value a MIDI-slider will output in neutral position.
 
 argument:: softWithin
-a link::Classes/Float:: - only applies when midiMode is set to code::0:: - default: code::0.1::. A threshold for a MIDI-slider to react. Only if the slider comes close to the link::Classes/CV::'s actual value +/- softWithin a new value will be set. This avoids sudden jumps if a slider gets moved but the actual value of the CV differs much.
+a link::Classes/Float:: - only applies when midiMode is set to code::0:: - default: code::0.1::. A threshold for a MIDI-slider to react. Only if the slider comes close to the link::Classes/CV::'s actual value +/- softWithin a new value will be set. This avoids sudden jumps if a slider gets moved but the actual value of the CV differs much. A value code::=< 0:: will prevent the snap-to.
 
 argument:: ctrlButtonBank
 CVCenter was written with a Doepfer Pocket Dial in mind which provides 16 fader-knobs and 4 different banks which sums up to 64 different slider-slots. However, it is not obvious which slider has to be moved to trigger a CCResponder initialised for controller nr. 37. Setting this argument to 16 (the number of knobs) will display controller nr. 37 as 3:5 (knob number 5 in bank 3).
@@ -73,14 +73,14 @@ Currently shortcuts can be edited for link::Classes/CVCenter::, link::Classes/CV
 More information about editing shortcuts with the editor: link::Classes/CVCenterShortcutsEditor::.
 
 argument:: globalShortcuts
-global shortcuts work from whereever you call them - whether IDE, the SClang or any other application is currently the frontmost one does not matter. When global shortcuts are enabled a synth that listens to the users keystrokes will be created at server-boot (every key with an action mapped to it takes one link::Classes/UGen::). 
+global shortcuts work from whereever you call them - whether IDE, the SClang or any other application is currently the frontmost one does not matter. When global shortcuts are enabled a synth that listens to the users keystrokes will be created at server-boot (every key with an action mapped to it takes one link::Classes/UGen::).
 By default the shortcut (fn)+F1 will front all SClang windows and open CVCenter - can be deactivated at any time.
 
 argument:: keyCodesAndMods
-key-mappings differ from platform to platform and may not be consitant accross all keyboards. As a consequence keycode- and modifier-mappings are made editable. At least on Linux and MacOSX things should work instantly. Windows-users may have to adjust the mappings in the editor (ideally edit and send me a copy so I can update them in the distribution). 
+key-mappings differ from platform to platform and may not be consitant accross all keyboards. As a consequence keycode- and modifier-mappings are made editable. At least on Linux and MacOSX things should work instantly. Windows-users may have to adjust the mappings in the editor (ideally edit and send me a copy so I can update them in the distribution).
 
 argument:: informString
-a link::Classes/String::, used as alternative inform-message (optional) 
+a link::Classes/String::, used as alternative inform-message (optional)
 
 returns:: this (code::CVCenterPreferences::)
 

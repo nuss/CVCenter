@@ -496,10 +496,6 @@ CVWidget {
 		var thisSlot, thisThresh, wcm;
 
 		thisThresh = threshold.asFloat;
-		if(thisThresh > 0.5 or:{ thisThresh < 0.01 }, {
-			Error("threshold must be between 0.01 and 0.5").throw;
-		});
-
 		switch(this.class,
 			CVWidget2D, {
 				thisSlot = slot.asSymbol;
@@ -1793,6 +1789,7 @@ CVWidget {
 
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
+					[src, chan, num, val].postln;
 					ctrlString ? ctrlString = num+1;
 					if(this.getCtrlButtonBank(slot).notNil, {
 						if(ctrlString % this.getCtrlButtonBank(slot) == 0, {
@@ -1809,19 +1806,25 @@ CVWidget {
 						0, {
 							switch(this.class,
 								CVWidgetMS, {
-									if(val/127 < (argWidgetCV.input[slot]+(this.getSoftWithin(slot)/2)) and:{
-										val/127 > (argWidgetCV.input[slot]-(this.getSoftWithin(slot)/2));
-									}, {
+									// softWithin disabled if getSoftWithin <= 0
+									if((this.getSoftWithin(slot) <= 0).or(
+										val/127 < (argWidgetCV.input[slot]+(this.getSoftWithin(slot)/2)) and:{
+											val/127 > (argWidgetCV.input[slot]-(this.getSoftWithin(slot)/2));
+										}
+									), {
 										argWidgetCV.input_(argWidgetCV.input.collect({ |it, i|
 											if(i == slot, { val/127 }, { it })
 										}))
 									})
 								},
 								{
-									if(val/127 < (argWidgetCV.input+(this.getSoftWithin(slot)/2)) and:{
-										val/127 > (argWidgetCV.input-(this.getSoftWithin(slot)/2));
-									}, {
-										argWidgetCV.input_(val/127)
+									// softWithin disabled if getSoftWithin <= 0
+									if((this.getSoftWithin(slot) <= 0).or(
+										val/127 < (argWidgetCV.input+(this.getSoftWithin(slot)/2)) and:{
+											val/127 > (argWidgetCV.input-(this.getSoftWithin(slot)/2));
+										}
+									), {
+										argWidgetCV.input_(val/127);
 									})
 								}
 							)

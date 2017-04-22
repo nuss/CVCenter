@@ -354,12 +354,11 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					widget.setSoftWithin(mb.value, slot);
 				})
 				.step_(0.005)
-				.clipLo_(0.01)
 				.clipHi_(0.5)
 			;
 
 			if(GUI.id !== \cocoa, {
-				softWithinNB.toolTip_("If your device outputs absolute values\nyou can set here a threshold to the\ncurrent CV-value within which a slider\nwill react and set a new value. This avoids\njumps if a new value set by a slider\nis far away from the previous value")
+				softWithinNB.toolTip_("If your device outputs absolute values\nyou can set here a threshold to the\ncurrent CV-value within which a slider\nwill react and set a new value. This avoids\njumps if a new value set by a slider\nis far away from the previous value.\nA value =< 0 will deactivate the snap-to setting.")
 			});
 
 			StaticText(tabView1, Point(flow1.bounds.width/2+60, 15))

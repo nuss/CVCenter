@@ -336,7 +336,7 @@ CVCenterPreferences {
 
 			if(GUI.id !== \cocoa, {
 				saveSoftWithin.toolTip_(
-					"Set an arbitrary floating point value. Recomended: 0.1.\nApplies only if midiMode is set to 0."
+					"Set an arbitrary floating point value. Recomended: 0.1.\nApplies only if midiMode is set to 0.\nA value =< 0 will prevent snap-to."
 				)
 			});
 
