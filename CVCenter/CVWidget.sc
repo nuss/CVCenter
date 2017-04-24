@@ -1789,7 +1789,6 @@ CVWidget {
 
 			if(theChanger.value.isKindOf(Event), {
 				ccResponderAction = { |src, chan, num, val|
-					[src, chan, num, val].postln;
 					ctrlString ? ctrlString = num+1;
 					if(this.getCtrlButtonBank(slot).notNil, {
 						if(ctrlString % this.getCtrlButtonBank(slot) == 0, {
