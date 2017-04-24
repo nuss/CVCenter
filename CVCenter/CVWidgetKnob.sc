@@ -140,7 +140,7 @@ CVWidgetKnob : CVWidget {
 		nameField = TextView(parent, Rect(label.bounds.left, label.bounds.top+label.bounds.height, thisWidth-2, thisHeight-label.bounds.height-2))
 			.background_(Color.white)
 			.font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9))
-			.string_("Add some notes if you like")
+			.string_(name.asString)
 			.visible_(false)
 			.keyUpAction_({ wdgtInfo = nameField.string })
 		;
