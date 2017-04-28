@@ -100,24 +100,26 @@ CVCenterShortcuts {
 		);
 		scFunc =
 		"// close all CVWidget(MS)Editors\n" ++
-		AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
-			switch(CVCenter.cvWidgets[k].class,
-				CVWidgetKnob, {
+		{
+			AbstractCVWidgetEditor.allEditors.pairsDo({ |k, v|
+				switch(CVCenter.cvWidgets[k].class,
+					CVWidgetKnob, {
+						v.editor !? { v.editor.close }
+					},
+					CVWidget2D, { #[lo, hi].do({ |sl|
+						v[sl] !? { v[sl].editor !? { v[sl].editor.close }}
+					}) },
+					CVWidgetMS, {
+						CVCenter.cvWidgets[k].msSize.do({ |i|
+							v[i] !? { v[i].editor !? { v[i].editor.close }}
+						})
+					}
+				);
+				CVCenter.cvWidgets[k] !? {
 					v.editor !? { v.editor.close }
-				},
-				CVWidget2D, { #[lo, hi].do({ |sl|
-					v[sl] !? { v[sl].editor !? { v[sl].editor.close }}
-				}) },
-				CVWidgetMS, {
-					CVCenter.cvWidgets[k].msSize.do({ |i|
-						v[i] !? { v[i].editor !? { v[i].editor.close }}
-					})
 				}
-			);
-			CVCenter.cvWidgets[k] !? {
-				v.editor !? { v.editor.close }
-			}
-		}).asCompileString;
+			})
+		}.asCompileString;
 		shortcuts.put(
 			'shift + esc',
 			(
