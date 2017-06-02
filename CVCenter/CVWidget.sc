@@ -3060,7 +3060,15 @@ CVWidget {
 					switch(this.class,
 						CVWidget2D, {
 							[this.slider2d, this.rangeSlider].do({ |view|
-								sliderConnection = [widgetCV.lo, widgetCV.hi].cvWidgetConnect(view);
+								sliderConnection ?? { sliderConnection = () };
+								switch (view.class,
+									Slider2D, {
+										sliderConnection.put(\td, [widgetCV.lo, widgetCV.hi].cvWidgetConnect(view));
+									},
+									RangeSlider, {
+										sliderConnection.put(\rs, [widgetCV.lo, widgetCV.hi].cvWidgetConnect(view));
+									}
+								)
 							})
 						},
 						CVWidgetMS, {
@@ -3077,7 +3085,9 @@ CVWidget {
 				}, {
 					// disconnect sliders
 					if(this.class == CVWidget2D, {
-						[widgetCV.lo, widgetCV.hi].cvWidgetDisconnect(sliderConnection);
+						sliderConnection.keysDo { |k|
+							[widgetCV.lo, widgetCV.hi].cvWidgetDisconnect(sliderConnection[k]);
+						}
 					}, {
 						widgetCV.cvWidgetDisconnect(sliderConnection);
 					});
