@@ -123,7 +123,7 @@ CVCenterControllersMonitor {
 	}
 
 	*getControllersList {
-		var midiCtrlrs, oscCtrlrs, tmp;
+		var midiCtrlrs, oscCtrlrs, tmpArr, tmp;
 
 		midiCtrlrs ? midiCtrlrs = ();
 		oscCtrlrs ? oscCtrlrs = ();
@@ -176,6 +176,21 @@ CVCenterControllersMonitor {
 							}
 						}
 					})
+				},
+				CVWidgetMS, {
+					tmpArr = w.wdgtControllersAndModels.slots.collect { |sl, i| sl.oscConnection.model.value };
+					tmpArr.postln;
+					tmpArr.do { |sl, i|
+						if (sl != false) {
+							tmp = (sl[2].asString + "(slot" + sl[3] ++ ")").asSymbol;
+							if (oscCtrlrs[tmp].isNil) {
+								oscCtrlrs.put(tmp, [1, [k.asString ++ "["++i++"]"]]);
+							} {
+								oscCtrlrs[tmp][0] = oscCtrlrs[tmp][0]+1;
+								oscCtrlrs[tmp][1] = oscCtrlrs[tmp][1].add(k.asString ++ "["++i++"]");
+							}
+						}
+					}
 				}
 			)
 		});
