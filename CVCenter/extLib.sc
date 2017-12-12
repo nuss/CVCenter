@@ -224,8 +224,15 @@
 
 +Font {
 
-	*available { |name|
-		^Font.availableFonts.detect(_ == name)
+	*available { |...names|
+		var match;
+		names.do { |name|
+			match = Font.availableFonts.detect(_ == name);
+			match !? {
+				^match
+			}
+		}
+		^nil;
 	}
 
 }
