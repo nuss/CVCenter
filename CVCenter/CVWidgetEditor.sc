@@ -40,6 +40,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var connectIP, connectPort;
 		var mouseOverFunc;
 		var modsDict, arrModsDict, arrowKeys;
+		var funcString;
 
 		buildCheckbox = { |active, view, props, font|
 			var cBox;
@@ -947,41 +948,47 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				});
 
 				wdgtActions.pairsDo({ |name, action|
-
+					funcString = action.asArray[0][0];
 					actionsUIs = actionsUIs.put(name, ());
 
 					flow3.shift(0, 5);
 
-					actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-173, 15))
+					if (funcString != "{ \"open Function\" }", {
+						actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-173, 15)) }, {
+						actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-110, 15))
+					});
+
+					actionsUIs[name].nameField
 						.font_(staticTextFont)
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.string_(""+name.asString)
 					;
 
-					flow3.shift(5, 0);
+					if (funcString != "{ \"open Function\" }", {
+						flow3.shift(5, 0);
+						actionsUIs[name].activate = Button(cTabView3, Point(60, 15))
+							.font_(staticTextFont)
+							.states_([
+								["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+								["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
+							])
+							.action_({ |rb|
+								switch(rb.value,
+									0, { widget.activateAction(name, false, slot) },
+									1, { widget.activateAction(name, true, slot) }
+								)
+							})
+						;
 
-					actionsUIs[name].activate = Button(cTabView3, Point(60, 15))
-						.font_(staticTextFont)
-						.states_([
-							["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
-							["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
-						])
-						.action_({ |rb|
-							switch(rb.value,
-								0, { widget.activateAction(name, false, slot) },
-								1, { widget.activateAction(name, true, slot) }
-							)
-						})
-					;
-
-					switch(action.asArray[0][1],
-						true, {
-							actionsUIs[name].activate.value_(1);
-						},
-						false, {
-							actionsUIs[name].activate.value_(0);
-						}
-					);
+						switch(action.asArray[0][1],
+							true, {
+								actionsUIs[name].activate.value_(1);
+							},
+							false, {
+								actionsUIs[name].activate.value_(0);
+							}
+						);
+					});
 
 					flow3.shift(5, 0);
 
@@ -1000,7 +1007,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					actionsUIs[name].actionView = TextView(cTabView3, Point(flow3.bounds.width-35, 50))
 						.background_(Color(1.0, 1.0, 1.0, 0.5))
 						.font_(textFieldFont)
-						.string_(action.asArray[0][0].replace("\t", "    "))
+						.string_(funcString.replace("\t", "    "))
 						.syntaxColorize
 						.editable_(false)
 					;
@@ -1092,6 +1099,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 9.4);
 		var textFieldFont = Font(Font.available("Courier New") ? Font.defaultSansFace, 9);
 		var actTop;
+		var funcString;
 
 		if(widget.class != CVWidgetMS, {
 			switch(addRemove,
@@ -1099,10 +1107,17 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 					actionsUIs[name] ?? {
 						actionsUIs.put(name, ());
 						cTabView3.bounds = Point(cTabView3.bounds.width, cTabView3.bounds.height+76);
+						funcString = action.asArray[0][0];
 
 						flow3.shift(0, 5);
 
-						actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-173, 15))
+						if (funcString != "{ \"open Function\" }", {
+							actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-173, 15))
+						}, {
+							actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-110, 15))
+						});
+
+						actionsUIs[name].nameField
 							.font_(staticTextFont)
 							.background_(Color(1.0, 1.0, 1.0, 0.5))
 							.string_(""+name.asString)
@@ -1110,28 +1125,30 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 
 						flow3.shift(5, 0);
 
-						actionsUIs[name].activate = Button(cTabView3, Point(60, 15))
-							.font_(staticTextFont)
-							.states_([
-								["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
-								["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
-							])
-							.action_({ |rb|
-								switch(rb.value,
-									0, { widget.activateAction(name, false, slot) },
-									1, { widget.activateAction(name, true, slot) }
-								)
-							})
-						;
+						if (funcString != "{ \"open Function\" }", {
+							actionsUIs[name].activate = Button(cTabView3, Point(60, 15))
+								.font_(staticTextFont)
+								.states_([
+									["activate", Color(0.1, 0.3, 0.15), Color(0.99, 0.77, 0.11)],
+									["deactivate", Color.white, Color(0.1, 0.30, 0.15)],
+								])
+								.action_({ |rb|
+									switch(rb.value,
+										0, { widget.activateAction(name, false, slot) },
+										1, { widget.activateAction(name, true, slot) }
+									)
+								})
+							;
 
-						switch(active,
-							true, {
-								actionsUIs[name].activate.value_(1);
-							},
-							false, {
-								actionsUIs[name].activate.value_(0);
-							}
-						);
+							switch(active,
+								true, {
+									actionsUIs[name].activate.value_(1);
+								},
+								false, {
+									actionsUIs[name].activate.value_(0);
+								}
+							);
+						});
 
 						flow3.shift(0, 0);
 
@@ -1147,7 +1164,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 						actionsUIs[name].actionView = TextView(cTabView3, Point(flow3.bounds.width-35, 50))
 							.background_(Color(1.0, 1.0, 1.0, 0.5))
 							.font_(textFieldFont)
-							.string_(action.asArray[0][0])
+							.string_(funcString)
 							.syntaxColorize
 							.editable_(false)
 						;
