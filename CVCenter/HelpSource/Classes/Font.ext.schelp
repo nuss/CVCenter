@@ -1,14 +1,13 @@
 classmethods::
 
 method:: available
-Return the font-name defined by code::name:: if the font is available on the user's machine, otherwise return code::nil::
+Return the first font name defined by code::names:: found within available typefaces on the user's machine, otherwise return code::nil::
 code::
-Font.available("Arial");
-Font.available("ywrsdstr");
-Font(Font.available("Arial") ? Font.defaultSansFace, 9.5)
+Font.available("Arial", "Helvetica", "Futura");
+Font(Font.available("Arial", "Helvetica") ? Font.defaultSansFace, 9.5)
 ::
 
-argument:: name
-a link::Classes/String::, denoting a font or font-family.
+argument:: names
+one or more link::Classes/String::s, denoting a list of font names to be searched for.
 
 returns:: a link::Classes/String:: or code::nil:: if no match was found
