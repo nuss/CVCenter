@@ -1339,7 +1339,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(0, 5);
 
-				if (funcString != "{ \"open Function\" }", {
+				if ("{(.*)\"open Function\" }".matchRegexp(funcString).not, {
 					actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-173, 15));
 				}, {
 					actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-110, 15));
@@ -1353,7 +1353,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 				flow3.shift(5, 0);
 
-				if (funcString != "{ \"open Function\" }", {
+				if ("{(.*)\"open Function\" }".matchRegexp(funcString).not, {
 					actionsUIs[name].activate = Button(cTabView3, Point(60, 15))
 						.font_(staticTextFont)
 						.states_([
@@ -1493,7 +1493,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(0, 5);
 
-					if (funcString != "{ \"open Function\" }", {
+					if ("{(.*)\"open Function\" }".matchRegexp(funcString).not, {
 						actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-173, 15));
 					}, {
 						actionsUIs[name].nameField = StaticText(cTabView3, Point(flow3.bounds.width-110, 15));
@@ -1507,7 +1507,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 
 					flow3.shift(5, 0);
 
-					if (funcString != "{ \"open Function\" }", {
+					if ("{(.*)\"open Function\" }".matchRegexp(funcString).not, {
 						actionsUIs[name].activate = Button(cTabView3, Point(60, 15))
 							.font_(staticTextFont)
 							.states_([
