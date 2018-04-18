@@ -2409,4 +2409,17 @@ CVCenter {
 		^obj;
 	}
 
+	*getCmdNamesAndAddressesInUse {
+		^cvWidgets.collect({ |wdgt| wdgt.midiOscEnv }).collect({ |env|
+			if (env.class == Array) {
+				env.collect(_.oscResponder)
+			} {
+				if (env.size == 2) {
+					[env.lo.oscResponder, env.hi.oscResponder]
+				} {
+					env.oscResponder
+				}
+			}
+		}).asArray.flat.takeThese(_.isNil).collect({ |resp| [resp.addr, resp.cmdName] })
+	}
 }

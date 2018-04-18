@@ -310,6 +310,14 @@ a link::Classes/String:: or link::Classes/Symbol:: - either code::\hi:: or code:
 
 returns:: code::this:: (CVCenter)
 
+METHOD:: getCmdNamesAndAddressesInUse
+Return the link::Addresses##NetAddr:: and OSC command names that are currently in use in an link::Array:: of arrays. The address denotes the address from which the regarding command is being sent. If no NetAddr is defined within the responder the address should be code::nil::. E.g.:
+code::
+[ [ a NetAddr(192.168.1.4, 55395), /my/cmd1 ], [ a NetAddr(192.168.1.4, 55395), /my/cmd2 ], [ a NetAddr(192.168.1.4, 55395), /my/cmd3 ], [ a NetAddr(192.168.1.4, 55395), /my/cmd3 ], [ a NetAddr(192.168.1.4, 55395), /my/cmd4 ] ]
+::
+
+returns:: a nested link::Array::
+
 METHOD:: snapShots
 Returns currently saved snapshots - an link::Classes/Event:: holding snapshots under the timestamp or custom name when they were saved as key and an link::Classes/IdentityDictionary:: of keys and values of all current link::Classes/CVWidget::s resp. their internal link::Classes/CV::(s) as values
 
