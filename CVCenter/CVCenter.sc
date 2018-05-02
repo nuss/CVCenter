@@ -2410,7 +2410,9 @@ CVCenter {
 	}
 
 	*getCmdNamesAndAddressesInUse {
-		^cvWidgets.collect({ |wdgt| wdgt.midiOscEnv }).collect({ |env|
+		^cvWidgets.collect({ |wdgt|
+			wdgt.midiOscEnv
+		}).collect({ |env|
 			if (env.class == Array) {
 				env.collect(_.oscResponder)
 			} {
@@ -2420,6 +2422,6 @@ CVCenter {
 					env.oscResponder
 				}
 			}
-		}).asArray.flat.takeThese(_.isNil).collect({ |resp| [resp.addr, resp.cmdName] })
+		}).asArray.flat.takeThese(_.isNil).collect({ |resp| resp.postln; [resp.addr, resp.cmdName] })
 	}
 }

@@ -187,7 +187,9 @@ CVWidget {
 		name ?? { Error("Please provide a name under which the action will be added to the widget").throw };
 		action ?? { Error("Please provide an action!").throw };
 		if(action.isFunction.not and:{
-			action.interpret.isFunction.not
+			action.class !== FunctionList and:{
+				action.interpret.isFunction.not
+			}
 		}, {
 			Error("'action' must be a function or a string that compiles to one").throw;
 		});
