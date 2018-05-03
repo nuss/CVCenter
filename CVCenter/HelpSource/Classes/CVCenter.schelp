@@ -413,6 +413,14 @@ a link::Classes/String:: or a link::Classes/Symbol:: representing the name of th
 
 returns:: an link::Classes/Array::
 
+METHOD:: getTab
+Get the tab label for the given widget name
+
+argument:: wdgtName
+a link::Classes/Symbol::, denoting the widget name
+
+returns:: the tab label as link::Classes/Symbol::
+
 METHOD:: widgetConnectGUI
 Drawing sliders in a widget while they're moved from outside (e.g. when they're set from some other application outside SuperCollider via OSC) may cost a lot of CPU power. Via this method the connection to sliders and number boxes can be suspended and hence CPU power may be freed for other processes.
 
