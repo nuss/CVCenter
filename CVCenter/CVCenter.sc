@@ -1424,6 +1424,11 @@ CVCenter {
 		cvWidgets[key.asSymbol].activateAction(name, activate, slot);
 	}
 
+	*getTab { |wdgtName|
+		var labels = tabs.tabViews.collect(_.label);
+		^labels.detect({ |l| this.widgetsAtTab(l).indexOf(wdgtName).notNil });
+	}
+
 	*widgetsAtTab { |label|
 		var index, wdgts = [];
 		all.keys.do({ |key|
