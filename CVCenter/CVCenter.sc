@@ -2421,12 +2421,12 @@ CVCenter {
 			wdgt.midiOscEnv
 		}).collect({ |env|
 			if (env.class == Array) {
-				env.collect(_.oscResponder)
+				env.collect({ |e| e.oscResponder !? { e.oscResponder }})
 			} {
 				if (env.size == 2) {
-					[env.lo.oscResponder, env.hi.oscResponder]
+					[env.lo !? { env.lo.oscResponder }, env.hi !? { env.hi.oscResponder }]
 				} {
-					env.oscResponder
+					env.oscResponder !? { env.oscResponder }
 				}
 			}
 		}).asArray.flat.takeThese(_.isNil).collect({ |resp| resp.postln; [resp.addr, resp.cmdName] })
