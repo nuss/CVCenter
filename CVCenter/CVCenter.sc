@@ -475,9 +475,11 @@ CVCenter {
 						if (k != 'select snapshot' and:{
 							k != 'snapshot'
 						}, {
-							if (CVCenter.at(k).class == Event) {
-								#[lo, hi].do({ |slot| CVCenter.at(k)[slot].value_(v[slot]) })
-							} { CVCenter.at(k).value_(v) }
+							CVCenter.at(k) !? {
+								if (CVCenter.at(k).class == Event) {
+									#[lo, hi].do({ |slot| CVCenter.at(k)[slot].value_(v[slot]) })
+								} { CVCenter.at(k).value_(v) }
+							}
 						})
 					})
 				})
