@@ -499,6 +499,10 @@ CVWidgetMS : CVWidget {
 		if(parent.respondsTo(\name), { oldName = parent.name });
 	}
 
+	size {
+		^msSize;
+	}
+
 	open { |window, wdgtBounds|
 		var thisWdgt, thisBounds;
 

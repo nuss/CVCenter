@@ -631,11 +631,6 @@ CVWidgets cannot gain focus themselves. However, their elements (buttons, slider
 
 returns:: an link::Classes/Array:: of GUI elements
 
-METHOD:: msSize
-Though this is an instance var defined in CVWidget it applies to CVWidgetMS only: It returns the number of slots of the multi-slider of a link::Classes/CVWidgetMS::.
-
-returns:: an link::Classes/Integer::
-
 METHOD:: cvArray
 link::Classes/CVWidgetMS:: only.
 
@@ -829,7 +824,7 @@ Server.default.waitForBoot{ ~noise = {
 
 // set various properties of the widgets
 (
-~ms.msSize.do({ |i|
+~ms.size.do({ |i|
 	~ms.setMidiMode(1, i).setCtrlButtonBank(16, i)
 });
 ~ms.addAction(\setFreq, { |cv| ~noise.set(\freq, cv.value) });

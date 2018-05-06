@@ -110,7 +110,7 @@ CVCenterShortcuts {
 						v[sl] !? { v[sl].editor !? { v[sl].editor.close }}
 					}) },
 					CVWidgetMS, {
-						CVCenter.cvWidgets[k].msSize.do({ |i|
+						CVCenter.cvWidgets[k].size.do({ |i|
 							v[i] !? { v[i].editor !? { v[i].editor.close }}
 						})
 					}
@@ -314,7 +314,7 @@ CVCenterShortcuts {
 					#[lo, hi].do({ |sl| wdgt.setCalibrate(true, sl) });
 				},
 				CVWidgetMS, {
-					wdgt.msSize.do({ |i| wdgt.setCalibrate(true, i) });
+					wdgt.size.do({ |i| wdgt.setCalibrate(true, i) });
 				},
 				{ wdgt.setCalibrate(true) }
 			)
@@ -336,7 +336,7 @@ CVCenterShortcuts {
 					#[lo, hi].do({ |sl| wdgt.setCalibrate(false, sl) });
 				},
 				CVWidgetMS, {
-					wdgt.msSize.do({ |i| wdgt.setCalibrate(false, i) });
+					wdgt.size.do({ |i| wdgt.setCalibrate(false, i) });
 				},
 				{ wdgt.setCalibrate(false) }
 			)
@@ -360,7 +360,7 @@ CVCenterShortcuts {
 					})
 				},
 				CVWidgetMS, {
-					wdgt.msSize.do({ |i|
+					wdgt.size.do({ |i|
 						wdgt.setOscInputConstraints(Point(0.0001, 0.0001), i).setCalibrate(true, i);
 					})
 				},

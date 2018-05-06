@@ -541,6 +541,10 @@ CVWidgetKnob : CVWidget {
 		if(parent.respondsTo(\name), { oldName = parent.name });
 	}
 
+	size {
+		^1;
+	}
+
 	open { |window, wdgtBounds|
 		var thisWdgt, thisBounds;
 
