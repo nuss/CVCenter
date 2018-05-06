@@ -74,8 +74,6 @@ CVWidgetMS : CVWidget {
 			widgetCV.spec.default.size
 		].maxItem;
 
-//		"msSize: %\n".postf(msSize);
-
 		prCalibrate = true ! msSize;
 		prMidiMode = 0 ! msSize;
 		prMidiMean = 64 ! msSize;
@@ -94,7 +92,7 @@ CVWidgetMS : CVWidget {
 			midiOscEnv = ()!msSize
 		});
 
-		msSize.do({ |i|
+		this.size.do({ |i|
 			midiOscEnv[i].oscMapping ?? { midiOscEnv[i].oscMapping = \linlin };
 		});
 
@@ -107,11 +105,11 @@ CVWidgetMS : CVWidget {
 		// controllersAndModels.pairsDo({ |k, v|
 		// 	if(k == \slots, { v.pairsDo({ |kk, vv| [kk, vv].postcs }) }, { [k, v].postln })
 		// });
-		msSize.do({ |sl| this.initControllersAndModels(controllersAndModels, sl) });
+		this.size.do({ |sl| this.initControllersAndModels(controllersAndModels, sl) });
 		// "wdgtControllersAndModels after init: %\n".postf(wdgtControllersAndModels.slots.collect(_.oscConnection));
 
 		setupArgs !? {
-			msSize.do({ |slot|
+			this.size.do({ |slot|
 				setupArgs[slot] !? { setupArgs[slot][\midiMode] !? { this.setMidiMode(setupArgs[slot][\midiMode], slot) }};
 				setupArgs[slot] !? { setupArgs[slot][\midiResolution] !? { this.setMidiResolution(setupArgs[slot][\midiResolution], slot) }};
 				setupArgs[slot] !? { setupArgs[slot][\midiMean] !? { this.setMidiMean(setupArgs[slot][\midiMean], slot) }};
@@ -140,7 +138,7 @@ CVWidgetMS : CVWidget {
 
 		cvcGui ?? {
 			parent.onClose_({
-				msSize.do({ |slot|
+				this.size.do({ |slot|
 					if(editor.editors[slot].notNil, {
 						if(editor.editors[slot].isClosed.not, {
 							editor.editors[slot].close(slot);
@@ -172,11 +170,9 @@ CVWidgetMS : CVWidget {
 			});
 			if(persistent == false or:{ persistent.isNil }, {
 				parent.onClose_(parent.onClose.addFunc({
-					msSize.do({ |slot|
+					this.size.do({ |slot|
 						this.oscDisconnect(slot);
 						this.midiDisconnect(slot);
-						// midiOscEnv[slot].oscResponder !? { midiOscEnv[slot].oscResponder.remove };
-						// midiOscEnv[slot].cc !? { midiOscEnv[slot].cc.remove };
 						wdgtControllersAndModels[slot].do({ |mc| mc.isKindOf(SimpleController).if{ mc.controller.remove } });
 					})
 				}))
@@ -248,7 +244,7 @@ CVWidgetMS : CVWidget {
 
 		calibViewsWidth = (thisWidth-2).div(msSize);
 		calibViewsNextX = thisXY.x+1;
-		msSize.do({ |sl|
+		this.size.do({ |sl|
 			calibViews.add(
 				CompositeView(parent, Rect(calibViewsNextX, nextY, calibViewsWidth, 2)).background_(Color.green);
 			);
@@ -315,7 +311,7 @@ CVWidgetMS : CVWidget {
 				}, {
 					editor.msEditor.midiTabs.focus(0)
 				});
-				msSize.do({ |i|
+				this.size.do({ |i|
 					wdgtControllersAndModels.slots[i].oscDisplay.model.value_(
 						wdgtControllersAndModels.slots[i].oscDisplay.model.value;
 					).changedKeys(synchKeys);
@@ -370,7 +366,7 @@ CVWidgetMS : CVWidget {
 				}, {
 					editor.msEditor.oscTabs.focus(0)
 				});
-				msSize.do({ |i|
+				this.size.do({ |i|
 					wdgtControllersAndModels.slots[i].oscDisplay.model.value_(
 						wdgtControllersAndModels.slots[i].oscDisplay.model.value;
 					).changedKeys(synchKeys);
@@ -492,7 +488,7 @@ CVWidgetMS : CVWidget {
 		};
 		mSlider.reference_(reference);
 
-		msSize.do({ |slot| this.initControllerActions(slot) });
+		this.size.do({ |slot| this.initControllerActions(slot) });
 
 		connectS !? { this.connectGUI(connectS, nil) };
 		connectTF !? { this.connectGUI(nil, connectTF) };
@@ -533,7 +529,7 @@ CVWidgetMS : CVWidget {
 				numSliders: msSize,
 				persistent: true
 			).front;
-			msSize.do({ |slot|
+			this.size.do({ |slot|
 				thisWdgt.wdgtControllersAndModels.slots[slot].oscDisplay.model.value_(
 					wdgtControllersAndModels.slots[slot].oscDisplay.model.value
 				).changedKeys(synchKeys);
@@ -551,7 +547,7 @@ CVWidgetMS : CVWidget {
 				).changedKeys(synchKeys);
 			});
 			thisWdgt.parent.onClose_(thisWdgt.parent.onClose.addFunc({
-				msSize.do({ |slot|
+				this.size.do({ |slot|
 					// "thisWdgt.editor.editors[%]: %\n".postf(slot, thisWdgt.editor.editors[slot]);
 					thisWdgt.editor.editors[slot] !? {
 						if(thisWdgt.editor.editors[slot].isClosed.not, { thisWdgt.editor.editors[slot].close });

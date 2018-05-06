@@ -189,8 +189,6 @@ CVCenter {
 		var tmpConnectS, tmpConnectTF;
 		// TabbedView2 specific
 
-		// "adding tab within *front: %\n".postf(tab);
-
 		// function for building cross-platform checkboxes
 		buildCheckbox = { |view, active, action|
 			var cBox;
@@ -475,9 +473,22 @@ CVCenter {
 							k != 'snapshot'
 						}, {
 							CVCenter.at(k) !? {
-								if (CVCenter.at(k).class == Event) {
-									#[lo, hi].do({ |slot| CVCenter.at(k)[slot].value_(v[slot]) })
-								} { CVCenter.at(k).value_(v) }
+								case
+								{ CVCenter.cvWidgets[k].class == CVWidget2D } {
+									if (v.size == 2) {
+										#[lo, hi].do({ |slot| CVCenter.at(k)[slot].value_(v[slot]) });
+									}
+								}
+								{ CVCenter.cvWidgets[k].class == CVWidgetMS } {
+									if (v.isArray and:{ v.size == CVCenter.cvWidgets[k].size}) {
+										CVCenter.at(k).value_(v);
+									}
+								}
+								{ CVCenter.cvWidgets[k].class == CVWidgetKnob } {
+									if (v.isNumber) {
+										CVCenter.at(k).value_(v);
+									}
+								}
 							}
 						})
 					})
@@ -777,6 +788,7 @@ CVCenter {
 						},
 						cvcGui: cvcArgs
 					);
+
 					defer {
 						removeButs.put(key,
 							Button(thisTab, Rect(thisNextPos.x, thisNextPos.y+widgetheight, widgetwidth, 15))
