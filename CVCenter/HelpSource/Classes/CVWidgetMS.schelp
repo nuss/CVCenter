@@ -59,11 +59,7 @@ returns:: this (a code::CVWidgetMS::)
 INSTANCEMETHODS::
 
 METHOD:: split
-<<<<<<< e7b2637de687f14653df6f2d067d05d04a18810c
 Split the internal multi-dimensional link::Classes/CV:: into an array of one-dimensional CVs. This is especially useful for the usage in link::Classes/Pattern::s. Once a CV has been split, it will return the split CVs in a variable code::cvArray::. Calling the method repeatedly will not try to split the CV again. Hence, it should be safe to call code::split:: within Pattern code.
-=======
-Split the internal multi-dimensional link::Classes/CV:: into an array of one-dimensional CVs. This is especially useful for the usage in link::Classes/Pattern::s. Once a CV has been split, it will return the split CVs in a variable code::cvArray::. Calling the method repeatedly will not try to split the CV again. Hence, it should be save to call code::split:: within Pattern code.
->>>>>>> implement CVWidgetMS:-split
 
 code::
 // a CVWidgetMS holding a 5-dimensional CV
@@ -75,13 +71,10 @@ p.stop;
 w.close;
 ::
 
-<<<<<<< e7b2637de687f14653df6f2d067d05d04a18810c
 METHOD:: size
 
 COPYMETHOD:: CVWidget -cvArray
 
-=======
->>>>>>> implement CVWidgetMS:-split
 METHOD:: open
 If a widget has been created with the argument code::persistent:: set to true the user may reopen the widget with this method. This is basically a workaround due to the fact that GUIs in SuperCollider usually can't be opened again once they have been closed (even though executing the variable storing the the regarding object still returns the object). However, rather than reopening the old widget this method will create a new one, holding all properties, the CV and MIDI-/OSC-responders. In order to make this work as desired one should apply the following syntax where code::x:: holds the instance of the initially created widget:
 
