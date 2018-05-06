@@ -71,7 +71,7 @@ p.stop;
 w.close;
 ::
 
-COPYMETHOD:: CVWidget -msSize
+METHOD:: size
 
 COPYMETHOD:: CVWidget -cvArray
 

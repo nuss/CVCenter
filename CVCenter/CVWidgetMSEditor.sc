@@ -107,9 +107,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		xySlots ?? { xySlots = [] };
 		msEditorEnv = ();
 
-//		"widget: %\n".postf(widget.msSize);
+//		"widget: %\n".postf(widget.size);
 
-		#thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank = Array.newClear(widget.msSize)!5;
+		#thisMidiMode, thisMidiMean, thisMidiResolution, thisSoftWithin, thisCtrlButtonBank = Array.newClear(widget.size)!5;
 
 		cmdNames ?? { cmdNames = OSCCommands.deviceCmds };
 		thisCmdNames ?? { thisCmdNames = [nil] };
@@ -120,7 +120,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			wcmMS = widget.wdgtControllersAndModels;
 		};
 
-		widget.msSize.do({ |i|
+		widget.size.do({ |i|
 			thisMidiMode[i] = widget.getMidiMode(i);
 			thisMidiMean[i] = widget.getMidiMean(i);
 			thisMidiResolution[i] = widget.getMidiResolution(i);
@@ -365,7 +365,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					if(spec[1].isKindOf(ControlSpec), {
 						if((tmp = [spec[1].minval, spec[1].maxval, spec[1].step, spec[1].default].select(_.isArray)).size > 0, {
 							// "array: %\n".postf(spec[1]);
-							if(tmp.collect(_.size).includes(widget.msSize), {
+							if(tmp.collect(_.size).includes(widget.size), {
 								specsList.items_(specsList.items.add(spec[0]++":"+spec[1]));
 								specsListSpecs.add(spec[1]);
 							});
@@ -401,7 +401,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.items_(midiModes)
 				.action_({ |ms|
 					tmp = ms.value;
-					widget.msSize.do({ |sl|
+					widget.size.do({ |sl|
 						if(tmp != 2, {
 							widget.setMidiMode(tmp, sl);
 						})
@@ -428,7 +428,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					tmp = mb.string;
 					// string for possible compilation to an int
 					if("^[-+]?[0-9]*$".matchRegexp(tmp), {
-						widget.msSize.do({ |sl|
+						widget.size.do({ |sl|
 							widget.setMidiMean(tmp.asInt, sl);
 						})
 					}, {
@@ -441,7 +441,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				midiMeanNB.toolTip_("If your device outputs in-/decremental\nvalues often a slider's output in neutral\nposition will not be 0. E.g. it could be 64")
 			});
 
-			if(thisMidiMean.select(_.isInteger).size == widget.msSize and:{
+			if(thisMidiMean.select(_.isInteger).size == widget.size and:{
 				thisMidiMean.minItem == thisMidiMean.maxItem;
 			}, {
 				midiMeanNB.string_(thisMidiMean[0].asString);
@@ -455,7 +455,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					tmp = mb.string;
 					// string must be a valid float or integer
 					if("^[0-9]*\.?[0-9]*$".matchRegexp(tmp), {
-						widget.msSize.do({ |sl|
+						widget.size.do({ |sl|
 							widget.setSoftWithin(tmp.asFloat, sl);
 						})
 					})
@@ -466,7 +466,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				softWithinNB.toolTip_("If your device outputs absolute values\nyou can set here a threshold to the\ncurrent CV-value within which a slider\nwill react and set a new value. This avoids\njumps if a new value set by a slider\nis far away from the previous value.\nA value =< 0 deactivates snap-to.")
 			});
 
-			if(thisSoftWithin.select(_.isNumber).size == widget.msSize and:{
+			if(thisSoftWithin.select(_.isNumber).size == widget.size and:{
 				thisSoftWithin.minItem == thisSoftWithin.maxItem;
 			}, {
 				softWithinNB.string_(thisSoftWithin[0].asString);
@@ -479,7 +479,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.action_({ |mb|
 					tmp = mb.string;
 					if("^[0-9]*\.?[0-9]*$".matchRegexp(tmp), {
-						widget.msSize.do({ |sl|
+						widget.size.do({ |sl|
 							widget.setMidiResolution(tmp.asFloat, sl);
 						})
 					})
@@ -490,7 +490,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				midiResolutionNB.toolTip_("Higher values mean lower\nresolution and vice versa.")
 			});
 
-			if(thisMidiResolution.select(_.isNumber).size == widget.msSize and:{
+			if(thisMidiResolution.select(_.isNumber).size == widget.size and:{
 				thisMidiResolution.minItem == thisMidiResolution.maxItem;
 			}, {
 				midiResolutionNB.string_(thisMidiResolution[0].asString);
@@ -505,12 +505,12 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					if(mb.string != "nil", {
 						tmp = mb.string;
 						if("^[0-9]*$".matchRegexp(mb.string), {
-							widget.msSize.do({ |sl|
+							widget.size.do({ |sl|
 								widget.setCtrlButtonBank(tmp.asInt, sl);
 							})
 						})
 					}, {
-						widget.msSize.do({ |sl|
+						widget.size.do({ |sl|
 							widget.setCtrlButtonBank(slot: sl);
 						})
 					})
@@ -521,10 +521,10 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				ctrlButtonBankField.toolTip_("Set the number of sliders on in one bank of your MIDI-device.\nSetting this number will display the selected slider in a widget not as\na single number but rather as combination of the selected bank and\nthe slider number (e.g.: 4:3 means bank nr. 4, slider nr. 3)")
 			});
 
-			if(thisCtrlButtonBank.select(_.isNil).size == widget.msSize, {
+			if(thisCtrlButtonBank.select(_.isNil).size == widget.size, {
 				ctrlButtonBankField.string_("nil");
 			}, {
-				if(thisCtrlButtonBank.select(_.isInteger).size == widget.msSize and:{
+				if(thisCtrlButtonBank.select(_.isInteger).size == widget.size and:{
 					thisCtrlButtonBank.minItem == thisCtrlButtonBank.maxItem;
 				}, {
 					ctrlButtonBankField.string_(thisCtrlButtonBank[0].asString);
@@ -666,7 +666,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.background_(textFieldBg)
 				.stringColor_(textFieldFontColor)
 				.clipLo_(0)
-				.clipHi_(widget.msSize-1)
+				.clipHi_(widget.size-1)
 				.shift_scale_(1)
 				.ctrl_scale_(1)
 				.alt_scale_(1)
@@ -736,7 +736,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			;
 
-			if(widget.midiOscEnv.collect(_.cc).takeThese(_.isNil).size < widget.msSize, {
+			if(widget.midiOscEnv.collect(_.cc).takeThese(_.isNil).size < widget.size, {
 				midiConnectorBut.enabled_(true).states_([
 					[midiConnectorBut.states[0][0], midiConnectorBut.states[0][1], Color.red]
 				])
@@ -749,7 +749,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.states_([
 					["disconnect all Midi-sliders", Color.white, Color.blue]
 				])
-				.action_({ |dcb| widget.msSize.do(widget.midiDisconnect(_)) })
+				.action_({ |dcb| widget.size.do(widget.midiDisconnect(_)) })
 			;
 
 			if(widget.midiOscEnv.collect(_.cc).takeThese(_.isNil).size > 0, {
@@ -772,7 +772,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			});
 
-			widget.msSize.do({ |sl|
+			widget.size.do({ |sl|
 				midiEditGroups.add(
 					CVMidiEditGroup(midiView1, Point(midiFlow1.bounds.width/5-10, 39), widget, sl);
 				)
@@ -951,7 +951,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.font_(textFieldFont)
 				.normalColor_(textFieldFontColor)
 				.clipLo_(0)
-				.clipHi_(widget.msSize-1)
+				.clipHi_(widget.size-1)
 				.shift_scale_(1)
 				.ctrl_scale_(1)
 				.alt_scale_(1)
@@ -1041,7 +1041,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.items_(mappingSelectItems)
 				.action_({ |ms|
 					if(ms.value != 0, {
-						widget.msSize.do({ |i|
+						widget.size.do({ |i|
 							if(i == 0, { tmp = ms.item });
 							widget.setOscMapping(tmp, i);
 						})
@@ -1049,9 +1049,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			;
 
-			tmp = widget.msSize.collect({ |sl| widget.getOscMapping(sl) });
+			tmp = widget.size.collect({ |sl| widget.getOscMapping(sl) });
 			block { |break|
-				(1..widget.msSize-1).do({ |sl|
+				(1..widget.size-1).do({ |sl|
 					if(tmp[0] != tmp[sl], {
 						break.value(mappingDiffers = true)
 					}, { mappingDiffers = false });
@@ -1077,13 +1077,13 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.action_({ |cb|
 					cb.value.switch(
 						0, {
-							widget.msSize.do({ |i|
+							widget.size.do({ |i|
 								widget.setCalibrate(true, i);
 								wcmMS.slots[i].calibration.model.value_(true).changedKeys(widget.synchKeys);
 							})
 						},
 						1, {
-							widget.msSize.do({ |i|
+							widget.size.do({ |i|
 								widget.setCalibrate(false, i);
 								wcmMS.slots[i].calibration.model.value_(false).changedKeys(widget.synchKeys);
 							})
@@ -1092,17 +1092,17 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			;
 
-			numCalibActive = widget.msSize.collect(widget.getCalibrate(_)).select(_ == true).size;
+			numCalibActive = widget.size.collect(widget.getCalibrate(_)).select(_ == true).size;
 
 			case
 				{ numCalibActive == 0 } { calibBut.value_(1) }
-				{ numCalibActive > 0 and:{ numCalibActive < widget.msSize }} {
+				{ numCalibActive > 0 and:{ numCalibActive < widget.size }} {
 					calibBut.states_([
 						["partially calibrating", calibBut.states[0][1], Color.yellow],
 						calibBut.states[1]
 					]).value_(0);
 				}
-				{ numCalibActive == widget.msSize } { calibBut.value_(0) }
+				{ numCalibActive == widget.size } { calibBut.value_(0) }
 			;
 
 			if(GUI.id !== \cocoa, {
@@ -1115,7 +1115,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					["reset all", Color.black, Color(0.9, 0.7, 0.14)],
 				])
 				.action_({ |rb|
-					widget.msSize.do({ |sl|
+					widget.size.do({ |sl|
 						// to do check setOscInputConstraints so constraints
 						// are displayed correctly when an editor gets opened
 					widget.setOscInputConstraints(Point(0.0001, 0.0001), sl).setCalibrate(true, sl);
@@ -1181,7 +1181,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 								});
 								connectIndexStart = intStartIndexField.value+i;
 								// [connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart].postln;
-								if(connectIndexStart >= 0 and:{ connectIndexStart < widget.msSize }, {
+								if(connectIndexStart >= 0 and:{ connectIndexStart < widget.size }, {
 									widget.oscConnect(
 										ip: connectIP,
 										port: connectPort,
@@ -1201,7 +1201,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			;
 
-			if(widget.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size < widget.msSize, {
+			if(widget.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size < widget.size, {
 				connectorBut.enabled_(true).states_([
 					[connectorBut.states[0][0], connectorBut.states[0][1], Color.red]
 				])
@@ -1214,7 +1214,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				.states_([
 					["disconnect all OSC-controllers", Color.white, Color.blue],
 				])
-				.action_({ |dcb| widget.msSize.do(widget.oscDisconnect(_)) })
+				.action_({ |dcb| widget.size.do(widget.oscDisconnect(_)) })
 			;
 
 			if(widget.midiOscEnv.collect(_.oscResponder).takeThese(_.isNil).size > 0, {
@@ -1237,7 +1237,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 				})
 			});
 
-			widget.msSize.do({ |sindex|
+			widget.size.do({ |sindex|
 				oscEditBtns.add(
 					Button(oscView1, Point(oscFlow1.bounds.width/5-10, 25))
 						.states_([

@@ -186,7 +186,6 @@ CVCenter {
 
 	*front { |tab...cvs|
 		var flow;
-		// var cvTabIndex, order, orderedCVs, msSize;
 		var updateRoutine, lastUpdate, lastUpdateBounds, lastSetUp, lastCtrlBtnBank, removedKeys, skipJacks;
 		var lastCtrlBtnsMode/*, swFlow*/;
 		var allTabs, thisTabLabel;
@@ -496,7 +495,7 @@ CVCenter {
 							})
 						},
 						CVWidgetMS, {
-							cvWidgets[editor].msSize.do({ |sl|
+							cvWidgets[editor].size.do({ |sl|
 								val[sl] !? { val[sl].window.close };
 							});
 							cvWidgets[editor].editor.msEditor !? {
@@ -1062,7 +1061,7 @@ CVCenter {
 				})
 			},
 			CVWidgetMS, {
-				cvWidgets[key].msSize.do({ |sl|
+				cvWidgets[key].size.do({ |sl|
 					cvWidgets[key].wdgtControllersAndModels.slots[sl].midiDisplay.model.value_(
 						cvWidgets[key].wdgtControllersAndModels.slots[sl].midiDisplay.model.value
 					).changedKeys(cvWidgets[key].synchKeys);
@@ -1187,7 +1186,7 @@ CVCenter {
 				}, {
 					cvWidgets[thisKey].editor.msEditor.close;
 				});
-				cvWidgets[thisKey].msSize.do({ |sl|
+				cvWidgets[thisKey].size.do({ |sl|
 					if (cvWidgets[thisKey].editor.editors[sl].notNil and:{
 						cvWidgets[thisKey].editor.editors[sl].isClosed.not
 					}, {
@@ -1698,10 +1697,10 @@ CVCenter {
 								}),
 								wdgtClass: CVWidgetMS,
 								midiOscRememberBatchConnection: cvWidgets[k].midiOscRememberBatchConnection,
-								osc: ()!cvWidgets[k].msSize,
-								midi: ()!cvWidgets[k].msSize,
+								osc: ()!cvWidgets[k].size,
+								midi: ()!cvWidgets[k].size,
 							);
-							cvWidgets[k].msSize.do({ |sl|
+							cvWidgets[k].size.do({ |sl|
 								// osc
 								cvWidgets[k].midiOscEnv[sl].oscResponder !? {
 									lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.addr;
@@ -1944,7 +1943,7 @@ CVCenter {
 										cvWidgets[key].midiOscRememberBatchConnection[k] = v;
 									});
 								};
-								cvWidgets[key].msSize.do({ |sl|
+								cvWidgets[key].size.do({ |sl|
 									cvWidgets[key].setMidiMode(v.midi[sl].midiMode, sl)
 										.setMidiMean(v.midi[sl].midiMean, sl)
 										.setSoftWithin(v.midi[sl].softWithin, sl)
@@ -1960,7 +1959,7 @@ CVCenter {
 									}
 								});
 								if (autoConnectOSC, {
-									cvWidgets[key].msSize.do({ |sl|
+									cvWidgets[key].size.do({ |sl|
 										v.osc[sl].cmdName !? {
 											cvWidgets[key].oscConnect(
 												if (oscIPAddress.isNil, {
@@ -2008,7 +2007,7 @@ CVCenter {
 									})
 								});
 								if (autoConnectMIDI, {
-									cvWidgets[key].msSize.do({ |sl|
+									cvWidgets[key].size.do({ |sl|
 										v.midi[sl].num !? {
 											try {
 												cvWidgets[key].midiConnect(
@@ -2133,7 +2132,7 @@ CVCenter {
 						});
 					},
 					CVWidgetMS, {
-						wdgt.msSize.do({ |sl|
+						wdgt.size.do({ |sl|
 							this.midiMode !? { wdgt.setMidiMode(this.midiMode, sl) };
 							this.midiResolution !? { wdgt.setMidiResolution(this.midiResolution, sl) };
 							this.midiMean !? { wdgt.setMidiMean(this.midiMean, sl) };

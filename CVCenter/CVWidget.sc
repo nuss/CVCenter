@@ -39,7 +39,7 @@ CVWidget {
 	var slotCmdName, lastIntSlots, msSlotsChecked = false;
 	var lastMsgIndex, msMsgIndexDiffers = false, count = 0;
 	// CVWidgetMS
-	var <msSize, <cvArray;
+	var msSize, <cvArray;
 
 	*initClass {
 		var scFunc, scPrefs = false;
@@ -166,6 +166,14 @@ CVWidget {
 		allGuiEls.do({ |el|
 			if(el.class == List, { el.do(_.remove) }, { el.remove });
 		});
+	}
+
+	size {
+		this.subclassResponsibility(thisMethod);
+	}
+
+	msSize {
+		this.deprecated(thisMethod, CVWidget.findMethod(\size));
 	}
 
 	close {
@@ -2754,14 +2762,14 @@ CVWidget {
 				if(GUI.id !== \cocoa, {
 					case
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size > 0} {
-							msTooltipLines ?? { msTooltipLines = nil!this.msSize };
+							msTooltipLines ?? { msTooltipLines = nil!this.size };
 
 							// a CVWidgetMS may grow or shrink
-							if(this.msSize < msTooltipLines.size) {
-								msTooltipLines = msTooltipLines[..this.msSize-1];
+							if(this.size < msTooltipLines.size) {
+								msTooltipLines = msTooltipLines[..this.size-1];
 							};
-							if(this.msSize > msTooltipLines.size) {
-								(msTooltipLines.size-this.msSize).do({
+							if(this.size > msTooltipLines.size) {
+								(msTooltipLines.size-this.size).do({
 									msTooltipLines = msTooltipLines.add(nil)
 								})
 							};
@@ -2790,7 +2798,7 @@ CVWidget {
 						defer { guiEnv.oscBut.toolTip_(msConnectionsMsg) };
 						}
 						{ this.midiOscEnv.select({ |it| it.oscResponder.notNil }).size == 0 } {
-							msTooltipLines = nil!this.msSize;
+							msTooltipLines = nil!this.size;
 							defer {
 								guiEnv.oscBut.toolTip_("no OSC-responders present.\nClick to edit.");
 							}

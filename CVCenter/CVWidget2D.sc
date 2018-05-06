@@ -726,6 +726,10 @@ CVWidget2D : CVWidget {
 		if(parent.respondsTo(\name), { oldName = parent.name });
 	}
 
+	size {
+		^2;
+	}
+
 	open { |window, wdgtBounds|
 		var thisWdgt, thisBounds;
 
