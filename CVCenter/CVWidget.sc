@@ -712,8 +712,6 @@ CVWidget {
 	setCalibrate { |bool, slot|
 		var thisSlot, wcm;
 
-		// "setCalibrate called: %\n".postf(this.name);
-
 		switch(this.class,
 			CVWidget2D, {
 				thisSlot = slot.asSymbol;
@@ -854,8 +852,6 @@ CVWidget {
 		var thisSlot, wcm;
 		var thisIP, intPort;
 
-		// "oscConnect called: %\n".postf(this.name);
-
 		switch(this.class,
 			CVWidget2D, {
 				thisSlot = slot.asSymbol;
@@ -916,7 +912,7 @@ CVWidget {
 			{
 				CmdPeriod.add({ if(this.class.removeResponders, { this.oscDisconnect(thisSlot) }) });
 			}
-		)
+		);
 	}
 
 	oscDisconnect { |slot|
@@ -1327,7 +1323,6 @@ CVWidget {
 		};
 
 		wcm.calibration.controller.put(\default, { |theChanger, what, moreArgs|
-			// "prInitCalibration: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' calibration.model: %\n".postf(this.name, this.class, slot, theChanger) });
 
 			if(this.class == CVWidgetMS, {
@@ -1335,8 +1330,6 @@ CVWidget {
 			}, {
 				thisEditor = guiEnv[\editor];
 			});
-
-			// [slot, thisEditor.calibNumBoxes.lo, thisEditor.calibNumBoxes.hi].postln;
 
 			theChanger.value.switch(
 				true, {
@@ -2642,7 +2635,6 @@ CVWidget {
 								]).changedKeys(synchKeys);
 							});
 						});
-						// [slot, midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi].postln;
 						wcm.mapConstrainterLo.value_(midiOscEnv.calibConstraints.lo);
 						wcm.mapConstrainterHi.value_(midiOscEnv.calibConstraints.hi);
 					}, {
@@ -2773,14 +2765,12 @@ CVWidget {
 		wcm.oscDisplay.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscDisplay: %\n".postf(theChanger);
 			if(debug, { "widget '%' (%) at slot '%' oscDisplay.model: %\n".postf(this.name, this.class, slot, theChanger) });
-
-			// "oscDisplay.controller in - %[%]: %\n".postf(this.name, slot, midiOscEnv);
-
 			switch(prCalibrate.class,
 				Event, { thisCalib = prCalibrate[slot] },
 				Array, { thisCalib = prCalibrate[slot] },
 				{ thisCalib = prCalibrate }
 			);
+
 
 			if(this.class == CVWidgetMS, {
 				thisEditor = guiEnv.editor[slot];
@@ -2995,7 +2985,6 @@ CVWidget {
 					].do(_.enabled_(theChanger.value.editEnabled));
 				}
 			});
-			// "oscDisplay.controller out - %[%]: %\n".postf(this.name, slot, midiOscEnv);
 		})
 	}
 
@@ -3010,7 +2999,6 @@ CVWidget {
 		wcm.oscInputRange.controller.put(\default, { |theChanger, what, moreArgs|
 			// "prInitOscInputRange: %\n".postf(theChanger.value);
 			if(debug, { "widget '%' (%) at slot '%' oscInputRange.model: %\n".postf(this.name, this.class, slot, theChanger) });
-
 			midiOscEnv.calibConstraints = (lo: theChanger.value[0], hi: theChanger.value[1]);
 
 			if(this.class == CVWidgetMS, {
