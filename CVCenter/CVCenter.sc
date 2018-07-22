@@ -1781,7 +1781,7 @@ CVCenter {
 			connectSliders, connectNumBoxes
 		|
 		var lib, successFunc, toBeRemoved;
-		var caibrationConstraints;
+		var calibrationConstraints;
 		var calibrationReset = Point(0.0001, 0.0001);
 
 		successFunc = { |f|
@@ -1842,16 +1842,16 @@ CVCenter {
 											cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo);
 											if (activateCalibration, {
 												if (resetCalibration or: { v[hilo].osc.calibConstraints.isNil }) {
-													caibrationConstraints = Point(0.0001, 0.0001);
+													calibrationConstraints = Point(0.0001, 0.0001);
 												} {
-													caibrationConstraints = Point(
+													calibrationConstraints = Point(
 														v[hilo].osc.calibConstraints.lo,
 														v[hilo].osc.calibConstraints.hi
 													)
 												};
-												cvWidgets[key].setOscInputConstraints(caibrationConstraints, hilo);
+												cvWidgets[key].setOscInputConstraints(calibrationConstraints, hilo);
 												cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
-													[caibrationConstraints]
+													[calibrationConstraints.x, calibrationConstraints.y]
 												).changedKeys(cvWidgets[key].synchKeys);
 											}, {
 												v[hilo].osc.calibConstraints !? {
@@ -1887,7 +1887,6 @@ CVCenter {
 										})
 									})
 								});
-								"added a CVWidget2D: '%'\n".postf(key);
 							},
 							CVWidgetKnob, {
 								this.prAdd(key, v.spec, v.val, v.tabLabel);
@@ -1929,16 +1928,16 @@ CVCenter {
 										cvWidgets[key].setOscMapping(v.osc.oscMapping);
 										if (activateCalibration, {
 											if (resetCalibration or: { v.osc.calibConstraints.isNil }) {
-												caibrationConstraints = Point(0.0001, 0.0001);
+												calibrationConstraints = Point(0.0001, 0.0001);
 											} {
-												caibrationConstraints = Point(
+												calibrationConstraints = Point(
 													v.osc.calibConstraints.lo,
 													v.osc.calibConstraints.hi
 												)
 											};
-											cvWidgets[key].setOscInputConstraints(caibrationConstraints);
+											cvWidgets[key].setOscInputConstraints(calibrationConstraints);
 											cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
-												[caibrationConstraints]
+												[calibrationConstraints.x, calibrationConstraints.y]
 											).changedKeys(cvWidgets[key].synchKeys);
 										}, {
 											v.osc.calibConstraints !? {
@@ -2018,18 +2017,18 @@ CVCenter {
 											cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl);
 											if (activateCalibration, {
 												if (resetCalibration or: { v.osc[sl].calibConstraints.isNil }) {
-													caibrationConstraints = Point(0.0001, 0.0001);
+													calibrationConstraints = Point(0.0001, 0.0001);
 												} {
-													caibrationConstraints = Point(
+													calibrationConstraints = Point(
 														v.osc[sl].calibConstraints.lo,
 														v.osc[sl].calibConstraints.hi
 													)
 												};
 												cvWidgets[key].setOscInputConstraints(
-													caibrationConstraints, sl
+													calibrationConstraints, sl
 												);
 												cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
-													[caibrationConstraints]
+													[calibrationConstraints.x, calibrationConstraints.y]
 												).changedKeys(cvWidgets[key].synchKeys);
 											}, {
 												v.osc[sl].calibConstraints !? {
