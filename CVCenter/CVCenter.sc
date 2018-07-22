@@ -1952,7 +1952,6 @@ CVCenter {
 										cvWidgets[key].split;
 									}
 								};
-								"added a CVWidgetMS: '%'\n".postf(key);
 							}
 						);
 
@@ -2306,7 +2305,7 @@ CVCenter {
 			case
 				{ more.slots.size == 1 } {
 					this.prAdd(more.cName, thisSpec, more.slots[0], more.enterTab);
-					varNames.postln;
+					// varNames.postln;
 					if (varNames.size > 0, {
 						varNames.do({ |v, j|
 							if (j == 0, { activate = true }, { activate = false });
