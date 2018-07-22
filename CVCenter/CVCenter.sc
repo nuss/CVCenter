@@ -1781,6 +1781,8 @@ CVCenter {
 			connectSliders, connectNumBoxes
 		|
 		var lib, successFunc, toBeRemoved;
+		var caibrationConstraints;
+		var calibrationReset = Point(0.0001, 0.0001);
 
 		successFunc = { |f|
 			if (GUI.id === \qt, {
@@ -1838,22 +1840,32 @@ CVCenter {
 											);
 
 											cvWidgets[key].setOscMapping(v[hilo].osc.oscMapping, hilo);
-											if (activateCalibration and:{ resetCalibration }, {
-												cvWidgets[key].setOscInputConstraints(Point(0.0001, 0.0001), hilo);
-												cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
-													[Point(0.0001, 0.0001)]
-												).changedKeys(cvWidgets[key].synchKeys);
-											}, {
-												cvWidgets[key].setOscInputConstraints(
-													Point(
+											if (activateCalibration, {
+												if (resetCalibration or: { v[hilo].osc.calibConstraints.isNil }) {
+													caibrationConstraints = Point(0.0001, 0.0001);
+												} {
+													caibrationConstraints = Point(
 														v[hilo].osc.calibConstraints.lo,
 														v[hilo].osc.calibConstraints.hi
-													),
-													hilo
-												);
+													)
+												};
+												cvWidgets[key].setOscInputConstraints(caibrationConstraints, hilo);
 												cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
-													[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
-												).changedKeys(cvWidgets[key].synchKeys)
+													[caibrationConstraints]
+												).changedKeys(cvWidgets[key].synchKeys);
+											}, {
+												v[hilo].osc.calibConstraints !? {
+													cvWidgets[key].setOscInputConstraints(
+														Point(
+															v[hilo].osc.calibConstraints.lo,
+															v[hilo].osc.calibConstraints.hi
+														),
+														hilo
+													);
+													cvWidgets[key].wdgtControllersAndModels[hilo].oscInputRange.model.value_(
+														[v[hilo].osc.calibConstraints.lo, v[hilo].osc.calibConstraints.hi]
+													).changedKeys(cvWidgets[key].synchKeys)
+												}
 											});
 											if (activateCalibration, { cvWidgets[key].setCalibrate(true, hilo) });
 										})
@@ -1874,7 +1886,8 @@ CVCenter {
 											}
 										})
 									})
-								})
+								});
+								"added a CVWidget2D: '%'\n".postf(key);
 							},
 							CVWidgetKnob, {
 								this.prAdd(key, v.spec, v.val, v.tabLabel);
@@ -1914,20 +1927,28 @@ CVCenter {
 											v.osc.msgIndex
 										);
 										cvWidgets[key].setOscMapping(v.osc.oscMapping);
-										if (activateCalibration and:{ resetCalibration }, {
-											cvWidgets[key].setOscInputConstraints(
-												Point(0.0001, 0.0001)
-											);
+										if (activateCalibration, {
+											if (resetCalibration or: { v.osc.calibConstraints.isNil }) {
+												caibrationConstraints = Point(0.0001, 0.0001);
+											} {
+												caibrationConstraints = Point(
+													v.osc.calibConstraints.lo,
+													v.osc.calibConstraints.hi
+												)
+											};
+											cvWidgets[key].setOscInputConstraints(caibrationConstraints);
 											cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
-												[Point(0.0001, 0.0001)]
+												[caibrationConstraints]
 											).changedKeys(cvWidgets[key].synchKeys);
 										}, {
-											cvWidgets[key].setOscInputConstraints(
-												Point(v.osc.calibConstraints.lo, v.osc.calibConstraints.hi)
-											);
-											cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
-												[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
-											).changedKeys(cvWidgets[key].synchKeys);
+											v.osc.calibConstraints !? {
+												cvWidgets[key].setOscInputConstraints(
+													Point(v.osc.calibConstraints.lo, v.osc.calibConstraints.hi)
+												);
+												cvWidgets[key].wdgtControllersAndModels.oscInputRange.model.value_(
+													[v.osc.calibConstraints.lo, v.osc.calibConstraints.hi]
+												).changedKeys(cvWidgets[key].synchKeys);
+											}
 										});
 										if (activateCalibration, { cvWidgets[key].setCalibrate(true) });
 									}
@@ -1946,7 +1967,7 @@ CVCenter {
 											)
 										}
 									}
-								})
+								});
 							},
 							CVWidgetMS, {
 								this.prAdd(key, v.spec, v.val, v.tabLabel);
@@ -1995,24 +2016,34 @@ CVCenter {
 												sl
 											);
 											cvWidgets[key].setOscMapping(v.osc[sl].oscMapping, sl);
-											if (activateCalibration and:{ resetCalibration }, {
-												cvWidgets[key].setOscInputConstraints(
-													Point(0.0001, 0.0001), sl
-												);
-												cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
-													[Point(0.0001, 0.0001)]
-												).changedKeys(cvWidgets[key].synchKeys);
-											}, {
-												cvWidgets[key].setOscInputConstraints(
-													Point(
+											if (activateCalibration, {
+												if (resetCalibration or: { v.osc[sl].calibConstraints.isNil }) {
+													caibrationConstraints = Point(0.0001, 0.0001);
+												} {
+													caibrationConstraints = Point(
 														v.osc[sl].calibConstraints.lo,
 														v.osc[sl].calibConstraints.hi
-													),
-													sl
+													)
+												};
+												cvWidgets[key].setOscInputConstraints(
+													caibrationConstraints, sl
 												);
-													cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
-													[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
+												cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
+													[caibrationConstraints]
 												).changedKeys(cvWidgets[key].synchKeys);
+											}, {
+												v.osc[sl].calibConstraints !? {
+													cvWidgets[key].setOscInputConstraints(
+														Point(
+															v.osc[sl].calibConstraints.lo,
+															v.osc[sl].calibConstraints.hi
+														),
+														sl
+													);
+													cvWidgets[key].wdgtControllersAndModels.slots[sl].oscInputRange.model.value_(
+														[v.osc[sl].calibConstraints.lo, v.osc[sl].calibConstraints.hi]
+													).changedKeys(cvWidgets[key].synchKeys);
+												}
 											});
 											if (activateCalibration, { cvWidgets[key].setCalibrate(true, sl) });
 										}
@@ -2041,6 +2072,7 @@ CVCenter {
 										cvWidgets[key].split;
 									}
 								};
+								"added a CVWidgetMS: '%'\n".postf(key);
 							}
 						);
 
