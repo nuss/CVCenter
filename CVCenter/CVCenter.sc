@@ -1965,6 +1965,7 @@ CVCenter {
 										cvWidgets[key].split;
 									}
 								};
+								"added a CVWidgetMS: '%'\n".postf(key);
 							}
 						);
 
