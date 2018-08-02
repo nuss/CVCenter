@@ -18,11 +18,11 @@
 CVWidgetSpecsEditor {
 	var <window;
 
-	*new { |displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment|
-		^super.new.init(displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment)
+	*new { |displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment, tab|
+		^super.new.init(displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment, tab)
 	}
 
-	init { |displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment|
+	init { |displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment, tab|
 		var object;
 		var wdgtName, windowTitle;
 		var specsList, specsListSpecs, selectMatch, thisSpec;
@@ -281,14 +281,14 @@ CVWidgetSpecsEditor {
 
 			if(object.class == NodeProxy, {
 				if(object.isPlaying, {
-					elem.enterTab.string_("NodeProxy ("++object.asNodeID++")");
+					tab ?? { tab = "NodeProxy ("++object.asNodeID++")" }
 				}, {
-					elem.enterTab.string_("NodeProxy");
-				})
+					tab ?? { tab = "NodeProxy" }
+				});
 			}, {
-				elem.enterTab.string_(name);
+				tab ?? { tab = name };
 			});
-
+			elem.enterTab.string_(tab.asString);
 		};
 
 		made = [];

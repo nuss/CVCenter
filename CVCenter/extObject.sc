@@ -98,14 +98,22 @@
 
 +Synth {
 
-	cvcGui { |displayDialog=true, prefix, pairs2D, environment|
+	cvcGui { |displayDialog=true, prefix, pairs2D, environment, excemptArgs, tab|
 		var sDef, def, cDict = (), metadata;
 		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
 		sDef = SynthDescLib.global[this.defName.asSymbol];
 		sDef.metadata !? { sDef.metadata.specs !? { metadata = sDef.metadata.specs }};
-		sDef.controlDict.pairsDo({ |n, c| cDict.put(n, c.defaultValue) });
+		sDef.controlDict.pairsDo({ |n, c|
+			if (excemptArgs.isNil) {
+				cDict.put(n, c.defaultValue)
+			} {
+				if (excemptArgs.indexOf(n).isNil) {
+					cDict.put(n, c.defaultValue)
+				}
+			}
+		});
 		if(displayDialog, {
-			CVWidgetSpecsEditor(displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, metadata, environment);
+			CVWidgetSpecsEditor(displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, metadata, environment, tab: tab);
 		}, {
 			cDict.pairsDo({ |cName, vals|
 				block { |break|
@@ -164,7 +172,7 @@
 				CVCenter.finishGui(this, cName, nil, (
 					cName: thisName,
 					type: thisType,
-					enterTab: this.defName.asSymbol,
+					enterTab: if (tab.notNil) { tab.asSymbol } { this.defName.asSymbol },
 					controls: thisControls,
 					slots: thisSlots,
 					specSelect: thisSpec
@@ -177,17 +185,25 @@
 
 +NodeProxy {
 
-	cvcGui { |displayDialog=true, prefix, pairs2D|
+	cvcGui { |displayDialog=true, prefix, pairs2D, excemptArgs, tab|
 		var cDict = (), name;
 		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
-		this.getKeysValues.do({ |pair| cDict.put(pair[0], pair[1]) });
+		this.getKeysValues.do({ |pair|
+			if (excemptArgs.isNil) {
+				cDict.put(pair[0], pair[1])
+			} {
+				if (excemptArgs.indexOf(pair[0].isNil)) {
+					cDict.put(pair[0], pair[1])
+				}
+			}
+		});
 		if(this.class === Ndef, {
 			name = this.key;
 		}, {
 			name = nil;
 		});
 		if(displayDialog, {
-			CVWidgetSpecsEditor(displayDialog, this, name, cDict, prefix, pairs2D);
+			CVWidgetSpecsEditor(displayDialog, this, name, cDict, prefix, pairs2D, tab: tab);
 		}, {
 			cDict.pairsDo({ |cName, vals|
 				block { |break|
@@ -230,7 +246,7 @@
 				CVCenter.finishGui(this, cName, nil, (
 					cName: thisName,
 					type: thisType,
-					enterTab: name,
+					enterTab: if (tab.notNil) { tab.asSymbol } { name },
 					controls: thisControls,
 					slots: thisSlots,
 					specSelect: thisSpec
