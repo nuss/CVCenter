@@ -1,10 +1,10 @@
 CVCenterKeyboard {
 	classvar <all;
-	var <synthDefName, <keyboardArg = \freq, <ampArg = \amp, <bendArg;
+	var <synthDefName, <keyboardArg = \freq, <velocArg = \veloc, <bendArg = \bend;
 	var on, off, bend;
 
-	*new { |synthDefName, keyboardArg, ampArg, bendArg|
-		^super.newCopyArgs(synthDefName, keyboardArg, ampArg, bendArg).init;
+	*new { |synthDefName|
+		^super.newCopyArgs(synthDefName).init;
 	}
 
 	init {
@@ -30,11 +30,22 @@ CVCenterKeyboard {
 
 	// keyboardArg is the arg that will be set through playing the keyboard
 	// bendArg will be the arg that's set through the pitch bend wheel
-	setUpControls { |widgetsPrefix, tab, server|
+	setUpControls { |keyboardControl, velocControl, bendControl, widgetsPrefix, tab, server|
 		var testSynth, notesEnv;
 		var args = [];
 
 		server ?? { server = Server.default };
+
+		keyboardControl !? { keyboardArg = keyboardControl };
+		velocControl !? { velocArg = velocControl };
+		bendControl !? { bendArg = bendControl };
+
+		// in case you're re-initializing
+		CVCenter.scv[synthDefName] !? {
+			"re-initializing!".postln;
+			this.free;
+			CVCenter.scv.put(synthDefName, Array.newClear(128));
+		};
 
 		/*if (server.serverRunning.not) {
 			Error("The server '%' must be running before calling CVCenter:*midiKeyboardGated").throw;
@@ -55,20 +66,22 @@ CVCenterKeyboard {
 			).throw;
 		};
 
-		args = SynthDescLib.at(synthDefName).controlDict.keys.asArray.takeThese({ |it|
-			it === keyboardArg or: {it === ampArg or: { it === bendArg or: { it === \gate }}}
-		});
+		/*args = SynthDescLib.at(synthDefName).controlDict.keys.asArray.takeThese({ |it|
+			it === keyboardArg or: { it === velocArg or: { it === bendArg or: { it === \gate }}}
+		});*/
 
 		server.waitForBoot {
 			// SynthDef *should* have an \amp arg, otherwise it will sound for moment
 			testSynth = Synth(synthDefName);
 			// \gate will be set internally
-			testSynth.cvcGui(prefix: widgetsPrefix, excemptArgs: [keyboardArg, \gate], tab: tab);
+			testSynth.cvcGui(prefix: widgetsPrefix, excemptArgs: [keyboardArg, velocArg, \gate], tab: tab, completionFunc: {
+				this.addWidgetActionsForKeyboard(widgetsPrefix, true);
+			});
 			testSynth.release;
 		}
 	}
 
-	addWidgetActionsForKeyboard { |notesEnvironment, widgetsPrefix, deactivateDefaultActions = true|
+	addWidgetActionsForKeyboard { |widgetsPrefix, deactivateDefaultActions = true|
 		var args = SynthDescLib.at(synthDefName).controlDict.keys.asArray;
 		var wdgtName, nameString, namesCVs = [];
 
@@ -102,16 +115,18 @@ CVCenterKeyboard {
 		};
 
 		on = MIDIFunc.noteOn({ |veloc, num, chan, src|
-			var argsValues = [keyboardArg, num.midicps, ampArg, veloc * 0.005] ++ namesCVs.deepCollect(2, _.value);
+			var argsValues = [keyboardArg, num.midicps, velocArg, veloc * 0.005] ++ namesCVs.deepCollect(2, _.value);
+			// "on".postln;
 			CVCenter.scv[synthDefName][num] = Synth(synthDefName, argsValues);
 		});
 
 		off = MIDIFunc.noteOff({ |veloc, num, chan, src|
+			// "off".postln;
 			CVCenter.scv[synthDefName][num].release;
 		});
 
 		bend = MIDIFunc.bend({ |bendVal, chan, src|
-			"bend: %\n".postf(bendVal);
+			// "bend: %\n".postf(bendVal);
 		});
 
 	}

@@ -98,7 +98,7 @@
 
 +Synth {
 
-	cvcGui { |displayDialog=true, prefix, pairs2D, environment, excemptArgs, tab|
+	cvcGui { |displayDialog=true, prefix, pairs2D, environment, excemptArgs, tab, completionFunc|
 		var sDef, def, cDict = (), metadata;
 		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
 		sDef = SynthDescLib.global[this.defName.asSymbol];
@@ -113,7 +113,10 @@
 			}
 		});
 		if(displayDialog, {
-			CVWidgetSpecsEditor(displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, metadata, environment, tab: tab);
+			CVWidgetSpecsEditor(
+				displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, metadata,
+				environment, tab: tab, completionFunc: if (displayDialog) { completionFunc }
+			)
 		}, {
 			cDict.pairsDo({ |cName, vals|
 				block { |break|
@@ -175,7 +178,8 @@
 					enterTab: if (tab.notNil) { tab.asSymbol } { this.defName.asSymbol },
 					controls: thisControls,
 					slots: thisSlots,
-					specSelect: thisSpec
+					specSelect: thisSpec,
+					completionFunc: if (displayDialog.not) { completionFunc }
 				))
 			})
 		})
@@ -185,7 +189,7 @@
 
 +NodeProxy {
 
-	cvcGui { |displayDialog=true, prefix, pairs2D, excemptArgs, tab|
+	cvcGui { |displayDialog=true, prefix, pairs2D, excemptArgs, tab, completionFunc|
 		var cDict = (), name;
 		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
 		this.getKeysValues.do({ |pair|
@@ -203,7 +207,10 @@
 			name = nil;
 		});
 		if(displayDialog, {
-			CVWidgetSpecsEditor(displayDialog, this, name, cDict, prefix, pairs2D, tab: tab);
+			CVWidgetSpecsEditor(
+				displayDialog, this, name, cDict, prefix, pairs2D,
+				tab: tab, completionFunc: if (displayDialog) { completionFunc }
+			)
 		}, {
 			cDict.pairsDo({ |cName, vals|
 				block { |break|
@@ -249,7 +256,8 @@
 					enterTab: if (tab.notNil) { tab.asSymbol } { name },
 					controls: thisControls,
 					slots: thisSlots,
-					specSelect: thisSpec
+					specSelect: thisSpec,
+					completionFunc: if (displayDialog.not) { completionFunc }
 				))
 			})
 		})

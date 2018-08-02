@@ -18,11 +18,11 @@
 CVWidgetSpecsEditor {
 	var <window;
 
-	*new { |displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment, tab|
-		^super.new.init(displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment, tab)
+	*new { |displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment, tab, completionFunc|
+		^super.new.init(displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment, tab, completionFunc)
 	}
 
-	init { |displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment, tab|
+	init { |displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment, tab, completionFunc|
 		var object;
 		var wdgtName, windowTitle;
 		var specsList, specsListSpecs, selectMatch, thisSpec;
@@ -364,6 +364,7 @@ CVWidgetSpecsEditor {
 					CVCenter.finishGui(obj, el, environment, vals);
 				});
 				window.close;
+				completionFunc.value;
 			})
 		;
 
