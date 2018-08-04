@@ -1,10 +1,10 @@
 CVCenterKeyboard {
 	classvar <all;
-	var <synthDefName, <keyboardArg = \freq, <velocArg = \veloc, <bendArg = \bend;
+	var <synthDefName, <keyboardArg, <velocArg, <bendArg;
 	var on, off, bend;
 
-	*new { |synthDefName|
-		^super.newCopyArgs(synthDefName).init;
+	*new { |synthDefName, keyboardArg = \freq, velocArg = \veloc, bendArg = \bend|
+		^super.newCopyArgs(synthDefName, keyboardArg, velocArg, bendArg).init;
 	}
 
 	init {
@@ -30,7 +30,7 @@ CVCenterKeyboard {
 
 	// keyboardArg is the arg that will be set through playing the keyboard
 	// bendArg will be the arg that's set through the pitch bend wheel
-	setUpControls { |keyboardControl, velocControl, bendControl, widgetsPrefix, tab, server|
+	setUpControls { |tab, widgetsPrefix, keyboardControl, velocControl, bendControl, server|
 		var testSynth, notesEnv;
 		var args = [];
 
@@ -47,10 +47,6 @@ CVCenterKeyboard {
 			CVCenter.scv.put(synthDefName, Array.newClear(128));
 		};
 
-		/*if (server.serverRunning.not) {
-			Error("The server '%' must be running before calling CVCenter:*midiKeyboardGated").throw;
-		};*/
-
 		tab ?? { tab = synthDefName };
 
 		server ?? { server = Server.default };
@@ -65,10 +61,6 @@ CVCenterKeyboard {
 				"The given SynthDef does not provide a 'gate' argument and can not be used."
 			).throw;
 		};
-
-		/*args = SynthDescLib.at(synthDefName).controlDict.keys.asArray.takeThese({ |it|
-			it === keyboardArg or: { it === velocArg or: { it === bendArg or: { it === \gate }}}
-		});*/
 
 		server.waitForBoot {
 			// SynthDef *should* have an \amp arg, otherwise it will sound for moment
@@ -116,7 +108,7 @@ CVCenterKeyboard {
 
 		on = MIDIFunc.noteOn({ |veloc, num, chan, src|
 			var argsValues = [keyboardArg, num.midicps, velocArg, veloc * 0.005] ++ namesCVs.deepCollect(2, _.value);
-			// "on".postln;
+			// "on: %\n".postf(argsValues);
 			CVCenter.scv[synthDefName][num] = Synth(synthDefName, argsValues);
 		});
 
