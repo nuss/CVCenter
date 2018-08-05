@@ -1,6 +1,6 @@
 CVCenterKeyboard {
 	classvar <all;
-	var <synthDefName, <keyboardArg, <velocArg, <bendArg, widgetsPrefix;
+	var <synthDefName, <keyboardArg, <velocArg, <bendArg, <widgetsPrefix;
 	var on, off, bend, namesCVs;
 	var <>debug = false;
 
@@ -62,17 +62,18 @@ CVCenterKeyboard {
 			testSynth = Synth(synthDefName);
 			// \gate will be set internally
 			testSynth.cvcGui(prefix: widgetsPrefix, excemptArgs: [keyboardArg, velocArg, \gate], tab: tab, completionFunc: {
-				this.addWidgetActionsForKeyboard(deactivateDefaultWidgetActions);
+				this.prAddWidgetActionsForKeyboard(deactivateDefaultWidgetActions);
 			});
 			testSynth.release;
 		}
 	}
 
-	addWidgetActionsForKeyboard { |deactivateDefaultActions = true|
+	// private
+	prAddWidgetActionsForKeyboard { |deactivateDefaultActions = true|
 		var args = SynthDescLib.at(synthDefName).controlDict.keys.asArray;
 		var wdgtNames, wdgtName, nameString;
 
-		wdgtNames = this.initCVs(args);
+		wdgtNames = this.prInitCVs(args);
 
 		args.do { |name, i|
 			wdgtName = wdgtNames[i];
@@ -94,7 +95,7 @@ CVCenterKeyboard {
 			}
 		};
 
-		this.initKeyboard;
+		this.prInitKeyboard;
 	}
 
 	reInit {
@@ -103,12 +104,13 @@ CVCenterKeyboard {
 			"re-initializing!".postln;
 			this.free;
 			CVCenter.scv.put(synthDefName, Array.newClear(128));
-			this.initCVs(args);
-			this.initKeyboard;
+			this.prInitCVs(args);
+			this.prInitKeyboard;
 		}
 	}
 
-	initCVs { |args|
+	// private
+	prInitCVs { |args|
 		var nameString, wdgtName;
 		var wdgtNames = [];
 
@@ -137,7 +139,8 @@ CVCenterKeyboard {
 		^wdgtNames;
 	}
 
-	initKeyboard {
+	// private
+	prInitKeyboard {
 		on = MIDIFunc.noteOn({ |veloc, num, chan, src|
 			var argsValues = [keyboardArg, num.midicps, velocArg, veloc * 0.005] ++ namesCVs.deepCollect(2, _.value);
 			if (this.debug) { "on: %\n".postf(argsValues) };
