@@ -25,8 +25,8 @@ CVCenterKeyboard {
 
 		MIDIClient.init;
 		// doesn't seem to work properly on Ubuntustudio 16
-		// rather do it manually in QJackQtl...
-		// MIDIClient.connectAll;
+		// possibly has to be done manually in QJackQtl...
+		MIDIClient.connectAll;
 	}
 
 	// keyboardArg is the arg that will be set through playing the keyboard
@@ -154,6 +154,7 @@ CVCenterKeyboard {
 
 		bend = MIDIFunc.bend({ |bendVal, chan, src|
 			if (this.debug) { "bend: %\n".postf(bendVal) };
+			// TODO
 		});
 	}
 
