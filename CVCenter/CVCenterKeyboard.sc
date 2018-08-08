@@ -11,6 +11,18 @@ CVCenterKeyboard {
 	init {
 		synthDefName = synthDefName.asSymbol;
 
+		SynthDescLib.at(synthDefName) ?? {
+			Error(
+				"The SynthDef '%' does not exist".format(synthDefName)
+			).throw;
+		};
+
+		if (SynthDescLib.at(synthDefName).hasGate.not) {
+			Error(
+				"The given SynthDef does not provide a 'gate' argument and can not be used."
+			).throw;
+		};
+
 		all ?? {
 			all = ();
 		};
@@ -43,19 +55,6 @@ CVCenterKeyboard {
 		bendControl !? { bendArg = bendControl };
 
 		tab ?? { tab = synthDefName };
-
-		server ?? { server = Server.default };
-		SynthDescLib.at(synthDefName) ?? {
-			Error(
-				"The synthDefName '%' does not exist".format(synthDefName)
-			).throw;
-		};
-
-		if (SynthDescLib.at(synthDefName).hasGate.not) {
-			Error(
-				"The given SynthDef does not provide a 'gate' argument and can not be used."
-			).throw;
-		};
 
 		server.waitForBoot {
 			// SynthDef *should* have an \amp arg, otherwise it will sound for moment
