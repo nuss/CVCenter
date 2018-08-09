@@ -85,7 +85,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 		if (\KeyDownActions.asClass.notNil and: { this.class.useKeyDownActions }) {
 			switch(GUI.id,
 				\cocoa, {
-					modsDict = KeyDownActions.modifiersCocoa;
+					modsDict = \KeyDownActions.asClass.modifiersCocoa;
 					arrModsDict = \KeyDownActions.asClass.arrowsModifiersCocoa;
 				},
 				\qt, {
