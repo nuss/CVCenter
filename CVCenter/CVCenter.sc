@@ -92,7 +92,10 @@ CVCenter {
 						Class.initClassTree(MIDIClient);
 						Class.initClassTree(MIDIEndPoint);
 						MIDIClient.init;
-						MIDIIn.connectAll;
+						try { MIDIIn.connectAll } { |error|
+							error.postln;
+							"MIDIIn.connectAll failed. Please establish the necessary connections manually.".warn;
+						}
 					})
 				})
 			};
