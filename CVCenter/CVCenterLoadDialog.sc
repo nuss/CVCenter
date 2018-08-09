@@ -8,7 +8,7 @@ CVCenterLoadDialog {
 
 	*new {
 		var staticTextFont, staticTextFontBold, staticTextColor, textFieldFont, textFieldFontColor, textFieldBg;
-		var buildCheckbox;
+		var buildCheckbox, midiConnectAll;
 		var flow, replaceBg, midiBg, oscBg, actionsBg, shortcutsBg;
 		var replaceFlow, midiFlow, oscFlow, actionsFlow, shortcutsFlow;
 		var replaceExisting, textReplaceExisting;
@@ -64,6 +64,13 @@ CVCenterLoadDialog {
 				cBox = \CheckBox.asClass.new(view, props).value_(active);
 			});
 			cBox;
+		};
+
+		midiConnectAll = {
+			try { MIDIIn.connectAll } { |error|
+				error.postln;
+				"MIDIIn.connectAll failed. Please establish the necessary connections manually".warn;
+			}
 		};
 
 		if(window.isNil or:{ window.isClosed }, {
@@ -189,11 +196,11 @@ CVCenterLoadDialog {
 					midiSources = ();
 					if(MIDIClient.initialized, {
 						MIDIClient.restart;
-						try { MIDIIn.connectAll } { |error|
-							error.postln;
-							"MIDIIn.connectAll failed. Please establish the necessary connections manually".warn;
-						}
-					}, { MIDIClient.init; MIDIIn.connectAll });
+						midiConnectAll.value;
+					}, {
+						MIDIClient.init;
+						midiConnectAll.value;
+					});
 					if(MIDIClient.initialized, {
 						b.states_([
 							["restart MIDI", Color.black, Color.green]
