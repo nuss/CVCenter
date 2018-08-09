@@ -36,7 +36,7 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 		var wdgtActions;
 		var cmdNames, orderedCmds, orderedCmdSlots;
 		var tmp, gapNextX, gapNextY;
-		var buildCheckbox, ddIPsItems, cmdPairs, dropDownIPs;
+		var buildCheckbox, midiConnectAll, ddIPsItems, cmdPairs, dropDownIPs;
 		var connectIP, connectPort;
 		var mouseOverFunc;
 		var modsDict, arrModsDict, arrowKeys;
@@ -57,6 +57,13 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				cBox = \CheckBox.asClass.new(view, props).value_(active);
 			});
 			cBox;
+		};
+
+		midiConnectAll = {
+			try { MIDIIn.connectAll } { |error|
+				error.postln;
+				"MIDIIn.connectAll failed. Please establish the necessary connections manually".warn;
+			}
 		};
 
 		switch(GUI.id,
@@ -417,8 +424,12 @@ CVWidgetEditor : AbstractCVWidgetEditor {
 				.font_(staticTextFont)
 				.action_({ |mb|
 					if(MIDIClient.initialized, {
-						MIDIClient.restart; MIDIIn.connectAll
-					}, { MIDIClient.init; MIDIIn.connectAll });
+						MIDIClient.restart;
+						midiConnectAll.value;
+					}, {
+						MIDIClient.init;
+						midiConnectAll.value;
+					});
 					wcm.midiDisplay.model.value_(
 						wcm.midiDisplay.model.value
 					).changedKeys(widget.synchKeys);

@@ -188,7 +188,11 @@ CVCenterLoadDialog {
 				]).action_({ |b|
 					midiSources = ();
 					if(MIDIClient.initialized, {
-						MIDIClient.restart; MIDIIn.connectAll;
+						MIDIClient.restart;
+						try { MIDIIn.connectAll } { |error|
+							error.postln;
+							"MIDIIn.connectAll failed. Please establish the necessary connections manually".warn;
+						}
 					}, { MIDIClient.init; MIDIIn.connectAll });
 					if(MIDIClient.initialized, {
 						b.states_([

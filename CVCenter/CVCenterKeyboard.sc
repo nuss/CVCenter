@@ -4,11 +4,11 @@ CVCenterKeyboard {
 	var on, off, bend, namesCVs;
 	var <>debug = false;
 
-	*new { |synthDefName, keyboardArg = \freq, velocArg = \veloc, bendArg = \bend, widgetsPrefix = \kb|
-		^super.newCopyArgs(synthDefName, keyboardArg, velocArg, bendArg, widgetsPrefix).init;
+	*new { |synthDefName, keyboardArg = \freq, velocArg = \veloc, bendArg = \bend, widgetsPrefix = \kb, connectMidi = true|
+		^super.newCopyArgs(synthDefName, keyboardArg, velocArg, bendArg, widgetsPrefix).init(connectMidi);
 	}
 
-	init {
+	init { |connectMidi|
 		synthDefName = synthDefName.asSymbol;
 
 		SynthDescLib.at(synthDefName) ?? {
@@ -38,7 +38,12 @@ CVCenterKeyboard {
 		MIDIClient.init;
 		// doesn't seem to work properly on Ubuntustudio 16
 		// possibly has to be done manually in QJackQtl...
-		MIDIClient.connectAll;
+		if (connectMidi) {
+			try { MIDIIn.connectAll } { |error|
+				error.postln;
+				"MIDIIn.connectAll failed. Please establish the necessary connections manually".warn;
+			}
+		}
 	}
 
 	// keyboardArg is the arg that will be set through playing the keyboard
