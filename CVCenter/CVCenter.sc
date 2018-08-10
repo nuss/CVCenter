@@ -1318,7 +1318,7 @@ CVCenter {
 	// add a CV using spec inference
 	*use { |key, spec, value, tab, slot, svItems, connectS, connectTF|
 		var thisKey = key.asSymbol;
-		var thisSlot;
+		var thisSlot = slot.asSymbol;
 
 		all[thisKey] !? {
 			if (all[thisKey].class !== Event) {
