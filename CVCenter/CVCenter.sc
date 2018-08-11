@@ -1061,7 +1061,8 @@ CVCenter {
 					cvWidgets[thisKey].midiOscEnv.cc = nil;
 				};
 				cvWidgets[thisKey].midiOscEnv.oscResponder !? {
-					cvWidgets[thisKey].midiOscEnv.oscResponder.remove;
+					// cvWidgets[thisKey].midiOscEnv.oscResponder.remove;
+					cvWidgets[thisKey].midiOscEnv.oscResponder.free;
 					cvWidgets[thisKey].midiOscEnv.oscResponder = nil;
 				};
 			},
@@ -1077,7 +1078,8 @@ CVCenter {
 						cvWidgets[thisKey].midiOscEnv[hilo].cc = nil;
 					};
 					cvWidgets[thisKey].midiOscEnv[hilo].oscResponder !? {
-						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder.remove;
+						// cvWidgets[thisKey].midiOscEnv[hilo].oscResponder.remove;
+						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder.free;
 						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder = nil;
 					}
 				})
@@ -1099,7 +1101,8 @@ CVCenter {
 						cvWidgets[thisKey].midiOscEnv[sl].cc = nil;
 					};
 					cvWidgets[thisKey].midiOscEnv[sl].oscResponder !? {
-						cvWidgets[thisKey].midiOscEnv[sl].oscResponder.remove;
+						// cvWidgets[thisKey].midiOscEnv[sl].oscResponder.remove;
+						cvWidgets[thisKey].midiOscEnv[sl].oscResponder.free;
 						cvWidgets[thisKey].midiOscEnv[sl].oscResponder = nil;
 					}
 				})
@@ -1531,10 +1534,12 @@ CVCenter {
 									},
 									osc: (
 										addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
-											cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
+											// cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
+											cvWidgets[k].midiOscEnv[hilo].oscResponder.srcID
 										},
 										cmdName: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
-											cvWidgets[k].midiOscEnv[hilo].oscResponder.cmdName
+											// cvWidgets[k].midiOscEnv[hilo].oscResponder.cmdName
+											cvWidgets[k].midiOscEnv[hilo].oscResponder.path
 										},
 										msgIndex: cvWidgets[k].midiOscEnv[hilo].oscMsgIndex,
 										calibConstraints: cvWidgets[k].getOscInputConstraints(hilo),
@@ -1562,10 +1567,12 @@ CVCenter {
 								}),
 								osc: (
 									addr: cvWidgets[k].midiOscEnv.oscResponder !? {
-										cvWidgets[k].midiOscEnv.oscResponder.addr
+										// cvWidgets[k].midiOscEnv.oscResponder.addr
+										cvWidgets[k].midiOscEnv.oscResponder.srcID
 									},
 									cmdName: cvWidgets[k].midiOscEnv.oscResponder !? {
-										cvWidgets[k].midiOscEnv.oscResponder.cmdName
+										// cvWidgets[k].midiOscEnv.oscResponder.cmdName
+										cvWidgets[k].midiOscEnv.oscResponder.path
 									},
 									msgIndex: cvWidgets[k].midiOscEnv.oscMsgIndex,
 									calibConstraints: cvWidgets[k].getOscInputConstraints,
@@ -1599,8 +1606,10 @@ CVCenter {
 							cvWidgets[k].size.do({ |sl|
 								// osc
 								cvWidgets[k].midiOscEnv[sl].oscResponder !? {
-									lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.addr;
-									lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.cmdName;
+									// lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.addr;
+									lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.srcID;
+									// lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.cmdName;
+									lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.path;
 								};
 								lib[\all][k].osc[sl].msgIndex = cvWidgets[k].midiOscEnv[sl].oscMsgIndex;
 								lib[\all][k].osc[sl].calibConstraints = cvWidgets[k].getOscInputConstraints(sl);

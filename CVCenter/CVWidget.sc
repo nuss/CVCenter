@@ -2551,7 +2551,8 @@ CVWidget {
 			if(theChanger.value.size == 4, {
 // 				OSCresponderNode: t, r, msg
 // 				OSCfunc: msg, time, addr // for the future
-				oscResponderAction = { |t, r, msg, addr|
+				// oscResponderAction = { |t, r, msg, addr|
+				oscResponderAction = { |msg, time, addr|
 					if(thisCalib, {
 						if(midiOscEnv.calibConstraints.isNil, {
 							midiOscEnv.calibConstraints = (lo: msg[theChanger.value[3]], hi: msg[theChanger.value[3]]);
@@ -2613,11 +2614,14 @@ CVWidget {
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
 
 				if(midiOscEnv.oscResponder.isNil, {
-					midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;
-//					midiOscEnv.oscResponder = OSCFunc(oscResponderAction, theChanger.value[2].asSymbol, netAddr);
+					// midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;
+					midiOscEnv.oscResponder = OSCFunc(oscResponderAction, theChanger.value[2].asSymbol, netAddr);
 					midiOscEnv.oscMsgIndex = theChanger.value[3];
 				}, {
-					midiOscEnv.oscResponder.action_(oscResponderAction);
+					// midiOscEnv.oscResponder.action_(oscResponderAction);
+					/*midiOscEnv.oscResponder.func ?? {
+						midiOscEnv.oscResponder.add(oscResponderAction)
+					}*/
 				});
 
 				tmp = theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString;
@@ -2640,7 +2644,11 @@ CVWidget {
 			});
 
 			if(theChanger.value == false, {
-				midiOscEnv.oscResponder.remove;
+				// old
+				/*midiOscEnv.oscResponder.remove;
+				midiOscEnv.oscResponder = nil;*/
+				midiOscEnv.oscResponder.clear;
+				midiOscEnv.oscResponder.free;
 				midiOscEnv.oscResponder = nil;
 				midiOscEnv.msgIndex = nil;
 				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changedKeys(synchKeys);
