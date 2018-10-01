@@ -1,6 +1,7 @@
 CVCenterKeyboard {
 	classvar <all;
 	var <synthDefName, <keyboardArg, <velocArg, <bendArg, <widgetsPrefix;
+	var <>bendSpec;
 	var on, off, bend, namesCVs;
 	var <>debug = false;
 
@@ -31,18 +32,17 @@ CVCenterKeyboard {
 
 		if (CVCenter.scv[synthDefName].isNil) {
 			CVCenter.scv.put(synthDefName, Array.newClear(128));
-		} {
-			Error("Sorry, the given SynthDef name cannot be used.").throw;
-		};
-
-		MIDIClient.init;
-		// doesn't seem to work properly on Ubuntustudio 16
-		// possibly has to be done manually in QJackQtl...
-		if (connectMidi) {
-			try { MIDIIn.connectAll } { |error|
-				error.postln;
-				"MIDIIn.connectAll failed. Please establish the necessary connections manually".warn;
+			MIDIClient.init;
+			// doesn't seem to work properly on Ubuntustudio 16
+			// possibly has to be done manually in QJackQtl...
+			if (connectMidi) {
+				try { MIDIIn.connectAll } { |error|
+					error.postln;
+					"MIDIIn.connectAll failed. Please establish the necessary connections manually".warn;
+				}
 			}
+		} {
+			"A keyboard for the SynthDef '%' has already been initialized".format(synthDefName).warn;
 		}
 	}
 
@@ -73,7 +73,7 @@ CVCenterKeyboard {
 	}
 
 	// private
-	prAddWidgetActionsForKeyboard { |deactivateDefaultActions = true|
+	prAddWidgetActionsForKeyboard { |deactivateDefaultActions|
 		var args = SynthDescLib.at(synthDefName).controlDict.keys.asArray;
 		var wdgtNames, wdgtName, nameString;
 
@@ -95,7 +95,7 @@ CVCenterKeyboard {
 						"{ |cv| CVCenter.scv['%'].do { |synth| synth !? { synth.set('%', cv.value) }}; }"
 						.format(synthDefName, name));
 					CVCenter.activateActionAt(wdgtName, \default, deactivateDefaultActions.not);
-				};
+				}
 			}
 		};
 
@@ -158,7 +158,9 @@ CVCenterKeyboard {
 
 		bend = MIDIFunc.bend({ |bendVal, chan, src|
 			if (this.debug) { "bend: %\n".postf(bendVal) };
-			// TODO
+			CVCenter.scv[synthDefName].do({ |synth, i|
+				synth.set(bendArg, i.midicps + bendSpec.map(bendVal - 8192))
+			})
 		});
 	}
 

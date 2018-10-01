@@ -107,7 +107,7 @@
 			if (excemptArgs.isNil) {
 				cDict.put(n, c.defaultValue)
 			} {
-				if (excemptArgs.indexOf(n).isNil) {
+				excemptArgs.indexOf(n) ?? {
 					cDict.put(n, c.defaultValue)
 				}
 			}
@@ -196,7 +196,7 @@
 			if (excemptArgs.isNil) {
 				cDict.put(pair[0], pair[1])
 			} {
-				if (excemptArgs.indexOf(pair[0].isNil)) {
+				excemptArgs.indexOf(pair[0]) ?? {
 					cDict.put(pair[0], pair[1])
 				}
 			}
