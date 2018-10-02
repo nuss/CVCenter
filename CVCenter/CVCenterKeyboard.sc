@@ -147,19 +147,19 @@ CVCenterKeyboard {
 	prInitKeyboard {
 		on = MIDIFunc.noteOn({ |veloc, num, chan, src|
 			var argsValues = [keyboardArg, num.midicps, velocArg, veloc * 0.005] ++ namesCVs.deepCollect(2, _.value);
-			if (this.debug) { "on: %\n".postf(argsValues) };
+			if (this.debug) { "on[num: %]: %\n".postf(num, argsValues) };
 			CVCenter.scv[synthDefName][num] = Synth(synthDefName, argsValues);
 		});
 
 		off = MIDIFunc.noteOff({ |veloc, num, chan, src|
-			if (this.debug) { "off".postln };
+			if (this.debug) { "off[num: %]\n".postf(num) };
 			CVCenter.scv[synthDefName][num].release;
 		});
 
 		bend = MIDIFunc.bend({ |bendVal, chan, src|
 			if (this.debug) { "bend: %\n".postf(bendVal) };
 			CVCenter.scv[synthDefName].do({ |synth, i|
-				synth.set(bendArg, i.midicps + bendSpec.map(bendVal - 8192))
+				synth.set(bendArg, (i + bendSpec.map(bendVal / 16383)).midicps)
 			})
 		});
 	}
