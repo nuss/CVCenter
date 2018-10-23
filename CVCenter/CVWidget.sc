@@ -3245,7 +3245,7 @@ CVWidget {
 				if(it.notNil, { it[0] }, { it })
 			};\n\n"
 		}, {
-			f3 = "\t\t\tcmd = '"++cmd++"';\n\n"
+			f3 = "\t\t\tcmd = '"++cmd++"/"++what++"';\n\n"
 		});
 
 		f4 = "\t\t\twdgt.sendOSCFeedback(cmd, cmdSlot, cvSlot, fbPort, what);
