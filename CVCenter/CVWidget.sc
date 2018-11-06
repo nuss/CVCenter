@@ -2896,7 +2896,7 @@ CVWidget {
 							if(theChanger.value.portField.notNil, {
 								guiEnv.msEditor.portRestrictor.value_(1);
 								if(this.midiOscEnv.collect({ |it|
-									it.oscResponder !? { it.oscResponder.addr }
+									it.oscResponder !? { it.oscResponder.srcID }
 								}).takeThese(_.isNil).asBag.contents.size > 1, {
 									guiEnv.msEditor.deviceDropDown.items_(
 										["receiving OSC-messages from various addresses..."]++guiEnv.msEditor.deviceDropDown.items[1..]
@@ -3355,8 +3355,8 @@ CVWidget {
 				if(multiSlotOSCcmds.values.asSet.detect{ |msCmd| msCmd.keys.includes(slcmd) }.isNil, {
 					// ("not in multi-slot cmds:"+slcmd).postln;
 					if(CVCenter.cvWidgets[name].class == CVWidgetMS, { thisCVSlot = i }, { thisCVSlot = cvSlot });
-					if(thisOscResponder.addr.notNil, {
-						if(oscFeedbackAddrs.includes(tmpAddr = NetAddr(thisOscResponder.addr.ip, port)).not, {
+					if(thisOscResponder.srcID.notNil, {
+						if(oscFeedbackAddrs.includes(tmpAddr = NetAddr(thisOscResponder.srcID.ip, port)).not, {
 							oscFeedbackAddrs.add(tmpAddr);
 						});
 						// ("send to "++tmpAddr++":"+[name, cvSlot, slcmd, i]).postln;
@@ -3385,7 +3385,7 @@ CVWidget {
 								};
 								// ("cvVals:"+cvVals).postln;
 								cvVals.flop.do{ |vals|
-									if(thisOscResponder.addr.notNil, {
+									if(thisOscResponder.srcID.notNil, {
 										tmpAddr.sendMsg(slcmd, *vals);
 									}, {
 										oscFeedbackAddrs.do(_.sendMsg(slcmd, *vals));
