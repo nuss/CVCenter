@@ -1014,6 +1014,34 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 //				.background_(Color.white)
 			;
 
+			StaticText(oscView0, Point(85, 15))
+				.font_(staticTextFont)
+				.stringColor_(staticTextColor)
+				.string_("OSC-feedback ports")
+			;
+
+			oscFlow0.shift(5, 0);
+
+			feedbackPortField = TextField(oscView0, Point(oscFlow0.bounds.width-115, 15))
+				.font_(textFieldFont)
+				.action_({ |f|
+					switch(f.string.interpret.class,
+						Integer, { widget.oscFeedbackPort = f.string.interpret!widget.msSize },
+						Array, {
+							f.string.interpret.do{ |port, i|
+								widget.oscFeedbackPort[i%widget.oscFeedbackPort.size] = port.asInteger;
+							}
+						}
+					)
+				})
+			;
+
+			if(widget.oscFeedbackPort.includes(nil), {
+				feedbackPortField.string_((widget.class.globalOSCfeedbackPort!widget.msSize).asCompileString);
+			}, {
+				feedbackPortField.string_(widget.oscFeedbackPort)
+			});
+
 			StaticText(oscView0, Point(oscFlow0.bounds.width/2-10, 15))
 				.font_(staticTextFont)
 				.stringColor_(staticTextColor)
