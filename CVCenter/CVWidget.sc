@@ -2868,7 +2868,7 @@ CVWidget {
 							if(theChanger.value.portField.notNil, {
 								guiEnv.msEditor.portRestrictor.value_(1);
 								if(this.midiOscEnv.collect({ |it|
-									it.oscResponder !? { it.oscResponder.addr }
+									it.oscResponder !? { it.oscResponder.srcID }
 								}).takeThese(_.isNil).asBag.contents.size > 1, {
 									guiEnv.msEditor.deviceDropDown.items_(
 										["receiving OSC-messages from various addresses..."]++guiEnv.msEditor.deviceDropDown.items[1..]
