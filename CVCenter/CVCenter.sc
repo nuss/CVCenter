@@ -31,7 +31,7 @@ CVCenter {
 	// CVWidgetMS: how many slots at max for one column
 	classvar <>numMsSlotsPerColumn = 15;
 	classvar <>connectSliders = true, <>connectTextFields = true;
-	classvar <>setupPath = "~/Music/SuperCollider";
+	classvar <>setupPath;
 
 	*initClass {
 		var newPrefs, newBounds;
@@ -1660,7 +1660,7 @@ CVCenter {
 					defaultName: "Setup",
 					successFunc: successFunc
 				)
-			}, { Dialog.savePanel(successFunc, path: setupPath.standardizePath) })
+			}, { Dialog.savePanel(successFunc, path: setupPath) })
 		}, {
 			successFunc.(path);
 		});
@@ -2027,7 +2027,7 @@ CVCenter {
 
 		if (path.isNil, {
 			if (GUI.id === \qt, {
-				Dialog.openPanel(successFunc, path: setupPath.standardizePath);
+				Dialog.openPanel(successFunc, path: setupPath);
 			}, {
 				File.openDialog(
 					prompt: "Please choose a setup",
