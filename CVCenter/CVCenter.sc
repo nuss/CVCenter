@@ -31,6 +31,7 @@ CVCenter {
 	// CVWidgetMS: how many slots at max for one column
 	classvar <>numMsSlotsPerColumn = 15;
 	classvar <>connectSliders = true, <>connectTextFields = true;
+	classvar <>setupPath = "~/Music/SuperCollider";
 
 	*initClass {
 		var newPrefs, newBounds;
@@ -1769,7 +1770,7 @@ CVCenter {
 					defaultName: "Setup",
 					successFunc: successFunc
 				)
-			}, { Dialog.savePanel(successFunc) })
+			}, { Dialog.savePanel(successFunc, path: setupPath.standardizePath) })
 		}, {
 			successFunc.(path);
 		});
@@ -2137,11 +2138,11 @@ CVCenter {
 
 		if (path.isNil, {
 			if (GUI.id === \qt, {
-				QDialog.openPanel(successFunc);
+				Dialog.openPanel(successFunc, path: setupPath.standardizePath);
 			}, {
 				File.openDialog(
 					prompt: "Please choose a setup",
-					successFunc: successFunc
+					successFunc: successFunc,
 				)
 			})
 		}, {
@@ -2474,6 +2475,6 @@ CVCenter {
 					env.oscResponder !? { env.oscResponder }
 				}
 			}
-		}).asArray.flat.takeThese(_.isNil).collect({ |resp| resp.postln; [resp.addr, resp.cmdName] })
+		}).asArray.flat.takeThese(_.isNil).collect({ |resp| resp.postln; [resp.srcID, resp.path] })
 	}
 }
