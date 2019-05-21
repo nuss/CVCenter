@@ -195,12 +195,12 @@ CVCenterShortcuts {
 			CVCenter.scv.pDefWin.front
 		}}.asCompileString;
 		shortcuts.put(
-			'shift + p',
+			'alt + p',
 			(
 				func: scFunc,
 				keyCode: KeyDownActions.keyCodes[$p],
-				modifierQt: KeyDownActions.modifiersQt[\shift],
-				modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
+				modifierQt: KeyDownActions.modifiersQt[\alt],
+				modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
 			)
 		);
 		scFunc =
@@ -215,12 +215,12 @@ CVCenterShortcuts {
 			CVCenter.scv.pDefnWin.front
 		}}.asCompileString;
 		shortcuts.put(
-			'alt + p',
+			'shift + p',
 			(
 				func: scFunc,
 				keyCode: KeyDownActions.keyCodes[$p],
-				modifierQt: KeyDownActions.modifiersQt[\alt],
-				modifierCocoa: KeyDownActions.modifiersCocoa[\alt]
+				modifierQt: KeyDownActions.modifiersQt[\shift],
+				modifierCocoa: KeyDownActions.modifiersCocoa[\shift]
 			)
 		);
 		scFunc =
