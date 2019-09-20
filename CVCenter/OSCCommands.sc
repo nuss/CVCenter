@@ -155,7 +155,7 @@ OSCCommands {
 			bigMonoFont = Font(Font.defaultMonoFace, 15);
 		};
 
-		OSCCommands.collect;
+		this.collect;
 
 		makeField = { |cmds|
 			if (fields.keys.size < cmds.size, {
