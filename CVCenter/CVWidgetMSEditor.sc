@@ -1433,6 +1433,8 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			window.onClose_({
 				msEditorEnv.specsListSpecs = specsListSpecs;
 				msEditorEnv.specsListItems = specsList.items;
+				OSCCommands.tempIPsAndCmds.keysDo(OSCCommands.tempIPsAndCmds[_] = nil);
+				if(allEditors.collect(_.isClosed).size == 0, { OSCCommands.collectTempIPsAndCmds(false) });
 			});
 
 			OSCCommands.collectTempIPsAndCmds;
