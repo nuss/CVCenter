@@ -145,12 +145,12 @@ OSCCommands {
 
 		if (Font.respondsTo(\available)) {
 			staticTextFont = Font(Font.available("Arial") ? Font.defaultSansFace, 10);
-			textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 10);
+			textFieldFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 9);
 			bigSansFont = Font(Font.available("Arial") ? Font.defaultSansFace, 15);
 			bigMonoFont = Font(Font.available("Courier New") ? Font.defaultMonoFace, 15);
 		} {
 			staticTextFont = Font(Font.defaultSansFace, 10);
-			textFieldFont = Font(Font.defaultMonoFace, 10);
+			textFieldFont = Font(Font.defaultMonoFace, 9);
 			bigSansFont = Font(Font.defaultSansFace, 15);
 			bigMonoFont = Font(Font.defaultMonoFace, 15);
 		};
@@ -216,21 +216,6 @@ OSCCommands {
 			deviceNameField = TextField(window, Point(144, 40))
 				.font_(Font(Font.available("Courier New") ? Font.defaultMonoFace, 15))
 				.string_("< device-name >")
-				.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
-					if (\KeyDownActions.asClass.notNil and: {
-						\CVCenter.asClass.notNil and: {
-							\CVCenter.asClass.useKeyDownActions
-						}
-					}) {
-						if (keycode == \KeyDownActions.asClass.keyCodes[\return]) { saveBut.doAction };
-						if (keycode == \KeyDownActions.asClass.keyCodes[\esc]) { window.close };
-					} {
-						// "return" key
-						if (key == 16777220) { saveBut.doAction };
-						// "esc" key
-						if (key == 16777216) { window.close };
-					}
-				})
 			;
 
 			saveBut = Button(window, Point(flow.indentedRemaining.width-20, 40))
@@ -261,11 +246,7 @@ OSCCommands {
 			}, AppClock);
 
 			window.view.keyDownAction_({ |view, char, modifiers, unicode, keycode, key|
-				if (\KeyDownActions.asClass.notNil and: {
-					\CVCenter.asClass.notNil and: {
-						\CVCenter.asClass.useKeyDownActions
-					}
-				}) {
+				if (\KeyDownActions.asClass.notNil) {
 					if (keycode == \KeyDownActions.asClass.keyCodes[\return]) { saveBut.doAction };
 					if (keycode == \KeyDownActions.asClass.keyCodes[\esc]) { window.close };
 				} {
