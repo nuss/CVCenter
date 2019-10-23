@@ -593,9 +593,9 @@ CVWidgetMS : CVWidget {
 		if (cvArray.isNil or: { cvArray.size != msSize }) {
 			cvArray = widgetCV.split;
 			splitSpec = spec;
-			this.addAction(\setSplitValues, { |cv|
-				cvArray.do({ |cvi, i| cvi.value_(cv.value[i]) });
-			});
+			this.addAction(\setSplitValues, "#{ |cv|
+				CVCenter.cvWidgets['%'].cvArray.do({ |cvi, i| cvi.value_(cv.value[i]) });
+			}".format(name));
 			"split CV actions for % set!\n".postf(name)
 		};
 		// update spec if spec of parent CVWidgetMS has changed
