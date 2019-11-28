@@ -64,7 +64,8 @@ CVWidget {
 
 		StartUp.add({
 			Spec.add(\in, ControlSpec(0, Server.default.options.firstPrivateBus-1, \lin, 1.0, 0));
-			// OSCCommands.collectTempIPsAndCmds;
+			Spec.add(\true, ControlSpec(0.0, 1.0, \lin, 1.0, 1.0));
+			Spec.add(\false, ControlSpec(0.0, 1.0, \lin, 1.0, 0.0));
 		});
 
 		prefs = CVCenterPreferences.readPreferences;

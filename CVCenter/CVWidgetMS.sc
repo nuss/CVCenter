@@ -266,7 +266,7 @@ CVWidgetMS : CVWidget {
 		numVal = TextView(parent, Rect(thisXY.x+1, nextY, thisWidth-2, 30))
 			.string_(widgetCV.value.asCompileString).font_(Font(Font.available("Arial") ? Font.defaultSansFace, 9.5))
 			.keyDownAction_({ |nv, char, modifiers, unicode, keycode|
-				if(char == $\r and:{ modifiers == 131072 }, {
+				if(char == $\r and:{ modifiers == 262144 }, {
 					if(nv.string.interpret.class == Array and:{
 						nv.string.interpret.select(_.isNumber).size == mSlider.size
 					}, { nv.doAction })
@@ -477,7 +477,7 @@ CVWidgetMS : CVWidget {
 		);
 
 		focusElements = allGuiEls.copy.removeAll([
-			widgetBg, calibViews, nameField, activeSliderB, activeTextB
+			widgetBg, calibViews, nameField, numVal, activeSliderB, activeTextB
 		]);
 
 		this.getSpec.split.do{ |sp|
