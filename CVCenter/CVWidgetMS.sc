@@ -603,18 +603,24 @@ CVWidgetMS : CVWidget {
 			cvArray = widgetCV.split;
 			splitSpec = spec;
 			this.addAction(\setSplitValues, "#{ |cv|
-				CVCenter.cvWidgets['%'].cvArray.do({ |cvi, i| cvi.value_(cv.value[i]) });
+				var w = CVCenter.cvWidgets['%'];
+				w.cvArray ?? { w.split };
+				w.cvArray.do({ |cvi, i| cvi.value_(cv.value[i]) });
 			}".format(name));
 			"split CV actions for % set!\n".postf(name)
 		};
 		// update spec if spec of parent CVWidgetMS has changed
-		if (cvArray.notNil and:{ spec != splitSpec }) {
+		if (cvArray.notNil and:{ spec !== splitSpec }) {
 			specs = spec.split;
 			cvArray.do({ |cvi, i| cvi.spec_(specs[i]) });
 			// specs have been set, update splitSpec
 			splitSpec = spec;
 		};
 		^cvArray;
+	}
+
+	unsplit {
+		cvArray = nil;
 	}
 
 }
