@@ -398,7 +398,7 @@ CVWidget2D : CVWidget {
 							[midiSrc[v[0]].string, msrc],
 							[midiChan[v[0]].string, mchan],
 							[midiCtrl[v[0]].string, mctrl]
-						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
+						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInteger }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
 							this.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], slot: v[0]);
 						}, {

@@ -571,13 +571,13 @@ CVCenterLoadDialog {
 
 	*prExternalSourcesList { |midiSources|
 		MIDIClient.externalSources.do({ |source|
-			if(midiSources.values.includes(source.uid.asInt).not, {
+			if(midiSources.values.includes(source.uid.asInteger).not, {
 				// OSX/Linux specific tweek
 				if(source.name == source.device, {
-					midiSources.put(source.name.asSymbol, source.uid.asInt)
+					midiSources.put(source.name.asSymbol, source.uid.asInteger)
 				}, {
 					midiSources.put(
-						(source.device++":"+source.name).asSymbol, source.uid.asInt
+						(source.device++":"+source.name).asSymbol, source.uid.asInteger
 					)
 				})
 			})

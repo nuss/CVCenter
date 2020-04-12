@@ -422,7 +422,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 					// string for possible compilation to an int
 					if("^[-+]?[0-9]*$".matchRegexp(tmp), {
 						widget.size.do({ |sl|
-							widget.setMidiMean(tmp.asInt, sl);
+							widget.setMidiMean(tmp.asInteger, sl);
 						})
 					}, {
 						Error("MIDI-mean must be an integer value!").throw;
@@ -499,7 +499,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						tmp = mb.string;
 						if("^[0-9]*$".matchRegexp(mb.string), {
 							widget.size.do({ |sl|
-								widget.setCtrlButtonBank(tmp.asInt, sl);
+								widget.setCtrlButtonBank(tmp.asInteger, sl);
 							})
 						})
 					}, {
@@ -722,7 +722,7 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 						extMidiCtrlArrayField.string.interpret.size
 					}, {
 						extMidiCtrlArrayField.string.interpret.do({ |ctrlNum, sl|
-							widget.midiConnect(midiUid, midiChan, ctrlNum.asInt, sl+msMidiIndexStartField.value)
+							widget.midiConnect(midiUid, midiChan, ctrlNum.asInteger, sl+msMidiIndexStartField.value)
 						})
 					});
 					// remember batch/connections
@@ -1241,9 +1241,9 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 									connectName = nameField.string;
 								});
 								if(indexField.string.includes($%), {
-									connectOscMsgIndex = indexField.string.format(ext).asInt;
+									connectOscMsgIndex = indexField.string.format(ext).asInteger;
 								}, {
-									connectOscMsgIndex = indexField.string.asInt;
+									connectOscMsgIndex = indexField.string.asInteger;
 								});
 								connectIndexStart = intStartIndexField.value+i;
 								// [connectIP, connectPort, connectName, connectOscMsgIndex, connectIndexStart].postln;

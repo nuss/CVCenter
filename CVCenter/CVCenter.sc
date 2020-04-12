@@ -1772,7 +1772,7 @@ CVCenter {
 													if (midiSrcID.isNil, {
 														if (midiConnectSrc, { v[hilo].midi.src })
 													}, {
-														midiSrcID.asInt
+														midiSrcID.asInteger
 													}),
 													if (midiConnectChannel, { v[hilo].midi.chan }),
 													if (midiConnectCtrl, { v[hilo].midi.num }),
@@ -1854,7 +1854,7 @@ CVCenter {
 												if (midiSrcID.isNil, {
 													if (midiConnectSrc, { v.midi.src })
 												}, {
-													midiSrcID.asInt
+													midiSrcID.asInteger
 												}),
 												if (midiConnectChannel, { v.midi.chan }),
 												if (midiConnectCtrl, { v.midi.num }),
@@ -1951,7 +1951,7 @@ CVCenter {
 													if (midiSrcID.isNil, {
 														if (midiConnectSrc, { v.midi[sl].src })
 													}, {
-														midiSrcID.asInt
+														midiSrcID.asInteger
 													}),
 													if (midiConnectChannel, { v.midi[sl].chan }),
 													if (midiConnectCtrl, { v.midi[sl].num }),

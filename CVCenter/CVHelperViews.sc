@@ -45,7 +45,7 @@ CVMidiEditGroup {
 				})
 			},
 			CVWidgetMS, {
-				thisSlot = slot.asInt;
+				thisSlot = slot.asInteger;
 				wcm = widget.wdgtControllersAndModels.slots[thisSlot];
 				if(widget.editor[thisSlot].notNil and:{ widget.editor[thisSlot].isClosed.not }, {
 					editor = widget.editor[thisSlot];
@@ -141,7 +141,7 @@ CVMidiEditGroup {
 							[midiSrc.string, msrc],
 							[midiChan.string, mchan],
 							[midiCtrl.string, mctrl]
-						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
+						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInteger }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
 							widget.midiConnect(uid: margs[0], chan: margs[1], num: margs[2], slot: thisSlot);
 						}, {
@@ -166,7 +166,7 @@ CVMidiEditGroup {
 				if("^[-+]?[0-9]*$".matchRegexp(ms.string), {
 					wcm.midiDisplay.model.value_((
 						learn: "C",
-						src: ms.string.asInt,
+						src: ms.string.asInteger,
 						chan: wcm.midiDisplay.model.value.chan,
 						ctrl: wcm.midiDisplay.model.value.ctrl
 					)).changedKeys(widget.synchKeys)
@@ -196,7 +196,7 @@ CVMidiEditGroup {
 					wcm.midiDisplay.model.value_((
 						learn: "C",
 						src: wcm.midiDisplay.model.value.src,
-						chan: mch.string.asInt,
+						chan: mch.string.asInteger,
 						ctrl: wcm.midiDisplay.model.value.ctrl
 					)).changedKeys(widget.synchKeys)
 				})
@@ -226,7 +226,7 @@ CVMidiEditGroup {
 						learn: "C",
 						src: wcm.midiDisplay.model.value.src,
 						chan: wcm.midiDisplay.model.value.chan,
-						ctrl: mctrl.string.asInt
+						ctrl: mctrl.string.asInteger
 					)).changedKeys(widget.synchKeys)
 				})
 			})

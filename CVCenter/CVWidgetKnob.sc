@@ -286,7 +286,7 @@ CVWidgetKnob : CVWidget {
 							[midiSrc.string, msrc],
 							[midiChan.string, mchan],
 							[midiCtrl.string, mctrl]
-						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInt }, { nil }) });
+						].collect({ |pair| if(pair[0] != pair[1], { pair[0].asInteger }, { nil }) });
 						if(margs.select({ |i| i.notNil }).size > 0, {
 							this.midiConnect(*margs);
 						}, {
