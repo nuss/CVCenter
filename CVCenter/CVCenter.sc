@@ -1349,6 +1349,12 @@ CVCenter {
 			})
 		});
 
+		// 	// Override whatever is given as Controlspec
+	// 	// ControlSpec's size always must be the size of what was given in items
+	// 	// TODO: multislider logic
+	// 	"thisSpec: %\n".postf(thisSpec);
+	// 	thisSpec = ControlSpec(0, thisSVItems.size-1, step: 1.0);
+	// };
 		case
 			{ tab.notNil } { thisTab = tab }
 			{ tab.isNil and:{ tabs.notNil and:{ tabs.activeTab.notNil }}} { thisTab = tabs.activeTab.label }
@@ -1380,6 +1386,8 @@ CVCenter {
 			thisVal = thisVal.asArray;
 		});
 
+		"cvClass: %\n".postf(cvClass);
+
 		if (thisSlot.notNil and:{ (thisSlot === \lo).or(thisSlot === \hi) }, {
 			// CVWidget2D
 			if (cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
@@ -1404,10 +1412,17 @@ CVCenter {
 			})
 		}, {
 			// other CVWidgets
-			all[thisKey] ?? { all.put(thisKey, cvClass.new(thisSpec, thisVal)) };
+			if (cvClass === SV) {
+				all[thisKey] ??	 { all.put(thisKey, cvClass.new(thisSVItems, thisVal)) };
+
+			} {
+				all[thisKey] ?? { all.put(thisKey, cvClass.new(thisSpec, thisVal)) };
+			};
+			// "this.at('%').items: %\n".postf(thisKey, all[thisKey].items);
+			"all['%'].items.unbubble.isNil: %\n".postf(thisKey, all[thisKey].items.unbubble.isNil);
 			if (cvClass === SV and:{ all[thisKey].items.unbubble.isNil }, {
 				all[thisKey].items_(thisSVItems)
-			})
+			});
 		});
 
 		if (window.isNil or:{ window.isClosed }, {
