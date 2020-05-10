@@ -1272,8 +1272,6 @@ CVCenter {
 			thisVal = thisVal.asArray;
 		});
 
-		"cvClass: %\n".postf(cvClass);
-
 		if (thisSlot.notNil and:{ (thisSlot === \lo).or(thisSlot === \hi) }, {
 			// CVWidget2D
 			if (cvWidgets[thisKey].notNil and:{ cvWidgets[thisKey].isClosed.not }, {
