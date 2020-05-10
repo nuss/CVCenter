@@ -1419,7 +1419,8 @@ CVCenter {
 				all[thisKey] ?? { all.put(thisKey, cvClass.new(thisSpec, thisVal)) };
 			};
 			// "this.at('%').items: %\n".postf(thisKey, all[thisKey].items);
-			"all['%'].items.unbubble.isNil: %\n".postf(thisKey, all[thisKey].items.unbubble.isNil);
+			// "all['%'].items.unbubble.isNil: %\n".postf(thisKey, all[thisKey].items.unbubble.isNil);
+			// most mysterious line of code ever...
 			if (cvClass === SV and:{ all[thisKey].items.unbubble.isNil }, {
 				all[thisKey].items_(thisSVItems)
 			});
