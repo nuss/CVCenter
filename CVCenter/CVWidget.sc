@@ -858,7 +858,7 @@ CVWidget {
 				thisIP != "nil"
 			}
 		}, {
-			Error("Please provide a valid IP-address or leave the IP-field empty").throw;
+			Error("IP must be a valid IP address or nil.").throw;
 		});
 
 		if(thisIP.size == 0 or:{ thisIP == "nil" }, { thisIP = nil });
@@ -867,7 +867,7 @@ CVWidget {
 
 		if(intPort.size > 0, {
 			if("^[0-9]{1,5}$".matchRegexp(intPort).not and:{ intPort != "nil" }, {
-				Error("Please provide a valid port or leave this field empty").throw;
+				Error("Port must be an integer between 0 and 65535 or nil.").throw;
 			}, {
 				intPort = intPort.asInteger;
 			})
@@ -876,10 +876,10 @@ CVWidget {
 		if(port == "nil" or:{ port == nil }, { intPort = nil });
 
 		if("^\/".matchRegexp(name.asString).not, {
-			Error("You have to supply a valid OSC-typetag (command-name), beginning with an \"/\" as third argument to oscConnect").throw;
+			Error("You have to supply a valid OSC typetag (command name), beginning with an \"/\" as third argument to oscConnect").throw;
 		});
 
-		if(oscMsgIndex.isKindOf(Integer).not, {
+		if(oscMsgIndex.isInteger.not, {
 			Error("You have to supply an integer as forth argument to oscConnect").throw;
 		});
 
