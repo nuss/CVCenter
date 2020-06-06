@@ -1164,7 +1164,8 @@ CVCenter {
 
 	*prAdd { |key, spec, value, tab, slot, svItems, connectS, connectTF|
 		var thisKey, thisSpec, thisVal, testSlot, thisSlot, thisTab, widget2DKey;
-		var specName, cvClass, thisSVItems;
+		var specName, cvClass, thisSV, thisSVItems, svKey, valPos;
+		var ret;
 
 		thisKey = key.asSymbol;
 
@@ -1172,7 +1173,16 @@ CVCenter {
 			if (svItems.isKindOf(SequenceableCollection).not, {
 				Error("svItems must be a SequenceableCollection or an instance of one of its subclasses!").throw;
 			}, {
-				thisSVItems = svItems.collect(_.asSymbol);
+				if (svItems.depth > 2) {
+					Error("'svItems' must at most contain one level of nested arrays").throw;
+				};
+				if (svItems.depth < 2) {
+					thisSVItems = svItems.collect(_.asSymbol);
+				} {
+					thisSVItems = svItems.collect { |its|
+						its.collect(_.asSymbol)
+					}
+				};
 				cvClass = SV;
 			})
 		}, {
@@ -1297,32 +1307,69 @@ CVCenter {
 		}, {
 			// other CVWidgets
 			if (cvClass === SV) {
-				all[thisKey] ??	 { all.put(thisKey, cvClass.new(thisSVItems, thisVal)) };
-
+				if (svItems.depth < 2) {
+					all[thisKey] ??	 { all.put(thisKey, cvClass.new(thisSVItems, thisVal)) };
+				} {
+					svItems.do { |its, i|
+						svKey = (thisKey ++ "["++i++"]").asSymbol;
+						all[svKey] ?? {
+							if (thisVal.isArray) { valPos = thisVal.wrapAt(i) } { valPos = thisVal };
+							all.put(svKey, cvClass.new(its, valPos));
+						}
+					}
+				}
 			} {
 				all[thisKey] ?? { all.put(thisKey, cvClass.new(thisSpec, thisVal)) };
 			};
 			// "this.at('%').items: %\n".postf(thisKey, all[thisKey].items);
 			// "all['%'].items.unbubble.isNil: %\n".postf(thisKey, all[thisKey].items.unbubble.isNil);
 			// most mysterious line of code ever...
-			if (cvClass === SV and:{ all[thisKey].items.unbubble.isNil }, {
-				all[thisKey].items_(thisSVItems)
-			});
+			if (cvClass === SV) {
+				if (thisSVItems.depth < 2) {
+					all[thisKey].items.unbubble ?? {
+						all[thisKey].items_(thisSVItems)
+					}
+				} {
+					thisSVItems.do { |its, i|
+						thisSV = all[(thisKey ++ "["++i++"]").asSymbol];
+						thisSV.items.unbubble ?? {
+							thisSV.items_(its)
+						}
+					}
+				}
+			}
 		});
 
 		if (window.isNil or:{ window.isClosed }, {
 			this.front(thisTab);
 		}, {
-			if (cvWidgets[thisKey].isNil or: { cvWidgets[thisKey].class == CVWidget2D })  {
-				this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
+			if (svItems.notNil and: svItems.depth == 2) {
+				svItems.size.do { |i|
+					svKey = (thisKey ++ "["++i++"]").asSymbol;
+					cvWidgets[svKey] ?? {
+						this.prAddWidget(thisTab, nil, svKey, connectS, connectTF);
+					}
+				}
+			} {
+				if (cvWidgets[thisKey].isNil or: { cvWidgets[thisKey].class == CVWidget2D }) {
+					this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
+				}
 			}
 		});
 
 		if (slot.notNil, {
-			^all[thisKey][thisSlot];
+			ret = all[thisKey][thisSlot];
 		}, {
-			^all[thisKey];
-		})
+			if (svItems.isNil or: { svItems.depth < 2 }) {
+				ret = all[thisKey];
+			} {
+				ret = svItems.collect { |its, i|
+					all[(thisKey ++ "["++i++"]").asSymbol]
+				}
+			}
+		});
+
+		^ret;
 	}
 
 	// spec inference - if it does not find the name, zaps all the non-alpha and looks again
