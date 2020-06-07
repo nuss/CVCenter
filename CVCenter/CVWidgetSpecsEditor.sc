@@ -18,11 +18,11 @@
 CVWidgetSpecsEditor {
 	var <window;
 
-	*new { |displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, tab, metadata, environment|
-		^super.new.init(displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, tab, metadata, environment)
+	*new { |displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment, tab, completionFunc|
+		^super.new.init(displayDialog, object, wdgtName, controlsDict, prefix, pairs2D, metadata, environment, tab, completionFunc)
 	}
 
-	init { |displayDialog, obj, name, controls, prefix, pairs2D, tab, metadata, environment|
+	init { |displayDialog, obj, name, controls, prefix, pairs2D, metadata, environment, tab, completionFunc|
 		var object;
 		var wdgtName, windowTitle;
 		var specsList, specsListSpecs, selectMatch, thisSpec;
@@ -223,7 +223,8 @@ CVWidgetSpecsEditor {
 								}, {
 									specsList = specsList.add(k.asString++":"+(spec.asSpec));
 									// make spec available for all subsequent selections
-									Spec.add(k, spec); 								});
+									Spec.add(k, spec);
+								});
 								elem.specSelect.items_(specsList);
 								specsListSpecs.includes(spec.asSpec).not.if{
 									specsListSpecs = specsListSpecs.add(spec.asSpec);
@@ -278,20 +279,16 @@ CVWidgetSpecsEditor {
 				.background_(textFieldBg)
 			;
 
-			if (tab.notNil) {
-				elem.enterTab.string_(tab.asString);
-			} {
-				if(object.class == NodeProxy, {
-					if(object.isPlaying, {
-						elem.enterTab.string_("NodeProxy ("++object.asNodeID++")");
-					}, {
-						elem.enterTab.string_("NodeProxy");
-					})
+			if(object.class == NodeProxy, {
+				if(object.isPlaying, {
+					tab ?? { tab = "NodeProxy ("++object.asNodeID++")" }
 				}, {
-					elem.enterTab.string_(name);
+					tab ?? { tab = "NodeProxy" }
 				});
-			}
-
+			}, {
+				tab ?? { tab = name };
+			});
+			elem.enterTab.string_(tab.asString);
 		};
 
 		made = [];
@@ -367,6 +364,7 @@ CVWidgetSpecsEditor {
 					CVCenter.finishGui(obj, el, environment, vals);
 				});
 				window.close;
+				completionFunc.value;
 			})
 		;
 

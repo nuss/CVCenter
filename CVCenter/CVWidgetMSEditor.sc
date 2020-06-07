@@ -82,6 +82,18 @@ CVWidgetMSEditor : AbstractCVWidgetEditor {
 			}
 		};
 
+
+		switch(GUI.id,
+			\cocoa, {
+				modsDict = KeyDownActions.modifiersCocoa;
+				arrModsDict = KeyDownActions.arrowsModifiersCocoa;
+			},
+			\qt, {
+				modsDict = KeyDownActions.modifiersQt;
+				arrModsDict = KeyDownActions.arrowsModifiersQt;
+			}
+		);
+
 		if (\KeyDownActions.asClass.notNil and: { this.class.useKeyDownActions }) {
 			switch(GUI.id,
 				\cocoa, {

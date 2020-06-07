@@ -98,14 +98,25 @@
 
 +Synth {
 
-	cvcGui { |displayDialog=true, prefix, pairs2D, tab, environment|
+	cvcGui { |displayDialog=true, prefix, pairs2D, environment, excemptArgs, tab, completionFunc|
 		var sDef, def, cDict = (), metadata;
 		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
 		sDef = SynthDescLib.global[this.defName.asSymbol];
 		sDef.metadata !? { sDef.metadata.specs !? { metadata = sDef.metadata.specs }};
-		sDef.controlDict.pairsDo({ |n, c| cDict.put(n, c.defaultValue) });
+		sDef.controlDict.pairsDo({ |n, c|
+			if (excemptArgs.isNil) {
+				cDict.put(n, c.defaultValue)
+			} {
+				excemptArgs.indexOf(n) ?? {
+					cDict.put(n, c.defaultValue)
+				}
+			}
+		});
 		if(displayDialog, {
-			CVWidgetSpecsEditor(displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, tab, metadata, environment);
+			CVWidgetSpecsEditor(
+				displayDialog, this, this.defName.asSymbol, cDict, prefix, pairs2D, metadata,
+				environment, tab: tab, completionFunc: if (displayDialog) { completionFunc }
+			)
 		}, {
 			cDict.pairsDo({ |cName, vals|
 				block { |break|
@@ -164,10 +175,11 @@
 				CVCenter.finishGui(this, cName, nil, (
 					cName: thisName,
 					type: thisType,
-					enterTab: this.defName.asSymbol,
+					enterTab: if (tab.notNil) { tab.asSymbol } { this.defName.asSymbol },
 					controls: thisControls,
 					slots: thisSlots,
-					specSelect: thisSpec
+					specSelect: thisSpec,
+					completionFunc: if (displayDialog.not) { completionFunc }
 				))
 			})
 		})
@@ -177,18 +189,28 @@
 
 +NodeProxy {
 
-	cvcGui { |displayDialog=true, prefix, pairs2D, tab|
+	cvcGui { |displayDialog=true, prefix, pairs2D, excemptArgs, tab, completionFunc|
 		var cDict = (), name;
 		var thisType, thisControls, thisSpec, thisSlots, thisName, done=[];
-		this.getKeysValues.do({ |pair| cDict.put(pair[0], pair[1]) });
+		this.getKeysValues.do({ |pair|
+			if (excemptArgs.isNil) {
+				cDict.put(pair[0], pair[1])
+			} {
+				excemptArgs.indexOf(pair[0]) ?? {
+					cDict.put(pair[0], pair[1])
+				}
+			}
+		});
 		if(this.class === Ndef, {
 			name = this.key;
 		}, {
 			name = nil;
 		});
 		if(displayDialog, {
-			// "cDict.keys: %\n".postf(cDict.keys);
-			CVWidgetSpecsEditor(displayDialog, this, name, cDict, prefix, pairs2D, tab);
+			CVWidgetSpecsEditor(
+				displayDialog, this, name, cDict, prefix, pairs2D,
+				tab: tab, completionFunc: if (displayDialog) { completionFunc }
+			)
 		}, {
 			cDict.pairsDo({ |cName, vals|
 				block { |break|
@@ -231,10 +253,11 @@
 				CVCenter.finishGui(this, cName, nil, (
 					cName: thisName,
 					type: thisType,
-					enterTab: name,
+					enterTab: if (tab.notNil) { tab.asSymbol } { name },
 					controls: thisControls,
 					slots: thisSlots,
-					specSelect: thisSpec
+					specSelect: thisSpec,
+					completionFunc: if (displayDialog.not) { completionFunc }
 				))
 			})
 		})

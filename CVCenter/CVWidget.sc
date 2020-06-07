@@ -29,7 +29,7 @@ CVWidget {
 	var visibleGuiEls, allGuiEls, <focusElements, <isCVCWidget = false;
 	var <widgetBg, <label, <nameField, wdgtInfo; // elements contained in any kind of CVWidget
 	var widgetXY, widgetProps, <>editor;
-	var <wdgtControllersAndModels, <midiOscEnv, <>oscReplyPort;
+	var <wdgtControllersAndModels, <midiOscEnv;
 	// persistent widgets
 	var isPersistent, oldBounds, oldName;
 	// extended API
@@ -1038,25 +1038,6 @@ CVWidget {
 				^midiOscEnv[thisSlot].calibConstraints;
 			}
 		)
-	}
-
-	setOSCfeedback { |cv, cmd, port, slot|
-		var constr, thisSlot, thisMidiOscEnv;
-		switch(this.class,
-			CVWidget2D, { thisSlot = slot.asSymbol },
-			CVWidgetMS, { thisSlot = slot.asInteger }
-		);
-		switch(this.class,
-			CVWidgetKnob, { thisMidiOscEnv = midiOscEnv },
-			{ thisMidiOscEnv = midiOscEnv[thisSlot] }
-		);
-		// what if more than 1 reply-address??
-		// keep an array of NetAddresses??
-		constr = Point(midiOscEnv.calibConstraints.lo, midiOscEnv.calibConstraints.hi);
-		midiOscEnv.oscReplyAddrs.do({ |addr|
-			if(addr.port != port, { addr.port_(port) });
-			addr.sendMsg(cmd, cv.input.linlin(0, 1, constr.x, constr.y));
-		})
 	}
 
 	front {
@@ -2677,11 +2658,14 @@ CVWidget {
 				if(theChanger.value[0].size > 0, { netAddr = NetAddr(theChanger.value[0], theChanger.value[1]) });
 
 				if(midiOscEnv.oscResponder.isNil, {
-					midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;
-//					midiOscEnv.oscResponder = OSCFunc(oscResponderAction, theChanger.value[2].asSymbol, netAddr);
+					// midiOscEnv.oscResponder = OSCresponderNode(netAddr, theChanger.value[2].asSymbol, oscResponderAction).add;
+					midiOscEnv.oscResponder = OSCFunc(oscResponderAction, theChanger.value[2].asSymbol, netAddr);
 					midiOscEnv.oscMsgIndex = theChanger.value[3];
 				}, {
-					midiOscEnv.oscResponder.action_(oscResponderAction);
+					// midiOscEnv.oscResponder.action_(oscResponderAction);
+					/*midiOscEnv.oscResponder.func ?? {
+						midiOscEnv.oscResponder.add(oscResponderAction)
+					}*/
 				});
 
 				tmp = theChanger.value[2].asString++"["++theChanger.value[3].asString++"]"++"\n"++midiOscEnv.oscMapping.asString;
@@ -2704,7 +2688,11 @@ CVWidget {
 			});
 
 			if(theChanger.value == false, {
-				midiOscEnv.oscResponder.remove;
+				// old
+				/*midiOscEnv.oscResponder.remove;
+				midiOscEnv.oscResponder = nil;*/
+				midiOscEnv.oscResponder.clear;
+				midiOscEnv.oscResponder.free;
 				midiOscEnv.oscResponder = nil;
 				midiOscEnv.msgIndex = nil;
 				wcm.oscInputRange.model.value_([0.0001, 0.0001]).changedKeys(synchKeys);

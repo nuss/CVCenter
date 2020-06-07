@@ -44,6 +44,7 @@ CVCenter {
 			Class.initClassTree(\KeyDownActions.asClass);
 		};
 		Class.initClassTree(CVWidget);
+		Class.initClassTree(KeyDownActions);
 		Class.initClassTree(CVCenterShortcuts);
 
 		this.dontSave_(['select snapshot', \snapshot]);
@@ -220,7 +221,6 @@ CVCenter {
 			});
 			cBox.action_(action);
 		};
-
 
 		tab !? { thisTabLabel = tab };
 		cvs !? { this.put(*cvs) };
@@ -559,7 +559,6 @@ CVCenter {
 								connectTF: tmpConnectTF ? this.connectTextFields
 							);
 						}, {
-							// "tmpConnectS: %, tmpConnectTF: %, this.connectSliders: %, this.connectTextFields: %\n".postf(tmpConnectS, tmpConnectTF, this.connectSliders, this.connectTextFields);
 							this.prAddWidget(
 								\default,
 								key: key,
@@ -702,26 +701,25 @@ CVCenter {
 
 		tabProperties[thisTabLabel] ?? {
 			thisTab = tabs.add(thisTabLabel, scroll: true)
-				.focusAction_({ |tab|
-					this.prRegroupWidgets(tab)
-				})
-				.useDetachIcon_(true)
-				.background_(Color.black)
-				.labelColor_(labelColor)
-				.unfocusedColor_(unfocusedColor)
-				.stringColor_(Color.white)
-				.stringFocusedColor_(Color.black)
-				.onChangeParent_({ |view|
-					childViews[view.parent.parent] !? {
-						oldChildView = childViews[view.parent.parent][\tabs][view];
-					};
-					if (tabs.tabViews.includes(view), {
-						cachedView = (widgets: this.widgetsAtTab(thisTabLabel));
-					}, {
-						childViews.do({ |child|
-							cachedView = child[\tabs][view];
-							child[\tabs].removeAt(view);
-						});
+			.focusAction_({ |tab|
+				this.prRegroupWidgets(tab)
+			})
+			.useDetachIcon_(true)
+			.background_(Color.black)
+			.labelColor_(labelColor)
+			.unfocusedColor_(unfocusedColor)
+			.stringColor_(Color.white)
+			.stringFocusedColor_(Color.black)
+			.onChangeParent_({ |view|
+				childViews[view.parent.parent] !? {
+					oldChildView = childViews[view.parent.parent][\tabs][view];
+				};
+				if (tabs.tabViews.includes(view), {
+					cachedView = (widgets: this.widgetsAtTab(thisTabLabel));
+				}, {
+					childViews.do({ |child|
+						cachedView = child[\tabs][view];
+						child[\tabs].removeAt(view);
 					});
 
 					if (\KeyDownActions.asClass.notNil and: { this.useKeyDownActions }) {
@@ -752,27 +750,28 @@ CVCenter {
 						})
 					}
 				})
-				.onAfterChangeParent_({ |view|
-					view.tabbedView.window !? {
-						view.tabbedView.window.background_(Color.black).alwaysOnTop_(alwaysOnTop);
-					};
-					cachedView !? {
-						if (tabs.tabViews.includes(view).not, {
-							if (childViews[view.parent.parent].isNil, {
-								childViews.put(view.parent.parent, ());
-							});
-							childViews[view.parent.parent][\tabs] ?? {
-								childViews[view.parent.parent].put(\tabs, ());
-							};
-							childViews[view.parent.parent][\tabs].put(view, cachedView);
+			})
+			.onAfterChangeParent_({ |view|
+				view.tabbedView.window !? {
+					view.tabbedView.window.background_(Color.black).alwaysOnTop_(alwaysOnTop);
+				};
+				cachedView !? {
+					if (tabs.tabViews.includes(view).not, {
+						if (childViews[view.parent.parent].isNil, {
+							childViews.put(view.parent.parent, ());
 						});
-						window.name_("CVCenter: "++tabs.tabViews.collect(_.label));
-						childViews.pairsDo({ |child, childProps|
-							child.name_("CVCenter: "++childProps[\tabs].keys.collectAs({ |tab| tab.label }, Array));
-						});
-					};
-					childViews.pairsDo({ |child, childProps| if (childProps.tabs.size < 1, { childViews.removeAt(child) }) });
-				})
+						childViews[view.parent.parent][\tabs] ?? {
+							childViews[view.parent.parent].put(\tabs, ());
+						};
+						childViews[view.parent.parent][\tabs].put(view, cachedView);
+					});
+					window.name_("CVCenter: "++tabs.tabViews.collect(_.label));
+					childViews.pairsDo({ |child, childProps|
+						child.name_("CVCenter: "++childProps[\tabs].keys.collectAs({ |tab| tab.label }, Array));
+					});
+				};
+				childViews.pairsDo({ |child, childProps| if (childProps.tabs.size < 1, { childViews.removeAt(child) }) });
+			})
 			;
 
 			tabs.labelPadding_(10).refresh;
@@ -1175,7 +1174,8 @@ CVCenter {
 					cvWidgets[thisKey].midiOscEnv.cc = nil;
 				};
 				cvWidgets[thisKey].midiOscEnv.oscResponder !? {
-					cvWidgets[thisKey].midiOscEnv.oscResponder.remove;
+					// cvWidgets[thisKey].midiOscEnv.oscResponder.remove;
+					cvWidgets[thisKey].midiOscEnv.oscResponder.free;
 					cvWidgets[thisKey].midiOscEnv.oscResponder = nil;
 				};
 			},
@@ -1191,7 +1191,8 @@ CVCenter {
 						cvWidgets[thisKey].midiOscEnv[hilo].cc = nil;
 					};
 					cvWidgets[thisKey].midiOscEnv[hilo].oscResponder !? {
-						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder.remove;
+						// cvWidgets[thisKey].midiOscEnv[hilo].oscResponder.remove;
+						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder.free;
 						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder = nil;
 					}
 				})
@@ -1213,7 +1214,8 @@ CVCenter {
 						cvWidgets[thisKey].midiOscEnv[sl].cc = nil;
 					};
 					cvWidgets[thisKey].midiOscEnv[sl].oscResponder !? {
-						cvWidgets[thisKey].midiOscEnv[sl].oscResponder.remove;
+						// cvWidgets[thisKey].midiOscEnv[sl].oscResponder.remove;
+						cvWidgets[thisKey].midiOscEnv[sl].oscResponder.free;
 						cvWidgets[thisKey].midiOscEnv[sl].oscResponder = nil;
 					}
 				})
@@ -1274,7 +1276,8 @@ CVCenter {
 
 	*prAdd { |key, spec, value, tab, slot, svItems, connectS, connectTF|
 		var thisKey, thisSpec, thisVal, testSlot, thisSlot, thisTab, widget2DKey;
-		var specName, cvClass, thisSVItems;
+		var specName, cvClass, thisSV, thisSVItems, svKey, valPos;
+		var ret;
 
 		thisKey = key.asSymbol;
 
@@ -1282,7 +1285,16 @@ CVCenter {
 			if (svItems.isKindOf(SequenceableCollection).not, {
 				Error("svItems must be a SequenceableCollection or an instance of one of its subclasses!").throw;
 			}, {
-				thisSVItems = svItems.collect(_.asSymbol);
+				if (svItems.depth > 1) {
+					Error("'svItems' must at most contain one level of nested arrays").throw;
+				};
+				if (svItems.depth < 1) {
+					thisSVItems = svItems.collect(_.asSymbol);
+				} {
+					thisSVItems = svItems.collect { |its|
+						its.collect(_.asSymbol)
+					}
+				};
 				cvClass = SV;
 			})
 		}, {
@@ -1313,8 +1325,6 @@ CVCenter {
 				Error("Looks like you wanted to create a multi-dimensional widget. However, the given slot-value '%' is not valid!".format(slot)).throw;
 			})
 		});
-
-		// "thisSlot: %\n".postf(thisSlot);
 
 		if (spec.class == ControlSpec, { thisSpec = spec }, {
 			// CVWidgetMS
@@ -1369,8 +1379,6 @@ CVCenter {
 			widgetStates[thisKey][thisSlot] ?? { widgetStates[thisKey].put(thisSlot, ()) };
 		};
 
-		// "thisSpec: %\n".postf(thisSpec);
-
 		if (value.notNil, {
 			case
 				{ value.isNumber } { thisVal = value }
@@ -1411,34 +1419,69 @@ CVCenter {
 		}, {
 			// other CVWidgets
 			if (cvClass === SV) {
-				all[thisKey] ??	 { all.put(thisKey, cvClass.new(thisSVItems, thisVal)) };
-
+				if (svItems.depth < 1) {
+					all[thisKey] ??	 { all.put(thisKey, cvClass.new(thisSVItems, thisVal)) };
+				} {
+					svItems.do { |its, i|
+						svKey = (thisKey ++ "["++i++"]").asSymbol;
+						all[svKey] ?? {
+							if (thisVal.isArray) { valPos = thisVal.wrapAt(i) } { valPos = thisVal };
+							all.put(svKey, cvClass.new(its, valPos));
+						}
+					}
+				}
 			} {
 				all[thisKey] ?? { all.put(thisKey, cvClass.new(thisSpec, thisVal)) };
 			};
 			// "this.at('%').items: %\n".postf(thisKey, all[thisKey].items);
 			// "all['%'].items.unbubble.isNil: %\n".postf(thisKey, all[thisKey].items.unbubble.isNil);
 			// most mysterious line of code ever...
-			if (cvClass === SV and:{ all[thisKey].items.unbubble.isNil }, {
-				all[thisKey].items_(thisSVItems)
-			});
+			if (cvClass === SV) {
+				if (thisSVItems.depth < 1) {
+					all[thisKey].items.unbubble ?? {
+						all[thisKey].items_(thisSVItems)
+					}
+				} {
+					thisSVItems.do { |its, i|
+						thisSV = all[(thisKey ++ "["++i++"]").asSymbol];
+						thisSV.items.unbubble ?? {
+							thisSV.items_(its)
+						}
+					}
+				}
+			}
 		});
 
 		if (window.isNil or:{ window.isClosed }, {
-			// "front: %, key: %\n".postf(thisTab, thisKey);
 			this.front(thisTab);
 		}, {
-			// "prAddWidget: %\n".postf(thisKey);
-			if (cvWidgets[thisKey].isNil or: { cvWidgets[thisKey].class == CVWidget2D })  {
-				this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
+			if (svItems.notNil and: svItems.depth == 1) {
+				svItems.size.do { |i|
+					svKey = (thisKey ++ "["++i++"]").asSymbol;
+					cvWidgets[svKey] ?? {
+						this.prAddWidget(thisTab, nil, svKey, connectS, connectTF);
+					}
+				}
+			} {
+				if (cvWidgets[thisKey].isNil or: { cvWidgets[thisKey].class == CVWidget2D }) {
+					this.prAddWidget(thisTab, widget2DKey, thisKey, connectS, connectTF);
+				}
 			}
 		});
 
 		if (slot.notNil, {
-			^all[thisKey][thisSlot];
+			ret = all[thisKey][thisSlot];
 		}, {
-			^all[thisKey];
-		})
+			if (svItems.isNil or: { svItems.depth < 1 }) {
+				ret = all[thisKey];
+			} {
+				ret = svItems.collect { |its, i|
+					all[(thisKey ++ "["++i++"]").asSymbol]
+				}
+			}
+		});
+
+		^ret;
 	}
 
 	// spec inference - if it does not find the name, zaps all the non-alpha and looks again
@@ -1665,10 +1708,12 @@ CVCenter {
 									},
 									osc: (
 										addr: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
-											cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
+											// cvWidgets[k].midiOscEnv[hilo].oscResponder.addr
+											cvWidgets[k].midiOscEnv[hilo].oscResponder.srcID
 										},
 										cmdName: cvWidgets[k].midiOscEnv[hilo].oscResponder !? {
-											cvWidgets[k].midiOscEnv[hilo].oscResponder.cmdName
+											// cvWidgets[k].midiOscEnv[hilo].oscResponder.cmdName
+											cvWidgets[k].midiOscEnv[hilo].oscResponder.path
 										},
 										msgIndex: cvWidgets[k].midiOscEnv[hilo].oscMsgIndex,
 										calibConstraints: cvWidgets[k].getOscInputConstraints(hilo),
@@ -1696,10 +1741,12 @@ CVCenter {
 								}),
 								osc: (
 									addr: cvWidgets[k].midiOscEnv.oscResponder !? {
-										cvWidgets[k].midiOscEnv.oscResponder.addr
+										// cvWidgets[k].midiOscEnv.oscResponder.addr
+										cvWidgets[k].midiOscEnv.oscResponder.srcID
 									},
 									cmdName: cvWidgets[k].midiOscEnv.oscResponder !? {
-										cvWidgets[k].midiOscEnv.oscResponder.cmdName
+										// cvWidgets[k].midiOscEnv.oscResponder.cmdName
+										cvWidgets[k].midiOscEnv.oscResponder.path
 									},
 									msgIndex: cvWidgets[k].midiOscEnv.oscMsgIndex,
 									calibConstraints: cvWidgets[k].getOscInputConstraints,
@@ -1733,8 +1780,10 @@ CVCenter {
 							cvWidgets[k].size.do({ |sl|
 								// osc
 								cvWidgets[k].midiOscEnv[sl].oscResponder !? {
-									lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.addr;
-									lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.cmdName;
+									// lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.addr;
+									lib[\all][k].osc[sl].addr = cvWidgets[k].midiOscEnv[sl].oscResponder.srcID;
+									// lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.cmdName;
+									lib[\all][k].osc[sl].cmdName = cvWidgets[k].midiOscEnv[sl].oscResponder.path;
 								};
 								lib[\all][k].osc[sl].msgIndex = cvWidgets[k].midiOscEnv[sl].oscMsgIndex;
 								lib[\all][k].osc[sl].calibConstraints = cvWidgets[k].getOscInputConstraints(sl);
@@ -2089,7 +2138,6 @@ CVCenter {
 										cvWidgets[key].split;
 									}
 								};
-								"added a CVWidgetMS: '%'\n".postf(key);
 							}
 						);
 
@@ -2409,7 +2457,6 @@ CVCenter {
 				})
 			})
 		}, {
-			// "varNames: %, more: %\n".postf(varNames, more);
 			addActionFunc = {
 				if (varNames.size > 0, {
 					varNames.do({ |v, j|
@@ -2444,7 +2491,6 @@ CVCenter {
 			case
 				{ more.slots.size == 1 } {
 					this.prAdd(more.cName, thisSpec, more.slots[0], more.enterTab);
-					varNames.postln;
 					if (varNames.size > 0, {
 						varNames.do({ |v, j|
 							if (j == 0, { activate = true }, { activate = false });
