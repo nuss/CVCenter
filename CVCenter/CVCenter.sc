@@ -1173,10 +1173,10 @@ CVCenter {
 			if (svItems.isKindOf(SequenceableCollection).not, {
 				Error("svItems must be a SequenceableCollection or an instance of one of its subclasses!").throw;
 			}, {
-				if (svItems.depth > 2) {
+				if (svItems.depth > 1) {
 					Error("'svItems' must at most contain one level of nested arrays").throw;
 				};
-				if (svItems.depth < 2) {
+				if (svItems.depth < 1) {
 					thisSVItems = svItems.collect(_.asSymbol);
 				} {
 					thisSVItems = svItems.collect { |its|
@@ -1307,7 +1307,7 @@ CVCenter {
 		}, {
 			// other CVWidgets
 			if (cvClass === SV) {
-				if (svItems.depth < 2) {
+				if (svItems.depth < 1) {
 					all[thisKey] ??	 { all.put(thisKey, cvClass.new(thisSVItems, thisVal)) };
 				} {
 					svItems.do { |its, i|
@@ -1325,7 +1325,7 @@ CVCenter {
 			// "all['%'].items.unbubble.isNil: %\n".postf(thisKey, all[thisKey].items.unbubble.isNil);
 			// most mysterious line of code ever...
 			if (cvClass === SV) {
-				if (thisSVItems.depth < 2) {
+				if (thisSVItems.depth < 1) {
 					all[thisKey].items.unbubble ?? {
 						all[thisKey].items_(thisSVItems)
 					}
@@ -1343,7 +1343,7 @@ CVCenter {
 		if (window.isNil or:{ window.isClosed }, {
 			this.front(thisTab);
 		}, {
-			if (svItems.notNil and: svItems.depth == 2) {
+			if (svItems.notNil and: svItems.depth == 1) {
 				svItems.size.do { |i|
 					svKey = (thisKey ++ "["++i++"]").asSymbol;
 					cvWidgets[svKey] ?? {
@@ -1360,7 +1360,7 @@ CVCenter {
 		if (slot.notNil, {
 			ret = all[thisKey][thisSlot];
 		}, {
-			if (svItems.isNil or: { svItems.depth < 2 }) {
+			if (svItems.isNil or: { svItems.depth < 1 }) {
 				ret = all[thisKey];
 			} {
 				ret = svItems.collect { |its, i|
