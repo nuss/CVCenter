@@ -78,6 +78,46 @@ a link::Classes/String:: or a link::Classes/Symbol:: - the tab under which the w
 argument:: slot
 only needed if a link::Classes/CVWidget2D:: shall be created. Either code::\lo:: or code::\hi::
 
+argument:: svItems
+if given, an link::Classes/SV:: will be returned instead of a link::Classes/CV:: (SV is a subclass of CV). An SV allows you to create dropdown menus, controlled by a CV. code::svItems:: must be given as an array of link::Classes/String::s/link::Classes/Symbol::s or an array of arrays of link::Classes/String::s/link::Classes/Symbol::s. While a one-dimensional array will create a singe SV the latter will produce an array of SVs, one for each nested array.
+
+argument:: connectS
+a link::Classes/Boolean::, indicating whether the resulting CVWidget's sliders should be connected instantly (fast moving sliders can put can put quite some weight on the CPU, so sometimes it may be useful to not connect them)
+
+argument:: cennectTF
+a link::Classes/Boolean::, indicating whether textfields in the resulting CVWidget should be connected instantly (see note on argument 'connectS').
+
+CODE::
+CVCenter.use(\knob, \freq); 					// create a CVWidgetKnob with a frequency ControlSpec
+CVCenter.use(\slider2D, \phase, slot: \lo); 	// create a 2D slider with a phase ControlSpec for the \lo slot
+												// a \hi slot with a default \unipolar ControlSpec will be created as well
+CVCenter.use(\slider2D, \phase, slot: \hi); 	// it's safe to call CVCenter.use for same key but for the \hi slot
+												// the original \unipolar spec is now replaced with a \phase spec
+CVCenter.use(\multislider, [20, 1000, \exp] ! 5);		// create a CVWidgetMS (a multislider with 5 sliders) with an custom ControlSpec
+(
+// create 4 CVWidgetKnobs, returning an array of 5 SVs
+CVCenter.use(\sv, svItems: [
+	[\white, \black],
+	[\green, \yellow],
+	[\orange, \blue],
+	[\pink, \brown]
+])
+)
+
+(
+// create a window, holding 4 popup menus and connect them to the just created SVs
+w = Window("SV multi test", Rect(0, 0, 350, 200));
+p = 4.collect { |i|
+	PopUpMenu(w, Rect(20, 20+(i*40), w.view.bounds.width-40, 40))
+};
+w.front;
+
+p.do { |pop, i|
+	CVCenter.at((\sv ++ "["++i++"]").asSymbol).connect(pop)
+}
+)
+::
+
 returns:: a link::Classes/CV::
 
 

@@ -1300,7 +1300,9 @@ CVCenter {
 				all[thisKey][thisSlot].spec_(thisSpec);
 				if (cvClass === SV and:{
 					all[thisKey][thisSlot].items.unbubble.isNil
-				}, { all[thisKey][thisSlot].items_(thisSVItems) });
+				}, {
+					all[thisKey][thisSlot].items_(thisSVItems)
+				});
 				widget2DKey = (key: thisKey, slot: thisSlot, spec: thisSpec);
 				widgetStates[thisKey][thisSlot].made = true;
 			})
@@ -1343,7 +1345,7 @@ CVCenter {
 		if (window.isNil or:{ window.isClosed }, {
 			this.front(thisTab);
 		}, {
-			if (svItems.notNil and: svItems.depth == 1) {
+			if (svItems.notNil and: { svItems.depth == 1 }) {
 				svItems.size.do { |i|
 					svKey = (thisKey ++ "["++i++"]").asSymbol;
 					cvWidgets[svKey] ?? {
