@@ -1,5 +1,7 @@
 INSTANCEMETHODS::
 
+SUBSECTION:: Extensions from CVCenter
+
 METHOD:: depth
 A simple method to determine the levels of nesting within a Collection. A Collection with no nested Collections simply returns code::0::.
 
@@ -11,7 +13,7 @@ CODE::
 A Collection may have nested Collections of different types:
 
 CODE::
-List[8, 9, (a: 89, b: Set(8, 10, IdentityDictionary[\a -> 6, \b -> 12]), g: \aaa)].depth // 2
+List[8, 9, (a: 89, b: Set[8, 10, IdentityDictionary[\a -> 6, \b -> [1, 2, 3]]], g: \aaa)].depth // 4
 ::
 
 RETURNS:: an link::Classes/Integer::
