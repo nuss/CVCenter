@@ -1181,7 +1181,7 @@ CVCenter {
 				} {
 					thisSVItems = svItems.collect { |its|
 						its.collect(_.asSymbol)
-					}
+					};
 				};
 				cvClass = SV;
 			})

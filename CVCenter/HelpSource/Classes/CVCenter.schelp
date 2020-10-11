@@ -84,7 +84,7 @@ if given, an link::Classes/SV:: will be returned instead of a link::Classes/CV::
 argument:: connectS
 a link::Classes/Boolean::, indicating whether the resulting CVWidget's sliders should be connected instantly (fast moving sliders can put can put quite some weight on the CPU, so sometimes it may be useful to not connect them)
 
-argument:: cennectTF
+argument:: connectTF
 a link::Classes/Boolean::, indicating whether textfields in the resulting CVWidget should be connected instantly (see note on argument 'connectS').
 
 CODE::
