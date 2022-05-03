@@ -1,0 +1,16 @@
+(
+	name: "CVCenter",
+	summary: "A collection of widgets built around CVs (originally part of Ron Kuivilla's Conductor library), as well as a GUI, allowing to easily connect to external MIDI or OSC hard/software to control Synths, NodeProxies and even Patterns."
+	version: "1.0.0",
+	schelp: "CVCenter",
+	dependencies: ["CVCenter", "CVmin", "TabbedView2", "wslib"],
+	copyright: "Stefan Nussbaumer",
+	license: "GPL3",
+	isCompatible: {
+		\CVCenter.asClass.notNil and: {
+			\CV.asClass.notNil and: {
+				\TabbedView2.asClass.notNil
+			}
+		}
+	}
+)
