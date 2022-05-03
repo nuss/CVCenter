@@ -1378,7 +1378,7 @@ CVCenter {
 	// This allows "freq 1" to resolve to \freq
 	*findSpec { |name|
 		var spec = name.asSymbol.asSpec;
-		spec ?? { spec = name.asString.select({ |c| c.isAlpha }).asSymbol.asSpec };
+		spec ?? { spec = name.asString.findSpec };
 		^spec;
 	}
 
@@ -1768,7 +1768,7 @@ CVCenter {
 									if (loadActions, {
 										v[hilo].actions !? {
 											v[hilo].actions.pairsDo({ |ak, av|
-												this.addActionAt(key, ak, av.asArray[0][0], hilo, av.asArray[0]	[1]);
+												this.addActionAt(key, ak, av.asArray[0][0], hilo, av.asArray[0][1]);
 											})
 										}
 									});
@@ -2228,7 +2228,7 @@ CVCenter {
 
 	/* utilities */
 
-	// key/value array way to connect CV's to a node
+	// key/value array way to connect CVs to a node
 	// this allows a number of variants documented in the Conductor help file (see below)
 	*connectToNode { |node, kvArray, environment|
 		var cvcKeys = [], nodeVars, activate;

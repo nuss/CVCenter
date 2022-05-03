@@ -200,9 +200,7 @@
 +Symbol {
 
 	findSpec {
-		var spec = this.asSpec;
-		spec ?? { spec = this.asString.select(_.isAlpha).asSymbol.asSpec };
-		^spec;
+		^this.asString.findSpec;
 	}
 
 }
@@ -210,7 +208,7 @@
 +IdentityDictionary {
 
 	findKeyForEqualValue { arg argValue;
-		this.keysValuesArrayDo(array, { arg key, val, i;
+		this.keysValuesArrayDo(array, { arg key, val;
 			if (argValue == val, { ^key })
 		});
 		^nil
