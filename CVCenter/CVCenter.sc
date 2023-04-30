@@ -1577,7 +1577,7 @@ CVCenter {
 	}
 
 	*saveSetup { |path|
-		var lib, successFunc;
+		var lib, successFunc, wdgtArgs;
 		successFunc = { |f|
 			lib = Library();
 			lib.put( \all, ());
@@ -1623,8 +1623,14 @@ CVCenter {
 							})
 						},
 						CVWidgetKnob, {
+							switch (cvWidgets[k].widgetCV.class)
+							{ CV } {
+								wdgtArgs = (spec: cvWidgets[k].widgetCV.spec)
+							}
+							{ SV } {
+								wdgtArgs = (svItems: cvWidgets[k].widgetCV.items)
+							};
 							lib[\all][k] = (
-								spec: cvWidgets[k].widgetCV.spec,
 								val: cvWidgets[k].widgetCV.value,
 								actions: cvWidgets[k].wdgtActions.reject({ |k|
 									"open Function".matchRegexp(k.values[0][0])
@@ -1653,7 +1659,8 @@ CVCenter {
 									ctrlButtonBank: cvWidgets[k].getCtrlButtonBank
 								),
 								wdgtClass: CVWidgetKnob
-							)
+							);
+							lib[\all][k] = lib[\all][k] ++ wdgtArgs
 						},
 						CVWidgetMS, {
 							lib[\all][k] = (
@@ -1846,7 +1853,11 @@ CVCenter {
 								});
 							},
 							CVWidgetKnob, {
-								this.prAdd(key, v.spec, v.val, v.tabLabel);
+								if (v.svItems.notNil) {
+									this.prAdd(key, value: v.val, tab: v.tabLabel, svItems: v.svItems)
+								} {
+									this.prAdd(key, v.spec, v.val, v.tabLabel);
+								};
 								cvWidgets[key].setMidiMode(v.midi.midiMode)
 									.setMidiMean(v.midi.midiMean)
 									.setSoftWithin(v.midi.softWithin)
