@@ -181,7 +181,7 @@ CVWidget {
 		var act, controller, thisEditor;
 
 		// "\nACTION!!!\n".postln;
-		// "this.guiEnv: %\n".postf(this.guiEnv.asCompileString);
+		// "slot: %\n, this.guiEnv: %\n".postf(slot, this.guiEnv.asCompileString);
 
 		switch(this.class,
 			CVWidgetKnob, { thisEditor = this.guiEnv.editor },
