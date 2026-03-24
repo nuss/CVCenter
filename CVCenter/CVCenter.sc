@@ -1062,7 +1062,6 @@ CVCenter {
 					cvWidgets[thisKey].midiOscEnv.cc = nil;
 				};
 				cvWidgets[thisKey].midiOscEnv.oscResponder !? {
-					// cvWidgets[thisKey].midiOscEnv.oscResponder.remove;
 					cvWidgets[thisKey].midiOscEnv.oscResponder.free;
 					cvWidgets[thisKey].midiOscEnv.oscResponder = nil;
 				};
@@ -1079,7 +1078,6 @@ CVCenter {
 						cvWidgets[thisKey].midiOscEnv[hilo].cc = nil;
 					};
 					cvWidgets[thisKey].midiOscEnv[hilo].oscResponder !? {
-						// cvWidgets[thisKey].midiOscEnv[hilo].oscResponder.remove;
 						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder.free;
 						cvWidgets[thisKey].midiOscEnv[hilo].oscResponder = nil;
 					}
@@ -1102,7 +1100,6 @@ CVCenter {
 						cvWidgets[thisKey].midiOscEnv[sl].cc = nil;
 					};
 					cvWidgets[thisKey].midiOscEnv[sl].oscResponder !? {
-						// cvWidgets[thisKey].midiOscEnv[sl].oscResponder.remove;
 						cvWidgets[thisKey].midiOscEnv[sl].oscResponder.free;
 						cvWidgets[thisKey].midiOscEnv[sl].oscResponder = nil;
 					}
@@ -1730,7 +1727,9 @@ CVCenter {
 					defaultName: "Setup",
 					successFunc: successFunc
 				)
-			}, { Dialog.savePanel(successFunc, path: setupPath) })
+			}, {
+				{ Dialog.savePanel(successFunc, path: setupPath) }.defer(0.1)
+			})
 		}, {
 			successFunc.(path);
 		});
@@ -2101,7 +2100,7 @@ CVCenter {
 
 		if (path.isNil, {
 			if (GUI.id === \qt, {
-				Dialog.openPanel(successFunc, path: setupPath);
+				{ Dialog.openPanel(successFunc, path: setupPath) }.defer(0.1);
 			}, {
 				File.openDialog(
 					prompt: "Please choose a setup",
@@ -2422,6 +2421,38 @@ CVCenter {
 		});
 
 		^obj;
+	}
+
+	*postCmdPathsInUse {
+		var resp, res;
+
+		res = List[];
+		cvWidgets.collectAs({ |wdgt| wdgt.name.asSymbol -> wdgt.midiOscEnv }, IdentityDictionary).pairsDo { |name, env|
+			// [name, env].postln;
+			if (env.class == Array) {
+				resp = env.collect({ |e| e.oscResponder !? { e.oscResponder.path }})
+			} {
+				if (env.size == 2) {
+					resp = [env.lo !? { env.lo.oscResponder.path }, env.hi !? { env.hi.oscResponder.path }]
+				} {
+					resp = env.oscResponder !? { env.oscResponder.path }
+				}
+			};
+			[resp, name].pairsDo { |k, v| k !? {
+				if (k.isArray) {
+					k.do { |path|
+						path !? {
+							res.add([path, v])
+						}
+					}
+				} {
+					k !? {
+						res.add([k, v])
+					}
+				}
+			}}
+		};
+		res.sort({ |a, b| a[0] < b[0] }).do(_.postln);""
 	}
 
 	*getCmdNamesAndAddressesInUse {

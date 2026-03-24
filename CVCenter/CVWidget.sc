@@ -209,7 +209,7 @@ CVWidget {
 				this.wdgtActions[slot.asSymbol][name.asSymbol] ?? { this.wdgtActions[slot.asSymbol].put(name.asSymbol, ()) };
 				if(this.wdgtActions[slot.asSymbol][name.asSymbol].size < 1, {
 					if(active == true, {
-						controller = widgetCV[slot.asSymbol].action_(act);
+						controller = widgetCV[slot.asSymbol].addController(act);
 						this.wdgtActions[slot.asSymbol][name.asSymbol].put(controller, [act.asCompileString, true]);
 					}, {
 						controller = \dummy;
@@ -235,7 +235,7 @@ CVWidget {
 				this.wdgtActions[name.asSymbol] ?? {
 					this.wdgtActions.put(name.asSymbol, ());
 					if(active == true, {
-						controller = widgetCV.action_(act);
+						controller = widgetCV.addController(act);
 						this.wdgtActions[name.asSymbol].put(controller, [act.asCompileString, true]);
 					}, {
 						controller = \dummy;
@@ -350,7 +350,7 @@ CVWidget {
 						}, {
 							thisAction = action.asArray[0][0];
 						});
-						controller = cv.action_(thisAction);
+						controller = cv.addController(thisAction);
 						action.put(controller, [thisAction.asCompileString, true]);
 						action.removeAt(\dummy);
 					})
