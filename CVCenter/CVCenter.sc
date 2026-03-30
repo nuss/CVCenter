@@ -2432,8 +2432,11 @@ CVCenter {
 			if (env.class == Array) {
 				resp = env.collect({ |e| e.oscResponder !? { e.oscResponder.path }})
 			} {
-				if (env.size == 2) {
-					resp = [env.lo !? { env.lo.oscResponder.path }, env.hi !? { env.hi.oscResponder.path }]
+				if (env.class == Event) {
+					resp = [
+						env.lo !? { env.lo.oscResponder !? { env.lo.oscResponder.path }},
+						env.hi !? { env.hi.oscResponder !? { env.hi.oscResponder.path }}
+					]
 				} {
 					resp = env.oscResponder !? { env.oscResponder.path }
 				}
@@ -2445,11 +2448,7 @@ CVCenter {
 							res.add([path, v])
 						}
 					}
-				} {
-					k !? {
-						res.add([k, v])
-					}
-				}
+				} { res.add([k, v]) }
 			}}
 		};
 		res.sort({ |a, b| a[0] < b[0] }).do(_.postln);""
@@ -2462,8 +2461,11 @@ CVCenter {
 			if (env.class == Array) {
 				env.collect({ |e| e.oscResponder !? { e.oscResponder }})
 			} {
-				if (env.size == 2) {
-					[env.lo !? { env.lo.oscResponder }, env.hi !? { env.hi.oscResponder }]
+				if (env.class == Event) {
+					[
+						env.lo !? { env.lo.oscResponder !? { env.lo.oscResponder.path }},
+						env.hi !? { env.hi.oscResponder !? { env.hi.oscResponder.path }}
+					]
 				} {
 					env.oscResponder !? { env.oscResponder }
 				}
