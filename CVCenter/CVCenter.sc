@@ -2428,17 +2428,17 @@ CVCenter {
 
 		res = List[];
 		cvWidgets.collectAs({ |wdgt| wdgt.name.asSymbol -> wdgt.midiOscEnv }, IdentityDictionary).pairsDo { |name, env|
-			// [name, env].postln;
+			// "name: %\nenv: %\n env.class: %\n".format(name, env, env.class).postln;
 			if (env.class == Array) {
 				resp = env.collect({ |e| e.oscResponder !? { e.oscResponder.path }})
 			} {
-				if (env.class == Event) {
+				if (env.hi.notNil.or(env.lo.notNil)) {
 					resp = [
 						env.lo !? { env.lo.oscResponder !? { env.lo.oscResponder.path }},
 						env.hi !? { env.hi.oscResponder !? { env.hi.oscResponder.path }}
 					]
 				} {
-					resp = env.oscResponder !? { env.oscResponder.path }
+					resp = env.oscResponder !? { env.oscResponder.path };
 				}
 			};
 			[resp, name].pairsDo { |k, v| k !? {
